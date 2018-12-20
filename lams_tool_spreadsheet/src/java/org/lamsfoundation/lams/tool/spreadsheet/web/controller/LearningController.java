@@ -168,9 +168,7 @@ public class LearningController {
 	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, false);
 	}
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(sessionId));
 
 	return "pages/learning/learning";
     }

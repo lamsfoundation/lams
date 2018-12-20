@@ -29,15 +29,19 @@ import java.util.List;
 
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
+import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Leaderselection Service
  */
-public interface ILeaderselectionService {
+public interface ILeaderselectionService extends ICommonToolService {
 
     /**
      * Get users by given toolSessionId.
@@ -133,6 +137,8 @@ public interface ILeaderselectionService {
      * @return
      */
     LeaderselectionUser createLeaderselectionUser(UserDTO user, LeaderselectionSession leaderselectionSession);
+    
+    String finishToolSession(Long toolSessionId, Long userId);
 
     /**
      *
@@ -160,13 +166,4 @@ public interface ILeaderselectionService {
      * @param entry
      */
     void updateEntry(Long uid, String entry);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

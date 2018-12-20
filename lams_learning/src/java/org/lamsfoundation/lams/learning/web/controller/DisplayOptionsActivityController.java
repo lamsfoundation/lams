@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -45,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display an OptionsActivity.
@@ -61,18 +61,14 @@ public class DisplayOptionsActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets an options activity from the request (attribute) and forwards to the display JSP.
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/DisplayOptionsActivity")
     public String execute(@ModelAttribute OptionsActivityForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
@@ -90,7 +86,7 @@ public class DisplayOptionsActivityController {
 	Iterator<Activity> i = subActivities.iterator();
 	int completedCount = 0;
 	while (i.hasNext()) {
-	    ActivityURL activityURL = LearningWebUtil.getActivityURL(actionMappings, learnerProgress, i.next(), false,
+	    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress, i.next(), false,
 		    false);
 	    if (activityURL.isComplete()) {
 		completedCount++;
@@ -114,8 +110,11 @@ public class DisplayOptionsActivityController {
 	form.setLessonID(learnerProgress.getLesson().getLessonId());
 	form.setProgressID(learnerProgress.getLearnerProgressId());
 
-	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request,
-		applicationContext.getServletContext());
+	//find activity position within Learning Design and stores it as request attribute.
+	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(form.getActivityID());
+	if (positionDTO != null) {
+	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	}
 
 	// lessonId needed for the progress bar
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());

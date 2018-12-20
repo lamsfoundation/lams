@@ -260,9 +260,7 @@ public class LearningController {
 	peerreview.setDefineLater(false);
 	service.saveOrUpdatePeerreview(peerreview);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(sessionId));
 
 	//markUser as not Finished if it's redo
 	boolean isRedo = WebUtil.readBooleanParam(request, "isRedo", false);

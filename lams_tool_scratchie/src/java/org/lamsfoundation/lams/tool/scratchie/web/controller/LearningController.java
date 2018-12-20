@@ -185,9 +185,7 @@ public class LearningController {
 	    return "pages/learning/definelater";
 	}
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
-		request, applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, scratchieService.isLastActivity(toolSessionId));
 
 	// check if there is submission deadline
 	Date submissionDeadline = scratchie.getSubmissionDeadline();

@@ -175,9 +175,7 @@ public class LearningController {
 	commonCartridge.setDefineLater(false);
 	commonCartridgeService.saveOrUpdateCommonCartridge(commonCartridge);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, commonCartridgeService.isLastActivity(sessionId));
 
 	// init commonCartridge item list
 	SortedSet<CommonCartridgeItem> commonCartridgeItemList = getCommonCartridgeItemList(sessionMap);

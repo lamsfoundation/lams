@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Jacky Fang
@@ -135,6 +137,13 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public String completeToolSession(Long toolSessionId, Long learnerId) {
 	return learnerService.completeToolSession(toolSessionId, learnerId);
+    }
+
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
+	//check whether Activity is the last
+	return (positionDTO != null) && positionDTO.getLast();
     }
 
     @Override

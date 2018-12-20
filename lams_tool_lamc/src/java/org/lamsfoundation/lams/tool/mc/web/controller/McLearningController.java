@@ -495,10 +495,7 @@ public class McLearningController {
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 	mcGeneralLearnerFlowDTO.setQuestionIndex(questionIndex);
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
-
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mcService.isLastActivity(new Long(toolSessionID)));
 	request.setAttribute("sessionMapID", sessionMap.getSessionID());
 
 	return "learning/AnswersContent";
@@ -639,10 +636,7 @@ public class McLearningController {
 	}
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
-
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mcService.isLastActivity(new Long(toolSessionID)));
 	return "learning/ViewAnswers";
     }
 

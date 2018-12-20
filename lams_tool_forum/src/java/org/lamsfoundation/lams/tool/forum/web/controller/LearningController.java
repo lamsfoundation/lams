@@ -196,10 +196,7 @@ public class LearningController {
 		forumService.getLearnerContentFolder(sessionId, forumUser.getUserId()));
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_REPLY, forum.getMinimumReply());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
-
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, forumService.isLastActivity(sessionId));
 
 	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(forumUser.getUid(), forum.getUid());
 	boolean noMoreRatings = (forum.getMaximumRate() != 0) && (numOfRatings >= forum.getMaximumRate())

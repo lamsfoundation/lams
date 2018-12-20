@@ -53,6 +53,7 @@
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="finishToolSession">PROPAGATION_REQUIRED</prop>
                 <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
 				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>

@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -46,7 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Andrey Balan
  */
-public interface IImageGalleryService extends ToolRatingManager {
+public interface IImageGalleryService extends ToolRatingManager, ICommonToolService {
 
     /**
      * Get a cloned copy of tool default tool content (ImageGallery) and assign the toolContentId of that copy as the
@@ -306,19 +307,4 @@ public interface IImageGalleryService extends ToolRatingManager {
     void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);
 
     void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

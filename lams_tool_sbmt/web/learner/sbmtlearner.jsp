@@ -380,7 +380,7 @@
 			<c:otherwise>
 				<button type="submit" onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
 					<c:choose>
-						<c:when test="${activityPosition.last}">
+						<c:when test="${isLastActivity}">
 							<fmt:message key="button.submit" />
 						</c:when>
 						<c:otherwise>

@@ -294,7 +294,7 @@ table.alternative-color td:first-child {
 						<button type="submit" id="finishButton" onclick="return finishSession()"
 							class="btn btn-primary pull-right na">
 							<span class="nextActivity"> <c:choose>
-									<c:when test="${sessionMap.activityPosition.last}">
+									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="label.submit" />
 									</c:when>
 

@@ -833,6 +833,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     public void setMindmapNodeDAO(IMindmapNodeDAO mindmapNodeDAO) {
 	this.mindmapNodeDAO = mindmapNodeDAO;

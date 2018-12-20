@@ -37,7 +37,7 @@
 
 			<button type="submit" class="btn btn-primary voffset10 pull-right na" id="finishButton">
 				<c:choose>
-					<c:when test="${sessionMap.activityPosition.last}">
+					<c:when test="${sessionMap.isLastActivity}">
 						<fmt:message key="label.submit" />
 					</c:when>
 					<c:otherwise>

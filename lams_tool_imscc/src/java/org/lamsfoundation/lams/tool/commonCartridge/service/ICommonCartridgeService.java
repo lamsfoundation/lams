@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigI
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  *         Interface that defines the contract that all ShareCommonCartridge service provider must follow.
  */
-public interface ICommonCartridgeService {
+public interface ICommonCartridgeService extends ICommonToolService {
 
     /**
      * Get <code>CommonCartridge</code> by toolContentID.
@@ -281,11 +282,4 @@ public interface ICommonCartridgeService {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

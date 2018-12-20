@@ -46,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display an OptionsActivity.
@@ -64,18 +63,14 @@ public class BranchingActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
-
+    private ActivityMapping activityMapping;
+    
     /**
      * Gets an options activity from the request (attribute) and forwards to the display JSP.
      */
     @RequestMapping("/performBranching")
     public String performBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request, HttpServletResponse response) {
-
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Integer learnerId = LearningWebUtil.getUserId();
@@ -85,7 +80,7 @@ public class BranchingActivityController {
 
 	if (activity == null) {
 	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
-	    forward = actionMappings.getActivityForward(activity, learnerProgress, true);
+	    forward = activityMapping.getActivityForward(activity, learnerProgress, true);
 
 	} else if (!(activity instanceof BranchingActivity)) {
 	    log.error("activity not BranchingActivity " + activity.getActivityId());
@@ -111,11 +106,11 @@ public class BranchingActivityController {
 		forward = "branching/preview";
 
 		List<ActivityURL> activityURLs = new ArrayList<>();
-		Iterator i = branchingActivity.getActivities().iterator();
+		Iterator<Activity> i = branchingActivity.getActivities().iterator();
 		int completedCount = 0;
 		while (i.hasNext()) {
-		    Activity nextBranch = (Activity) i.next();
-		    ActivityURL activityURL = LearningWebUtil.getActivityURL(actionMappings, learnerProgress,
+		    Activity nextBranch = i.next();
+		    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress,
 			    nextBranch, (branch != null) && branch.equals(nextBranch), false);
 		    if (activityURL.isComplete()) {
 			completedCount++;
@@ -149,7 +144,7 @@ public class BranchingActivityController {
 		// Set the branch as the current part of the sequence and display it
 		learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 			branch, true);
-		forward = actionMappings.getActivityForward(branch, learnerProgress, true);
+		forward = activityMapping.getActivityForward(branch, learnerProgress, true);
 	    }
 	}
 
@@ -162,10 +157,6 @@ public class BranchingActivityController {
     @RequestMapping("/forceBranching")
     public String forceBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request) {
-
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Integer learnerId = LearningWebUtil.getUserId();
@@ -173,7 +164,7 @@ public class BranchingActivityController {
 
 	if (activity == null) {
 	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
-	    forward = actionMappings.getActivityForward(activity, learnerProgress, true);
+	    forward = activityMapping.getActivityForward(activity, learnerProgress, true);
 
 	} else if (!(activity instanceof BranchingActivity)) {
 	    log.error("activity not BranchingActivity " + activity.getActivityId());
@@ -201,7 +192,7 @@ public class BranchingActivityController {
 	    // Set the branch as the current part of the sequence and display it
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 		    branch, true);
-	    forward = actionMappings.getActivityForward(branch, learnerProgress, true);
+	    forward = activityMapping.getActivityForward(branch, learnerProgress, true);
 	}
 
 	return forward;

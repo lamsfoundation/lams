@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
@@ -42,7 +43,7 @@ import org.lamsfoundation.lams.util.MessageService;
  *
  *         Interface that defines the contract that all ShareSpreadsheet service provider must follow.
  */
-public interface ISpreadsheetService {
+public interface ISpreadsheetService extends ICommonToolService {
 
     /**
      * Get <code>Spreadsheet</code> by toolContentID.
@@ -232,19 +233,4 @@ public interface ISpreadsheetService {
      * @param sessionId
      */
     public void releaseMarksForSession(Long sessionId);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

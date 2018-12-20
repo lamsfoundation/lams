@@ -700,6 +700,11 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods

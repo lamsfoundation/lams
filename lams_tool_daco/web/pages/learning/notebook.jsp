@@ -40,7 +40,7 @@
 				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity">
 						<c:choose>
-		 					<c:when test="${sessionMap.activityPosition.last}">
+		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />
 		 					</c:when>
 		 					<c:otherwise>

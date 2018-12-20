@@ -185,9 +185,7 @@ public class LearningController {
 	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedImages);
 	}
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, igService.isLastActivity(sessionId));
 
 	// Create set of images, along with this filtering out items added by users from other groups
 	TreeSet<ImageGalleryItem> images = new TreeSet<>(new ImageGalleryItemComparator());

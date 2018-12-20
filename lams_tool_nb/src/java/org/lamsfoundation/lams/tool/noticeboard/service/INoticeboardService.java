@@ -30,13 +30,14 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 
 /**
  * Defines the contract that the tool service provider must follow
  *
  * @author mtruong
  */
-public interface INoticeboardService {
+public interface INoticeboardService extends ICommonToolService {
 
     // ===================================================================
     // NoticeboardContent access methods
@@ -304,19 +305,4 @@ public interface INoticeboardService {
     public void updateEntry(NotebookEntry notebookEntry);
 
     public List<NoticeboardUser> getUsersBySession(Long sessionId);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

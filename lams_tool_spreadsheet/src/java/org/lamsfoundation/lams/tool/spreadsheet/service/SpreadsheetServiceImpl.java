@@ -324,6 +324,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
     	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     // *****************************************************************************
     // private methods

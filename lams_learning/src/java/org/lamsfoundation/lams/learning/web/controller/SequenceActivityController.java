@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display a sequence activity.
@@ -54,7 +53,7 @@ public class SequenceActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets an sequence activity from the request (attribute) and forwards to either the first activity in the sequence
@@ -66,9 +65,6 @@ public class SequenceActivityController {
     @RequestMapping("/SequenceActivity")
     public String execute(HttpServletRequest request, HttpServletResponse response)
 	    throws LearnerServiceException, UnsupportedEncodingException {
-
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
@@ -86,11 +82,11 @@ public class SequenceActivityController {
 	    // Set the first activity as the current activity and display it
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 		    firstActivityInSequence, true);
-	    forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
+	    forward = activityMapping.getActivityForward(firstActivityInSequence, learnerProgress, true);
 	    return forward;
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.
-	    return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity,
+	    return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
 		    learnerId, learnerService, true);
 	}
     }

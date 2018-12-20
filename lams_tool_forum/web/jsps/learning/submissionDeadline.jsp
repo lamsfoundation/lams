@@ -85,7 +85,7 @@
 						<a href="#nogo"  name="finish" id="finish"
 							onclick="submitFinish();" class="btn btn-primary voffset5 pull-right na">
 								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
+				 					<c:when test="${sessionMap.isLastActivity}">
 				 						<fmt:message key="label.submit" />
 				 					</c:when>
 				 					<c:otherwise>

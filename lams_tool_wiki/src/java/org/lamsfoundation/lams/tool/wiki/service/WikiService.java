@@ -838,6 +838,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {

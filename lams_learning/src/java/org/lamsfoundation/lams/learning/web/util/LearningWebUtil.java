@@ -25,16 +25,13 @@ package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -43,17 +40,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- *
  * @author Jacky Fang
- * @since 2005-3-10
  */
 public class LearningWebUtil {
-
-    private static Logger log = Logger.getLogger(LearningWebUtil.class);
     // ---------------------------------------------------------------------
     // Class level constants - session attributes
     // ---------------------------------------------------------------------
@@ -100,7 +91,7 @@ public class LearningWebUtil {
 	}
 
 	if (learnerProgressId != null) {
-	    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
+	    learnerProgress = learnerService.getProgressById(learnerProgressId);
 	}
 
 	if (learnerProgress == null) {
@@ -122,7 +113,7 @@ public class LearningWebUtil {
      */
     public static Activity getActivityFromRequest(HttpServletRequest request, ILearnerFullService learnerService) {
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	Activity activity = learnerService.getActivity(new Long(activityId));
+	Activity activity = learnerService.getActivity(activityId);
 	return activity;
     }
 
@@ -166,14 +157,6 @@ public class LearningWebUtil {
 	return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
     }
 
-    /**
-     * Get the ActionMappings.
-     */
-    public static ActivityMapping getActivityMapping(ServletContext context) {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	return (ActivityMapping) wac.getBean("activityMapping");
-    }
-
     public static ActivityURL getActivityURL(ActivityMapping activityMapping, LearnerProgress learnerProgress,
 	    Activity activity, boolean defaultURL, boolean isFloating) {
 	ActivityURL activityURL = new ActivityURL();
@@ -198,23 +181,5 @@ public class LearningWebUtil {
 	activityURL.setFloating(isFloating);
 	activityURL.setDefaultURL(defaultURL);
 	return activityURL;
-    }
-
-    /**
-     * Finds activity position within Learning Design and stores it as request attribute.
-     */
-    public static ActivityPositionDTO putActivityPositionInRequest(Long activityId, HttpServletRequest request,
-	    ServletContext context) {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	ILearnerFullService learnerService = (ILearnerFullService) wac.getBean("learnerService");
-	if (learnerService == null) {
-	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
-	    return null;
-	}
-	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
-	if (positionDTO != null) {
-	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
-	}
-	return positionDTO;
     }
 }

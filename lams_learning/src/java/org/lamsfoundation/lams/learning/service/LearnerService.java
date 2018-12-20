@@ -1298,7 +1298,6 @@ public class LearnerService implements ILearnerFullService {
     /**
      * Finds activity position within Learning Design.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public ActivityPositionDTO getActivityPosition(Long activityId) {
 	if (activityId == null) {

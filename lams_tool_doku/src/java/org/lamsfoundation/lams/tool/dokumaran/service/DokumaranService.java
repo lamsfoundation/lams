@@ -528,8 +528,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws DokumaranApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
 	    DokumaranService.log.error(error);
@@ -546,6 +545,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
     }
 
     // *******************************************************************************

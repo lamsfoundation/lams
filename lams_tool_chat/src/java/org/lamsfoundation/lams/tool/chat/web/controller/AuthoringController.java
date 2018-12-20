@@ -31,7 +31,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
@@ -53,8 +52,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/authoring")
 public class AuthoringController {
-
-    private static Logger logger = Logger.getLogger(AuthoringController.class);
 
     @Autowired
     private IChatService chatService;
@@ -78,7 +75,7 @@ public class AuthoringController {
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 
 	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
@@ -118,6 +115,7 @@ public class AuthoringController {
 	return "pages/authoring/authoring";
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("/updateContent")
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 	// TODO need error checking.
@@ -221,6 +219,7 @@ public class AuthoringController {
     /**
      * Retrieve the SessionMap from the HttpSession.
      */
+    @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request, AuthoringForm authoringForm) {
 	return (SessionMap<String, Object>) request.getSession().getAttribute(authoringForm.getSessionMapID());
     }

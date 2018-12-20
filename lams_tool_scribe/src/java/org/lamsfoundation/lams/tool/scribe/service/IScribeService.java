@@ -32,6 +32,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Defines the services available to the web layer from the Scribe Service
  */
-public interface IScribeService {
+public interface IScribeService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -137,15 +138,6 @@ public interface IScribeService {
      * @param toolSessionId
      */
     public void createReportEntry(Long toolSessionId);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     void submitReport(Long toolSessionId, String userName, ObjectNode requestJSON);
 

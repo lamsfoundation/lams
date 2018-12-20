@@ -66,7 +66,7 @@
 					<c:otherwise>
 						<c:set var="buttonLabel">
 							<c:choose>
-								<c:when test="${sessionMap.activityPosition.last}">
+								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />
 								</c:when>
 
@@ -206,7 +206,7 @@
 						<button type="submit" id="finishButton" onclick="return finishSession()"
 							class="btn btn-sm btn-primary pull-right na">
 							<c:choose>
-								<c:when test="${sessionMap.activityPosition.last}">
+								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />
 								</c:when>
 

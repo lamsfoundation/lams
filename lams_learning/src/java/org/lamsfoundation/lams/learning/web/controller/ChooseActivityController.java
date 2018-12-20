@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.learning.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -38,21 +37,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author daveg
  */
 @Controller
 public class ChooseActivityController {
-    private static Logger log = Logger.getLogger(ChooseActivityController.class);
-
     protected static String className = "ChooseActivity";
 
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto the required jsp (SingleActivity or
@@ -61,9 +57,6 @@ public class ChooseActivityController {
     @RequestMapping("/ChooseActivity")
     public String execute(@ModelAttribute("activityForm") ActivityForm activityForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	// Get learner and lesson details.
 	Integer learnerId = LearningWebUtil.getUserId();
 	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
@@ -78,7 +71,7 @@ public class ChooseActivityController {
 	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
 	}
 
-	String forward = actionMappings.getActivityForward(activity, progress, true);
+	String forward = activityMapping.getActivityForward(activity, progress, true);
 	return forward;
     }
 }

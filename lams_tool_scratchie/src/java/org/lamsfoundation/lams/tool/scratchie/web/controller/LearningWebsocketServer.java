@@ -20,14 +20,16 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
-import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -122,13 +124,13 @@ public class LearningWebsocketServer {
 		    }
 		} catch (Exception e) {
 		    // error caught, but carry on
-		    LearningWebsocketServer.log.error("Error in Scratchie worker thread", e);
+		    log.error("Error in Scratchie worker thread", e);
 		} finally {
 		    HibernateSessionManager.closeSession();
 		    try {
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
 		    } catch (InterruptedException e) {
-			LearningWebsocketServer.log.warn("Stopping Scratchie worker thread");
+			log.warn("Stopping Scratchie worker thread");
 			stopFlag = true;
 		    }
 		}
@@ -224,8 +226,8 @@ public class LearningWebsocketServer {
 	}
 	sessionWebsockets.add(websocket);
 
-	if (LearningWebsocketServer.log.isDebugEnabled()) {
-	    LearningWebsocketServer.log.debug("User " + websocket.getUserPrincipal().getName()
+	if (log.isDebugEnabled()) {
+	    log.debug("User " + websocket.getUserPrincipal().getName()
 		    + " entered Scratchie with toolSessionId: " + toolSessionId);
 	}
     }
@@ -239,9 +241,9 @@ public class LearningWebsocketServer {
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	LearningWebsocketServer.websockets.get(toolSessionId).remove(websocket);
 
-	if (LearningWebsocketServer.log.isDebugEnabled()) {
+	if (log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
-	    LearningWebsocketServer.log.debug("User " + websocket.getUserPrincipal().getName()
+	    log.debug("User " + websocket.getUserPrincipal().getName()
 		    + " left Scratchie with Tool Session ID: " + toolSessionId
 		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
 			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
@@ -294,10 +296,11 @@ public class LearningWebsocketServer {
     }
 
     private static IScratchieService getScratchieService() {
-	if (LearningWebsocketServer.scratchieService == null) {
-	    LearningWebsocketServer.scratchieService = ScratchieServiceProxy
-		    .getScratchieService(SessionManager.getServletContext());
+	if (scratchieService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    scratchieService = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
 	}
-	return LearningWebsocketServer.scratchieService;
+	return scratchieService;
     }
 }

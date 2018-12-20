@@ -445,6 +445,11 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     @SuppressWarnings("unchecked")

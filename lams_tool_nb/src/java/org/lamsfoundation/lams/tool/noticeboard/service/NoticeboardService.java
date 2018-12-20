@@ -278,6 +278,11 @@ public class NoticeboardService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {

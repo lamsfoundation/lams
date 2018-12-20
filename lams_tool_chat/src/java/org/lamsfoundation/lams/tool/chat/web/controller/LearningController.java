@@ -31,17 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
-import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
@@ -64,16 +62,12 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-
-    private static Logger log = Logger.getLogger(LearningController.class);
-
+    
     @Autowired
     private IChatService chatService;
-
     @Autowired
     @Qualifier("chatMessageService")
     private MessageService messageService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -119,12 +113,11 @@ public class LearningController {
 
 	// Ensure that the content is use flag is set.
 	if (!chat.isContentInUse()) {
-	    chat.setContentInUse(new Boolean(true));
+	    chat.setContentInUse(true);
 	    chatService.saveOrUpdateChat(chat);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionID));
 
 	/* Check if submission deadline is null */
 
@@ -153,28 +146,11 @@ public class LearningController {
     @RequestMapping("/finishActivity")
     public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	// set the finished flag
-	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
-	if (chatUser != null) {
-	    chatUser.setFinishedActivity(true);
-	    chatService.saveOrUpdateChatUser(chatUser);
-	} else {
-	    LearningController.log
-		    .error("finishActivity(): couldn't find ChatUser with uid: " + learningForm.getChatUserUID());
-	}
-
-	ToolSessionManager sessionMgrService = ChatServiceProxy
-		.getChatSessionManager(applicationContext.getServletContext());
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
-	Long toolSessionID = chatUser.getChatSession().getSessionId();
+	Long userUid = learningForm.getChatUserUID();
 
 	String nextActivityUrl;
 	try {
-	    nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, userID);
+	    nextActivityUrl = chatService.finishToolSession(userUid);
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new ChatException(e);
@@ -204,9 +180,9 @@ public class LearningController {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, chatUser.getChatSession().getSessionId());
-	WebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
-		applicationContext.getServletContext());
+	Long toolSessionId = chatUser.getChatSession().getSessionId();
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionId));
 
 	return "pages/learning/notebook";
     }
@@ -243,7 +219,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
 		toolSessionId);
 
 	if (chatUser == null) {

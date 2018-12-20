@@ -50,10 +50,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * In order to return a URL this class needs to know the baseURL. This can be set using in the application context.
  *
  * @author daveg
- *
  */
 public class ActivityMapping implements Serializable {
-
     private static final long serialVersionUID = 5887602834473598770L;
 
     /* These are global struts forwards. */
@@ -76,8 +74,6 @@ public class ActivityMapping implements Serializable {
      *            the LearnerProgress associated with the Activity and learner
      */
     public String getActivityForward(Activity activity, LearnerProgress progress, boolean redirect) {
-	String forward = null;
-
 	String action = this.activityMappingStrategy.getActivityAction(activity);
 	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		progress.getLearnerProgressId().toString());
@@ -86,8 +82,7 @@ public class ActivityMapping implements Serializable {
 		    activity.getActivityId().toString());
 	}
 
-	forward = actionToForward(action, activity, redirect);
-	return forward;
+	return ActivityMapping.actionToForward(action, activity, redirect);
     }
 
     /**
@@ -118,20 +113,21 @@ public class ActivityMapping implements Serializable {
 	    action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		    progress.getLearnerProgressId().toString());
 	    action = ActivityMapping.actionToURL(action, null, true);
-	    forward = this.getClearFramesForward(action, progress.getLearnerProgressId().toString());
+	    forward = ActivityMapping.getClearFramesForward(action, progress.getLearnerProgressId().toString());
 	} else {
 	    if (!displayParallelFrames && (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING)) {
 		// processing the screen WITHIN parallel activity frames.
 		// progress is waiting, goto waiting page
 		String action = this.getActivityMappingStrategy().getWaitingAction();
-		forward = this.actionToForward(action, null, redirect);
+		forward = ActivityMapping.actionToForward(action, null, redirect);
 	    } else {
 		// display next activity
 		if (progress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE) {
 		    // if previous activity was a parallel activity then we need to
 		    // clear frames.
 		    String activityURL = this.getActivityURL(progress.getNextActivity());
-		    forward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
+		    forward = ActivityMapping.getClearFramesForward(activityURL,
+			    progress.getLearnerProgressId().toString());
 		} else {
 		    forward = getActivityForward(progress.getNextActivity(), progress, redirect);
 		}
@@ -150,18 +146,14 @@ public class ActivityMapping implements Serializable {
      * @return actionForward to which to forward
      * @throws UnsupportedEncodingException
      */
-    private String getClearFramesForward(String activityURL, String progressId) throws UnsupportedEncodingException {
-
+    private static String getClearFramesForward(String activityURL, String progressId)
+	    throws UnsupportedEncodingException {
 	String encodedURL = URLEncoder.encode(activityURL, "UTF-8");
-
-	String forward = null;
-
 	String action = "/requestURL.jsp?url=" + encodedURL;
 	action = WebUtil.appendParameterToURL(action, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
 
-	forward = actionToForward(action, null, false);
+	String forward = ActivityMapping.actionToForward(action, null, false);
 	return forward;
-
     }
 
     /**
@@ -239,7 +231,7 @@ public class ActivityMapping implements Serializable {
 //	return redirect ? "redirect:" + ActivityMapping.actionToURL(action, activity, false) : "forward:" + action;
 //    }
 
-    protected String actionToForward(String action, Activity activity, boolean addParams) {
+    protected static String actionToForward(String action, Activity activity, boolean addParams) {
 	return "redirect:" + (addParams ? ActivityMapping.actionToURL(action, activity, false) : action);
     }
 
@@ -315,7 +307,7 @@ public class ActivityMapping implements Serializable {
 	    closeWindowURLAction = WebUtil.appendParameterToURL(closeWindowURLAction, "waitURL", action);
 	}
 
-	return actionToForward(closeWindowURLAction, null, false);
+	return ActivityMapping.actionToForward(closeWindowURLAction, null, false);
     }
 
     public String getProgressBrokenURL() {

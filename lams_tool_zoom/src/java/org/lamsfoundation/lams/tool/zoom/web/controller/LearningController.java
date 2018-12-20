@@ -124,20 +124,16 @@ public class LearningController {
 	// set the finished flag
 	ZoomUser user = getCurrentUser(learningForm.getToolSessionID());
 	ContentDTO contentDTO = new ContentDTO(user.getZoomSession().getZoom());
-
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 
 	NotebookEntry notebookEntry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
-
 	if (notebookEntry != null) {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(learningForm.getToolSessionID(), request,
-		applicationContext.getServletContext());
-
+	boolean isLastActivity = zoomService.isLastActivity(learningForm.getToolSessionID());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "pages/learning/notebook";
-
     }
 
     @RequestMapping("submitReflection")
@@ -200,8 +196,8 @@ public class LearningController {
 	    zoomService.saveOrUpdateZoom(zoom);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	boolean isLastActivity = zoomService.isLastActivity(toolSessionID);
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 
 	ZoomUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

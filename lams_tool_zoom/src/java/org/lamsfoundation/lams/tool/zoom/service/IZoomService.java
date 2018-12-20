@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
@@ -36,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * Defines the services available to the web layer from the Zoom Service
  */
-public interface IZoomService {
+public interface IZoomService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -63,19 +64,6 @@ public interface IZoomService {
      * @return
      */
     public Zoom getZoomByContentId(Long toolContentID);
-
-    /**
-     * @param toolContentID
-     * @return
-     */
-    public boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * @param zoom

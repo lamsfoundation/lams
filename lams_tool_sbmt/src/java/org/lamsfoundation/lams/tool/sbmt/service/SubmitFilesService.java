@@ -1052,6 +1052,11 @@ public class SubmitFilesService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public SubmitUser getUserByUid(Long learnerID) {

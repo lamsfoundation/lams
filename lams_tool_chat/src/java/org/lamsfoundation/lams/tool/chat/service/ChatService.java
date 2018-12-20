@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -161,6 +162,19 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	// + toolSessionId);
 	// }
 	return toolService.completeToolSession(toolSessionId, learnerId);
+    }
+    
+    @Override
+    public String finishToolSession(Long userUid) {
+
+	// set the finished flag
+	ChatUser chatUser = getUserByUID(userUid);
+	if (chatUser != null) {
+	    chatUser.setFinishedActivity(true);
+	    saveOrUpdateChatUser(chatUser);
+	}
+
+	return leaveToolSession(chatUser.getChatSession().getSessionId(), chatUser.getUserId());
     }
 
     @Override
@@ -414,10 +428,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     }
 
     /* IChatService Methods */
-    @Override
-    public Long getDefaultContentIdBySignature(String toolSignature) {
-	Long toolContentId = null;
-	toolContentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+    private Long getDefaultContentIdBySignature(String toolSignature) {
+	Long toolContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (toolContentId == null) {
 	    String error = "Could not retrieve default content id for this tool";
 	    ChatService.logger.error(error);
@@ -671,6 +683,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
     }
 
     /* Private methods */

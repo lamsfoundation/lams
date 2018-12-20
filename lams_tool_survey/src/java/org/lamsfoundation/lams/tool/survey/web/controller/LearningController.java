@@ -182,9 +182,7 @@ public class LearningController {
 	survey.setDefineLater(false);
 	surveyService.saveOrUpdateSurvey(survey);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, surveyService.isLastActivity(sessionId));
 
 	// check if there is submission deadline
 	Date submissionDeadline = survey.getSubmissionDeadline();

@@ -4,7 +4,7 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU General License as published by
  * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -35,56 +35,53 @@ import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Chat Service
  */
-public interface IChatService {
+public interface IChatService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
      * @params newContentID
      * @return
      */
-    public Chat copyDefaultContent(Long newContentID);
+    Chat copyDefaultContent(Long newContentID);
 
     /**
      * Returns an instance of the Chat tools default content.
      *
      * @return
      */
-    public Chat getDefaultContent();
-
-    /**
-     * @param toolSignature
-     * @return
-     */
-    public Long getDefaultContentIdBySignature(String toolSignature);
+    Chat getDefaultContent();
 
     /**
      * @param toolContentID
      * @return
      */
-    public Chat getChatByContentId(Long toolContentID);
+    Chat getChatByContentId(Long toolContentID);
 
     /**
      * @param chat
      */
-    public void saveOrUpdateChat(Chat chat);
+    void saveOrUpdateChat(Chat chat);
+    
+    String finishToolSession(Long userUid);
 
     /**
      * @param toolSessionId
      * @return
      */
-    public ChatSession getSessionBySessionId(Long toolSessionId);
+    ChatSession getSessionBySessionId(Long toolSessionId);
 
     /**
      * @param chatSession
      */
-    public void saveOrUpdateChatSession(ChatSession chatSession);
+    void saveOrUpdateChatSession(ChatSession chatSession);
 
-    public List<ChatUser> getUsersActiveBySessionId(Long toolSessionId);
+    List<ChatUser> getUsersActiveBySessionId(Long toolSessionId);
 
     /**
      *
@@ -92,7 +89,7 @@ public interface IChatService {
      * @param toolSessionId
      * @return
      */
-    public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+    ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
      *
@@ -100,14 +97,14 @@ public interface IChatService {
      * @param sessionID
      * @return
      */
-    public ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
+    ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
 
     /**
      *
      * @param uid
      * @return
      */
-    public ChatUser getUserByUID(Long uid);
+    ChatUser getUserByUID(Long uid);
 
     /**
      *
@@ -115,7 +112,7 @@ public interface IChatService {
      * @param sessionID
      * @return
      */
-    public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
+    ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
 
     /**
      * Get how many post of this user post in a special session. DOES NOT include posts from author.
@@ -126,26 +123,26 @@ public interface IChatService {
      */
     int getTopicsNum(Long userID, Long sessionId);
 
-    public void updateUserPresence(Long toolSessionId, Set<String> activeUsers);
+    void updateUserPresence(Long toolSessionId, Set<String> activeUsers);
 
     /**
      *
      * @param chatUser
      */
-    public void saveOrUpdateChatUser(ChatUser chatUser);
+    void saveOrUpdateChatUser(ChatUser chatUser);
 
     /**
      *
      * @param chatUser
      * @return
      */
-    public List<ChatMessage> getMessagesForUser(ChatUser chatUser);
+    List<ChatMessage> getMessagesForUser(ChatUser chatUser);
 
     /**
      *
      * @param chatMessage
      */
-    public void saveOrUpdateChatMessage(ChatMessage chatMessage);
+    void saveOrUpdateChatMessage(ChatMessage chatMessage);
 
     /**
      *
@@ -153,43 +150,43 @@ public interface IChatService {
      * @param chatSession
      * @return
      */
-    public ChatUser createChatUser(UserDTO user, ChatSession chatSession);
+    ChatUser createChatUser(UserDTO user, ChatSession chatSession);
 
     /**
      *
      * @param toolContentID
      * @param pattern
      */
-    public ChatMessageFilter updateMessageFilters(Chat chat);
+    ChatMessageFilter updateMessageFilters(Chat chat);
 
-    public String filterMessage(String message, Chat chat);
+    String filterMessage(String message, Chat chat);
 
     /**
      *
      * @param messageUID
      * @return
      */
-    public ChatMessage getMessageByUID(Long messageUID);
+    ChatMessage getMessageByUID(Long messageUID);
 
-    public List<ChatMessage> getLastestMessages(ChatSession chatSession, Integer max, boolean orderAsc);
+    List<ChatMessage> getLastestMessages(ChatSession chatSession, Integer max, boolean orderAsc);
 
-    public void auditEditMessage(ChatMessage chatMessage, String messageBody);
+    void auditEditMessage(ChatMessage chatMessage, String messageBody);
 
-    public void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden);
+    void auditHideShowMessage(ChatMessage chatMessage, boolean messageHidden);
 
-    public Map<Long, Integer> getMessageCountBySession(Long chatUID);
+    Map<Long, Integer> getMessageCountBySession(Long chatUID);
 
-    public Map<Long, Integer> getMessageCountByFromUser(Long sessionUID);
+    Map<Long, Integer> getMessageCountByFromUser(Long sessionUID);
 
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
-    public String createConditionName(Collection<ChatCondition> existingConditions);
+    String createConditionName(Collection<ChatCondition> existingConditions);
 
-    public void deleteCondition(ChatCondition condition);
+    void deleteCondition(ChatCondition condition);
 
     /**
      * Gets all messages sent by the given user.
@@ -198,16 +195,7 @@ public interface IChatService {
      *            UID of the user
      * @return list of his/hers messages
      */
-    public List<ChatMessage> getMessagesSentByUser(Long userUid);
+    List<ChatMessage> getMessagesSentByUser(Long userUid);
 
     void releaseConditionsFromCache(Chat chat);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

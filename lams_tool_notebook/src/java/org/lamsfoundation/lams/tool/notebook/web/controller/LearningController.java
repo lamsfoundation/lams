@@ -33,9 +33,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookDTO;
@@ -43,8 +41,6 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
-import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
-import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -109,12 +105,11 @@ public class LearningController {
 
 	// Set the content in use flag.
 	if (!notebook.isContentInUse()) {
-	    notebook.setContentInUse(new Boolean(true));
+	    notebook.setContentInUse(true);
 	    notebookService.saveOrUpdateNotebook(notebook);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, notebookService.isLastActivity(toolSessionID));
 
 	NotebookUser notebookUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
@@ -191,27 +186,9 @@ public class LearningController {
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
 
-	// learningForm.getContentEditable() will be null if the deadline has passed
-	if (messageForm.getContentEditable() != null && messageForm.getContentEditable()) {
-	    // TODO fix idType to use real value not 999
-	    if (notebookUser.getEntryUID() == null) {
-		notebookUser.setEntryUID(notebookService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
-			notebookUser.getUserId().intValue(), messageForm.getEntryText()));
-	    } else {
-		// update existing entry.
-		notebookService.updateEntry(notebookUser.getEntryUID(), messageForm.getEntryText());
-	    }
-
-	    notebookUser.setFinishedActivity(true);
-	    notebookService.saveOrUpdateNotebookUser(notebookUser);
-	}
-
-	ToolSessionManager sessionMgrService = NotebookServiceProxy
-		.getNotebookSessionManager(applicationContext.getServletContext());
-
 	try {
-	    String nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, notebookUser.getUserId());
+	    String nextActivityUrl = notebookService.finishToolSession(notebookUser, messageForm.getContentEditable(),
+		    messageForm.getEntryText());
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new NotebookException(e);

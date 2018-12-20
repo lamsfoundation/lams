@@ -29,6 +29,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -90,6 +91,11 @@ public interface ILamsToolService {
      *             in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
+    
+    /**
+     * Checks whether specified activity is the last one in the learning design.
+     */
+    boolean isLastActivity(Long toolSessionId);
 
     /**
      * Method for updating an activity mark that tools can call

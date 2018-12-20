@@ -52,7 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * <p>
@@ -80,7 +79,8 @@ public class GateController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
+    
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
@@ -119,9 +119,6 @@ public class GateController {
 
 	// initialize service object
 	Activity activity = learnerService.getActivity(activityId);
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	User learner = LearningWebUtil.getUser(learnerService);
 	Lesson lesson = learnerService.getLesson(lessonId);
 
@@ -143,7 +140,7 @@ public class GateController {
 	}
 
 	// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-	return LearningWebUtil.completeActivity(request, response, actionMappings, learnerProgress, activity,
+	return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
 		learner.getUserId(), learnerService, true);
 
     }

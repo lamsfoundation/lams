@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to forward the user to a Tool.
@@ -50,17 +49,13 @@ public class DisplayToolActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets a tool activity from the request (attribute) and uses a redirect to forward the user to the tool.
      */
     @RequestMapping("/DisplayToolActivity")
     public String execute(HttpServletRequest request, HttpServletResponse response) {
-	//ActivityForm form = (ActivityForm)actionForm;
-	ActivityMapping actionMappings = LearningWebUtil
-		.getActivityMapping(this.applicationContext.getServletContext());
-
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
@@ -71,7 +66,7 @@ public class DisplayToolActivityController {
 
 	ToolActivity toolActivity = (ToolActivity) activity;
 
-	String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), toolActivity,
+	String url = activityMapping.getLearnerToolURL(learnerProgress.getLesson(), toolActivity,
 		learnerProgress.getUser());
 	try {
 	    response.sendRedirect(url);

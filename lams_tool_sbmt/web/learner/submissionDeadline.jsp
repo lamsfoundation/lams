@@ -47,7 +47,7 @@
 				<a href="#nogo" name="finishButton" onclick="javascript:finish();"
 					class="btn btn-primary pull-right na" id="finishButton">
 					<span class="nextActivity"> <c:choose>
-							<c:when test="${activityPosition.last}">
+							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />
 							</c:when>
 							<c:otherwise>

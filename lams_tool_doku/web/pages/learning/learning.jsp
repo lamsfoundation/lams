@@ -266,7 +266,7 @@
 								onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
-				 					<c:when test="${sessionMap.activityPosition.last}">
+				 					<c:when test="${sessionMap.isLastActivity}">
 				 						<fmt:message key="label.submit" />
 				 					</c:when>
 				 					<c:otherwise>

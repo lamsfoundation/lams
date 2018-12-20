@@ -104,12 +104,11 @@ public class LearningController {
 
 	// Ensure that the content in use flag is set.
 	if (!scribe.isContentInUse()) {
-	    scribe.setContentInUse(new Boolean(true));
+	    scribe.setContentInUse(true);
 	    scribeService.saveOrUpdateScribe(scribe);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, scribeService.isLastActivity(toolSessionID));
 
 	// Retrieve the current user
 	ScribeUser scribeUser = getCurrentUser(toolSessionID);
@@ -243,12 +242,10 @@ public class LearningController {
 	// set the finished flag
 	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
 	ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession().getScribe());
-
 	request.setAttribute("scribeDTO", scribeDTO);
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(), request,
-		applicationContext.getServletContext());
-
+	boolean isLastActivity = scribeService.isLastActivity(scribeUser.getScribeSession().getSessionId());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "pages/learning/notebook";
     }
 
@@ -288,9 +285,8 @@ public class LearningController {
 	    setupOtherGroupReportDTO(request, session, scribeUser);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request,
-		applicationContext.getServletContext());
-
+	boolean isLastActivity = scribeService.isLastActivity(session.getSessionId());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "pages/learning/report";
     }
 

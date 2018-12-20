@@ -113,7 +113,7 @@ public class AuthoringController {
     public String defineLater(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	TaskList taskList = taskListService.getTaskListByContentId(contentId);
 
 	taskList.setDefineLater(true);
@@ -132,7 +132,7 @@ public class AuthoringController {
     private String readDatabaseData(TaskListForm taskListForm, HttpServletRequest request) throws ServletException {
 
 	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, TaskListConstants.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, TaskListConstants.PARAM_TOOL_CONTENT_ID);
 
 	List<TaskListItem> items = null;
 	TaskList taskList = null;

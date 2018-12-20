@@ -34,12 +34,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.GroupingForm;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -51,7 +53,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -76,7 +77,7 @@ public class GroupingController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
     
     // ---------------------------------------------------------------------
     // Class level constants - Session Attributes
@@ -170,7 +171,11 @@ public class GroupingController {
 	request.setAttribute(GroupingController.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
 
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	LearningWebUtil.putActivityPositionInRequest(activityId, request, applicationContext.getServletContext());
+	//find activity position within Learning Design and store it as request attribute
+	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
+	if (positionDTO != null) {
+	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	}
 
 	// make sure the lesson id is always in the request for the progress bar.
 	if (request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null) {
@@ -202,9 +207,8 @@ public class GroupingController {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
-	return LearningWebUtil.completeActivity(request, response,
-		LearningWebUtil.getActivityMapping(this.applicationContext.getServletContext()), progress,
-		groupingActivity, learnerId, learnerService, true);
+	return LearningWebUtil.completeActivity(request, response, activityMapping, progress, groupingActivity,
+		learnerId, learnerService, true);
     }
 
     /**

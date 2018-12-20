@@ -56,7 +56,7 @@
 			<c:otherwise>
 				<button type="submit" class="btn btn-primary na" id="finishButton">
 					<c:choose>
-						<c:when test="${activityPosition.last}">
+						<c:when test="${isLastActivity}">
 							<fmt:message key="button.submit" />
 						</c:when>
 						<c:otherwise>

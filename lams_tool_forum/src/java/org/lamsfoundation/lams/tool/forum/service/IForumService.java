@@ -42,12 +42,13 @@ import org.lamsfoundation.lams.tool.forum.model.ForumUser;
 import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.model.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * User: conradb Date: 8/06/2005 Time: 14:49:59
  */
-public interface IForumService {
+public interface IForumService extends ICommonToolService {
     // ************************************************************************************
     // Forum Method
     // ************************************************************************************
@@ -427,21 +428,6 @@ public interface IForumService {
     void deleteCondition(ForumCondition condition) throws PersistenceException;
 
     void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.

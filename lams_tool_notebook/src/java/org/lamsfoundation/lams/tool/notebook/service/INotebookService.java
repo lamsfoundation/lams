@@ -33,12 +33,13 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Notebook Service
  */
-public interface INotebookService {
+public interface INotebookService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -112,18 +113,8 @@ public interface INotebookService {
     NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession);
 
     boolean notifyUser(Integer userId, String comment);
-
-    /**
-     *
-     * @param id
-     * @param idType
-     * @param signature
-     * @param userID
-     * @param title
-     * @param entry
-     * @return
-     */
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    
+    String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText);
 
     /**
      *
@@ -131,14 +122,6 @@ public interface INotebookService {
      * @return
      */
     NotebookEntry getEntry(Long uid);
-
-    /**
-     *
-     * @param uid
-     * @param title
-     * @param entry
-     */
-    void updateEntry(Long uid, String entry);
 
     /**
      * Creates an unique name for a ChatCondition. It consists of the tool output definition name and a unique positive
@@ -153,15 +136,6 @@ public interface INotebookService {
     void releaseConditionsFromCache(Notebook notebook);
 
     void deleteCondition(NotebookCondition condition);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.

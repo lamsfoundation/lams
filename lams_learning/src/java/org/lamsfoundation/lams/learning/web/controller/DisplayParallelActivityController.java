@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -44,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Action class to display a ParallelActivity.
@@ -58,18 +56,14 @@ public class DisplayParallelActivityController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
-    private WebApplicationContext applicationContext;
+    private ActivityMapping activityMapping;
 
     /**
      * Gets a parallel activity from the request (attribute) and forwards to the display JSP.
      */
     @RequestMapping("/DisplayParallelActivity")
     public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
-
-	ActivityMapping actionMappings = LearnerServiceProxy
-		.getActivityMapping(this.applicationContext.getServletContext());
-
-	actionMappings.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
+	activityMapping.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof ParallelActivity)) {
@@ -81,12 +75,11 @@ public class DisplayParallelActivityController {
 
 	form.setActivityID(activity.getActivityId());
 
-	List activityURLs = new ArrayList();
-
-	for (Iterator i = parallelActivity.getActivities().iterator(); i.hasNext();) {
-	    Activity subActivity = (Activity) i.next();
+	List<ActivityURL> activityURLs = new ArrayList<>();
+	for (Iterator<Activity> i = parallelActivity.getActivities().iterator(); i.hasNext();) {
+	    Activity subActivity = i.next();
 	    ActivityURL activityURL = new ActivityURL();
-	    String url = actionMappings.getActivityURL(subActivity);
+	    String url = activityMapping.getActivityURL(subActivity);
 	    activityURL.setUrl(url);
 	    activityURLs.add(activityURL);
 	}

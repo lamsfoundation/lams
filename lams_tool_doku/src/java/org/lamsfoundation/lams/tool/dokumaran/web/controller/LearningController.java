@@ -190,10 +190,7 @@ public class LearningController {
 	dokumaran.setDefineLater(false);
 	dokumaranService.saveOrUpdateDokumaran(dokumaran);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId,
-		request, applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dokumaranService.isLastActivity(toolSessionId));
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 
 	// get the API key from the config table and add it to the session
