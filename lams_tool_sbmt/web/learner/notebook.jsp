@@ -35,7 +35,7 @@
 				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit">
 
 					<c:choose>
-						<c:when test="${activityPosition.last}">
+						<c:when test="${isLastActivity}">
 							<fmt:message key="button.submit" />
 						</c:when>
 						<c:otherwise>

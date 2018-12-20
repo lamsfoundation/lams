@@ -92,9 +92,6 @@ public class LearningController {
 	    leaderselectionService.saveOrUpdateLeaderselection(content);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request,
-		applicationContext.getServletContext());
-
 	LeaderselectionUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
@@ -112,7 +109,7 @@ public class LearningController {
 	// checks whether to display dialog prompting to become a leader
 	boolean isSelectLeaderActive = (groupLeader == null) && !user.isFinishedActivity() && !mode.isTeacher();
 	request.setAttribute("isSelectLeaderActive", isSelectLeaderActive);
-
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, leaderselectionService.isLastActivity(toolSessionId));
 	return "pages/learning/leaderselection";
     }
 

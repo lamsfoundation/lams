@@ -30,6 +30,7 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
@@ -42,7 +43,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 /**
  * Defines the services available to the web layer from the Wiki Service
  */
-public interface IWikiService {
+public interface IWikiService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -310,21 +311,6 @@ public interface IWikiService {
      * @return
      */
     List<User> getMonitorsByToolSessionId(Long sessionId);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.

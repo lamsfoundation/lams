@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -53,7 +54,7 @@ import org.lamsfoundation.lams.util.ExcelCell;
  *
  *         Interface that defines the contract that all ShareAssessment service provider must follow.
  */
-public interface IAssessmentService {
+public interface IAssessmentService extends ICommonToolService {
 
     /**
      * @param user
@@ -487,21 +488,6 @@ public interface IAssessmentService {
      * @return
      */
     String getMessage(String key);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions

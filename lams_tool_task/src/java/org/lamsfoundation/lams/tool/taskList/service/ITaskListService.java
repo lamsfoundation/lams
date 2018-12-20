@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
@@ -44,7 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Andrey Balan
  */
-public interface ITaskListService {
+public interface ITaskListService extends ICommonToolService {
 
     /**
      * Returns number of tasks completed by user. Used in <code>TaskListOutputFactory</code>.
@@ -348,21 +349,6 @@ public interface ITaskListService {
     NotebookEntry getEntry(Long sessionId, Integer userId);
 
     List<ReflectDTO> getReflectList(Long contentId);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Get localized message.

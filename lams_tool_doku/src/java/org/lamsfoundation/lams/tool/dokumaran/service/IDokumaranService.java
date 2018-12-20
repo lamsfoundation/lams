@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 import net.gjerull.etherpad.client.EPLiteClient;
@@ -46,7 +47,7 @@ import net.gjerull.etherpad.client.EPLiteClient;
  *
  *         Interface that defines the contract that all ShareDokumaran service provider must follow.
  */
-public interface IDokumaranService {
+public interface IDokumaranService extends ICommonToolService {
 
     /**
      * Get <code>Dokumaran</code> by toolContentID.
@@ -277,19 +278,4 @@ public interface IDokumaranService {
      * @return
      */
     DokumaranUser getUser(Long uid);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

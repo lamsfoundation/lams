@@ -598,22 +598,4 @@ public class WebUtil {
 
 	return decodedLessonId;
     }
-
-    /**
-     * Finds activity position within Learning Design and stores it as request attribute.
-     */
-    public static ActivityPositionDTO putActivityPositionInRequestByToolSessionId(Long toolSessionId,
-	    HttpServletRequest request, ServletContext context) {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
-	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
-	if (learnerService == null) {
-	    log.warn("Can not set activity position, no Learner service in servlet context.");
-	    return null;
-	}
-	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
-	if (positionDTO != null) {
-	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
-	}
-	return positionDTO;
-    }
 }

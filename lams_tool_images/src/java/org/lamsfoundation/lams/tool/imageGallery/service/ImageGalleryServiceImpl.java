@@ -638,6 +638,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser) {

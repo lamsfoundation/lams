@@ -171,8 +171,7 @@ public class LearnerController implements SbmtConstants {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, submitFilesService.isLastActivity(toolSessionID));
 
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
@@ -313,10 +312,8 @@ public class LearnerController implements SbmtConstants {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute("sessionMapID", sessionMapID);
 
-	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	WebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, submitFilesService.isLastActivity(sessionID));
 
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.

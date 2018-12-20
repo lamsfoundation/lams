@@ -122,12 +122,11 @@ public class LearningController {
 
 	// Set the content in use flag.
 	if (!pixlr.isContentInUse()) {
-	    pixlr.setContentInUse(new Boolean(true));
+	    pixlr.setContentInUse(true);
 	    pixlrService.saveOrUpdatePixlr(pixlr);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, pixlrService.isLastActivity(toolSessionID));
 
 	// get the user
 	PixlrUser pixlrUser;
@@ -341,9 +340,8 @@ public class LearningController {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
-		applicationContext.getServletContext());
-
+	Long toolSessionID = pixlrUser.getPixlrSession().getSessionId();
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, pixlrService.isLastActivity(toolSessionID));
 	return "pages/learning/notebook";
     }
 
@@ -424,8 +422,7 @@ public class LearningController {
 	request.setAttribute("mode", mode);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, pixlrService.isLastActivity(toolSessionID));
 
 	return "pages/learning/viewAll";
     }

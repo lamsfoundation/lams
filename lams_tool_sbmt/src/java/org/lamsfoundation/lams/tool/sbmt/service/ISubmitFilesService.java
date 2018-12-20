@@ -40,13 +40,14 @@ import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Manpreet Minhas
  */
-public interface ISubmitFilesService {
+public interface ISubmitFilesService extends ICommonToolService {
 
     /**
      * Returns the <code>SubmitFilesContent</code> object corresponding to the given <code>contentID</code>. If
@@ -343,21 +344,6 @@ public interface ISubmitFilesService {
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.

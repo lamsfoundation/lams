@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
@@ -44,7 +45,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
  *
  *         Interface that defines the contract that all Survey service provider must follow.
  */
-public interface ISurveyService {
+public interface ISurveyService extends ICommonToolService {
 
     // ******************************************************************************************
     // Content methods
@@ -289,21 +290,6 @@ public interface ISurveyService {
     String createConditionName(Collection<SurveyCondition> existingConditions);
 
     void deleteCondition(SurveyCondition condition);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Gets the Answer information for the monitoring listAnswers tablesorter. Will return List<[SurveyUser, String,

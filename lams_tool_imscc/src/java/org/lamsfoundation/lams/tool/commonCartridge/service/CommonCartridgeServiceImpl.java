@@ -869,10 +869,20 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return lessonService.getMonitorsByToolSessionId(sessionId);
     }
+    
+    @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
     }
 
     @Override

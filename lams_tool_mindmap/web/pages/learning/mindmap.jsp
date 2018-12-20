@@ -114,7 +114,7 @@
 									<a href="javascript:submitForm();" class="btn btn-primary" id="finishButton">
 										<span class="na">
 											<c:choose>
-							 					<c:when test="${activityPosition.last}">
+							 					<c:when test="${isLastActivity}">
 							 						<fmt:message key="button.submit" />
 							 					</c:when>
 							 					<c:otherwise>

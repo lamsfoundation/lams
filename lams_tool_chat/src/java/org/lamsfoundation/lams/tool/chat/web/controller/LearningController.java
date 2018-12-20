@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -62,15 +62,12 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-    private static Logger log = Logger.getLogger(LearningController.class);
-
+    
     @Autowired
     private IChatService chatService;
-
     @Autowired
     @Qualifier("chatMessageService")
     private MessageService messageService;
-
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -120,8 +117,7 @@ public class LearningController {
 	    chatService.saveOrUpdateChat(chat);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionID));
 
 	/* Check if submission deadline is null */
 
@@ -184,9 +180,9 @@ public class LearningController {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, chatUser.getChatSession().getSessionId());
-	WebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
-		applicationContext.getServletContext());
+	Long toolSessionId = chatUser.getChatSession().getSessionId();
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionId));
 
 	return "pages/learning/notebook";
     }
@@ -223,7 +219,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
 		toolSessionId);
 
 	if (chatUser == null) {

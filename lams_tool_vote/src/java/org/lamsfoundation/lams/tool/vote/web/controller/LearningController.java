@@ -141,9 +141,8 @@ public class LearningController implements VoteAppConstants {
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
-
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "/learning/AllNominations";
     }
 
@@ -207,8 +206,8 @@ public class LearningController implements VoteAppConstants {
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "/learning/ViewAnswers";
     }
 
@@ -576,9 +575,8 @@ public class LearningController implements VoteAppConstants {
 
 	voteLearningForm.resetCommands();
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
-
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 	return "/learning/Notebook";
     }
 
@@ -745,8 +743,8 @@ public class LearningController implements VoteAppConstants {
 	    }
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
-		applicationContext.getServletContext());
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 
 	/* find out if the content is being modified at the moment. */
 	if (voteContent.isDefineLater()) {

@@ -46,13 +46,14 @@ import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.model.McSession;
 import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
  *
  * @author Ozgur Demirtas
  */
-public interface IMcService {
+public interface IMcService extends ICommonToolService {
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -175,21 +176,6 @@ public interface IMcService {
      * @return lowest mark, average mark, top mark in that order
      */
     Object[] getMarkStatistics(McSession mcSession);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions

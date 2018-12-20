@@ -35,12 +35,13 @@ import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Chat Service
  */
-public interface IChatService {
+public interface IChatService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -55,12 +56,6 @@ public interface IChatService {
      * @return
      */
     Chat getDefaultContent();
-
-    /**
-     * @param toolSignature
-     * @return
-     */
-    Long getDefaultContentIdBySignature(String toolSignature);
 
     /**
      * @param toolContentID
@@ -203,13 +198,4 @@ public interface IChatService {
     List<ChatMessage> getMessagesSentByUser(Long userUid);
 
     void releaseConditionsFromCache(Chat chat);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

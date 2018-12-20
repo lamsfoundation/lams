@@ -90,6 +90,7 @@ public class AttributeNames {
     public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
     public static final String ATTR_SESSION_STATUS = "sessionStatus";
     public static final String ATTR_ACTIVITY_POSITION = "activityPosition";
+    public static final String ATTR_IS_LAST_ACTIVITY = "isLastActivity";
     public static final String ATTR_LEARNER_CONTENT_FOLDER = "learnerContentFolder";
 
     public static final String ATTR_RATING_CRITERIAS = "ratingCriterias";

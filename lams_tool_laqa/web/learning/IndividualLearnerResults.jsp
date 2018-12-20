@@ -141,7 +141,7 @@
 							<button type="button" id="finishButton" 
 								onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
 								<c:choose>
-									<c:when test="${sessionMap.activityPosition.last}">
+									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="button.submit" />
 									</c:when>
 									<c:otherwise>

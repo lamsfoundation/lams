@@ -29,12 +29,13 @@ import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Pixlr Service
  */
-public interface IPixlrService {
+public interface IPixlrService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -153,20 +154,5 @@ public interface IPixlrService {
      * @param item
      */
     public void saveOrUpdatePixlrConfigItem(PixlrConfigItem item);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
 }

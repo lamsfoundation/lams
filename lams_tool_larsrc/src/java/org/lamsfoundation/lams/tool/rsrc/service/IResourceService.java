@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.rsrc.model.Resource;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -47,7 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  *         Interface that defines the contract that all ShareResource service provider must follow.
  */
-public interface IResourceService {
+public interface IResourceService extends ICommonToolService {
 
     /**
      * Get <code>Resource</code> by toolContentID.
@@ -259,21 +260,6 @@ public interface IResourceService {
 
     void notifyTeachersOnFileUpload(Long toolContentId, Long toolSessionId, String sessionMapId, String userName,
 	    Long itemUid, String fileName);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     void evict(Object object);
 

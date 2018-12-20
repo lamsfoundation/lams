@@ -467,6 +467,11 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
     	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public String getMessage(String key) {

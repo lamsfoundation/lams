@@ -211,9 +211,7 @@ public class LearningController {
 	resource.setDefineLater(false);
 	resourceService.saveOrUpdateResource(resource);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, resourceService.isLastActivity(sessionId));
 
 	// init resource item list
 	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);

@@ -42,7 +42,7 @@
 
 			<a href="#nogo" class="btn btn-primary pull-right voffset10" onclick="submitForm('finish')">
 				<c:choose>
-					<c:when test="${activityPosition.last}">
+					<c:when test="${isLastActivity}">
 						<fmt:message key="button.submit" />
 					</c:when>
 					<c:otherwise>

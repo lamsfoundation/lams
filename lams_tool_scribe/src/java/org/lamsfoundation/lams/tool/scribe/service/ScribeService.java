@@ -497,9 +497,13 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void submitReport(Long toolSessionId, String userName, ObjectNode requestJSON) {
 	ScribeSession scribeSession = getSessionBySessionId(toolSessionId);
 	ScribeUser scribe = scribeSession.getAppointedScribe();

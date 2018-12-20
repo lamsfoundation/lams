@@ -33,12 +33,13 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Defines the services available to the web layer from the Notebook Service
  */
-public interface INotebookService {
+public interface INotebookService extends ICommonToolService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
      *
@@ -135,15 +136,6 @@ public interface INotebookService {
     void releaseConditionsFromCache(Notebook notebook);
 
     void deleteCondition(NotebookCondition condition);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.

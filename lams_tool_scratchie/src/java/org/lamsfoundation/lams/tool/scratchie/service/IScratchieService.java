@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.quartz.SchedulerException;
 
@@ -52,7 +53,7 @@ import org.quartz.SchedulerException;
  *
  * @author Andrey Balan
  */
-public interface IScratchieService {
+public interface IScratchieService extends ICommonToolService {
 
     /**
      * Get <code>Scratchie</code> by toolContentID.
@@ -362,21 +363,6 @@ public interface IScratchieService {
      * @return message content
      */
     String getMessage(String key);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return all leaders in activity for all groups

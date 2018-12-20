@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -47,7 +48,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  *
  * @author Andrey Balan
  */
-public interface IPeerreviewService extends ToolRatingManager {
+public interface IPeerreviewService extends ToolRatingManager, ICommonToolService {
 
     /**
      * Get <code>Peerreview</code> by toolContentID.
@@ -222,21 +223,6 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @param isHidden
      */
     void setUserHidden(Long toolContentId, Long userUid, boolean isHidden);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     int getCommentsMinWordsLimit(Long toolContentId);
 

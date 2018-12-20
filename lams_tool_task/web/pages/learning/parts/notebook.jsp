@@ -35,7 +35,7 @@
 			<div class="voffset10">
 				<button type="submit" class="btn btn-primary pull-right na" id="finishButton">
 					<span class="nextActivity"> <c:choose>
-							<c:when test="${sessionMap.activityPosition.last}">
+							<c:when test="${sessionMap.isLastActivity}">
 								<fmt:message key="label.submit" />
 							</c:when>
 							<c:otherwise>

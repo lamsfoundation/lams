@@ -104,7 +104,7 @@
 			<c:otherwise>
 				<button type="submit" name="FinishButton" id="finishButton" onclick="javascript:finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
 					<c:choose>
-		 					<c:when test="${sessionMap.activityPosition.last}">
+		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />
 		 					</c:when>
 		 					<c:otherwise>

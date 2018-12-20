@@ -103,7 +103,7 @@
 				<button type="submit" class="btn btn-primary voffset10 pull-right na"
 					id="finishButton" onclick="submitMethod('learnerFinished')">
 					<c:choose>
-						<c:when test="${activityPosition.last}">
+						<c:when test="${isLastActivity}">
 							<fmt:message key="button.submitActivity" />
 						</c:when>
 						<c:otherwise>

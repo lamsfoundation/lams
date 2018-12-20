@@ -45,11 +45,10 @@
 				<div class="form-group">
 					<textarea id="focused" rows="4" name="entryText" class="form-control">${learningForm.entryText}</textarea>
 		
-		
 					<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton"
 						onclick="submitForm('finish');return false">
 						<c:choose>
-							<c:when test="${activityPosition.last}">
+							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />
 							</c:when>
 							<c:otherwise>
@@ -59,20 +58,15 @@
 					</a>
 				</div>
 			</form:form>
-		
 		</lams:Page>
 		
-			<script type="text/javascript">
-				window.onload = function() {
-					document.getElementById("focused").focus();
-				}
-			</script>
-		
-		
+		<script type="text/javascript">
+			window.onload = function() {
+				document.getElementById("focused").focus();
+			}
+		</script>
 
 		<div class="footer">
 		</div>					
 	</body>
 </lams:html>
-
-

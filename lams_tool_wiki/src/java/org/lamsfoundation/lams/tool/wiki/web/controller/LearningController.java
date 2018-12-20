@@ -120,12 +120,11 @@ public class LearningController extends WikiPageController {
 
 	// Set the content in use flag.
 	if (!wiki.isContentInUse()) {
-	    wiki.setContentInUse(new Boolean(true));
+	    wiki.setContentInUse(true);
 	    wikiService.saveOrUpdateWiki(wiki);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, wikiService.isLastActivity(toolSessionID));
 
 	// get the user
 	WikiUser wikiUser;
@@ -322,7 +321,7 @@ public class LearningController extends WikiPageController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionId
-	WikiUser wikiUser = wikiService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	WikiUser wikiUser = wikiService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
 		toolSessionId);
 
 	if (wikiUser == null) {
@@ -388,8 +387,8 @@ public class LearningController extends WikiPageController {
 	    learningForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(learningForm.getToolSessionID(), request,
-		applicationContext.getServletContext());
+	boolean isLastActivity = wikiService.isLastActivity(learningForm.getToolSessionID());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
 
 	return "pages/learning/notebook";
     }

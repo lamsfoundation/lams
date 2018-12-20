@@ -548,6 +548,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
+    
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
 
     @Override
     public String createConditionName(Collection<SurveyCondition> existingConditions) {

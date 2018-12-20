@@ -196,8 +196,7 @@ public class NbLearnerController {
 	Boolean userFinished = (nbUser != null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
 	request.setAttribute("userFinished", userFinished);
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, nbService.isLastActivity(toolSessionID));
 
 	/*
 	 * Checks to see if the runOffline flag is set.
@@ -366,9 +365,7 @@ public class NbLearnerController {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
-
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, nbService.isLastActivity(toolSessionID));
 	return "reflect";
     }
 

@@ -41,13 +41,14 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 
 /**
  * This interface define the contract that all Q/A service provider must follow.
  *
  * @author Ozgur Demirtas
  */
-public interface IQaService extends ToolRatingManager {
+public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     /**
      * @param user
@@ -243,21 +244,6 @@ public interface IQaService extends ToolRatingManager {
     void removeQuestionsFromCache(QaContent qaContent);
 
     void removeQaContentFromCache(QaContent qaContent);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content. It's

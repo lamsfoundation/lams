@@ -156,7 +156,7 @@
 					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button"
 						onclick="submitForm('finish')">
 						<c:choose>
-							<c:when test="${activityPosition.last}">
+							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />
 							</c:when>
 							<c:otherwise>

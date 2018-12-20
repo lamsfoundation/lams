@@ -178,9 +178,7 @@ public class LearningController {
 	Integer totalRecordCount = dacoService.getGroupRecordCount(dacoUser.getSession().getSessionId());
 	sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request,
-		applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dacoService.isLastActivity(sessionId));
 
 	// add define later support
 	if (daco.isDefineLater()) {

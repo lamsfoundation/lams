@@ -105,12 +105,11 @@ public class LearningController {
 
 	// Set the content in use flag.
 	if (!notebook.isContentInUse()) {
-	    notebook.setContentInUse(new Boolean(true));
+	    notebook.setContentInUse(true);
 	    notebookService.saveOrUpdateNotebook(notebook);
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, notebookService.isLastActivity(toolSessionID));
 
 	NotebookUser notebookUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {

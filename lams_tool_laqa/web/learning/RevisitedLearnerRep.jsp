@@ -452,7 +452,7 @@
 					<button type="submit" id="finishButton" onclick="javascript:submitMethod('endLearning');"
 						class="btn btn-primary pull-right na">
 						<c:choose>
-							<c:when test="${sessionMap.activityPosition.last}">
+							<c:when test="${sessionMap.isLastActivity}">
 								<fmt:message key="button.submit" />
 							</c:when>
 							<c:otherwise>

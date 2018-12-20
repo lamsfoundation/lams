@@ -53,7 +53,7 @@
 					<a href="#nogo" name="endLearning" id="finishButton"
 						onclick="javascript:submitMethod('endLearning');return false" class="btn btn-primary pull-right">
 						<span class="na"> <c:choose>
-								<c:when test="${sessionMap.activityPosition.last}">
+								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="button.submit" />
 								</c:when>
 								<c:otherwise>

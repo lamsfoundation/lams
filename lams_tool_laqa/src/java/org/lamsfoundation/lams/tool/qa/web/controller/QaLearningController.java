@@ -236,9 +236,7 @@ public class QaLearningController implements QaAppConstants {
 	    return "learning/defineLater";
 	}
 
-	ActivityPositionDTO activityPosition = WebUtil.putActivityPositionInRequestByToolSessionId(
-		new Long(toolSessionID), request, applicationContext.getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, qaService.isLastActivity(Long.parseLong(toolSessionID)));
 
 	/*
 	 * fetch question content from content

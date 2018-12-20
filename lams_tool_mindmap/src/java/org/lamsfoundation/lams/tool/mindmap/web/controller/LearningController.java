@@ -144,12 +144,11 @@ public class LearningController {
 
 	// Set the content in use flag.
 	if (!mindmap.isContentInUse()) {
-	    mindmap.setContentInUse(new Boolean(true));
+	    mindmap.setContentInUse(true);
 	    mindmapService.saveOrUpdateMindmap(mindmap);
 	}
-
-	WebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
-		applicationContext.getServletContext());
+	
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mindmapService.isLastActivity(toolSessionID));
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -587,9 +586,8 @@ public class LearningController {
 	    request.setAttribute("reflectEntry", entry.getEntry());
 	}
 
-	WebUtil.putActivityPositionInRequestByToolSessionId(mindmapSession.getSessionId(), request,
-		applicationContext.getServletContext());
-
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY,
+		mindmapService.isLastActivity(mindmapSession.getSessionId()));
 	return "pages/learning/reflect";
     }
 

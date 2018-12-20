@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.tool.mindmap.model.MindmapRequest;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapSession;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 import org.lamsfoundation.lams.tool.mindmap.util.xmlmodel.NodeModel;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -41,7 +42,7 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Defines the services available to the web layer from the Mindmap Service
  */
-public interface IMindmapService {
+public interface IMindmapService extends ICommonToolService {
 
     public Mindmap copyDefaultContent(Long newContentID);
 
@@ -74,15 +75,6 @@ public interface IMindmapService {
     void updateEntry(Long uid, String entry);
 
     public void updateEntry(NotebookEntry notebookEntry);
-
-    boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     * 
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     public void setMindmapMessageService(MessageService mindmapMessageService);
 

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
@@ -59,7 +60,7 @@ import org.lamsfoundation.lams.util.MessageService;
  *
  *         Interface that defines the contract Voting service provider must follow.
  */
-public interface IVoteService {
+public interface IVoteService extends ICommonToolService {
 
     /**
      * @return Returns the MessageService.
@@ -255,21 +256,6 @@ public interface IVoteService {
     void saveDataFlowObjectAssigment(DataFlowObject assignedDataFlowObject);
 
     DataFlowObject getAssignedDataFlowObject(Long toolContentId);
-
-    /**
-     * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     *
-     * @param toolContentID
-     * @return
-     */
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.

@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswer;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoSession;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
+import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -42,7 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  *         Interface that defines the contract that all Data Collection service provider must follow.
  */
-public interface IDacoService {
+public interface IDacoService extends ICommonToolService {
 
     /**
      * Get <code>Daco</code> by toolContentID.
@@ -304,13 +305,4 @@ public interface IDacoService {
      * @return
      */
     int getRecordNum(Long userID, Long sessionId);
-
-    boolean isGroupedActivity(long toolContentID);
-
-    /**
-     * Audit log the teacher has started editing activity in monitor.
-     *
-     * @param toolContentID
-     */
-    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }
