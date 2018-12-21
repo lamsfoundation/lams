@@ -88,9 +88,6 @@ public class LearningController {
     private IResourceService resourceService;
 
     @Autowired
-    private WebApplicationContext applicationContext;
-
-    @Autowired
     @Qualifier("resourceMessageService")
     private MessageService messageService;
 

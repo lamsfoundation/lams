@@ -68,7 +68,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -80,9 +79,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/learning")
 public class LearningController implements VoteAppConstants {
     private static Logger logger = Logger.getLogger(LearningController.class.getName());
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @Autowired
     @Qualifier("lavoteMessageService")

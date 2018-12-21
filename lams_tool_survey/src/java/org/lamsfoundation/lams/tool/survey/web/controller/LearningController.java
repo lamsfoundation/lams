@@ -42,7 +42,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -74,17 +73,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 @Controller
 @RequestMapping("/learning")
@@ -93,9 +88,6 @@ public class LearningController {
     @Autowired
     @Qualifier("lasurvSurveyService")
     private ISurveyService surveyService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @Autowired
     @Qualifier("lasurvMessageService")

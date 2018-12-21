@@ -41,7 +41,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -74,7 +73,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -86,9 +84,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class LearningController {
 
     private static Logger log = Logger.getLogger(LearningController.class);
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @Autowired
     private IDacoService dacoService;
@@ -124,7 +119,7 @@ public class LearningController {
     protected String start(@ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -213,7 +208,7 @@ public class LearningController {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -495,7 +490,7 @@ public class LearningController {
 		    request.getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
 	    return "pages/learning/learning";
 	}
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	HttpSession httpSession = SessionManager.getSession();
@@ -555,7 +550,7 @@ public class LearningController {
     // *************************************************************************************
     protected MultiValueMap<String, String> validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	int recordCount = ((List) sessionMap.get(DacoConstants.ATTR_RECORD_LIST)).size();
 	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 	Short min = daco.getMinRecords();
@@ -572,7 +567,7 @@ public class LearningController {
      * @param request
      * @return
      */
-    protected SortedSet<DacoQuestion> getDacoQuestionList(SessionMap sessionMap) {
+    protected SortedSet<DacoQuestion> getDacoQuestionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<DacoQuestion> list = (SortedSet<DacoQuestion>) sessionMap.get(DacoConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
 	    list = new TreeSet<>(new DacoQuestionComparator());
@@ -588,7 +583,7 @@ public class LearningController {
      * @param name
      * @return
      */
-    protected List getListFromSession(SessionMap sessionMap, String name) {
+    protected List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -916,7 +911,7 @@ public class LearningController {
     @RequestMapping("/editRecord")
     protected String editRecord(@ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	int recordIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_RECORD_INDEX), -1);
 	List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
 	if (recordIndex != -1 && records != null && records.size() >= recordIndex) {
@@ -983,7 +978,7 @@ public class LearningController {
     @RequestMapping("/removeRecord")
     protected String removeRecord(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	int recordIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_RECORD_INDEX), -1);
 	List<List<DacoAnswer>> records = (List<List<DacoAnswer>>) sessionMap.get(DacoConstants.ATTR_RECORD_LIST);
 	if (recordIndex != -1 && records != null && records.size() >= recordIndex) {
@@ -1001,7 +996,7 @@ public class LearningController {
     @RequestMapping("/changeView")
     protected String changeView(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
 		WebUtil.readIntParam(request, DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
@@ -1019,7 +1014,7 @@ public class LearningController {
     @RequestMapping("/refreshQuestionSummaries")
     protected String refreshQuestionSummaries(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	DacoUser user = getCurrentUser(dacoService, sessionId, daco);

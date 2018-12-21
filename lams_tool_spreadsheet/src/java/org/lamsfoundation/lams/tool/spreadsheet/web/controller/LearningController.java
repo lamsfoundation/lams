@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -52,7 +51,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 /**
@@ -68,9 +66,6 @@ public class LearningController {
     @Autowired
     @Qualifier("spreadsheetService")
     private ISpreadsheetService service;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     /**
      * Read spreadsheet data from database and put them into HttpSession. It will redirect to init.do directly after
@@ -325,8 +320,7 @@ public class LearningController {
 	HttpSession ss = SessionManager.getSession();
 	//get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	SpreadsheetUser spreadsheetUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
-		sessionId);
+	SpreadsheetUser spreadsheetUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 
 	if (spreadsheetUser == null) {
 	    SpreadsheetSession session = service.getSessionBySessionId(sessionId);
@@ -337,7 +331,7 @@ public class LearningController {
     }
 
     private SpreadsheetUser getSpecifiedUser(ISpreadsheetService service, Long sessionId, Integer userId) {
-	SpreadsheetUser spreadsheetUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+	SpreadsheetUser spreadsheetUser = service.getUserByIDAndSession(userId.longValue(), sessionId);
 	if (spreadsheetUser == null) {
 	    log.error("Unable to find specified user for spreadsheet activity. Screens are likely to fail. SessionId="
 		    + sessionId + " UserId=" + userId);
