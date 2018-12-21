@@ -39,7 +39,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -77,7 +76,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -99,9 +97,6 @@ public class LearningController {
     @Autowired
     @Qualifier("forumMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     // ==========================================================================================
     // Forum level methods

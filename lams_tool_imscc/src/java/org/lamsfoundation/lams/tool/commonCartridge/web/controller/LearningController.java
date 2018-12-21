@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -61,7 +60,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -72,9 +70,6 @@ import org.springframework.web.context.WebApplicationContext;
 public class LearningController {
 
     private static Logger log = Logger.getLogger(LearningController.class);
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @Autowired
     private ICommonCartridgeService commonCartridgeService;

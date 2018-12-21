@@ -54,7 +54,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
@@ -68,9 +67,6 @@ public class LearningController {
     @Autowired
     @Qualifier("zoomMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("finishActivity")
     public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request)

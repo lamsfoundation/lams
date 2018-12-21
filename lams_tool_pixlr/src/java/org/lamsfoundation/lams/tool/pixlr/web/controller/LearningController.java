@@ -70,7 +70,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
@@ -83,9 +82,6 @@ public class LearningController {
 
     @Autowired
     private IPixlrService pixlrService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("")
     public String unspecified(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,

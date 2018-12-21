@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -52,19 +51,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-    private static Logger log = Logger.getLogger(LearningController.class);
 
     private static final boolean MODE_OPTIONAL = false;
 
     @Autowired
     private INotebookService notebookService;
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping(value = "")
     public String unspecified(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request)

@@ -39,7 +39,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -72,7 +71,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
@@ -93,9 +91,6 @@ public class LearningController {
     @Autowired
     @Qualifier("laimagMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after

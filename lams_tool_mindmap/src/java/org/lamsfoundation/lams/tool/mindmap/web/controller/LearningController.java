@@ -71,7 +71,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -83,8 +82,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-
     private static Logger log = Logger.getLogger(LearningController.class);
+    
     private static final boolean MODE_OPTIONAL = false;
 
     private static final String REQUEST_JSON_TYPE = "type"; // Expected to be int: 0 - delete; 1 - create node; 2 - change color; 3 - change text
@@ -97,9 +96,6 @@ public class LearningController {
     @Autowired
     @Qualifier("mindmapMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     /**
      * Default action on page load. Clones Mindmap Nodes for each Learner in single-user mode. Uses shared (runtime

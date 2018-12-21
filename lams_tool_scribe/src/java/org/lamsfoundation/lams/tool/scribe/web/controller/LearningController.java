@@ -58,7 +58,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/learning")
@@ -75,9 +74,6 @@ public class LearningController {
     @Autowired
     @Qualifier("lascrbMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("")
     public String unspecified(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request)
@@ -165,7 +161,7 @@ public class LearningController {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	// attempt to retrieve user using userId and toolSessionID
-	ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+	ScribeUser scribeUser = scribeService.getUserByUserIdAndSessionId(user.getUserID().longValue(),
 		toolSessionID);
 
 	if (scribeUser == null) {
@@ -217,7 +213,7 @@ public class LearningController {
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(user.getUserID().longValue());
+	Long userID = user.getUserID().longValue();
 	Long toolSessionID = scribeUser.getScribeSession().getSessionId();
 
 	String nextActivityUrl;
