@@ -299,6 +299,10 @@ td.contributeEntryCell a {
 }
 }
 
+#lessonDetails #description {
+	overflow: hidden;
+}
+
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
 	text-align: center;
