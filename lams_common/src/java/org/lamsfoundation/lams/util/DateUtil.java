@@ -105,7 +105,7 @@ public class DateUtil {
      */
     public static Date convertToTimeZoneFromDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = new Integer(defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime()));
+	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() - rawOffset);
     }
@@ -121,7 +121,7 @@ public class DateUtil {
      */
     public static Date convertFromTimeZoneToDefault(TimeZone targetTimeZone, Date date) {
 	TimeZone defaultTz = TimeZone.getDefault();
-	Integer rawOffset = new Integer(defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime()));
+	Integer rawOffset = defaultTz.getOffset(date.getTime()) - targetTimeZone.getOffset(date.getTime());
 
 	return new Date(date.getTime() + rawOffset);
     }
