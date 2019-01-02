@@ -869,7 +869,7 @@ public class UserManagementService implements IUserManagementService {
 	if (count != null) {
 	    return count;
 	} else {
-	    return new Integer(0);
+	    return 0;
 	}
     }
 
@@ -881,8 +881,8 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public Theme getDefaultTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
-	List list = findByProperty(Theme.class, "name", "defaultHTML");
-	return list != null ? (Theme) list.get(0) : null;
+	List<Theme> list = findByProperty(Theme.class, "name", htmlName);
+	return list != null ? list.get(0) : null;
     }
 
     @Override
