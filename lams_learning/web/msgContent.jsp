@@ -40,19 +40,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		src="${lams}includes/javascript/common.js"></script>
 </lams:head>
 
-<c:choose>
-		<body class="stripes">
-			<c:set var="title"><fmt:message key="error.title"/></c:set>
-			
-			<lams:Page type="admin" title="${title}">
-			
-				<span class="text-center">
-					 ${messageKey}
-				</span>
-			
-			</lams:Page>
-		</body>
-
-</c:choose>
+<body class="stripes">
+	<c:set var="title"><fmt:message key="error.title"/></c:set>
+	
+	<lams:Page type="admin" title="${title}">
+	
+		<span class="text-center">
+			 ${messageKey}
+		</span>
+	
+	</lams:Page>
+</body>
 
 </lams:html>
