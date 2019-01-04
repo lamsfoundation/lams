@@ -155,7 +155,7 @@ INSERT INTO tl_latask10_tasklist (uid, title,instructions,
 	reflect_on_activity) VALUES
   (1,'Task List','Instructions ',0,0,${default_content_id},0,0,0,0,0,0);
   
-INSERT INTO tl_latask10_tasklist_item (uid, sequence_id, title,  create_date, create_by_author, is_required, is_comments_allowed, is_comments_required, is_files_allowed, is_files_required, is_comments_files_allowed, show_comments_to_all, is_child_task, taskList_uid) VALUES 
-  (1,1,'Task number 1',NOW(),1,0,0,0,0,0,0,1,0,1);
+INSERT INTO tl_latask10_tasklist_item (uid, sequence_id, title,  create_date, create_by_author, is_required, is_comments_allowed, is_comments_required, is_files_allowed, is_files_required, is_child_task, taskList_uid) VALUES 
+  (1,1,'Task number 1',NOW(),1,0,0,0,0,0,0,1);
     
 SET FOREIGN_KEY_CHECKS=1;
