@@ -1,16 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
-
 <h4>
 	<fmt:message key="label.learning.tasks.to.do" />
 </h4>
 
 <div class="panel-group" id="accordion">
-
-
 	<c:forEach var="itemDTO" items="${sessionMap.itemDTOs}" varStatus="status">
 		<c:set var="item" value="${itemDTO.taskListItem}" />
 
@@ -51,17 +45,13 @@
 				
 				<div id="collapse${item.uid}" class="panel-collapse collapse <c:if test="${not item.complete}">in</c:if>">
 					<div class="panel-body">
-						<!-- tasks details -->
-							<%@ include file="/pages/learning/parts/itemdetails.jsp"%>
-						<!-- end task details -->
+						<!-- task details -->
+						<%@ include file="/pages/learning/parts/itemdetails.jsp"%>
 					</div>
 				</div>
 			</div>
 		</c:if>
 	</c:forEach>
-
-
-
 
 	<c:if test="${fn:length(taskList.minimumNumberTasksErrorStr) > 0}">
 		<p class="help-block">

@@ -22,6 +22,9 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
 	<script type="text/javascript">
 
 		function disableButtons() {
@@ -105,6 +108,23 @@
 			if (elem != null) {
 				elem.style.display = "block";
 			}
+		}
+
+		function addNewComment(itemUid) {
+			var comment = $("#comment-" + itemUid).val();
+			//skip submition of empty comments
+			if (!comment) {
+				return;
+			}
+			
+			$("#comment-list-" + itemUid).load(
+				"<c:url value="/learning/addNewComment.do"/>",
+				{
+					itemUid: itemUid,
+					sessionMapID: "${sessionMapID}",
+					comment: comment
+				}
+			);
 		}
 
 	</script>

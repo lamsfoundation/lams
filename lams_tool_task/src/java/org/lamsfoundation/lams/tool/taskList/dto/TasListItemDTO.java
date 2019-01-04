@@ -47,14 +47,14 @@ public class TasListItemDTO {
     private boolean isDisplayedOpen;
 
     //Set of comments posted by the members of the group to which user belong to
-    private Set comments;
+    private Set<TaskListItemComment> comments;
     //Set of files uploaded by the members of the group to which user belong to
-    private Set attachments;
+    private Set<TaskListItemAttachment> attachments;
 
     public TasListItemDTO(TaskListItem taskListItem) {
 	this.taskListItem = taskListItem;
-	comments = new HashSet<TaskListItemComment>();
-	attachments = new HashSet<TaskListItemAttachment>();
+	this.comments = new HashSet<>();
+	this.attachments = new HashSet<>();
     }
 
     //  **********************************************************
@@ -179,7 +179,7 @@ public class TasListItemDTO {
      * 
      * @return set of comments posted by the members of the group to which user belong to
      */
-    public Set getComments() {
+    public Set<TaskListItemComment> getComments() {
 	return comments;
     }
 
@@ -189,7 +189,7 @@ public class TasListItemDTO {
      * @param comments
      *            set of comments posted by the members of the group to which user belong to
      */
-    public void setComments(Set comments) {
+    public void setComments(Set<TaskListItemComment> comments) {
 	this.comments = comments;
     }
 
@@ -198,7 +198,7 @@ public class TasListItemDTO {
      * 
      * @return set of files uploaded by the members of the group to which user belong to
      */
-    public Set getAttachments() {
+    public Set<TaskListItemAttachment> getAttachments() {
 	return attachments;
     }
 
@@ -208,7 +208,7 @@ public class TasListItemDTO {
      * @param attachments
      *            set of files uploaded by the members of the group to which user belong to
      */
-    public void setAttachments(Set attachments) {
+    public void setAttachments(Set<TaskListItemAttachment> attachments) {
 	this.attachments = attachments;
     }
 
