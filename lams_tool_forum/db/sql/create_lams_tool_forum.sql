@@ -8,7 +8,7 @@ create table tl_lafrum11_forum (
    title varchar(255),
    allow_anonym tinyint(1),
    lock_on_finished tinyint(1),
-   instructions text,
+   instructions MEDIUMTEXT,
    content_in_use tinyint(1),
    define_later tinyint(1),
    content_id bigint,
@@ -21,7 +21,7 @@ create table tl_lafrum11_forum (
    minimum_reply integer,
    limited_of_chars integer,
    limited_input_flag tinyint(1),
-   reflect_instructions text,
+   reflect_instructions MEDIUMTEXT,
    reflect_on_activity tinyint(1), 
    notify_learners_on_forum_posting tinyint(1) DEFAULT 0,
    notify_teachers_on_forum_posting tinyint(1) DEFAULT 0,
@@ -37,7 +37,6 @@ create table tl_lafrum11_forum (
 
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
-   version integer not null,
    session_end_date datetime,
    session_start_date datetime,
    status integer,
@@ -67,8 +66,7 @@ create table tl_lafrum11_forum_user (
 
 create table tl_lafrum11_report (
    uid bigint not null auto_increment,
-   comment text,
-   release_date datetime,
+   comment MEDIUMTEXT,
    mark float,
    primary key (uid)
 );
@@ -81,7 +79,7 @@ create table tl_lafrum11_message (
    create_by bigint,
    modified_by bigint,
    subject varchar(255),
-   body text,
+   body MEDIUMTEXT,
    sequence_id integer,
    is_authored tinyint(1),
    is_anonymous tinyint(1),
@@ -132,7 +130,7 @@ CREATE TABLE tl_lafrum11_message_rating (
                   REFERENCES tl_lafrum11_forum_user (uid)
      , INDEX (message_id)
      , CONSTRAINT FK_tl_lafrum11_message_rating_2 FOREIGN KEY (message_id)
-                  REFERENCES tl_lafrum11_message (uid)
+                  REFERENCES tl_lafrum11_message (uid) ON DELETE CASCADE   ON UPDATE CASCADE
 );
 
 CREATE TABLE tl_lafrum11_conditions (
@@ -196,5 +194,15 @@ VALUES(1,"Forum","Instructions",${default_content_id},0,0,0,0,1,0,1,0,0,1,0,1,50
 INSERT INTO tl_lafrum11_message (uid, create_date, last_reply_date, update_date, subject, body,
 								   sequence_id, is_authored, is_anonymous, forum_uid, reply_number, hide_flag)
 VALUES (1,NOW(),NOW(),NOW(),'Topic Heading','Topic message',1,1,0,1,0,0);
+
+CREATE TABLE tl_lafrum11_configuration (
+  uid bigint(20) NOT NULL AUTO_INCREMENT,
+  config_key VARCHAR(30),
+  config_value VARCHAR(255),
+  PRIMARY KEY (uid),
+  UNIQUE KEY config_key (config_key)
+);
+
+INSERT INTO tl_lafrum11_configuration (config_key, config_value) VALUES ('keepLearnerContent',	'false');
 
 SET FOREIGN_KEY_CHECKS=1;

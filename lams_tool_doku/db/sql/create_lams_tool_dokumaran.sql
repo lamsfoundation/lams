@@ -10,7 +10,7 @@ CREATE TABLE tl_ladoku11_dokumaran (
    create_by bigint,
    title varchar(255),
    lock_on_finished tinyint,
-   instructions text,
+   instructions MEDIUMTEXT,
    content_in_use tinyint,
    define_later tinyint,
    content_id bigint unique,
@@ -19,8 +19,10 @@ CREATE TABLE tl_ladoku11_dokumaran (
    shared_pad_id varchar(255),
    use_select_leader_tool_ouput tinyint,
    allow_multiple_leaders tinyint,
-   reflect_instructions TEXT, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity smallint,
+   time_limit integer DEFAULT 0,
+   time_limit_launched_date datetime,
    primary key (uid)
 )ENGINE=InnoDB;
 CREATE TABLE tl_ladoku11_session (

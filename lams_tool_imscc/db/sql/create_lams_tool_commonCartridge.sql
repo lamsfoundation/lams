@@ -6,14 +6,13 @@ create table tl_laimsc11_commoncartridge (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   lock_on_finished tinyint(1),
-   instructions text,
+   instructions MEDIUMTEXT,
    content_in_use tinyint(1),
    define_later tinyint(1),
    content_id bigint,
    mini_view_commonCartridge_number integer,
    allow_auto_run tinyint(1),
-   reflect_instructions text, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity tinyint(1),
    primary key (uid),
    UNIQUE KEY content_id (content_id)
@@ -118,10 +117,10 @@ ALTER TABLE tl_laimsc11_commoncartridge ADD CONSTRAINT FK_NEW_1279208528_89093BF
    		REFERENCES tl_laimsc11_user (uid) ON DELETE SET NULL ON UPDATE CASCADE;
 
    		
-INSERT INTO tl_laimsc11_commoncartridge (uid, title, lock_on_finished,
+INSERT INTO tl_laimsc11_commoncartridge (uid, title,
  instructions, content_in_use, define_later, content_id,
  mini_view_commonCartridge_number, allow_auto_run,reflect_on_activity) VALUES
-  (1,'CommonCartridge','0','Instructions ',0,0,${default_content_id},0,0,0);
+  (1,'CommonCartridge','Instructions ',0,0,${default_content_id},0,0,0);
   
 INSERT INTO tl_laimsc11_commoncartridge_item (uid, title, url, create_date, create_by_author, is_hide, item_type,open_url_new_window, commonCartridge_uid,frame_height) VALUES 
   (1,'Web Search','http://www.google.com ',NOW(),1,0,1,0,1,100);
