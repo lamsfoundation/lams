@@ -2,7 +2,7 @@ CREATE TABLE tl_lavote11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
      , title TEXT
-     , instructions TEXT
+     , instructions MEDIUMTEXT
      , creation_date DATETIME
      , update_date DATETIME
      , maxNominationCount SMALLINT NOT NULL DEFAULT 1
@@ -13,7 +13,7 @@ CREATE TABLE tl_lavote11_content (
      , define_later TINYINT(1) NOT NULL DEFAULT 0
      , lock_on_finish TINYINT(1) NOT NULL DEFAULT 1
      , retries TINYINT(1) NOT NULL DEFAULT 0
-     , reflectionSubject TEXT
+     , reflectionSubject MEDIUMTEXT
      , show_results TINYINT(1) NOT NULL DEFAULT 1
 	 , assigned_data_flow_object TINYINT(1)
      , external_inputs_added SMALLINT DEFAULT 0
@@ -56,7 +56,7 @@ CREATE TABLE tl_lavote11_usr (
 
 CREATE TABLE tl_lavote11_nomination_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , nomination TEXT
+     , nomination MEDIUMTEXT
      , display_order INT(5)
      , vote_content_id BIGINT(20) NOT NULL
      , PRIMARY KEY (uid)

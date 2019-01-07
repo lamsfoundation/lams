@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS=0;
 create table tl_lasprd10_spreadsheet_mark (
    uid bigint not null auto_increment,
    marks FLOAT,
-   comments text,
+   comments MEDIUMTEXT,
    date_marks_released datetime,
    primary key (uid)
 );
@@ -18,12 +18,12 @@ create table tl_lasprd10_spreadsheet (
    is_learner_allowed_to_save TINYINT(1),
    is_marking_enabled TINYINT(1),
    lock_on_finished TINYINT(1),
-   instructions text,
+   instructions MEDIUMTEXT,
    code text,
    content_in_use TINYINT(1),
    define_later TINYINT(1),
    content_id bigint,
-   reflect_instructions text, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity TINYINT(1), 
    primary key (uid),
    UNIQUE KEY content_id (content_id)

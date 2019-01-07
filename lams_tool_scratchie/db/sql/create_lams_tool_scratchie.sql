@@ -6,15 +6,19 @@ create table tl_lascrt11_scratchie (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   instructions text,
+   instructions MEDIUMTEXT,
    define_later TINYINT(1),
    content_id bigint,
-   reflect_instructions text, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity TINYINT(1),
    extra_point TINYINT(1),
    submission_deadline datetime,
    burning_questions_enabled TINYINT(1) DEFAULT 1,
    time_limit int(11) DEFAULT 0,
+   shuffle_items TINYINT(1) DEFAULT 0,
+   confidence_levels_activity_uiid INT(11),
+   preset_marks varchar(255),
+   show_scratchies_in_results TINYINT(1) DEFAULT 1,
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
 );
@@ -45,13 +49,10 @@ create table tl_lascrt11_user (
    login_name varchar(255),
    session_finished TINYINT(1),
    scratching_finished TINYINT(1),
-   session_uid bigint,
    scratchie_uid bigint,
    primary key (uid),
    UNIQUE KEY user_id (user_id,session_uid),
    KEY userIdIndex (user_id),
-   CONSTRAINT FK_NEW_610529188_30113BFC309ED320 FOREIGN KEY (scratchie_uid)
-   		REFERENCES tl_lascrt11_scratchie (uid) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT FK_NEW_610529188_30113BFCEC0D3147 FOREIGN KEY (session_uid)
    		REFERENCES tl_lascrt11_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -59,7 +60,7 @@ create table tl_lascrt11_user (
 create table tl_lascrt11_scratchie_item (
    uid bigint not null auto_increment,
    title varchar(255),
-   description text,
+   description MEDIUMTEXT,
    create_date datetime,
    create_by_author TINYINT(1),
    scratchie_uid bigint,
@@ -74,7 +75,7 @@ create table tl_lascrt11_scratchie_item (
 
 create table tl_lascrt11_scratchie_answer (
    uid bigint not null auto_increment,
-   description text,
+   description MEDIUMTEXT,
    correct TINYINT(1),
    scratchie_item_uid bigint,
    order_id integer,
