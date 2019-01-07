@@ -6,7 +6,7 @@ create table tl_larsrc11_resource (
    create_by bigint,
    title varchar(255),
    lock_on_finished TINYINT(1),
-   instructions text,
+   instructions MEDIUMTEXT,
    content_in_use TINYINT(1),
    define_later TINYINT(1),
    content_id bigint,
@@ -14,7 +14,7 @@ create table tl_larsrc11_resource (
    allow_add_urls TINYINT(1),
    mini_view_resource_number integer,
    allow_auto_run TINYINT(1),
-   reflect_instructions text, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity TINYINT(1),
    assigment_submit_notify TINYINT(1) DEFAULT 0,
    file_upload_notify TINYINT(1) DEFAULT 0,
@@ -74,6 +74,8 @@ create table tl_larsrc11_resource_item (
    resource_uid bigint,
    session_uid bigint,
    order_id integer,
+   is_allow_rating TINYINT(1) default 0,
+   is_allow_comments TINYINT(1) default 0,
    primary key (uid),
    CONSTRAINT FKF52D1F9330E79035 FOREIGN KEY (resource_uid)
    		REFERENCES tl_larsrc11_resource (uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -85,7 +87,7 @@ create table tl_larsrc11_resource_item (
 
 create table tl_larsrc11_item_instruction (
    uid bigint not null auto_increment,
-   description text,
+   description MEDIUMTEXT,
    sequence_id integer,
    item_uid bigint,
    primary key (uid),
@@ -120,7 +122,7 @@ INSERT INTO tl_larsrc11_resource (uid, title, lock_on_finished,
   (1,'Resources','0','Instructions ',0,0,${default_content_id},0,0,0,0,0);
   
 INSERT INTO tl_larsrc11_resource_item (uid, title, url,create_date, create_by_author, is_hide, item_type, open_url_new_window, resource_uid,order_id) VALUES 
-  (1,'Web Search','http://www.google.com ',NOW(),1,0,1,0,1,1);
+  (1,'Web Search','http://www.google.com ',NOW(),1,0,1,1,1,1);
 INSERT INTO tl_larsrc11_item_instruction (uid, description, sequence_id, item_uid) VALUES 
   (1,'Use Google to search the web',0,1);
     

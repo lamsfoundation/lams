@@ -1,5 +1,3 @@
-
- 
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -31,13 +29,13 @@ VALUES
 '@tool_version@',
 0,
 2,
-'tool/lazoom10/learning.do?mode=learner',
-'tool/lazoom10/learning.do?mode=author',
-'tool/lazoom10/learning.do?mode=teacher',
-'tool/lazoom10/authoring.do',
-'tool/lazoom10/monitoring.do',
+'tool/lazoom10/learning/start.do?mode=learner',
+'tool/lazoom10/learning/start.do?mode=author',
+'tool/lazoom10/learning/start.do?mode=teacher',
+'tool/lazoom10/authoring/start.do',
+'tool/lazoom10/monitoring/start.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/lazoom10',
-'tool/lazoom10/admin.do',
+'tool/lazoom10/admin/start.do',
 'org.lamsfoundation.lams.tool.zoom.ApplicationResources',
 NOW(),
 NOW()
