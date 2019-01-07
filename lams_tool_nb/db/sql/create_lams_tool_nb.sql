@@ -12,6 +12,7 @@ CREATE TABLE tl_lanb11_content (
      , date_updated DATETIME
      , allow_comments tinyint(1) DEFAULT 0
      , comments_like_dislike tinyint(1) DEFAULT 0
+     , allow_anonymous TINYINT(1) DEFAULT 0
      , PRIMARY KEY (uid)
      , UNIQUE KEY nb_content_id (nb_content_id)
 );
