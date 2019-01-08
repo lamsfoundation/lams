@@ -46,18 +46,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-
-/**
- *
- *
- *
- *
- *
- *
- */
 @Controller
 public class LoginMaintainController {
-
     private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar + "lams-www.war" + File.separatorChar
 	    + "news.html";
 
