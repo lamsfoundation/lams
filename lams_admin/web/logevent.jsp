@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 
 <%@ include file="/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="label.event.log"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<c:set var="lams"><lams:LAMSURL/></c:set>
-
 	<link rel="stylesheet" href="${lams}css/jquery-ui.timepicker.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
@@ -27,7 +24,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
-	
 	<script type="text/javascript">
 	
 		<fmt:message key="label.lesson.with.name" var="LESSON_LABEL_VAR"><fmt:param value="{0}"/></fmt:message>
@@ -236,18 +232,21 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+	
+		<p>
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
+		</p>
 
-			<div class="form form-inline">
+		<div class="form form-inline">
 				<span><select id="areaMenu" class="form-control" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
 				<select id="typeMenu" class="form-control"></select></span>
 				<span class="pull-right"><fmt:message key="label.between.dates"/>&nbsp;<input type="text" class="form-control" name="startDatePicker" id="startDatePicker" value=""/>
 				&nbsp;<input type="text" class="form-control" name="endDatePicker" id="endDatePicker" value=""/>
 				<a href="#" class="btn btn-default" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>
 				</span>
-			</div>
+		</div>
 		
-			<div class="voffset10">	
+		<div class="voffset10">	
 			<lams:TSTable numColumns="5" dataId="data-session-id='1'">
 					<th style="width:20%"><fmt:message key="label.date"/></th>
 					<th class="no-spinner"><fmt:message key="label.event.type"/></th>
@@ -255,11 +254,8 @@
 					<th class="no-spinner" style="width:12%"><fmt:message key="audit.change.made.to"/></th>
 					<th class="no-spinner"><fmt:message key="audit.remarks"/></th>
 			</lams:TSTable>
-			</div>
+		</div>
+			
 	</lams:Page>
-
 </body>
 </lams:html>
-
-
-

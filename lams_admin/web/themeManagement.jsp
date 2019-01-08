@@ -6,12 +6,11 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.themes.title"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
 	<script type="text/javascript">
 		function editTheme(name, description, imageDirectory, id, currentDefaultTheme) {
@@ -81,8 +80,9 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="themeForm">
-			<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
+		<p>
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
+		</p>
 			
 			<table class="table table-striped table-condensed" >
 				<tr>
@@ -203,12 +203,5 @@
 			</div>
 
 	</lams:Page>
-
 </body>
 </lams:html>
-
-
-
-
-
-

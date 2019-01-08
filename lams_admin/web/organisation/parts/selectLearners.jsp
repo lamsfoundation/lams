@@ -39,7 +39,6 @@
 		var isChecked = $("#checkAllLearners").prop('checked');
 		$("input[name=learners]").prop('checked', isChecked);
 	}
-	//-->
 </script>
 
 <c:if test="${empty learners}">
