@@ -10,7 +10,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	</lams:head>
 	
-	<script language="javascript" type="text/JavaScript">
+	<script type="text/JavaScript">
 		<% if (SessionManager.getSession().getAttribute("results") != null) { %>
 				document.location = '<lams:LAMSURL/>admin/importuserresult.do';
 		<% } %>

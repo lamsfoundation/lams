@@ -13,12 +13,9 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	
-	<script type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 </lams:head>
     
 <body class="stripes">
-
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm">

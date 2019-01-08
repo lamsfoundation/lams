@@ -10,8 +10,7 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>/admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/changeStyle.js"></script>
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">	

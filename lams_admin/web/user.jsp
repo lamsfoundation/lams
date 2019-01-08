@@ -13,40 +13,37 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.user.entry"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
-	<lams:css/>
-	
-	<script src="/lams/includes/javascript/jquery.js"></script>
-	<script src="/lams/includes/javascript/jquery-ui.js"></script>
-	<script src="/lams/includes/javascript/jquery.validate.js"></script>
-	<script src="/lams/includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/portrait.js"></script>
 	<script type="text/javascript">
-	var mustHaveUppercase = ${mustHaveUppercase},
-	mustHaveNumerics  = ${mustHaveNumerics},
-	mustHaveLowercase  = ${mustHaveLowercase},
-	mustHaveSymbols   = ${mustHaveSymbols};
+		var mustHaveUppercase = ${mustHaveUppercase},
+		mustHaveNumerics  = ${mustHaveNumerics},
+		mustHaveLowercase  = ${mustHaveLowercase},
+		mustHaveSymbols   = ${mustHaveSymbols};
 	
-	$.validator.addMethod("pwcheck", function(value) {
-	 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-	(!mustHaveNumerics || /\d/.test(value)) && // has a digit
-	(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-	(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
-	});
+		$.validator.addMethod("pwcheck", function(value) {
+		 return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+		(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+		(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+		(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+		});
 	
 		$.validator.addMethod("charactersAllowed", function(value) {
 			return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 					.test(value)
 		});
 	
-	$.validator.addMethod("notEqualTo", function(value, element, param) {
-		return this.optional(element) || value != param;
-	}, "Please specify a different (non-default) value");
+		$.validator.addMethod("notEqualTo", function(value, element, param) {
+			return this.optional(element) || value != param;
+		}, "Please specify a different (non-default) value");
 
 		$(function() {
 			// Setup form validation 
@@ -164,12 +161,10 @@
 </lams:head>
     
 <body class="stripes">
-
 	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
-	
 	<lams:Page type="admin" title="${title}" formID="userForm">
 	
-				<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
+			<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
 				<form:hidden path="orgId" />
 				<form:hidden path="userId" />
 
@@ -586,6 +581,5 @@
 			</form:form>
 
 	</lams:Page>
-		
 </body>
 </lams:html>

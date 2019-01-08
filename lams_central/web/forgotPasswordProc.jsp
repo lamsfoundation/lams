@@ -13,15 +13,11 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 </lams:head>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	function toHome() {
 		window.location = "<lams:LAMSURL/>index.do";
-	};
+	}
 </script>
-
-<c:set var="title">
-	<fmt:message key="title.forgot.password" />
-</c:set>
 
 <body class="stripes">
 	<c:set var="title"><fmt:message key="title.forgot.password" /></c:set>

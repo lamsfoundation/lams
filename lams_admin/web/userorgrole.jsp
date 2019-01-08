@@ -2,26 +2,23 @@
 
 <%@ include file="/taglibs.jsp"%>
 
-
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.user.entry"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
-	<script language="javascript" type="text/JavaScript">
-	function toggleCheckboxes(roleIndex, object){
-		<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" varStatus="beanIndex" >
-		document.forms.userOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}"/>*(<c:out value="${beanIndex.index}"/>+1)].checked=object.checked;
-		</c:forEach>
-	}
+	<script type="text/JavaScript">
+		function toggleCheckboxes(roleIndex, object){
+			<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" varStatus="beanIndex" >
+			document.forms.userOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}"/>*(<c:out value="${beanIndex.index}"/>+1)].checked=object.checked;
+			</c:forEach>
+		}
 	</script>
-	
 </lams:head>
     
 <body class="stripes">
@@ -81,9 +78,6 @@
 			<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save"/>" />
 		</div>
 		</form:form>
-		</lams:Page>
-
-
+	</lams:Page>
 </body>
 </lams:html>
-
