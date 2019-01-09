@@ -6,15 +6,12 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.servertimezone.title"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
-	
-	<lams:css />
 	<style media="screen,projection" type="text/css">
 		html {
 			margin: 1;
@@ -36,13 +33,15 @@
 			parent.document.location.href ='<c:url value="/timezonemanagement/changeServerTimezone.do?timeZoneId="/>' + $("#timeZoneId").val();
 		}
 	</script>
-
 </lams:head>
     
 <body class="stripes">
-			<lams:Page type="admin" title="${title}">
-				<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
-				<div style="padding: 13px 20px 20px;">
+	<lams:Page type="admin" title="${title}">
+		<h4 class="loffset10">
+			<fmt:message key="admin.servertimezone.select.server.timezone" />
+		</h4>
+		
+		<div style="padding: 13px 20px 20px;">
 			
 					<form:select id="timeZoneId" path="serverTimezone" style="margin-bottom:40px;">
 						<c:forEach items="${timezoneDtos}" var="timezoneDto">
@@ -66,9 +65,8 @@
 							<fmt:message key="admin.servertimezone.select" /> 
 						</a>
 					</div>
-				</div>
-			</lams:Page>
-
+		</div>
+	</lams:Page>
 </body>
 </lams:html>
 

@@ -160,7 +160,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public Resource getDefaultContent(Long contentId) throws ResourceApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ResourceServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ResourceApplicationException(error);
 	}
 
@@ -172,7 +172,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List getAuthoredItems(Long resourceUid) {
+    public List<ResourceItem> getAuthoredItems(Long resourceUid) {
 	return resourceItemDao.getAuthoringItems(resourceUid);
     }
 
@@ -183,16 +183,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     @Override
     public ResourceUser getUserByIDAndContent(Long userId, Long contentId) {
-
 	return resourceUserDao.getUserByUserIDAndContentID(userId, contentId);
-
     }
 
     @Override
     public ResourceUser getUserByIDAndSession(Long userId, Long sessionId) {
-
 	return resourceUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-
     }
 
     @Override
@@ -214,7 +210,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public List<ResourceItem> getResourceItemsBySessionId(Long sessionId) {
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
-	    ResourceServiceImpl.log.error("Failed get ResourceSession by ID [" + sessionId + "]");
+	    log.error("Failed get ResourceSession by ID [" + sessionId + "]");
 	    return null;
 	}
 	// add resource items from Authoring
@@ -322,7 +318,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	int miniView = resourceItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
 	ResourceSession session = resourceSessionDao.getSessionBySessionId(toolSessionId);
 	if (session == null) {
-	    ResourceServiceImpl.log.error("Failed get session by ID [" + toolSessionId + "]");
+	    log.error("Failed get session by ID [" + toolSessionId + "]");
 	    return 0;
 	}
 	int reqView = session.getResource().getMiniViewResourceNumber();
@@ -508,7 +504,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if (session != null) {
 		    toolContentId = session.getResource().getContentId();
 		} else {
-		    ResourceServiceImpl.log.error("setItemVisible: Failed get ResourceSession by ID [" + sessionId
+		    log.error("setItemVisible: Failed get ResourceSession by ID [" + sessionId
 			    + "]. Audit log entry will be created but will be missing tool content id");
 		}
 	    }
@@ -581,7 +577,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	Resource defaultResource = getResourceByContentId(defaultResourceId);
 	if (defaultResource == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ResourceServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ResourceApplicationException(error);
 	}
 
@@ -589,11 +585,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     private Long getToolDefaultContentIdBySignature(String toolSignature) throws ResourceApplicationException {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	Long contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    ResourceServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new ResourceApplicationException(error);
 	}
 	return contentId;
@@ -682,14 +677,13 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setFileType(fileType);
 	    item.setFileName(fileName);
 	} catch (ZipFileUtilException e) {
-	    ResourceServiceImpl.log
-		    .error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
+	    log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.zip.file.exception"));
 	} catch (FileNotFoundException e) {
-	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
+	    log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.file.not.found"));
 	} catch (IOException e) {
-	    ResourceServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
+	    log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
 	    throw new UploadResourceFileException(messageService.getMessage("error.msg.io.exception"));
 	}
     }
@@ -805,15 +799,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
-		    toolContentId);
+	    ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(newUserUid.longValue(), toolContentId);
 	    if (user == null) {
 		user = new ResourceUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
 		user.setFirstName(sysUser.getFirstName());
 		user.setLastName(sysUser.getLastName());
 		user.setLoginName(sysUser.getLogin());
-		user.setUserId(new Long(newUserUid.longValue()));
+		user.setUserId(newUserUid.longValue());
 		user.setResource(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
@@ -875,11 +868,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resourceDao.saveObject(toContent);
 
 	// save resource items as well
-	Set items = toContent.getResourceItems();
+	Set<ResourceItem> items = toContent.getResourceItems();
 	if (items != null) {
-	    Iterator iter = items.iterator();
+	    Iterator<ResourceItem> iter = items.iterator();
 	    while (iter.hasNext()) {
-		ResourceItem item = (ResourceItem) iter.next();
+		ResourceItem item = iter.next();
 		// createRootTopic(toContent.getUid(),null,msg);
 	    }
 	}
@@ -920,7 +913,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (resource == null) {
-	    ResourceServiceImpl.log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -935,16 +928,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ResourceServiceImpl.log.isDebugEnabled()) {
-	    ResourceServiceImpl.log.debug(
+	if (log.isDebugEnabled()) {
+	    log.debug(
 		    "Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (resource == null) {
-	    ResourceServiceImpl.log
+	    log
 		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
@@ -999,11 +991,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    ResourceServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    ResourceServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 
@@ -1012,7 +1004,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    session.setStatus(ResourceConstants.COMPLETED);
 	    resourceSessionDao.saveObject(session);
 	} else {
-	    ResourceServiceImpl.log.error("Fail to leave tool Session.Could not find shared resources "
+	    log.error("Fail to leave tool Session.Could not find shared resources "
 		    + "session by given session id: " + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared resource session by given session id: " + toolSessionId);
@@ -1246,7 +1238,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	// **************************** Handle topic *********************
 	ArrayNode resources = JsonUtil.optArray(toolContentJSON, "resources");
-	Set itemList = new LinkedHashSet();
+	Set<ResourceItem> itemList = new LinkedHashSet<>();
 	for (JsonNode itemData : resources) {
 	    ResourceItem item = new ResourceItem();
 	    item.setTitle(JsonUtil.optString(itemData, "title"));
@@ -1270,7 +1262,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    ArrayNode instructionStrings = JsonUtil.optArray(itemData, "instructions");
 	    if ((instructionStrings != null) && (instructionStrings.size() > 0)) {
-		Set instructions = new LinkedHashSet();
+		Set<ResourceItemInstruction> instructions = new LinkedHashSet<>();
 		for (int j = 0; j < instructionStrings.size(); j++) {
 		    ResourceItemInstruction rii = new ResourceItemInstruction();
 		    rii.setDescription(instructionStrings.get(j).asText(null));
@@ -1288,11 +1280,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    itemList.add(item);
 	}
-
 	resource.setResourceItems(itemList);
 
 	saveOrUpdateResource(resource);
-
     }
 
     @Override

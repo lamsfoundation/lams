@@ -10,19 +10,18 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
 </lams:head>
     
 <body class="stripes">
-	
 	<c:set var="title">${title}: <fmt:message key="admin.add.edit.signup.page"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="signupForm">
+	
 		<div>
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
 			<a href="<lams:LAMSURL/>admin/signupManagement/start.do" class="btn btn-default loffset5"><fmt:message key="admin.signup.title" /></a>
-			</div>
+		</div>
 			
-			<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
+		<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
 				<form:hidden path="signupOrganisationId" />
 				
 				<table class="table table-condensed table-no-border">
@@ -105,9 +104,8 @@
 					<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</div>
 			
-			</form:form>
+		</form:form>
 	</lams:Page>
-
 </body>
 </lams:html>
 

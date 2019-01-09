@@ -44,9 +44,9 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * Interface that defines the contract that all ShareResource service provider must follow.
+ * 
  * @author Dapeng.Ni
- *
- *         Interface that defines the contract that all ShareResource service provider must follow.
  */
 public interface IResourceService extends ICommonToolService {
 
@@ -74,7 +74,7 @@ public interface IResourceService extends ICommonToolService {
      * @param resourceUid
      * @return
      */
-    List getAuthoredItems(Long resourceUid);
+    List<ResourceItem> getAuthoredItems(Long resourceUid);
 
     /**
      * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.

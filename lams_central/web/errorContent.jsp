@@ -10,12 +10,12 @@
 <lams:head>
 	<base href="<lams:LAMSURL/>"/>
 	<title><fmt:message key="heading.general.error" /></title>
-	<lams:css/>
-	<script language="JavaScript" type="text/JavaScript" src="<lams:WebAppURL />includes/javascript/changeStyle.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	<lams:css/>
+
+	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
 </lams:head>
     
 <body class="stripes">
@@ -35,6 +35,3 @@
 </lams:Page>
 </body>
 </lams:html>
-
-
-
