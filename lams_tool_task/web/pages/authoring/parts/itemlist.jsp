@@ -11,9 +11,6 @@
 
 		<c:forEach var="taskList" items="${sessionMap.taskListList}" varStatus="status">
 			<tr>
-				<td width="5%" class="field-name align-right">
-					<fmt:message key="label.authoring.basic.resource.task" />
-				</td>
                  <td>
 					<c:out value="${taskList.title}" escapeXml="true"/>
 				</td>

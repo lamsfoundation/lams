@@ -140,7 +140,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		.setMaxResults(size);
 	List<Object[]> list = query.list();
 
-	ArrayList<VisitLogDTO> visitLogDto = new ArrayList<VisitLogDTO>();
+	ArrayList<VisitLogDTO> visitLogDtos = new ArrayList<VisitLogDTO>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
@@ -152,18 +152,18 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 			: new Date(completeDate.getTime() - accessDate.getTime());
 		Long portraitId =  element[4] == null ? null : ((Number) element[4]).longValue();
 
-		VisitLogDTO userDto = new VisitLogDTO();
-		userDto.setUserId(userId);
-		userDto.setUserFullName(userFullName);
-		userDto.setCompleteDate(completeDate);
-		userDto.setAccessDate(accessDate);
-		userDto.setTimeTaken(timeTaken);
-		userDto.setPortraitId(portraitId);;
-		visitLogDto.add(userDto);
+		VisitLogDTO visitLogDto = new VisitLogDTO();
+		visitLogDto.setUserId(userId);
+		visitLogDto.setUserFullName(userFullName);
+		visitLogDto.setCompleteDate(completeDate);
+		visitLogDto.setAccessDate(accessDate);
+		visitLogDto.setTimeTaken(timeTaken);
+		visitLogDto.setPortraitId(portraitId);;
+		visitLogDtos.add(visitLogDto);
 	    }
 	}
 
-	return visitLogDto;
+	return visitLogDtos;
     }
 
     @Override

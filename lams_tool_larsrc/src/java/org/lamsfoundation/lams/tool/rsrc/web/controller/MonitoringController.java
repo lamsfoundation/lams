@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -64,15 +63,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/monitoring")
 public class MonitoringController {
-    public static Logger log = Logger.getLogger(MonitoringController.class);
-
     @Autowired
     private IResourceService resourceService;
 
     @RequestMapping("/summary")
-    private String summary(HttpServletRequest request) {
+    public String summary(HttpServletRequest request) {
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
@@ -100,12 +97,12 @@ public class MonitoringController {
     }
 
     @RequestMapping("/listuser")
-    private String listuser(HttpServletRequest request) {
+    public String listuser(HttpServletRequest request) {
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 
 	// get user list by given item uid
-	List list = resourceService.getUserListBySessionItem(sessionId, itemUid);
+	List<ResourceUser> list = resourceService.getUserListBySessionItem(sessionId, itemUid);
 
 	// set to request
 	request.setAttribute(ResourceConstants.ATTR_USER_LIST, list);
@@ -113,8 +110,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/getSubgridData")
-    private String getSubgridData(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String getSubgridData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -139,8 +135,8 @@ public class MonitoringController {
 	DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
 	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
 	HttpSession ss = SessionManager.getSession();
-	UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	TimeZone monitorTimeZone = learnerDto.getTimeZone();
+	UserDTO monitorDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	TimeZone monitorTimeZone = monitorDto.getTimeZone();
 	int i = 1;
 	for (VisitLogDTO visitLogDto : visitLogDtos) {
 
@@ -157,7 +153,8 @@ public class MonitoringController {
 			    DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getCompleteDate()));
 	    visitLogData.add(completeDate);
 	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? ""
-		    : timeTakenFormatter.format(visitLogDto.getTimeTaken());
+		    : timeTakenFormatter
+			    .format(DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getTimeTaken()));
 	    visitLogData.add(timeTaken);
 	    visitLogData.add(visitLogDto.getPortraitId());
 
@@ -180,7 +177,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/changeItemVisibility")
-    private String changeItemVisibility(HttpServletRequest request) {
+    public String changeItemVisibility(HttpServletRequest request) {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, ResourceConstants.PARAM_IS_HIDE_ITEM);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -191,7 +188,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/viewReflection")
-    private String viewReflection(HttpServletRequest request) {
+    public String viewReflection(HttpServletRequest request) {
 
 	Long uid = WebUtil.readLongParam(request, ResourceConstants.ATTR_USER_UID);
 	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -216,9 +213,9 @@ public class MonitoringController {
 	return "pages/monitoring/reflections";
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("/viewComments")
-    private String viewComments(HttpServletRequest request) {
-
+    public String viewComments(HttpServletRequest request) {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 

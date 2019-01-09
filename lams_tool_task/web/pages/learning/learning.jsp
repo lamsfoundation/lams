@@ -22,6 +22,9 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
 	<script type="text/javascript">
 
 		function disableButtons() {
@@ -105,6 +108,30 @@
 			if (elem != null) {
 				elem.style.display = "block";
 			}
+		}
+
+		function addNewComment(itemUid) {
+			var comment = $("#comment-" + itemUid).val();
+			//skip submition of empty comments
+			if (!comment) {
+				return;
+			}
+			
+			$("#comment-list-" + itemUid).load(
+				"<c:url value="/learning/addNewComment.do"/>",
+				{
+					itemUid: itemUid,
+					sessionMapID: "${sessionMapID}",
+					comment: comment
+				},
+				function() {
+					//show complete item button in case comment is required and only its absence prevented it from completion
+					var i = $("#item-faminus-" + itemUid);
+					if (eval(i.data("waiting-for-comment"))) {
+						i.replaceWith( '<a href="javascript:;" onclick="return completeItem(' + itemUid + ')"><i class="fa fa-lg fa-square-o"></i></a>' );
+					}
+				}
+			);
 		}
 
 	</script>

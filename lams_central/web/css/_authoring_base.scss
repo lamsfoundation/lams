@@ -314,6 +314,7 @@ div#ldStoreDialogContents #ldStoreDialogNameContainer input {
 div.branchMappingDialog {
 	margin-left: 10px;
 	margin-right: 10px;
+	display: block; // override the none for dialogContents
 }
 
 div.branchMappingDialog .container-fluid {

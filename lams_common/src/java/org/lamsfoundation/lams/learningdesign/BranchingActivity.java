@@ -31,6 +31,7 @@ import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.BranchingActivityStrategy;
@@ -40,6 +41,7 @@ import org.lamsfoundation.lams.util.MessageService;
 /**
  * @author Mitchell Seaton
  */
+@MappedSuperclass
 abstract public class BranchingActivity extends ComplexActivity implements Serializable, ISystemToolActivity {
 
     private static final long serialVersionUID = -7920442950752010105L;

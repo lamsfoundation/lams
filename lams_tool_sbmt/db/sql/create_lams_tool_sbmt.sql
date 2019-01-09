@@ -3,11 +3,11 @@ SET FOREIGN_KEY_CHECKS=0;
 create table tl_lasbmt11_content (
    content_id bigint not null,
    title varchar(255) not null,
-   instruction text,
+   instruction MEDIUMTEXT,
    define_later TINYINT(1),
    content_in_use TINYINT(1),
    lock_on_finished TINYINT(1),
-   reflect_instructions TEXT, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity TINYINT(1), 
    limit_upload TINYINT(1), 
    limit_upload_number integer,
@@ -17,6 +17,7 @@ create table tl_lasbmt11_content (
    submission_deadline datetime,
    mark_release_notify TINYINT(1) DEFAULT 0,
    file_submit_notify TINYINT(1) DEFAULT 0,
+   use_select_leader_tool_ouput TINYINT(1) NOT NULL DEFAULT 0,
    primary key (content_id)
 );
 
@@ -25,9 +26,14 @@ create table tl_lasbmt11_session (
    status TINYINT(1),
    content_id bigint,
    session_name varchar(250),
-   primary key (session_id),
+   group_leader_uid BIGINT,
+   marks_released TINYINT(1) DEFAULT 0,
+   PRIMARY KEY (session_id),
+   KEY FK_lasbmt11_session_1 (group_leader_uid),
    CONSTRAINT FKEC8C77C9785A173A FOREIGN KEY (content_id)
-   		REFERENCES tl_lasbmt11_content (content_id) ON DELETE CASCADE ON UPDATE CASCADE
+   		REFERENCES tl_lasbmt11_content (content_id) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT tl_lasbmt11_session FOREIGN KEY (group_leader_uid) 
+   		REFERENCES tl_lasbmt11_user (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table tl_lasbmt11_user (
@@ -39,7 +45,8 @@ create table tl_lasbmt11_user (
 	login_name varchar(255), 
 	last_name varchar(255), 
 	content_id bigint, 
-	primary key (uid),
+	PRIMARY KEY (uid),
+	UNIQUE KEY user_id (user_id, session_id),
 	KEY session_id (session_id),
     CONSTRAINT tl_lasbmt11_user_ibfk_1 FOREIGN KEY (session_id)
     		REFERENCES tl_lasbmt11_session (session_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -48,7 +55,7 @@ create table tl_lasbmt11_user (
 create table tl_lasbmt11_submission_details (
    submission_id bigint not null auto_increment,
    filePath varchar(250),
-   fileDescription text,
+   fileDescription MEDIUMTEXT,
    date_of_submission datetime,
    uuid bigint,
    version_id bigint,
@@ -64,13 +71,12 @@ create table tl_lasbmt11_submission_details (
 
 create table tl_lasbmt11_report (
    report_id bigint not null auto_increment,
-   comments text,
+   comments MEDIUMTEXT,
    marks float,
-   date_marks_released datetime,
    mark_file_uuid bigint,
    mark_file_version_id bigint,
    mark_file_name varchar(255),
-   primary key (report_id),
+   PRIMARY KEY (report_id),
    CONSTRAINT tl_lasbmt11_report_ibfk_1 FOREIGN KEY (report_id)
    		REFERENCES tl_lasbmt11_submission_details (submission_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

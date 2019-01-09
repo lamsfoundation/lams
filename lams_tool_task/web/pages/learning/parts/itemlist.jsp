@@ -1,16 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
-
 <h4>
 	<fmt:message key="label.learning.tasks.to.do" />
 </h4>
 
 <div class="panel-group" id="accordion">
-
-
 	<c:forEach var="itemDTO" items="${sessionMap.itemDTOs}" varStatus="status">
 		<c:set var="item" value="${itemDTO.taskListItem}" />
 
@@ -21,7 +15,7 @@
 					<div class="panel-title pull-left" data-toggle="collapse" data-target="#collapse${item.uid}">
 						<c:out value="${item.title}" escapeXml="true" /> 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
+							[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
 						</c:if>
 						<c:if test="${item.required}">
 							*
@@ -34,16 +28,17 @@
 								<i title="<fmt:message key='label.completed' />" class="fa fa-lg fa-check text-success"></i>
 							</c:when>
 
-							<c:when
-								test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
+							<c:when test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
 									&& itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}">
-								<a href="javascript:;" onclick="return completeItem(${item.uid})"> <i class="fa fa-lg fa-square-o"></i>
-
+								<a href="javascript:;" onclick="return completeItem(${item.uid})"> 
+									<i class="fa fa-lg fa-square-o"></i>
 								</a>
 							</c:when>
 
 							<c:otherwise>
-								<i class="fa fa-lg fa-minus"></i>
+								<i id="item-faminus-${item.uid}" class="fa fa-lg fa-minus" 
+									data-waiting-for-comment="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
+									&& !itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}"></i>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -51,17 +46,13 @@
 				
 				<div id="collapse${item.uid}" class="panel-collapse collapse <c:if test="${not item.complete}">in</c:if>">
 					<div class="panel-body">
-						<!-- tasks details -->
-							<%@ include file="/pages/learning/parts/itemdetails.jsp"%>
-						<!-- end task details -->
+						<!-- task details -->
+						<%@ include file="/pages/learning/parts/itemdetails.jsp"%>
 					</div>
 				</div>
 			</div>
 		</c:if>
 	</c:forEach>
-
-
-
 
 	<c:if test="${fn:length(taskList.minimumNumberTasksErrorStr) > 0}">
 		<p class="help-block">

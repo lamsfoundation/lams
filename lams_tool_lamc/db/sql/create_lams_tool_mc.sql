@@ -4,7 +4,7 @@ CREATE TABLE tl_lamc11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , content_id BIGINT(20) NOT NULL
      , title TEXT
-     , instructions TEXT
+     , instructions MEDIUMTEXT
      , creation_date DATETIME
      , update_date DATETIME
      , reflect TINYINT(1) NOT NULL DEFAULT 0
@@ -14,13 +14,15 @@ CREATE TABLE tl_lamc11_content (
      , retries TINYINT(1) NOT NULL DEFAULT 0
      , pass_mark INTEGER
      , show_report TINYINT(1) NOT NULL DEFAULT 0
-     , reflectionSubject TEXT
+     , reflectionSubject MEDIUMTEXT
      , showMarks TINYINT(1) NOT NULL DEFAULT 0
      , randomize TINYINT(1) NOT NULL DEFAULT 0
      , displayAnswers TINYINT(1) NOT NULL DEFAULT 1
      , submission_deadline datetime
      , use_select_leader_tool_ouput tinyint(1) NOT NULL DEFAULT 0
      , prefix_answers_with_letters tinyint(1) NOT NULL DEFAULT 1
+     , enable_confidence_levels TINYINT(1) NOT NULL DEFAULT 0
+     , display_feedback_only TINYINT(1) NOT NULL DEFAULT 0
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 );
@@ -60,11 +62,12 @@ CREATE TABLE tl_lamc11_que_usr (
 
 CREATE TABLE tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , question TEXT
+     , question MEDIUMTEXT
      , mark INT(5) NOT NULL DEFAULT 1
      , display_order INT(5)
      , mc_content_id BIGINT(20) NOT NULL
-     , feedback TEXT
+     , feedback MEDIUMTEXT
+     , question_hash CHAR(40)
      , PRIMARY KEY (uid)
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_que_content_1 FOREIGN KEY (mc_content_id)
@@ -75,7 +78,7 @@ CREATE TABLE tl_lamc11_options_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , correct_option TINYINT(1) NOT NULL DEFAULT 0
      , mc_que_content_id BIGINT(20)
-     , mc_que_option_text TEXT
+     , mc_que_option_text MEDIUMTEXT
      , displayOrder INT(5)
      , PRIMARY KEY (uid)
      , INDEX (mc_que_content_id)
@@ -92,6 +95,7 @@ CREATE TABLE tl_lamc11_usr_attempt (
      , isAttemptCorrect TINYINT(1) NOT NULL DEFAULT 0
      , mark VARCHAR(255)
      , passed TINYINT(1) NOT NULL DEFAULT 0
+     , confidence_level INT(11) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , UNIQUE KEY attempt_unique_index (que_usr_id,mc_que_content_id)
      , INDEX (mc_que_content_id)

@@ -52,7 +52,7 @@ CREATE TABLE tl_lamind10_node (
   unique_id bigint(20),
   parent_id bigint(20),
   node_text varchar(100),
-  node_color varchar(6),
+  node_color varchar(7),
   session_id bigint(20),
   user_id bigint(20),
   mindmap_id bigint(20),

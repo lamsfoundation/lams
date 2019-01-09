@@ -1933,7 +1933,7 @@ GeneralLib = {
 							// re-arrange only if it is old SVG being converted into new one
 							arrangeNeeded |= (activityData.xCoord != null && activityData.yCoord != null)
 											 || activityData.startXCoord == null
-											 || activityData.startXCoord == null;
+											 || activityData.startYCoord == null;
 							var branchingType = branchingType || 'optional',
 								branchingEdge = new ActivityDefs.BranchingEdgeActivity(activityData.activityID,
 										activityData.activityUIID,

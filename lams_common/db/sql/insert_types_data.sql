@@ -1,321 +1,235 @@
-INSERT INTO lams_privilege VALUES (1,'Z','do anything');
-INSERT INTO lams_privilege VALUES (2,'A','add/remove/modify classes within the course');
-INSERT INTO lams_privilege VALUES (3,'B','create running instances of sequences and assign those to a class');
-INSERT INTO lams_privilege VALUES (4,'C','stop/start running sequences');
-INSERT INTO lams_privilege VALUES (5,'D','monitor the progress of learners');
-INSERT INTO lams_privilege VALUES (6,'E','participates in sequences');
-INSERT INTO lams_privilege VALUES (7,'F','export their progress on each running sequence');
-INSERT INTO lams_privilege VALUES (8,'G','write/create/delete permissions in course content folder');
-INSERT INTO lams_privilege VALUES (9,'H','read course content folder');
-INSERT INTO lams_privilege VALUES (10,'I','create new users');
-INSERT INTO lams_privilege VALUES (11,'J','create guest users');
-INSERT INTO lams_privilege VALUES (12,'K','change status of course');
-INSERT INTO lams_privilege VALUES (13,'L','browse all users in the system');
-INSERT INTO lams_privilege VALUES (14,'M','write/create/delete permissions in all course content folders');
+SET FOREIGN_KEY_CHECKS=0;
+SET NAMES utf8mb4 ;
 
-INSERT INTO lams_role VALUES (1, 'SYSADMIN', 'LAMS System Adminstrator', NOW());
-INSERT INTO lams_role VALUES (2, 'GROUP MANAGER', 'Group Manager', NOW());
-INSERT INTO lams_role VALUES (3, 'AUTHOR', 'Authors Learning Designs', NOW());
-INSERT INTO lams_role VALUES (4, 'MONITOR', 'Member of Staff', NOW());
-INSERT INTO lams_role VALUES (5, 'LEARNER', 'Student', NOW());
-INSERT INTO lams_role VALUES (6, 'GROUP ADMIN', 'Group Administrator', NOW());
+--
+-- Dumping data for table `lams_activity_category`
+--
 
-INSERT INTO lams_role_privilege VALUES (NULL,1,1);
-INSERT INTO lams_role_privilege VALUES (NULL,2,2);
-INSERT INTO lams_role_privilege VALUES (NULL,2,3);
-INSERT INTO lams_role_privilege VALUES (NULL,2,4);
-INSERT INTO lams_role_privilege VALUES (NULL,2,5);
-INSERT INTO lams_role_privilege VALUES (NULL,2,8);
-INSERT INTO lams_role_privilege VALUES (NULL,2,9);
-INSERT INTO lams_role_privilege VALUES (NULL,2,10);
-INSERT INTO lams_role_privilege VALUES (NULL,2,12);
-INSERT INTO lams_role_privilege VALUES (NULL,2,13);
-INSERT INTO lams_role_privilege VALUES (NULL,3,8);
-INSERT INTO lams_role_privilege VALUES (NULL,3,9);
-INSERT INTO lams_role_privilege VALUES (NULL,4,3);
-INSERT INTO lams_role_privilege VALUES (NULL,4,4);
-INSERT INTO lams_role_privilege VALUES (NULL,4,5);
-INSERT INTO lams_role_privilege VALUES (NULL,5,6);
-INSERT INTO lams_role_privilege VALUES (NULL,5,7);
-INSERT INTO lams_role_privilege VALUES (NULL,6,2);
-INSERT INTO lams_role_privilege VALUES (NULL,6,10);
-INSERT INTO lams_role_privilege VALUES (NULL,6,12);
-INSERT INTO lams_role_privilege VALUES (NULL,6,13);
+LOCK TABLES `lams_activity_category` WRITE;
+INSERT INTO `lams_activity_category` VALUES (1,'SYSTEM'),(2,'COLLABORATION'),(3,'ASSESSMENT'),(4,'CONTENT'),(5,'SPLIT'),(6,'RESPONSE');
+UNLOCK TABLES;
 
+--
+-- Dumping data for table `lams_auth_method_type`
+--
 
-INSERT INTO lams_auth_method_type VALUES(1, 'LAMS');
-INSERT INTO lams_auth_method_type VALUES(2, 'WEB_AUTH');
-INSERT INTO lams_auth_method_type VALUES(3, 'LDAP');
+LOCK TABLES `lams_auth_method_type` WRITE;
+INSERT INTO `lams_auth_method_type` VALUES (1,'LAMS'),(2,'WEB_AUTH'),(3,'LDAP');
+UNLOCK TABLES;
 
-INSERT INTO lams_organisation_type VALUES(1, 'ROOT ORGANISATION', 'root all other organisations: controlled by Sysadmin');
-INSERT INTO lams_organisation_type VALUES(2, 'COURSE ORGANISATION', 'main organisation level - equivalent to an entire course.');
-INSERT INTO lams_organisation_type VALUES(3, 'CLASS', 'runtime organisation level - lessons are run for classes.');
+--
+-- Dumping data for table `lams_authentication_method`
+--
 
-INSERT INTO lams_organisation_state VALUES (1, 'ACTIVE');
-INSERT INTO lams_organisation_state VALUES (2, 'HIDDEN');
-INSERT INTO lams_organisation_state VALUES (3, 'ARCHIVED');
-INSERT INTO lams_organisation_state VALUES (4, 'REMOVED');
+LOCK TABLES `lams_authentication_method` WRITE;
+INSERT INTO `lams_authentication_method` VALUES (1,1,'LAMS-Database'),(3,3,'MQ-LDAP');
+UNLOCK TABLES;
 
-INSERT INTO lams_grouping_type VALUES (1, 'RANDOM_GROUPING');
-INSERT INTO lams_grouping_type VALUES (2, 'CHOSEN_GROUPING');
-INSERT INTO lams_grouping_type VALUES (3, 'CLASS_GROUPING');
-INSERT INTO lams_grouping_type VALUES (4, 'LEARNER_CHOICE_GROUPING');
+--
+-- Dumping data for table `lams_copy_type`
+--
 
-INSERT INTO lams_tool_session_type VALUES (1, 'NON_GROUPED');
-INSERT INTO lams_tool_session_type VALUES (2, 'GROUPED');
+LOCK TABLES `lams_copy_type` WRITE;
+INSERT INTO `lams_copy_type` VALUES (1,'NONE'),(2,'LESSON'),(3,'PREVIEW');
+UNLOCK TABLES;
 
-INSERT INTO lams_learning_activity_type VALUES (1, 'TOOL');
-INSERT INTO lams_learning_activity_type VALUES (2, 'GROUPING');
-INSERT INTO lams_learning_activity_type VALUES (3, 'GATE_SYNCH');
-INSERT INTO lams_learning_activity_type VALUES (4, 'GATE_SCHEDULE');
-INSERT INTO lams_learning_activity_type VALUES (5, 'GATE_PERMISSION');
-INSERT INTO lams_learning_activity_type VALUES (6, 'PARALLEL');
-INSERT INTO lams_learning_activity_type VALUES (7, 'OPTIONS');
-INSERT INTO lams_learning_activity_type VALUES (8, 'SEQUENCE');
-INSERT INTO lams_learning_activity_type VALUES (9, 'GATE_SYSTEM');
-INSERT INTO lams_learning_activity_type VALUES (10, 'BRANCHING_CHOSEN');
-INSERT INTO lams_learning_activity_type VALUES (11, 'BRANCHING_GROUP');
-INSERT INTO lams_learning_activity_type VALUES (12, 'BRANCHING_TOOL');
-INSERT INTO lams_learning_activity_type VALUES (13, 'OPTIONS_WITH_SEQUENCES');
-INSERT INTO lams_learning_activity_type VALUES (14, 'GATE_CONDITION');
-INSERT INTO lams_learning_activity_type VALUES (15, 'FLOATING');
+--
+-- Dumping data for table `lams_ext_server_org_map`
+--
 
-INSERT INTO lams_gate_activity_level VALUES (1, 'LEARNER');
-INSERT INTO lams_gate_activity_level VALUES (2, 'GROUP');
-INSERT INTO lams_gate_activity_level VALUES (3, 'CLASS');
+LOCK TABLES `lams_ext_server_org_map` WRITE;
+INSERT INTO `lams_ext_server_org_map` VALUES (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','',0x01,80,0,NULL,1,NULL,0,0,1,1,0,0,1);
+UNLOCK TABLES;
 
-INSERT INTO lams_tool_session_state VALUES  (1, 'STARTED');
-INSERT INTO lams_tool_session_state VALUES  (2, 'ENDED');
+--
+-- Dumping data for table `lams_ext_server_type`
+--
 
-INSERT INTO lams_lesson_state VALUES (1, 'CREATED');
-INSERT INTO lams_lesson_state VALUES (2, 'NOT_STARTED');
-INSERT INTO lams_lesson_state VALUES (3, 'STARTED');
-INSERT INTO lams_lesson_state VALUES (4, 'SUSPENDED');
-INSERT INTO lams_lesson_state VALUES (5, 'FINISHED');
-INSERT INTO lams_lesson_state VALUES (6, 'ARCHIVED');
-INSERT INTO lams_lesson_state VALUES (7, 'REMOVED');
+LOCK TABLES `lams_ext_server_type` WRITE;
+INSERT INTO `lams_ext_server_type` VALUES (1,'INTEGRATED SERVER'),(2,'LTI TOOL CONSUMER');
+UNLOCK TABLES;
 
-INSERT into lams_license VALUES (1, 'LAMS Recommended: CC Attribution-Noncommercial-ShareAlike 2.5', 'by-nc-sa', 'http://creativecommons.org/licenses/by-nc-sa/2.5/', 1, '/images/license/byncsa.jpg');
-INSERT into lams_license VALUES (2, 'CC Attribution-No Derivatives 2.5', 'by-nd', 'http://creativecommons.org/licenses/by-nd/2.5/',0,'/images/license/bynd.jpg');
-INSERT into lams_license VALUES (3, 'CC Attribution-Noncommercial-No Derivatives 2.5', 'by-nc-nd', 'http://creativecommons.org/licenses/by-nc-nd/2.5/',0, '/images/license/byncnd.jpg');
-INSERT into lams_license VALUES (4, 'CC Attribution-Noncommercial 2.5', 'by-nc', 'http://creativecommons.org/licenses/by-nc/2.5/',0,'/images/license/bync.jpg');
-INSERT into lams_license VALUES (5, 'CC Attribution-ShareAlike 2.5', 'by-sa', 'http://creativecommons.org/licenses/by-sa/2.5/',0,'/images/license/byncsa.jpg'); 
-INSERT into lams_license VALUES (6, 'Other Licensing Agreement', 'other', '',0, '');
+--
+-- Dumping data for table `lams_gate_activity_level`
+--
 
-INSERT into lams_copy_type VALUES(1,'NONE');
-INSERT into lams_copy_type VALUES(2,'LESSON');
-INSERT into lams_copy_type VALUES(3,'PREVIEW');
+LOCK TABLES `lams_gate_activity_level` WRITE;
+INSERT INTO `lams_gate_activity_level` VALUES (1,'LEARNER'),(2,'GROUP'),(3,'CLASS');
+UNLOCK TABLES;
 
-INSERT into lams_workspace_folder_type VALUES (1, 'NORMAL');
-INSERT into lams_workspace_folder_type VALUES (2, 'RUN SEQUENCES');
-INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
+--
+-- Dumping data for table `lams_grouping_support_type`
+--
 
-INSERT INTO lams_authentication_method VALUES (1, 1, 'LAMS-Database');
-INSERT INTO lams_authentication_method VALUES (3, 3, 'MQ-LDAP');
+LOCK TABLES `lams_grouping_support_type` WRITE;
+INSERT INTO `lams_grouping_support_type` VALUES (1,'NONE'),(2,'OPTIONAL'),(3,'REQUIRED');
+UNLOCK TABLES;
 
-INSERT INTO lams_activity_category VALUES (1 ,'SYSTEM');
-INSERT INTO lams_activity_category VALUES (2 ,'COLLABORATION');
-INSERT INTO lams_activity_category VALUES (3 ,'ASSESSMENT');
-INSERT INTO lams_activity_category VALUES (4 ,'CONTENT');
-INSERT INTO lams_activity_category VALUES (5 ,'SPLIT');
-INSERT INTO lams_activity_category VALUES (6 ,'RESPONSE');
+--
+-- Dumping data for table `lams_grouping_type`
+--
 
-INSERT INTO lams_grouping_support_type VALUES (1 ,'NONE');
-INSERT INTO lams_grouping_support_type VALUES (2 ,'OPTIONAL');
-INSERT INTO lams_grouping_support_type VALUES (3 ,'REQUIRED');
+LOCK TABLES `lams_grouping_type` WRITE;
+INSERT INTO `lams_grouping_type` VALUES (1,'RANDOM_GROUPING'),(2,'CHOSEN_GROUPING'),(3,'CLASS_GROUPING'),(4,'LEARNER_CHOICE_GROUPING');
+UNLOCK TABLES;
 
-INSERT INTO lams_log_event_type VALUES (1, 'TYPE_TEACHER_LEARNING_DESIGN_CREATE');
-INSERT INTO lams_log_event_type VALUES (2, 'TYPE_TEACHER_LESSON_CREATE');
-INSERT INTO lams_log_event_type VALUES (3, 'TYPE_TEACHER_LESSON_START');
-INSERT INTO lams_log_event_type VALUES (4, 'TYPE_TEACHER_LESSON_CHANGE_STATE');
-INSERT INTO lams_log_event_type VALUES (5, 'TYPE_LEARNER_ACTIVITY_START');
-INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
+--
+-- Dumping data for table `lams_learning_activity_type`
+--
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time,pedagogical_planner_url)
-VALUES (1, 2, 'Grouping', 'All types of grouping including random and chosen.', 
-	'learning/grouping.do?method=performGrouping', 'learning/grouping.do?method=performGrouping', 
-	'learning/grouping.do?method=viewGrouping&mode=teacher',
-	'monitoring/grouping.do?method=startGrouping', 
-	'monitoring/grouping.do?method=startGrouping', now(),
-	'pedagogicalPlanner/grouping.do?method=initGrouping');
+LOCK TABLES `lams_learning_activity_type` WRITE;
+INSERT INTO `lams_learning_activity_type` VALUES (1,'TOOL'),(2,'GROUPING'),(3,'GATE_SYNCH'),(4,'GATE_SCHEDULE'),(5,'GATE_PERMISSION'),(6,'PARALLEL'),(7,'OPTIONS'),(8,'SEQUENCE'),(9,'GATE_SYSTEM'),(10,'BRANCHING_CHOSEN'),(11,'BRANCHING_GROUP'),(12,'BRANCHING_TOOL'),(13,'OPTIONS_WITH_SEQUENCES'),(14,'GATE_CONDITION'),(15,'FLOATING');
+UNLOCK TABLES;
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (2, 3, 'Sync Gate', 'Gate: Synchronise Learners.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null, 
-	'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
+--
+-- Dumping data for table `lams_lesson_state`
+--
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (3, 4, 'Schedule Gate', 'Gate: Opens/shuts at particular times.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
-	'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
+LOCK TABLES `lams_lesson_state` WRITE;
+INSERT INTO `lams_lesson_state` VALUES (1,'CREATED'),(2,'NOT_STARTED'),(3,'STARTED'),(4,'SUSPENDED'),(5,'FINISHED'),(6,'ARCHIVED'),(7,'REMOVED');
+UNLOCK TABLES;
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (4, 5, 'Permission Gate', 'Gate: Opens under teacher or staff control.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
-	'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
+--
+-- Dumping data for table `lams_license`
+--
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (5, 9, 'System Gate', 'Gate: Opens under system control.', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
-	'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
-	
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (6, 10, 'Monitor Chosen Branching', 'Select between multiple sequence activities, with the branch chosen in monitoring.', 
-	'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching', 
-	'monitoring/complexProgress.do', 'monitoring/chosenBranching.do?method=assignBranch', 
-	'monitoring/grouping.do?method=startGrouping', now());
+LOCK TABLES `lams_license` WRITE;
+INSERT INTO `lams_license` VALUES (1,'LAMS Recommended: CC Attribution-Noncommercial-ShareAlike 4.0','by-nc-sa','https://creativecommons.org/licenses/by-nc-sa/4.0/',1,'/images/license/by-nc-sa.eu.svg',1),(2,'CC Attribution-No Derivatives 4.0','by-nd','https://creativecommons.org/licenses/by-nd/4.0/',0,'/images/license/by-nd.svg',2),(3,'CC Attribution-Noncommercial-No Derivatives 4.0','by-nc-nd','https://creativecommons.org/licenses/by-nc-nd/4.0/',0,'/images/license/by-nc-nd.svg',3),(4,'CC Attribution-Noncommercial 4.0','by-nc','https://creativecommons.org/licenses/by-nc/4.0/',0,'/images/license/by-nc.eu.svg',4),(5,'CC Attribution-ShareAlike 4.0','by-sa','https://creativecommons.org/licenses/by-sa/4.0/',0,'/images/license/by-sa.svg',5),(6,'Other Licensing Agreement','other','',0,'',8),(7,'CC Attribution 4.0','by','https://creativecommons.org/licenses/by/4.0/',0,'/images/license/by.svg',6),(8,'Public Domain','CC0','https://creativecommons.org/publicdomain/zero/1.0/',0,'/images/license/publicdomain.svg',7);
+UNLOCK TABLES;
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (7, 11, 'Group Based Branching', 'Select between multiple sequence activities, with the branch chosen by an existing group.',
-        'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'monitoring/complexProgress.do', 'monitoring/groupedBranching.do?method=viewBranching',
-        'monitoring/groupedBranching.do?method=assignBranch', now());
+--
+-- Dumping data for table `lams_log_event_type`
+--
 
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (8, 12, 'Tool Output Based Branching', 'Select between multiple sequence activities, with the branch chosen on results of another activity.',
-        'learning/branching.do?method=performBranching', 'learning/branching.do?method=performBranching',
-        'monitoring/complexProgress.do', 'monitoring/toolBranching.do?method=viewBranching',
-        'monitoring/toolBranching.do?method=viewBranching', now());
-
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description,
-        learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (9, 8, 'Sequence', 'A sequence of activities',
-        'learning/SequenceActivity.do', 'learning/SequenceActivity.do',
-        'monitoring/complexProgress.do', 'monitoring/sequence.do?method=viewSequence',
-        'monitoring/sequence.do?method=viewSequence', now());
-
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (10, 14, 'Condition Gate', 'Gate: Opens if conditions are met', 
-	'learning/gate.do?method=knockGate', 'learning/gate.do?method=knockGate', null,
-	'monitoring/gate.do?method=viewGate', 
-	'monitoring/gate.do?method=viewGate', now()	);
-
-INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
-	learner_url, learner_preview_url, learner_progress_url, monitor_url, contribute_url, create_date_time)
-VALUES (11, 15, 'Floating Activities', 'A collection of floating activities', 
-	NULL, NULL, null, 'monitoring/floating.do?method=viewFloating', 
-	'monitoring/floating.do?method=viewFloating', now()	);
-
--- Supported Locales
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (1, 'en', 'AU', 'English (Australia)', 'LTR', 'en-au');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (2, 'es', 'ES', 'Español', 'LTR', 'es');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (3, 'mi', 'NZ', 'Māori', 'LTR', 'en-au');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (4, 'de', 'DE', 'Deutsch', 'LTR', 'de');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (5, 'zh', 'CN', '简体中文', 'LTR', 'zh-cn');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (6, 'fr', 'FR', 'Français', 'LTR', 'fr');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (7, 'it', 'IT', 'Italiano', 'LTR', 'it');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (8, 'no', 'NO', 'Norsk', 'LTR', 'no');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (9, 'sv', 'SE', 'Svenska', 'LTR', 'sv');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (10, 'ko', 'KR', '한국어', 'LTR', 'ko');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (11, 'pl', 'PL', 'Polski', 'LTR', 'pl');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (12, 'pt', 'BR', 'Português (Brasil)', 'LTR', 'pt-br');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (13, 'hu', 'HU', 'Magyar', 'LTR', 'hu');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (14, 'bg', 'BG', 'Български', 'LTR', 'bg');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (15, 'cy', 'GB', 'Cymraeg (Cymru)', 'LTR', 'en-au');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (16, 'th', 'TH', 'Thai', 'LTR', 'th');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (17, 'el', 'GR', 'Ελληνικά', 'LTR', 'el');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (18, 'nl', 'BE', 'Nederlands (België)', 'LTR', 'nl');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (19, 'ar', 'JO', 'عربي', 'RTL', 'ar');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (20, 'da', 'DK', 'Dansk', 'LTR', 'da');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (21, 'ru', 'RU', 'Русский', 'LTR', 'ru');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (22, 'vi', 'VN', 'Tiếng Việt', 'LTR', 'vi');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (23, 'zh', 'TW', 'Chinese (Taiwan)', 'LTR', 'zh');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (24, 'ja', 'JP', '日本語', 'LTR', 'ja');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (25, 'ms', 'MY', 'Malay (Malaysia)', 'LTR', 'ms');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (26, 'tr', 'TR', 'Türkçe', 'LTR', 'tr');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (27, 'ca', 'ES', 'Català', 'LTR', 'ca');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (28, 'sl', 'SI', 'Slovenščina', 'LTR', 'sl');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (29, 'es', 'MX', 'Español (México)', 'LTR', 'es');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (30, 'cs', 'CZ', 'Čeština', 'LTR', 'cs');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (31, 'id', 'ID', 'Indonesian', 'LTR', 'en-au');
+LOCK TABLES `lams_log_event_type` WRITE;
+INSERT INTO `lams_log_event_type` VALUES (1,'TYPE_TEACHER_LEARNING_DESIGN_CREATE','LESSON'),(2,'TYPE_TEACHER_LESSON_CREATE','LESSON'),(3,'TYPE_TEACHER_LESSON_START','LESSON'),(4,'TYPE_TEACHER_LESSON_CHANGE_STATE','LESSON'),(5,'TYPE_LEARNER_ACTIVITY_START','LESSON'),(6,'TYPE_LEARNER_ACTIVITY_FINISH','LESSON'),(7,'TYPE_LEARNER_LESSON_COMPLETE','LESSON'),(8,'TYPE_LEARNER_LESSON_MARK_SUBMIT','LESSON'),(9,'TYPE_ACTIVITY_EDIT','LESSON'),(10,'TYPE_FORCE_COMPLETE','LESSON'),(11,'TYPE_USER_ORG_ADMIN','SECURITY'),(12,'TYPE_LOGIN_AS','SECURITY'),(13,'TYPE_PASSWORD_CHANGE','SECURITY'),(14,'TYPE_ROLE_FAILURE','SECURITY'),(15,'TYPE_ACCOUNT_LOCKED','SECURITY'),(16,'TYPE_NOTIFICATION','NOTIFICATION'),(17,'TYPE_MARK_UPDATED','MARKS'),(18,'TYPE_MARK_RELEASED','MARKS'),(19,'TYPE_LEARNER_CONTENT_UPDATED','LEARNER_CONTENT'),(20,'TYPE_LEARNER_CONTENT_SHOW_HIDE','LEARNER_CONTENT'),(21,'TYPE_UNKNOWN','UNKNOWN'),(22,'TYPE_LIVE_EDIT','LESSON'),(23,'TYPE_TOOL_MARK_RELEASED','MARKS');
+UNLOCK TABLES;
 
 
--- Default TimeZones
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+14');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+13');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+12');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+11');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+10');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+9');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+8');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+7');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+6');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+5');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+4');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+3');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+2');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+1');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-1');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-2');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-3');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-4');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-5');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-6');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-7');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-8');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-9');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-10');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-11');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-12');
+--
+-- Dumping data for table `lams_organisation_state`
+--
 
-INSERT INTO lams_ext_server_type VALUES (1, 'INTEGRATED SERVER');
-INSERT INTO lams_ext_server_type VALUES (2, 'LTI TOOL CONSUMER');
+LOCK TABLES `lams_organisation_state` WRITE;
+INSERT INTO `lams_organisation_state` VALUES (1,'ACTIVE'),(2,'HIDDEN'),(3,'ARCHIVED'),(4,'REMOVED');
+UNLOCK TABLES;
 
--- external server mapping to a lams organisation
-INSERT INTO lams_ext_server_org_map VALUES
-  (1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%', '',
-   'http://dummy', '', true,80,0,NULL,1,NULL);
+--
+-- Dumping data for table `lams_organisation_type`
+--
 
--- LDEV-3450 Implement peer review feature
-INSERT INTO lams_rating_criteria_type VALUES (1, 'TOOL_ACTIVITY');
-INSERT INTO lams_rating_criteria_type VALUES (2, 'AUTHORED_ITEM');
-INSERT INTO lams_rating_criteria_type VALUES (3, 'LEARNER_ITEM');
-INSERT INTO lams_rating_criteria_type VALUES (4, 'LESSON');
-   
--- initialise db version
-INSERT INTO patches VALUES ('lams', 20170101, NOW(), 'F');
+LOCK TABLES `lams_organisation_type` WRITE;
+INSERT INTO `lams_organisation_type` VALUES (1,'ROOT ORGANISATION','root all other organisations: controlled by Sysadmin'),(2,'COURSE ORGANISATION','main organisation level - equivalent to an entire course.'),(3,'CLASS','runtime organisation level - lessons are run for classes.');
+UNLOCK TABLES;
+
+
+--
+-- Dumping data for table `lams_outcome_scale`
+--
+
+LOCK TABLES `lams_outcome_scale` WRITE;
+INSERT INTO `lams_outcome_scale` VALUES (1,NULL,'Default attainment scale','default','Default global scale',NULL,1,NOW());
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_outcome_scale_item`
+--
+
+LOCK TABLES `lams_outcome_scale_item` WRITE;
+INSERT INTO `lams_outcome_scale_item` VALUES (1,1,0,'Not yet attained'),(2,1,1,'Attained');
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_policy_state`
+--
+
+LOCK TABLES `lams_policy_state` WRITE;
+INSERT INTO `lams_policy_state` VALUES (1,'ACTIVE'),(2,'INACTIVE');
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_policy_type`
+--
+
+LOCK TABLES `lams_policy_type` WRITE;
+INSERT INTO `lams_policy_type` VALUES (1,'TYPE_SITE_POLICY'),(2,'TYPE_PRIVACY_POLICY'),(3,'TYPE_THIRD_PARTIES_POLICY'),(4,'TYPE_OTHER');
+UNLOCK TABLES;
+
+
+--
+-- Dumping data for table `lams_rating_criteria_type`
+--
+
+LOCK TABLES `lams_rating_criteria_type` WRITE;
+INSERT INTO `lams_rating_criteria_type` VALUES (1,'TOOL_ACTIVITY'),(2,'AUTHORED_ITEM'),(3,'LEARNER_ITEM'),(4,'LESSON');
+UNLOCK TABLES;
+
+
+--
+-- Dumping data for table `lams_role`
+--
+
+LOCK TABLES `lams_role` WRITE;
+INSERT INTO `lams_role` VALUES (1,'SYSADMIN','LAMS System Adminstrator',NOW()),(2,'GROUP MANAGER','Group Manager',NOW()),(3,'AUTHOR','Authors Learning Designs',NOW()),(4,'MONITOR','Member of Staff',NOW()),(5,'LEARNER','Student',NOW());
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_supported_locale`
+--
+
+LOCK TABLES `lams_supported_locale` WRITE;
+INSERT INTO `lams_supported_locale` VALUES (1,'en','AU','English (Australia)','LTR','en-au'),(2,'es','ES','Español','LTR','es'),(3,'mi','NZ','Māori','LTR','en-au'),(4,'de','DE','Deutsch','LTR','de'),(5,'zh','CN','简体中文','LTR','zh-cn'),(6,'fr','FR','Français','LTR','fr'),(7,'it','IT','Italiano','LTR','it'),(8,'no','NO','Norsk','LTR','no'),(9,'sv','SE','Svenska','LTR','sv'),(10,'ko','KR','한국어','LTR','ko'),(11,'pl','PL','Polski','LTR','pl'),(12,'pt','BR','Português (Brasil)','LTR','pt-br'),(13,'hu','HU','Magyar','LTR','hu'),(14,'bg','BG','Български','LTR','bg'),(15,'cy','GB','Cymraeg (Cymru)','LTR','cy'),(16,'th','TH','Thai','LTR','th'),(17,'el','GR','Ελληνικά','LTR','el'),(18,'nl','BE','Nederlands (België)','LTR','nl'),(19,'ar','JO','عربي','RTL','ar'),(20,'da','DK','Dansk','LTR','da'),(21,'ru','RU','Русский','LTR','ru'),(22,'vi','VN','Tiếng Việt','LTR','vi'),(23,'zh','TW','Chinese (Taiwan)','LTR','zh'),(24,'ja','JP','日本語','LTR','ja'),(25,'ms','MY','Malay (Malaysia)','LTR','ms'),(26,'tr','TR','Türkçe','LTR','tr'),(27,'ca','ES','Català','LTR','ca'),(28,'sl','SI','Slovenščina','LTR','sl'),(29,'es','MX','Español (México)','LTR','es'),(30,'cs','CZ','Čeština','LTR','cs'),(31,'id','ID','Indonesian','LTR','id');
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_system_tool`
+--
+
+LOCK TABLES `lams_system_tool` WRITE;
+INSERT INTO `lams_system_tool` VALUES (1,2,'Grouping','All types of grouping including random and chosen.','learning/grouping/performGrouping.do','learning/grouping/performGrouping.do','learning/grouping/viewGrouping.do?mode=teacher','monitoring/grouping/startGrouping.do','monitoring/grouping/startGrouping.do',NULL,NOW(),NULL,'pedagogicalPlanner/grouping.do?method=initGrouping'),(2,3,'Sync Gate','Gate: Synchronise Learners.','learning/gate/knockGate.do','learning/gate/knockGate.do',NULL,'monitoring/gate/viewGate.do','monitoring/gate/viewGate.do',NULL,NOW(),NULL,NULL),(3,4,'Schedule Gate','Gate: Opens/shuts at particular times.','learning/gate/knockGate.do','learning/gate/knockGate.do',NULL,'monitoring/gate/viewGate.do','monitoring/gate/viewGate.do',NULL,NOW(),NULL,NULL),(4,5,'Permission Gate','Gate: Opens under teacher or staff control.','learning/gate/knockGate.do','learning/gate/knockGate.do',NULL,'monitoring/gate/viewGate.do','monitoring/gate/viewGate.do',NULL,NOW(),NULL,NULL),(5,9,'System Gate','Gate: Opens under system control.','learning/gate/knockGate.do','learning/gate/knockGate.do',NULL,'monitoring/gate/viewGate.do','monitoring/gate/viewGate.do',NULL,NOW(),NULL,NULL),(6,10,'Monitor Chosen Branching','Select between multiple sequence activities, with the branch chosen in monitoring.','learning/branching/performBranching.do','learning/branching/performBranching.do','monitoring/complexProgress.do','monitoring/chosenBranching.do?method=assignBranch','monitoring/grouping/startGrouping.do',NULL,NOW(),NULL,NULL),(7,11,'Group Based Branching','Select between multiple sequence activities, with the branch chosen by an existing group.','learning/branching/performBranching.do','learning/branching/performBranching.do','monitoring/complexProgress.do','monitoring/groupedBranching.do?method=viewBranching','monitoring/groupedBranching.do?method=assignBranch',NULL,NOW(),NULL,NULL),(8,12,'Tool Output Based Branching','Select between multiple sequence activities, with the branch chosen on results of another activity.','learning/branching/performBranching.do','learning/branching/performBranching.do','monitoring/complexProgress.do','monitoring/toolBranching.do?method=viewBranching','monitoring/toolBranching.do?method=viewBranching',NULL,NOW(),NULL,NULL),(9,8,'Sequence','A sequence of activities','learning/SequenceActivity.do','learning/SequenceActivity.do','monitoring/complexProgress.do','monitoring/sequence/viewSequence.do','monitoring/sequence/viewSequence.do',NULL,NOW(),NULL,NULL),(10,14,'Condition Gate','Gate: Opens if conditions are met','learning/gate/knockGate.do','learning/gate/knockGate.do',NULL,'monitoring/gate/viewGate.do','monitoring/gate/viewGate.do',NULL,NOW(),NULL,NULL),(11,15,'Floating Activities','A collection of floating activities',NULL,NULL,NULL,'monitoring/floating.do?method=viewFloating','monitoring/floating.do?method=viewFloating',NULL,NOW(),NULL,NULL);
+UNLOCK TABLES;
+
+
+--
+-- Dumping data for table `lams_timezone`
+--
+
+LOCK TABLES `lams_timezone` WRITE;
+INSERT INTO `lams_timezone` VALUES (1,'Etc/GMT+14',0),(2,'Etc/GMT+13',0),(3,'Etc/GMT+12',0),(4,'Etc/GMT+11',0),(5,'Etc/GMT+10',0),(6,'Etc/GMT+9',0),(7,'Etc/GMT+8',0),(8,'Etc/GMT+7',0),(9,'Etc/GMT+6',0),(10,'Etc/GMT+5',0),(11,'Etc/GMT+4',0),(12,'Etc/GMT+3',0),(13,'Etc/GMT+2',0),(14,'Etc/GMT+1',0),(15,'Etc/GMT',0),(16,'Etc/GMT-1',0),(17,'Etc/GMT-2',0),(18,'Etc/GMT-3',0),(19,'Etc/GMT-4',0),(20,'Etc/GMT-5',0),(21,'Etc/GMT-6',0),(22,'Etc/GMT-7',0),(23,'Etc/GMT-8',0),(24,'Etc/GMT-9',0),(25,'Etc/GMT-10',0),(26,'Etc/GMT-11',0),(27,'Etc/GMT-12',0);
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_tool_session_state`
+--
+
+LOCK TABLES `lams_tool_session_state` WRITE;
+INSERT INTO `lams_tool_session_state` VALUES (1,'STARTED'),(2,'ENDED');
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `lams_tool_session_type`
+--
+
+LOCK TABLES `lams_tool_session_type` WRITE;
+INSERT INTO `lams_tool_session_type` VALUES (1,'NON_GROUPED'),(2,'GROUPED');
+UNLOCK TABLES;
+
+
+
+--
+-- Dumping data for table `lams_workspace_folder_type`
+--
+
+LOCK TABLES `lams_workspace_folder_type` WRITE;
+INSERT INTO `lams_workspace_folder_type` VALUES (1,'NORMAL'),(2,'RUN SEQUENCES'),(3,'PUBLIC SEQUENCES');
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `patches`
+--
+
+LOCK TABLES `patches` WRITE;
+INSERT INTO patches VALUES ('lams', 20190103, NOW(), 'F');
+UNLOCK TABLES;
+
+SET FOREIGN_KEY_CHECKS=1;

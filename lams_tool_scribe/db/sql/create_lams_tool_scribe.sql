@@ -20,7 +20,6 @@ CREATE TABLE tl_lascrb11_scribe (
 
 CREATE TABLE tl_lascrb11_session (
   uid bigint(20) NOT NULL AUTO_INCREMENT,
-  version int(11) NOT NULL,
   session_end_date datetime,
   session_start_date datetime,
   status int(11),

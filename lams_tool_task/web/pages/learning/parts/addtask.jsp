@@ -8,7 +8,6 @@
 	<%@ include file="/common/header.jsp"%>
 	
 	<script type="text/javascript">
-
 		function disableButtons() {
 			$('.btn-disable-on-submit').prop('disabled', true);
 		}
@@ -22,11 +21,9 @@
 		function cancel() {
 			 window.parent.hideMessage();
 		}
-		
 	</script>		
 </lams:head>
 <body>
-
 
 	<form:form action="saveNewTask.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
 		<form:hidden path="mode" />

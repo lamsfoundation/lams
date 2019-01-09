@@ -11,9 +11,11 @@
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	
+	<lams:css/>
+	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript">
 		$(function() {
 			$('#lessonForm').ajaxForm( {
 				beforeSerialize: function(arr, $form, options) { 
@@ -29,9 +31,6 @@
 			 } );
 		});
 	</script>
-	
-	<lams:css/>
-	
 </lams:head>
 
 <body class="stripes">

@@ -50,7 +50,6 @@ public interface TaskListConstants {
     public static final String ATTR_DELETED_TASKLIST_ITEM_LIST = "deleteTaskListList";
     public static final String ATTR_DELETED_CONDITION_LIST = "deleteConditionList";
     public static final String ATTR_TASKLIST = "taskList";
-    public static final String ATTR_RUN_AUTO = "runAuto";
     public static final String ATTR_ITEM_UID = "itemUid";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_MONITOR_VERIFICATION_REQUIRED = "monitorVerificationRequired";

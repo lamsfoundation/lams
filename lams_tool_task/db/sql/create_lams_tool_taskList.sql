@@ -6,7 +6,7 @@ create table tl_latask10_tasklist (
    update_date datetime,
    create_by bigint,
    title varchar(255),
-   instructions text,
+   instructions MEDIUMTEXT,
    content_in_use TINYINT(1),
    define_later TINYINT(1),
    content_id bigint,
@@ -15,7 +15,7 @@ create table tl_latask10_tasklist (
    minimum_number_tasks integer,
    allow_contribute_tasks TINYINT(1),
    is_monitor_verification_required TINYINT(1),
-   reflect_instructions text, 
+   reflect_instructions MEDIUMTEXT, 
    reflect_on_activity TINYINT(1), 
    submission_deadline datetime,
    primary key (uid),
@@ -56,7 +56,7 @@ create table tl_latask10_user (
 create table tl_latask10_tasklist_item (
    uid bigint not null auto_increment,
    sequence_id integer,
-   description text,
+   description MEDIUMTEXT,
    init_item varchar(255),
    organization_xml text,
    title varchar(255),
@@ -68,8 +68,6 @@ create table tl_latask10_tasklist_item (
    is_comments_required TINYINT(1),
    is_files_allowed TINYINT(1),
    is_files_required TINYINT(1),
-   is_comments_files_allowed TINYINT(1),
-   show_comments_to_all TINYINT(1),
    is_child_task TINYINT(1),
    parent_task_name varchar(255),
    taskList_uid bigint,
@@ -115,7 +113,7 @@ create table tl_latask10_item_attachment (
 
 create table tl_latask10_item_comment (
    uid bigint not null auto_increment,
-   comment text,
+   comment MEDIUMTEXT,
    taskList_item_uid bigint,
    create_by bigint,
    create_date datetime,
@@ -157,7 +155,7 @@ INSERT INTO tl_latask10_tasklist (uid, title,instructions,
 	reflect_on_activity) VALUES
   (1,'Task List','Instructions ',0,0,${default_content_id},0,0,0,0,0,0);
   
-INSERT INTO tl_latask10_tasklist_item (uid, sequence_id, title,  create_date, create_by_author, is_required, is_comments_allowed, is_comments_required, is_files_allowed, is_files_required, is_comments_files_allowed, show_comments_to_all, is_child_task, taskList_uid) VALUES 
-  (1,1,'Task number 1',NOW(),1,0,0,0,0,0,0,1,0,1);
+INSERT INTO tl_latask10_tasklist_item (uid, sequence_id, title,  create_date, create_by_author, is_required, is_comments_allowed, is_comments_required, is_files_allowed, is_files_required, is_child_task, taskList_uid) VALUES 
+  (1,1,'Task number 1',NOW(),1,0,0,0,0,0,0,1);
     
 SET FOREIGN_KEY_CHECKS=1;

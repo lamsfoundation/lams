@@ -7,14 +7,13 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.timezone.title"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
+
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">	
@@ -91,13 +90,13 @@
 				</table>
 				
 				<div class="pull-right">
-					<input type="submit" name="CANCEL" value="<fmt:message key="admin.cancel"/>" onclick="bCancel=true;" class="btn btn-default">
+					<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
+						<fmt:message key="admin.cancel"/>
+					</a>
 					<input type="submit" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 				</p>
+				
 			</form:form>
 		</lams:Page>
-		
 </body>
 </lams:html>
-
-

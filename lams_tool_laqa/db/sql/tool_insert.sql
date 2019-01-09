@@ -1,4 +1,3 @@
--- Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -19,8 +18,7 @@ help_url,
 language_file,
 create_date_time,
 modified_date_time,
-supports_outputs,
-admin_url
+supports_outputs
 )
 VALUES
 (
@@ -32,16 +30,15 @@ VALUES
 '@tool_version@',
 0,
 2,
-'tool/laqa11/learningStarter.do?mode=learner',
-'tool/laqa11/learningStarter.do?mode=author',
-'tool/laqa11/learningStarter.do?mode=teacher',
-'tool/laqa11/authoringStarter.do',
-'tool/laqa11/monitoringStarter.do',
-'tool/laqa11/pedagogicalPlanner.do',
+'tool/laqa11/learning/learning.do?mode=learner',
+'tool/laqa11/learning/learning.do?mode=author',
+'tool/laqa11/learning/learning.do?mode=teacher',
+'tool/laqa11/authoring/authoring.do',
+'tool/laqa11/monitoring/monitoring.do',
+'tool/laqa11/pedagogicalPlanner/initPedagogicalPlannerForm.do',
 'http://wiki.lamsfoundation.org/display/lamsdocs/laqa11',
 'org.lamsfoundation.lams.tool.qa.ApplicationResources',
 NOW(),
 NOW(),
-1,
-'tool/laqa11/laqa11admin.do'
+1
 )

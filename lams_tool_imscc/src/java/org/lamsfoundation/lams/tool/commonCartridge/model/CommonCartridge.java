@@ -347,8 +347,9 @@ public class CommonCartridge implements Cloneable {
 	this.reflectInstructions = reflectInstructions;
     }
 
-    public Boolean isReflectOnActivity() {
-	return reflectOnActivity;
+    // LDEV-4744 The JSTL pages require this to be a primitive boolean
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity != null ? reflectOnActivity : false;
     }
 
     public void setReflectOnActivity(Boolean reflectOnActivity) {

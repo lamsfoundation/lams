@@ -6,72 +6,70 @@
 <lams:head>
 	<c:set var="title"><fmt:message key="sysadmin.batch.preview.lesson.delete"/></c:set>
 	<title>${title}</title>
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/JavaScript" src="<lams:LAMSURL/>/includes/javascript/changeStyle.js"></script>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-	
-	$(document).ready(function(){
-		var previewCount = ${previewCount},
-			deleteButton = $('#deleteButton');
-		
-		if (previewCount == 0) {
-			deleteButton.prop('disabled', true);
-			return;
-		}
-		
-		deleteButton.click(function(){
-			if (!confirm('<fmt:message key="msg.cleanup.preview.lesson.confirm" />')) {
+		$(document).ready(function(){
+			var previewCount = ${previewCount},
+				deleteButton = $('#deleteButton');
+			
+			if (previewCount == 0) {
+				deleteButton.prop('disabled', true);
 				return;
 			}
 			
-			deleteButton.prop('disabled', true);
-			$('#deletingBox').show();
-			
-			// delete lesson in batches of 5 until done
-			deletePreviewLessons(previewCount, $('#previewCount'), $('#allLessonCount'));
-		});
-	});
-	
-	function deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan){
-		if (previewCount <= 0) {
-			$('#deletingBox').hide();
-			return;
-		}
-		$.ajax({
-			'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do',
-			'data'    : {
-				'limit'  : 5
-			},
-			type: 'POST',
-			'cache'   : false,
-			'success' : function(response){
-				try {
-					previewCount = response[0];
-					previewCountSpan.text(previewCount);
-					allLessonCountSpan.text(response[1]);
-					setTimeout(function(){
-						deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan);
-					}, 500);
-				} catch(err) {
-					alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
-					previewCountSpan.text('ERROR');
-					allLessonCountSpan.text('ERROR');
+			deleteButton.click(function(){
+				if (!confirm('<fmt:message key="msg.cleanup.preview.lesson.confirm" />')) {
+					return;
 				}
-			},
-			'error'	  : function(){
-				alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
-			}
+				
+				deleteButton.prop('disabled', true);
+				$('#deletingBox').show();
+				
+				// delete lesson in batches of 5 until done
+				deletePreviewLessons(previewCount, $('#previewCount'), $('#allLessonCount'));
+			});
 		});
-	}
+	
+		function deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan){
+			if (previewCount <= 0) {
+				$('#deletingBox').hide();
+				return;
+			}
+			$.ajax({
+				'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do',
+				'data'    : {
+					'limit'  : 5
+				},
+				type: 'POST',
+				'cache'   : false,
+				'success' : function(response){
+					try {
+						previewCount = response[0];
+						previewCountSpan.text(previewCount);
+						allLessonCountSpan.text(response[1]);
+						setTimeout(function(){
+							deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan);
+						}, 500);
+					} catch(err) {
+						alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
+						previewCountSpan.text('ERROR');
+						allLessonCountSpan.text('ERROR');
+					}
+				},
+				'error'	  : function(){
+					alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
+				}
+			});
+		}
 	</script>
 </lams:head>
-    
+
 <body class="stripes">
 
 	<lams:Page type="admin" title="${title}">

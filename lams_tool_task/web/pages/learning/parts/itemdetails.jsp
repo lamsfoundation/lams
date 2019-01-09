@@ -1,40 +1,21 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <div class="row">
 	<div class="col-xs-12">
 		<div class="panel-body">${item.description}</div>
-
-		<hr class="msg-hr">
+		
 		<!-- Comments Part -->
 		<c:if test="${item.commentsAllowed}">
-			<form:form action="addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
-					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
-
+			<br>
+			<div id="comment-list-${item.uid}">
 				<%@ include file="commentlist.jsp"%>
-
-				<c:if test="${mode != 'teacher'}">
-
-					<div class="form-group voffset5">
-						<label for="comment-${item.uid}">
-							<fmt:message key="label.preview.add.comment" />
-						</label>
-						<lams:textarea name="comment" rows="2" id="comment-${item.uid}" class="form-control" index="${item.uid}"></lams:textarea>
-							
-						<c:if test="${(mode != 'teacher') && !itemDTO.commentRequirementsMet}">
-							<div class="help-block">
-								<fmt:message key="label.learning.info.add.comment.required" />
-							</div>
-						</c:if>
-
-						<input type="submit" name="commentButton" value='<fmt:message key="label.preview.post" />'
-							class="btn btn-default btn-disable-on-submit voffset5" />
-					</div>
-
-				</c:if>
-			</form:form>
+			</div>
 		</c:if>
 
 		<!-- Uploaded Attachments -->
 		<c:if test="${item.filesAllowed}">
-			<hr class="msg-hr">				
+			<br>
+						
 			<form:form action="uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
 					modelAttribute="taskListItemForm" method="post" enctype="multipart/form-data" onsubmit="return validateFiles();">
 				<c:if test="${(mode != 'teacher') && !itemDTO.attachmentRequirementsMet}">
