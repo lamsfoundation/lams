@@ -56,8 +56,6 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItemInstruction;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
-import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
-import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
@@ -120,19 +118,12 @@ public class AuthoringController {
      * Remove resource item from HttpSession list and update page display. As
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
-     *
-     * @param request
-     * @return
      */
     @RequestMapping("/removeItem")
-    private String removeItem(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
-	    HttpServletRequest request) {
+    private String removeItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-
+	@SuppressWarnings("deprecation")
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
 	    SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
@@ -141,11 +132,10 @@ public class AuthoringController {
 	    resourceList.clear();
 	    resourceList.addAll(rList);
 	    // add to delList
-	    List delList = getDeletedResourceItemList(sessionMap);
+	    List<ResourceItem> delList = getDeletedResourceItemList(sessionMap);
 	    delList.add(item);
 	}
 
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
     }
 
@@ -157,13 +147,8 @@ public class AuthoringController {
      * @return
      */
     @RequestMapping("/editItemInit")
-    private String editItemInit(@ModelAttribute("resourceItemForm") ResourceItemForm resourceItemForm,
-	    HttpServletRequest request) {
-
-	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+    private String editItemInit(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	ResourceItem item = null;
@@ -191,10 +176,6 @@ public class AuthoringController {
 
     /**
      * Display empty page for new resource item.
-     *
-     * @param authorngForm
-     * @param request
-     * @return
      */
     @RequestMapping("/newItemInit")
     private String newItemlInit(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
@@ -228,16 +209,9 @@ public class AuthoringController {
      * this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the
      * entire authoring page is being persisted.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @RequestMapping(value = "/saveOrUpdateItem")
-    private String saveOrUpdateItem(@ModelAttribute("authoringForm") ResourceItemForm resourceItemForm, HttpServletRequest request) {
+    private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -370,8 +344,7 @@ public class AuthoringController {
     @RequestMapping("/definelater")
     private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
 	    throws ServletException {
-
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Resource resource = resourceService.getResourceByContentId(contentId);
 
 	resource.setDefineLater(true);
@@ -390,7 +363,7 @@ public class AuthoringController {
      */
     private String readDatabaseData(ResourceForm startForm, HttpServletRequest request) throws ServletException {
 	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_CONTENT_ID);
 
 	// get back the resource and item list and display them on page
 
@@ -467,21 +440,11 @@ public class AuthoringController {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-
     @RequestMapping("/init")
     private String initPage(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
 	    throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
 
 	try {
@@ -501,17 +464,10 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include
      * all resource item, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm,
-	    HttpServletRequest request) throws Exception {
+    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
+	    throws Exception {
 
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -556,7 +512,7 @@ public class AuthoringController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ResourceUser resourceUser = resourceService.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+	ResourceUser resourceUser = resourceService.getUserByIDAndContent(user.getUserID().longValue(),
 		resourcePO.getContentId());
 	if (resourceUser == null) {
 	    resourceUser = new ResourceUser(user, resourcePO);
@@ -567,11 +523,11 @@ public class AuthoringController {
 	// ************************* Handle resource items *******************
 	// Handle resource items
 	boolean useRatings = false;
-	Set itemList = new LinkedHashSet();
-	SortedSet topics = getResourceItemList(sessionMap);
-	Iterator iter = topics.iterator();
+	Set<ResourceItem> itemList = new LinkedHashSet<>();
+	SortedSet<ResourceItem> topics = getResourceItemList(sessionMap);
+	Iterator<ResourceItem> iter = topics.iterator();
 	while (iter.hasNext()) {
-	    ResourceItem item = (ResourceItem) iter.next();
+	    ResourceItem item = iter.next();
 	    if (item != null) {
 		// This flushs user UID info to message if this user is a new
 		// user.
@@ -582,7 +538,7 @@ public class AuthoringController {
 	}
 	resourcePO.setResourceItems(itemList);
 	// delete instruction file from database.
-	List delResourceItemList = getDeletedResourceItemList(sessionMap);
+	List<ResourceItem> delResourceItemList = getDeletedResourceItemList(sessionMap);
 	iter = delResourceItemList.iterator();
 	while (iter.hasNext()) {
 	    ResourceItem item = (ResourceItem) iter.next();
@@ -592,7 +548,7 @@ public class AuthoringController {
 	    }
 	}
 	// handle resource item attachment file:
-	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
+	List<ResourceItem> delItemAttList = getDeletedItemAttachmentList(sessionMap);
 	iter = delItemAttList.iterator();
 	while (iter.hasNext()) {
 	    ResourceItem delAtt = (ResourceItem) iter.next();
@@ -637,6 +593,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
+    @SuppressWarnings("unchecked")
     private SortedSet<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
 		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
@@ -654,6 +611,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
+    @SuppressWarnings("unchecked")
     private List<ResourceItem> getDeletedResourceItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_LIST);
     }
@@ -663,21 +621,16 @@ public class AuthoringController {
      * change the attachment to new file, then the old file need be deleted when
      * submitting the whole authoring page. Save the file uuid and version id
      * into ResourceItem object for temporarily use.
-     *
-     * @param request
-     * @return
      */
-    private List getDeletedItemAttachmentList(SessionMap<String, Object> sessionMap) {
+    @SuppressWarnings("unchecked")
+    private List<ResourceItem> getDeletedItemAttachmentList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
     }
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
      */
+    @SuppressWarnings("rawtypes")
     private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
@@ -742,11 +695,11 @@ public class AuthoringController {
 	form.setAllowRating(item.isAllowRating());
 	form.setAllowComments(item.isAllowComments());
 	if (itemIdx >= 0) {
-	    form.setItemIndex(new Integer(itemIdx).toString());
+	    form.setItemIndex(String.valueOf(itemIdx));
 	}
 
 	Set<ResourceItemInstruction> instructionList = item.getItemInstructions();
-	List instructions = new ArrayList();
+	List<String> instructions = new ArrayList<>();
 	for (ResourceItemInstruction in : instructionList) {
 	    instructions.add(in.getDescription());
 	}
@@ -770,19 +723,13 @@ public class AuthoringController {
     /**
      * Extract web from content to resource item.
      *
-     * @param request
-     * @param instructionList
-     * @param itemForm
-     * @throws ResourceApplicationException
+     * BE CAREFUL: This method will copy nessary info from request form to a
+     * old or new ResourceItem instance. It gets all info EXCEPT
+     * ResourceItem.createDate and ResourceItem.createBy, which need be set
+     * when persisting this resource item.
      */
     private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList,
 	    ResourceItemForm itemForm) throws Exception {
-	/*
-	 * BE CAREFUL: This method will copy nessary info from request form to a
-	 * old or new ResourceItem instance. It gets all info EXCEPT
-	 * ResourceItem.createDate and ResourceItem.createBy, which need be set
-	 * when persisting this resource item.
-	 */
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(itemForm.getSessionMapID());
@@ -795,7 +742,7 @@ public class AuthoringController {
 	    item = new ResourceItem();
 	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    item.setOrderId(resourceList.size() + 1);
-	    resourceList.add(item);
+	    
 	} else { // edit
 	    List<ResourceItem> rList = new ArrayList<>(resourceList);
 	    item = rList.get(itemIdx);
@@ -815,8 +762,7 @@ public class AuthoringController {
 	    if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE
 		    || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		    || type == ResourceConstants.RESOURCE_TYPE_FILE) {
-		// if it has old file, and upload a new, then save old to
-		// deleteList
+		// if it has old file, and upload a new, then save old to deleteList
 		ResourceItem delAttItem = new ResourceItem();
 		boolean hasOld = false;
 		if (item.getFileUuid() != null) {
@@ -828,19 +774,14 @@ public class AuthoringController {
 		    delAttItem.setFileUuid(item.getFileUuid());
 		    delAttItem.setFileVersionId(item.getFileVersionId());
 		}
-		try {
-		    resourceService.uploadResourceItemFile(item, itemForm.getFile());
-		} catch (UploadResourceFileException e) {
-		    // if it is new add , then remove it!
-		    if (itemIdx == -1) {
-			resourceList.remove(item);
-		    }
-		    throw e;
-		}
+
+		//throws UploadResourceFileException
+		resourceService.uploadResourceItemFile(item, itemForm.getFile());
+		
 		// put it after "upload" to ensure deleted file added into list
 		// only no exception happens during upload
 		if (hasOld) {
-		    List delAtt = getDeletedItemAttachmentList(sessionMap);
+		    List<ResourceItem> delAtt = getDeletedItemAttachmentList(sessionMap);
 		    delAtt.add(delAttItem);
 		}
 	    }
@@ -851,13 +792,13 @@ public class AuthoringController {
 	item.setAllowRating(itemForm.isAllowRating());
 	item.setAllowComments(itemForm.isAllowComments());
 	// set instructions
-	Set instructions = new LinkedHashSet();
+	Set<ResourceItemInstruction> instructions = new LinkedHashSet<>();
 	int idx = 0;
 	for (String ins : instructionList) {
-	    ResourceItemInstruction rii = new ResourceItemInstruction();
-	    rii.setDescription(ins);
-	    rii.setSequenceId(idx++);
-	    instructions.add(rii);
+	    ResourceItemInstruction instruction = new ResourceItemInstruction();
+	    instruction.setDescription(ins);
+	    instruction.setSequenceId(idx++);
+	    instructions.add(instruction);
 	}
 	item.setItemInstructions(instructions);
 
@@ -867,12 +808,12 @@ public class AuthoringController {
 	if (type == ResourceConstants.RESOURCE_TYPE_URL || type == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    item.setOpenUrlNewWindow(itemForm.isOpenUrlNewWindow());
 	}
-	// if(type == ResourceConstants.RESOURCE_TYPE_WEBSITE
-	// ||itemForm.getItemType() ==
-	// ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
 	item.setDescription(itemForm.getDescription());
-	// }
 
+	// if it's a new item, add it to resourceList
+	if (itemIdx == -1) {
+	    resourceList.add(item);
+	}
     }
 
     /**
@@ -975,8 +916,8 @@ public class AuthoringController {
 
 			HttpSession session = SessionManager.getSession();
 			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			ResourceUser taskListUser = resourceService.getUserByIDAndContent(
-				new Long(user.getUserID().intValue()), pedagogicalPlannerForm.getToolContentID());
+			ResourceUser taskListUser = resourceService.getUserByIDAndContent(user.getUserID().longValue(),
+				pedagogicalPlannerForm.getToolContentID());
 			resourceItem.setCreateBy(taskListUser);
 
 			newItems.add(resourceItem);
@@ -1045,7 +986,7 @@ public class AuthoringController {
 	int insertIndex = pedagogicalPlannerForm.getItemCount();
 	pedagogicalPlannerForm.setTitle(insertIndex, "");
 	pedagogicalPlannerForm.setType(insertIndex,
-		new Short(request.getParameter(ResourceConstants.ATTR_ADD_RESOURCE_TYPE)));
+		(short) WebUtil.readIntParam(request, ResourceConstants.ATTR_ADD_RESOURCE_TYPE));
 	pedagogicalPlannerForm.setUrl(insertIndex, null);
 	pedagogicalPlannerForm.setFileName(insertIndex, null);
 	pedagogicalPlannerForm.setFile(insertIndex, null);
@@ -1056,13 +997,10 @@ public class AuthoringController {
 
     @RequestMapping("/switchResourceItemPosition")
     private String switchResourceItemPosition(HttpServletRequest request) {
-
-	String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int resourceItemOrderID1 = WebUtil.readIntParam(request, "resourceItemOrderID1");
 	int resourceItemOrderID2 = WebUtil.readIntParam(request, "resourceItemOrderID2");
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 
@@ -1080,10 +1018,16 @@ public class AuthoringController {
 	SortedSet<ResourceItem> newItems = new TreeSet<>(new ResourceItemComparator());
 	newItems.addAll(resourceList);
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, newItems);
-	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	// return null to close this window
 	return "pages/authoring/parts/itemlist";
     }
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    } 
 
 }
