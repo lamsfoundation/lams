@@ -1111,7 +1111,7 @@ public class MonitoringService implements IMonitoringFullService {
     @SuppressWarnings("unchecked")
     @Override
     // For this method to work, the Lesson must not be loaded into the Hibernate cache. If it is, then the call
-    // lessonDAO.deleteByProperty(Transition.class...) call will trigger a 
+    // lessonDAO.deleteByProperty(Transition.class...) call will trigger a
     // "deleted object would be re-saved by cascade (remove deleted object from associations)" exception
     // on the Lesson object. If you only access the lesson id then it will work. You can still load the Organisation,
     // but do not load the Lesson collection in the Organisation
@@ -1121,23 +1121,24 @@ public class MonitoringService implements IMonitoringFullService {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LearningDesign learningDesign = lesson.getLearningDesign();
 
+	// manually delete transitions as subsequent activity removal does not cascade to them
+	lessonDAO.deleteByProperty(Transition.class, "learningDesign.learningDesignId",
+		learningDesign.getLearningDesignId());
+	lessonDAO.flush();
+
 	// remove lesson resources
 	lessonDAO.deleteByProperty(LogEvent.class, "lessonId", lessonId);
 	lessonDAO.deleteByProperty(ToolSession.class, "lesson.lessonId", lessonId);
-	Map<String, Object> notebookProperties = new TreeMap<String, Object>();
+	Map<String, Object> notebookProperties = new TreeMap<>();
 	notebookProperties.put("externalID", lessonId);
 	notebookProperties.put("externalSignature", CoreNotebookConstants.SCRATCH_PAD_SIG);
 	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
 	lessonDAO.deleteLesson(lesson);
 
-	// manually delete transitions as subsequent activity removal does not cascade to them
-	lessonDAO.deleteByProperty(Transition.class, "learningDesign.learningDesignId",
-		learningDesign.getLearningDesignId());
-
 	// remove each Tool activity content
 	// It has to be done before removing BranchEntries as fetching Tool content
 	// in its own transaction would re-add connected BranchEntries (Hibernate error)
-	Set<Activity> systemActivities = new HashSet<Activity>();
+	Set<Activity> systemActivities = new HashSet<>();
 	for (Activity activity : learningDesign.getActivities()) {
 	    // get the real object, not the proxy
 	    activity = activityDAO.getActivityByActivityId(activity.getActivityId());
@@ -1535,7 +1536,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 	// list of activities for which "attempted" and "completed" status will be removed
 	// in last-to-first order
-	List<Activity> uncompleteActivities = new LinkedList<Activity>();
+	List<Activity> uncompleteActivities = new LinkedList<>();
 
 	if (currentActivity == null) {
 	    // Learner has finished the whole lesson. Find the last activity by traversing the transition.
@@ -1580,7 +1581,7 @@ public class MonitoringService implements IMonitoringFullService {
 	learnerProgress.setNextActivity(targetActivity);
 
 	// grouping and branch activities which need to be reset
-	Set<Activity> groupings = new HashSet<Activity>();
+	Set<Activity> groupings = new HashSet<>();
 
 	// remove completed activities step by step, all the way from current to target activity
 	while (!currentActivity.equals(targetActivity)) {
@@ -1607,7 +1608,7 @@ public class MonitoringService implements IMonitoringFullService {
 			    // get real instance instead of a lazy loaded proxy
 			    Activity sequenceChildActivity = ((SequenceActivity) activityDAO
 				    .getActivityByActivityId(childActivity.getActivityId())).getDefaultActivity();
-			    List<Activity> sequenceChildActivities = new LinkedList<Activity>();
+			    List<Activity> sequenceChildActivities = new LinkedList<>();
 			    while (sequenceChildActivity != null) {
 				sequenceChildActivities.add(sequenceChildActivity);
 				if (sequenceChildActivity.getTransitionFrom() != null) {
@@ -1754,7 +1755,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    lesson = learnerService.getLesson(lessonId);
 	}
 
-	Collection<User> users = new LinkedList<User>();
+	Collection<User> users = new LinkedList<>();
 	switch (searchType) {
 	    case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
 		users = lesson.getAllLearners();
@@ -1808,7 +1809,7 @@ public class MonitoringService implements IMonitoringFullService {
 
 	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
 		List<User> allUSers = userManagementService.getUsersFromOrganisation(orgId);
-		Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
+		Set<User> usersStartedAtLest1Lesson = new TreeSet<>();
 
 		Organisation org = getOrganisation(orgId);
 		Set<Lesson> lessons = org.getLessons();
@@ -1837,7 +1838,7 @@ public class MonitoringService implements IMonitoringFullService {
 		break;
 
 	    case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
-		users = new TreeSet<User>();
+		users = new TreeSet<>();
 
 		// add all available users from selected lessons
 		for (String lessonIdStr : lessonIds) {
@@ -1855,7 +1856,7 @@ public class MonitoringService implements IMonitoringFullService {
 		break;
 	}
 
-	Set<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
+	Set<User> sortedUsers = new TreeSet<>(new Comparator<User>() {
 	    @Override
 	    public int compare(User usr0, User usr1) {
 		return ((usr0.getFirstName() + usr0.getLastName() + usr0.getLogin())
@@ -1899,8 +1900,8 @@ public class MonitoringService implements IMonitoringFullService {
 	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
 		emailNotificationUid);
 
-	LinkedHashMap<String, ExcelCell[][]> sheets = new LinkedHashMap<String, ExcelCell[][]>();
-	List<ExcelCell[]> rows = new LinkedList<ExcelCell[]>();
+	LinkedHashMap<String, ExcelCell[][]> sheets = new LinkedHashMap<>();
+	List<ExcelCell[]> rows = new LinkedList<>();
 	ExcelCell[] row = new ExcelCell[3];
 	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.date"), true);
 	row[1] = new ExcelCell(
@@ -1950,7 +1951,7 @@ public class MonitoringService implements IMonitoringFullService {
      */
     @Override
     public List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending) {
-	List<User> usersCompletedLesson = new LinkedList<User>();
+	List<User> usersCompletedLesson = new LinkedList<>();
 
 	List<LearnerProgress> completedLearnerProgresses = learnerProgressDAO
 		.getCompletedLearnerProgressForLesson(lessonId, limit, offset, orderAscending);
@@ -2143,10 +2144,10 @@ public class MonitoringService implements IMonitoringFullService {
 	}
 
 	// create the lesson class - add the teacher as the learner and as staff
-	LinkedList<User> learners = new LinkedList<User>();
+	LinkedList<User> learners = new LinkedList<>();
 	learners.add(user);
 
-	LinkedList<User> staffs = new LinkedList<User>();
+	LinkedList<User> staffs = new LinkedList<>();
 	staffs.add(user);
 
 	createLessonClassForLesson(lessonID, null, "Learner Group", learners, "Staff Group", staffs, userID);
@@ -2282,7 +2283,7 @@ public class MonitoringService implements IMonitoringFullService {
 
     private ArrayList<User> createUserList(Long activityIDForErrorMessage, String[] learnerIDs,
 	    String addRemoveTextForErrorMessage) {
-	ArrayList<User> learners = new ArrayList<User>();
+	ArrayList<User> learners = new ArrayList<>();
 	for (String strlearnerID : learnerIDs) {
 	    boolean added = false;
 	    try {
@@ -2307,7 +2308,7 @@ public class MonitoringService implements IMonitoringFullService {
     public int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins)
 	    throws LessonServiceException {
 
-	ArrayList<User> learners = new ArrayList<User>();
+	ArrayList<User> learners = new ArrayList<>();
 	for (String login : logins) {
 	    User learner = userManagementService.getUserByLogin(login);
 	    if (learner == null) {
@@ -2323,7 +2324,7 @@ public class MonitoringService implements IMonitoringFullService {
 		"addUsersToGroupByLogins");
 
 	Group group = null;
-	Set<String> otherGroupNames = new HashSet<String>();
+	Set<String> otherGroupNames = new HashSet<>();
 	for (Group checkGroup : grouping.getGroups()) {
 	    if (checkGroup.getGroupName().equalsIgnoreCase(groupName)) {
 		group = checkGroup;
@@ -2537,7 +2538,7 @@ public class MonitoringService implements IMonitoringFullService {
 	    throw new MonitoringServiceException(error);
 	}
 
-	TreeSet<Group> unassignedGroups = new TreeSet<Group>();
+	TreeSet<Group> unassignedGroups = new TreeSet<>();
 
 	Grouping grouping = branchingActivity.getGrouping();
 	Iterator groupIterator = grouping.getGroups().iterator();
@@ -2644,7 +2645,7 @@ public class MonitoringService implements IMonitoringFullService {
     public void removeLearnerContent(Long lessonId, Integer learnerId) {
 	User learner = (User) userManagementService.findById(User.class, learnerId);
 	LearnerProgress learnerProgress = getLearnerProgress(learnerId, lessonId);
-	Set<Activity> activities = new HashSet<Activity>();
+	Set<Activity> activities = new HashSet<>();
 	activities.addAll(learnerProgress.getAttemptedActivities().keySet());
 	activities.addAll(learnerProgress.getCompletedActivities().keySet());
 	boolean resetReadOnly = true;
@@ -2819,7 +2820,7 @@ public class MonitoringService implements IMonitoringFullService {
      * Used in cloneLessons.
      */
     private List<User> createLearnerGroup(Integer groupId, Boolean addAllLearners, String[] learnerIds) {
-	List<User> learnerUsers = new ArrayList<User>();
+	List<User> learnerUsers = new ArrayList<>();
 	if (addAllLearners) {
 	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, true);
 	    learnerUsers.addAll(learnerVector);
@@ -2841,7 +2842,7 @@ public class MonitoringService implements IMonitoringFullService {
      * Used in cloneLessons.
      */
     private List<User> createStaffGroup(Integer groupId, Boolean addAllStaff, String[] staffIds) {
-	List<User> staffUsers = new ArrayList<User>();
+	List<User> staffUsers = new ArrayList<>();
 	if (addAllStaff) {
 	    Vector staffVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, true);
 	    staffUsers.addAll(staffVector);
