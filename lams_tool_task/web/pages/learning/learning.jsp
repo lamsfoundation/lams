@@ -123,6 +123,13 @@
 					itemUid: itemUid,
 					sessionMapID: "${sessionMapID}",
 					comment: comment
+				},
+				function() {
+					//show complete item button in case comment is required and only its absence prevented it from completion
+					var i = $("#item-faminus-" + itemUid);
+					if (eval(i.data("waiting-for-comment"))) {
+						i.replaceWith( '<a href="javascript:;" onclick="return completeItem(' + itemUid + ')"><i class="fa fa-lg fa-square-o"></i></a>' );
+					}
 				}
 			);
 		}

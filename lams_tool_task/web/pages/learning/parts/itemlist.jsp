@@ -15,7 +15,7 @@
 					<div class="panel-title pull-left" data-toggle="collapse" data-target="#collapse${item.uid}">
 						<c:out value="${item.title}" escapeXml="true" /> 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
-								[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
+							[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
 						</c:if>
 						<c:if test="${item.required}">
 							*
@@ -28,16 +28,17 @@
 								<i title="<fmt:message key='label.completed' />" class="fa fa-lg fa-check text-success"></i>
 							</c:when>
 
-							<c:when
-								test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
+							<c:when test="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
 									&& itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}">
-								<a href="javascript:;" onclick="return completeItem(${item.uid})"> <i class="fa fa-lg fa-square-o"></i>
-
+								<a href="javascript:;" onclick="return completeItem(${item.uid})"> 
+									<i class="fa fa-lg fa-square-o"></i>
 								</a>
 							</c:when>
 
 							<c:otherwise>
-								<i class="fa fa-lg fa-minus"></i>
+								<i id="item-faminus-${item.uid}" class="fa fa-lg fa-minus" 
+									data-waiting-for-comment="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
+									&& !itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}"></i>
 							</c:otherwise>
 						</c:choose>
 					</div>

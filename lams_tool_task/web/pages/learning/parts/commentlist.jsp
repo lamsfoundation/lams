@@ -50,19 +50,21 @@
 </script>
 
 <c:if test="${sessionMap.mode != 'teacher'}">
+
+	<c:if test="${!itemDTO.commentRequirementsMet}">
+		<lams:Alert id="commentRequired" close="true" type="info">
+			<fmt:message key="label.learning.info.add.comment.required" />
+		</lams:Alert>
+	</c:if>
+
 	<div class="form-group voffset5">
 		<label for="comment-${itemUid}">
 			<fmt:message key="label.preview.add.comment" />
 		</label>
 		<textarea name="comment-${itemUid}" id="comment-${itemUid}" class="form-control" rows="2"></textarea>
-							
-		<c:if test="${!itemDTO.commentRequirementsMet}">
-			<div class="help-block">
-				<fmt:message key="label.learning.info.add.comment.required" />
-			</div>
-		</c:if>
 
 		<input type="submit" value='<fmt:message key="label.preview.post" />'
 				class="btn btn-default btn-disable-on-submit voffset5" onclick="addNewComment(${itemUid})"/>
 	</div>
+	
 </c:if>
