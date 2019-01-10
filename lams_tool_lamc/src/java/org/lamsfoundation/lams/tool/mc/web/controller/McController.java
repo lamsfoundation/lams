@@ -448,6 +448,7 @@ public class McController {
 	String newQuestion = request.getParameter("newQuestion");
 	String feedback = request.getParameter("feedback");
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
+	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid", true);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	if ((newQuestion != null) && (newQuestion.length() > 0)) {
@@ -465,6 +466,7 @@ public class McController {
 
 		McQuestionDTO questionDTO = new McQuestionDTO();
 		questionDTO.setQuestion(newQuestion);
+		questionDTO.setQbQuestionUid(qbQuestionUid);
 		questionDTO.setFeedback(feedback);
 		questionDTO.setDisplayOrder(maxDisplayOrder + 1);
 		questionDTO.setOptionDtos(options);
@@ -485,6 +487,7 @@ public class McController {
 		}
 
 		questionDto.setQuestion(newQuestion);
+		questionDto.setQbQuestionUid(qbQuestionUid);
 		questionDto.setFeedback(feedback);
 		questionDto.setDisplayOrder(questionIndex);
 		questionDto.setOptionDtos(options);

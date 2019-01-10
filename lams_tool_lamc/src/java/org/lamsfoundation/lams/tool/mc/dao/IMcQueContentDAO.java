@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 
 /**
@@ -31,7 +32,7 @@ import org.lamsfoundation.lams.tool.mc.model.McQueContent;
  *
  * @author Ozgur Demirtas
  */
-public interface IMcQueContentDAO {
+public interface IMcQueContentDAO extends IBaseDAO {
 
     /**
      * <p>
@@ -91,4 +92,8 @@ public interface IMcQueContentDAO {
     List getAllQuestionEntriesSorted(final long qaContentId);
 
     void releaseQuestionFromCache(McQueContent question);
+
+    // finds next question ID for Question Ban question
+    // it will be moved to a common service in the future
+    public int getMaxQbQuestionId();
 }

@@ -148,6 +148,7 @@
 
 	<form:form action="saveQuestion.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST">
 		<form:hidden path="questionIndex" />
+		<input type="hidden" name="qbQuestionUid" value="${questionDto.qbQuestionUid}" />
 
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
 		<lams:Page title="${title}" type="learner" formID="mcAuthoringForm">

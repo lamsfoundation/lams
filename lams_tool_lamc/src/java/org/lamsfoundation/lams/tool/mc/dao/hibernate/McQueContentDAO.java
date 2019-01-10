@@ -64,8 +64,8 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<McQueContent> getQuestionsByContentUid(final long contentUid) {
-	List<McQueContent> list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID)
-		.setParameter("mcContentId", contentUid).list();
+	List<McQueContent> list = getSessionFactory().getCurrentSession()
+		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("mcContentId", contentUid).list();
 
 	return list;
     }
@@ -81,8 +81,7 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @Override
     public McQueContent getQuestionContentByDisplayOrder(final Integer displayOrder, final Long mcContentUid) {
 	List<?> list = getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER)
-		.setParameter("displayOrder", displayOrder).setParameter("mcContentUid", mcContentUid)
-		.list();
+		.setParameter("displayOrder", displayOrder).setParameter("mcContentUid", mcContentUid).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueContent mcq = (McQueContent) list.get(0);
@@ -114,5 +113,12 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @Override
     public void releaseQuestionFromCache(McQueContent question) {
 	getSession().evict(question);
+    }
+
+    @Override
+    public int getMaxQbQuestionId() {
+	Object result = this.getSession().createQuery("SELECT MAX(questionId) FROM QbQuestion").uniqueResult();
+	Integer max = (Integer) result;
+	return max == null ? 1 : max + 1;
     }
 }

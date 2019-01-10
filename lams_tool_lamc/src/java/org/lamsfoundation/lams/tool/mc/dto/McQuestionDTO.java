@@ -32,6 +32,7 @@ import java.util.List;
  */
 public class McQuestionDTO implements Comparable<McQuestionDTO> {
     private Long uid;
+    private Long qbQuestionUid;
     private String question;
     private Integer displayOrder;
     private String feedback;
@@ -62,6 +63,14 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
      */
     public void setUid(Long uid) {
 	this.uid = uid;
+    }
+
+    public Long getQbQuestionUid() {
+	return qbQuestionUid;
+    }
+
+    public void setQbQuestionUid(Long qaQuestionId) {
+	this.qbQuestionUid = qaQuestionId;
     }
 
     /**

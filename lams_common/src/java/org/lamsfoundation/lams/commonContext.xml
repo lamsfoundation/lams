@@ -30,6 +30,7 @@
 				<value>org.lamsfoundation.lams.outcome</value>
 				<value>org.lamsfoundation.lams.planner</value>
 				<value>org.lamsfoundation.lams.policies</value>
+				<value>org.lamsfoundation.lams.qb</value>
 				<value>org.lamsfoundation.lams.themes</value>
 				<value>org.lamsfoundation.lams.timezone</value>
 				<value>org.lamsfoundation.lams.tool</value>

@@ -42,6 +42,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.qb.QbQuestion;
 
 /**
  * <p>
@@ -51,18 +52,22 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-@SuppressWarnings("serial")
 @Entity
 @Table(name = "tl_lamc11_que_content")
 public class McQueContent implements Serializable, Comparable<McQueContent> {
+    private static final long serialVersionUID = 4022287106119453962L;
 
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column
-    private String question;
+    // part of question's data is stored in Question Bank's DB tables
+    // getters and setters of this data (question, mark, feedback) are mapped to QbQuestion
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
+	    CascadeType.PERSIST, CascadeType.REFRESH })
+    @JoinColumn(name = "qb_question_uid")
+    private QbQuestion qbQuestion = new QbQuestion();
 
     /**
      * It stores sha1(question) value that allows us to search for the McQueContentc with the same question
@@ -72,12 +77,6 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     @Column(name = "display_order")
     private Integer displayOrder;
-
-    @Column
-    private Integer mark;
-
-    @Column
-    private String feedback;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mc_content_id")
@@ -94,20 +93,18 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     @Transient
     private String escapedQuestion;
 
-    public McQueContent(String question, String questionHash, Integer displayOrder, Integer mark, String feedback,
-	    McContent mcContent, Set<McOptsContent> mcOptionsContents) {
-	this.question = question;
+    public McQueContent(QbQuestion qbQuestion, String questionHash, Integer displayOrder, McContent mcContent,
+	    Set<McOptsContent> mcOptionsContents) {
+	this.qbQuestion = qbQuestion;
 	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
-	this.mark = mark;
-	this.feedback = feedback;
 	this.mcContent = mcContent;
-	this.mcOptionsContents = mcOptionsContents != null ? mcOptionsContents : new HashSet<McOptsContent>();
+	this.mcOptionsContents = mcOptionsContents != null ? mcOptionsContents : new HashSet<>();
     }
 
     /** default constructor */
     public McQueContent() {
-	this.mcOptionsContents = new HashSet<McOptsContent>();
+	this.mcOptionsContents = new HashSet<>();
     }
 
     /**
@@ -120,15 +117,14 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * @return the new qa question content object
      */
     public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
-	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getQuestionHash(),
-		queContent.getDisplayOrder(), queContent.getMark(), queContent.getFeedback(), newMcContent,
-		new TreeSet<McOptsContent>());
+	McQueContent newQueContent = new McQueContent(queContent.getQbQuestion(), queContent.getQuestionHash(),
+		queContent.getDisplayOrder(), newMcContent, new TreeSet<McOptsContent>());
 	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
 	return newQueContent;
     }
 
     public Set<McOptsContent> deepCopyMcOptionsContent(McQueContent newQueContent) {
-	Set<McOptsContent> newMcOptionsContent = new TreeSet<McOptsContent>();
+	Set<McOptsContent> newMcOptionsContent = new TreeSet<>();
 	for (McOptsContent mcOptsContent : this.getMcOptionsContents()) {
 	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
 	    newMcOptionsContent.add(mcNewOptsContent);
@@ -144,12 +140,20 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 	this.uid = uid;
     }
 
+    public QbQuestion getQbQuestion() {
+	return qbQuestion;
+    }
+
+    public void setQbQuestion(QbQuestion qbQuestion) {
+	this.qbQuestion = qbQuestion;
+    }
+
     public String getQuestion() {
-	return this.question;
+	return this.qbQuestion.getName();
     }
 
     public void setQuestion(String question) {
-	this.question = question;
+	this.qbQuestion.setName(question);
     }
 
     /**
@@ -208,7 +212,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * @return Returns the feedback.
      */
     public String getFeedback() {
-	return feedback;
+	return qbQuestion.getFeedback();
     }
 
     /**
@@ -216,7 +220,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      *            The feedback to set.
      */
     public void setFeedback(String feedback) {
-	this.feedback = feedback;
+	qbQuestion.setFeedback(feedback);
     }
 
     @Override
@@ -235,7 +239,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      * @return Returns the mark.
      */
     public Integer getMark() {
-	return mark;
+	return qbQuestion.getMark();
     }
 
     /**
@@ -243,7 +247,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
      *            The mark to set.
      */
     public void setMark(Integer mark) {
-	this.mark = mark;
+	qbQuestion.setMark(mark);
     }
 
     public String getEscapedQuestion() {

@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -71,7 +70,7 @@ public class AuthoringUtil {
     }
 
     /**
-     * persisting content. 
+     * persisting content.
      */
     public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
 	    String strToolContentID, List<McQuestionDTO> questionDTOs) {
@@ -110,11 +109,11 @@ public class AuthoringUtil {
 	    randomizeBoolean = true;
 	}
 
-	if ( displayAnswersFeedback != null) {
-	    if ( displayAnswersFeedback.equalsIgnoreCase("answers")) {
+	if (displayAnswersFeedback != null) {
+	    if (displayAnswersFeedback.equalsIgnoreCase("answers")) {
 		displayAnswersBoolean = true;
 		displayFeedbackOnlyBoolean = false;
-	    } else if ( displayAnswersFeedback.equalsIgnoreCase("feedback")) {
+	    } else if (displayAnswersFeedback.equalsIgnoreCase("feedback")) {
 		displayAnswersBoolean = false;
 		displayFeedbackOnlyBoolean = true;
 	    }
@@ -185,10 +184,10 @@ public class AuthoringUtil {
 
 	mcContent.setReflect(reflectBoolean);
 	mcContent.setReflectionSubject(reflectionSubject);
-	
+
 	//calculate total mark
 	int totalMark = 0;
-	for (McQuestionDTO questionDto: questionDTOs) {
+	for (McQuestionDTO questionDto : questionDTOs) {
 	    String mark = questionDto.getMark();
 	    if (StringUtils.isNotBlank(mark)) {
 		int intMark = new Integer(mark).intValue();
@@ -223,11 +222,11 @@ public class AuthoringUtil {
      * generates a list for holding default questions and their candidate answers
      */
     public static List<McQuestionDTO> buildDefaultQuestions(McContent mcContent) {
-	List<McQuestionDTO> questionDtos = new LinkedList<McQuestionDTO>();
+	List<McQuestionDTO> questionDtos = new LinkedList<>();
 
 	Long mapIndex = new Long(1);
 
-	for (McQueContent question : (Set<McQueContent>) mcContent.getMcQueContents()) {
+	for (McQueContent question : mcContent.getMcQueContents()) {
 	    McQuestionDTO questionDto = new McQuestionDTO();
 
 	    String feedback = "";
@@ -238,14 +237,15 @@ public class AuthoringUtil {
 	    String questionText = question.getQuestion();
 
 	    questionDto.setUid(question.getUid());
+	    questionDto.setQbQuestionUid(question.getQbQuestion().getUid());
 	    questionDto.setQuestion(questionText);
 	    questionDto.setDisplayOrder(question.getDisplayOrder());
 	    questionDto.setFeedback(feedback);
 	    questionDto.setMark(question.getMark().toString());
 
 	    // build candidate dtos
-	    List<McOptionDTO> optionDtos = new LinkedList<McOptionDTO>();
-	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+	    List<McOptionDTO> optionDtos = new LinkedList<>();
+	    for (McOptsContent option : question.getMcOptionsContents()) {
 		McOptionDTO optionDTO = new McOptionDTO(option);
 		optionDtos.add(optionDTO);
 	    }
