@@ -22,16 +22,24 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
 -- fill Question Bank table with unique questions, with manually incremented question ID
 SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FROM lams_qb_question);
 SET @start_question_id = @question_id;
-INSERT INTO lams_qb_question SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, question, mark, feedback FROM (SELECT DISTINCT TRIM(question) AS question, mark, IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback FROM tl_lamc11_que_content) AS mcq;
+INSERT INTO lams_qb_question SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, question, mark, feedback
+	FROM (SELECT DISTINCT TRIM(question) AS question, mark, IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback FROM tl_lamc11_que_content) AS mcq;
 
 -- prepare MCQ's question table for referencing Question Bank's question
-ALTER TABLE tl_lamc11_que_content ADD COLUMN qb_question_uid BIGINT AFTER uid, ADD CONSTRAINT FK_qb_question FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE;
+ALTER TABLE tl_lamc11_que_content ADD COLUMN qb_question_uid BIGINT AFTER uid,
+								  ADD CONSTRAINT FK_qb_question FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE;
 
 -- find matching questions in Question Bank and set up references
-UPDATE tl_lamc11_que_content AS mcq, lams_qb_question AS qb SET mcq.qb_question_uid = qb.uid WHERE TRIM(mcq.question) = qb.name AND mcq.mark = qb.mark AND (TRIM(mcq.feedback) = qb.feedback OR (IF(TRIM(mcq.feedback) = '', NULL, TRIM(mcq.feedback)) IS NULL AND qb.feedback IS NULL)) AND qb.question_id > @start_question_id;
+UPDATE tl_lamc11_que_content AS mcq, lams_qb_question AS qb
+	SET mcq.qb_question_uid = qb.ui
+	WHERE TRIM(mcq.question) = qb.name AND mcq.mark = qb.mark 
+		AND (TRIM(mcq.feedback) = qb.feedback OR (IF(TRIM(mcq.feedback) = '', NULL, TRIM(mcq.feedback)) IS NULL AND qb.feedback IS NULL))
+		AND qb.question_id > @start_question_id;
 
 -- remove columns from MCQ which are duplicated in Question Bank
-ALTER TABLE tl_lamc11_que_content DROP COLUMN question, DROP COLUMN mark, DROP COLUMN feedback;
+ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
+								  DROP COLUMN mark,
+								  DROP COLUMN feedback;
 
 ----------------------Put all sql statements above here-------------------------
 
