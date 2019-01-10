@@ -32,8 +32,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.service.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
@@ -186,7 +185,7 @@ public class NbAuthoringController {
 	    throw new NbApplicationException(error);
 	}
 
-	Long content_id = NbWebUtil.convertToLong(nbAuthoringForm.getToolContentID());
+	Long content_id = Long.valueOf(nbAuthoringForm.getToolContentID());
 
 	//throws exception if the content id does not exist
 	checkContentId(content_id);

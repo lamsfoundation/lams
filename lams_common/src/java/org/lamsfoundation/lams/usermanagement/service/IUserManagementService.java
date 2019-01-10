@@ -246,6 +246,8 @@ public interface IUserManagementService {
      * @return the User
      */
     User getUserByLogin(String login);
+    
+    User getUserById(Integer userId);
 
     /**
      * @param login

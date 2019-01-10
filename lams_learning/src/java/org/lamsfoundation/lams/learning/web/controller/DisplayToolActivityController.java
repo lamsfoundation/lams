@@ -33,6 +33,8 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,8 +59,9 @@ public class DisplayToolActivityController {
     @RequestMapping("/DisplayToolActivity")
     public String execute(HttpServletRequest request, HttpServletResponse response) {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (!(activity instanceof ToolActivity)) {
 	    log.error("activity not ToolActivity");
 	    return "error";

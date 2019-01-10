@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -124,6 +125,20 @@ public interface ILearnerService {
      * calculate the url to go to next, based on the ActivityMapping class.
      */
     void completeActivity(Integer learnerId, Activity activity, Long progressID);
+
+    /**
+     * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
+     * in the learning design. It is currently triggered by various progress engine related action classes, which then
+     * calculate the url to go to next, based on the ActivityMapping class.
+     *
+     * @param learnerId
+     *            the learner who are running this activity in the design.
+     * @param activity
+     *            the activity is being run.
+     * @return the updated learner progress
+     */
+    String completeActivity(LearnerProgress progress, Activity currentActivity, Integer learnerId,
+	    boolean redirect) throws UnsupportedEncodingException;
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All finished but archived lesson should not be

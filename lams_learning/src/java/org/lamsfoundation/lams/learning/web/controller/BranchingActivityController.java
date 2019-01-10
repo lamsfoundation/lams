@@ -72,12 +72,14 @@ public class BranchingActivityController {
     public String performBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	
 	Integer learnerId = LearningWebUtil.getUserId();
 	boolean forceGroup = WebUtil.readBooleanParam(request, BranchingActivityController.PARAM_FORCE_GROUPING, false);
 
 	String forward = null;
 
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (activity == null) {
 	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
 	    forward = activityMapping.getActivityForward(activity, learnerProgress, true);
@@ -110,8 +112,8 @@ public class BranchingActivityController {
 		int completedCount = 0;
 		while (i.hasNext()) {
 		    Activity nextBranch = i.next();
-		    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress,
-			    nextBranch, (branch != null) && branch.equals(nextBranch), false);
+		    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, nextBranch,
+			    (branch != null) && branch.equals(nextBranch), false);
 		    if (activityURL.isComplete()) {
 			completedCount++;
 		    }
@@ -158,10 +160,11 @@ public class BranchingActivityController {
     public String forceBranching(@ModelAttribute BranchingForm branchingForm,
 	    HttpServletRequest request) {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	Integer learnerId = LearningWebUtil.getUserId();
 	String forward = null;
 
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (activity == null) {
 	    learnerProgress = learnerService.joinLesson(learnerId, learnerProgress.getLesson().getLessonId());
 	    forward = activityMapping.getActivityForward(activity, learnerProgress, true);
@@ -171,7 +174,6 @@ public class BranchingActivityController {
 	    forward = "error";
 
 	} else {
-
 	    BranchingActivity branchingActivity = (BranchingActivity) activity;
 	    Long branchId = WebUtil.readLongParam(request, "branchID", false);
 

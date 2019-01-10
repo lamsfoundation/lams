@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -71,7 +72,9 @@ public class DisplayOptionsActivityController {
 	    HttpServletResponse response) {
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (!(activity instanceof OptionsActivity)) {
 	    log.error("activity not OptionsActivity " + activity.getActivityId());
 	    return "error";
@@ -86,8 +89,7 @@ public class DisplayOptionsActivityController {
 	Iterator<Activity> i = subActivities.iterator();
 	int completedCount = 0;
 	while (i.hasNext()) {
-	    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress, i.next(), false,
-		    false);
+	    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, i.next(), false, false);
 	    if (activityURL.isComplete()) {
 		completedCount++;
 	    }

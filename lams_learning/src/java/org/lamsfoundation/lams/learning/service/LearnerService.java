@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -138,26 +139,14 @@ public class LearnerService implements ILearnerFullService {
     public LearnerService() {
     }
 
-    /**
-     * @param lessonDAO
-     *            The lessonDAO to set.
-     */
     public void setLessonDAO(ILessonDAO lessonDAO) {
 	this.lessonDAO = lessonDAO;
     }
 
-    /**
-     * @param learnerProgressDAO
-     *            The learnerProgressDAO to set.
-     */
     public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
 	this.learnerProgressDAO = learnerProgressDAO;
     }
 
-    /**
-     * @param lamsToolService
-     *            The lamsToolService to set.
-     */
     public void setLamsCoreToolService(ILamsCoreToolService lamsToolService) {
 	lamsCoreToolService = lamsToolService;
     }
@@ -166,49 +155,18 @@ public class LearnerService implements ILearnerFullService {
 	this.activityMapping = activityMapping;
     }
 
-    /**
-     * @param activityDAO
-     *            The activityDAO to set.
-     */
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
 
-    /**
-     * @param groupingDAO
-     *            The groupingDAO to set.
-     */
     public void setGroupingDAO(IGroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
     }
 
-    /**
-     * @return the groupUserDAO
-     */
-    public IGroupUserDAO getGroupUserDAO() {
-	return groupUserDAO;
-    }
-
-    /**
-     * @param groupUserDAO
-     *            groupUserDAO
-     */
     public void setGroupUserDAO(IGroupUserDAO groupUserDAO) {
 	this.groupUserDAO = groupUserDAO;
     }
 
-    /**
-     * @return the User Management Service
-     */
-    @Override
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
-    /**
-     * @param userService
-     *            User Management Service
-     */
     public void setUserManagementService(IUserManagementService userService) {
 	userManagementService = userService;
     }
@@ -604,22 +562,10 @@ public class LearnerService implements ILearnerFullService {
 
     }
 
-    /**
-     * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
-     * in the learning design. It is currently triggered by various progress engine related action classes, which then
-     * calculate the url to go to next, based on the ActivityMapping class.
-     *
-     * @param learnerId
-     *            the learner who are running this activity in the design.
-     * @param activity
-     *            the activity is being run.
-     * @return the updated learner progress
-     */
     @Override
     public void completeActivity(Integer learnerId, Activity activity, Long progressID) {
-	if (LearnerService.log.isDebugEnabled()) {
-	    LearnerService.log
-		    .debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
 	}
 	LearnerProgress progress = learnerProgressDAO.getLearnerProgress(progressID);
 	if (progress.getCompletedActivities().keySet().contains(activity)) {
@@ -640,7 +586,7 @@ public class LearnerService implements ILearnerFullService {
 	    try {
 		progressEngine.setUpStartPoint(progress);
 	    } catch (ProgressException e) {
-		LearnerService.log.error("error occurred in 'setUpStartPoint':" + e.getMessage(), e);
+		log.error("error occurred in 'setUpStartPoint':" + e.getMessage(), e);
 		throw new LearnerServiceException(e);
 	    }
 
@@ -657,6 +603,42 @@ public class LearnerService implements ILearnerFullService {
 		messageService.getMessage(ProgressEngine.AUDIT_ACTIVITY_STOP_KEY,
 			new Object[] { progress.getUser().getLogin(), progress.getUser().getUserId(),
 				activity.getTitle(), activity.getActivityId() }));
+    }
+    
+    /**
+     * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
+     * Grouping actions. Calls the learningService to actually complete the activity and progress.
+     *
+     * @param redirect
+     *            Should this call redirect to the next screen (true) or use a forward (false)
+     *
+     * @throws UnsupportedEncodingException
+     * @throws InterruptedException
+     */
+    @Override
+    public String completeActivity(LearnerProgress progress, Activity currentActivity, Integer learnerId,
+	    boolean redirect) throws UnsupportedEncodingException {
+	Lesson lesson = progress.getLesson();
+
+	if (currentActivity == null) {
+	    progress = joinLesson(learnerId, lesson.getLessonId());
+	    
+	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
+
+	    // recalculate activity mark and pass it to gradebook
+	    updateGradebookMark(currentActivity, progress);
+	    return activityMapping.getCloseForward(currentActivity, lesson.getLessonId());
+	    
+	} else {
+	    completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
+	}
+
+	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
+		&& progress.getCompletedActivities().containsKey(currentActivity.getParentActivity())))) {
+	    return activityMapping.getCloseForward(currentActivity, lesson.getLessonId());
+	}
+
+	return activityMapping.getProgressForward(progress, redirect, false);
     }
 
     @Override
@@ -1603,11 +1585,6 @@ public class LearnerService implements ILearnerFullService {
     public boolean isKumaliveDisabledForOrganisation(Integer organisationId) {
 	Kumalive kumalive = kumaliveService.getKumaliveByOrganisation(organisationId);
 	return kumalive == null || kumalive.getFinished();
-    }
-
-    @Override
-    public IActivityDAO getActivityDAO() {
-	return activityDAO;
     }
 
 }

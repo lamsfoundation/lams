@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.strategy.ScheduleGateActivityStrat
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,8 @@ public class GateController {
     @Autowired
     private ILearnerFullService learnerService;
     @Autowired
+    private IUserManagementService userManagementService;
+    @Autowired
     private ActivityMapping activityMapping;
     
     // ---------------------------------------------------------------------
@@ -100,16 +103,6 @@ public class GateController {
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
     // ---------------------------------------------------------------------
-    /**
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
     @RequestMapping("knockGate")
     public String knockGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -117,13 +110,13 @@ public class GateController {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	// initialize service object
-	Activity activity = learnerService.getActivity(activityId);
-	User learner = LearningWebUtil.getUser(learnerService);
+	Integer userId = LearningWebUtil.getUserId();
+	User learner = userManagementService.getUserById(userId);
 	Lesson lesson = learnerService.getLesson(lessonId);
 
 	LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
 
+	Activity activity = learnerService.getActivity(activityId);
 	if (activity != null) {
 	    // knock the gate
 	    GateActivityDTO gateDTO = learnerService.knockGate(activityId, learner, forceGate);
@@ -140,9 +133,7 @@ public class GateController {
 	}
 
 	// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-	return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
-		learner.getUserId(), learnerService, true);
-
+	return learnerService.completeActivity(learnerProgress, activity, learner.getUserId(), true);
     }
 
     // ---------------------------------------------------------------------
@@ -181,7 +172,8 @@ public class GateController {
 		// so it is in seconds
 		gateForm.setStartOffset(scheduleGate.getGateStartTimeOffset() * 60);
 
-		User learner = LearningWebUtil.getUser(learnerService);
+		Integer userId = LearningWebUtil.getUserId();
+		User learner = userManagementService.getUserById(userId);
 		Date reachTime = ScheduleGateActivityStrategy.getPreviousActivityCompletionDate(scheduleGate, learner);
 		gateForm.setReachDate(reachTime);
 

@@ -41,8 +41,7 @@ import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.service.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -69,8 +68,7 @@ public class NbMonitoringController {
 
     @RequestMapping("/monitoring")
     public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
-
-	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
+	Long toolContentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
 	if (toolContentId == null) {
@@ -139,8 +137,8 @@ public class NbMonitoringController {
 
     @RequestMapping("/viewReflection")
     public String viewReflection(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
-	Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
-	Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
+	Long userId = WebUtil.readLongParam(request, NoticeboardConstants.USER_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID);
 	NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userId, toolSessionId);
 	NotebookEntry nbEntry = nbService.getEntry(nbUser.getNbSession().getNbSessionId(),
 		CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE, userId.intValue());

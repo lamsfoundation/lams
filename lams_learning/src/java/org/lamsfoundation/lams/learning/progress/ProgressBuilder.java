@@ -176,8 +176,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 	    log.error(error);
 	    throw new LearningDesignProcessorException(error);
 	}
-	ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, progress, activity, false,
-		isFloating);
+	ActivityURL activityURL = activityMapping.getActivityURL(progress, activity, false, isFloating);
 	if (activityURL.getStatus() == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
 	    activityURL.setUrl((previewMode || isFloating) ? forceLearnerURL + activity.getActivityId() : null);
 	}
