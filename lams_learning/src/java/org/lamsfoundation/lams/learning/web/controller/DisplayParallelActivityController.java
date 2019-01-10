@@ -39,6 +39,8 @@ import org.lamsfoundation.lams.learning.web.util.ParallelActivityMappingStrategy
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -65,7 +67,8 @@ public class DisplayParallelActivityController {
     public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
 	activityMapping.setActivityMappingStrategy(new ParallelActivityMappingStrategy());
 
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (!(activity instanceof ParallelActivity)) {
 	    log.error("activity not ParallelActivity " + activity.getActivityId());
 	    return "error";

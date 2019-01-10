@@ -43,8 +43,7 @@ import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
+import org.lamsfoundation.lams.tool.noticeboard.service.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.NbLearnerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
@@ -284,7 +283,7 @@ public class NbLearnerController {
 
 	Long userID = getUserID(request);
 
-	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
+	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
 	    logger.error(error);
@@ -350,7 +349,7 @@ public class NbLearnerController {
     @RequestMapping(path = "/reflect", method = RequestMethod.POST)
     public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {
 
-	Long toolSessionID = NbWebUtil.convertToLong(nbLearnerForm.getToolSessionID());
+	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
 	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
 	request.setAttribute("title", nbContent.getTitle());

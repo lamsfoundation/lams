@@ -75,7 +75,6 @@ public class GradebookUtil {
      * @param page
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static String toGridXML(List gridRows, GBGridView view, String sortBy, boolean isSearch, String searchField,
 	    String searchOper, String searchString, String sortOrder, int rowLimit, int page) {
 
@@ -112,7 +111,6 @@ public class GradebookUtil {
      * @param view
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static String toGridXML(List gridRows, int page, int totalPages, GBGridView view) {
 	String xml = "";
 	try {
@@ -168,19 +166,15 @@ public class GradebookUtil {
     }
 
     public static String niceFormatting(Double mark) {
-
 	String markStr = new DecimalFormat("##0.00").format(mark);
 	return markStr;
-
     }
 
     public static String niceFormatting(Double mark, boolean displayAsPercentage) {
-
 	String markStr = new DecimalFormat("##0.00").format(mark);
 	if ( displayAsPercentage )
 	    markStr += "%";
 	return markStr;
-
     }
 
     public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
@@ -284,7 +278,6 @@ public class GradebookUtil {
      * @param searchString
      * @return
      */
-    @SuppressWarnings("unchecked")
     private static List doRowNameSearch(List gradebookRows, String searchField, String searchOper,
 	    String searchString) {
 	List<GradebookGridRowDTO> ret = new ArrayList<GradebookGridRowDTO>();

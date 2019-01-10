@@ -22,26 +22,47 @@
  */
 
 
-package org.lamsfoundation.lams.tool.noticeboard.util;
+package org.lamsfoundation.lams.tool.noticeboard.service;
 
 /**
- * This Web Utility class contains helper methods used in the Action Servlets
- *
- * @author mtruong
- *
+ * Generic exception class for the noticeboard tool
  */
-public class NbWebUtil {
 
-    private NbWebUtil() {
+public class NbApplicationException extends RuntimeException {
+    /**
+     * Default Constructor
+     */
+    public NbApplicationException() {
+	super();
     }
 
-    public static Long convertToLong(String id) {
-	try {
-	    return new Long(id);
-	} catch (NumberFormatException e) {
-	    return null;
-	}
+    /**
+     * Constructor for customized error message
+     * 
+     * @param message
+     */
+    public NbApplicationException(String message) {
+	super(message);
+    }
 
+    /**
+     * Constructor for wrapping the throwable object
+     * 
+     * @param cause
+     */
+    public NbApplicationException(Throwable cause) {
+	super(cause);
+    }
+
+    /**
+     * Constructor for wrapping both the customized error message and
+     * throwable exception object.
+     * 
+     * @param message
+     * @param cause
+     */
+    public NbApplicationException(String message, Throwable cause) {
+	super(message, cause);
     }
 
 }

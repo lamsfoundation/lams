@@ -111,7 +111,9 @@ public class GroupingController {
 
 	// initialize service object
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (!(activity instanceof GroupingActivity)) {
 	    log.error("activity not GroupingActivity");
 	    return "error";
@@ -203,12 +205,12 @@ public class GroupingController {
 	    throws IOException, ServletException {
 	// initialize service object
 	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity groupingActivity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity groupingActivity = learnerService.getActivity(activityId);
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
-	return LearningWebUtil.completeActivity(request, response, activityMapping, progress, groupingActivity,
-		learnerId, learnerService, true);
+	return learnerService.completeActivity(progress, groupingActivity, learnerId, true);
     }
 
     /**
@@ -221,7 +223,8 @@ public class GroupingController {
     private void prepareGroupData(HttpServletRequest request) {
 
 	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 
 	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
 	if (grouping != null) {
@@ -251,7 +254,8 @@ public class GroupingController {
     @RequestMapping("/learnerChooseGroup")
     public String learnerChooseGroup(@ModelAttribute GroupingForm groupingForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	Long groupId = WebUtil.readLongParam(request, "groupId");
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Long lessonId = learnerProgress.getLesson().getLessonId();

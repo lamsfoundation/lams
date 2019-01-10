@@ -74,7 +74,6 @@ public class CompleteActivityController {
     public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	Integer learnerId = LearningWebUtil.getUserId();
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
 	// This must get the learner progress from the progress id, not cached from the request,
 	// otherwise we may be using an old version of a lesson while a teacher is starting a
@@ -101,14 +100,16 @@ public class CompleteActivityController {
 	    }
 	}
 
-	String forward = null;
 	// Set activity as complete
 	try {
-	    forward = LearningWebUtil.completeActivity(request, response, activityMapping, progress, activity, learnerId,
-		    learnerService, false);
+	    
+	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	    Activity activity = learnerService.getActivity(activityId);
+	    //return forward
+	    return learnerService.completeActivity(progress, activity, learnerId, false);
+	    
 	} catch (LearnerServiceException e) {
 	    return "error";
 	}
-	return forward;
     }
 }
