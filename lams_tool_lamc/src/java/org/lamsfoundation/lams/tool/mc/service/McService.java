@@ -283,9 +283,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
 	    } else {
-		// if it exists, clone it so we do not change data on the existing entity,
+		// if it exists, detach it so we do not change data on the existing entity,
 		// otherwise it gets saved on transaction end with modified data
-		qbQuestion = qbQuestion.clone();
+		mcQueContentDAO.releaseFromCache(qbQuestion);
 	    }
 	    // set question's data to current values
 	    qbQuestion.setName(currentQuestionText);
@@ -294,10 +294,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // if it is a new question, it is always considered modified
 	    // if it is an existing question, it gets checked whether data changed
 	    if (qbQuestion.isModified()) {
+		// the cloned entity will be attached to session, unlike the previously detached qbQuestion
+		qbQuestion = qbQuestion.clone();
 		// if vital data changed, create a new question instead of modifying existing one
 		qbQuestion.setQuestionId(mcQueContentDAO.getMaxQbQuestionId());
 		qbQuestion.setVersion(1);
-		question.setQbQuestion(qbQuestion);
 	    }
 
 	    // in case question doesn't exist
@@ -311,13 +312,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// in case question exists already
 	    } else {
 		question.setDisplayOrder(new Integer(displayOrder));
+		question.setQbQuestion(qbQuestion);
 	    }
 
 	    // persist candidate answers
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
 	    Set<McOptsContent> newOptions = new HashSet<>();
-	    Set<Long> wantedUids = new HashSet<>();
 	    int displayOrderOption = 1;
 	    for (McOptionDTO optionDTO : optionDTOs) {
 

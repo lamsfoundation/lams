@@ -141,7 +141,7 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public void setName(String name) {
-	this.name = name == null ? null : name.trim();
+	this.name = StringUtils.isBlank(name) ? null : name.trim();
     }
 
     public Integer getMark() {
@@ -157,6 +157,6 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public void setFeedback(String feedback) {
-	this.feedback = feedback == null ? null : feedback.trim();
+	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
     }
 }
