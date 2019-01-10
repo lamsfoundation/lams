@@ -49,7 +49,7 @@ create table tl_lascrt11_user (
    login_name varchar(255),
    session_finished TINYINT(1),
    scratching_finished TINYINT(1),
-   scratchie_uid bigint,
+   session_uid bigint,
    primary key (uid),
    UNIQUE KEY user_id (user_id,session_uid),
    KEY userIdIndex (user_id),
