@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.qb.QbQuestion;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -251,6 +252,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	mcQueContentDAO.insertOrUpdate(mcQueContent.getQbQuestion());
 
+	for (McOptsContent mcqOption : mcQueContent.getMcOptionsContents()) {
+	    mcQueContentDAO.insertOrUpdate(mcqOption.getQbOption());
+	}
+
 	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
     }
 
@@ -286,6 +291,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// if it exists, detach it so we do not change data on the existing entity,
 		// otherwise it gets saved on transaction end with modified data
 		mcQueContentDAO.releaseFromCache(qbQuestion);
+		for (QbOption option : qbQuestion.getOptions()) {
+		    mcQueContentDAO.releaseFromCache(option);
+		}
 	    }
 	    // set question's data to current values
 	    qbQuestion.setName(currentQuestionText);
@@ -329,8 +337,17 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		//find persisted option if it exists
 		McOptsContent option = new McOptsContent();
 		for (McOptsContent oldOption : oldOptions) {
+		    mcQueContentDAO.releaseFromCache(oldOption.getQbOption());
+		    mcQueContentDAO.releaseFromCache(oldOption.getQbOption().getQuestion());
 		    if (oldOption.getUid().equals(optionUid)) {
 			option = oldOption;
+		    }
+		}
+
+		for (QbOption qbOption : question.getQbQuestion().getOptions()) {
+		    if (qbOption.getUid().equals(optionDTO.getQbOptionUid())) {
+			option.setQbOption(qbOption);
+			break;
 		    }
 		}
 
@@ -1970,10 +1987,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (JsonNode optionData : optionsData) {
-		question.getMcOptionsContents()
-			.add(new McOptsContent(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER),
-				JsonUtil.optBoolean(optionData, RestTags.CORRECT),
-				JsonUtil.optString(optionData, RestTags.ANSWER_TEXT), question));
+		QbOption qbOption = new QbOption();
+		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
+		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
+		question.getMcOptionsContents().add(
+			new McOptsContent(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER), qbOption, question));
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}

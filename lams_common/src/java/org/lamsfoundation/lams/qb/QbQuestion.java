@@ -1,12 +1,17 @@
 package org.lamsfoundation.lams.qb;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -61,6 +66,9 @@ public class QbQuestion implements Serializable, Cloneable {
 
     @Column
     private String feedback;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<QbOption> options = new ArrayList<>();
 
     // question state when it was loaded from DB
     @Transient
@@ -158,5 +166,13 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setFeedback(String feedback) {
 	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
+    }
+
+    public List<QbOption> getOptions() {
+	return options;
+    }
+
+    public void setOptions(List<QbOption> options) {
+	this.options = options;
     }
 }

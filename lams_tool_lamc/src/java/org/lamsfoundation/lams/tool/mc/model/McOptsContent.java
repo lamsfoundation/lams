@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,6 +37,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.qb.QbOption;
 
 /**
  * Persistent object/bean that defines the content for the MCQ tool. Provides accessors and mutators to get/set
@@ -53,14 +55,13 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column(name = "correct_option")
-    private boolean correctOption;
-
-    @Column(name = "mc_que_option_text")
-    private String mcQueOptionText;
-
     @Column
     private Integer displayOrder;
+
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
+	    CascadeType.PERSIST, CascadeType.REFRESH })
+    @JoinColumn(name = "qb_option_uid")
+    private QbOption qbOption = new QbOption();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mc_que_content_id")
@@ -72,17 +73,15 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @Transient
     private String escapedOptionText;
 
-    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
-	    McQueContent mcQueContent) {
+    public McOptsContent(Integer displayOrder, QbOption qbOption, McQueContent mcQueContent) {
 	this.displayOrder = displayOrder;
-	this.correctOption = correctOption;
-	this.mcQueOptionText = mcQueOptionText;
+	this.qbOption = qbOption;
 	this.mcQueContent = mcQueContent;
     }
 
     public static McOptsContent newInstance(McOptsContent mcOptsContent, McQueContent newMcQueContent) {
-	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(),
-		mcOptsContent.isCorrectOption(), mcOptsContent.getMcQueOptionText(), newMcQueContent);
+	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(), mcOptsContent.getQbOption(),
+		newMcQueContent);
 	return newMcOptsContent;
     }
 
@@ -99,19 +98,19 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     }
 
     public boolean isCorrectOption() {
-	return this.correctOption;
+	return qbOption.isCorrect();
     }
 
     public void setCorrectOption(boolean correctOption) {
-	this.correctOption = correctOption;
+	qbOption.setCorrect(correctOption);
     }
 
     public String getMcQueOptionText() {
-	return this.mcQueOptionText;
+	return qbOption.getName();
     }
 
     public void setMcQueOptionText(String mcQueOptionText) {
-	this.mcQueOptionText = mcQueOptionText;
+	qbOption.setName(mcQueOptionText);
     }
 
     public McQueContent getMcQueContent() {
@@ -120,6 +119,7 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 
     public void setMcQueContent(McQueContent mcQueContent) {
 	this.mcQueContent = mcQueContent;
+	this.qbOption.setQuestion(mcQueContent.getQbQuestion());
     }
 
     @Override
@@ -166,6 +166,14 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 
     public void setEscapedOptionText(String escapedOptionText) {
 	this.escapedOptionText = escapedOptionText;
+    }
+
+    public QbOption getQbOption() {
+	return qbOption;
+    }
+
+    public void setQbOption(QbOption qbOption) {
+	this.qbOption = qbOption;
     }
 
     public String formatPrefixLetter(int index) {

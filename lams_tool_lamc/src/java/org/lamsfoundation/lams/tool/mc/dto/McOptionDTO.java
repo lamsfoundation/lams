@@ -32,9 +32,10 @@ import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 public class McOptionDTO implements Comparable {
 
     private Long uid;
+    private Long qbOptionUid;
     private String candidateAnswer;
     private String correct;
-    
+
     /**
      * used for TBL monitoring
      */
@@ -47,6 +48,7 @@ public class McOptionDTO implements Comparable {
     public McOptionDTO(McOptsContent option) {
 	this.uid = option.getUid();
 	this.candidateAnswer = option.getMcQueOptionText();
+	this.qbOptionUid = option.getQbOption().getUid();
 	//this.correct = new Boolean(option.isCorrectOption()).toString();
 
 	if (option.isCorrectOption()) {
@@ -69,6 +71,14 @@ public class McOptionDTO implements Comparable {
      */
     public void setUid(Long uid) {
 	this.uid = uid;
+    }
+
+    public Long getQbOptionUid() {
+	return qbOptionUid;
+    }
+
+    public void setQbOptionUid(Long qbOptionUid) {
+	this.qbOptionUid = qbOptionUid;
     }
 
     /**
@@ -100,11 +110,11 @@ public class McOptionDTO implements Comparable {
     public void setCorrect(String correct) {
 	this.correct = correct;
     }
-    
+
     public float getPercentage() {
 	return percentage;
     }
-    
+
     public void setPercentage(float percentage) {
 	this.percentage = percentage;
     }

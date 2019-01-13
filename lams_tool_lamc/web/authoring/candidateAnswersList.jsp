@@ -39,6 +39,7 @@
 		    
 	 	<c:forEach items="${questionDto.optionDtos}" var="optionDto" varStatus="status">
 		   		<c:set var="optionIndex" scope="request" value="${optionIndex +1}"/>
+		   		<input type="hidden" name="qbOptionUid" value="${optionDto.qbOptionUid}" />
 		   	
 				<tr>
 					<td width="10px">
