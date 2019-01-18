@@ -217,6 +217,14 @@
                 <level name="WARN"/>
             </logger>
             
+           	 <logger category="io.undertow.request">
+                <level name="INFO"/>
+            </logger>
+            
+            <logger category="org.springframework.web">
+                <level name="INFO"/>
+            </logger>
+            
             <root-logger>
                 <level name="DEBUG" />
                 <handlers>
