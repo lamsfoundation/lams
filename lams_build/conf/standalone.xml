@@ -247,9 +247,17 @@
                 <level name="WARN"/>
             </logger>
             
-            <logger category="io.undertow.request">
-                <level name="INFO"/>
+            <!-- On production change below settings to INFO -->
+            
+           	 <logger category="io.undertow.request">
+                <level name="DEBUG"/>
             </logger>
+            
+            <logger category="org.springframework.web">
+                <level name="DEBUG"/>
+            </logger>
+            
+            <!-- On production change above settings to INFO -->
             
             <root-logger>
                 <level name="DEBUG" />
