@@ -607,7 +607,7 @@
 	
 	<!-- GROUP OR CONDITION TO BRANCH MATCHING DIALOG -->
 	
-	<div id="branchMappingDialogContents" class="dialogContents branchMappingDialog">
+	<div id="branchMappingDialogContents" class="dialogContents branchMappingDialog" style="display:none">
 		<table>
 			<tr>
 				<td></td>
