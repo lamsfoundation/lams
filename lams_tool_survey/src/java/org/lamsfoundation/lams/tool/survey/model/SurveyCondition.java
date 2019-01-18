@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -55,7 +56,7 @@ public class SurveyCondition extends TextSearchCondition {
      * Questions linked to this condition. Answers to them will be scanned for the words that make the condition's
      * parameters.
      */
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "tl_lasurv11_condition_questions", joinColumns = @JoinColumn(name = "condition_id"), inverseJoinColumns = @JoinColumn(name = "question_uid"))
     @SortComparator(QuestionsComparator.class)
     private Set<SurveyQuestion> questions = new TreeSet<SurveyQuestion>(new QuestionsComparator());
