@@ -33,5 +33,6 @@
         <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
         <archive path="/lams_build/lib/xstream/xstream-1.4.11.jar" source="/3rdParty_sources/xstream"/>
+        <archive javadoc="https://jar-download.com/artifacts/xyz.capybara/clamav-client/2.0.2/documentation" path="/lams_build/lib/clamav/clamav-client-2.0.2.jar"/>
     </library>
 </eclipse-userlibraries>
