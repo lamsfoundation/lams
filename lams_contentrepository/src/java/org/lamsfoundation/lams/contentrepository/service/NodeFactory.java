@@ -76,7 +76,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     @Override
     public SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode, String relPath,
 	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId)
-	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
+	    throws InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.FILENODE, workspace, parentNode, relPath,
 		versionDescription, userId);
