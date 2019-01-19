@@ -859,9 +859,14 @@ public class FileUtil {
      * Checks the given input stream for viruses. Uses ClamAV client.
      */
     public static boolean isVirusFree(InputStream inputStream) throws IOException {
+	boolean scanEnabled = Configuration.getAsBoolean(ConfigurationKeys.ANTIVIRUS_ENABLE);
+	if (!scanEnabled) {
+	    return true;
+	}
+
 	// get URL when ClamAV server listens
-	String host = "localhost";
-	int port = 3310;
+	String host = Configuration.get(ConfigurationKeys.ANTIVIRUS_HOST);
+	int port = Configuration.getAsInt(ConfigurationKeys.ANTIVIRUS_PORT);
 	try {
 	    // set up th client
 	    ClamavClient client = new ClamavClient(host, port);
