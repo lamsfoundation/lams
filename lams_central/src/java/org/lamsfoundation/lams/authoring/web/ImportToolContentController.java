@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -121,7 +120,7 @@ public class ImportToolContentController {
 
 	} catch (Exception e) {
 	    log.error("Error occured during import", e);
-	    ldErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
+	    ldErrorMsgs.add(e.getCause().getMessage());
 	}
 
 	request.setAttribute(ATTR_LD_ID, ldId);

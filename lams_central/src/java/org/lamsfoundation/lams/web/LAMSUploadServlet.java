@@ -55,7 +55,7 @@ public class LAMSUploadServlet extends HttpServlet {
 
     @Autowired
     private MessageService centralMessageService;
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -131,17 +131,29 @@ public class LAMSUploadServlet extends HttpServlet {
 		    returnMessage = "Invalid file type";
 
 		} else {
-		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
-		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
-		    newName = fileName;
-		    File destinationFile = new File(uploadDir, fileName);
+		    try {
+			boolean isVirusFree = FileUtil.isVirusFree(uplFile.getInputStream());
+			if (!isVirusFree) {
+			    returnMessage = "File contains a virus: " + fileName;
+			}
+		    } catch (IOException e) {
+			returnMessage = "Could not scan file: " + fileName;
+		    }
 
-		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
-		    fileUrl = currentWebPath + '/' + fileName;
+		    if (returnMessage == null) {
 
-		    FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(destinationFile));
-		    if (log.isDebugEnabled()) {
-			log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
+			File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
+			fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
+			newName = fileName;
+			File destinationFile = new File(uploadDir, fileName);
+
+			String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
+			fileUrl = currentWebPath + '/' + fileName;
+
+			FileCopyUtils.copy(uplFile.getInputStream(), new FileOutputStream(destinationFile));
+			if (log.isDebugEnabled()) {
+			    log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
+			}
 		    }
 		}
 	    } catch (Exception e) {

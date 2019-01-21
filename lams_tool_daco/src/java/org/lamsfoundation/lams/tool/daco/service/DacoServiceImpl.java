@@ -333,10 +333,10 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    answer.setFileType(fileType);
 	    answer.setFileName(fileName);
 	} catch (FileNotFoundException e) {
-	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":" + e.toString());
+	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ": " + e.toString());
 	    throw new UploadDacoFileException(messageService.getMessage("error.msg.file.not.found"));
 	} catch (IOException e) {
-	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":" + e.toString());
+	    DacoServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ": " + e.toString());
 	    throw new UploadDacoFileException(messageService.getMessage("error.msg.io.exception"));
 	}
     }
@@ -700,7 +700,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -726,13 +726,17 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    try {
 		node = dacoToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
-		throw new UploadDacoFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+		throw new UploadDacoFileException(
+			messageService.getMessage("error.msg.invaid.param.upload") + " " + e.getMessage());
 	    } catch (FileNotFoundException e) {
-		throw new UploadDacoFileException(messageService.getMessage("error.msg.file.not.found"));
+		throw new UploadDacoFileException(
+			messageService.getMessage("error.msg.file.not.found") + " " + e.getMessage());
 	    } catch (RepositoryCheckedException e) {
-		throw new UploadDacoFileException(messageService.getMessage("error.msg.repository"));
+		throw new UploadDacoFileException(
+			messageService.getMessage("error.msg.repository") + " " + e.getMessage());
 	    } catch (IOException e) {
-		throw new UploadDacoFileException(messageService.getMessage("error.msg.io.exception"));
+		throw new UploadDacoFileException(
+			messageService.getMessage("error.msg.io.exception") + " " + e.getMessage());
 	    }
 	}
 	return node;

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.File;
@@ -148,7 +147,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, java.lang.String,
      * int)
      */
@@ -160,7 +159,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, java.lang.String)
      */
     @Override
@@ -171,7 +170,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, boolean)
      */
     @Override
@@ -182,7 +181,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, double)
      */
     @Override
@@ -193,7 +192,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, long)
      */
     @Override
@@ -204,7 +203,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#setProperty(java.lang.String, java.util.Calendar)
      */
     @Override
@@ -271,7 +270,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#isNodeType(java.lang.String)
      */
     @Override
@@ -284,7 +283,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      * Get the history for this node. Quite intensive operation
      * as it has to build all the data structures. Can't be easily
      * cached.
-     * 
+     *
      * @return SortedSet of IVersionDetail objects, ordered by version
      */
     @Override
@@ -380,7 +379,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      * of the caller to close the stream. Note: this should only be
      * called once the node is saved - do not call it directly after
      * setting the file stream
-     * 
+     *
      * If the node is a package node, it will get the input stream
      * of the first file.
      */
@@ -416,7 +415,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     /**
      * Set the file, passed in as an inputstream. The stream will be closed
      * when the file is saved. Only nodes of type FILENODE can have a file!
-     * 
+     *
      * @param iStream
      *            mandatory
      * @param filename
@@ -442,6 +441,15 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	String trimmedFilename = filename != null ? filename.trim() : null;
 	if (trimmedFilename == null || trimmedFilename.length() == 0) {
 	    throw new InvalidParameterException("Filename is required.");
+	}
+
+	try {
+	    boolean isVirusFree = FileUtil.isVirusFree(iStream);
+	    if (!isVirusFree) {
+		throw new InvalidParameterException("File contains a virus: " + filename);
+	    }
+	} catch (IOException e) {
+	    throw new InvalidParameterException("Could not scan file: " + filename, e);
 	}
 
 	/* Validation passed, set up the file details */
@@ -478,7 +486,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      * we could just be doing a setProperty save, in which case the file
      * will already exist.
      * <LI>Package nodes must not have a file, must have a INITIALPATH property
-     * 
+     *
      * @throws ValidationException
      *             if problems exist.
      */
@@ -541,18 +549,18 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      * Save the changes to this node. This method must be called when saving a file
      * or package node for the first time - it does both the database and the file
      * saves.
-     * 
+     *
      * If it is a file node, then it writes out the db changes and then saves
      * the file.
-     * 
+     *
      * If is is a package node, then it writes out the db changes for all the nodes,
      * then saves all the file. Why do it this way - we want to do all the file
      * changes at the end as they cannot be rolled back if there is a db error.
-     * 
+     *
      * This method only works as we know that we have two levels of nodes - the
      * childNodes can't have their own childNodes. If this is no longer the case,
      * this method and copy() will need to be changed.
-     * 
+     *
      *
      * TODO This needs a lot of testing
      */
@@ -615,7 +623,8 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 				: element.getFilePath();
 		    } else {
 			failedDeleted = failedDeleted != null
-				? failedDeleted + File.pathSeparator + element.getFilePath() : element.getFilePath();
+				? failedDeleted + File.pathSeparator + element.getFilePath()
+				: element.getFilePath();
 		    }
 		}
 		String msg = "Result of rolling back file changes:";
@@ -667,7 +676,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /**
      * Write the file out (if one exists). Sets the private attribute filePath.
-     * 
+     *
      * @return the path to which the file was written
      */
     private void writeFile() throws FileException {
@@ -695,7 +704,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /**
      * Another case for the factory?
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getNode(String relPath)
      */
     @Override
@@ -719,7 +728,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
     /**
      * If no nodes are found, returns an empty set.
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNode#getChildNodes()
      */
     @Override
@@ -782,13 +791,13 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     /**
      * Delete all versions of this node, returning the number of nodes
      * deleted. If it is a package node, all child nodes will be deleted.
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.IVersionedNodeAdmin#deleteNode()
      */
     @Override
     public List deleteNode() {
 
-	// first make a list of all the versions to delete. 
+	// first make a list of all the versions to delete.
 	// don't iterate over the set, deleting as we go so that
 	// we can't run into any issues trying to access something
 	// that is deleted or belongs to an iterator.
@@ -822,7 +831,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	// doing file system changes if the db would fail later.
 	deleteVersionFromDB(nodeKeysDeleted);
 
-	// now delete the files. If it fails due to the file not being found, then 
+	// now delete the files. If it fails due to the file not being found, then
 	// that's fine.
 	ArrayList failedList = new ArrayList();
 	Iterator iter = nodeKeysDeleted.iterator();
@@ -890,7 +899,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     /**
      * Process files in the package. Create a List of file nodes but do not persist
      * the nodes.
-     * 
+     *
      * @param dirPath:
      *            the directory from which to get files. Mandatory.
      * @param packageNode:
@@ -1009,11 +1018,11 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     /**
      * Copy the supplied node/version to a new node. Does not copy the history
      * of the node. Copies any child nodes of the current version. All files are duplicated.
-     * 
+     *
      * This method only works as we know that we have two levels of nodes - the
      * childNodes can't have their own childNodes. If this is no longer the case,
      * this method and SimpleVersionedNode.save() will need to be changed.
-     * 
+     *
      * @throws FileException
      *             will occur if there is a problem reading a file from the repository
      * @throws InvalidParameterException

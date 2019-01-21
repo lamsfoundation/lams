@@ -421,8 +421,11 @@ public class LearningController {
 			try {
 			    dacoService.uploadDacoAnswerFile(answer, file);
 			} catch (UploadDacoFileException e) {
-			    LearningController.log.error("Failed upload Resource File " + e.toString());
-			    e.printStackTrace();
+			    LearningController.log.error("Failed upload Daco File " + e.toString());
+			    errorMap.add("GLOBAL", messageService.getMessage(DacoConstants.ERROR_MSG_UPLOAD_FAILED,
+				    new Object[] { e.getMessage() }));
+			    request.setAttribute("errorMap", errorMap);
+			    return "pages/learning/learning";
 			}
 		    }
 		}
