@@ -170,6 +170,7 @@ public class Message implements Cloneable {
 		while (iter.hasNext()) {
 		    Attachment file = (Attachment) iter.next();
 		    Attachment newFile = (Attachment) file.clone();
+		    newFile.setMessage(msg); // attachment 'owns' the relationship
 		    // use common file node in repository
 		    set.add(newFile);
 		}
