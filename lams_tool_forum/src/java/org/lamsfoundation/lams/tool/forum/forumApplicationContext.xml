@@ -73,7 +73,7 @@
 	<bean id="forumToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
 		<property name="repositoryService"><ref bean="repositoryService"/></property>
 		<property name="repositoryWorkspaceName" ><value>forumworkspace</value></property>
-		<property name="repositoryUser"><value>forumw</value></property>
+		<property name="repositoryUser"><value>forum</value></property>
 		<property name="repositoryId"><value>lams-forum</value></property>
 	</bean>
 
