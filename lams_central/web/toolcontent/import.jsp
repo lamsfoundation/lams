@@ -8,6 +8,7 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+<c:set var="ANTIVIRUS_ENABLE"><%=Configuration.get(ConfigurationKeys.ANTIVIRUS_ENABLE)%></c:set>
 
 <lams:html>
 	<lams:head>
@@ -60,6 +61,10 @@
 
 				<div class="panel">
 					<fmt:message key="title.import.instruction" />
+					<c:if test="${ANTIVIRUS_ENABLE == 'true'}">
+						<br />
+						<fmt:message key="title.import.instruction.antivirus" />
+					</c:if>
 				</div>
 
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data" id="importForm">
