@@ -313,7 +313,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
 	List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 
-	List<SessionDTO> summaryList = new ArrayList<SessionDTO>();
+	List<SessionDTO> summaryList = new ArrayList<>();
 
 	// create the user list of all whom were started this task
 	for (TaskListSession session : sessionList) {
@@ -352,7 +352,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
+	List<ReflectDTO> reflectList = new LinkedList<>();
 
 	List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
 	for (TaskListSession session : sessionList) {
@@ -462,12 +462,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -855,12 +855,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return taskListOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
@@ -910,7 +910,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
 	// create the list containing all taskListItems
 	TaskList taskList = taskListDao.getByContentId(contentId);
-	ArrayList<TaskListItem> itemList = new ArrayList<TaskListItem>();
+	ArrayList<TaskListItem> itemList = new ArrayList<>();
 	itemList.addAll(taskList.getTaskListItems());
 
 	List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
@@ -925,7 +925,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
 	List<TaskListUser> userList = taskListUserDao.getBySessionID(sessionId);
 
-	ArrayList<TaskListItem> groupItemList = new ArrayList<TaskListItem>();
+	ArrayList<TaskListItem> groupItemList = new ArrayList<>();
 	for (TaskListItem item : itemList) {
 
 	    if (item.isCreateByAuthor()) {
@@ -959,13 +959,17 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    try {
 		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
 	    } catch (InvalidParameterException e) {
-		throw new UploadTaskListFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+		throw new UploadTaskListFileException(
+			messageService.getMessage("error.msg.invaid.param.upload") + " " + e.getMessage());
 	    } catch (FileNotFoundException e) {
-		throw new UploadTaskListFileException(messageService.getMessage("error.msg.file.not.found"));
+		throw new UploadTaskListFileException(
+			messageService.getMessage("error.msg.file.not.found") + " " + e.getMessage());
 	    } catch (RepositoryCheckedException e) {
-		throw new UploadTaskListFileException(messageService.getMessage("error.msg.repository"));
+		throw new UploadTaskListFileException(
+			messageService.getMessage("error.msg.repository") + " " + e.getMessage());
 	    } catch (IOException e) {
-		throw new UploadTaskListFileException(messageService.getMessage("error.msg.io.exception"));
+		throw new UploadTaskListFileException(
+			messageService.getMessage("error.msg.io.exception") + " " + e.getMessage());
 	    }
 	}
 	return node;
@@ -979,7 +983,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getTaskListOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	TaskListUser learner = getUserByIDAndSession(learnerId, toolSessionId);
@@ -988,11 +992,11 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 
 	Object[] dates = getTaskListItemVisitDao().getDateRangeOfTasks(learner.getUid(), toolSessionId);
-	if (learner.isSessionFinished())
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date)dates[0], (Date)dates[1]);
-	else
-	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
+	if (learner.isSessionFinished()) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date) dates[0], (Date) dates[1]);
+	} else {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, (Date) dates[0], null);
+	}
     }
-
 
 }
