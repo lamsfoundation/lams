@@ -31,7 +31,7 @@ ALTER TABLE tl_lamc11_que_content ADD COLUMN qb_question_uid BIGINT AFTER uid,
 
 -- find matching questions in Question Bank and set up references
 UPDATE tl_lamc11_que_content AS mcq, lams_qb_question AS qb
-	SET mcq.qb_question_uid = qb.ui
+	SET mcq.qb_question_uid = qb.uid
 	WHERE TRIM(mcq.question) = qb.name
 		AND mcq.mark = qb.mark 
 		AND (TRIM(mcq.feedback) = qb.feedback OR (IF(TRIM(mcq.feedback) = '', NULL, TRIM(mcq.feedback)) IS NULL AND qb.feedback IS NULL))
