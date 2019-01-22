@@ -121,4 +121,13 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
 	Integer max = (Integer) result;
 	return max == null ? 1 : max + 1;
     }
+
+    @Override
+    public int getMaxQbQuestionVersion(Integer qbQuestionId) {
+	Object result = this.getSession()
+		.createQuery("SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId")
+		.setParameter("questionId", qbQuestionId).uniqueResult();
+	Integer max = (Integer) result;
+	return max == null ? 1 : max + 1;
+    }
 }

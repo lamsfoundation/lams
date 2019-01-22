@@ -287,26 +287,49 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// if it does not exist, create a new one
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    }
+
+	    QbQuestion qbQuestionClone = qbQuestion.clone();
+
+	    // set question's data to current values
+	    qbQuestionClone.setName(currentQuestionText);
+	    qbQuestionClone.setMark(Integer.valueOf(currentMark));
+	    qbQuestionClone.setFeedback(currentFeedback);
+	    // if it is a new question, it is always considered modified
+	    // if it is an existing question, it gets checked whether data changed
+
+	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
+	    boolean isModified = qbQuestion.isModified(qbQuestionClone)
+		    || optionDTOs.size() != qbQuestionClone.getOptions().size();
+	    if (!isModified) {
+		for (McOptionDTO optionDTO : optionDTOs) {
+		    String optionText = optionDTO.getCandidateAnswer();
+		    boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
+
+		    //find persisted option if it exists
+		    for (QbOption qbOption : qbQuestionClone.getOptions()) {
+			if (optionDTO.getQbOptionUid().equals(qbOption.getUid())) {
+			    qbOption.setCorrect(isCorrectOption);
+			    qbOption.setName(optionText);
+			    break;
+			}
+		    }
+		}
+		isModified = qbQuestion.isModified(qbQuestionClone);
+	    }
+
+	    if (isModified) {
+		qbQuestion = qbQuestionClone;
+		// if vital data changed, create a new question version instead of modifying existing one
+		int newVersion = mcQueContentDAO.getMaxQbQuestionVersion(qbQuestion.getQuestionId());
+		qbQuestion.setVersion(newVersion);
 	    } else {
 		// if it exists, detach it so we do not change data on the existing entity,
 		// otherwise it gets saved on transaction end with modified data
-		mcQueContentDAO.releaseFromCache(qbQuestion);
-		for (QbOption option : qbQuestion.getOptions()) {
+		mcQueContentDAO.releaseFromCache(qbQuestionClone);
+		for (QbOption option : qbQuestionClone.getOptions()) {
 		    mcQueContentDAO.releaseFromCache(option);
 		}
-	    }
-	    // set question's data to current values
-	    qbQuestion.setName(currentQuestionText);
-	    qbQuestion.setMark(Integer.valueOf(currentMark));
-	    qbQuestion.setFeedback(currentFeedback);
-	    // if it is a new question, it is always considered modified
-	    // if it is an existing question, it gets checked whether data changed
-	    if (qbQuestion.isModified()) {
-		// the cloned entity will be attached to session, unlike the previously detached qbQuestion
-		qbQuestion = qbQuestion.clone();
-		// if vital data changed, create a new question instead of modifying existing one
-		qbQuestion.setQuestionId(mcQueContentDAO.getMaxQbQuestionId());
-		qbQuestion.setVersion(1);
 	    }
 
 	    // in case question doesn't exist
@@ -324,10 +347,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 
 	    // persist candidate answers
-	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
 	    Set<McOptsContent> newOptions = new HashSet<>();
 	    int displayOrderOption = 1;
+	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getOptions());
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
 		Long optionUid = optionDTO.getUid();
@@ -337,17 +360,21 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		//find persisted option if it exists
 		McOptsContent option = new McOptsContent();
 		for (McOptsContent oldOption : oldOptions) {
-		    mcQueContentDAO.releaseFromCache(oldOption.getQbOption());
-		    mcQueContentDAO.releaseFromCache(oldOption.getQbOption().getQuestion());
 		    if (oldOption.getUid().equals(optionUid)) {
 			option = oldOption;
+			break;
 		    }
 		}
 
-		for (QbOption qbOption : question.getQbQuestion().getOptions()) {
-		    if (qbOption.getUid().equals(optionDTO.getQbOptionUid())) {
-			option.setQbOption(qbOption);
-			break;
+		if (optionDTO.getQbOptionUid() == null) {
+		    option.setQbOption(new QbOption());
+		} else {
+		    for (QbOption qbOption : qbQuestion.getOptions()) {
+			if (qbOption.getUid().equals(optionDTO.getQbOptionUid())) {
+			    option.setQbOption(qbOption);
+			    qbOptionsToRemove.remove(qbOption);
+			    break;
+			}
 		    }
 		}
 
@@ -360,6 +387,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		displayOrderOption++;
 	    }
 	    question.setMcOptionsContents(newOptions);
+
+	    qbQuestion.getOptions().removeAll(qbOptionsToRemove);
+	    qbOptionsToRemove.clear();
+	    if (isModified) {
+		qbQuestion.clearID();
+	    }
 
 	    // updating the existing question content
 	    saveOrUpdateMcQueContent(question);

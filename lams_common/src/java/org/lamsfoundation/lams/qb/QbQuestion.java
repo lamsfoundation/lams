@@ -12,11 +12,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * A question in Question Bank.
@@ -67,31 +67,26 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column
     private String feedback;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QbOption> options = new ArrayList<>();
-
-    // question state when it was loaded from DB
-    @Transient
-    private QbQuestion initialContent;
-
-    // runs when the question gets loaded from DB
-    @PostLoad
-    private void setInitialContent() throws CloneNotSupportedException {
-	initialContent = this.clone();
-    }
 
     // compares if current question state and the state when it was loaded from DB
     // it detects if question is the same or should another question/version be created
-    public boolean isModified() {
-	return !equals(initialContent);
+    public boolean isModified(QbQuestion modifiedQuestion) {
+	return !equals(modifiedQuestion);
     }
 
     // checks if important parts of another question are the same as current question's
     @Override
     public boolean equals(Object o) {
 	QbQuestion other = (QbQuestion) o;
-	return other != null && StringUtils.equals(other.name, name) && StringUtils.equals(other.feedback, feedback)
-		&& (mark == null ? other.mark == null : mark.equals(other.mark));
+	return new EqualsBuilder().append(name, other.name).append(feedback, other.feedback).append(mark, other.mark)
+		.append(options.toArray(), other.getOptions().toArray()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(name).append(feedback).append(mark).toHashCode();
     }
 
     @Override
@@ -99,13 +94,25 @@ public class QbQuestion implements Serializable, Cloneable {
 	QbQuestion clone = null;
 	try {
 	    clone = (QbQuestion) super.clone();
-	    clone.uid = null;
-	} catch (Exception e) {
-	    // this will never happen
+	} catch (CloneNotSupportedException e) {
+	    // it should never happen
 	    e.printStackTrace();
 	}
+	List<QbOption> optionsClone = new ArrayList<>(options.size());
+	clone.setOptions(optionsClone);
+	for (QbOption option : options) {
+	    QbOption optionClone = option.clone();
+	    optionClone.setQuestion(clone);
+	    optionsClone.add(optionClone);
+	}
 	return clone;
+    }
 
+    public void clearID() {
+	this.uid = null;
+	for (QbOption option : options) {
+	    option.uid = null;
+	}
     }
 
     public Long getUid() {

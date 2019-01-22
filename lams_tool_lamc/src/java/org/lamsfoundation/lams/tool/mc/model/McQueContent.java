@@ -67,7 +67,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
 	    CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "qb_question_uid")
-    private QbQuestion qbQuestion = new QbQuestion();
+    private QbQuestion qbQuestion;
 
     /**
      * It stores sha1(question) value that allows us to search for the McQueContentc with the same question

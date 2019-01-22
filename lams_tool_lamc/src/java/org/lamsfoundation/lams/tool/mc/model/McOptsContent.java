@@ -61,7 +61,7 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
 	    CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "qb_option_uid")
-    private QbOption qbOption = new QbOption();
+    private QbOption qbOption;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mc_que_content_id")

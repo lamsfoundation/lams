@@ -11,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * One of possible answers for a question in Question Bank.
  *
@@ -24,7 +27,7 @@ public class QbOption implements Serializable, Cloneable {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
+    Long uid;
 
     @Column
     private String name;
@@ -35,6 +38,30 @@ public class QbOption implements Serializable, Cloneable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "qb_question_uid")
     private QbQuestion question;
+
+    @Override
+    public QbOption clone() {
+	QbOption clone = null;
+	try {
+	    clone = (QbOption) super.clone();
+	    clone.question = null;
+	} catch (CloneNotSupportedException e) {
+	    // it should never happen
+	    e.printStackTrace();
+	}
+	return clone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+	QbOption other = (QbOption) o;
+	return new EqualsBuilder().append(this.name, other.name).append(this.correct, other.correct).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(this.name).append(this.correct).toHashCode();
+    }
 
     public String getName() {
 	return name;
