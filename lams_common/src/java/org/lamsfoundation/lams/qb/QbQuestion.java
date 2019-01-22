@@ -70,7 +70,7 @@ public class QbQuestion implements Serializable, Cloneable {
     @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QbOption> options = new ArrayList<>();
 
-    // compares if current question state and the state when it was loaded from DB
+    // compares if current question data and the other one (probably modified with new data) are the same
     // it detects if question is the same or should another question/version be created
     public boolean isModified(QbQuestion modifiedQuestion) {
 	return !equals(modifiedQuestion);
@@ -80,6 +80,7 @@ public class QbQuestion implements Serializable, Cloneable {
     @Override
     public boolean equals(Object o) {
 	QbQuestion other = (QbQuestion) o;
+	// options are also checked if they are equal
 	return new EqualsBuilder().append(name, other.name).append(feedback, other.feedback).append(mark, other.mark)
 		.append(options.toArray(), other.getOptions().toArray()).isEquals();
     }
@@ -98,6 +99,7 @@ public class QbQuestion implements Serializable, Cloneable {
 	    // it should never happen
 	    e.printStackTrace();
 	}
+	// make a deep copy of options
 	List<QbOption> optionsClone = new ArrayList<>(options.size());
 	clone.setOptions(optionsClone);
 	for (QbOption option : options) {
