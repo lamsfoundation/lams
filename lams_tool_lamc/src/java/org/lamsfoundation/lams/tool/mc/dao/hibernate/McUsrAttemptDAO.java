@@ -50,17 +50,17 @@ import org.springframework.stereotype.Repository;
 public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
-	    + " and attempt.mcQueContent.uid=:mcQueContentId" + " order by attempt.mcOptionsContent.uid";
+	    + " and attempt.mcQueContent.uid=:mcQueContentId order by attempt.qbOption.uid";
 
     private static final String LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION = "from attempt in class McUsrAttempt where "
 	    + " attempt.mcQueUsr.mcSessionId=:sessionUid AND attempt.mcQueContent.uid=:mcQueContentId "
 	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueUsr.uid";
 
     private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
-	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContent.uid, attempt.mcOptionsContent.uid";
+	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContent.uid, attempt.qbOption.uid";
 
     private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from " + McUsrAttempt.class.getName()
-	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
+	    + " as attempt where attempt.qbOption.uid=? AND attempt.mcQueUsr.responseFinalised = true";
 
     private static final String FIND_USER_TOTAL_MARK = "select COALESCE(SUM(attempt.mark),0) from "
 	    + McUsrAttempt.class.getName()

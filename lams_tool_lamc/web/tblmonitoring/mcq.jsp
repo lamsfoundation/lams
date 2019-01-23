@@ -57,13 +57,13 @@
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<tbody>
-						<c:forEach var="option" items="${question.mcOptionsContents}" varStatus="j">
+						<c:forEach var="option" items="${question.qbQuestion.qbOptions}" varStatus="j">
 							<tr>
 								<td width="5px">
 									${ALPHABET[j.index]}.
 								</td>
 								<td>
-									<c:out value="${option.mcQueOptionText}" escapeXml="false"/>
+									<c:out value="${option.name}" escapeXml="false"/>
 								</td>
 							</tr>
 						</c:forEach>

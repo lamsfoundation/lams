@@ -34,8 +34,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.qb.QbOption;
 
 /**
  * <p>
@@ -77,25 +79,27 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
     private McQueUsr mcQueUsr;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mc_que_option_id")
-    private McOptsContent mcOptionsContent;
+    @JoinColumn(name = "qb_option_uid")
+    private QbOption qbOption;
 
     @Column(name = "confidence_level")
     private int confidenceLevel;
 
-    public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, McOptsContent mcOptionsContent,
-	    Integer mark, boolean passed, boolean attemptCorrect, int confidenceLevel) {
+    @Transient
+    private McOptsContent mcOptionsContent;
+
+    public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, QbOption qbOption, Integer mark,
+	    boolean passed, boolean attemptCorrect, int confidenceLevel) {
 	this.attemptTime = attemptTime;
 	this.mcQueContent = mcQueContent;
 	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
+	this.qbOption = qbOption;
 	this.mark = mark;
 	this.passed = passed;
 	this.attemptCorrect = attemptCorrect;
 	this.confidenceLevel = confidenceLevel;
     }
 
-    /** default constructor */
     public McUsrAttempt() {
     }
 
@@ -161,12 +165,20 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	this.mcQueUsr = mcQueUsr;
     }
 
-    public org.lamsfoundation.lams.tool.mc.model.McOptsContent getMcOptionsContent() {
-	return this.mcOptionsContent;
+    public QbOption getQbOption() {
+	return qbOption;
     }
 
-    public void setMcOptionsContent(org.lamsfoundation.lams.tool.mc.model.McOptsContent mcOptionsContent) {
-	this.mcOptionsContent = mcOptionsContent;
+    public void setQbOption(QbOption qbOption) {
+	this.qbOption = qbOption;
+    }
+
+    public McOptsContent getMcOptionsContent() {
+	if (mcOptionsContent == null) {
+	    mcOptionsContent = new McOptsContent();
+	    mcOptionsContent.setQbOption(qbOption);
+	}
+	return mcOptionsContent;
     }
 
     @Override
@@ -174,47 +186,26 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-    /**
-     * @return Returns the mark.
-     */
     public Integer getMark() {
 	return mark;
     }
 
-    /**
-     * @param mark
-     *            The mark to set.
-     */
     public void setMark(Integer mark) {
 	this.mark = mark;
     }
 
-    /**
-     * @return Returns the passed.
-     */
     public boolean isPassed() {
 	return passed;
     }
 
-    /**
-     * @param passed
-     *            The passed to set.
-     */
     public void setPassed(boolean isPassed) {
 	this.passed = isPassed;
     }
 
-    /**
-     * @return Returns the attemptCorrect.
-     */
     public boolean isAttemptCorrect() {
 	return attemptCorrect;
     }
 
-    /**
-     * @param attemptCorrect
-     *            The attemptCorrect to set.
-     */
     public void setAttemptCorrect(boolean attemptCorrect) {
 	this.attemptCorrect = attemptCorrect;
     }
@@ -251,5 +242,4 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	    return (int) (uid.longValue() - other.uid.longValue());
 	}
     }
-
 }

@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.mc.dto;
 
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
+import org.lamsfoundation.lams.qb.QbOption;
 
 /**
  * DTO that holds candiate answers data for summary page
@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
  */
 public class McOptionDTO implements Comparable {
 
-    private Long uid;
     private Long qbOptionUid;
     private String candidateAnswer;
     private String correct;
@@ -45,32 +44,16 @@ public class McOptionDTO implements Comparable {
 
     }
 
-    public McOptionDTO(McOptsContent option) {
-	this.uid = option.getUid();
-	this.candidateAnswer = option.getMcQueOptionText();
-	this.qbOptionUid = option.getQbOption().getUid();
+    public McOptionDTO(QbOption option) {
+	this.candidateAnswer = option.getName();
+	this.qbOptionUid = option.getUid();
 	//this.correct = new Boolean(option.isCorrectOption()).toString();
 
-	if (option.isCorrectOption()) {
+	if (option.isCorrect()) {
 	    this.correct = "Correct";
 	} else {
 	    this.correct = "Incorrect";
 	}
-    }
-
-    /**
-     * @return Returns the uid.
-     */
-    public Long getUid() {
-	return uid;
-    }
-
-    /**
-     * @param uid
-     *            The uid to set.
-     */
-    public void setUid(Long uid) {
-	this.uid = uid;
     }
 
     public Long getQbOptionUid() {

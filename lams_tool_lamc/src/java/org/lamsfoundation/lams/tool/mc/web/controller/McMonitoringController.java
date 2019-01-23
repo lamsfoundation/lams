@@ -378,7 +378,7 @@ public class McMonitoringController {
 		    question.setEscapedQuestion(escapedQuestion);
 		}
 
-		String optionText = option.getMcQueOptionText();
+		String optionText = option.getQbOption().getName();
 		if (optionText != null) {
 		    String escapedOptionText = StringEscapeUtils.escapeJavaScript(optionText);
 		    option.setEscapedOptionText(escapedOptionText);

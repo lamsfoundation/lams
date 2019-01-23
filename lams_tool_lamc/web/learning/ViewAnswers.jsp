@@ -152,7 +152,7 @@
 													<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 														<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
 															<c:choose>
-																<c:when test="${attemptEntry.value.mcOptionsContent.correctOption}">
+																<c:when test="${attemptEntry.value.qbOption.correct}">
 																	<td class="bg-success" style="vertical-align: top;"><i class="fa fa-check"
 																		style="color: green; font-size: 22px"></i>
 																	</td>
@@ -172,7 +172,7 @@
 													<!-- display student selection --> 
 													<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 														<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-															<c:out value="${attemptEntry.value.mcOptionsContent.mcQueOptionText}" escapeXml="false" />
+															<c:out value="${attemptEntry.value.qbOption.name}" escapeXml="false" />
 														</c:if>
 													</c:forEach> 
 													<!-- end student selection -->

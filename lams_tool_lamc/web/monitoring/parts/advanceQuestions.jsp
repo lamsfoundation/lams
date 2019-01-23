@@ -1,3 +1,5 @@
+<%@ page import="org.lamsfoundation.lams.tool.mc.util.LearningUtil"%>
+
  <div class="panel panel-default" >
 	<div class="panel-heading" id="heading-advanced-questions">
 		<span class="panel-title collapsable-icon-left">
@@ -21,18 +23,18 @@
 				<tr>					
 					<td>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
 						<table class="table table-condensed" style="margin-bottom:0px">
-							<c:forEach var="option" items="${question.mcOptionsContents}" varStatus="optionStatus">
+							<c:forEach var="option" items="${question.qbQuestion.qbOptions}" varStatus="optionStatus">
 								<tr>			
 									<c:if test="${prefixAnswersWithLetters}">
 									<td style="vertical-align:top">
-										${option.formatPrefixLetter(optionStatus.index)}	
+										${LearningUtil.formatPrefixLetter(optionStatus.index)}	
 									</td>
 									</c:if>	
 									<td>
-										<c:if test="${option.correctOption}"> 		
+										<c:if test="${option.correct}"> 		
 											(<fmt:message key="label.correct"/>)
 										</c:if>	
-										<c:out value="${option.mcQueOptionText}" escapeXml="false"/> 
+										<c:out value="${option.name}" escapeXml="false"/> 
 									</td>	
 								</tr>
 							</c:forEach>		  	

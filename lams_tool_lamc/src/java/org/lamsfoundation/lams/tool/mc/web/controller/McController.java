@@ -799,7 +799,6 @@ public class McController {
 	for (int i = 0; i < McAppConstants.MAX_OPTION_COUNT; i++) {
 	    String optionText = request.getParameter("ca" + i);
 	    Long qbOptionUid = WebUtil.readLongParam(request, "qbOptionUid" + i, true);
-	    Long optionUid = WebUtil.readLongParam(request, "caUid" + i, true);
 
 	    String isCorrect = "Incorrect";
 
@@ -809,7 +808,6 @@ public class McController {
 
 	    if (optionText != null) {
 		McOptionDTO optionDTO = new McOptionDTO();
-		optionDTO.setUid(optionUid);
 		optionDTO.setCandidateAnswer(optionText);
 		optionDTO.setCorrect(isCorrect);
 		optionDTO.setQbOptionUid(qbOptionUid);

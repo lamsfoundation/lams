@@ -43,7 +43,6 @@
 		   	
 				<tr>
 					<td width="10px">
-						<input type="hidden" name="caUid${optionIndex}" value="${optionDto.uid}">
 						<c:out value="${optionIndex}" />
 					</td>
 				

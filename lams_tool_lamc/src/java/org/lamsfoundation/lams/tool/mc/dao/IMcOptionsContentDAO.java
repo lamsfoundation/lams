@@ -24,15 +24,16 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**
  * Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content
  *
  * @author Ozgur Demirtas
  */
-public interface IMcOptionsContentDAO {
+public interface IMcOptionsContentDAO extends IBaseDAO {
 
     /**
      * <p>
@@ -43,16 +44,7 @@ public interface IMcOptionsContentDAO {
      * @param mcQueContentId
      * @return List
      */
-    List findMcOptionsContentByQueId(Long mcQueContentId);
+    List<QbOption> findOptionsByQueId(Long questionUid);
 
     List<McOptionDTO> getOptionDtos(Long mcQueContentId);
-
-    /**
-     * <p>
-     * updates McOptsContent
-     * </p>
-     *
-     * @param mcOptionsContent
-     */
-    void updateMcOptionsContent(McOptsContent mcOptionsContent);
 }

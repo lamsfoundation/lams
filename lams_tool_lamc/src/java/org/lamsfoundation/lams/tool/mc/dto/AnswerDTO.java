@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dto;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**
@@ -34,7 +35,7 @@ import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
  *
  * @author Ozgur Demirtas
  */
-public class AnswerDTO implements Comparable {
+public class AnswerDTO implements Comparable<AnswerDTO> {
     protected String question;
 
     protected String displayOrder;
@@ -43,7 +44,7 @@ public class AnswerDTO implements Comparable {
 
     protected Integer mark;
 
-    protected McOptsContent answerOption;
+    protected QbOption answerOption;
 
     protected List<McOptsContent> options;
 
@@ -54,37 +55,24 @@ public class AnswerDTO implements Comparable {
     protected String feedbackCorrect;
 
     protected String feedback;
-    
+
     private int confidenceLevel;
 
-    /**
-     * @return Returns the answerOption.
-     */
-    public McOptsContent getAnswerOption() {
+    public QbOption getAnswerOption() {
 	return answerOption;
     }
 
-    /**
-     * @param answerOption
-     *            The answerOption to set.
-     */
-    public void setAnswerOption(McOptsContent answerOption) {
+    public void setAnswerOption(QbOption answerOption) {
 	this.answerOption = answerOption;
     }
 
-    /**
-     * @return Returns the options.
-     */
+
     public List<McOptsContent> getOptions() {
-	return options;
+        return options;
     }
 
-    /**
-     * @param options
-     *            The options to set.
-     */
     public void setOptions(List<McOptsContent> options) {
-	this.options = options;
+        this.options = options;
     }
 
     /**
@@ -109,8 +97,7 @@ public class AnswerDTO implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	AnswerDTO answerDto = (AnswerDTO) o;
+    public int compareTo(AnswerDTO answerDto) {
 
 	if (answerDto == null) {
 	    return 1;
@@ -223,7 +210,7 @@ public class AnswerDTO implements Comparable {
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
-    
+
     public int getConfidenceLevel() {
 	return confidenceLevel;
     }

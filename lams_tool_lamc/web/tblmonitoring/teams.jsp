@@ -15,13 +15,13 @@
 					<tbody>
 						<tr>
 							<td width="5px">
-								${ALPHABET[userAttempt.mcOptionsContent.displayOrder-1]}.
+								${ALPHABET[userAttempt.qbOption.displayOrder-1]}.
 							</td>
 							<td>
-								<c:out value="${userAttempt.mcOptionsContent.mcQueOptionText}" escapeXml="false"/>
+								<c:out value="${userAttempt.qbOption.name}" escapeXml="false"/>
 												
 								<c:choose>
-									<c:when test="${userAttempt.mcOptionsContent.correctOption}">
+									<c:when test="${userAttempt.qbOption.correct}">
 										<i class="fa fa-check-square"></i>
 									</c:when>
 									<c:otherwise>

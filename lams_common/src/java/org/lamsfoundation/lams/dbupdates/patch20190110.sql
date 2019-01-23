@@ -65,15 +65,20 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
 ALTER TABLE tl_lamc11_options_content ADD COLUMN qb_option_uid BIGINT AFTER uid,
 									  ADD CONSTRAINT FK_tl_lamc11_options_content_2 FOREIGN KEY (qb_option_uid) REFERENCES lams_qb_option (uid) ON UPDATE CASCADE;
 									  
-UPDATE tl_lamc11_options_content AS mco, lams_qb_tool_question AS tq, lams_qb_option AS qo
-	SET mco.qb_option_uid = qo.uid
+UPDATE tl_lamc11_usr_attempt AS ua, tl_lamc11_options_content AS mco, lams_qb_tool_question AS tq, lams_qb_option AS qo
+	SET ua.mc_que_option_id = qo.uid
 	WHERE TRIM(mco.mc_que_option_text) = qo.name
+		AND ua.mc_que_option_id = mco.uid
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND mco.mc_que_content_id = tq.tool_question_uid;
 	
-ALTER TABLE tl_lamc11_options_content DROP COLUMN mc_que_option_text,
-									  DROP COLUMN correct_option,
-									  DROP COLUMN displayOrder;
+ALTER TABLE tl_lamc11_usr_attempt DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_3,
+								  RENAME COLUMN mc_que_option_id TO qb_option_uid;
+								  
+ALTER TABLE tl_lamc11_usr_attempt ADD CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (qb_option_uid)
+	REFERENCES lams_qb_option (uid) ON DELETE CASCADE ON UPDATE CASCADE;
+								  
+DROP TABLE tl_lamc11_options_content;
 
 ----------------------Put all sql statements above here-------------------------
 

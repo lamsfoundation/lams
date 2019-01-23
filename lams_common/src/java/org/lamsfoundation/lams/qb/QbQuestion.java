@@ -67,8 +67,8 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column
     private String feedback;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<QbOption> options = new ArrayList<>();
+    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QbOption> qbOptions = new ArrayList<>();
 
     // compares if current question data and the other one (probably modified with new data) are the same
     // it detects if question is the same or should another question/version be created
@@ -82,7 +82,7 @@ public class QbQuestion implements Serializable, Cloneable {
 	QbQuestion other = (QbQuestion) o;
 	// options are also checked if they are equal
 	return new EqualsBuilder().append(name, other.name).append(feedback, other.feedback).append(mark, other.mark)
-		.append(options.toArray(), other.getOptions().toArray()).isEquals();
+		.append(qbOptions.toArray(), other.getQbOptions().toArray()).isEquals();
     }
 
     @Override
@@ -100,11 +100,11 @@ public class QbQuestion implements Serializable, Cloneable {
 	    e.printStackTrace();
 	}
 	// make a deep copy of options
-	List<QbOption> optionsClone = new ArrayList<>(options.size());
-	clone.setOptions(optionsClone);
-	for (QbOption option : options) {
+	List<QbOption> optionsClone = new ArrayList<>(qbOptions.size());
+	clone.setQbOptions(optionsClone);
+	for (QbOption option : qbOptions) {
 	    QbOption optionClone = option.clone();
-	    optionClone.setQuestion(clone);
+	    optionClone.setQbQuestion(clone);
 	    optionsClone.add(optionClone);
 	}
 	return clone;
@@ -112,7 +112,7 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void clearID() {
 	this.uid = null;
-	for (QbOption option : options) {
+	for (QbOption option : qbOptions) {
 	    option.uid = null;
 	}
     }
@@ -177,11 +177,11 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
     }
 
-    public List<QbOption> getOptions() {
-	return options;
+    public List<QbOption> getQbOptions() {
+	return qbOptions;
     }
 
-    public void setOptions(List<QbOption> options) {
-	this.options = options;
+    public void setQbOptions(List<QbOption> options) {
+	this.qbOptions = options;
     }
 }

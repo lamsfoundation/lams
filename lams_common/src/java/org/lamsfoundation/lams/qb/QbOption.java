@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 @Entity
 @Table(name = "lams_qb_option")
-public class QbOption implements Serializable, Cloneable {
+public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     private static final long serialVersionUID = -2354311780882736829L;
 
     @Id
@@ -40,14 +40,14 @@ public class QbOption implements Serializable, Cloneable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "qb_question_uid")
-    private QbQuestion question;
+    private QbQuestion qbQuestion;
 
     @Override
     public QbOption clone() {
 	QbOption clone = null;
 	try {
 	    clone = (QbOption) super.clone();
-	    clone.question = null;
+	    clone.qbQuestion = null;
 	} catch (CloneNotSupportedException e) {
 	    // it should never happen
 	    e.printStackTrace();
@@ -65,6 +65,11 @@ public class QbOption implements Serializable, Cloneable {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(this.name).append(this.correct).toHashCode();
+    }
+
+    @Override
+    public int compareTo(QbOption o) {
+	return Integer.compare(this.displayOrder, o.displayOrder);
     }
 
     public Long getUid() {
@@ -95,11 +100,11 @@ public class QbOption implements Serializable, Cloneable {
 	this.displayOrder = displayOrder;
     }
 
-    public QbQuestion getQuestion() {
-	return question;
+    public QbQuestion getQbQuestion() {
+	return qbQuestion;
     }
 
-    public void setQuestion(QbQuestion question) {
-	this.question = question;
+    public void setQbQuestion(QbQuestion question) {
+	this.qbQuestion = question;
     }
 }

@@ -20,23 +20,21 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mc.service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.model.McSession;
@@ -51,7 +49,7 @@ public class MCOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) {
 
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	ToolOutputDefinition definition = buildBooleanOutputDefinition(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
 	definitionMap.put(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, definition);
 
@@ -72,7 +70,7 @@ public class MCOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IMcService mcService, Long toolSessionId,
 	    Long learnerId) {
 
-	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> output = new TreeMap<>();
 
 	McSession session = mcService.getMcSessionById(toolSessionId);
 	if (session != null) {
@@ -110,18 +108,18 @@ public class MCOutputFactory extends OutputFactory {
 	}
 	return null;
     }
-    
+
     public List<ToolOutput> getToolOutputs(String name, IMcService assessmentService, Long toolContentId) {
 	if ((name != null) && (toolContentId != null)) {
 
 	    if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_MARK)) {
 		List<ToolOutputDTO> toolOutputDtos = assessmentService.getLearnerMarksByContentId(toolContentId);
-		
+
 		//convert toolOutputDtos to toolOutputs
-		List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
+		List<ToolOutput> toolOutputs = new ArrayList<>();
 		for (ToolOutputDTO toolOutputDto : toolOutputDtos) {
 		    float totalMark = toolOutputDto.getMark() == null ? 0 : toolOutputDto.getMark().floatValue();
-		    
+
 		    ToolOutput toolOutput = new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_MARK,
 			    getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_MARK, true), totalMark);
 		    toolOutput.setUserId(toolOutputDto.getUserId().intValue());
@@ -129,25 +127,26 @@ public class MCOutputFactory extends OutputFactory {
 		}
 
 		return toolOutputs;
-		
+
 	    } else if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
 		List<ToolOutputDTO> toolOutputDtos = assessmentService.getLearnerMarksByContentId(toolContentId);
-		
+
 		//calculate max possible total mark
 		int maxMark = 0;
 		McContent mcContent = assessmentService.getMcContent(toolContentId);
-		for (McQueContent question : (Set<McQueContent>)mcContent.getMcQueContents()) {
+		for (McQueContent question : mcContent.getMcQueContents()) {
 		    maxMark += question.getMark();
 		}
-		
+
 		//convert toolOutputDtos to toolOutputs
-		List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
+		List<ToolOutput> toolOutputs = new ArrayList<>();
 		for (ToolOutputDTO toolOutputDto : toolOutputDtos) {
 		    float totalMark = toolOutputDto.getMark() == null ? 0 : toolOutputDto.getMark().floatValue();
 		    boolean isAllQuestionAnswersCorrect = totalMark == maxMark;
-		    
+
 		    ToolOutput toolOutput = new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
-			    getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), isAllQuestionAnswersCorrect);
+			    getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true),
+			    isAllQuestionAnswersCorrect);
 		    toolOutput.setUserId(toolOutputDto.getUserId().intValue());
 		    toolOutputs.add(toolOutput);
 		}
@@ -193,8 +192,8 @@ public class MCOutputFactory extends OutputFactory {
 	long correctlearnerOptions = 0;
 	List<McUsrAttempt> userAttempts = mcService.getFinalizedUserAttempts(user);
 	for (McUsrAttempt userAttempt : userAttempts) {
-	    McOptsContent option = userAttempt.getMcOptionsContent();
-	    if (!option.isCorrectOption()) {
+	    QbOption option = userAttempt.getQbOption();
+	    if (!option.isCorrect()) {
 		// wrong answer so no point going any further
 		return false;
 	    } else {
@@ -208,10 +207,9 @@ public class MCOutputFactory extends OutputFactory {
 	Iterator questionIterator = mcContent.getMcQueContents().iterator();
 	while (questionIterator.hasNext()) {
 	    McQueContent mcQueContent = (McQueContent) questionIterator.next();
-	    Iterator optionIterator = mcQueContent.getMcOptionsContents().iterator();
+	    Iterator<QbOption> optionIterator = mcQueContent.getQbQuestion().getQbOptions().iterator();
 	    while (optionIterator.hasNext()) {
-		McOptsContent mcOptsContent = (McOptsContent) optionIterator.next();
-		if (mcOptsContent.isCorrectOption()) {
+		if (optionIterator.next().isCorrect()) {
 		    correctOptions++;
 		}
 	    }

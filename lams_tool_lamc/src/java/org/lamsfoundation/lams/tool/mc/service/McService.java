@@ -196,13 +196,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // if response doesn't exist - created mcUsrAttempt in the db
 	    if (userAttempt == null) {
 		userAttempt = new McUsrAttempt(leaderAttempt.getAttemptTime(), question, user,
-			leaderAttempt.getMcOptionsContent(), leaderAttempt.getMark(), leaderAttempt.isPassed(),
+			leaderAttempt.getQbOption(), leaderAttempt.getMark(), leaderAttempt.isPassed(),
 			leaderAttempt.isAttemptCorrect(), leaderAttempt.getConfidenceLevel());
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
 		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
-		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
+		userAttempt.setQbOption(leaderAttempt.getQbOption());
 		userAttempt.setConfidenceLevel(leaderAttempt.getConfidenceLevel());
 		userAttempt.setAttemptTime(leaderAttempt.getAttemptTime());
 		this.updateMcUsrAttempt(userAttempt);
@@ -252,8 +252,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	mcQueContentDAO.insertOrUpdate(mcQueContent.getQbQuestion());
 
-	for (McOptsContent mcqOption : mcQueContent.getMcOptionsContents()) {
-	    mcQueContentDAO.insertOrUpdate(mcqOption.getQbOption());
+	for (QbOption option : mcQueContent.getQbQuestion().getQbOptions()) {
+	    mcQueContentDAO.insertOrUpdate(option);
 	}
 
 	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
@@ -301,18 +301,20 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    // basic question data does not match, skip option checking
 	    boolean isModified = qbQuestion.isModified(qbQuestionClone)
-		    || optionDTOs.size() != qbQuestionClone.getOptions().size();
+		    || optionDTOs.size() != qbQuestionClone.getQbOptions().size();
 	    if (!isModified) {
 		// check if options changed
-		for (McOptionDTO optionDTO : optionDTOs) {
+		for (int i = 0; i < optionDTOs.size(); i++) {
+		    McOptionDTO optionDTO = optionDTOs.get(i);
 		    String optionText = optionDTO.getCandidateAnswer();
 		    boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
 
 		    //find persisted option if it exists
-		    for (QbOption qbOption : qbQuestionClone.getOptions()) {
+		    for (QbOption qbOption : qbQuestionClone.getQbOptions()) {
 			if (optionDTO.getQbOptionUid().equals(qbOption.getUid())) {
 			    qbOption.setCorrect(isCorrectOption);
 			    qbOption.setName(optionText);
+			    qbOption.setDisplayOrder(i + 1);
 			    break;
 			}
 		    }
@@ -330,14 +332,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    } else {
 		// if no modification was made, prevent clone from being persisted
 		mcQueContentDAO.releaseFromCache(qbQuestionClone);
-		for (QbOption option : qbQuestionClone.getOptions()) {
+		for (QbOption option : qbQuestionClone.getQbOptions()) {
 		    mcQueContentDAO.releaseFromCache(option);
 		}
 	    }
 
 	    // in case question doesn't exist
 	    if (question == null) {
-		question = new McQueContent(qbQuestion, null, new Integer(displayOrder), content, null);
+		question = new McQueContent(qbQuestion, null, new Integer(displayOrder), content);
 
 		// adding a new question to content
 		content.getMcQueContents().add(question);
@@ -351,20 +353,19 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 
 	    // persist candidate answers
-	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
-	    Set<McOptsContent> newOptions = new TreeSet<>(McQueContent.OPTION_COMPARATOR);
+	    List<QbOption> oldOptions = question.getQbQuestion().getQbOptions();
+	    List<QbOption> newOptions = new ArrayList<>();
 	    int displayOrderOption = 1;
-	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getOptions());
+	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getQbOptions());
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
-		Long optionUid = optionDTO.getUid();
 		String optionText = optionDTO.getCandidateAnswer();
 		boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
 
 		//find persisted option if it exists
-		McOptsContent option = new McOptsContent();
-		for (McOptsContent oldOption : oldOptions) {
-		    if (oldOption.getUid().equals(optionUid)) {
+		QbOption option = null;
+		for (QbOption oldOption : oldOptions) {
+		    if (oldOption.getUid().equals(optionDTO.getQbOptionUid())) {
 			option = oldOption;
 			break;
 		    }
@@ -372,14 +373,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		if (optionDTO.getQbOptionUid() == null) {
 		    // it is a new option
-		    option.setQbOption(new QbOption());
+		    option = new QbOption();
 		} else {
 		    // match existing options with DTO data
-		    for (QbOption qbOption : qbQuestion.getOptions()) {
+		    for (QbOption qbOption : qbQuestion.getQbOptions()) {
 			if (qbOption.getUid().equals(optionDTO.getQbOptionUid())) {
-			    option.setQbOption(qbOption);
+			    option = qbOption;
 			    // if a match was found, we do not remove the option
-			    qbOptionsToRemove.remove(qbOption);
+			    qbOptionsToRemove.remove(option);
 			    break;
 			}
 		    }
@@ -387,17 +388,17 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		// QB option data is set here
 		option.setDisplayOrder(displayOrderOption);
-		option.setCorrectOption(isCorrectOption);
-		option.setMcQueOptionText(optionText);
-		option.setMcQueContent(question);
+		option.setCorrect(isCorrectOption);
+		option.setName(optionText);
 
 		newOptions.add(option);
 		displayOrderOption++;
 	    }
-	    question.setMcOptionsContents(newOptions);
+	    qbQuestion.getQbOptions().clear();
+	    qbQuestion.getQbOptions().addAll(newOptions);
 
 	    // make removed options orphaned, so they will be removed from DB
-	    qbQuestion.getOptions().removeAll(qbOptionsToRemove);
+	    qbQuestion.getQbOptions().removeAll(qbOptionsToRemove);
 	    qbOptionsToRemove.clear();
 	    // if clone is the real question, clear its IDs so it is saved as a new question
 	    // it needs to be only now as above we used option UID matching
@@ -506,7 +507,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			"Can't find question with specified question uid: " + answerDto.getQuestionUid());
 	    }
 
-	    McOptsContent answerOption = answerDto.getAnswerOption();
+	    QbOption answerOption = answerDto.getAnswerOption();
 	    if (answerOption != null) {
 
 		Integer mark = answerDto.getMark();
@@ -517,7 +518,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
 		    userAttempt.setAttemptTime(attemptTime);
-		    userAttempt.setMcOptionsContent(answerOption);
+		    userAttempt.setQbOption(answerOption);
 		    userAttempt.setMark(mark);
 		    userAttempt.setPassed(passed);
 		    userAttempt.setAttemptCorrect(isAttemptCorrect);
@@ -557,14 +558,19 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	for (McQueContent question : questions) {
 	    AnswerDTO answerDto = new AnswerDTO();
-	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
-	    List<McOptsContent> optionList = new LinkedList<>(optionSet);
+	    List<QbOption> optionList = question.getQbQuestion().getQbOptions();
+	    List<McOptsContent> mcOptsContentList = new ArrayList<>();
 
 	    boolean randomize = mcContent.isRandomize();
 	    if (randomize) {
-		ArrayList<McOptsContent> shuffledList = new ArrayList<>(optionList);
+		ArrayList<QbOption> shuffledList = new ArrayList<>(optionList);
 		Collections.shuffle(shuffledList);
 		optionList = new LinkedList<>(shuffledList);
+	    }
+	    for (QbOption option : optionList) {
+		McOptsContent mcOptsContent = new McOptsContent();
+		mcOptsContent.setQbOption(option);
+		mcOptsContentList.add(mcOptsContent);
 	    }
 
 	    answerDto.setQuestion(question.getQuestion());
@@ -572,7 +578,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    answerDto.setQuestionUid(question.getUid());
 
 	    answerDto.setMark(question.getMark());
-	    answerDto.setOptions(optionList);
+
+	    answerDto.setOptions(mcOptsContentList);
 
 	    answerDtos.add(answerDto);
 	}
@@ -588,9 +595,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    answerDto.setConfidenceLevel(dbAttempt.getConfidenceLevel());
 
 		    // mark selected option as selected
-		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
+		    Long selectedOptionUid = dbAttempt.getQbOption().getUid();
 		    for (McOptsContent option : answerDto.getOptions()) {
-			if (selectedOptionUid.equals(option.getUid())) {
+			if (selectedOptionUid.equals(option.getQbOption().getUid())) {
 			    option.setSelected(true);
 			}
 		    }
@@ -667,8 +674,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			    // find out the answered option's sequential letter - A,B,C...
 			    String answeredOptionLetter = "";
 			    int optionCount = 1;
-			    for (McOptsContent option : attempt.getMcQueContent().getMcOptionsContents()) {
-				if (attempt.getMcOptionsContent().getUid().equals(option.getUid())) {
+			    for (QbOption option : attempt.getMcQueContent().getQbQuestion().getQbOptions()) {
+				if (attempt.getQbOption().getUid().equals(option.getUid())) {
 				    answeredOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 				    break;
 				}
@@ -779,9 +786,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public List<McOptsContent> findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException {
+    public List<QbOption> findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException {
 	try {
-	    return mcOptionsContentDAO.findMcOptionsContentByQueId(mcQueContentId);
+	    return mcOptionsContentDAO.findOptionsByQueId(mcQueContentId);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is finding by que id" + " the mc options: " + e.getMessage(), e);
@@ -798,9 +805,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException {
+    public void updateQbOption(QbOption option) throws McApplicationException {
 	try {
-	    mcOptionsContentDAO.updateMcOptionsContent(mcOptsContent);
+	    mcOptionsContentDAO.update(option);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is updating" + " the mc options content: " + e.getMessage(), e);
@@ -893,14 +900,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    }
 
 		    // options are different
-		    Set<McOptsContent> oldOptions = oldQuestion.getMcOptionsContents();
+		    List<QbOption> oldOptions = oldQuestion.getQbQuestion().getQbOptions();
 		    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
-		    for (McOptsContent oldOption : oldOptions) {
+		    for (QbOption oldOption : oldOptions) {
 			for (McOptionDTO optionDTO : optionDTOs) {
-			    if (oldOption.getUid().equals(optionDTO.getUid())) {
+			    if (oldOption.getUid().equals(optionDTO.getQbOptionUid())) {
 
-				if (!StringUtils.equals(oldOption.getMcQueOptionText(), optionDTO.getCandidateAnswer())
-					|| (oldOption.isCorrectOption() != "Correct".equals(optionDTO.getCorrect()))) {
+				if (!StringUtils.equals(oldOption.getName(), optionDTO.getCandidateAnswer())
+					|| (oldOption.isCorrect() != "Correct".equals(optionDTO.getCorrect()))) {
 				    isQuestionModified = true;
 				}
 			    }
@@ -1005,8 +1012,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
 	for (McQueContent question : questions) {
-	    if (question.getMcOptionsContents().size() > maxOptionsInQuestion) {
-		maxOptionsInQuestion = question.getMcOptionsContents().size();
+	    if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
+		maxOptionsInQuestion = question.getQbQuestion().getQbOptions().size();
 	    }
 	}
 
@@ -1057,13 +1064,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    rowCount++;
 
 	    int totalPercentage = 0;
-	    for (McOptsContent option : question.getMcOptionsContents()) {
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = mcUsrAttemptDAO.getAttemptsCountPerOption(option.getUid());
 		cell = row.createCell(count++);
 		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
 		cell.setCellValue(percentage + "%");
 		totalPercentage += percentage;
-		if (option.isCorrectOption()) {
+		if (option.isCorrect()) {
 		    cell.setCellStyle(greenColor);
 		}
 	    }
@@ -1111,8 +1118,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // find out the correct answer's sequential letter - A,B,C...
 	    String correctAnswerLetter = "";
 	    int answerCount = 1;
-	    for (McOptsContent option : question.getMcOptionsContents()) {
-		if (option.isCorrectOption()) {
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
+		if (option.isCorrect()) {
 		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
 		}
@@ -1624,7 +1631,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    //fill in question's and user answer's hashes
 	    McQueContent question = userAttempt.getMcQueContent();
-	    String answer = userAttempt.getMcOptionsContent().getMcQueOptionText();
+	    String answer = userAttempt.getQbOption().getName();
 
 	    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 	    confidenceLevelDto.setUserId(userId.intValue());
@@ -2027,7 +2034,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setMark(1);
 	    McQueContent question = new McQueContent(qbQuestion, null,
-		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq, new HashSet<McOptsContent>());
+		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 
 	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (JsonNode optionData : optionsData) {
@@ -2035,7 +2042,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
 		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
 		qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
-		question.getMcOptionsContents().add(new McOptsContent(qbOption, question));
+		question.getQbQuestion().getQbOptions().add(qbOption);
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}

@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -47,7 +48,6 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.model.McSession;
@@ -329,11 +329,12 @@ public class McLearningController {
 	return null;
     }
 
-    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, Map<String, Integer> confidenceLevels, McContent content, HttpServletRequest request) {
+    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, Map<String, Integer> confidenceLevels,
+	    McContent content, HttpServletRequest request) {
 
 	List<AnswerDTO> answerDtos = new LinkedList<>();
 
-	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
+	for (McQueContent question : content.getMcQueContents()) {
 	    String questionUid = question.getUid().toString();
 	    int questionMark = question.getMark().intValue();
 
@@ -344,20 +345,20 @@ public class McLearningController {
 	    answerDto.setFeedback(question.getFeedback() != null ? question.getFeedback() : "");
 
 	    //search for according answer
-	    McOptsContent answerOption = null;
+	    QbOption answerOption = null;
 	    for (String answer : answers) {
 		int hyphenPosition = answer.indexOf("-");
 		String answeredQuestionUid = answer.substring(0, hyphenPosition);
 
 		if (questionUid.equals(answeredQuestionUid)) {
 		    String answeredOptionUid = answer.substring(hyphenPosition + 1);
-		    answerOption = question.getOptionsContentByUID(new Long(answeredOptionUid));
+		    answerOption = question.getOptionByUID(new Long(answeredOptionUid));
 		    answerDto.setAnswerOption(answerOption);
 		    break;
 		}
 	    }
 
-	    boolean isCorrect = (answerOption != null) && answerOption.isCorrectOption();
+	    boolean isCorrect = (answerOption != null) && answerOption.isCorrect();
 	    answerDto.setAttemptCorrect(isCorrect);
 	    if (isCorrect) {
 		answerDto.setFeedbackCorrect(question.getFeedback());
@@ -367,12 +368,13 @@ public class McLearningController {
 		answerDto.setMark(0);
 	    }
 
-	    // handle confidence levels 
+	    // handle confidence levels
 	    if (content.isEnableConfidenceLevels()) {
 		String wantedKey = "confidenceLevel" + question.getUid();
 		Integer confidenceLevel = confidenceLevels.get(wantedKey);
-		if ( confidenceLevel != null )
+		if (confidenceLevel != null) {
 		    answerDto.setConfidenceLevel(confidenceLevel);
+		}
 	    }
 
 	    answerDtos.add(answerDto);
@@ -401,14 +403,16 @@ public class McLearningController {
 		mcContent.isQuestionsSequenced());
 
 	Map<String, Integer> learnerConfidenceLevels = null;
-	if (mcContent.isEnableConfidenceLevels())
+	if (mcContent.isEnableConfidenceLevels()) {
 	    learnerConfidenceLevels = parseLearnerConfidenceLevels(mcLearningForm, request,
 		    mcContent.isQuestionsSequenced());
+	}
 
 	if (mcContent.isQuestionsSequenced()) {
 	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
-	    if ( mcContent.isEnableConfidenceLevels() ) 
+	    if (mcContent.isEnableConfidenceLevels()) {
 		sessionMap.put(McAppConstants.CONFIDENCE_LEVELS_KEY, learnerConfidenceLevels);
+	    }
 	}
 
 	mcLearningForm.resetCa(request);
@@ -473,7 +477,7 @@ public class McLearningController {
 		    mcContent.isQuestionsSequenced());
 	    sessionMap.put(McAppConstants.CONFIDENCE_LEVELS_KEY, learnerConfidenceLevels);
 	}
-	
+
 	//save user attempt
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
@@ -539,17 +543,18 @@ public class McLearningController {
 	while (itMap.hasNext()) {
 	    Map.Entry pairs = (Map.Entry) itMap.next();
 	    String currentQuestionUid = pairs.getValue().toString();
-	    List listQuestionOptions = mcService.findOptionsByQuestionUid(new Long(currentQuestionUid));
+	    List<QbOption> listQuestionOptions = mcService.findOptionsByQuestionUid(new Long(currentQuestionUid));
 
 	    //builds a questions map from questions list
 	    Map<String, String> mapOptsContent = new TreeMap<>();
-	    Iterator<McOptsContent> iter = listQuestionOptions.iterator();
+	    Iterator<QbOption> iter = listQuestionOptions.iterator();
 	    int mapIndex2 = 0;
 	    while (iter.hasNext()) {
-		McOptsContent option = iter.next();
-		String stringIndex = mcContent.isPrefixAnswersWithLetters() ? option.formatPrefixLetter(mapIndex2++)
+		QbOption option = iter.next();
+		String stringIndex = mcContent.isPrefixAnswersWithLetters()
+			? LearningUtil.formatPrefixLetter(mapIndex2++)
 			: Integer.toString(++mapIndex2);
-		mapOptsContent.put(stringIndex, option.getMcQueOptionText());
+		mapOptsContent.put(stringIndex, option.getName());
 	    }
 
 	    mapStartupGeneralOptionsContent.put(mapIndex.toString(), mapOptsContent);
@@ -788,9 +793,10 @@ public class McLearningController {
 	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
 		mcContent.isQuestionsSequenced());
 	Map<String, Integer> learnerConfidenceLevels = null;
-	if (mcContent.isEnableConfidenceLevels())
+	if (mcContent.isEnableConfidenceLevels()) {
 	    learnerConfidenceLevels = parseLearnerConfidenceLevels(mcLearningForm, request,
 		    mcContent.isQuestionsSequenced());
+	}
 
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
@@ -842,12 +848,13 @@ public class McLearningController {
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	Map<String, Integer> confidenceLevels = new HashMap<String, Integer>();
+	Map<String, Integer> confidenceLevels = new HashMap<>();
 	if (isQuestionsSequenced) {
 	    Map<String, Integer> previousConfidenceLevels = (Map<String, Integer>) sessionMap
 		    .get(McAppConstants.CONFIDENCE_LEVELS_KEY);
-	    if ( previousConfidenceLevels != null )
+	    if (previousConfidenceLevels != null) {
 		confidenceLevels.putAll(previousConfidenceLevels);
+	    }
 	}
 
 	Map parameters = request.getParameterMap();
@@ -860,7 +867,7 @@ public class McLearningController {
 	}
 	return confidenceLevels;
     }
-    
+
     private McQueUsr getCurrentUser(String toolSessionId) {
 
 	// get back login user DTO

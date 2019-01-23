@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -41,7 +42,6 @@ import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.model.McSession;
@@ -137,9 +137,9 @@ public interface IMcService extends ICommonToolService {
 
     List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user);
 
-    List findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
+    List<QbOption> findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
 
-    void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
+    void updateQbOption(QbOption option) throws McApplicationException;
 
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
 
@@ -236,7 +236,7 @@ public interface IMcService extends ICommonToolService {
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
      * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -244,7 +244,7 @@ public interface IMcService extends ICommonToolService {
 
     /**
      * Prepares data for the marks summary graph on the statistics page
-     * 
+     *
      * @param assessment
      * @param sessionDtos
      * @return
@@ -254,7 +254,7 @@ public interface IMcService extends ICommonToolService {
     /**
      * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
      * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
-     * 
+     *
      * @param assessment
      * @param sessionDtos
      * @return

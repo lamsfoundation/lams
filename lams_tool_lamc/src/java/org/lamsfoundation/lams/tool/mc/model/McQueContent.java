@@ -23,24 +23,18 @@
 package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.qb.QbQuestion;
 import org.lamsfoundation.lams.qb.QbToolQuestion;
 
@@ -57,15 +51,6 @@ import org.lamsfoundation.lams.qb.QbToolQuestion;
 // in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
 @PrimaryKeyJoinColumn(name = "uid")
 public class McQueContent extends QbToolQuestion implements Serializable, Comparable<McQueContent> {
-    public static class OptionComparator implements Comparator<McOptsContent> {
-	@Override
-	public int compare(McOptsContent o1, McOptsContent o2) {
-	    return Integer.compare(o1.getQbOption().getDisplayOrder(), o2.getQbOption().getDisplayOrder());
-	}
-    }
-
-    public static final Comparator<McOptsContent> OPTION_COMPARATOR = new OptionComparator();
-
     private static final long serialVersionUID = 4022287106119453962L;
 
     /**
@@ -81,29 +66,18 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
     @JoinColumn(name = "mc_content_id")
     private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
 
-    // TODO Make this orphanRemoval = true, but first fix McService.createQuestions() to stop mucking around with the collections.
-    // Currently options that are deleted in authoring leave junk records in the database with the mc_que_content_id set to null
-    @OneToMany(cascade = CascadeType.ALL)
-    @SortComparator(OptionComparator.class)
-    @JoinColumn(name = "mc_que_content_id")
-    private Set<McOptsContent> mcOptionsContents;
-
     //DTO fields
     @Transient
     private String escapedQuestion;
 
-    public McQueContent(QbQuestion qbQuestion, String questionHash, Integer displayOrder, McContent mcContent,
-	    Set<McOptsContent> mcOptionsContents) {
+    public McQueContent(QbQuestion qbQuestion, String questionHash, Integer displayOrder, McContent mcContent) {
 	this.qbQuestion = qbQuestion;
 	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
 	this.mcContent = mcContent;
-	this.mcOptionsContents = mcOptionsContents != null ? mcOptionsContents : new HashSet<>();
     }
 
-    /** default constructor */
     public McQueContent() {
-	this.mcOptionsContents = new HashSet<>();
     }
 
     /**
@@ -117,18 +91,8 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      */
     public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
 	McQueContent newQueContent = new McQueContent(queContent.getQbQuestion(), queContent.getQuestionHash(),
-		queContent.getDisplayOrder(), newMcContent, new TreeSet<McOptsContent>());
-	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
+		queContent.getDisplayOrder(), newMcContent);
 	return newQueContent;
-    }
-
-    public Set<McOptsContent> deepCopyMcOptionsContent(McQueContent newQueContent) {
-	Set<McOptsContent> newMcOptionsContent = new TreeSet<>(McQueContent.OPTION_COMPARATOR);
-	for (McOptsContent mcOptsContent : this.getMcOptionsContents()) {
-	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
-	    newMcOptionsContent.add(mcNewOptsContent);
-	}
-	return newMcOptionsContent;
     }
 
     public String getQuestion() {
@@ -166,19 +130,11 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 	this.mcContent = mcContent;
     }
 
-    public Set<McOptsContent> getMcOptionsContents() {
-	return this.mcOptionsContents;
-    }
-
-    public void setMcOptionsContents(Set<McOptsContent> mcOptionsContents) {
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
     /**
      * Get an options content record by its uid. Iterates over the set from getMcOptionsContents().
      */
-    public McOptsContent getOptionsContentByUID(Long uid) {
-	for (McOptsContent elem : getMcOptionsContents()) {
+    public QbOption getOptionByUID(Long uid) {
+	for (QbOption elem : qbQuestion.getQbOptions()) {
 	    if (elem.getUid().equals(uid)) {
 		return elem;
 	    }

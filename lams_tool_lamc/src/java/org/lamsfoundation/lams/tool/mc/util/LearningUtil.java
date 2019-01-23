@@ -83,4 +83,7 @@ public class LearningUtil {
 	return Boolean.FALSE;
     }
 
+    public static String formatPrefixLetter(int index) {
+	return new String(Character.toChars(97 + index)) + ")";
+    }
 }

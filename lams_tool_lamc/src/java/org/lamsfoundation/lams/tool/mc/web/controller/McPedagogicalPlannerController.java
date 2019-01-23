@@ -28,17 +28,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.QbQuestion;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.web.form.McPedagogicalPlannerForm;
@@ -110,28 +109,30 @@ public class McPedagogicalPlannerController {
 				mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
-			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
-			Iterator<McOptsContent> candidateAnswerIter = candidateAnswers.iterator();
+			List<QbOption> candidateAnswers = mcQueContent.getQbQuestion().getQbOptions();
+			Iterator<QbOption> candidateAnswerIter = candidateAnswers.iterator();
 			while (candidateAnswerIter.hasNext()) {
-			    McOptsContent candidateAnswer = candidateAnswerIter.next();
+			    QbOption candidateAnswer = candidateAnswerIter.next();
 			    if (candidateAnswerDTOIndex >= candidateAnswerDTOList.size()) {
 				candidateAnswerIter.remove();
 			    } else {
 				McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
-				candidateAnswer.setCorrectOption(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
-				candidateAnswer.setMcQueOptionText(answerDTO.getCandidateAnswer());
-				mcService.updateMcOptionsContent(candidateAnswer);
+				candidateAnswer.setCorrect(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
+				candidateAnswer.setName(answerDTO.getCandidateAnswer());
+				mcService.updateQbOption(candidateAnswer);
 			    }
 			    candidateAnswerDTOIndex++;
 			}
 			mcService.saveOrUpdateMcQueContent(mcQueContent);
 		    } else {
 			McQueContent mcQueContent = new McQueContent();
+			mcQueContent.setQbQuestion(new QbQuestion());
+			// TODO Set question ID and version
 			mcQueContent.setDisplayOrder(questionIndex);
 			mcQueContent.setMcContent(mcContent);
 			mcQueContent.setQuestion(question);
 			mcQueContent.setMark(McAppConstants.QUESTION_DEFAULT_MARK);
-			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
+			List<QbOption> candidateAnswers = mcQueContent.getQbQuestion().getQbOptions();
 			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList
 				.size(); candidateAnswerDTOIndex++) {
 			    McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
@@ -139,9 +140,7 @@ public class McPedagogicalPlannerController {
 			    qbOption.setName(answerDTO.getCandidateAnswer());
 			    qbOption.setCorrect(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
 			    qbOption.setDisplayOrder(candidateAnswerDTOIndex + 1);
-			    McOptsContent candidateAnswer = new McOptsContent(qbOption, mcQueContent);
-			    candidateAnswer.setMcQueContent(mcQueContent);
-			    candidateAnswers.add(candidateAnswer);
+			    candidateAnswers.add(qbOption);
 			}
 			mcService.saveOrUpdateMcQueContent(mcQueContent);
 			mcContent.getMcQueContents().add(mcQueContent);

@@ -32,11 +32,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -245,7 +245,7 @@ public class AuthoringUtil {
 
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<>();
-	    for (McOptsContent option : question.getMcOptionsContents()) {
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		McOptionDTO optionDTO = new McOptionDTO(option);
 		optionDtos.add(optionDTO);
 	    }

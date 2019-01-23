@@ -7,11 +7,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.QbOption;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
-import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.model.McSession;
@@ -20,15 +19,12 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/tblmonitoring")
 public class TblMonitoringController {
-
-    private static Logger logger = Logger.getLogger(TblMonitoringController.class.getName());
 
     @Autowired
     private IMcService mcService;
@@ -43,7 +39,7 @@ public class TblMonitoringController {
 	McContent mcContent = mcService.getMcContent(toolContentId);
 
 	int attemptedLearnersNumber = 0;
-	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	for (McSession session : mcContent.getMcSessions()) {
 	    attemptedLearnersNumber += session.getMcQueUsers().size();
 	}
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
@@ -67,14 +63,14 @@ public class TblMonitoringController {
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
 	for (McQueContent question : questions) {
-	    if (question.getMcOptionsContents().size() > maxOptionsInQuestion) {
-		maxOptionsInQuestion = question.getMcOptionsContents().size();
+	    if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
+		maxOptionsInQuestion = question.getQbQuestion().getQbOptions().size();
 	    }
 	}
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
 	int totalNumberOfUsers = 0;
-	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	for (McSession session : mcContent.getMcSessions()) {
 	    totalNumberOfUsers += session.getMcQueUsers().size();
 	}
 
@@ -83,7 +79,7 @@ public class TblMonitoringController {
 
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<>();
-	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = mcService.getAttemptsCountPerOption(option.getUid());
 
 		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
