@@ -58,7 +58,6 @@ import org.lamsfoundation.lams.tool.noticeboard.dao.INoticeboardUserDAO;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
-import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.JsonUtil;

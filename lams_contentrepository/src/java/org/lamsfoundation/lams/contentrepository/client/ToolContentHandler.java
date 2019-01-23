@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
@@ -64,7 +63,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * Content Repository's applicationContext.xml. The name must be unique to this project.
  * </UL>
  * For example:
- * 
+ *
  * <pre>
  * 	&lt;bean id="blahToolContentHandler" class="your class name here"&gt;
  * 		&lt;property name="repositoryService"&gt; &lt;ref bean="repositoryService"/&lt;/property&gt;
@@ -84,7 +83,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * <LI>IVersionedNode getFileNode(Long uuid)<BR>
  * Gets the file node from the repository. To get the file stream, do getFileNode().getFile()
  * For example:<BR>
- * 
+ *
  * <pre>
  * NodeKey nodeKey = handler.uploadFile(istream, fileName, fileMimeType);<BR>
  * Long uuid = nodeKey.getUuid();<BR>
@@ -111,7 +110,7 @@ public class ToolContentHandler implements IToolContentFullHandler {
 
     private IRepositoryService repositoryService;
     private ITicket ticket;
-    
+
     private String repositoryWorkspaceName;
     private String repositoryUser;
     private String repositoryId;
@@ -125,7 +124,7 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	}
 	return repositoryWorkspaceName;
     }
-    
+
     public void setRepositoryWorkspaceName(String repositoryWorkspaceName) {
 	this.repositoryWorkspaceName = repositoryWorkspaceName;
     }
@@ -135,9 +134,9 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	    log.error(
 		    "Accessing ToolContentHandler bean, but repositoryUser has not been defined. Please define this property in ApplicationContext.xml");
 	}
-	return repositoryUser;	
+	return repositoryUser;
     }
-    
+
     public void setRepositoryUser(String repositoryUser) {
 	this.repositoryUser = repositoryUser;
     }
@@ -147,9 +146,9 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	    log.error(
 		    "Accessing ToolContentHandler bean, but repositoryWorkspaceName has not been defined. Please define this property in ApplicationContext.xml");
 	}
-	return repositoryId.toCharArray();	
+	return repositoryId.toCharArray();
     }
-    
+
     public void setRepositoryId(String repositoryId) {
 	this.repositoryId = repositoryId;
     }
@@ -162,7 +161,7 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	    // make sure workspace exists - sometimes it does not get created when creating a ticket
 	    cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
 	    doLogin = !repositoryService.workspaceExists(cred, getRepositoryWorkspaceName());
-		}
+	}
 	if (doLogin) {
 	    if (cred == null) {
 		cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
@@ -186,14 +185,14 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	    }
 
 	} catch (RepositoryCheckedException e2) {
-	    log.warn("Unable to to uploadFile" + fileName + "Repository Exception: " + e2.getMessage()
+	    log.warn("Unable to to uploadFile " + fileName + ". Repository Exception: " + e2.getMessage()
 		    + " Retry not possible.");
 	    throw e2;
 	}
 
 	return nodeKey;
     }
-	    
+
     @Override
     public NodeKey updateFile(Long uuid, InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
@@ -229,7 +228,7 @@ public class ToolContentHandler implements IToolContentFullHandler {
 
     /**
      * Save a directory of files in the content repository.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param dirPath
@@ -387,7 +386,7 @@ public class ToolContentHandler implements IToolContentFullHandler {
  * out.flush();
  * return file;
  * }
- * 
+ *
  * protected byte[] getBytes(File file) throws FileNotFoundException, Exception {
  * byte[] byteArray = new byte[(int) file.length()];
  * FileInputStream stream = new FileInputStream(file);

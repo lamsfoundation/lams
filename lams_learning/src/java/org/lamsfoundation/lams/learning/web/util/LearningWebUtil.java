@@ -23,19 +23,13 @@
 
 package org.lamsfoundation.lams.learning.web.util;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -61,18 +55,6 @@ public class LearningWebUtil {
     }
 
     /**
-     * Helper method to retrieve the user data. Gets the id from the user details in the shared session then retrieves
-     * the real user object.
-     */
-    public static User getUser(ILearnerFullService learnerService) {
-	HttpSession ss = SessionManager.getSession();
-	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	return learner != null
-		? (User) learnerService.getUserManagementService().findById(User.class, learner.getUserID())
-		: null;
-    }
-
-    /**
      * Get the current learner progress. Check the request - in some cases it may be there.
      *
      * If not, the learner progress id might be in the request (if we've just come from complete activity). If so, get
@@ -95,91 +77,14 @@ public class LearningWebUtil {
 	}
 
 	if (learnerProgress == null) {
+	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	    Activity activity = learnerService.getActivity(activityId);
+	    Lesson lesson = learnerService.getLessonByActivity(activity);
+
 	    Integer learnerId = LearningWebUtil.getUserId();
-	    Activity act = LearningWebUtil.getActivityFromRequest(request, learnerService);
-	    Lesson lesson = learnerService.getLessonByActivity(act);
 	    learnerProgress = learnerService.getProgress(learnerId, lesson.getLessonId());
 	}
 
 	return learnerProgress;
-    }
-
-    /**
-     * Get the activity from request. We assume there is a parameter coming in. Then the activity id parameter is used
-     * to retrieve from database.
-     *
-     * @param request
-     * @return
-     */
-    public static Activity getActivityFromRequest(HttpServletRequest request, ILearnerFullService learnerService) {
-	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	Activity activity = learnerService.getActivity(activityId);
-	return activity;
-    }
-
-    /**
-     * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
-     * Grouping actions. Calls the learningService to actually complete the activity and progress.
-     *
-     * @param redirect
-     *            Should this call redirect to the next screen (true) or use a forward (false)
-     * @param windowName
-     *            Name of the window that triggered this code. Normally LearnerActivity (the popup window) or lWindow
-     *            (normal learner window)
-     * @throws UnsupportedEncodingException
-     * @throws InterruptedException
-     *
-     */
-    public static String completeActivity(HttpServletRequest request, HttpServletResponse response,
-	    ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity, Integer learnerId,
-	    ILearnerFullService learnerService, boolean redirect)
-	    throws LearnerServiceException, UnsupportedEncodingException {
-
-	Lesson lesson = progress.getLesson();
-
-	if (currentActivity == null) {
-	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
-	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
-
-	    // recalculate activity mark and pass it to gradebook
-	    learnerService.updateGradebookMark(currentActivity, progress);
-
-	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
-	} else {
-	    learnerService.completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
-	}
-
-	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
-		&& progress.getCompletedActivities().containsKey(currentActivity.getParentActivity())))) {
-	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
-	}
-
-	return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
-    }
-
-    public static ActivityURL getActivityURL(ActivityMapping activityMapping, LearnerProgress learnerProgress,
-	    Activity activity, boolean defaultURL, boolean isFloating) {
-	ActivityURL activityURL = new ActivityURL();
-	activityURL.setType(activity.getClass().getSimpleName());
-
-	if (isFloating && activity.isFloatingActivity()) {
-	    // special case - progress engine. Do not want the unknown activity warning
-	    activityURL.setUrl(null);
-	} else {
-	    activityURL.setUrl(activityMapping.getActivityURL(activity));
-	}
-
-	activityURL.setActivityId(activity.getActivityId());
-	activityURL.setTitle(activity.getTitle());
-	activityURL.setDescription(activity.getDescription());
-
-	byte status = learnerProgress.getProgressState(activity);
-	activityURL.setStatus(status);
-	if (status == LearnerProgress.ACTIVITY_COMPLETED) {
-	    activityURL.setComplete(true);
-	}
-	activityURL.setFloating(isFloating);
-	activityURL.setDefaultURL(defaultURL);
-	return activityURL;
     }
 }

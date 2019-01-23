@@ -33,6 +33,8 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -62,8 +64,8 @@ public class ChooseActivityController {
 	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Lesson lesson = progress.getLesson();
 
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (activity != null) {
 	    progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity, false);
 	} else {

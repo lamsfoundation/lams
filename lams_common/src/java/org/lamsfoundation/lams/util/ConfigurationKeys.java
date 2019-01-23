@@ -285,5 +285,11 @@ public class ConfigurationKeys {
 
     // LDEV-4594 / LDEV-4583 Allow/Block access to index.do for integration learners. Default to false - do not allow direct access.
     public static String ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS = "AllowDirectAccessIntgrtnLrnr";
+    
+    // LDEV-4755 Antivirus
+    public static String ANTIVIRUS_ENABLE = "AntivirusEnable";
+    public static String ANTIVIRUS_HOST = "AntivirusHost";
+    public static String ANTIVIRUS_PORT = "AntivirusPort";
+    
 
 }

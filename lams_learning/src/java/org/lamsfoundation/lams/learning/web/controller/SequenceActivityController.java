@@ -37,6 +37,8 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,13 +70,14 @@ public class SequenceActivityController {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 	if (!(activity instanceof SequenceActivity)) {
 	    log.error("activity not SequenceActivity " + activity.getActivityId());
 	    return "error";
 	}
 
-	String forward = null;
 	SequenceActivity sequenceActivity = (SequenceActivity) activity;
 	Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
 
@@ -82,12 +85,11 @@ public class SequenceActivityController {
 	    // Set the first activity as the current activity and display it
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 		    firstActivityInSequence, true);
-	    forward = activityMapping.getActivityForward(firstActivityInSequence, learnerProgress, true);
-	    return forward;
+	    return activityMapping.getActivityForward(firstActivityInSequence, learnerProgress, true);
+
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.
-	    return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
-		    learnerId, learnerService, true);
+	    return learnerService.completeActivity(learnerProgress, activity, learnerId, true);
 	}
     }
 }

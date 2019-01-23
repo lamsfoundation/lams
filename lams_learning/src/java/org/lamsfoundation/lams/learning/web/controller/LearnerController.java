@@ -155,17 +155,14 @@ public class LearnerController {
     @RequestMapping("/joinLesson")
     public String joinLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
-	// initialize service object
-	Integer learner = null;
+	// get user and lesson based on request
+	Integer userId = LearningWebUtil.getUserId();
+	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	
 	try {
-
-	    // get user and lesson based on request.
-	    learner = LearningWebUtil.getUserId();
-	    long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
 	    // security check
 	    Lesson lesson = learnerService.getLesson(lessonID);
-	    User user = (User) userManagementService.findById(User.class, learner);
+	    User user = (User) userManagementService.findById(User.class, userId);
 	    if ((lesson.getLessonClass() == null) || !lesson.getLessonClass().getLearners().contains(user)) {
 		request.setAttribute("messageKey",
 			"User " + user.getLogin() + " is not a learner in the requested lesson.");
@@ -178,14 +175,14 @@ public class LearnerController {
 	    }
 
 	    if (log.isDebugEnabled()) {
-		log.debug("The learner [" + learner + "] is joining the lesson [" + lessonID + "]");
+		log.debug("The learner [" + userId + "] is joining the lesson [" + lessonID + "]");
 	    }
 
 	    // join user to the lesson on the server
-	    LearnerProgress learnerProgress = learnerService.joinLesson(learner, lessonID);
+	    LearnerProgress learnerProgress = learnerService.joinLesson(userId, lessonID);
 
 	    if (log.isDebugEnabled()) {
-		log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
+		log.debug("The learner [" + userId + "] joined lesson. The" + "progress data is:"
 			+ learnerProgress.toString());
 	    }
 
@@ -193,8 +190,7 @@ public class LearnerController {
 	    redirectToURL(response, url);
 
 	} catch (Exception e) {
-	    log
-		    .error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
+	    log.error("An error occurred while learner " + userId + " attempting to join the lesson.", e);
 	    return "error";
 	}
 
@@ -209,8 +205,8 @@ public class LearnerController {
 	    throws IOException, ServletException {
 	// fetch necessary parameters
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	User user = LearningWebUtil.getUser(learnerService);
-	Integer userID = user.getUserId();
+	Integer userID = LearningWebUtil.getUserId();
+	User user = userManagementService.getUserById(userID);
 
 	// find number of previous attempts
 	Integer attemptID = learnerService.getProgressArchiveMaxAttemptID(userID, lessonID);

@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.controller.DisplayActivityController;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -99,8 +100,8 @@ public class ActivityMapping implements Serializable {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
-	    HttpServletRequest request, ILearnerFullService learnerService) throws UnsupportedEncodingException {
+    public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames)
+	    throws UnsupportedEncodingException {
 	String forward = null;
 
 	if (progress.isComplete()) {
@@ -168,6 +169,32 @@ public class ActivityMapping implements Serializable {
     public String getActivityURL(Activity activity) {
 	String action = this.activityMappingStrategy.getActivityAction(activity);
 	return ActivityMapping.actionToURL(action, activity, true);
+    }
+
+    public ActivityURL getActivityURL(LearnerProgress learnerProgress, Activity activity, boolean defaultURL,
+	    boolean isFloating) {
+	ActivityURL activityURL = new ActivityURL();
+	activityURL.setType(activity.getClass().getSimpleName());
+
+	if (isFloating && activity.isFloatingActivity()) {
+	    // special case - progress engine. Do not want the unknown activity warning
+	    activityURL.setUrl(null);
+	} else {
+	    activityURL.setUrl(this.getActivityURL(activity));
+	}
+
+	activityURL.setActivityId(activity.getActivityId());
+	activityURL.setTitle(activity.getTitle());
+	activityURL.setDescription(activity.getDescription());
+
+	byte status = learnerProgress.getProgressState(activity);
+	activityURL.setStatus(status);
+	if (status == LearnerProgress.ACTIVITY_COMPLETED) {
+	    activityURL.setComplete(true);
+	}
+	activityURL.setFloating(isFloating);
+	activityURL.setDefaultURL(defaultURL);
+	return activityURL;
     }
 
     /**

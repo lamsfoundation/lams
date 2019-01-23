@@ -444,7 +444,7 @@ public class LearningController implements TaskListConstants {
 	Set<TaskListItemComment> dbComments = dbItem.getComments();
 	dbComments.add(comment);
 	taskListService.saveOrUpdateTaskListItem(dbItem);
-	
+
 	TasListItemDTO itemDTO = new TasListItemDTO(dbItem);
 	itemDTO.setCommentRequirementsMet(true);
 	request.setAttribute("itemDTO", itemDTO);
@@ -498,7 +498,14 @@ public class LearningController implements TaskListConstants {
 	// upload to repository
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	TaskListUser taskListUser = taskListService.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
-	TaskListItemAttachment att = taskListService.uploadTaskListItemFile(file, taskListUser);
+	TaskListItemAttachment att = null;
+	try {
+	    att = taskListService.uploadTaskListItemFile(file, taskListUser);
+	} catch (UploadTaskListFileException e) {
+	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
+	    request.setAttribute("errorMap", errorMap);
+	    return "pages/learning/learning";
+	}
 
 	// persist TaskListItem changes in DB
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
@@ -540,7 +547,8 @@ public class LearningController implements TaskListConstants {
 
 	// get the existing reflection entry
 
-	SessionMap<String, Object> sessionMap = getSessionMap(request);;
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	;
 	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = taskListService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		TaskListConstants.TOOL_SIGNATURE, user.getUserID());
@@ -652,7 +660,7 @@ public class LearningController implements TaskListConstants {
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 	taskListService.setItemComplete(taskListItemUid, user.getUserID().longValue(), sessionId);
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);

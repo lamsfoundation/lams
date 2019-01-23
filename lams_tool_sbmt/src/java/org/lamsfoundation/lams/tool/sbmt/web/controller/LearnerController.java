@@ -89,7 +89,7 @@ public class LearnerController implements SbmtConstants {
 
     @Autowired
     @Qualifier("sbmtMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -100,7 +100,7 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/learner")
     public String learner(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	// initial session Map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -280,7 +280,8 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/refresh")
     public String refresh(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	learnerForm.setSessionMapID(sessionMap.getSessionID());
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
@@ -309,7 +310,8 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/uploadFile")
     public String uploadFile(@ModelAttribute LearnerForm learnerForm, HttpServletRequest request) {
 	String sessionMapID = learnerForm.getSessionMapID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute("sessionMapID", sessionMapID);
 
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -342,8 +344,17 @@ public class LearnerController implements SbmtConstants {
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
+	try {
+	    submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+	} catch (SubmitFilesException e) {
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	    logger.error("Error while uploading file", e);
+	    errorMap.add("GLOBAL", messageService.getMessage("error.upload", new Object[] { e.getMessage() }));
 
-	submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+	    request.setAttribute("errorMap", errorMap);
+	    return "learner/sbmtlearner";
+	}
+
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
 
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
@@ -365,7 +376,8 @@ public class LearnerController implements SbmtConstants {
     @RequestMapping("/finish")
     public String finish(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -566,7 +578,8 @@ public class LearnerController implements SbmtConstants {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -587,9 +600,10 @@ public class LearnerController implements SbmtConstants {
 	return finish(request, response);
     }
 
-    public static void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
+    public void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {
 	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
@@ -603,5 +617,4 @@ public class LearnerController implements SbmtConstants {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.learning.minimum.upload.number.less"));
 	}
     }
-
 }

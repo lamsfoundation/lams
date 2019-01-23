@@ -9,19 +9,14 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,63 +44,10 @@ public class WebUtil {
     private static final String URL_SHORTENING_CYPHER = "jbdnuteywk";
 
     /**
-     */
-    public static boolean isTokenValid(HttpServletRequest req, String tokenName) {
-	if (req.getSession() != null) {
-	    String valueSession = (String) req.getSession().getAttribute(tokenName);
-	    String valueRequest = req.getParameter(tokenName);
-	    WebUtil.log.debug("(Session Token) name : " + tokenName + " value : " + valueSession);
-	    WebUtil.log.debug("(Request Token) name : " + tokenName + " value : " + valueRequest);
-	    if ((valueSession != null) && (valueRequest != null)) {
-		if (valueSession.equals(valueRequest)) {
-		    return true;
-		}
-	    }
-	}
-	return false;
-    }
-
-    /**
-     */
-    public static void saveTaskURL(HttpServletRequest req, String[] urls) {
-	if (urls != null) {
-	    if (urls.length == 1) {
-		req.setAttribute("urlA", urls[0]);
-	    } else if (urls.length == 2) {
-		req.setAttribute("urlA", urls[0]);
-		req.setAttribute("urlB", urls[1]);
-	    }
-	}
-    }
-
-    /**
-     */
-    public static void saveToken(HttpServletRequest req, String tokenName, String tokenValue) {
-	if (req.getSession().getAttribute(tokenName) != null) {
-	    WebUtil.resetToken(req, tokenName);
-	}
-	req.getSession().setAttribute(tokenName, tokenValue);
-	WebUtil.log.debug("(Save Session Token) name : " + tokenName + " value : " + tokenValue);
-
-    }
-
-    /**
-     */
-    public static String retrieveToken(HttpServletRequest req, String tokenName) {
-	return (String) req.getSession().getAttribute(tokenName);
-    }
-
-    /**
-     */
-    public static void resetToken(HttpServletRequest req, String tokenName) {
-	req.getSession().removeAttribute(tokenName);
-    }
-
-    /**
      * @exception IllegalArgumentException
      *                - if not set
      */
-    public static void checkObject(String paramName, Object paramValue) throws IllegalArgumentException {
+    private static void checkObject(String paramName, Object paramValue) throws IllegalArgumentException {
 	boolean isNull = paramValue == null;
 	if (!isNull && String.class.isInstance(paramValue)) {
 	    String str = (String) paramValue;
@@ -128,7 +70,7 @@ public class WebUtil {
 		WebUtil.checkObject(paramName, paramValue);
 	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
-	    return value != null ? new Integer(value) : null;
+	    return value != null ? Integer.valueOf(value) : null;
 
 	} catch (NumberFormatException e) {
 	    throw new IllegalArgumentException(paramName + " should be an integer '" + paramValue + "'");
@@ -147,7 +89,7 @@ public class WebUtil {
 		WebUtil.checkObject(paramName, paramValue);
 	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
-	    return value != null ? new Long(value) : null;
+	    return value != null ? Long.valueOf(value) : null;
 
 	} catch (NumberFormatException e) {
 	    throw new IllegalArgumentException(paramName + " should be a long '" + paramValue + "'");
@@ -176,7 +118,6 @@ public class WebUtil {
      *                - if not set or not boolean
      */
     public static boolean checkBoolean(String paramName, String paramValue) throws IllegalArgumentException {
-
 	WebUtil.checkObject(paramName, paramValue);
 	return Boolean.valueOf(paramValue.trim()).booleanValue();
     }
@@ -293,34 +234,6 @@ public class WebUtil {
 
     public static boolean readBooleanAttr(HttpServletRequest req, String attrName) {
 	return WebUtil.checkBoolean(attrName, (String) req.getSession().getAttribute(attrName));
-    }
-
-    /**
-     * TODO default proper exception at lams level to replace RuntimeException TODO isTesting should be removed when
-     * login is done properly.
-     *
-     * @param req
-     *            -
-     * @return username from principal object
-     */
-    public static String getUsername(HttpServletRequest req, boolean isTesting) throws RuntimeException {
-	if (isTesting) {
-	    return "test";
-	}
-
-	Principal prin = req.getUserPrincipal();
-	if (prin == null) {
-	    throw new RuntimeException(
-		    "Trying to get username but principal object missing. Request is " + req.toString());
-	}
-
-	String username = prin.getName();
-	if (username == null) {
-	    throw new RuntimeException("Name missing from principal object. Request is " + req.toString()
-		    + " Principal object is " + prin.toString());
-	}
-
-	return username;
     }
 
     /**
@@ -555,7 +468,6 @@ public class WebUtil {
      * @return
      */
     public static String encodeLessonId(Long lessonId) {
-
 	String encodedLessonId = lessonId.toString();
 	encodedLessonId = encodedLessonId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
 	encodedLessonId = encodedLessonId.replace('1', URL_SHORTENING_CYPHER.charAt(1));

@@ -370,6 +370,11 @@ public class UserManagementService implements IUserManagementService {
 	List results = baseDAO.findByProperty(User.class, "login", login);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
+    
+    @Override
+    public User getUserById(Integer userId) {
+	return (User) findById(User.class, userId);
+    }   
 
     @Override
     public void updatePassword(String login, String password) {

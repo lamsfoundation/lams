@@ -159,7 +159,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
     private Logger log = Logger.getLogger(ExportToolContentService.class);
 
-     // export tool content zip file prefix
+    // export tool content zip file prefix
     public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
 
     public static final String EXPORT_LDCONTENT_ZIP_PREFIX = "lams_ldcontent_";
@@ -206,7 +206,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private ILearningDesignService learningDesignService;
 
     private ApplicationContext applicationContext;
-        
 
     // save list of all tool file node class information. One tool may have
     // over one file node, such as
@@ -637,6 +636,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	try {
 	    if (extension.equalsIgnoreCase(".zip")) {
+		if (!FileUtil.isVirusFree(new FileInputStream(designFile))) {
+		    throw new ImportToolContentException("Virus found in imported design file");
+		}
+
 		String ldPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename);
 
 		File fullFilePath = new File(
@@ -1165,7 +1168,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		idx++;
 	    }
 	}
-	Set<Activity> actList = new TreeSet<Activity>(new ActivityOrderComparator());
+	Set<Activity> actList = new TreeSet<>(new ActivityOrderComparator());
 	Map<Long, Activity> activityMapper = new HashMap<>();
 	Map<Integer, Activity> activityByUIIDMapper = new HashMap<>();
 
@@ -1211,7 +1214,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    if (parent.isComplexActivity()) {
 			Set<Activity> set = ((ComplexActivity) parent).getActivities();
 			if (set == null) {
-			    set = new TreeSet<Activity>(new ActivityOrderComparator());
+			    set = new TreeSet<>(new ActivityOrderComparator());
 			    ((ComplexActivity) parent).setActivities(set);
 			}
 			if (!removedActMap.containsKey(actDto.getActivityID())) {
@@ -1407,9 +1410,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
 	if ((addSuffix == null) || Boolean.valueOf(addSuffix)) {
 	    String title = ld.getTitle();
-	    if (title == null || title.trim().length() == 0)
+	    if (title == null || title.trim().length() == 0) {
 		title = "unknown";
-	    ld.setTitle(learningDesignService.getUniqueNameForLearningDesign(ld.getTitle(), folder.getWorkspaceFolderId()));
+	    }
+	    ld.setTitle(
+		    learningDesignService.getUniqueNameForLearningDesign(ld.getTitle(), folder.getWorkspaceFolderId()));
 	    learningDesignDAO.update(ld);
 	    // persist
 	}
@@ -2017,18 +2022,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     public MessageService getMessageService() {
-        return messageService;
+	return messageService;
     }
 
     public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
+	this.messageService = messageService;
     }
 
     public ILearningDesignService getLearningDesignService() {
-        return learningDesignService;
+	return learningDesignService;
     }
 
     public void setLearningDesignService(ILearningDesignService learningDesignService) {
-        this.learningDesignService = learningDesignService;
+	this.learningDesignService = learningDesignService;
     }
 }

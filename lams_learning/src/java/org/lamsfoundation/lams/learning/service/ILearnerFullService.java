@@ -15,7 +15,6 @@ import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * Contains methods intended for internal usage by lams_learning.
@@ -23,9 +22,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  * @author Andrey Balan
  */
 public interface ILearnerFullService extends ILearnerService {
-
-    /** Get the user service. Used when the action needs the real user object, not just the userId */
-    IUserManagementService getUserManagementService();
 
     /**
      * Get the last attempt ID for the given learner and lesson.
@@ -175,6 +171,4 @@ public interface ILearnerFullService extends ILearnerService {
     /* Added for RepopulateProgressMarksServlet - can be removed later */
     String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList, LearnerProgress learnerProgress,
 	    boolean updateGradebookForAll);
-
-    IActivityDAO getActivityDAO();
 }

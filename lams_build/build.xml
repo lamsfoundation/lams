@@ -438,6 +438,32 @@
 
 
 
+		<copy todir="${server.home}/modules/system/layers/base/xyz/capybara/clamav-client/main" overwrite="true" verbose="true">
+			<fileset dir="lib/clamav">
+				<include name="clamav-client-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/xyz/capybara/clamav-client/main/module.xml"
+			  file="lib/clamav/clamav.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/jetbrains/kotlin/kotlin-stdlib/main" overwrite="true" verbose="true">
+			<fileset dir="lib/clamav">
+				<include name="kotlin-stdlib-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/jetbrains/kotlin/kotlin-stdlib/main/module.xml"
+			  file="lib/clamav/kotlin.stdlib.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/io/github/microutils/kotlin-logging/main" overwrite="true" verbose="true">
+			<fileset dir="lib/clamav">
+				<include name="kotlin-logging-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/io/github/microutils/kotlin-logging/main/module.xml"
+			  file="lib/clamav/kotlin.logging.module.xml" overwrite="true" verbose="true" />
+			
+		
+			
 		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/fckeditor">
 				<include name="fckeditor-*.jar" />

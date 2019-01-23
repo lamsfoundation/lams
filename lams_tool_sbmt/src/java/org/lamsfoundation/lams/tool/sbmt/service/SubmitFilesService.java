@@ -503,7 +503,7 @@ public class SubmitFilesService
     private void removeToolSession(SubmitFilesSession session) {
 	Set<SubmissionDetails> filesUploaded = session.getSubmissionDetails();
 	if (filesUploaded != null) {
-	    Iterator<SubmissionDetails>fileIterator = filesUploaded.iterator();
+	    Iterator<SubmissionDetails> fileIterator = filesUploaded.iterator();
 	    while (fileIterator.hasNext()) {
 		SubmissionDetails details = fileIterator.next();
 		try {
@@ -594,18 +594,8 @@ public class SubmitFilesService
 	    String fileName = file.getOriginalFilename();
 	    try {
 		node = sbmtToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
-	    } catch (InvalidParameterException e) {
-		throw new SubmitFilesException(
-			"FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (FileNotFoundException e) {
-		throw new SubmitFilesException(
-			"FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (RepositoryCheckedException e) {
-		throw new SubmitFilesException(
-			"FileNotFoundException occured while trying to upload File" + e.getMessage());
-	    } catch (IOException e) {
-		throw new SubmitFilesException(
-			"FileNotFoundException occured while trying to upload File" + e.getMessage());
+	    } catch (RepositoryCheckedException | IOException e) {
+		throw new SubmitFilesException(e.getMessage());
 	    }
 	}
 	return node;
@@ -615,9 +605,9 @@ public class SubmitFilesService
     public List<FileDetailsDTO> getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale,
 	    boolean includeRemovedFiles) {
 	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
-	SortedSet<FileDetailsDTO> details = new TreeSet<FileDetailsDTO>(this.new FileDtoComparator());
+	SortedSet<FileDetailsDTO> details = new TreeSet<>(this.new FileDtoComparator());
 	if (list == null) {
-	    return new ArrayList<FileDetailsDTO>(details);
+	    return new ArrayList<>(details);
 	}
 
 	NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
@@ -627,7 +617,7 @@ public class SubmitFilesService
 		details.add(detailDto);
 	    }
 	}
-	return new ArrayList<FileDetailsDTO>(details);
+	return new ArrayList<>(details);
     }
 
     @Override
@@ -662,7 +652,7 @@ public class SubmitFilesService
 		userFileList = map.get(submitUserDTO);
 		// if it is first time to this user, creating a new ArrayList for this user.
 		if (userFileList == null) {
-		    userFileList = new ArrayList<FileDetailsDTO>();
+		    userFileList = new ArrayList<>();
 		}
 		userFileList.add(detailDto);
 		map.put(submitUserDTO, userFileList);
@@ -782,7 +772,7 @@ public class SubmitFilesService
 	Long sessionID = session.getSessionID();
 
 	//calculate users' total marks
-	Map<Integer, Float> userIdToTotalMarkMap = new TreeMap<Integer, Float>();
+	Map<Integer, Float> userIdToTotalMarkMap = new TreeMap<>();
 	if (updateMarksForAllSessionUsers) {
 	    List<SubmissionDetails> allDetails = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 	    for (SubmissionDetails details : allDetails) {
@@ -941,7 +931,7 @@ public class SubmitFilesService
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
 		SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
 	if (notifyLearnersOnMarkRelease) {
-	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<Integer, StringBuilder>();
+	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
 
 	    List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 	    for (SubmissionDetails details : list) {
@@ -1052,7 +1042,7 @@ public class SubmitFilesService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);

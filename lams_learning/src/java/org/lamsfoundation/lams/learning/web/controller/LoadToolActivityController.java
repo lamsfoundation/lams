@@ -38,6 +38,8 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,16 +61,15 @@ public class LoadToolActivityController {
     public static final String PARAM_ACTIVITY_URL = "activityURL";
     public static final String PARAM_IS_BRANCHING = "isBranching";
 
-    private static final Map<Long, Object> toolSessionCreationLocks = new TreeMap<>();
-
     /**
      * Gets an activity from the request (attribute) and forwards onto a loading page.
      */
     @RequestMapping("/LoadToolActivity")
     public String execute(@ModelAttribute ActivityForm form, HttpServletRequest request, HttpServletResponse response) {
-
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
 
 	/*
 	 * Synchronise calls to the same activity and attempt to create a session, if it does not exist.

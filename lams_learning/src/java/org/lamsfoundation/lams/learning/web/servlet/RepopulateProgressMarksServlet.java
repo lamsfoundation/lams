@@ -64,6 +64,8 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(RepopulateProgressMarksServlet.class);
 
     @Autowired
+    private IActivityDAO activityDAO;
+    @Autowired
     private ILogEventService logEventService;
     @Autowired
     private ILessonService lessonService;
@@ -81,7 +83,6 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 
@@ -113,7 +114,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 		    .toString();
 
 	    ActivitiesToCheckProcessor processor = new ActivitiesToCheckProcessor(lesson.getLearningDesign(),
-		    learnerService.getActivityDAO());
+		    activityDAO);
 	    processor.parseLearningDesign();
 	    ArrayList<Activity> activityList = processor.getActivityList();
 

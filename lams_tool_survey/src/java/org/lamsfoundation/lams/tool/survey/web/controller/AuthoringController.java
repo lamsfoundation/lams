@@ -579,9 +579,11 @@ public class AuthoringController {
 	surveyPO.setConditions(conditions);
 
 	//permanently remove conditions from DB
+	// don't want them to try to delete the related questions and there is a cacade all here to make sure the condition itself is deleted, so clear the question link
 	iter = delConditions.iterator();
 	while (iter.hasNext()) {
 	    SurveyCondition condition = (SurveyCondition) iter.next();
+	    condition.getQuestions().clear();
 	    iter.remove();
 	    service.deleteCondition(condition);
 	}

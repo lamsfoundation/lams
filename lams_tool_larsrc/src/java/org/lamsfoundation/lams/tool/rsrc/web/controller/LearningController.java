@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -74,7 +73,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Steve.Ni
@@ -155,7 +153,7 @@ public class LearningController {
 	// check whether there is only one resource item and run auto flag is true or not.
 	boolean runAuto = false;
 	Long runAutoItemUid = null;
-	if (resource.isRunAuto() && items != null ) {
+	if (resource.isRunAuto() && items != null) {
 	    int itemsNumber = 0;
 	    for (ResourceItem item : items) {
 		// only visible item can be run auto.
@@ -165,7 +163,7 @@ public class LearningController {
 		}
 	    }
 	    // can't autorun if there is more than one!
-	    if ( itemsNumber == 1 ) {
+	    if (itemsNumber == 1) {
 		runAuto = true;
 	    } else {
 		runAutoItemUid = null;
@@ -247,7 +245,7 @@ public class LearningController {
 	    resourceService.retrieveComplete(resourceItemList, resourceUser);
 	}
 	int numItemsCompleted = 0;
-	for ( ResourceItem item: resourceItemList ) {
+	for (ResourceItem item : resourceItemList) {
 	    if (item.isComplete()) {
 		numItemsCompleted++;
 	    }
@@ -378,8 +376,10 @@ public class LearningController {
 	    try {
 		resourceService.uploadResourceItemFile(item, resourceItemForm.getFile());
 	    } catch (UploadResourceFileException e) {
-		LearningController.log.error("Failed upload Resource File " + e.toString());
-		return "error";
+		errorMap.add("GLOBAL",
+			messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
+		request.setAttribute("errorMap", errorMap);
+		return "pages/authoring/parts/addurl";
 	    }
 	    item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 

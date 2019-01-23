@@ -27,13 +27,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.internet.MimeUtility;
@@ -59,6 +62,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+
+import xyz.capybara.clamav.ClamavClient;
+import xyz.capybara.clamav.ClamavException;
+import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 /**
  * General File Utilities
@@ -640,7 +647,7 @@ public class FileUtil {
 	((Configurable) uuidGen).configure(StringType.INSTANCE, new Properties(), null);
 
 //	Serializable generate(SharedSessionContractImplementor session, Object object)
-	
+
 	// lowercase to resolve OS issues
 	return ((String) uuidGen.generate(null, null)).toLowerCase();
     }
@@ -846,5 +853,39 @@ public class FileUtil {
 	    FileUtil.log.error("Error while writing out XML document to string", e);
 	    return null;
 	}
+    }
+
+    /**
+     * Checks the given input stream for viruses. Uses ClamAV client.
+     */
+    public static boolean isVirusFree(InputStream inputStream) throws IOException {
+	boolean scanEnabled = Configuration.getAsBoolean(ConfigurationKeys.ANTIVIRUS_ENABLE);
+	if (!scanEnabled) {
+	    return true;
+	}
+
+	// get URL when ClamAV server listens
+	String host = Configuration.get(ConfigurationKeys.ANTIVIRUS_HOST);
+	int port = Configuration.getAsInt(ConfigurationKeys.ANTIVIRUS_PORT);
+	try {
+	    // set up th client
+	    ClamavClient client = new ClamavClient(host, port);
+	    // check if client can connect; if not, it throws ClamavException
+	    client.ping();
+	    // try scanning
+	    ScanResult result = client.scan(inputStream);
+	    if (result instanceof ScanResult.OK) {
+		if (log.isDebugEnabled()) {
+		    log.debug("File scan completed successfully");
+		}
+		return true;
+	    }
+	    // if the result is not OK, write out viruses which have been found
+	    Map<String, Collection<String>> viruses = ((ScanResult.VirusFound) result).getFoundViruses();
+	    log.info("When uploading a file found viruses: " + viruses.toString());
+	} catch (ClamavException e) {
+	    throw new IOException("Could not connect to ClamAV server at " + host + ":" + port, e);
+	}
+	return false;
     }
 }
