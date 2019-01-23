@@ -32,18 +32,17 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.QbQuestion;
+import org.lamsfoundation.lams.qb.QbToolQuestion;
 
 /**
  * <p>
@@ -55,7 +54,9 @@ import org.lamsfoundation.lams.qb.QbQuestion;
  */
 @Entity
 @Table(name = "tl_lamc11_que_content")
-public class McQueContent implements Serializable, Comparable<McQueContent> {
+// in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
+@PrimaryKeyJoinColumn(name = "uid")
+public class McQueContent extends QbToolQuestion implements Serializable, Comparable<McQueContent> {
     public static class OptionComparator implements Comparator<McOptsContent> {
 	@Override
 	public int compare(McOptsContent o1, McOptsContent o2) {
@@ -66,18 +67,6 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     public static final Comparator<McOptsContent> OPTION_COMPARATOR = new OptionComparator();
 
     private static final long serialVersionUID = 4022287106119453962L;
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
-
-    // part of question's data is stored in Question Bank's DB tables
-    // getters and setters of this data (question, mark, feedback) are mapped to QbQuestion
-    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
-	    CascadeType.PERSIST, CascadeType.REFRESH })
-    @JoinColumn(name = "qb_question_uid")
-    private QbQuestion qbQuestion;
 
     /**
      * It stores sha1(question) value that allows us to search for the McQueContentc with the same question
@@ -140,22 +129,6 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 	    newMcOptionsContent.add(mcNewOptsContent);
 	}
 	return newMcOptionsContent;
-    }
-
-    public Long getUid() {
-	return this.uid;
-    }
-
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
-    public QbQuestion getQbQuestion() {
-	return qbQuestion;
-    }
-
-    public void setQbQuestion(QbQuestion qbQuestion) {
-	this.qbQuestion = qbQuestion;
     }
 
     public String getQuestion() {
