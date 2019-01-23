@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,11 +38,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.QbQuestion;
 
 /**
@@ -55,6 +56,15 @@ import org.lamsfoundation.lams.qb.QbQuestion;
 @Entity
 @Table(name = "tl_lamc11_que_content")
 public class McQueContent implements Serializable, Comparable<McQueContent> {
+    public static class OptionComparator implements Comparator<McOptsContent> {
+	@Override
+	public int compare(McOptsContent o1, McOptsContent o2) {
+	    return Integer.compare(o1.getQbOption().getDisplayOrder(), o2.getQbOption().getDisplayOrder());
+	}
+    }
+
+    public static final Comparator<McOptsContent> OPTION_COMPARATOR = new OptionComparator();
+
     private static final long serialVersionUID = 4022287106119453962L;
 
     @Id
@@ -85,7 +95,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     // TODO Make this orphanRemoval = true, but first fix McService.createQuestions() to stop mucking around with the collections.
     // Currently options that are deleted in authoring leave junk records in the database with the mc_que_content_id set to null
     @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("displayOrder")
+    @SortComparator(OptionComparator.class)
     @JoinColumn(name = "mc_que_content_id")
     private Set<McOptsContent> mcOptionsContents;
 
@@ -124,7 +134,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     }
 
     public Set<McOptsContent> deepCopyMcOptionsContent(McQueContent newQueContent) {
-	Set<McOptsContent> newMcOptionsContent = new TreeSet<>();
+	Set<McOptsContent> newMcOptionsContent = new TreeSet<>(McQueContent.OPTION_COMPARATOR);
 	for (McOptsContent mcOptsContent : this.getMcOptionsContents()) {
 	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
 	    newMcOptionsContent.add(mcNewOptsContent);

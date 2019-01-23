@@ -45,13 +45,14 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
 -- create Question Bank option
 CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
 							 `qb_question_uid` BIGINT NOT NULL,
+							 `display_order`TINYINT NOT NULL DEFAULT 1,
 							 `name` TEXT NOT NULL,
 							 `correct` TINYINT(1) NOT NULL DEFAULT 0,
 							 PRIMARY KEY (uid),
 							 CONSTRAINT FK_lams_qb_option_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE);
 
-INSERT INTO lams_qb_option (qb_question_uid, name, correct)
-	SELECT DISTINCT q.qb_question_uid, TRIM(o.mc_que_option_text), o.correct_option
+INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
+	SELECT DISTINCT q.qb_question_uid, o.displayOrder, TRIM(o.mc_que_option_text), o.correct_option
 	FROM tl_lamc11_que_content AS q JOIN tl_lamc11_options_content AS o ON q.uid = o.mc_que_content_id;
 	
 ALTER TABLE tl_lamc11_options_content ADD COLUMN qb_option_uid BIGINT AFTER uid,
@@ -60,11 +61,12 @@ ALTER TABLE tl_lamc11_options_content ADD COLUMN qb_option_uid BIGINT AFTER uid,
 UPDATE tl_lamc11_options_content AS mco, tl_lamc11_que_content AS mcq, lams_qb_option AS qo
 	SET mco.qb_option_uid = qo.uid
 	WHERE TRIM(mco.mc_que_option_text) = qo.name
-	AND qo.qb_question_uid = mcq.qb_question_uid
-	AND mco.mc_que_content_id = mcq.uid;
+		AND qo.qb_question_uid = mcq.qb_question_uid
+		AND mco.mc_que_content_id = mcq.uid;
 	
 ALTER TABLE tl_lamc11_options_content DROP COLUMN mc_que_option_text,
-									  DROP COLUMN correct_option;
+									  DROP COLUMN correct_option,
+									  DROP COLUMN displayOrder;
 
 ----------------------Put all sql statements above here-------------------------
 

@@ -55,9 +55,6 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column
-    private Integer displayOrder;
-
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE,
 	    CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "qb_option_uid")
@@ -73,15 +70,13 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
     @Transient
     private String escapedOptionText;
 
-    public McOptsContent(Integer displayOrder, QbOption qbOption, McQueContent mcQueContent) {
-	this.displayOrder = displayOrder;
+    public McOptsContent(QbOption qbOption, McQueContent mcQueContent) {
 	this.qbOption = qbOption;
 	this.mcQueContent = mcQueContent;
     }
 
     public static McOptsContent newInstance(McOptsContent mcOptsContent, McQueContent newMcQueContent) {
-	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(), mcOptsContent.getQbOption(),
-		newMcQueContent);
+	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getQbOption(), newMcQueContent);
 	return newMcOptsContent;
     }
 
@@ -113,6 +108,14 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 	qbOption.setName(mcQueOptionText);
     }
 
+    public Integer getDisplayOrder() {
+	return qbOption.getDisplayOrder();
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+	qbOption.setDisplayOrder(displayOrder);
+    }
+
     public McQueContent getMcQueContent() {
 	return this.mcQueContent;
     }
@@ -135,21 +138,6 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 	} else {
 	    return (int) (uid.longValue() - optContent.uid.longValue());
 	}
-    }
-
-    /**
-     * @return Returns the displayOrder.
-     */
-    public Integer getDisplayOrder() {
-	return displayOrder;
-    }
-
-    /**
-     * @param displayOrder
-     *            The displayOrder to set.
-     */
-    public void setDisplayOrder(Integer displayOrder) {
-	this.displayOrder = displayOrder;
     }
 
     public boolean isSelected() {

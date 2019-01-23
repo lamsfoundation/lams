@@ -138,8 +138,8 @@ public class McPedagogicalPlannerController {
 			    QbOption qbOption = new QbOption();
 			    qbOption.setName(answerDTO.getCandidateAnswer());
 			    qbOption.setCorrect(McAppConstants.CORRECT.equals(answerDTO.getCorrect()));
-			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1, qbOption,
-				    mcQueContent);
+			    qbOption.setDisplayOrder(candidateAnswerDTOIndex + 1);
+			    McOptsContent candidateAnswer = new McOptsContent(qbOption, mcQueContent);
 			    candidateAnswer.setMcQueContent(mcQueContent);
 			    candidateAnswers.add(candidateAnswer);
 			}

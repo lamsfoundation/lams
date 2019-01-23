@@ -41,7 +41,7 @@ import org.springframework.stereotype.Repository;
 public class McOptionsContentDAO extends LAMSBaseDAO implements IMcOptionsContentDAO {
     private static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
 
-    private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContent.uid=:mcQueContentUid order by mcOptsContent.displayOrder";
+    private static final String FIND_OPTIONS_BY_QUESTION_UID = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContent.uid=:mcQueContentUid order by mcOptsContent.qbOption.displayOrder";
 
     @SuppressWarnings("unchecked")
     @Override

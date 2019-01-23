@@ -352,7 +352,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    // persist candidate answers
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
-	    Set<McOptsContent> newOptions = new HashSet<>();
+	    Set<McOptsContent> newOptions = new TreeSet<>(McQueContent.OPTION_COMPARATOR);
 	    int displayOrderOption = 1;
 	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getOptions());
 	    for (McOptionDTO optionDTO : optionDTOs) {
@@ -2034,8 +2034,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		QbOption qbOption = new QbOption();
 		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
 		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
-		question.getMcOptionsContents().add(
-			new McOptsContent(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER), qbOption, question));
+		qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
+		question.getMcOptionsContents().add(new McOptsContent(qbOption, question));
 	    }
 	    saveOrUpdateMcQueContent(question);
 	}

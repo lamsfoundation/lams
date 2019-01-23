@@ -35,6 +35,9 @@ public class QbOption implements Serializable, Cloneable {
     @Column
     private boolean correct = false;
 
+    @Column(name = "display_order")
+    private int displayOrder = 1;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "qb_question_uid")
     private QbQuestion question;
@@ -55,12 +58,17 @@ public class QbOption implements Serializable, Cloneable {
     @Override
     public boolean equals(Object o) {
 	QbOption other = (QbOption) o;
-	return new EqualsBuilder().append(this.name, other.name).append(this.correct, other.correct).isEquals();
+	return new EqualsBuilder().append(this.name, other.name).append(this.correct, other.correct)
+		.append(this.displayOrder, other.displayOrder).isEquals();
     }
 
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(this.name).append(this.correct).toHashCode();
+    }
+
+    public Long getUid() {
+	return uid;
     }
 
     public String getName() {
@@ -79,15 +87,19 @@ public class QbOption implements Serializable, Cloneable {
 	this.correct = correct;
     }
 
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
+    }
+
     public QbQuestion getQuestion() {
 	return question;
     }
 
     public void setQuestion(QbQuestion question) {
 	this.question = question;
-    }
-
-    public Long getUid() {
-	return uid;
     }
 }
