@@ -30,7 +30,6 @@ CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
 
 -- fill Question Bank table with unique questions, with manually incremented question ID
 SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FROM lams_qb_question);
-SET @start_question_id = @question_id;
 INSERT INTO lams_qb_question SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, question, mark, feedback
 	FROM (SELECT DISTINCT TRIM(question) AS question, mark, IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback FROM tl_lamc11_que_content) AS mcq;
 
@@ -41,7 +40,7 @@ FROM tl_lamc11_que_content AS mcq JOIN lams_qb_question AS qb
 	ON TRIM(mcq.question) = qb.name
 	AND mcq.mark = qb.mark 
 	AND (TRIM(mcq.feedback) = qb.feedback OR (IF(TRIM(mcq.feedback) = '', NULL, TRIM(mcq.feedback)) IS NULL AND qb.feedback IS NULL))
-WHERE qb.question_id > @start_question_id;
+WHERE qb.type = 1;
 
 -- remove columns from MCQ which are duplicated in Question Bank
 ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
