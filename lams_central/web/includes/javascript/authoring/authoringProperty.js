@@ -1509,7 +1509,7 @@ PropertyLib = {
 			// generate a name and an UIID if they do not exist
 			var item = itemIndex > existingList.length ? {} : existingList[itemIndex - 1];
 			if (!item[nameAttr]) {
-				item[nameAttr] = prefix + itemIndex;
+				item[nameAttr] = prefix + ' ' + itemIndex;
 			}
 			if (!item.uiid) {
 				item.uiid = ++layout.ld.maxUIID;

@@ -1842,6 +1842,10 @@ GeneralLib = {
 											'uiid' 	  : this.groupUIID,
 											'orderID' : this.orderID
 											});
+										
+										if (this.groupUIID && layout.ld.maxUIID < this.groupUIID) {
+											layout.ld.maxUIID = this.groupUIID;
+										}
 									});
 									
 									// sort groups by asceding order ID
