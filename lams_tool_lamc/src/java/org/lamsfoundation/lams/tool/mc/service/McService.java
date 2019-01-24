@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.Tool;
@@ -138,6 +139,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     private IToolContentHandler mcToolContentHandler = null;
     private IExportToolContentService exportContentService;
     private ICoreNotebookService coreNotebookService;
+    private IQbService qbService;
 
     private MessageService messageService;
 
@@ -288,7 +290,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// if it does not exist, create a new one
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
-		qbQuestion.setQuestionId(mcQueContentDAO.getMaxQbQuestionId());
+		qbQuestion.setQuestionId(qbService.getMaxQuestionId());
 	    }
 	    // make a clone to check if data changed
 	    QbQuestion qbQuestionClone = qbQuestion.clone();
@@ -327,7 +329,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// if vital data changed, the already modified clone becomes the new question
 		qbQuestion = qbQuestionClone;
 		// create a new question version instead of modifying existing one
-		int newVersion = mcQueContentDAO.getMaxQbQuestionVersion(qbQuestion.getQuestionId());
+		int newVersion = qbService.getMaxQuestionVersion(qbQuestion.getQuestionId());
 		qbQuestion.setVersion(newVersion);
 	    } else {
 		// if no modification was made, prevent clone from being persisted
@@ -1878,6 +1880,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
      */
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public void setQbService(IQbService qbService) {
+	this.qbService = qbService;
     }
 
     @Override

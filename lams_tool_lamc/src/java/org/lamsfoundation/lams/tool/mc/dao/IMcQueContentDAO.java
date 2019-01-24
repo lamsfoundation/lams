@@ -92,12 +92,4 @@ public interface IMcQueContentDAO extends IBaseDAO {
     List getAllQuestionEntriesSorted(final long qaContentId);
 
     void releaseQuestionFromCache(McQueContent question);
-
-    // finds next question ID for Question Bank question
-    // it will be moved to a common service in the future
-    public int getMaxQbQuestionId();
-
-    // finds next version for given question ID for Question Bank question
-    // it will be moved to a common service in the future
-    public int getMaxQbQuestionVersion(Integer qbQuestionId);
 }

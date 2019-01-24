@@ -114,20 +114,4 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     public void releaseQuestionFromCache(McQueContent question) {
 	getSession().evict(question);
     }
-
-    @Override
-    public int getMaxQbQuestionId() {
-	Object result = this.getSession().createQuery("SELECT MAX(questionId) FROM QbQuestion").uniqueResult();
-	Integer max = (Integer) result;
-	return max == null ? 1 : max + 1;
-    }
-
-    @Override
-    public int getMaxQbQuestionVersion(Integer qbQuestionId) {
-	Object result = this.getSession()
-		.createQuery("SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId")
-		.setParameter("questionId", qbQuestionId).uniqueResult();
-	Integer max = (Integer) result;
-	return max == null ? 1 : max + 1;
-    }
 }

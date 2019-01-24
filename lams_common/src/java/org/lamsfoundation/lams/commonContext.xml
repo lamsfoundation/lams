@@ -537,6 +537,27 @@
 		</property>
 	</bean>
 
+
+	<bean id="qbServiceTarget" class="org.lamsfoundation.lams.qb.service.QbService">
+		<property name="qbDAO"><ref bean="qbDAO"/></property>
+	</bean>
+	
+	<bean id="qbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="qbServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
 	<!-- Learning Design related beans-->
 	
 	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
@@ -677,6 +698,10 @@
 		
 	<!-- Outcome related beans -->
 	<bean id="outcomeDAO" class="org.lamsfoundation.lams.outcome.dao.hibernate.OutcomeDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="qbDAO" class="org.lamsfoundation.lams.qb.dao.hibernate.QbDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	
