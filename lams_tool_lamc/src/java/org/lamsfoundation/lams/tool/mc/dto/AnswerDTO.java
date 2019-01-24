@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dto;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**

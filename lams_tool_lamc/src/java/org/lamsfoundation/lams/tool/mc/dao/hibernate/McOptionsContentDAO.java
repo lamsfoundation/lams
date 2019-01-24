@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McOptsContent;

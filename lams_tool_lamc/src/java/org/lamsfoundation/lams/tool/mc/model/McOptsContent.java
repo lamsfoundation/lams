@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.mc.model;
 
-import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.model.QbOption;
 
 /**
  * Acts as a DTO which envelops QbOption and adds extra, transient fields.

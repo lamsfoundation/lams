@@ -34,9 +34,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.qb.QbOption;
-import org.lamsfoundation.lams.qb.QbQuestion;
-import org.lamsfoundation.lams.qb.QbToolQuestion;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * <p>

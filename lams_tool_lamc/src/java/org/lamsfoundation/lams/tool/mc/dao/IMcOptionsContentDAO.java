@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 
 /**

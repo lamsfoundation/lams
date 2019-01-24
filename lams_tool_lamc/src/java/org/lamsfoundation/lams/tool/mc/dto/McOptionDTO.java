@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.mc.dto;
 
-import org.lamsfoundation.lams.qb.QbOption;
+import org.lamsfoundation.lams.qb.model.QbOption;
 
 /**
  * DTO that holds candiate answers data for summary page

@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.qb;
+package org.lamsfoundation.lams.qb.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
