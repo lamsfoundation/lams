@@ -1,11 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
+<script>
+$(document).ready(function(){
+	//update slider's label with the initial value
+	$('.slider').trigger('slide');
+})
+</script>
+
 <div id="optionArea">
 	<input type="hidden" name="optionCount" id="optionCount" value="${fn:length(optionList)}">
 	<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 	
-	<table class="table table-condensed table-striped">
+	<div id="option-table" class="hover-active">
+	
 		<c:forEach var="option" items="${optionList}" varStatus="status">
+		<table>
 			<tr>
+			
+				<td>
+					<span>${status.index+1}</span>
+				</td>
+				
 				<td>
 					<c:choose>
 						<c:when test="${questionType == 1}">
@@ -29,7 +43,8 @@
 					</c:choose>	
 				</td>
 				
-				<td class="arrows">
+				<td class="arrows" style="display: none;">
+					<div class="arrows-div">
 					<!-- Don't display up icon if first line -->
 					<c:if test="${not status.first}">
 		 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" 
@@ -40,16 +55,19 @@
 						<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" 
 								onclick="javascript:downOption(${status.index})"/>
 		 			</c:if>
+		 			</div>
 				</td>			
 
 				<c:if test="${!isAuthoringRestricted}">
 					<td width="30px">
-						<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
+						<i class="fa fa-trash delete-button" title="<fmt:message key="label.authoring.basic.delete" />"
 							onclick="javascript:removeOption(${status.index})"></i>
 					</td>
 				</c:if>
 				
 			</tr>
+			</table>
 		</c:forEach>
-	</table>
+	</div>
+
 </div>

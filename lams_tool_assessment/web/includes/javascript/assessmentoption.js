@@ -1,9 +1,9 @@
-	//This is Assessment Question option area.
-	var optionTargetDiv = "#optionArea";
+//This is Assessment Question option area.
+var optionTargetDiv = "#optionArea";
 	
-	// 	  Please set these 2 variables in JSP file for using tag reason:
-	//    var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
-	//    var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
+// 	  Please set these 2 variables in JSP file for using tag reason:
+//    var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
+//    var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
 	
 	function addOption(){
 		//store old InstanceIds before doing Ajax call. We need to keep record of old ones to prevent reinitializing new CKEditor two times.
@@ -23,6 +23,9 @@
 				contentFolderID: contentFolderID,
 				questionType: questionType,
 				optionList: optionList 
+			}, 
+			function() {
+				initializeOptionItems();
 			}
 		);
 	}
@@ -34,13 +37,16 @@
  		var optionList = $("#optionForm").serialize(true);
  		$.ajaxSetup({ cache: true });
 		$(optionTargetDiv).load(
-				url,
-				{
-					contentFolderID: contentFolderID,					
-					questionType: questionType,
-					optionIndex: idx,
-					optionList: optionList 
-				}
+			url,
+			{
+				contentFolderID: contentFolderID,					
+				questionType: questionType,
+				optionIndex: idx,
+				optionList: optionList 
+			}, 
+			function() {
+				initializeOptionItems();
+			}
 		);
 	}
 	function upOption(idx){
@@ -50,13 +56,16 @@
  		var optionList = $("#optionForm").serialize(true);
  		$.ajaxSetup({ cache: true });
 		$(optionTargetDiv).load(
-				url,
-				{
-					contentFolderID: contentFolderID,					
-					questionType: questionType,
-					optionIndex: idx,
-					optionList: optionList 
-				}
+			url,
+			{
+				contentFolderID: contentFolderID,					
+				questionType: questionType,
+				optionIndex: idx,
+				optionList: optionList 
+			}, 
+			function() {
+				initializeOptionItems();
+			}
 		);
 	}
 	function downOption(idx){
@@ -66,13 +75,16 @@
  		var optionList = $("#optionForm").serialize(true);
  		$.ajaxSetup({ cache: true });
  		$(optionTargetDiv).load(
-				url,
-				{
-					contentFolderID: contentFolderID,	
-					questionType: questionType,
-					optionIndex: idx,
-					optionList: optionList 
-				}
+			url,
+			{
+				contentFolderID: contentFolderID,	
+				questionType: questionType,
+				optionIndex: idx,
+				optionList: optionList 
+			}, 
+			function() {
+				initializeOptionItems();
+			}
 		);
 	}
 	

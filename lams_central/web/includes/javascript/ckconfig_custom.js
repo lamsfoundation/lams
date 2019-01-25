@@ -131,7 +131,7 @@ CKEDITOR.config.bootsnippets_files = [CKEDITOR.basePath + '../www/public/ckedito
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,bootstrapTabs,bootpanel,bootsnippets';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,image2,html5audio,confighelper,bootstrapTabs,bootpanel,bootsnippets';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath,about,specialchar';
 CKEDITOR.config.allowedContent = true;
@@ -150,6 +150,13 @@ CKEDITOR.on('instanceCreated', function(e){
 });
 
 CKEDITOR.on('instanceReady', function(e){
+	
+	//add custom classes
+	var classes = e.editor.config.classes;
+	if (classes) {
+		e.editor._.editable.$.classList.add(classes);
+	}
+	
 	var height = e.editor.config.height;
 	if ( ! height ) {
 		height = "60px";
