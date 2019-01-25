@@ -47,7 +47,7 @@ public class SubmitFilesImportContentVersionFilter extends ToolContentVersionFil
 	this.removeField(SubmitFilesContent.class, "createdBy");
     }
 
-    public void up20170101To20181202() {
+    public void up20180720To20181202() {
 	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent",
 		"org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent");
 	this.renameClass("org.lamsfoundation.lams.tool.sbmt.SubmitFilesDetails",
