@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
@@ -43,6 +44,9 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 
     private static final long serialVersionUID = 8343443197068061495L;
 
+    @Column(name = "branching_ordered_asc")
+    private Boolean branchingOrderedAsc;
+
     /** default constructor */
     public ToolBranchingActivity() {
 	super();
@@ -58,6 +62,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 
 	ToolBranchingActivity newBranchingActivity = new ToolBranchingActivity();
 	copyBranchingFields(newBranchingActivity);
+	newBranchingActivity.branchingOrderedAsc = this.branchingOrderedAsc;
 	copyToNewComplexActivity(newBranchingActivity, uiidOffset);
 
 	// Any grouping attached to a teacher chosen branching was either a runtime grouping
@@ -85,7 +90,7 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
      */
     @Override
     public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
-	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<ValidationErrorDTO>();
+	Vector<ValidationErrorDTO> listOfValidationErrors = new Vector<>();
 
 	if (getDefaultActivity() == null) {
 	    listOfValidationErrors.add(
@@ -140,5 +145,13 @@ public class ToolBranchingActivity extends BranchingActivity implements Serializ
 	}
 
 	return listOfValidationErrors;
+    }
+
+    public Boolean getBranchingOrderedAsc() {
+	return branchingOrderedAsc;
+    }
+
+    public void setBranchingOrderedAsc(Boolean branchingOrderedAsc) {
+	this.branchingOrderedAsc = branchingOrderedAsc;
     }
 }

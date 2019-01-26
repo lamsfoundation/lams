@@ -158,7 +158,7 @@ public class LearnerController {
 	// get user and lesson based on request
 	Integer userId = LearningWebUtil.getUserId();
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	
+
 	try {
 	    // security check
 	    Lesson lesson = learnerService.getLesson(lessonID);
@@ -218,8 +218,8 @@ public class LearnerController {
 	// make a copy of attempted and completed activities
 	Date archiveDate = new Date();
 	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
-	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
-	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
+	Map<Activity, Date> attemptedActivities = new HashMap<>(learnerProgress.getAttemptedActivities());
+	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<>();
 	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
 	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(
 		    entry.getValue().getStartDate(), entry.getValue().getFinishDate());
@@ -384,7 +384,7 @@ public class LearnerController {
 	String type = "a";
 	if (actType.contains("gate")) {
 	    type = "g";
-	} else if (actType.contains("options")) {
+	} else if (actType.contains("options") || actType.contains("ordered")) {
 	    type = "o";
 	} else if (actType.contains("branching")) {
 	    type = "b";

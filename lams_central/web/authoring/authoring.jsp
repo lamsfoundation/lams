@@ -633,6 +633,12 @@
 				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
 				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
 			</tr>
+			<tr id="branchMappingOrderedRow">
+				<td colspan="5">
+					<input id="branchMappingOrderedAscCheckbox" type="checkbox" checked="checked"></input>
+					<fmt:message key="authoring.fla.branch.mapping.ordered.asc" />
+				</td>
+			</tr>
 			<tr>
 				<td colspan="5">
 					<div class="container-fluid">

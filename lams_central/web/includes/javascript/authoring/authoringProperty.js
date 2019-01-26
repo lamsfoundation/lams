@@ -104,6 +104,7 @@ var PropertyDefs = {
 						inputDefinitionRows.hide();
 					}
 				} else {
+					branchingActivity.orderedAsc = null;
 					inputRow.hide();
 					inputDefinitionRows.hide();
 				}
@@ -1078,19 +1079,21 @@ PropertyLib = {
 						// build output dropdown and bind data to each option
 						$.each(activity.input.outputDefinitions,function(){
 							var suffix = '';
-							switch(this.type) {
-								case 'OUTPUT_COMPLEX' :
-									suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
-									break;
-														
-								case 'OUTPUT_LONG' :
-									suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-									break;
-									
-								case 'OUTPUT_BOOLEAN' :
-									suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
-									break;
-							};
+							if (!this.showConditionNameOnly) {
+								switch(this.type) {
+									case 'OUTPUT_COMPLEX' :
+										suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
+										break;
+															
+									case 'OUTPUT_LONG' :
+										suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+										break;
+										
+									case 'OUTPUT_BOOLEAN' :
+										suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+										break;
+								};
+							}
 			
 							this.toolActivityUIID = activity.input.uiid;
 							var option = $('<option />')
@@ -1148,19 +1151,19 @@ PropertyLib = {
 							// build list using conditions from Tool activity output definitions
 							$.each(output.conditions, function(){
 								// use an existing mapping or build a new one
-								var mappingEntry = mappingEntries[this.conditionId] || {};
+								var mappingEntry = this.conditionId ? (mappingEntries[this.conditionId] || {}) : {};
 								
 								mappingEntry.condition = {
 									'name' 			  : this.name,
 								    'displayName' 	  : this.displayName,
-								    'type' 			  : 'OUTPUT_COMPLEX',
+								    'type' 			  : this.type,
 								    'conditionID'	  : this.conditionId,
 								    'toolActivityUIID' : output.toolActivityUIID
 								};
 								
 								$('<li />').text(this.displayName)
-								   		   .data('mappingEntry', mappingEntry)			   
-								   		   .appendTo(list);
+										   .appendTo(list)
+								   		   .data('mappingEntry', mappingEntry);			   
 							});
 						}
 					} else {
@@ -1355,7 +1358,7 @@ PropertyLib = {
 	        			assignedToDefault = false,
 	        			defaultBranch = isGate ? 'closed' : null,
 	        			close = true;
-	        		
+            		
             		// see what was mapped
 	    			$.each(mappingCopy, function(){
 	    				var mappingEntry = this;
@@ -1410,6 +1413,8 @@ PropertyLib = {
 	    			
 	    			if (close) {
 	    				activity.conditionsToBranches = mappingCopy;
+	    				activity.orderedAsc = $('#branchMappingOrderedRow', dialog).is(':visible') ? 
+     						   				  $('#branchMappingOrderedAscCheckbox', dialog).prop('checked') : null;
 	            		GeneralLib.setModified(true);
 	    			}
 	    			
@@ -1638,12 +1643,17 @@ PropertyLib = {
 					activity.branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
 		}
 		
+		var orderedAsc = null;
 		$.each(activity.conditionsToBranches, function(){
 			// see what conditions are already mapped to branches/gate states and which are free
 			var entry = this,
 				condition = entry.condition,
 				conditionElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
 										.text(condition.displayName).attr('uiid', entry.uiid);
+			// there are special conditions that tell that this is an ordered branching
+			if (orderedAsc === null && condition.name.startsWith('ordered.answer')){
+				orderedAsc = activity.orderedAsc === null ? true : activity.orderedAsc;
+			}
 			
 			// is it mapped already?
 			if (entry.branch && (isGate || activity.branches.indexOf(entry.branch) != -1)) {
@@ -1661,6 +1671,12 @@ PropertyLib = {
 				conditionElem.appendTo(conditionsCell);
 			}
 		});
+		
+		if (orderedAsc === null) {
+			$('#branchMappingOrderedRow', dialog).hide();
+		} else {
+			$('#branchMappingOrderedRow', dialog).show().prop('checked', orderedAsc);
+		}
 		
 		// find the default branch
 		var defaultBranch = isGate ? 'closed' : null;
@@ -1716,6 +1732,11 @@ PropertyLib = {
 			return;
 		}
 
+		var conditionsLength = activity.input.outputDefinitions.length;
+		ActivityLib.getOutputDefinitions(activity.input);
+		if (conditionsLength != activity.input.outputDefinitions.length) {
+			PropertyLib.fillOutputDefinitionsDropdown(activity.input);
+		}
 		layout.outputConditionsDialog.data('parentObject', activity)
 			  						 .modal('show');
 	},

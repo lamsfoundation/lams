@@ -1950,6 +1950,7 @@ GeneralLib = {
 							// for later reference
 							activityData.activity = branchingEdge;
 							activity = branchingEdge.branchingActivity;
+							activity.orderedAsc = activityData.branchingOrderedAsc;
 							
 							branchingEdge = new ActivityDefs.BranchingEdgeActivity(
 									null, null,
@@ -2648,6 +2649,7 @@ GeneralLib = {
 				'minOptions'			 : activity.minOptions || null,
 				'maxOptions'			 : activity.maxOptions || null,
 				'stopAfterActivity'		 : activity.stopAfterActivity ? true : false,
+				'branchingOrderedAsc'    : activity.orderedAsc,
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName == '<NONE>' ?
 														null : activity.gradebookToolOutputDefinitionName,
