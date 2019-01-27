@@ -86,14 +86,14 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
     @JoinTable(name = "lams_user_group", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     @BatchSize(size = 20)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<User> users = new HashSet<User>();
+    private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "sessionGroup")
     @BatchSize(size = 20)
-    private Set<GroupedToolSession> toolSessions = new HashSet<GroupedToolSession>();
+    private Set<GroupedToolSession> toolSessions = new HashSet<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private Set<BranchActivityEntry> branchActivities = new HashSet<BranchActivityEntry>();
+    private Set<BranchActivityEntry> branchActivities = new HashSet<>();
 
     // ---------------------------------------------------------------------
     // Object creation Methods
@@ -344,6 +344,9 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
     public BranchActivityEntry allocateBranchToGroup(Integer entryUIID, SequenceActivity branch,
 	    BranchingActivity branchingActivity) {
 	BranchActivityEntry entry = new BranchActivityEntry(null, entryUIID, branch, branchingActivity, this);
+	if (getBranchActivities() == null) {
+	    setBranchActivities(new HashSet<BranchActivityEntry>());
+	}
 	getBranchActivities().add(entry);
 	return entry;
     }
