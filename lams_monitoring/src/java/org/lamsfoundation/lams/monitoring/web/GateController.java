@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -257,10 +258,15 @@ public class GateController {
 	} else {
 	    gateForm.setActivityCompletionBased(false);
 	    Lesson lesson = learnerService.getLessonByActivity(scheduleGate);
-	    Calendar startingTime = new GregorianCalendar(TimeZone.getDefault());
-	    startingTime.setTime(lesson.getStartDateTime());
-	    startingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
-	    gateForm.setStartingTime(startingTime.getTime());
+	    Date lessonStartingTime = lesson.getStartDateTime();
+	    if (lessonStartingTime == null && Lesson.NOT_STARTED_STATE.equals(lesson.getLessonStateId())) {
+		// Assume the lesson will start at the scheduled time
+		lessonStartingTime = lesson.getScheduleStartDate();
+	    }
+	    Calendar gateStartingTime = new GregorianCalendar(TimeZone.getDefault());
+	    gateStartingTime.setTime(lessonStartingTime);
+	    gateStartingTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+	    gateForm.setStartingTime(gateStartingTime.getTime());
 	}
 
 	return "gate/scheduleGateContent";
