@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
@@ -1444,6 +1445,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 	baseDAO.insertOrUpdateAll(allCompetenceMappings);
+
+	// Process annotations (regions and labels)
+	for (LearningDesignAnnotation annotation : dto.getAnnotations()) {
+	    annotation.setUid(null);
+	    annotation.setLearningDesignId(ld.getLearningDesignId());
+	    baseDAO.insert(annotation);
+	}
 
 	return ld.getLearningDesignId();
     }
