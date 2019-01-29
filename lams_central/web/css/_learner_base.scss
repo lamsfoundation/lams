@@ -118,6 +118,10 @@ a:focus {
 	background-color: $brand-primary-light;
 }
 
+// override the bootstrap 3.3.7 setting
+label {
+    font-weight: initial;
+}
 
 /* Spacer classes */
 
@@ -581,10 +585,6 @@ a.button-add-item:before {
 
 .rating-criteria-tag .ui-button-icon-only .ui-icon {
     margin-left: 0px;
-}
-
-.rating-criteria-tag label {
-    font-weight: initial;
 }
 
 #criterias-table {
