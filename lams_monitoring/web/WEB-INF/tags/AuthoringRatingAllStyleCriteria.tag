@@ -320,7 +320,7 @@
 		})).append(jQuery('<td/>', {
 			width: '20px',
 			html: '<i class="fa fa-times" title="<fmt:message key="${deleteLabel}"/>"></i>'
-		})).appendTo('#criterias-table');	
+		})).appendTo('#criterias-table-body');	
 		
 		// cannot activate the spinners until after the fields have been created by the appendTo above.
 		if ( style == 0 ) {
@@ -334,7 +334,7 @@
 	}
 	 
 	function reactivateArrows() {
-		$('#criterias-table tr').each(function() {
+		$('#criterias-table-body tr').each(function() {
 	
 		    $this = $(this); // cache $(this)
 		    
@@ -399,7 +399,9 @@
 			</div>
 	
 			<table class="table table-striped table-condensed" id="criterias-table">	
+			<tbody id="criterias-table-body">
 				<!--  populated by javascript -->
+			</tbody>
 			</table>
 		</div>
 
