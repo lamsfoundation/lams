@@ -68,7 +68,7 @@
 	    if (editor) { editor.destroy(true); }
 	    
 		var instance = CKEDITOR.${method}( "${id}", {
-				classes                       : "${classes}",
+				//classes                       : "${classes}",
 				width                         : "${width}",
 				height                        : "${height}",
 				toolbar                       : "${toolbarSet}",

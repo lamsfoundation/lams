@@ -31,61 +31,7 @@ var optionTargetDiv = "#optionArea";
 	}
 	
 	function removeOption(idx){
- 		var url= removeOptionUrl;
-		var contentFolderID= $("#contentFolderID").val();
-		prepareOptionEditorsForAjaxSubmit();
- 		var optionList = $("#optionForm").serialize(true);
- 		$.ajaxSetup({ cache: true });
-		$(optionTargetDiv).load(
-			url,
-			{
-				contentFolderID: contentFolderID,					
-				questionType: questionType,
-				optionIndex: idx,
-				optionList: optionList 
-			}, 
-			function() {
-				initializeOptionItems();
-			}
-		);
-	}
-	function upOption(idx){
- 		var url= upOptionUrl;
-		var contentFolderID= $("#contentFolderID").val();
-		prepareOptionEditorsForAjaxSubmit();
- 		var optionList = $("#optionForm").serialize(true);
- 		$.ajaxSetup({ cache: true });
-		$(optionTargetDiv).load(
-			url,
-			{
-				contentFolderID: contentFolderID,					
-				questionType: questionType,
-				optionIndex: idx,
-				optionList: optionList 
-			}, 
-			function() {
-				initializeOptionItems();
-			}
-		);
-	}
-	function downOption(idx){
- 		var url= downOptionUrl;
-		var contentFolderID= $("#contentFolderID").val(); 	
-		prepareOptionEditorsForAjaxSubmit();
- 		var optionList = $("#optionForm").serialize(true);
- 		$.ajaxSetup({ cache: true });
- 		$(optionTargetDiv).load(
-			url,
-			{
-				contentFolderID: contentFolderID,	
-				questionType: questionType,
-				optionIndex: idx,
-				optionList: optionList 
-			}, 
-			function() {
-				initializeOptionItems();
-			}
-		);
+		$("#option-table-" + idx).remove();
 	}
 	
 	//in order to be able to use option's value, copy it from CKEditor to textarea

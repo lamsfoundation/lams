@@ -817,77 +817,6 @@ public class AuthoringController {
     }
 
     /**
-     * Ajax call, remove the given line of instruction of resource item.
-     */
-    @RequestMapping("/removeOption")
-    public String removeOption(HttpServletRequest request) {
-	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
-	    rList.remove(optionIndex);
-	    optionList.clear();
-	    optionList.addAll(rList);
-	}
-
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
-		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return "pages/authoring/parts/optionlist";
-    }
-
-    /**
-     * Move up current option.
-     */
-    @RequestMapping("/upOption")
-    public String upOption(HttpServletRequest request) {
-	return switchOption(request, true);
-    }
-
-    /**
-     * Move down current option.
-     */
-    @RequestMapping("/downOption")
-    public String downOption(HttpServletRequest request) {
-	return switchOption(request, false);
-    }
-
-    private String switchOption(HttpServletRequest request, boolean up) {
-	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-
-	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
-
-	    // get current and the target item, and switch their sequnece
-	    AssessmentQuestionOption option = rList.get(optionIndex);
-	    AssessmentQuestionOption repOption;
-	    if (up) {
-		repOption = rList.get(--optionIndex);
-	    } else {
-		repOption = rList.get(++optionIndex);
-	    }
-
-	    int upSeqId = repOption.getSequenceId();
-	    repOption.setSequenceId(option.getSequenceId());
-	    option.setSequenceId(upSeqId);
-
-	    // put back list, it will be sorted again
-	    optionList.clear();
-	    optionList.addAll(rList);
-	}
-
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
-		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return "pages/authoring/parts/optionlist";
-    }
-
-    /**
      * Ajax call, will add one more input line for new Unit.
      */
     @RequestMapping("/newUnit")
@@ -1271,12 +1200,19 @@ public class AuthoringController {
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    AssessmentQuestionOption option = new AssessmentQuestionOption();
+	    
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+	    //sequenceId is null, in case this item was removed using Remove button
+	    if (sequenceId == null) {
+		continue;
+	    } else {
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
+	    }
+	    
 	    String uid = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uid != null) {
 		option.setUid(NumberUtils.toLong(uid));
 	    }
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-	    option.setSequenceId(NumberUtils.toInt(sequenceId));
 	    
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {

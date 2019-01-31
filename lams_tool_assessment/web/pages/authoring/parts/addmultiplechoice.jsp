@@ -15,15 +15,42 @@
 	label {
     	font-weight: initial;
 	}
-	.justify-content-end {
-    -webkit-box-pack: end!important;
-    -ms-flex-pack: end!important;
-    justify-content: flex-end!important;
-}
-.nav-pills>li {
-    float: right;
-}
 	
+	#question-settings-link{
+		margin-top: -10px;
+    	margin-bottom: 5px;
+    	position: absolute;
+    	top: 60px;
+	    right: 20px;
+    	z-index: 2;
+    }
+	.delete-button, .arrows-div, .option-settings, #question-settings-link{
+		visibility:hidden;
+	}
+	.sortable-placeholder .option-text {
+		pointer-events: none
+	}
+	
+	
+	#option-table.hover-active tr:hover .delete-button, #option-table.hover-active tr:hover .arrows-div, #option-table.hover-active tr:hover .option-settings, #assessmentQuestionForm:hover #question-settings-link {
+		visibility:visible;
+	}
+	.basic-tab[style*="display: none"] + #question-settings-link {
+		visibility:visible;
+	}
+	#title {
+	    padding-right: 80px;
+	}
+	.advanced-tab {
+		display:none;
+	}
+	.delete-button {
+		opacity: 0.6;
+		cursor: pointer;
+	}
+
+
+	/*----------TEXT INPUT----------------*/
 	.form-control-new {
 	    display: block;
 	    width: 100%;
@@ -54,10 +81,10 @@
 	}
 	.form-control-new:-o-input-placeholder {
 	    font-weight: normal;
-	} 
-	
-	
-	.ckeditor-without-borders {
+	}
+
+	/*----------CKEDITOR----------------*/
+	div[contenteditable] {
 	    display: block;
 	    width: 100%;
 	    padding: 0;
@@ -73,37 +100,9 @@
 	    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
 	    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 	    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-	    border: 0;
 	    overflow: hidden;
 	    min-height: 60px;
 	    -webkit-appearance: textfield;
-	}
-	
-	#question-settings-link{
-		margin-top: -10px;
-    	margin-bottom: 5px;
-    	position: absolute;
-    	top: 60px;
-	    right: 20px;
-    	z-index: 2;
-    }
-	.delete-button, .arrows-div, .option-settings, #question-settings-link{
-		visibility:hidden;
-	}
-	#option-table.hover-active tr:hover .delete-button, #option-table.hover-active tr:hover .arrows-div, #option-table.hover-active tr:hover .option-settings, #assessmentQuestionForm:hover #question-settings-link {
-		visibility:visible;
-	}
-	.basic-tab[style*="display: none"] + #question-settings-link {
-		visibility:visible;
-	}
-	#title {
-	    padding-right: 80px;
-	}
-	.advanced-tab {
-		display:none;
-	}
-	.delete-button {
-		opacity: 0.6;
 	}
 	
 /*----------UL numbers----------------*/
@@ -195,44 +194,39 @@
     height: 30px;
     padding-top: 15px;
 }
+/*
 .sortable-placeholder {
 	height: 130px; 
 	background-color: #f1f1f1;
 	margin: 0px 0 20px -0;
-}
+}*/
 .ui-sortable-helper {
 	opacity: 0.8;
 }
+	.sortable-chosen {
+		background-color: #fff;
+	}
+
+
+
+
+	.sortable-placeholder {
+		background-color: rgba(241, 241, 241, 0.7);
+	}
 	</style>
 
 	<script type="text/javascript">
 		var questionType = ${questionType};
 		var addOptionUrl = "<c:url value='/authoring/addOption.do'/>";
-	   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
-   	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
-   	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
 	</script>
 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/assessmentoption.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.touch-punch.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
-	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
     <script>
-
-    import { Sortable } from '@shopify/draggable';
-
-	const sortable = new Sortable(document.querySelectorAll('#option-table'), {
-	  draggable: 'table'
-	});
 		$(document).ready(function(){
-
-			sortable.on('sortable:start', () => console.log('sortable:start'));
-			sortable.on('sortable:sort', () => console.log('sortable:sort'));
-			sortable.on('sortable:sorted', () => console.log('sortable:sorted'));
-			sortable.on('sortable:stop', () => console.log('sortable:stop'));
 				
 		    	$("#assessmentQuestionForm").validate({
 		    		onkeyup: false,
@@ -402,10 +396,50 @@
 	        //$('.slider').trigger('slide');
 	        //$('#slider').slider('value', $('#slider').slider('value'));
 
+	        new Sortable(document.getElementById('option-table'), {
+			    animation: 150,
+			    ghostClass: 'sortable-placeholder',
+			    direction: 'vertical',
+			    
+				// Element dragging started
+				onStart: function (/**Event*/evt) {
+					//stop answers' hover effect
+					$("#option-table").removeClass("hover-active");
+				},
 
-/**
-			$( "#option-table" ).sortable({
+				// Element dragging ended
+				onEnd: function (/**Event*/evt) {
+					//activate answers' hover effect
+					//$("#option-table").addClass("");
+					$("#option-table").delay(50).queue(function(next){
+					    $(this).addClass("hover-active", 1000);
+					    next();
+					});
+				},
+				store: {
+
+					/**
+					 * Save the order of elements. Called onEnd (when the item is dropped).
+					 * @param {Sortable}  sortable
+					 */
+					set: function (sortable) {
+						//update all sequenceIds
+						var order = sortable.toArray();
+						for (var i = 0; i < order.length; i++) {
+						    var optionIndex = order[i];
+						    $('input[name="optionSequenceId' + optionIndex + '"]').val(i+1);
+						}
+						//localStorage.setItem(sortable.options.group.name, order.join('|'));
+					}
+				}
+			});
+			
+	        /*		$( "#option-table" ).sortable({
+				tolerance: "pointer",
 				placeholder: "sortable-placeholder",
+				forcePlaceholderSize: true,
+				forceHelperSize: true,
+				helper: "clone",
 				cancel: ':input,button,[contenteditable]',
 				start: function( event, ui ) {
 					//stop answers' hover effect
@@ -415,7 +449,7 @@
 					//activate answers' hover effect
 					$("#option-table").addClass("hover-active");
 				}
-			});**/
+			});*/
 		}
 	</script>
 </lams:head>
@@ -449,7 +483,7 @@
 					</div>
 				
 					<div class="form-group">
-						<lams:CKEditor id="question" classes="ckeditor-without-borders" 
+						<lams:CKEditor id="question" classes="ckeditor-without-borders22" 
 						placeholder="Question's description"
 						value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
