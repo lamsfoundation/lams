@@ -157,7 +157,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    } else {
 			ExtUserUseridMap userMap = integrationService.getExistingExtUserUseridMap(extServer, login);
 			if (userMap == null) {
-			    userMap = new ExtUserUseridMap(login, user, extServer);
+			    userMap = new ExtUserUseridMap();
+			    userMap.setExtServer(extServer);
+			    userMap.setUser(user);
+			    userMap.setExtUsername(login);
 			    userManagementService.save(userMap);
 
 			    String message = "External user created for existing user with login \"" + login
@@ -199,7 +202,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 			ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), name);
 			if (extOrgMap == null) {
-			    extOrgMap = new ExtCourseClassMap(name, extServer, course);
+			    extOrgMap = new ExtCourseClassMap();
+			    extOrgMap.setCourseid(name);
+			    extOrgMap.setExtServer(extServer);
+			    extOrgMap.setOrganisation(course);
 			    userManagementService.save(extOrgMap);
 
 			    String message = "External course created for existing course with code \"" + code
@@ -242,7 +248,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 			    ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(),
 				    name);
 			    if (extOrgMap == null) {
-				extOrgMap = new ExtCourseClassMap(name, extServer, subcourse);
+				extOrgMap = new ExtCourseClassMap();
+				extOrgMap.setCourseid(name);
+				extOrgMap.setExtServer(extServer);
+				extOrgMap.setOrganisation(subcourse);
 				userManagementService.save(extOrgMap);
 
 				String message = "External subcourse created for existing subcourse with code \"" + code
