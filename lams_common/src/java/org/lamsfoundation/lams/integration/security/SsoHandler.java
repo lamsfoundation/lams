@@ -189,6 +189,11 @@ public class SsoHandler implements ServletExtension {
 			getUserManagementService(session.getServletContext()).save(user);
 		    }
 
+		    String message = new StringBuilder("User ").append(user.getLogin()).append(" (")
+			    .append(user.getUserId()).append(") logged in").toString();
+		    getLogEventService(session.getServletContext()).logEvent(LogEvent.TYPE_LOGIN, user.getUserId(),
+			    user.getUserId(), null, null, message);
+
 		} else {
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts == null) {
@@ -205,7 +210,7 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
-			String message = new StringBuilder("User ").append(user.getLogin()).append("(")
+			String message = new StringBuilder("User ").append(user.getLogin()).append(" (")
 				.append(user.getUserId()).append(") is locked out for ")
 				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
 				.append(failedAttempts).append(" failed attempts.").toString();

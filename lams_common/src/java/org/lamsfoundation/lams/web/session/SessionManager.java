@@ -44,9 +44,9 @@ public class SessionManager {
 
     // singleton
     private static SessionManager sessionManager;
-    private static final Map<String, HttpSession> sessionIdMapping = new ConcurrentHashMap<String, HttpSession>();
-    private static final Map<String, HttpSession> loginMapping = new ConcurrentHashMap<String, HttpSession>();
-    private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<String>();
+    private static final Map<String, HttpSession> sessionIdMapping = new ConcurrentHashMap<>();
+    private static final Map<String, HttpSession> loginMapping = new ConcurrentHashMap<>();
+    private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<>();
 
     // various classes need to have to access these
     private static ServletContext servletContext;
@@ -132,7 +132,7 @@ public class SessionManager {
     /**
      * Unregisteres the session by the given ID.
      */
-    public static void removeSessionByID(String sessionID, boolean invalidate, boolean clearLoginMapping) {
+    public static boolean removeSessionByID(String sessionID, boolean invalidate, boolean clearLoginMapping) {
 	HttpSession session = SessionManager.getSession(sessionID);
 	if (session != null) {
 	    SessionManager.sessionIdMapping.remove(sessionID);
@@ -158,6 +158,8 @@ public class SessionManager {
 		SessionManager.loginMapping.remove(login);
 	    }
 	}
+
+	return session != null;
     }
 
     /**
@@ -210,11 +212,11 @@ public class SessionManager {
      * Lists all logins with their assigned sessions
      */
     public static Map<String, List<String>> getLoginToSessionIDMappings() {
-	Map<String, List<String>> result = new TreeMap<String, List<String>>();
+	Map<String, List<String>> result = new TreeMap<>();
 	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
 	    HttpSession session = entry.getValue();
 	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    List<String> sessionInfo = new LinkedList<String>();
+	    List<String> sessionInfo = new LinkedList<>();
 	    sessionInfo.add(user.getFirstName());
 	    sessionInfo.add(user.getLastName());
 	    sessionInfo.add(session.getId());
