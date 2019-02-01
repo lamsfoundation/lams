@@ -35,6 +35,8 @@ import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.jboss.security.CacheableManager;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.SimplePrincipal;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -43,6 +45,8 @@ import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Listens for creation of HTTP sessions. Sets inactive timeout and default locale.
@@ -50,6 +54,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionListener implements HttpSessionListener {
     private static CacheableManager<?, Principal> authenticationManager;
+
+    private ILogEventService logEventService;
 
     private static Logger log = Logger.getLogger(SessionListener.class);
 
@@ -89,7 +95,7 @@ public class SessionListener implements HttpSessionListener {
 	// clear the authentication cache when the session is invalidated
 	HttpSession session = sessionEvent.getSession();
 	if (session != null) {
-	    SessionManager.removeSessionByID(session.getId(), false, true);
+	    boolean sessionFound = SessionManager.removeSessionByID(session.getId(), false, true);
 
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
 	    if (userDTO != null) {
@@ -97,10 +103,22 @@ public class SessionListener implements HttpSessionListener {
 		Principal principal = new SimplePrincipal(login);
 		SessionListener.authenticationManager.flushCache(principal);
 
-		// remove obsolete mappings to session
-		// the session is either already invalidated or will be very soon by another module
-		SessionManager.removeSessionByLogin(login, false);
+		if (sessionFound) {
+		    String message = new StringBuilder("User ").append(login).append(" (").append(userDTO.getUserID())
+			    .append(") logged out").toString();
+		    getLogEventService().logEvent(LogEvent.TYPE_LOGOUT, userDTO.getUserID(), userDTO.getUserID(), null,
+			    null, message);
+		}
 	    }
 	}
+    }
+
+    private ILogEventService getLogEventService() {
+	if (logEventService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    logEventService = (ILogEventService) ctx.getBean("logEventService");
+	}
+	return logEventService;
     }
 }
