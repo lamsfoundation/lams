@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,31 +46,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.integration.ExtCourseClassMap;
+import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.themes.Theme;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Consumes enrolments file produced by EnrolmentParser.
  * Accepts file-input parameter with a path to file to process.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class SPEnrolmentServlet extends HttpServlet {
@@ -82,10 +79,12 @@ public class SPEnrolmentServlet extends HttpServlet {
     private static final String FILE_INPUT_DEFAULT_NAME = "LAMS-OUTPUT.csv";
     private static final String FILE_INPUT_PARAM = "file-input";
     private static final String DELIMITER = "\\|";
+    private static final String INTEGRATED_SERVER_NAME = "saml";
 
     private static ILessonService lessonService = null;
     private static IUserManagementService userManagementService = null;
-    private static ILogEventService logEventService;
+    private static ILogEventService logEventService = null;
+    private static IIntegrationService integrationService = null;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -105,8 +104,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		// split each line into list of trimmed pieces
 		List<List<String>> lines = Files.readAllLines(fileInput).parallelStream().unordered()
-			.collect(Collectors.mapping(line -> Arrays.stream(line.split(DELIMITER))
-				.map(elem -> elem.trim()).collect(Collectors.toList()), Collectors.toList()));
+			.map(line -> Arrays.stream(line.split(DELIMITER)).map(elem -> elem.trim())
+				.collect(Collectors.toList()))
+			// filter out malformed rows
+			.filter(row -> row.size() == 6).collect(Collectors.toList());
 
 		// map of course code (ID) -> course name
 		ConcurrentMap<String, String> courses = lines.parallelStream().unordered().collect(
@@ -128,17 +129,14 @@ public class SPEnrolmentServlet extends HttpServlet {
 		// map of user login -> user ID
 		Map<String, Integer> userIDs = new HashMap<>();
 
-		// prepare missing, default inromation
-		String defaultCountry = LanguageUtil.getDefaultCountry();
-		SupportedLocale defaultLocale = LanguageUtil.getDefaultLocale();
-		Theme defaultTheme = userManagementService.getDefaultTheme();
-		AuthenticationMethod defaultAuthenticationMethod = (AuthenticationMethod) userManagementService
-			.findById(AuthenticationMethod.class, AuthenticationMethod.DB);
-		Date createDate = new Date();
-
 		// find sysadmin as he/she will be the creator of organisations
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
 		Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
+
+		ExtServer extServer = integrationService.getExtServer(INTEGRATED_SERVER_NAME);
+		if (extServer == null) {
+		    throw new ServletException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
+		}
 
 		// create users
 		for (Entry<String, String[]> userEntry : users.entrySet()) {
@@ -148,39 +146,32 @@ public class SPEnrolmentServlet extends HttpServlet {
 			String salt = HashUtil.salt();
 			String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 
-			user = new User();
-			user.setAuthenticationMethod(defaultAuthenticationMethod);
-			user.setLogin(login);
-			user.setSalt(salt);
-			user.setPassword(password);
-			user.setFirstName(userEntry.getValue()[0]);
-			user.setLastName(".");
-			user.setEmail(userEntry.getValue()[1]);
-			user.setCountry(defaultCountry);
-			user.setLocale(defaultLocale);
-			user.setCreateDate(createDate);
-			user.setDisabledFlag(false);
-			user.setTheme(defaultTheme);
-			userManagementService.saveUser(user);
+			ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, login,
+				password, salt, userEntry.getValue()[0], ".", userEntry.getValue()[1]);
+			user = userMap.getUser();
 
 			String message = "User created with login \"" + login + "\" and ID " + user.getUserId();
 			logger.info(message);
 			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 				"SPEnrolment: " + message);
+		    } else {
+			ExtUserUseridMap userMap = integrationService.getExistingExtUserUseridMap(extServer, login);
+			if (userMap == null) {
+			    userMap = new ExtUserUseridMap(login, user, extServer);
+			    userManagementService.save(userMap);
+
+			    String message = "External user created for existing user with login \"" + login
+				    + "\" and ID " + user.getUserId();
+			    logger.info(message);
+			    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				    "SPEnrolment: " + message);
+			}
 		    }
 
 		    // fill data for later usage
 		    existingRoles.put(login, userManagementService.getRolesForUser(user.getUserId()));
 		    userIDs.put(login, user.getUserId());
 		}
-
-		// organisation defaults
-		OrganisationState defaultOrganisationState = (OrganisationState) userManagementService
-			.findById(OrganisationState.class, OrganisationState.ACTIVE);
-		OrganisationType courseOrganisationType = (OrganisationType) userManagementService
-			.findById(OrganisationType.class, OrganisationType.COURSE_TYPE);
-		OrganisationType subcourseOrganisationType = (OrganisationType) userManagementService
-			.findById(OrganisationType.class, OrganisationType.CLASS_TYPE);
 
 		// go through each course
 		for (Entry<String, String> courseEntry : courses.entrySet()) {
@@ -191,12 +182,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // create course
 		    if (organisations.isEmpty()) {
 			String name = courseEntry.getValue();
-			course = new Organisation();
+			ExtCourseClassMap extOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId,
+				name, name, rootOrganisation.getOrganisationId().toString(), false);
+			course = extOrgMap.getOrganisation();
 			course.setCode(code);
-			course.setName(name);
-			course.setOrganisationState(defaultOrganisationState);
-			course.setOrganisationType(courseOrganisationType);
-			userManagementService.saveOrganisation(course, creatorId);
+			userManagementService.save(course);
 
 			String message = "Course created with code \"" + code + "\" and name \"" + name + "\" and ID "
 				+ course.getOrganisationId();
@@ -205,6 +195,19 @@ public class SPEnrolmentServlet extends HttpServlet {
 				"SPEnrolment: " + message);
 		    } else {
 			course = organisations.get(0);
+			String name = course.getName();
+
+			ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), name);
+			if (extOrgMap == null) {
+			    extOrgMap = new ExtCourseClassMap(name, extServer, course);
+			    userManagementService.save(extOrgMap);
+
+			    String message = "External course created for existing course with code \"" + code
+				    + "\" and name \"" + name + "\" and ID " + course.getOrganisationId();
+			    logger.info(message);
+			    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				    "SPEnrolment: " + message);
+			}
 		    }
 
 		    // go through each subcourse
@@ -219,13 +222,13 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 			// create subcourse
 			if (organisations.isEmpty()) {
-			    subcourse = new Organisation();
+
+			    ExtCourseClassMap extSubOrgMap = integrationService.createExtCourseClassMap(extServer,
+				    creatorId, subcourseCode, subcourseCode, course.getOrganisationId().toString(),
+				    false);
+			    subcourse = extSubOrgMap.getOrganisation();
 			    subcourse.setCode(subcourseCode);
-			    subcourse.setName(subcourseCode);
-			    subcourse.setOrganisationState(defaultOrganisationState);
-			    subcourse.setOrganisationType(subcourseOrganisationType);
-			    subcourse.setParentOrganisation(course);
-			    userManagementService.saveOrganisation(subcourse, creatorId);
+			    userManagementService.save(subcourse);
 
 			    String message = "Subcourse created with code and name \"" + code + "\" and ID "
 				    + subcourse.getOrganisationId();
@@ -234,6 +237,20 @@ public class SPEnrolmentServlet extends HttpServlet {
 				    "SPEnrolment: " + message);
 			} else {
 			    subcourse = organisations.get(0);
+			    String name = subcourse.getName();
+
+			    ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(),
+				    name);
+			    if (extOrgMap == null) {
+				extOrgMap = new ExtCourseClassMap(name, extServer, subcourse);
+				userManagementService.save(extOrgMap);
+
+				String message = "External subcourse created for existing subcourse with code \"" + code
+					+ "\" and name \"" + name + "\" and ID " + course.getOrganisationId();
+				logger.info(message);
+				logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+					"SPEnrolment: " + message);
+			    }
 			}
 
 			Integer subcourseId = subcourse.getOrganisationId();
@@ -323,5 +340,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 	logEventService = (ILogEventService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("logEventService");
+
+	integrationService = (IIntegrationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
     }
 }
