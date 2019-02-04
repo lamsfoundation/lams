@@ -180,6 +180,7 @@ public class SsoHandler implements ServletExtension {
 		    // if user is already logged in on another browser, log him out
 		    if (existingSession != null) {
 			SessionManager.removeSessionByID(existingSession.getId(), true, false);
+			SsoHandler.logLogout(userDTO);
 		    }
 
 		    Integer failedAttempts = user.getFailedAttempts();
@@ -305,6 +306,13 @@ public class SsoHandler implements ServletExtension {
 	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
 		.append(") logged in from IP ").append(clientIP).toString();
 	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGIN,
+		user.getUserID(), user.getUserID(), null, null, message);
+    }
+
+    private static void logLogout(UserDTO user) {
+	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
+		.append(") got logged out from another browser").toString();
+	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGOUT,
 		user.getUserID(), user.getUserID(), null, null, message);
     }
 
