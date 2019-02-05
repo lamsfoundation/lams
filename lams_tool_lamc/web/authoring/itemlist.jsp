@@ -1,6 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 <c:set var="questionDtos" value="${sessionMap.questionDtos}" />
+<%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
+
+<script>
+	// Inform author whether the QB question was modified
+	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
+		qbMessage = null;
+	switch (qbQuestionModified) {
+		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.update" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.version" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.new" />';
+			break;
+	}
+	if (qbMessage) {
+		alert(qbMessage);
+	}
+</script>
 
 <div id="itemList">
 	<div class="panel panel-default add-file">

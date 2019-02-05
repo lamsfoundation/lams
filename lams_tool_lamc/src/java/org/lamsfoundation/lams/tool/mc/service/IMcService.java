@@ -267,4 +267,9 @@ public interface IMcService extends ICommonToolService {
      */
     List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
+    /**
+     * Checks if data in DTO is the same as in the corresponding QB question and options in DB.
+     * Returns one of statuses from IQbService.QUESTION_MODIFIED_*
+     */
+    int isQbQuestionModified(McQuestionDTO questionDTO);
 }

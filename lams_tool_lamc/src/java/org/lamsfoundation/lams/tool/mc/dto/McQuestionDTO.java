@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.mc.dto;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.qb.service.IQbService;
+
 /**
  * DTO that holds users attempt history data for jsp purposes
  *
@@ -33,6 +35,7 @@ import java.util.List;
 public class McQuestionDTO implements Comparable<McQuestionDTO> {
     private Long uid;
     private Long qbQuestionUid;
+    private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
     private String question;
     private Integer displayOrder;
     private String feedback;
@@ -71,6 +74,14 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
 
     public void setQbQuestionUid(Long qaQuestionId) {
 	this.qbQuestionUid = qaQuestionId;
+    }
+
+    public int getQbQuestionModified() {
+	return qbQuestionModified;
+    }
+
+    public void setQbQuestionModified(int qbQuestionModified) {
+	this.qbQuestionModified = qbQuestionModified;
     }
 
     /**

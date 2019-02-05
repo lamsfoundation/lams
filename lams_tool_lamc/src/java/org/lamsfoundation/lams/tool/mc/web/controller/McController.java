@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -471,6 +472,8 @@ public class McController {
 		questionDTO.setDisplayOrder(maxDisplayOrder + 1);
 		questionDTO.setOptionDtos(options);
 		questionDTO.setMark(mark);
+		questionDTO.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
+		request.setAttribute("qbQuestionModified", questionDTO.getQbQuestionModified());
 
 		questionDTOs.add(questionDTO);
 
@@ -492,6 +495,9 @@ public class McController {
 		questionDto.setDisplayOrder(questionIndex);
 		questionDto.setOptionDtos(options);
 		questionDto.setMark(mark);
+
+		questionDto.setQbQuestionModified(mcService.isQbQuestionModified(questionDto));
+		request.setAttribute("qbQuestionModified", questionDto.getQbQuestionModified());
 	    }
 	} else {
 	    // entry blank, not adding

@@ -300,43 +300,28 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    qbQuestionClone.setMark(Integer.valueOf(currentMark));
 	    qbQuestionClone.setFeedback(currentFeedback);
 
-	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
-	    // basic question data does not match, skip option checking
-	    boolean isModified = qbQuestion.isModified(qbQuestionClone)
-		    || optionDTOs.size() != qbQuestionClone.getQbOptions().size();
-	    if (!isModified) {
-		// check if options changed
-		for (int i = 0; i < optionDTOs.size(); i++) {
-		    McOptionDTO optionDTO = optionDTOs.get(i);
-		    String optionText = optionDTO.getCandidateAnswer();
-		    boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
-
-		    //find persisted option if it exists
-		    for (QbOption qbOption : qbQuestionClone.getQbOptions()) {
-			if (optionDTO.getQbOptionUid().equals(qbOption.getUid())) {
-			    qbOption.setCorrect(isCorrectOption);
-			    qbOption.setName(optionText);
-			    qbOption.setDisplayOrder(i + 1);
-			    break;
-			}
-		    }
-		}
-		// run check again, this time with modified options
-		isModified = qbQuestion.isModified(qbQuestionClone);
-	    }
-
-	    if (isModified) {
-		// if vital data changed, the already modified clone becomes the new question
-		qbQuestion = qbQuestionClone;
-		// create a new question version instead of modifying existing one
-		int newVersion = qbService.getMaxQuestionVersion(qbQuestion.getQuestionId());
-		qbQuestion.setVersion(newVersion);
-	    } else {
-		// if no modification was made, prevent clone from being persisted
-		mcQueContentDAO.releaseFromCache(qbQuestionClone);
-		for (QbOption option : qbQuestionClone.getQbOptions()) {
-		    mcQueContentDAO.releaseFromCache(option);
-		}
+	    // modification status was already set in McController#saveQuestion()
+	    switch (questionDTO.getQbQuestionModified()) {
+		case IQbService.QUESTION_MODIFIED_NONE:
+		    // if no modification was made, prevent clone from being persisted
+		    releaseQbQuestionFromCache(qbQuestionClone);
+		    break;
+		case IQbService.QUESTION_MODIFIED_UPDATE:
+		    // simply accept the modified clone as new version of the question
+		    // this option is not supported yet
+		    qbQuestion = qbQuestionClone;
+		    break;
+		case IQbService.QUESTION_MODIFIED_VERSION_BUMP:
+		    // new version of the old question gets created
+		    qbQuestion = qbQuestionClone;
+		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+		    break;
+		case IQbService.QUESTION_MODIFIED_ID_BUMP:
+		    // new question gets created
+		    qbQuestion = qbQuestionClone;
+		    qbQuestion.setVersion(1);
+		    qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+		    break;
 	    }
 
 	    // in case question doesn't exist
@@ -359,6 +344,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    List<QbOption> newOptions = new ArrayList<>();
 	    int displayOrderOption = 1;
 	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getQbOptions());
+	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
 		String optionText = optionDTO.getCandidateAnswer();
@@ -376,6 +362,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		if (optionDTO.getQbOptionUid() == null) {
 		    // it is a new option
 		    option = new QbOption();
+		    option.setQbQuestion(qbQuestion);
 		} else {
 		    // match existing options with DTO data
 		    for (QbOption qbOption : qbQuestion.getQbOptions()) {
@@ -402,9 +389,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // make removed options orphaned, so they will be removed from DB
 	    qbQuestion.getQbOptions().removeAll(qbOptionsToRemove);
 	    qbOptionsToRemove.clear();
-	    // if clone is the real question, clear its IDs so it is saved as a new question
-	    // it needs to be only now as above we used option UID matching
-	    if (isModified) {
+	    // if clone is the real question, clear its IDs so it is saved as a new question or version
+	    // it needs to happen only now as above we used option UID matching
+	    if (questionDTO.getQbQuestionModified() > IQbService.QUESTION_MODIFIED_UPDATE) {
 		qbQuestion.clearID();
 	    }
 
@@ -2053,5 +2040,70 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    saveOrUpdateMcQueContent(question);
 	}
 
+    }
+
+    @Override
+    public int isQbQuestionModified(McQuestionDTO questionDTO) {
+	String currentQuestionText = questionDTO.getQuestion();
+
+	// skip empty questions
+	if (currentQuestionText.isEmpty()) {
+	    return IQbService.QUESTION_MODIFIED_NONE;
+	}
+	QbQuestion baseLine = questionDTO.getQbQuestionUid() == null ? null
+		: (QbQuestion) mcQueContentDAO.find(QbQuestion.class, questionDTO.getQbQuestionUid());
+	if (baseLine == null) {
+	    return IQbService.QUESTION_MODIFIED_ID_BUMP;
+	}
+
+	releaseQbQuestionFromCache(baseLine);
+	// make a clone to check if data changed
+	QbQuestion modifiedQuestion = baseLine.clone();
+	releaseQbQuestionFromCache(modifiedQuestion);
+
+	String currentFeedback = questionDTO.getFeedback();
+	String currentMark = questionDTO.getMark();
+	/* set the default mark in case it is not provided */
+	if (currentMark == null) {
+	    currentMark = "1";
+	}
+
+	// set clone's data to current values
+	modifiedQuestion.setName(currentQuestionText);
+	modifiedQuestion.setMark(Integer.valueOf(currentMark));
+	modifiedQuestion.setFeedback(currentFeedback);
+
+	List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
+	boolean isModified = baseLine.isModified(modifiedQuestion)
+		|| optionDTOs.size() != modifiedQuestion.getQbOptions().size();
+	if (isModified) {
+	    return IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
+	// check if options changed
+	for (int i = 0; i < optionDTOs.size(); i++) {
+	    McOptionDTO optionDTO = optionDTOs.get(i);
+	    String optionText = optionDTO.getCandidateAnswer();
+	    boolean isCorrectOption = "Correct".equals(optionDTO.getCorrect());
+
+	    //find persisted option if it exists
+	    for (QbOption qbOption : modifiedQuestion.getQbOptions()) {
+		if (optionDTO.getQbOptionUid().equals(qbOption.getUid())) {
+		    qbOption.setCorrect(isCorrectOption);
+		    qbOption.setName(optionText);
+		    qbOption.setDisplayOrder(i + 1);
+		    break;
+		}
+	    }
+	}
+	// run check again, this time with modified options
+	return baseLine.isModified(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
+		: IQbService.QUESTION_MODIFIED_NONE;
+    }
+
+    private void releaseQbQuestionFromCache(QbQuestion qbQuestion) {
+	mcQueContentDAO.releaseFromCache(qbQuestion);
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    mcQueContentDAO.releaseFromCache(option);
+	}
     }
 }
