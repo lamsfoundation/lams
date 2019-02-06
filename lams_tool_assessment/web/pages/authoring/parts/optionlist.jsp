@@ -1,10 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<script>
-$(document).ready(function(){
-	//update slider's label with the initial value
-	$('.slider').trigger('slide');
-})
-</script>
 
 <div id="optionArea">
 	<input type="hidden" name="optionCount" id="optionCount" value="${fn:length(optionList)}">
@@ -14,7 +8,6 @@ $(document).ready(function(){
 		<c:forEach var="option" items="${optionList}" varStatus="status">
 			<table id="option-table-${status.index}" data-id="${status.index}">
 				<tr>
-				
 					<td>
 						<span>${status.index+1}</span>
 					</td>
@@ -53,5 +46,4 @@ $(document).ready(function(){
 			</table>
 		</c:forEach>
 	</div>
-
 </div>

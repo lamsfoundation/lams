@@ -3,12 +3,7 @@
 div.error {
 	display:none;
 }
-// label.error { 
-// 	color: brand-danger; 
-// 	font-weight: bold; 
-// 	margin-left: 0px;
-// 	display: inline-block;
-// }
+
 em { 
 	font-weight: bold; 
 	padding-right: 1em; 
@@ -22,7 +17,7 @@ table.alternative-color td {
 	padding-left: 0;
 }
 .short-input-text {
-	width:10%;
+	width:10% !important;
 }
 
 #max-words-limit-checkbox, #min-words-limit-checkbox {
@@ -36,7 +31,246 @@ table.alternative-color td {
 	float: right !important;
 }
 
+.greyed-out-label {
+	opacity: 0.55;
+}
+
 /* overwriting bootstrap value. */
 .panel {
 	margin-bottom: 0 !important;
+}
+.panel-default>.panel-heading {
+	border-color: transparent;
+}
+.input-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+
+/* Remove focus effect from title */
+:focus {
+    outline: 0;
+    /* or */
+    outline: none;
+}
+
+label {
+   	font-weight: initial;
+}
+
+.voffset5-bottom {
+	margin-bottom: 5px;
+}
+
+#title {
+	width: 100%;
+	height: 34px;
+	font-weight: bold;
+}
+#title-container, div.error {
+    padding-right: 80px;
+}
+
+/*Style for text input fields*/
+.borderless-text-input {
+    border: 0;
+}
+
+/* Remove bold style from title field */
+.borderless-text-input::-webkit-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+.borderless-text-input::-moz-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+.borderless-text-input:-ms-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+.borderless-text-input:-o-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+
+.settings-tab {
+	display:none;
+}
+.delete-button {
+	opacity: 0.6;
+	cursor: pointer;
+}
+
+/* hover effect for Settings button  */
+#question-settings-link{
+	margin-top: -10px;
+   	margin-bottom: 5px;
+   	position: absolute;
+   	top: 60px;
+    right: 20px;
+   	z-index: 2;
+   	visibility:hidden;
+}	
+#assessmentQuestionForm:hover #question-settings-link, #question-settings-link.btn-primary {
+	visibility:visible;
+}
+
+/* hover effect for options area */
+.delete-button, .settings-on-hover-hidden{
+	visibility:hidden;
+}	
+#option-table.hover-active tr:hover .delete-button, #option-table.hover-active tr:hover .settings-on-hover-hidden {
+	visibility:visible;
+}
+
+/* Overwrite default CKEditor style */
+div[contenteditable] {
+    display: block;
+    width: 100%;
+    padding: 0;
+	font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 0;
+    border-radius: 0;
+    -webkit-box-shadow: inset 0 0 0 rgba(0,0,0,0.075);
+    box-shadow: 0;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    overflow: hidden;
+    min-height: 60px;
+    -webkit-appearance: textfield;
+}
+
+/*----------STICKY FOOTER----------------*/
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+	margin-bottom: 44px;
+}
+footer {
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 44px;
+    background-color: #f5f5f5;
+}
+footer > div {
+	height: 44px;
+}
+
+/*----------numbers before answers----------------*/
+#option-table table {
+	width: 100%;
+}
+#option-table td:first-child {
+	width: 60px;
+	vertical-align: top;
+}
+#option-table td:first-child span{
+	display: inline-block;
+	width: 4rem;
+	height: 4rem;
+	text-align: center;
+	line-height: 2em;
+	font-size: 1.8rem;
+	color: #fff;
+	border: .2rem solid #313537;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+	border-color: #337ab7 !important;
+	background-color: #337ab7 !important;
+}
+
+/*----------SORTABLE----------------*/
+/* prevent inserting text into CKEditors */
+.sortable-placeholder .option-ckeditor {
+	pointer-events: none
+}
+.sortable-chosen {
+	background-color: #fff;
+}
+.sortable-placeholder {
+	background-color: rgba(241, 241, 241, 0.7);
+}
+
+/*----------SLIDER----------------*/
+
+.ui-widget-content {
+	border: 0.03em solid #bdc3c7;
+	background: #e1e1e1;
+	color: #222222;
+	margin-top: -0.03em;
+	padding: 0.08em;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default{
+	background:transparent !important;
+	border:none !important;
+}
+.ui-slider .ui-slider-handle label{
+    background: #c3c3c3;
+    border-radius: 20px;
+    width:5.2em;
+}
+
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 5.2em;
+	height: 100px;
+	cursor: default;
+	margin: 0 -40px auto !important;
+	text-align: center;	
+	line-height: 28px;
+	color: #FFFFFF;
+}
+
+.ui-slider .ui-slider-handle .fa {
+	color: #FFFFFF;
+    margin: 0 3px;
+    font-size: 18px;
+    opacity: 0.5;
+    font-weight: bolder;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	top: -.9em;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default {
+	border: 1px solid #f9f9f9;
+	background: #3498db;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	margin-left: -0.5em;
+}
+
+.ui-slider .ui-slider-handle {
+	cursor: pointer;
+}
+
+.ui-slider a, .ui-slider a:focus {
+	cursor: pointer;
+	outline: none;
+}
+
+.grade-slider {
+    height: 30px;
+    padding-top: 15px;
+}
+
+.grade-slider>div:first-child {
+	margin-top: -7px;
+	padding: 0;
 }

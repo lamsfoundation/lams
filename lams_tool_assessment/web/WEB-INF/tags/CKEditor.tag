@@ -3,7 +3,6 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
-<%@ attribute name="classes" required="false" rtexprvalue="true"%>
 <%@ attribute name="placeholder" required="false" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
@@ -68,7 +67,6 @@
 	    if (editor) { editor.destroy(true); }
 	    
 		var instance = CKEDITOR.${method}( "${id}", {
-				//classes                       : "${classes}",
 				width                         : "${width}",
 				height                        : "${height}",
 				toolbar                       : "${toolbarSet}",
