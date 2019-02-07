@@ -110,7 +110,7 @@
     			$("#unitArea").load(
     				url,
     				{
-    					questionType: questionType,
+    					questionType: QUESTION_TYPE,
     					unitList: unitList 
     				}
     			);

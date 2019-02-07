@@ -5,53 +5,121 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/authoringQuestionHeader.jsp"%>
+	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+	<style>
+	
+	/* --- SWITCH --- */
+	
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 23px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 3px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked ~ .switch-slider {
+  background-color: #2196F3;
+}
+
+input:focus ~ .switch-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked ~ .switch-slider:before {
+  -webkit-transform: translateX(17px);
+  -ms-transform: translateX(17px);
+  transform: translateX(17px);
+}
+
+/* Rounded switch-sliders */
+.switch-slider.round {
+  border-radius: 23px;
+}
+
+.switch-slider.round:before {
+  border-radius: 50%;
+}
+	
+	</style>
+	
     <script>
 		$(document).ready(function(){
 		    $("#assessmentQuestionForm").validate({
-		    		ignore: 'hidden',
-		    		rules: {
-		    			title: "required",
-		    			defaultGrade: {
-		    			      required: true,
-		    			      digits: true
-		    			},
-		    			hasOptionFilled: {
-		    				required: function(element) {
-				    			prepareOptionEditorsForAjaxSubmit();
-		    		        	return $("textarea[name^=optionString]:filled").length < 1;
-			    		    }			    		    
-	    			    }
+		    	ignore: 'hidden',
+		    	rules: {
+		    		title: "required",
+		    		defaultGrade: {
+		    		      required: true,
+		    		      digits: true
 		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			defaultGrade: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			},
-		    			hasOptionFilled: {
-		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
-		    			}
+		    		hasOptionFilled: {
+		    			required: function(element) {
+				   			prepareOptionEditorsForAjaxSubmit();
+		    	        	return $("textarea[name^=optionString]:filled").length < 1;
+			    	    }			    		    
+	    		    }
+		    	},
+		    	messages: {
+		    		title: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    		defaultGrade: {
+		    			required: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    			digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 		    		},
-		    	    invalidHandler: formInvalidHandler,
-		    		debug: true,
-		    		errorClass: "alert alert-danger",
-     			    submitHandler: function(form) {
-     			    	prepareOptionEditorsForAjaxSubmit();
-		    			$("#optionList").val($("#optionForm").serialize(true));
-		    			$("#question").val(CKEDITOR.instances.question.getData());
-		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
-		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
-		    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
-		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
-		    			
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#questionListArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
-		    		    				
-		    			$('#assessmentQuestionForm').ajaxSubmit(options);
+		    		hasOptionFilled: {
+		    			required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    		}
-		  		});    	
+		    	},
+		    	   invalidHandler: formInvalidHandler,
+		    	debug: true,
+		    	errorClass: "alert alert-danger",
+     			submitHandler: function(form) {
+     			   	prepareOptionEditorsForAjaxSubmit();
+		    		$("#optionList").val($("#optionForm").serialize(true));
+		    		$("#question").val(CKEDITOR.instances.question.getData());
+		    		$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+		    		$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
+		    		$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
+		    		$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
+		    			
+		    	   	var options = { 
+		    	   		target:  parent.jQuery('#questionListArea'), 
+		    	   		success: afterRatingSubmit  // post-submit callback
+		    	    }; 				
+		    		    				
+		    		$('#assessmentQuestionForm').ajaxSubmit(options);
+		    	}
+		  	});    	
 		});   
  	</script>
 </lams:head>
@@ -105,13 +173,14 @@
 							<span></span>
 						</lams:Alert>	
 				    </div>
-				    
-					<div class="checkbox">
-						<label for="answer-required">
-							<form:checkbox path="answerRequired" id="answer-required"/>
-							<fmt:message key="label.authoring.answer.required" />
-						</label>
-					</div>
+
+					<label class="switch">
+						<form:checkbox path="answerRequired" id="answer-required"/>
+						<span class="switch-slider round"></span>
+					</label>
+					<label for="answer-required">
+						<fmt:message key="label.authoring.answer.required" />
+					</label>
 	
 					<c:if test="${!isAuthoringRestricted}">
 						<div class="form-group form-inline">
@@ -122,17 +191,23 @@
 						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
 						</div>
 					</c:if>
-						
-					<div class="checkbox">
-						<label for="shuffle">
+					
+					<div>
+						<label class="switch">
 							<form:checkbox path="shuffle" id="shuffle"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="shuffle">		
 							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 						</label>
 					</div>
 					
-					<div class="checkbox">
-						<label for="hedging-justification">
+					<div>
+						<label class="switch">
 							<form:checkbox path="hedgingJustificationEnabled" id="hedging-justification"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="hedging-justification">
 							<fmt:message key="label.ask.for.hedging.justification" />
 						</label>
 					</div>

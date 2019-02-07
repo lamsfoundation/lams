@@ -9,8 +9,8 @@
 		<td>
 			<div class="form-inline">    	
 				<input type="text" name="optionFloat${status.index}" value="${option.optionFloat}" 
-						id="optionFloat${status.index}" class="number form-control short-input-text input-xs" 
-						title="<fmt:message key='label.authoring.choice.enter.float'/>">
+					id="optionFloat${status.index}" class="number form-control short-input-text input-xs" 
+					title="<fmt:message key='label.authoring.choice.enter.float'/>">
 			</div>
 		</td>
 	</tr>
@@ -22,8 +22,8 @@
 		<td>
 			<div class="form-inline">	
 				<input type="text" name="optionAcceptedError${status.index}" value="${option.acceptedError}"
-						id="optionAcceptedError${status.index}" class="number form-control short-input-text input-xs" 
-						title="<fmt:message key='label.authoring.choice.enter.float'/>">
+					id="optionAcceptedError${status.index}" class="number form-control short-input-text input-xs" 
+					title="<fmt:message key='label.authoring.choice.enter.float'/>">
 			</div>
 		</td>
 	</tr>

@@ -8,69 +8,69 @@
     <script>
 		$(document).ready(function(){
 		    $("#assessmentQuestionForm").validate({
-		    		ignore: 'hidden',
-		    		rules: {
-		    			title: "required",
-		    			defaultGrade: {
-		    			    required: true,
-		    			    digits: true
-		    			},
-		    			penaltyFactor: {
-		    			    required: true,
-		    			    number: true
-		    			},
-		    			hasOptionFilled: {
-		    				required: function(element) {
-				    			prepareOptionEditorsForAjaxSubmit();
-		    		        	return $("textarea[name^=optionString]:filled").length < 1;
-			    		    }			    		    
-	    			    },
-	    			    hasOneHundredGrade: {
-		    				required: function(element) {
-		    					var hasOneHundredGrade = false;
-		    					$("input[name^='optionGrade']").each(function() {
-		    						hasOneHundredGrade = hasOneHundredGrade || (eval(this.value) == 1);
-		    					});
-	    			    		return !hasOneHundredGrade && !eval($("#multipleAnswersAllowed").val());
-			    		    }		    		    
-	    			    }
-		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			defaultGrade: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			},
-		    			penaltyFactor: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-		    			},
-		    			hasOptionFilled: {
-		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
-		    			},
-		    			hasOneHundredGrade: {
-		    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
-		    			}
-		    		},
-		    	    invalidHandler: formInvalidHandler,
-		    		debug: true,
-		    		errorClass: "alert alert-danger",
-     			    submitHandler: function(form) {
-     			    	prepareOptionEditorsForAjaxSubmit();
-		    			$("#optionList").val($("#optionForm").serialize(true));
-		    			$("#question").val(CKEDITOR.instances.question.getData());
-		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
-		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
-		    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
-		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
+		    	ignore: 'hidden',
+	    		rules: {
+	    			title: "required",
+	    			defaultGrade: {
+	    			    required: true,
+	    			    digits: true
+	    			},
+	    			penaltyFactor: {
+	    			    required: true,
+	    			    number: true
+	    			},
+	    			hasOptionFilled: {
+	    				required: function(element) {
+			    			prepareOptionEditorsForAjaxSubmit();
+	    		        	return $("textarea[name^=optionString]:filled").length < 1;
+		    		    }			    		    
+    			    },
+    			    hasOneHundredGrade: {
+	    				required: function(element) {
+	    					var hasOneHundredGrade = false;
+	    					$("input[name^='optionGrade']").each(function() {
+	    						hasOneHundredGrade = hasOneHundredGrade || (eval(this.value) == 1);
+	    					});
+    			    		return !hasOneHundredGrade && !eval($("#multipleAnswersAllowed").val());
+		    		    }		    		    
+    			    }
+	    		},
+	    		messages: {
+	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    			defaultGrade: {
+	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+	    			},
+	    			penaltyFactor: {
+	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+	    			},
+	    			hasOptionFilled: {
+	    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
+	    			},
+	    			hasOneHundredGrade: {
+	    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
+	    			}
+	    		},
+	    	    invalidHandler: formInvalidHandler,
+	    		debug: true,
+	    		errorClass: "alert alert-danger",
+   			    submitHandler: function(form) {
+   			    	prepareOptionEditorsForAjaxSubmit();
+	    			$("#optionList").val($("#optionForm").serialize(true));
+	    			$("#question").val(CKEDITOR.instances.question.getData());
+	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
+	    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
+	    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#questionListArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
+	    	    	var options = { 
+	    	    		target:  parent.jQuery('#questionListArea'), 
+	    		   		success: afterRatingSubmit  // post-submit callback
+	    		    }; 				
 		    		    				
-		    			$('#assessmentQuestionForm').ajaxSubmit(options);
-		    		}
+	    			$('#assessmentQuestionForm').ajaxSubmit(options);
+	    		}
 		  	});
 		    	
 			$("#multipleAnswersAllowed").on('change', function() {

@@ -7,53 +7,53 @@
 	<%@ include file="/common/authoringQuestionHeader.jsp"%>
     <script>
 		$(document).ready(function(){
-		    	$("#assessmentQuestionForm").validate({
-		    		ignore: 'hidden',
-		    		rules: {
-		    			title: "required",
-		    			defaultGrade: {
-		    			      required: true,
-		    			      digits: true
-		    			},
-		    			penaltyFactor: {
-		    			      required: true,
-		    			      number: true
-		    			},
-		    			hasOptionFilled: {
-		    				required: function(element) {
-		    					prepareOptionEditorsForAjaxSubmit();	    				
-		    		        	return $("textarea[name^=optionQuestion]:filled").length < 1;
-			    		    }
-	    			    }
+		    $("#assessmentQuestionForm").validate({
+		    	ignore: 'hidden',
+		    	rules: {
+		    		title: "required",
+		    		defaultGrade: {
+		    	    	required: true,
+		    		    digits: true
 		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			defaultGrade: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			},
-		    			penaltyFactor: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-		    			},
-		    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
+		    		penaltyFactor: {
+		    		    required: true,
+		    		    number: true
 		    		},
-		    	    invalidHandler: formInvalidHandler,
-		    		debug: true,
-		    		errorClass: "alert alert-danger",
-     			    submitHandler: function(form) {
-		    			$("#optionList").val($("#optionForm").serialize(true));
-		    			$("#question").val(CKEDITOR.instances.question.getData());
-		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+		    		hasOptionFilled: {
+		    			required: function(element) {
+		    				prepareOptionEditorsForAjaxSubmit();	    				
+		    		       	return $("textarea[name^=optionQuestion]:filled").length < 1;
+			    	    }
+	    			   }
+		    	},
+	    		messages: {
+	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    			defaultGrade: {
+	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+	    			},
+	    			penaltyFactor: {
+	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+	    			},
+	    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
+	    		},
+	    	    invalidHandler: formInvalidHandler,
+	    		debug: true,
+	    		errorClass: "alert alert-danger",
+   			    submitHandler: function(form) {
+	    			$("#optionList").val($("#optionForm").serialize(true));
+	    			$("#question").val(CKEDITOR.instances.question.getData());
+	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
 		    			
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#questionListArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
+	    	    	var options = { 
+	    	    		target:  parent.jQuery('#questionListArea'), 
+	    		   		success: afterRatingSubmit  // post-submit callback
+	    		    }; 				
 		    		    				
-		    			$('#assessmentQuestionForm').ajaxSubmit(options);
-		    		}
-		  		});
+	    			$('#assessmentQuestionForm').ajaxSubmit(options);
+	    		}
+	  		});
 		}); 
 	</script>
 </lams:head>

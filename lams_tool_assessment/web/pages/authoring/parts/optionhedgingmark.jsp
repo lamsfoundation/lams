@@ -8,19 +8,25 @@
 </div>
 
 <div class="settings-on-hover-hidden">
-	<div class="radio">
-		<label for="option-correct">
-			<input type="radio" alt="${status.index}" name="optionCorrect" value="${option.sequenceId}" id="option-correct"
-					<c:if test="${option.correct}">checked="checked"</c:if> >
+
+	<div class="voffset5-bottom" style="margin-top: 5px;">
+		<input type="checkbox" name="optionCorrect" value="${option.sequenceId}" id="option-correct-${status.index}" data-toggle="toggle" data-on="Correct" data-off="Wrong" data-size="mini"
+			<c:if test="${option.correct}">checked="checked"</c:if>>
+	</div>
+				
+	<!--<div class="radio">
+		<label for="option-correct-${status.index}">
+			 <input type="radio" alt="${status.index}" name="optionCorrect" value="${option.sequenceId}" id="option-correct"
+					<c:if test="${option.correct}">checked="checked"</c:if> > 
 			<span class="greyed-out-label">
 				<fmt:message key="label.option.correct" />
 			</span>
 		</label>
-	</div>
+	</div>-->
 	
 	<div class="voffset5-bottom">
 	    <c:set var="FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.option.feedback"/></c:set>
 	    <lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-	    	placeholder="${FEEDBACK_LABEL}" contentFolderID="${contentFolderID}" height="50px"/>
+	    	placeholder="${FEEDBACK_LABEL}" contentFolderID="${contentFolderID}" height="40px"/>
 	</div>
 </div>

@@ -57,7 +57,6 @@
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
 		    		}
 		  		});
-		    	
 			});
   		</script>
 </lams:head>

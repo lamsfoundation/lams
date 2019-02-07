@@ -18,76 +18,76 @@
     <script>
 		$(document).ready(function(){
 		    $("#assessmentQuestionForm").validate({
-		    		ignore: 'hidden',
-		    		rules: {
-		    			title: "required",
-		    			defaultGrade: {
-		    			      required: true,
-		    			      digits: true
-		    			}
-		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			defaultGrade: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			}
-		    		},
-		    	    invalidHandler: formInvalidHandler,
-		    		debug: true,
-		    		errorClass: "alert alert-danger",
-     			    submitHandler: function(form) {
-		    			$("#question").val(CKEDITOR.instances.question.getData());
-		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
-	     			    
-		    	    	var options = { 
-		    	    		target:  parent.jQuery('#questionListArea'), 
-		    		   		success: afterRatingSubmit  // post-submit callback
-		    		    }; 				
-		    		    				
-		    			$('#assessmentQuestionForm').ajaxSubmit(options);
+		    	ignore: 'hidden',
+		    	rules: {
+		    		title: "required",
+		    		defaultGrade: {
+		    		      required: true,
+		    		      digits: true
 		    		}
+		    	},
+	    		messages: {
+	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    			defaultGrade: {
+	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+	    			}
+	    		},
+	    	    invalidHandler: formInvalidHandler,
+	    		debug: true,
+	    		errorClass: "alert alert-danger",
+   			    submitHandler: function(form) {
+	    			$("#question").val(CKEDITOR.instances.question.getData());
+	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	     			    
+	    	    	var options = { 
+	    	    		target:  parent.jQuery('#questionListArea'), 
+	    		   		success: afterRatingSubmit  // post-submit callback
+	    		    }; 				
+		    		    				
+	    			$('#assessmentQuestionForm').ajaxSubmit(options);
+	    		}
 		  	});
 		    	
-		    	//spinner
-		    	var validateMinMax = function() {
-		    			// min can't be more than max
-		    			var min = $( "#min-words-limit" ),
-		    				max = $( "#max-words-limit" ),
-		    				minVal = +min.val(),
-		    				maxVal = +max.val();
-		    			if (minVal > maxVal){
-		    				max.val(minVal);
-		    			}
-		    		},
-		    		maximumWordsSpinner = $( "#max-words-limit" ).spinner({ 
-			    		min: 0,
-			    		disabled: ($( "#max-words-limit" ).val() == 0),
-			    		change: validateMinMax,
-			    		stop: validateMinMax
-		    		}),
-		    		minimumWordsSpinner = $( "#min-words-limit" ).spinner({ 
-			    		min: 0,
-			    		disabled: ($( "#min-words-limit" ).val() == 0),
-			    		change: validateMinMax,
-			    		stop: validateMinMax
-		    		});
-		    	$("#max-words-limit-checkbox").click(function() {
-		    		if ( maximumWordsSpinner.spinner( "option", "disabled" ) ) {
-		    			 maximumWordsSpinner.spinner( "enable" );
-		    		} else {
-		    			maximumWordsSpinner.spinner( "disable" );
-		    		}
-		        });
+		   	//spinner
+	    	var validateMinMax = function() {
+	    		// min can't be more than max
+	    		var min = $( "#min-words-limit" ),
+	    			max = $( "#max-words-limit" ),
+	    			minVal = +min.val(),
+	    			maxVal = +max.val();
+	    		if (minVal > maxVal){
+	    			max.val(minVal);
+	    		}
+	    	},
+		    	maximumWordsSpinner = $( "#max-words-limit" ).spinner({ 
+			   		min: 0,
+			   		disabled: ($( "#max-words-limit" ).val() == 0),
+			   		change: validateMinMax,
+			   		stop: validateMinMax
+		    	}),
+		    	minimumWordsSpinner = $( "#min-words-limit" ).spinner({ 
+			   		min: 0,
+			   		disabled: ($( "#min-words-limit" ).val() == 0),
+			   		change: validateMinMax,
+			   		stop: validateMinMax
+		    	});
+	    	$("#max-words-limit-checkbox").click(function() {
+	    		if ( maximumWordsSpinner.spinner( "option", "disabled" ) ) {
+	    			 maximumWordsSpinner.spinner( "enable" );
+	    		} else {
+	    			maximumWordsSpinner.spinner( "disable" );
+	    		}
+	        });
 		    	
-		    	//spinner
-		    	$("#min-words-limit-checkbox").click(function() {
-		    		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
-		    			minimumWordsSpinner.spinner( "enable" );
-		    		} else {
-		    			minimumWordsSpinner.spinner( "disable" );
-		    		}
-		        });
+		    //spinner
+	    	$("#min-words-limit-checkbox").click(function() {
+	    		if ( minimumWordsSpinner.spinner( "option", "disabled" ) ) {
+	    			minimumWordsSpinner.spinner( "enable" );
+	    		} else {
+	    			minimumWordsSpinner.spinner( "disable" );
+	    		}
+	        });
 		});
   	</script>
 </lams:head>
