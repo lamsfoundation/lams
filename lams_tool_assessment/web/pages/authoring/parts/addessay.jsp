@@ -22,8 +22,14 @@
 		    	rules: {
 		    		title: "required",
 		    		defaultGrade: {
-		    		      required: true,
-		    		      digits: true
+		    			required: true,
+		    		    digits: true
+		    		},
+		    		maxWordsLimit: {
+		    		    digits: true
+		    		},
+		    		minWordsLimit: {
+		    		    digits: true
 		    		}
 		    	},
 	    		messages: {
@@ -44,7 +50,7 @@
 	    	    		target:  parent.jQuery('#questionListArea'), 
 	    		   		success: afterRatingSubmit  // post-submit callback
 	    		    }; 				
-		    		    				
+
 	    			$('#assessmentQuestionForm').ajaxSubmit(options);
 	    		}
 		  	});
@@ -166,19 +172,21 @@
 					<div class="checkbox">
 					    <label for="max-words-limit-checkbox">
 							<input type="checkbox" id="max-words-limit-checkbox" name="noname"
-									<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
+								<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.maximum.number.words" />
 					    </label>
 					    <form:input path="maxWordsLimit" id="max-words-limit"/>
+					    <label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
 					</div>
 					
 					<div class="checkbox">
 					    <label for="min-words-limit-checkbox">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
-									<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
+								<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.minimum.number.words" />
 					    </label>
 					    <form:input path="minWordsLimit" id="min-words-limit"/>
+					    <label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
 					</div>
 	
 					<div class="voffset5 form-group">

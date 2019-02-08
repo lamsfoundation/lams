@@ -38,7 +38,7 @@ table.alternative-color td {
 	display: table;
 }
 
-/* overwriting bootstrap value. */
+/* overwriting bootstrap values */
 .panel {
 	margin-bottom: 0 !important;
 }
@@ -57,6 +57,11 @@ label.alert {
   font-size: 12px;
   line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
   border-radius: 3px;
+}
+
+/* overwriting jqeury-ui values */
+.ui-spinner .ui-icon {
+	left: 50%;
 }
 
 /* Remove focus effect from title */
@@ -214,7 +219,7 @@ footer > div {
 
 /*----------SLIDER----------------*/
 
-.ui-widget-content {
+.ui-widget-content.ui-slider {
 	border: 0.03em solid #bdc3c7;
 	background: #e1e1e1;
 	color: #222222;
@@ -222,7 +227,7 @@ footer > div {
 	padding: 0.08em;
 }
 
-.ui-state-default, .ui-widget-content .ui-state-default{
+.ui-state-default, .ui-widget-content.ui-slider .ui-state-default{
 	background:transparent !important;
 	border:none !important;
 }
@@ -256,7 +261,7 @@ footer > div {
 	top: -.9em;
 }
 
-.ui-state-default, .ui-widget-content .ui-state-default {
+.ui-state-default, .ui-widget-content.ui-slider .ui-state-default {
 	border: 1px solid #f9f9f9;
 	background: #3498db;
 }
