@@ -202,8 +202,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_PAGED_QUESTION_DTOS = "pagedQuestions";
 
-    public static final String ATTR_QUESTION_FOR_ORDERING = "questionForOrdering";
-
     public static final String ATTR_ASSESSMENT_RESULT = "assessmentResult";
 
     public static final String ATTR_IS_RESUBMIT_ALLOWED = "isResubmitAllowed";
