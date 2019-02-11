@@ -848,11 +848,12 @@ public class AssessmentServiceImpl
 	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
 	    TreeSet<OptionDTO> correctOptionSet = new TreeSet<>(new SequencableComparator());
-	    correctOptionSet.addAll(questionDto.getOptionDtos());
+	    Set<OptionDTO> originalOptions = questionResult.getAssessmentQuestion().getQuestionDTO().getOptionDtos();
+	    correctOptionSet.addAll(originalOptions);
 	    ArrayList<OptionDTO> correctOptionList = new ArrayList<>(correctOptionSet);
 	    int i = 0;
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		if (optionDto.getUid() == correctOptionList.get(i++).getUid()) {
+		if (optionDto.getUid().equals(correctOptionList.get(i++).getUid())) {
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
