@@ -642,62 +642,6 @@ public class LearningController {
     }
 
     /**
-     * Move up current option.
-     */
-    @RequestMapping("/upOption")
-    public String upOption(HttpServletRequest request) {
-	return switchOption(request, true);
-    }
-
-    /**
-     * Move down current option.
-     */
-    @RequestMapping("/downOption")
-    public String downOption(HttpServletRequest request) {
-	return switchOption(request, false);
-    }
-
-    @SuppressWarnings("unchecked")
-    private String switchOption(HttpServletRequest request, boolean up) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
-	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-
-	QuestionDTO questionDto = null;
-	for (QuestionDTO questionDtoIter : questionsForOnePage) {
-	    if (questionDtoIter.getUid().equals(questionUid)) {
-		questionDto = questionDtoIter;
-		break;
-	    }
-	}
-
-	Set<OptionDTO> optionDtoList = questionDto.getOptionDtos();
-
-	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<OptionDTO> rList = new ArrayList<>(optionDtoList);
-
-	    // get current and the target item, and switch their sequnece
-	    OptionDTO option = rList.remove(optionIndex);
-	    if (up) {
-		rList.add(--optionIndex, option);
-	    } else {
-		rList.add(++optionIndex, option);
-	    }
-
-	    // put back list
-	    optionDtoList = new LinkedHashSet<>(rList);
-	    questionDto.setOptionDtos(optionDtoList);
-	}
-
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, questionDto);
-	return "pages/learning/parts/ordering";
-    }
-
-    /**
      * auto saves responses
      */
     @RequestMapping("/autoSaveAnswers")
@@ -862,6 +806,15 @@ public class LearningController {
 		questionDto.setAnswerString(answerString);
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    int answerSequenceId = WebUtil.readIntParam(request,
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+		    optionDto.setSequenceId(answerSequenceId);
+		}
+		//sort accrording to the new sequenceIds
+		Set<OptionDTO> sortedOptions = new TreeSet<>(new SequencableComparator());
+		sortedOptions.addAll(questionDto.getOptionDtos());
+		questionDto.setOptionDtos(sortedOptions);
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 
