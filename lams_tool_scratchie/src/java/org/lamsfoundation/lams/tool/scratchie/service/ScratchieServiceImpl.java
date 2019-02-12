@@ -57,6 +57,9 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -90,7 +93,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -206,6 +208,10 @@ public class ScratchieServiceImpl
 
     @Override
     public void saveOrUpdateScratchie(Scratchie scratchie) {
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
+	    scratchieItemDao.saveObject(item.getQbQuestion());
+	    scratchieItemDao.saveObject(item);
+	}
 	scratchieDao.saveObject(scratchie);
     }
 
@@ -213,7 +219,13 @@ public class ScratchieServiceImpl
     public void releaseItemsFromCache(Scratchie scratchie) {
 	for (ScratchieItem item : scratchie.getScratchieItems()) {
 	    scratchieItemDao.releaseItemFromCache(item);
+	    scratchieItemDao.releaseFromCache(item.getQbQuestion());
 	}
+    }
+
+    @Override
+    public void releaseFromCache(Object object) {
+	scratchieDao.releaseFromCache(object);
     }
 
     @Override
@@ -272,13 +284,14 @@ public class ScratchieServiceImpl
 	for (ScratchieItem item : items) {
 
 	    //init answers' confidenceLevelDtos list
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
+	    for (ScratchieAnswer answer : item.getAnswers()) {
+		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<>();
 		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
 	    }
 
 	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
-	    String question = item.getDescription() == null ? "" : item.getDescription().replaceAll("(\\r|\\n)", "");
+	    String question = item.getQbQuestion().getDescription() == null ? ""
+		    : item.getQbQuestion().getDescription().replaceAll("(\\r|\\n)", "");
 
 	    //find according confidenceLevelDto
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
@@ -286,7 +299,7 @@ public class ScratchieServiceImpl
 
 		    //find according answer
 		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-			String answerText = answer.getDescription().replaceAll("(\\r|\\n)", "");
+			String answerText = answer.getQbOption().getName().replaceAll("(\\r|\\n)", "");
 			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
 			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
@@ -420,17 +433,18 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void recordItemScratched(Long sessionId, Long answerUid) {
-	ScratchieAnswer answer = this.getScratchieAnswerByUid(answerUid);
+    public void recordItemScratched(Long sessionId, Long itemUid, Long answerUid) {
+	QbOption answer = this.getQbOptionByUid(answerUid);
 	if (answer == null) {
 	    return;
 	}
 
-	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, sessionId);
+	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, itemUid, sessionId);
 	if (log == null) {
 	    log = new ScratchieAnswerVisitLog();
-	    log.setScratchieAnswer(answer);
+	    log.setQbOption(answer);
 	    log.setSessionId(sessionId);
+	    log.setScratchieItemUid(itemUid);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
 	}
@@ -487,19 +501,19 @@ public class ScratchieServiceImpl
 		    boolean isItemModified = false;
 
 		    // title or description is different
-		    if (!oldItem.getTitle().equals(newItem.getTitle())
-			    || !oldItem.getDescription().equals(newItem.getDescription())) {
+		    if (!oldItem.getQbQuestion().getName().equals(newItem.getQbQuestion().getName()) || !oldItem
+			    .getQbQuestion().getDescription().equals(newItem.getQbQuestion().getDescription())) {
 			isItemModified = true;
 		    }
 
 		    // options are different
-		    Set<ScratchieAnswer> oldAnswers = oldItem.getAnswers();
-		    Set<ScratchieAnswer> newAnswers = newItem.getAnswers();
-		    for (ScratchieAnswer oldAnswer : oldAnswers) {
-			for (ScratchieAnswer newAnswer : newAnswers) {
+		    List<QbOption> oldAnswers = oldItem.getQbQuestion().getQbOptions();
+		    List<QbOption> newAnswers = newItem.getQbQuestion().getQbOptions();
+		    for (QbOption oldAnswer : oldAnswers) {
+			for (QbOption newAnswer : newAnswers) {
 			    if (oldAnswer.getUid().equals(newAnswer.getUid())) {
 
-				if (!StringUtils.equals(oldAnswer.getDescription(), newAnswer.getDescription())
+				if (!StringUtils.equals(oldAnswer.getName(), newAnswer.getName())
 					|| (oldAnswer.isCorrect() != newAnswer.isCorrect())) {
 				    isItemModified = true;
 				}
@@ -585,8 +599,9 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public ScratchieAnswer getScratchieAnswerByUid(Long answerUid) {
-	ScratchieAnswer res = (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
+    public QbOption getQbOptionByUid(Long optionUid) {
+	QbOption res = (QbOption) userManagementService.findById(QbOption.class, optionUid);
+	releaseFromCache(res);
 	return res;
     }
 
@@ -692,10 +707,11 @@ public class ScratchieServiceImpl
 	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    item.getUid());
 
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 
 		int attemptNumber;
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getUid(), sessionId);
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getQbOption().getUid(),
+			item.getUid(), sessionId);
 		if (log == null) {
 		    // -1 if there is no log
 		    attemptNumber = -1;
@@ -726,12 +742,13 @@ public class ScratchieServiceImpl
 
 	for (ScratchieItem item : items) {
 
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 
 		// find according log if it exists
 		ScratchieAnswerVisitLog log = null;
 		for (ScratchieAnswerVisitLog userLog : userLogs) {
-		    if (userLog.getScratchieAnswer().getUid().equals(answer.getUid())) {
+		    if (userLog.getQbOption().getUid().equals(answer.getQbOption().getUid())
+			    && userLog.getScratchieItemUid().equals(item.getUid())) {
 			log = userLog;
 			break;
 		    }
@@ -762,11 +779,11 @@ public class ScratchieServiceImpl
     private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
-	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	for (QbOption answer : item.getQbQuestion().getQbOptions()) {
 
 	    ScratchieAnswerVisitLog log = null;
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
-		if (userLog.getScratchieAnswer().getUid().equals(answer.getUid())) {
+		if (userLog.getQbOption().getUid().equals(answer.getUid())) {
 		    log = userLog;
 		    break;
 		}
@@ -819,7 +836,7 @@ public class ScratchieServiceImpl
 
 	int itemAttempts = 0;
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
-	    if (userLog.getScratchieAnswer().getScratchieItem().getUid().equals(item.getUid())) {
+	    if (userLog.getScratchieItemUid().equals(item.getUid())) {
 		itemAttempts++;
 	    }
 	}
@@ -832,7 +849,7 @@ public class ScratchieServiceImpl
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
-	Collection<ScratchieAnswer> answers = item.getAnswers();
+	List<QbOption> answers = item.getQbQuestion().getQbOptions();
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -841,11 +858,11 @@ public class ScratchieServiceImpl
 	    GroupSummary groupSummary = new GroupSummary(session);
 
 	    Map<Long, ScratchieAnswer> answerMap = new HashMap<>();
-	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>) answers) {
+	    for (QbOption dbAnswer : answers) {
 
 		// clone it so it doesn't interfere with values from other sessions
-		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
-		answer.setUid(dbAnswer.getUid());
+		ScratchieAnswer answer = new ScratchieAnswer();
+		answer.setQbOption(dbAnswer);
 		int[] attempts = new int[answers.size()];
 		answer.setAttempts(attempts);
 		answerMap.put(dbAnswer.getUid(), answer);
@@ -860,14 +877,14 @@ public class ScratchieServiceImpl
 		int attemptNumber = 0;
 
 		for (ScratchieAnswerVisitLog attempt : sessionAttempts) {
-		    ScratchieAnswer answer = answerMap.get(attempt.getScratchieAnswer().getUid());
+		    ScratchieAnswer answer = answerMap.get(attempt.getQbOption().getUid());
 		    int[] attempts = answer.getAttempts();
 		    // +1 for corresponding choice
 		    attempts[attemptNumber++]++;
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>(new ScratchieAnswerComparator());
+	    Collection<ScratchieAnswer> sortedAnswers = new LinkedList<>();
 	    sortedAnswers.addAll(answerMap.values());
 	    groupSummary.setAnswers(sortedAnswers);
 	    groupSummaryList.add(groupSummary);
@@ -881,9 +898,11 @@ public class ScratchieServiceImpl
 	    groupSummaryTotal.setMark(0);
 
 	    Map<Long, ScratchieAnswer> answerMapTotal = new HashMap<>();
-	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>) answers) {
+	    for (QbOption dbAnswer : answers) {
+
 		// clone it so it doesn't interfere with values from other sessions
-		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
+		ScratchieAnswer answer = new ScratchieAnswer();
+		answer.setQbOption(dbAnswer);
 		int[] attempts = new int[answers.size()];
 		answer.setAttempts(attempts);
 		answerMapTotal.put(dbAnswer.getUid(), answer);
@@ -894,7 +913,7 @@ public class ScratchieServiceImpl
 		for (ScratchieAnswer sortedAnswer : sortedAnswers) {
 		    int[] attempts = sortedAnswer.getAttempts();
 
-		    ScratchieAnswer answerTotal = answerMapTotal.get(sortedAnswer.getUid());
+		    ScratchieAnswer answerTotal = answerMapTotal.get(sortedAnswer.getQbOption().getUid());
 		    int[] attemptsTotal = answerTotal.getAttempts();
 		    for (int i = 0; i < attempts.length; i++) {
 			attemptsTotal[i] += attempts[i];
@@ -902,7 +921,7 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>(new ScratchieAnswerComparator());
+	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>();
 	    sortedAnswers.addAll(answerMapTotal.values());
 	    groupSummaryTotal.setAnswers(sortedAnswers);
 	    groupSummaryList.add(0, groupSummaryTotal);
@@ -949,9 +968,10 @@ public class ScratchieServiceImpl
 	// handle general burning question
 	BurningQuestionItemDTO generalBurningQuestionItemDto = new BurningQuestionItemDTO();
 	ScratchieItem generalDummyItem = new ScratchieItem();
-	generalDummyItem.setUid(0L);
+	generalDummyItem.setQbQuestion(new QbQuestion());
+	// generalDummyItem.setUid(0L);
 	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
-	generalDummyItem.setTitle(generalQuestionMessage);
+	generalDummyItem.getQbQuestion().setName(generalQuestionMessage);
 	generalBurningQuestionItemDto.setScratchieItem(generalDummyItem);
 	List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<>();
 	for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
@@ -1153,7 +1173,7 @@ public class ScratchieServiceImpl
 	    String correctAnswerLetter = "";
 	    int answerCount = 1;
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		if (answer.isCorrect()) {
+		if (answer.getQbOption().isCorrect()) {
 		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
 		}
@@ -1337,11 +1357,12 @@ public class ScratchieServiceImpl
 	    List<GroupSummary> itemSummary = getQuestionSummary(contentId, item.getUid());
 
 	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }), true);
+	    row[0] = new ExcelCell(
+		    getMessage("label.question.semicolon", new Object[] { item.getQbQuestion().getName() }), true);
 	    rowList.add(row);
 
 	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(removeHtmlMarkup(item.getDescription()), true);
+	    row[0] = new ExcelCell(removeHtmlMarkup(item.getQbQuestion().getDescription()), true);
 	    rowList.add(row);
 	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
 	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
@@ -1363,9 +1384,9 @@ public class ScratchieServiceImpl
 
 		for (ScratchieAnswer answer : answers) {
 		    row = new ExcelCell[1 + answers.size()];
-		    String answerTitle = removeHtmlMarkup(answer.getDescription());
+		    String answerTitle = removeHtmlMarkup(answer.getQbOption().getName());
 		    IndexedColors color = null;
-		    if (answer.isCorrect()) {
+		    if (answer.getQbOption().isCorrect()) {
 			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 			color = IndexedColors.GREEN;
 		    }
@@ -1403,8 +1424,8 @@ public class ScratchieServiceImpl
 
 		for (ScratchieAnswer answer : answers) {
 		    row = new ExcelCell[1 + answers.size()];
-		    String answerTitle = removeHtmlMarkup(answer.getDescription());
-		    if (answer.isCorrect()) {
+		    String answerTitle = removeHtmlMarkup(answer.getQbOption().getName());
+		    if (answer.getQbOption().isCorrect()) {
 			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 		    }
 		    columnCount = 0;
@@ -1451,7 +1472,8 @@ public class ScratchieServiceImpl
 
 		for (ScratchieItem item : items) {
 		    row = new ExcelCell[1];
-		    row[0] = new ExcelCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }),
+		    row[0] = new ExcelCell(
+			    getMessage("label.question.semicolon", new Object[] { item.getQbQuestion().getName() }),
 			    false);
 		    rowList.add(row);
 		    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
@@ -1462,7 +1484,7 @@ public class ScratchieServiceImpl
 		    for (ScratchieAnswerVisitLog log : logs) {
 			row = new ExcelCell[4];
 			row[0] = new ExcelCell(new Long(i++), false);
-			String answerDescr = removeHtmlMarkup(log.getScratchieAnswer().getDescription());
+			String answerDescr = removeHtmlMarkup(log.getQbOption().getName());
 			row[1] = new ExcelCell(answerDescr, false);
 			row[3] = new ExcelCell(fullDateFormat.format(log.getAccessDate()), false);
 			rowList.add(row);
@@ -1536,10 +1558,10 @@ public class ScratchieServiceImpl
 
 		    // correct answer
 		    String correctAnswer = "";
-		    Set<ScratchieAnswer> answers = itemDto.getAnswers();
+		    List<ScratchieAnswer> answers = itemDto.getAnswers();
 		    for (ScratchieAnswer answer : answers) {
-			if (answer.isCorrect()) {
-			    correctAnswer = removeHtmlMarkup(answer.getDescription());
+			if (answer.getQbOption().isCorrect()) {
+			    correctAnswer = removeHtmlMarkup(answer.getQbOption().getName());
 			}
 		    }
 		    row[columnCount++] = new ExcelCell(correctAnswer, false);
@@ -1569,7 +1591,7 @@ public class ScratchieServiceImpl
 		    }
 
 		    for (ScratchieAnswerVisitLog log : logs) {
-			String answer = removeHtmlMarkup(log.getScratchieAnswer().getDescription());
+			String answer = removeHtmlMarkup(log.getQbOption().getName());
 			row[columnCount++] = new ExcelCell(answer, false);
 		    }
 		    for (int i = logs.size(); i < itemDto.getAnswers().size(); i++) {
@@ -1630,7 +1652,7 @@ public class ScratchieServiceImpl
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 		row = new ExcelCell[1];
-		row[0] = new ExcelCell(item.getTitle(), false);
+		row[0] = new ExcelCell(item.getQbQuestion().getName(), false);
 		rowList.add(row);
 
 		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
@@ -1676,6 +1698,16 @@ public class ScratchieServiceImpl
 	return newDto;
     }
 
+    @Override
+    public int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion) {
+	if (baseLine.getUid() == null) {
+	    return IQbService.QUESTION_MODIFIED_ID_BUMP;
+	}
+
+	return baseLine.isModified(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
+		: IQbService.QUESTION_MODIFIED_NONE;
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -1719,7 +1751,7 @@ public class ScratchieServiceImpl
 		    //create a list of attempts user done for the current item
 		    List<ScratchieAnswerVisitLog> itemAttempts = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog answerLog : answerLogs) {
-			if (answerLog.getScratchieAnswer().getScratchieItem().getUid().equals(item.getUid())) {
+			if (answerLog.getScratchieItemUid().equals(item.getUid())) {
 			    itemAttempts.add(answerLog);
 			}
 		    }
@@ -1733,14 +1765,14 @@ public class ScratchieServiceImpl
 		    // find out answers' sequential letters - A,B,C...
 		    for (ScratchieAnswerVisitLog itemAttempt : itemAttempts) {
 			String sequencialLetter = ScratchieServiceImpl.getSequencialLetter(item,
-				itemAttempt.getScratchieAnswer());
+				itemAttempt.getQbOption());
 			answersSequence += answersSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
 		    }
 
 		}
 
 		itemDto.setUid(item.getUid());
-		itemDto.setTitle(item.getTitle());
+		itemDto.setTitle(item.getQbQuestion().getName());
 		itemDto.setAnswers(item.getAnswers());
 		itemDto.setUserAttempts(numberOfAttempts);
 		itemDto.setUserMark(mark);
@@ -1760,12 +1792,12 @@ public class ScratchieServiceImpl
     /**
      * Return specified answer's sequential letter (e.g. A,B,C) among other possible answers
      */
-    private static String getSequencialLetter(ScratchieItem item, ScratchieAnswer asnwer) {
+    private static String getSequencialLetter(ScratchieItem item, QbOption asnwer) {
 	String sequencialLetter = "";
 
 	int answerCount = 1;
 	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-	    if (answer.getUid().equals(asnwer.getUid())) {
+	    if (answer.getQbOption().getUid().equals(asnwer.getUid())) {
 		sequencialLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		break;
 	    }
@@ -1806,7 +1838,7 @@ public class ScratchieServiceImpl
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1885,9 +1917,9 @@ public class ScratchieServiceImpl
 	// include the hibernate object version of the ScratchieItem within the XML
 	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
 	for (ScratchieItem item : items) {
-	    Set<ScratchieAnswer> answers = item.getAnswers();
-	    for (ScratchieAnswer answer : answers) {
-		answer.setScratchieItem(null);
+	    Collection<QbOption> answers = item.getQbQuestion().getQbOptions();
+	    for (QbOption answer : answers) {
+		answer.setQbQuestion(null);
 	    }
 	}
 
@@ -1976,17 +2008,7 @@ public class ScratchieServiceImpl
 	}
 
 	Scratchie toContent = Scratchie.newInstance(scratchie, toContentId);
-	scratchieDao.saveObject(toContent);
-
-	// save scratchie items as well
-	Set<ScratchieItem> items = toContent.getScratchieItems();
-	if (items != null) {
-	    Iterator<ScratchieItem> iter = items.iterator();
-	    while (iter.hasNext()) {
-		ScratchieItem item = iter.next();
-		// createRootTopic(toContent.getUid(),null,msg);
-	    }
-	}
+	saveOrUpdateScratchie(toContent);
     }
 
     @Override
@@ -2276,31 +2298,29 @@ public class ScratchieServiceImpl
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
-	    item.setCreateDate(updateDate);
-	    item.setCreateByAuthor(true);
 	    item.setOrderId(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
-	    item.setTitle(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
-	    item.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+	    item.getQbQuestion().setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
+	    item.getQbQuestion().setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    newItems.add(item);
 
 	    // set options
-	    Set<ScratchieAnswer> newAnswers = new LinkedHashSet<>();
+	    List<QbOption> newAnswers = new LinkedList<>();
 
 	    ArrayNode answersData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (int j = 0; j < answersData.size(); j++) {
 		ObjectNode answerData = (ObjectNode) answersData.get(j);
-		ScratchieAnswer answer = new ScratchieAnswer();
+		QbOption answer = new QbOption();
 		// Removes redundant new line characters from options left by CKEditor (otherwise it will break
 		// Javascript in monitor). Copied from AuthoringAction.
 		String answerDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
-		answer.setDescription(answerDescription != null ? answerDescription.replaceAll("[\n\r\f]", "") : "");
+		answer.setName(answerDescription != null ? answerDescription.replaceAll("[\n\r\f]", "") : "");
 		answer.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
-		answer.setOrderId(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		answer.setScratchieItem(item);
+		answer.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+		answer.setQbQuestion(item.getQbQuestion());
 		newAnswers.add(answer);
 	    }
 
-	    item.setAnswers(newAnswers);
+	    item.getQbQuestion().setQbOptions(newAnswers);
 
 	}
 

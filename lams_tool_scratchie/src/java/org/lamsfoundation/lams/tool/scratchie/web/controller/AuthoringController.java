@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -55,11 +59,9 @@ import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieItemForm;
@@ -88,6 +90,9 @@ public class AuthoringController {
 
     @Autowired
     private IScratchieService scratchieService;
+
+    @Autowired
+    private IQbService qbService;
 
     @Autowired
     @Qualifier("scratchieMessageService")
@@ -177,14 +182,6 @@ public class AuthoringController {
 	// init it to avoid null exception in following handling
 	if (items == null) {
 	    items = new ArrayList<>();
-	} else {
-	    for (ScratchieItem item : items) {
-
-		// sort answers by order id. it's needed only for the default answers. rest could be skipped
-		TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
-		answerList.addAll(item.getAnswers());
-		item.setAnswers(answerList);
-	    }
 	}
 	// init scratchie item list
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
@@ -257,14 +254,6 @@ public class AuthoringController {
 	//allow using old and modified questions and references altogether
 	if (mode.isTeacher()) {
 	    oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
-
-	    // initialize oldItems' answers
-	    for (ScratchieItem oldItem : oldItems) {
-		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) oldItem.getAnswers()) {
-		}
-	    }
-
-	    scratchieService.releaseItemsFromCache(scratchiePO);
 	}
 
 	if (scratchiePO == null) {
@@ -272,8 +261,11 @@ public class AuthoringController {
 	    scratchiePO = scratchie;
 	    scratchiePO.setCreated(new Timestamp(new Date().getTime()));
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
-
 	} else {
+	    // copyProperties() below sets scratchiePO's items to empty collection
+	    // but the items still exist in Hibernate cache, so we need to evict them now
+	    scratchieService.releaseItemsFromCache(scratchiePO);
+	    scratchiePO.getScratchieItems().clear();
 	    Long uid = scratchiePO.getUid();
 	    PropertyUtils.copyProperties(scratchiePO, scratchie);
 	    // set back UID
@@ -296,6 +288,26 @@ public class AuthoringController {
 	    if (item != null) {
 		removeNewLineCharacters(item);
 		items.add(item);
+		// modification status was already set in AuthoringController#saveItem()
+		switch (item.getQbQuestionModified()) {
+		    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
+			// new version of the old question gets created
+			QbQuestion qbQuestion = item.getQbQuestion().clone();
+			item.setQbQuestion(qbQuestion);
+			qbQuestion.clearID();
+			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+		    }
+			break;
+		    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
+			// new question gets created
+			QbQuestion qbQuestion = item.getQbQuestion().clone();
+			item.setQbQuestion(qbQuestion);
+			qbQuestion.clearID();
+			qbQuestion.setVersion(1);
+			qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+		    }
+			break;
+		}
 	    }
 	}
 	scratchiePO.setScratchieItems(items);
@@ -342,10 +354,10 @@ public class AuthoringController {
 	scratchieItemForm.setSessionMapID(sessionMapID);
 	scratchieItemForm.setContentFolderID(contentFolderID);
 
-	List<ScratchieAnswer> answerList = new ArrayList<>();
+	List<QbOption> answerList = new ArrayList<>();
 	for (int i = 0; i < ScratchieConstants.INITIAL_ANSWERS_NUMBER; i++) {
-	    ScratchieAnswer answer = new ScratchieAnswer();
-	    answer.setOrderId(i + 1);
+	    QbOption answer = new QbOption();
+	    answer.setDisplayOrder(i + 1);
 	    answerList.add(answer);
 	}
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
@@ -374,13 +386,13 @@ public class AuthoringController {
 	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
 	    if (item != null) {
-		scratchieItemForm.setTitle(item.getTitle());
-		scratchieItemForm.setDescription(item.getDescription());
+		scratchieItemForm.setTitle(item.getQbQuestion().getName());
+		scratchieItemForm.setDescription(item.getQbQuestion().getDescription());
 		if (itemIdx >= 0) {
 		    scratchieItemForm.setItemIndex(new Integer(itemIdx).toString());
 		}
 
-		Set<ScratchieAnswer> answerList = item.getAnswers();
+		List<QbOption> answerList = item.getQbQuestion().getQbOptions();
 		request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
 
 		scratchieItemForm.setContentFolderID(contentFolderID);
@@ -410,7 +422,9 @@ public class AuthoringController {
 
 	if (itemIdx == -1) { // add
 	    item = new ScratchieItem();
-	    item.setCreateDate(new Timestamp(new Date().getTime()));
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    item.setQbQuestion(qbQuestion);
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
@@ -423,18 +437,28 @@ public class AuthoringController {
 	    item = rList.get(itemIdx);
 	}
 
-	item.setTitle(scratchieItemForm.getTitle());
-	item.setDescription(scratchieItemForm.getDescription());
+	QbQuestion baseLine = item.getQbQuestion().clone();
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+	scratchieService.releaseFromCache(item);
+	scratchieService.releaseFromCache(baseLine);
+	scratchieService.releaseFromCache(item.getQbQuestion());
+
+	item.getQbQuestion().setName(scratchieItemForm.getTitle());
+	item.getQbQuestion().setDescription(scratchieItemForm.getDescription());
 
 	// set options
-	Set<ScratchieAnswer> answerList = getAnswersFromRequest(request, true);
-	Set<ScratchieAnswer> answers = new LinkedHashSet<>();
+	Set<QbOption> answerList = getAnswersFromRequest(request, true);
+	List<QbOption> answers = new ArrayList<>();
 	int orderId = 0;
-	for (ScratchieAnswer answer : answerList) {
-	    answer.setOrderId(orderId++);
+	for (QbOption answer : answerList) {
+	    answer.setDisplayOrder(orderId++);
 	    answers.add(answer);
 	}
-	item.setAnswers(answers);
+	item.getQbQuestion().setQbOptions(answers);
+
+	item.setQbQuestionModified(scratchieService.isQbQuestionModified(baseLine, item.getQbQuestion()));
+	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, scratchieItemForm.getSessionMapID());
@@ -457,18 +481,17 @@ public class AuthoringController {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    ScratchieItem item = new ScratchieItem();
-	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
 		maxSeq = last.getOrderId() + 1;
 	    }
 	    item.setOrderId(maxSeq);
-	    item.setTitle(question.getTitle());
-	    item.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
+	    item.getQbQuestion().setName(question.getTitle());
+	    item.getQbQuestion().setDescription(QuestionParser.processHTMLField(question.getText(), false,
+		    contentFolderID, question.getResourcesFolderPath()));
 
-	    TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
+	    TreeSet<QbOption> answerList = new TreeSet<>();
 	    String correctAnswer = null;
 	    int orderId = 1;
 	    if (question.getAnswers() != null) {
@@ -479,9 +502,9 @@ public class AuthoringController {
 			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			continue;
 		    }
-		    ScratchieAnswer scratchieAnswer = new ScratchieAnswer();
-		    scratchieAnswer.setDescription(answerText);
-		    scratchieAnswer.setOrderId(orderId++);
+		    QbOption scratchieAnswer = new QbOption();
+		    scratchieAnswer.setName(answerText);
+		    scratchieAnswer.setDisplayOrder(orderId++);
 
 		    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			if (correctAnswer == null) {
@@ -505,7 +528,7 @@ public class AuthoringController {
 		continue;
 	    }
 
-	    item.setAnswers(answerList);
+	    item.getQbQuestion().setQbOptions(new ArrayList<>(answerList));
 	    itemList.add(item);
 	    if (log.isDebugEnabled()) {
 		log.debug("Added question: " + question.getText());
@@ -533,16 +556,16 @@ public class AuthoringController {
 	    Question question = new Question();
 
 	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-	    question.setTitle(item.getTitle());
-	    question.setText(item.getDescription());
+	    question.setTitle(item.getQbQuestion().getName());
+	    question.setText(item.getQbQuestion().getDescription());
 
 	    List<Answer> answers = new ArrayList<>();
-	    Set<ScratchieAnswer> scratchieAnswers = new TreeSet<>(new ScratchieAnswerComparator());
-	    scratchieAnswers.addAll(item.getAnswers());
+	    Set<QbOption> scratchieAnswers = new TreeSet<>();
+	    scratchieAnswers.addAll(item.getQbQuestion().getQbOptions());
 
-	    for (ScratchieAnswer itemAnswer : scratchieAnswers) {
+	    for (QbOption itemAnswer : scratchieAnswers) {
 		Answer answer = new Answer();
-		answer.setText(itemAnswer.getDescription());
+		answer.setText(itemAnswer.getName());
 		// there is no LAMS interface to adjust, so use the default 1 point
 		Float score = itemAnswer.isCorrect() ? 1F : 0;
 		answer.setScore(score);
@@ -669,15 +692,15 @@ public class AuthoringController {
     @RequestMapping("/addAnswer")
     private String addAnswer(HttpServletRequest request) {
 
-	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
+	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
 
-	ScratchieAnswer answer = new ScratchieAnswer();
+	QbOption answer = new QbOption();
 	int maxSeq = 1;
 	if (answerList != null && answerList.size() > 0) {
-	    ScratchieAnswer last = answerList.last();
-	    maxSeq = last.getOrderId() + 1;
+	    QbOption last = answerList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
 	}
-	answer.setOrderId(maxSeq);
+	answer.setDisplayOrder(maxSeq);
 	answerList.add(answer);
 
 	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
@@ -698,11 +721,11 @@ public class AuthoringController {
     @RequestMapping("/removeAnswer")
     private String removeAnswer(HttpServletRequest request) {
 
-	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
+	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
 
 	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
 	if (answerIndex != -1) {
-	    List<ScratchieAnswer> rList = new ArrayList<>(answerList);
+	    List<QbOption> rList = new ArrayList<>(answerList);
 	    rList.remove(answerIndex);
 	    answerList.clear();
 	    answerList.addAll(rList);
@@ -743,24 +766,24 @@ public class AuthoringController {
     }
 
     private String switchAnswer(HttpServletRequest request, boolean up) {
-	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
+	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
 
 	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
 	if (answerIndex != -1) {
-	    List<ScratchieAnswer> rList = new ArrayList<>(answerList);
+	    List<QbOption> rList = new ArrayList<>(answerList);
 
 	    // get current and the target item, and switch their sequnece
-	    ScratchieAnswer answer = rList.get(answerIndex);
-	    ScratchieAnswer repAnswer;
+	    QbOption answer = rList.get(answerIndex);
+	    QbOption repAnswer;
 	    if (up) {
 		repAnswer = rList.get(--answerIndex);
 	    } else {
 		repAnswer = rList.get(++answerIndex);
 	    }
 
-	    int upSeqId = repAnswer.getOrderId();
-	    repAnswer.setOrderId(answer.getOrderId());
-	    answer.setOrderId(upSeqId);
+	    int upSeqId = repAnswer.getDisplayOrder();
+	    repAnswer.setDisplayOrder(answer.getDisplayOrder());
+	    answer.setDisplayOrder(upSeqId);
 
 	    // put back list, it will be sorted again
 	    answerList.clear();
@@ -852,13 +875,13 @@ public class AuthoringController {
      *            whether the blank options will be preserved or not
      *
      */
-    private TreeSet<ScratchieAnswer> getAnswersFromRequest(HttpServletRequest request, boolean isForSaving) {
+    private TreeSet<QbOption> getAnswersFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, ScratchieConstants.ATTR_ANSWER_LIST);
 	Integer correctAnswerIndex = (paramMap.get(ScratchieConstants.ATTR_ANSWER_CORRECT) == null) ? null
 		: NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_CORRECT));
 
 	int count = NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_COUNT));
-	TreeSet<ScratchieAnswer> answerList = new TreeSet<>(new ScratchieAnswerComparator());
+	TreeSet<QbOption> answerList = new TreeSet<>();
 	for (int i = 0; i < count; i++) {
 
 	    String answerDescription = paramMap.get(ScratchieConstants.ATTR_ANSWER_DESCRIPTION_PREFIX + i);
@@ -866,20 +889,25 @@ public class AuthoringController {
 		continue;
 	    }
 
-	    ScratchieAnswer answer = new ScratchieAnswer();
+	    QbOption answer = null;
 	    String uidStr = paramMap.get(ScratchieConstants.ATTR_ANSWER_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		answer.setUid(uid);
+		answer = scratchieService.getQbOptionByUid(uid);
+		scratchieService.releaseFromCache(answer.getQbQuestion());
+	    } else {
+		answer = new QbOption();
 	    }
+
 	    String orderIdStr = paramMap.get(ScratchieConstants.ATTR_ANSWER_ORDER_ID_PREFIX + i);
 	    Integer orderId = NumberUtils.toInt(orderIdStr);
-	    answer.setOrderId(orderId);
-	    answer.setDescription(answerDescription);
+	    answer.setDisplayOrder(orderId);
+	    answer.setName(answerDescription);
 	    if ((correctAnswerIndex != null) && correctAnswerIndex.equals(orderId)) {
 		answer.setCorrect(true);
 	    }
 	    answerList.add(answer);
+
 	}
 
 	return answerList;
@@ -920,17 +948,16 @@ public class AuthoringController {
      * monitor)
      */
     private void removeNewLineCharacters(ScratchieItem item) {
-	Set<ScratchieAnswer> answers = item.getAnswers();
+	Collection<QbOption> answers = item.getQbQuestion().getQbOptions();
 	if (answers != null) {
-	    for (ScratchieAnswer answer : answers) {
-		String answerDescription = answer.getDescription();
+	    for (QbOption answer : answers) {
+		String answerDescription = answer.getName();
 		if (answerDescription != null) {
 		    answerDescription = answerDescription.replaceAll("[\n\r\f]", "");
-		    answer.setDescription(answerDescription);
+		    answer.setName(answerDescription);
 		}
 	    }
 
 	}
     }
-
 }

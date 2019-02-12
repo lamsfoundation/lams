@@ -15,8 +15,6 @@ public class ScratchieItemComparator implements Comparator<ScratchieItem> {
 	    } else {
 		return -1;
 	    }
-	} else if (o1 != null && o2 != null & o1.getCreateDate() != null && o2.getCreateDate() != null) {
-	    return (o1.getCreateDate().getTime() - o2.getCreateDate().getTime()) > 0 ? 1 : -1;
 	} else if (o1 != null) {
 	    return 1;
 	} else {

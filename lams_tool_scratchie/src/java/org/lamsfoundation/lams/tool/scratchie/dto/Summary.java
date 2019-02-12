@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class Summary {
     private Long itemUid;
     private short itemType;
     private String itemTitle;
-    private List<String> itemInstructions = new ArrayList<String>();
+    private List<String> itemInstructions = new ArrayList<>();
     private int viewNumber;
 
     // true: initial group item, false, belong to some group.
@@ -65,7 +64,7 @@ public class Summary {
 	if (item != null) {
 	    this.itemUid = item.getUid();
 	    // TODO maybe a,b,c,d ?
-	    this.itemTitle = item.getDescription();
+	    this.itemTitle = item.getQbQuestion().getDescription();
 	} else {
 	    this.itemUid = new Long(-1);
 	}

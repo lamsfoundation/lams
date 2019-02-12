@@ -81,7 +81,7 @@
 		function scratchItem(itemUid, answerUid){
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
+	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid + '&itemUid=' + itemUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {

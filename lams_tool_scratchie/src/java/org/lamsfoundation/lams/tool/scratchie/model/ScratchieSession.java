@@ -37,7 +37,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
@@ -81,7 +80,6 @@ public class ScratchieSession {
     private int status;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("create_date DESC")
     @JoinColumn(name = "session_uid")
     private Set<ScratchieItem> scratchieItems = new HashSet<>();
 

@@ -35,6 +35,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.lamsfoundation.lams.qb.model.QbOption;
+
 /**
  * Scratchie
  *
@@ -50,14 +52,17 @@ public class ScratchieAnswerVisitLog {
     private Long uid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scratchie_answer_uid")
-    private ScratchieAnswer scratchieAnswer;
+    @JoinColumn(name = "qb_option_uid")
+    private QbOption qbOption;
 
     @Column(name = "access_date")
     private Date accessDate;
 
     @Column(name = "session_id")
     private Long sessionId;
+
+    @Column(name = "scratchie_item_uid")
+    private Long scratchieItemUid;
 
     public Date getAccessDate() {
 	return accessDate;
@@ -67,12 +72,12 @@ public class ScratchieAnswerVisitLog {
 	this.accessDate = accessDate;
     }
 
-    public ScratchieAnswer getScratchieAnswer() {
-	return scratchieAnswer;
+    public QbOption getQbOption() {
+	return qbOption;
     }
 
-    public void setScratchieAnswer(ScratchieAnswer item) {
-	this.scratchieAnswer = item;
+    public void setQbOption(QbOption qbOption) {
+	this.qbOption = qbOption;
     }
 
     public Long getUid() {
@@ -91,4 +96,11 @@ public class ScratchieAnswerVisitLog {
 	this.sessionId = sessionId;
     }
 
+    public Long getScratchieItemUid() {
+	return scratchieItemUid;
+    }
+
+    public void setScratchieItemUid(Long scratchieItemUid) {
+	this.scratchieItemUid = scratchieItemUid;
+    }
 }

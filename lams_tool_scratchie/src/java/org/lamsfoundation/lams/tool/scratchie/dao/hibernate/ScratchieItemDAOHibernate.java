@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 public class ScratchieItemDAOHibernate extends LAMSBaseDAO implements ScratchieItemDAO {
 
     private static final String FIND_AUTHORING_ITEMS = "from " + ScratchieItem.class.getName()
-	    + " where scratchie_uid = ? order by create_date asc";
+	    + " where scratchie_uid = ?";
 
     @SuppressWarnings("unchecked")
     @Override

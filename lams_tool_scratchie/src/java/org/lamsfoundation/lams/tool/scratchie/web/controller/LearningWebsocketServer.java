@@ -163,8 +163,8 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			Long answerUid = answer.getUid();
-			Boolean answerStoredIsCorrect = answer.isCorrect();
+			Long answerUid = answer.getQbOption().getUid();
+			Boolean answerStoredIsCorrect = answer.getQbOption().isCorrect();
 			Boolean answerCache = itemCache.get(answerUid);
 			// check if the correct answer is stored in cache
 			if ((answerCache == null) || !answerCache.equals(answerStoredIsCorrect)) {
@@ -227,8 +227,8 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " entered Scratchie with toolSessionId: " + toolSessionId);
+	    log.debug("User " + websocket.getUserPrincipal().getName() + " entered Scratchie with toolSessionId: "
+		    + toolSessionId);
 	}
     }
 
@@ -243,8 +243,8 @@ public class LearningWebsocketServer {
 
 	if (log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
-	    log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " left Scratchie with Tool Session ID: " + toolSessionId
+	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Scratchie with Tool Session ID: "
+		    + toolSessionId
 		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
 			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
 				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "

@@ -24,122 +24,33 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.qb.model.QbOption;
 
 /**
  * Tool may contain several questions. Which in turn contain answers.
  *
  * @author Andrey Balan
  */
-@Entity
-@Table(name = "tl_lascrt11_scratchie_answer")
-public class ScratchieAnswer implements Cloneable {
-    private static final Logger log = Logger.getLogger(ScratchieAnswer.class);
+public class ScratchieAnswer implements Comparable<ScratchieAnswer> {
+    private QbOption qbOption;
 
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
-
-    @Column
-    private String description;
-
-    @Column
-    private boolean correct;
-
-    @Column(name = "order_id")
-    private Integer orderId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scratchie_item_uid")
-    private ScratchieItem scratchieItem;
-
-    // ******************** DTO fields ***************************
-    @Transient
     private boolean scratched;
-    @Transient
     private int attemptOrder;
-    @Transient
     private int[] attempts;
-    @Transient
     private List<ConfidenceLevelDTO> confidenceLevelDtos;
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-    /**
-     *
-     * @return Returns the uid.
-     */
-    public Long getUid() {
-	return uid;
+    @Override
+    public int compareTo(ScratchieAnswer o) {
+	return this.qbOption.compareTo(o.qbOption);
     }
 
-    /**
-     * @param uid
-     *            The uid to set.
-     */
-    public void setUid(Long userID) {
-	this.uid = userID;
+    public QbOption getQbOption() {
+	return qbOption;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getDescription() {
-	return description;
-    }
-
-    public void setDescription(String description) {
-	this.description = description;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isCorrect() {
-	return correct;
-    }
-
-    public void setCorrect(boolean correctScratchie) {
-	this.correct = correctScratchie;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Integer getOrderId() {
-	return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-	this.orderId = orderId;
-    }
-
-    /**
-     *
-     */
-    public ScratchieItem getScratchieItem() {
-	return scratchieItem;
-    }
-
-    public void setScratchieItem(ScratchieItem scratchieItem) {
-	this.scratchieItem = scratchieItem;
+    public void setQbOption(QbOption qbOption) {
+	this.qbOption = qbOption;
     }
 
     public void setScratched(boolean complete) {
@@ -163,8 +74,6 @@ public class ScratchieAnswer implements Cloneable {
 
     /**
      * Used for item summary page in monitor
-     *
-     * @return
      */
     public int[] getAttempts() {
 	return attempts;
@@ -180,18 +89,5 @@ public class ScratchieAnswer implements Cloneable {
 
     public void setConfidenceLevelDtos(List<ConfidenceLevelDTO> confidenceLevelDtos) {
 	this.confidenceLevelDtos = confidenceLevelDtos;
-    }
-
-    @Override
-    public Object clone() {
-	ScratchieAnswer obj = null;
-	try {
-	    obj = (ScratchieAnswer) super.clone();
-	    obj.setUid(null);
-	} catch (CloneNotSupportedException e) {
-	    ScratchieAnswer.log.error("When clone " + ScratchieAnswer.class + " failed");
-	}
-
-	return obj;
     }
 }

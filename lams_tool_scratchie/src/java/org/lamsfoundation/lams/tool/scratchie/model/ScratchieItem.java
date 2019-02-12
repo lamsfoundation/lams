@@ -23,24 +23,20 @@
 
 package org.lamsfoundation.lams.tool.scratchie.model;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 
 /**
  * Tool may contain several questions. Which in turn contain answers.
@@ -49,109 +45,52 @@ import org.apache.log4j.Logger;
  */
 @Entity
 @Table(name = "tl_lascrt11_scratchie_item")
-public class ScratchieItem implements Cloneable {
+//in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
+@PrimaryKeyJoinColumn(name = "uid")
+public class ScratchieItem extends QbToolQuestion implements Serializable, Cloneable {
+    private static final long serialVersionUID = -2824051249870361117L;
+
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
-
-    @Column
-    private String title;
-
-    @Column
-    private String description;
 
     @Column(name = "order_id")
     private Integer orderId;
-
-    @Column(name = "create_by_author")
-    private boolean isCreateByAuthor;
-
-    @Column(name = "create_date")
-    private Date createDate;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("order_id ASC")
-    @JoinColumn(name = "scratchie_item_uid")
-    private Set<ScratchieAnswer> answers = new HashSet<>();
 
     // ************************ DTO fields ***********************
     @Transient
     private boolean isUnraveled;
     @Transient
     private String burningQuestion;
+    @Transient
+    private List<ScratchieAnswer> answers = null;
+    @Transient
+    private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
 
     @Override
     public Object clone() {
 	ScratchieItem item = null;
 	try {
 	    item = (ScratchieItem) super.clone();
-
-	    item.setUid(null);
-
-	    if (answers != null) {
-		Iterator<ScratchieAnswer> iter = answers.iterator();
-		Set<ScratchieAnswer> set = new HashSet<>();
-		while (iter.hasNext()) {
-		    ScratchieAnswer answer = iter.next();
-		    ScratchieAnswer newAnswer = (ScratchieAnswer) answer.clone();
-		    // just clone old file without duplicate it in repository
-		    set.add(newAnswer);
-		}
-		item.answers = set;
-	    }
-
+	    item.uid = null;
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ScratchieItem.class + " failed");
 	}
-
 	return item;
     }
 
-    // **********************************************************
-    // Get/Set methods
-    // **********************************************************
-
-    public Long getUid() {
-	return uid;
+    public List<ScratchieAnswer> getAnswers() {
+	if (answers == null) {
+	    answers = new LinkedList<>();
+	    for (QbOption option : qbQuestion.getQbOptions()) {
+		ScratchieAnswer answer = new ScratchieAnswer();
+		answer.setQbOption(option);
+		answers.add(answer);
+	    }
+	}
+	return answers;
     }
 
-    public void setUid(Long userID) {
-	this.uid = userID;
-    }
-    
-    public String getTitle() {
-	return title;
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
-    public String getDescription() {
-	return description;
-    }
-
-    public void setDescription(String description) {
-	this.description = description;
-    }
-
-    public Date getCreateDate() {
-	return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
-    }
-
-    public boolean isCreateByAuthor() {
-	return isCreateByAuthor;
-    }
-
-    public void setCreateByAuthor(boolean isCreateByAuthor) {
-	this.isCreateByAuthor = isCreateByAuthor;
+    public void setAnswers(List<ScratchieAnswer> answers) {
+	this.answers = answers;
     }
 
     public Integer getOrderId() {
@@ -160,14 +99,6 @@ public class ScratchieItem implements Cloneable {
 
     public void setOrderId(Integer orderId) {
 	this.orderId = orderId;
-    }
-
-    public Set<ScratchieAnswer> getAnswers() {
-	return answers;
-    }
-
-    public void setAnswers(Set<ScratchieAnswer> answers) {
-	this.answers = answers;
     }
 
     public boolean isUnraveled() {
@@ -185,4 +116,13 @@ public class ScratchieItem implements Cloneable {
     public void setBurningQuestion(String burningQuestion) {
 	this.burningQuestion = burningQuestion;
     }
+
+    public int getQbQuestionModified() {
+	return qbQuestionModified;
+    }
+
+    public void setQbQuestionModified(int qbQuestionModified) {
+	this.qbQuestionModified = qbQuestionModified;
+    }
+
 }

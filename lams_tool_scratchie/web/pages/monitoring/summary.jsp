@@ -125,7 +125,7 @@
 			   		{name:'feedback', index:'feedback', width:520},
 			   		{name:'count', index:'count', align:"right", width:70}
 			   	],
-			   	// caption: "${scratchieItem.title}"
+			   	// caption: "${scratchieItem.qbQuestion.name}"
 			});
 			
 			<c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">
@@ -281,7 +281,7 @@
 		<select id="item-uid" class="form-control">
 			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
    			<c:forEach var="item" items="${scratchie.scratchieItems}">
-				<option value="${item.uid}"><c:out value="${item.title}" escapeXml="true"/></option>
+				<option value="${item.uid}"><c:out value="${item.qbQuestion.name}" escapeXml="true"/></option>
 		   	</c:forEach>
 		</select>
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
@@ -342,7 +342,7 @@
 		
 		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning">
 					<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
-						<div class="voffset5"><strong>${burningQuestionItemDto.scratchieItem.title}</strong></div>
+						<div class="voffset5"><strong>${burningQuestionItemDto.scratchieItem.qbQuestion.name}</strong></div>
 						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</c:forEach>
 				</div>

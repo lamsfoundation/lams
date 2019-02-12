@@ -1,7 +1,7 @@
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 
@@ -14,18 +14,18 @@ public class ScratchieItemDTO implements Cloneable {
 
     private Long uid;
     private String title;
-    private Set<ScratchieAnswer> answers;
+    private List<ScratchieAnswer> answers;
     private boolean unraveledOnFirstAttempt;
     private int userMark;
     private int userAttempts;
-    //sequence of answers selected by user in the form of "X, Y, Z" 
+    //sequence of answers selected by user in the form of "X, Y, Z"
     private String answersSequence;
 
     /**
      * Default contruction method.
      */
     public ScratchieItemDTO() {
-	answers = new HashSet<ScratchieAnswer>();
+	answers = new LinkedList<>();
     }
 
     // **********************************************************
@@ -47,11 +47,11 @@ public class ScratchieItemDTO implements Cloneable {
 	this.title = title;
     }
 
-    public Set<ScratchieAnswer> getAnswers() {
+    public List<ScratchieAnswer> getAnswers() {
 	return answers;
     }
 
-    public void setAnswers(Set<ScratchieAnswer> answers) {
+    public void setAnswers(List<ScratchieAnswer> answers) {
 	this.answers = answers;
     }
 
@@ -80,17 +80,17 @@ public class ScratchieItemDTO implements Cloneable {
     }
 
     /**
-     * @return sequence of answers selected by user in the form of "X, Y, Z" 
+     * @return sequence of answers selected by user in the form of "X, Y, Z"
      */
     public String getAnswersSequence() {
 	return answersSequence;
     }
 
     /**
-     * @param answersSequence sequence of answers selected by user in the form of "X, Y, Z" 
+     * @param answersSequence
+     *            sequence of answers selected by user in the form of "X, Y, Z"
      */
     public void setAnswersSequence(String answersSequence) {
 	this.answersSequence = answersSequence;
     }
 }
-

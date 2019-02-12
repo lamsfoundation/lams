@@ -177,7 +177,7 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
-                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
+                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.qbQuestion.name}"</c:when><c:otherwise>"<a href='#${scratchieItem.qbQuestion.name}' class='bq-title'>${scratchieItem.qbQuestion.name}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
 	  	          	beforeEditRow: function (options, rowid) {
 		  	          	alert("aaa");

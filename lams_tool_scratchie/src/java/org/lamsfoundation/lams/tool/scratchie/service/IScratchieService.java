@@ -29,16 +29,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -62,10 +62,10 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     Scratchie getScratchieByContentId(Long contentId);
-    
+
     /**
      * Populate scratchie items with the confidence levels from the activity specified in author
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @param confidenceLevelsActivityUiid
@@ -73,11 +73,12 @@ public interface IScratchieService extends ICommonToolService {
      */
     void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items);
-    
+
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
-     * 
-     * @param toolContentId toolContentId of the specified activity 
+     *
+     * @param toolContentId
+     *            toolContentId of the specified activity
      * @return
      */
     Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
@@ -89,18 +90,18 @@ public interface IScratchieService extends ICommonToolService {
      * @param toolSessionId
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
-    
+
     /**
      * Stores date when user has started activity with time limit.
-     * 
+     *
      * @param sessionId
-     * @throws SchedulerException 
+     * @throws SchedulerException
      */
     void launchTimeLimit(Long sessionId) throws SchedulerException;
-    
+
     /**
      * Checks if non-leaders should still wait for leader to submit notebook.
-     * 
+     *
      * @param toolSession
      * @return
      */
@@ -118,7 +119,7 @@ public interface IScratchieService extends ICommonToolService {
      */
     void saveBurningQuestion(Long sessionId, Long itemUid, String question);
 
-    ScratchieAnswer getScratchieAnswerByUid(Long answerUid);
+    QbOption getQbOptionByUid(Long optionUid);
 
     /**
      * Get a cloned copy of tool default tool content (Scratchie) and assign the toolContentId of that copy as the given
@@ -160,9 +161,9 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     List<ScratchieUser> getUsersBySession(Long toolSessionId);
-    
+
     ScratchieUser getUserByUserIDAndContentID(Long userId, Long contentId);
-    
+
     int countUsersByContentId(Long contentId);
 
     /**
@@ -202,10 +203,10 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     ScratchieSession getScratchieSessionBySessionId(Long sessionId);
-    
+
     /**
      * Return all sessions realted to the specified toolContentId.
-     * 
+     *
      * @param toolContentId
      * @return
      */
@@ -251,7 +252,7 @@ public interface IScratchieService extends ICommonToolService {
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
      * update all the marks.
      */
-    void recordItemScratched(Long toolSessionId, Long scratchieItemUid);
+    void recordItemScratched(Long toolSessionId, Long itemUid, Long scratchieItemUid);
 
     void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook);
 
@@ -259,8 +260,8 @@ public interface IScratchieService extends ICommonToolService {
      * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
      *
      * @param toolSessionId
-     * @throws IOException 
-     * @throws JSONException 
+     * @throws IOException
+     * @throws JSONException
      */
     void setScratchingFinished(Long toolSessionId) throws IOException;
 
@@ -292,7 +293,8 @@ public interface IScratchieService extends ICommonToolService {
      * @param sessionId
      *            optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader
      *            of this group has liked
-     * @param includeEmptyItems whether it should include questions that don't have any burning questions
+     * @param includeEmptyItems
+     *            whether it should include questions that don't have any burning questions
      * @return
      */
     List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems);
@@ -386,31 +388,34 @@ public interface IScratchieService extends ICommonToolService {
 
     void releaseItemsFromCache(Scratchie scratchie);
 
+    void releaseFromCache(Object object);
+
     ScratchieConfigItem getConfigItem(String key);
 
     void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);
-    
+
     /**
      * Return preset marks that is going to be used for calculating learners' marks. Return scratchie.presetMarks if
      * it's not null, otherwise returns default setting stored as admin config setting.
-     * 
+     *
      * @param scratchie
      * @return
      */
     String[] getPresetMarks(Scratchie scratchie);
-    
+
     /**
      * Return a maximum possible mark that user can get on answering all questions.
-     * 
+     *
      * @param scratchie
      * @return
      */
     int getMaxPossibleScore(Scratchie scratchie);
-    
+
     /** Get the raw marks for display in a graph in monitoring */
     List<Number> getMarksArray(Long contentId);
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
 
+    int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion);
 }

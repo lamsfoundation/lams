@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -125,7 +124,7 @@ public class TblMonitorController {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	request.setAttribute("items", items);
 
@@ -163,14 +162,14 @@ public class TblMonitorController {
 		String answersSequence = groupRow[i].getCellValue().toString();
 		String[] answerLetters = answersSequence.split(", ");
 
-		Set<ScratchieAnswer> answers = new LinkedHashSet<>();
+		List<ScratchieAnswer> answers = new LinkedList<>();
 		for (int j = 0; j < answerLetters.length; j++) {
 		    String answerLetter = answerLetters[j];
 		    String correctAnswerLetter = correctAnswersRow[i].getCellValue().toString();
 
 		    ScratchieAnswer answer = new ScratchieAnswer();
-		    answer.setDescription(answerLetter);
-		    answer.setCorrect(correctAnswerLetter.equals(answerLetter));
+		    answer.getQbOption().setName(answerLetter);
+		    answer.getQbOption().setCorrect(correctAnswerLetter.equals(answerLetter));
 
 		    answers.add(answer);
 		}

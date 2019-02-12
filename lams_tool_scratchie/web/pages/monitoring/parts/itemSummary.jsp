@@ -94,7 +94,7 @@
 	
 		<c:set var="title">
 			<fmt:message key="label.monitoring.summary.report.for" >
-				<fmt:param>${fn:escapeXml(item.title)}</fmt:param>
+				<fmt:param>${fn:escapeXml(item.qbQuestion.name)}</fmt:param>
 			</fmt:message>
 		</c:set>
 		<lams:Page type="learning" title="${title}">

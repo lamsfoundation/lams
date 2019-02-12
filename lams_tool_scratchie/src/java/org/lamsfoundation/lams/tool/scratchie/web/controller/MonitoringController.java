@@ -149,9 +149,9 @@ public class MonitoringController {
 	// escape JS sensitive characters in answer descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieAnswer answer : summary.getAnswers()) {
-		String description = (answer.getDescription() == null) ? ""
-			: StringEscapeUtils.escapeJavaScript(answer.getDescription());
-		answer.setDescription(description);
+		String description = (answer.getQbOption().getName() == null) ? ""
+			: StringEscapeUtils.escapeJavaScript(answer.getQbOption().getName());
+		answer.getQbOption().setName(description);
 	    }
 	}
 

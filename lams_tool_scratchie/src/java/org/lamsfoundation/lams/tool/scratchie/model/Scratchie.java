@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -73,7 +72,7 @@ public class Scratchie implements Cloneable {
     private boolean defineLater;
 
     // general infomation
-    
+
     @Column(name = "create_date")
     private Date created;
 
@@ -83,7 +82,7 @@ public class Scratchie implements Cloneable {
     @Column(name = "submission_deadline")
     private Date submissionDeadline;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     @OrderBy("order_id ASC")
     @JoinColumn(name = "scratchie_uid")
     private Set<ScratchieItem> scratchieItems = new HashSet<>();;
@@ -243,7 +242,7 @@ public class Scratchie implements Cloneable {
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
     }
-    
+
     public Long getUid() {
 	return uid;
     }

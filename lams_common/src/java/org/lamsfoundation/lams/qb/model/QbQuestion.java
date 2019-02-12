@@ -62,6 +62,9 @@ public class QbQuestion implements Serializable, Cloneable {
     private String name;
 
     @Column
+    private String description;
+
+    @Column
     private Integer mark;
 
     @Column
@@ -81,13 +84,14 @@ public class QbQuestion implements Serializable, Cloneable {
     public boolean equals(Object o) {
 	QbQuestion other = (QbQuestion) o;
 	// options are also checked if they are equal
-	return new EqualsBuilder().append(name, other.name).append(feedback, other.feedback).append(mark, other.mark)
+	return new EqualsBuilder().append(name, other.name).append(description, other.description)
+		.append(feedback, other.feedback).append(mark, other.mark)
 		.append(qbOptions.toArray(), other.getQbOptions().toArray()).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(name).append(feedback).append(mark).toHashCode();
+	return new HashCodeBuilder().append(name).append(description).append(feedback).append(mark).toHashCode();
     }
 
     @Override
@@ -159,6 +163,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setName(String name) {
 	this.name = StringUtils.isBlank(name) ? null : name.trim();
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     public Integer getMark() {

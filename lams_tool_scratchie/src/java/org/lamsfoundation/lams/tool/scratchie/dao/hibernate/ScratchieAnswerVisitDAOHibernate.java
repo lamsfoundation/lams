@@ -34,10 +34,10 @@ import org.springframework.stereotype.Repository;
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
 
     private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId = ? and r.scratchieAnswer.uid=?";
+	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.scratchieItemUid.uid = ?";
 
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
+	    + " as r where r.sessionId=? and r.scratchieItemUid.uid = ?  order by r.accessDate asc";
 
     private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? order by r.accessDate asc";
@@ -46,8 +46,8 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=?";
 
     @Override
-    public ScratchieAnswerVisitLog getLog(Long answerUid, Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, answerUid });
+    public ScratchieAnswerVisitLog getLog(Long answerUid, Long itemUid, Long sessionId) {
+	List list = doFind(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, itemUid, answerUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

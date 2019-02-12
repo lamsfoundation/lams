@@ -46,12 +46,12 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -168,7 +168,7 @@ public class LearningController {
 	if (isUserLeader) {
 	    Set<Long> answerUids = new HashSet<>();
 	    for (ScratchieItem item : scratchie.getScratchieItems()) {
-		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		for (QbOption answer : item.getQbQuestion().getQbOptions()) {
 		    answerUids.add(answer.getUid());
 		}
 	    }
@@ -355,6 +355,7 @@ public class LearningController {
 		.getAttribute(sessionMapID);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	final Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
+	final Long itemUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ITEM_UID));
 
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
 
@@ -371,7 +372,7 @@ public class LearningController {
 	}
 
 	// Return whether scratchie answer is correct or not
-	ScratchieAnswer answer = scratchieService.getScratchieAnswerByUid(answerUid);
+	QbOption answer = scratchieService.getQbOptionByUid(answerUid);
 	if (answer == null) {
 	    return null;
 	}
@@ -386,7 +387,7 @@ public class LearningController {
 	Thread recordItemScratchedThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
-		scratchieService.recordItemScratched(toolSessionId, answerUid);
+		scratchieService.recordItemScratched(toolSessionId, itemUid, answerUid);
 	    }
 	}, "LAMS_recordItemScratched_thread");
 	recordItemScratchedThread.start();

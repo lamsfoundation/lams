@@ -1,5 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
+<%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
+<script>
+	// Inform author whether the QB question was modified
+	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
+		qbMessage = null;
+	switch (qbQuestionModified) {
+		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.update" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.version" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.new" />';
+			break;
+	}
+	if (qbMessage) {
+		alert(qbMessage);
+	}
+</script>
+
 <!-- Dropdown menu for choosing a question from question bank -->
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
@@ -20,7 +42,7 @@
 			<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 				<tr>
 					<td style="padding-top:15px; padding-bottom:15px;">
-						<c:out value="${item.title}" escapeXml="true"/>			
+						<c:out value="${item.qbQuestion.name}" escapeXml="true"/>			
 					</td>
 						
 					<td class="arrows" style="width:5%">

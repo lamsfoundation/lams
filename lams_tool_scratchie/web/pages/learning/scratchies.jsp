@@ -1,33 +1,33 @@
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 	<div class="lead">
-        <a name="${item.title}" style="text-decoration:none;color:black"><c:out value="${item.title}" escapeXml="true" /></a>
+        <a name="${item.qbQuestion.name}" style="text-decoration:none;color:black"><c:out value="${item.qbQuestion.name}" escapeXml="true" /></a>
 	</div>
 	<div class="panel-body-sm">
-		<c:out value="${item.description}" escapeXml="false" />
+		<c:out value="${item.qbQuestion.description}" escapeXml="false" />
 	</div>
 
 	<table id="scratches" class="table table-hover">
 		<c:forEach var="answer" items="${item.answers}" varStatus="status">
-			<tr id="tr${answer.uid}">
+			<tr id="tr${answer.qbOption.uid}">
 				<td style="width: 40px;">
 					<c:choose>
-						<c:when test="${answer.scratched && answer.correct}">
+						<c:when test="${answer.scratched && answer.qbOption.correct}">
 							<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
+								 id="image-${item.uid}-${answer.qbOption.uid}">
 						</c:when>
-						<c:when test="${answer.scratched && !answer.correct}">
+						<c:when test="${answer.scratched && !answer.qbOption.correct}">
 							<img src="<lams:WebAppURL/>includes/images/scratchie-wrong.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
+								 id="image-${item.uid}-${answer.qbOption.uid}">
 						</c:when>
 						<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
 							<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.uid}">
+								 id="image-${item.uid}-${answer.qbOption.uid}">
 						</c:when>
 						<c:otherwise>
-							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;"
-								id="imageLink-${item.uid}-${answer.uid}"> <img
+							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.qbOption.uid}); return false;"
+								id="imageLink-${item.uid}-${answer.qbOption.uid}"> <img
 								src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-								id="image-${item.uid}-${answer.uid}" />
+								id="image-${item.uid}-${answer.qbOption.uid}" />
 							</a>
 						</c:otherwise>
 					</c:choose> 
@@ -45,7 +45,7 @@
 					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
 				>
 					<div class="answer-description">
-						<c:out value="${answer.description}" escapeXml="false" />
+						<c:out value="${answer.qbOption.name}" escapeXml="false" />
 					</div>
 					
 					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
