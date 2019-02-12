@@ -836,6 +836,9 @@ PropertyLib = {
 								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 		 						  .mousemove(HandlerPropertyLib.approachPropertiesDialogHandler)
 		                          .find('.modal-header button').remove();
+		propertiesDialog.on('drag', function(event, ui){
+			$(this).data('dragged', true);
+		});
 		layout.dialogs.push(propertiesDialog);
 		
 		var groupNamingContent = $('#propertiesContentGroupNaming');
@@ -1764,6 +1767,10 @@ PropertyLib = {
 		}
 		modalBody.find('input').blur();
 		dialog.on('shown.bs.modal', function(){
+			if (dialog.data('dragged')){
+				// if user dragged the dialog at least once, it does not automatically change its position anymore
+				return;
+			}
 			var box = object.items.getBBox(),
 				canvasOffset = canvas.offset(),
 				canvasWidth = canvas.width(),
