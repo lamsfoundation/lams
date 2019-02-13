@@ -99,6 +99,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 	// run processing in a separate thread as it can take a while and request would time out
 	new Thread(() -> {
 	    try {
+		logger.info("SP enrolments provisioning starting");
 		// start interacting with DB
 		HibernateSessionManager.openSession();
 
@@ -113,16 +114,15 @@ public class SPEnrolmentServlet extends HttpServlet {
 		ConcurrentMap<String, String> courses = lines.parallelStream().unordered().collect(
 			Collectors.toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
 
-		// map of user login -> user first name and email
-		ConcurrentMap<String, String[]> users = lines.parallelStream().unordered()
-			.collect(Collectors.toConcurrentMap(elem -> elem.get(3),
-				elem -> new String[] { elem.get(4), elem.get(5) }, (elem1, elem2) -> elem1));
+		// map of user login (email) -> first name
+		ConcurrentMap<String, String> users = lines.parallelStream().unordered().collect(
+			Collectors.toConcurrentMap(elem -> elem.get(5), elem -> elem.get(4), (elem1, elem2) -> elem1));
 
 		// map of course code -> subcourse code -> user logins
 		Map<String, Map<String, List<String>>> mappings = lines.stream()
 			.collect(Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
 				Collectors.groupingBy(elem -> elem.get(2), LinkedHashMap::new,
-					Collectors.mapping(elem -> elem.get(3), Collectors.toList()))));
+					Collectors.mapping(elem -> elem.get(5), Collectors.toList()))));
 
 		// map of user login -> course ID -> role IDs
 		Map<String, Map<Integer, Set<Integer>>> existingRoles = new HashMap<>();
@@ -139,7 +139,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 
 		// create users
-		for (Entry<String, String[]> userEntry : users.entrySet()) {
+		for (Entry<String, String> userEntry : users.entrySet()) {
+		    // email servers as login
 		    String login = userEntry.getKey();
 		    User user = userManagementService.getUserByLogin(login);
 		    if (user == null) {
@@ -147,7 +148,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 			String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
 
 			ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, login,
-				password, salt, userEntry.getValue()[0], ".", userEntry.getValue()[1]);
+				password, salt, userEntry.getValue(), ".", login);
 			user = userMap.getUser();
 
 			String message = "User created with login \"" + login + "\" and ID " + user.getUserId();
@@ -309,7 +310,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 			// user is a learner, but he should not; remove learner role from subcourse and lessons
 			for (User user : subcourseLearners) {
-			    Set<Integer> existingSubcourseRoles = existingRoles.get(user.getLogin()).get(subcourseId);
+			    Map<Integer, Set<Integer>> existingSubcoursesRoles = existingRoles.get(user.getLogin());
+			    Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
+				    : existingSubcoursesRoles.get(subcourseId);
 			    if (existingSubcourseRoles != null) {
 				existingSubcourseRoles.remove(Role.ROLE_LEARNER);
 				userManagementService.setRolesForUserOrganisation(user.getUserId(), subcourseId,
