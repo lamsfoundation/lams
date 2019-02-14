@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
@@ -165,6 +166,16 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
+    }
+    
+    @Override
+    public boolean isMcContentAttempted(Long mcContentUid) {
+	final String IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT = "select COUNT(*) > 0 FROM " + McUsrAttempt.class.getName()
+		+ " AS attempt WHERE attempt.mcQueContent.mcContent.uid=:mcContentUid";
+
+	Query<Boolean> q = getSession().createQuery(IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT, Boolean.class);
+	q.setParameter("mcContentUid", mcContentUid);
+	return q.uniqueResult();
     }
     
     @Override

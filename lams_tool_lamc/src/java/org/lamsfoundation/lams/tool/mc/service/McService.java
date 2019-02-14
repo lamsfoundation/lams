@@ -465,6 +465,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public int getAttemptsCountPerOption(Long optionUid) {
 	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
     }
+    
+    @Override
+    public boolean isMcContentAttempted(Long mcContentUid) {
+	return mcUsrAttemptDAO.isMcContentAttempted(mcContentUid);
+    }
 
     @Override
     public List<AnswerDTO> getAnswersFromDatabase(McContent mcContent, McQueUsr user) {
@@ -780,18 +785,17 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 	    logEventService.logMarkChange(user.getQueUsrId(), user.getUsername(), toolContentId, "" + oldMark,
 		    "" + totalMark);
-
 	}
     }
 
     @Override
     public void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions,
-	    List<McQuestionDTO> questionDTOs, List<McQuestionDTO> deletedQuestions) {
-
+	    List<McQuestionDTO> questionDTOs) {
 	// create list of modified questions
 	List<McQuestionDTO> modifiedQuestions = new ArrayList<McQuestionDTO>();
-	// create list of modified question marks
+	// create list of questions where only mark was modified
 	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<McQuestionDTO>();
+	
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -799,29 +803,31 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    boolean isQuestionModified = false;
 		    boolean isQuestionMarkModified = false;
 
-		    // question is different
-		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
-			isQuestionModified = true;
-		    }
+		    // question text is different - do nothing
 
 		    // mark is different
-		    if (oldQuestion.getMark().intValue() != (new Integer(questionDTO.getMark())).intValue()) {
+		    if (!oldQuestion.getMark().equals(Integer.valueOf(questionDTO.getMark()))) {
 			isQuestionMarkModified = true;
 		    }
 
-		    // options are different
+		    // options are different (correct option got changed)
 		    Set<McOptsContent> oldOptions = oldQuestion.getMcOptionsContents();
 		    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 		    for (McOptsContent oldOption : oldOptions) {
 			for (McOptionDTO optionDTO : optionDTOs) {
 			    if (oldOption.getUid().equals(optionDTO.getUid())) {
 
-				if (!StringUtils.equals(oldOption.getMcQueOptionText(), optionDTO.getCandidateAnswer())
-					|| (oldOption.isCorrectOption() != "Correct".equals(optionDTO.getCorrect()))) {
+				if (oldOption.isCorrectOption() != "Correct".equals(optionDTO.getCorrect())) {
 				    isQuestionModified = true;
+				    break;
 				}
 			    }
 			}
+		    }
+		    
+		    // a new option is added
+		    if (oldOptions.size() != optionDTOs.size()) {
+			isQuestionModified = true;
 		    }
 
 		    if (isQuestionModified) {
@@ -849,65 +855,59 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		Iterator<McUsrAttempt> iter = userAttempts.iterator();
 		while (iter.hasNext()) {
 		    McUsrAttempt userAttempt = iter.next();
-
 		    McQueContent question = userAttempt.getMcQueContent();
-
-		    boolean isRemoveQuestionResult = false;
+		    Integer oldUserMark = userAttempt.getMark();
 
 		    // [+] if the question mark is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestionsMarksOnly) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    Integer newQuestionMark = new Integer(modifiedQuestion.getMark());
+			    Integer newQuestionMark = Integer.valueOf(modifiedQuestion.getMark());
 			    Integer oldQuestionMark = question.getMark();
 			    Integer newActualMark = (userAttempt.getMark() * newQuestionMark) / oldQuestionMark;
-
-			    newTotalMark += newActualMark - userAttempt.getMark();
 
 			    // update question answer's mark
 			    userAttempt.setMark(newActualMark);
 			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
+			    newTotalMark += newActualMark - oldUserMark;
+
 			    break;
 			}
-
 		    }
 
 		    // [+] if the question is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestions) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
+			    
+			    //check whether user has selected correct answer, taking into account changes done to modifiedQuestion
+			    boolean isAnswerCorrect = false;
+			    McOptsContent selectedOption = userAttempt.getMcOptionsContent();
+			    for (McOptionDTO modifiedOption : modifiedQuestion.getOptionDtos()) {
+				if (selectedOption.getUid().equals(modifiedOption.getUid())) {
+				    isAnswerCorrect = "Correct".equals(modifiedOption.getCorrect());
+				}
+			    }
+			    
+			    //recalculate mark
+			    Integer newActualMark = isAnswerCorrect ? Integer.valueOf(modifiedQuestion.getMark()) : 0;
+			    boolean passed = user.isMarkPassed(newActualMark);
+			    userAttempt.setMark(newActualMark);
+			    userAttempt.setPassed(passed);
+			    userAttempt.setAttemptCorrect(isAnswerCorrect);
+			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+			    
+			    newTotalMark += newActualMark - oldUserMark;
+
 			    break;
 			}
 		    }
-
-		    // [+] if the question was removed
-		    for (McQuestionDTO deletedQuestion : deletedQuestions) {
-			if (question.getUid().equals(deletedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
-			    break;
-			}
-		    }
-
-		    if (isRemoveQuestionResult) {
-
-			Integer oldMark = userAttempt.getMark();
-			if (oldMark != null) {
-			    newTotalMark -= oldMark;
-			}
-
-			iter.remove();
-			mcUsrAttemptDAO.removeAttempt(userAttempt);
-		    }
-
-		    // [+] doing nothing if the new question was added
-
 		}
 
 		// if the mark is changed, update user's lastAttemptTotalMark and also propagade it to the Gradebook
 		if (newTotalMark != oldTotalMark) {
 		    user.setLastAttemptTotalMark(newTotalMark);
 		    updateMcQueUsr(user);
-		    toolService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
+		    toolService.updateActivityMark(Double.valueOf(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
 

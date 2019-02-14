@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 <c:set var="questionDtos" value="${sessionMap.questionDtos}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 
 <div id="itemList">
 	<div class="panel panel-default add-file">
@@ -9,9 +10,11 @@
 		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
 		<div class="btn-group btn-group-xs pull-right">
-			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
-				<fmt:message key="label.authoring.import.qti" />
-			</a>
+			<c:if test="${!isAuthoringRestricted}">
+				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
+					<fmt:message key="label.authoring.import.qti" />
+				</a>
+			</c:if>
 			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
 				<fmt:message key="label.authoring.export.qti" />
 			</a>
@@ -82,9 +85,11 @@
 					</a>
 				</td>
 
-				<td  align="center" style="width:5%">
-					<i class="fa fa-times" title="<fmt:message key="label.tip.deleteQuestion" />" 	onclick="removeQuestion(${queIndex});"></i>
-				</td>
+				<c:if test="${!isAuthoringRestricted}">
+					<td  align="center" style="width:5%">
+						<i class="fa fa-times" title="<fmt:message key="label.tip.deleteQuestion" />" onclick="removeQuestion(${queIndex});"></i>
+					</td>
+				</c:if>
 
 			</tr>
 		</c:forEach>
