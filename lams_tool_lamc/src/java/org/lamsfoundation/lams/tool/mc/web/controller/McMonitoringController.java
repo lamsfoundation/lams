@@ -94,9 +94,6 @@ public class McMonitoringController {
     @Qualifier("lamcMessageService")
     private static MessageService messageService;
 
-    @Autowired
-    private WebApplicationContext applicationContext;
-
     @RequestMapping("/monitoring")
     public String execute(HttpServletRequest request) {
 

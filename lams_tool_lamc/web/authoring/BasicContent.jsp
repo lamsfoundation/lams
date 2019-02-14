@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 
 <script type="text/javascript">
 	function removeQuestion(questionIndex) {
@@ -45,10 +46,16 @@
     function exportQTI() {
     	var frame = document.getElementById("downloadFileDummyIframe"),
     		title = encodeURIComponent(document.getElementsByName("title")[0].value);
-    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}'
-    			+ '&title=' + title;
+		
+    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}&title=' + title;
     }
 </script>
+
+<c:if test="${isAuthoringRestricted}">
+	<lams:Alert id="edit-in-monitor-while-assessment-already-attempted" type="error" close="true">
+		<fmt:message key="label.edit.in.monitor.warning"/>
+	</lams:Alert>
+</c:if>
 
 <input type="hidden" name="questionIndex" />
 
@@ -65,13 +72,15 @@
 <div id="resourceListArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
-  
-<p>
-	<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
-		class="btn btn-default btn-sm thickbox"> 
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
-	</a>
-</p>
-
+ 
+<c:if test="${!isAuthoringRestricted}">
+	<p>
+		<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
+			class="btn btn-default btn-sm thickbox"> 
+			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
+		</a>
+	</p>
+</c:if>
+	
 <!-- For exporting QTI packages -->
 <iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
