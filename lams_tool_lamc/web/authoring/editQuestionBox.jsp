@@ -3,13 +3,13 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 <c:set var="questionDtos" value="${sessionMap.questionDtos}" />
 <c:set var="questionDto" value="${sessionMap.questionDto}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-
 		<script type="text/JavaScript">
 			
 			function submitMethod(actionMethod) {
@@ -140,10 +140,8 @@
 				
 				return true;
 			}
-
 		</script>
 	</lams:head>
-
 <body class="stripes">
 
 	<form:form action="saveQuestion.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST">
