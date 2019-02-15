@@ -27,15 +27,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 
 /**
  * Scratchie
@@ -44,25 +39,14 @@ import org.lamsfoundation.lams.qb.model.QbOption;
  */
 @Entity
 @Table(name = "tl_lascrt11_answer_log")
-public class ScratchieAnswerVisitLog {
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qb_option_uid")
-    private QbOption qbOption;
-
+//in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
+@PrimaryKeyJoinColumn(name = "uid")
+public class ScratchieAnswerVisitLog extends QbToolAnswer {
     @Column(name = "access_date")
     private Date accessDate;
 
     @Column(name = "session_id")
     private Long sessionId;
-
-    @Column(name = "scratchie_item_uid")
-    private Long scratchieItemUid;
 
     public Date getAccessDate() {
 	return accessDate;
@@ -72,35 +56,11 @@ public class ScratchieAnswerVisitLog {
 	this.accessDate = accessDate;
     }
 
-    public QbOption getQbOption() {
-	return qbOption;
-    }
-
-    public void setQbOption(QbOption qbOption) {
-	this.qbOption = qbOption;
-    }
-
-    public Long getUid() {
-	return uid;
-    }
-
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
     public Long getSessionId() {
 	return sessionId;
     }
 
     public void setSessionId(Long sessionId) {
 	this.sessionId = sessionId;
-    }
-
-    public Long getScratchieItemUid() {
-	return scratchieItemUid;
-    }
-
-    public void setScratchieItemUid(Long scratchieItemUid) {
-	this.scratchieItemUid = scratchieItemUid;
     }
 }

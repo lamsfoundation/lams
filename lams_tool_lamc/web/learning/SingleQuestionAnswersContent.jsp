@@ -35,8 +35,8 @@
 									<c:forEach var="option" varStatus="status" items="${dto.options}">
 										<tr>
 											<td class="text-nowrap" style="vertical-align: top;">
-												<input type="radio"	id="${dto.questionUid}-${option.uid}" name="checkedCa" class="noBorder"
-														value="${dto.questionUid}-${option.uid}" 
+												<input type="radio"	id="${dto.questionUid}-${option.qbOption.uid}" name="checkedCa" class="noBorder"
+														value="${dto.questionUid}-${option.qbOption.uid}" 
 														<c:if test="${option.selected}">checked="checked"</c:if> 
 												/> 
 												<c:if test="${isPrefixAnswersWithLetters}">
@@ -46,8 +46,8 @@
                               				</td>
 
 											<td width="100%">
-												<label for="${dto.questionUid}-${option.uid}"> <c:out
-														value="${option.mcQueOptionText}" escapeXml="false" />
+												<label for="${dto.questionUid}-${option.qbOption.uid}"> <c:out
+														value="${option.qbOption.name}" escapeXml="false" />
 												</label>
 											</td>
 

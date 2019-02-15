@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -444,7 +445,8 @@ public class ScratchieServiceImpl
 	    log = new ScratchieAnswerVisitLog();
 	    log.setQbOption(answer);
 	    log.setSessionId(sessionId);
-	    log.setScratchieItemUid(itemUid);
+	    QbToolQuestion qbToolQuestion = (QbToolQuestion) scratchieDao.find(QbToolQuestion.class, itemUid);
+	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
 	}
@@ -748,7 +750,7 @@ public class ScratchieServiceImpl
 		ScratchieAnswerVisitLog log = null;
 		for (ScratchieAnswerVisitLog userLog : userLogs) {
 		    if (userLog.getQbOption().getUid().equals(answer.getQbOption().getUid())
-			    && userLog.getScratchieItemUid().equals(item.getUid())) {
+			    && userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 			log = userLog;
 			break;
 		    }
@@ -836,7 +838,7 @@ public class ScratchieServiceImpl
 
 	int itemAttempts = 0;
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
-	    if (userLog.getScratchieItemUid().equals(item.getUid())) {
+	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 		itemAttempts++;
 	    }
 	}
@@ -1751,7 +1753,7 @@ public class ScratchieServiceImpl
 		    //create a list of attempts user done for the current item
 		    List<ScratchieAnswerVisitLog> itemAttempts = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog answerLog : answerLogs) {
-			if (answerLog.getScratchieItemUid().equals(item.getUid())) {
+			if (answerLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 			    itemAttempts.add(answerLog);
 			}
 		    }

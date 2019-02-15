@@ -26,7 +26,26 @@ CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
 									`qb_question_uid` BIGINT NOT NULL,
 									PRIMARY KEY (tool_question_uid),
 									CONSTRAINT FK_lams_qb_tool_question_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE);
+-- create Question Bank option
+CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
+							 `qb_question_uid` BIGINT NOT NULL,
+							 `display_order` TINYINT NOT NULL DEFAULT 1,
+							 `name` TEXT NOT NULL,
+							 `correct` TINYINT(1) NOT NULL DEFAULT 0,
+							 PRIMARY KEY (uid),
+							 INDEX (display_order),
+							 CONSTRAINT FK_lams_qb_option_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE);
 
+-- create an answer table from tools' answers will inherit
+CREATE TABLE lams_qb_tool_answer (`answer_uid` BIGINT AUTO_INCREMENT,
+								  `tool_question_uid` BIGINT NOT NULL,
+								  `qb_option_uid` BIGINT NOT NULL,
+								  PRIMARY KEY (answer_uid),
+								  CONSTRAINT FK_lams_qb_tool_answer_1 FOREIGN KEY (tool_question_uid) 
+								  	REFERENCES lams_qb_tool_question (tool_question_uid) ON DELETE CASCADE ON UPDATE CASCADE,
+								  CONSTRAINT FK_lams_qb_tool_answer_2 FOREIGN KEY (qb_option_uid)
+								  	REFERENCES lams_qb_option (uid)  ON DELETE CASCADE ON UPDATE CASCADE);
+							 
 -- Migrate MCQ question into Question Bank question
 -- This part of patch should be in MCQ, but it must be run after lams_qb_question is created and it must not run in parallel with other tools' patches,
 -- so the safest solution is to place it here
@@ -82,16 +101,6 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
 								  DROP COLUMN mark,
 								  DROP COLUMN feedback;
 								  
--- create Question Bank option
-CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
-							 `qb_question_uid` BIGINT NOT NULL,
-							 `display_order` TINYINT NOT NULL DEFAULT 1,
-							 `name` TEXT NOT NULL,
-							 `correct` TINYINT(1) NOT NULL DEFAULT 0,
-							 PRIMARY KEY (uid),
-							 INDEX (display_order),
-							 CONSTRAINT FK_lams_qb_option_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE);
-
 -- fill table with options matching unique QB questions inserted above
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
 	SELECT q.uid, o.displayOrder, TRIM(o.mc_que_option_text), o.correct_option
@@ -107,16 +116,17 @@ UPDATE tl_lamc11_usr_attempt AS ua, tl_lamc11_options_content AS mco, lams_qb_to
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND mco.mc_que_content_id = tq.tool_question_uid;
 
--- rewrite foreign keys and column name
-ALTER TABLE tl_lamc11_usr_attempt DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_3,
-								  RENAME COLUMN mc_que_option_id TO qb_option_uid;
-								  
-ALTER TABLE tl_lamc11_usr_attempt ADD CONSTRAINT FK_tl_lamc11_usr_attempt_3 FOREIGN KEY (qb_option_uid)
-	REFERENCES lams_qb_option (uid) ON DELETE CASCADE ON UPDATE CASCADE;
-	
+-- prepare for answer inheritance		
+INSERT INTO lams_qb_tool_answer
+	SELECT uid, mc_que_content_id, mc_que_option_id FROM tl_lamc11_usr_attempt;
+
 -- clean up
 DROP TABLE tl_lamc11_options_content;
 
+ALTER TABLE tl_lamc11_usr_attempt DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_2,
+								  DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_3,
+								  DROP COLUMN mc_que_content_id,
+								  DROP COLUMN mc_que_option_id;
 
 
 -- prepare for Scratchie migration
@@ -196,29 +206,33 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
 	ORDER BY o.order_id;
 	
 
-ALTER TABLE tl_lascrt11_answer_log ADD COLUMN scratchie_item_uid BIGINT,
-								   DROP FOREIGN KEY FK_NEW_610529188_693580A438BF8DFE,
-								   RENAME COLUMN scratchie_answer_uid TO qb_option_uid;
-								   
+ALTER TABLE tl_lascrt11_answer_log ADD COLUMN scratchie_item_uid BIGINT;
+
+-- shift Scratchie answer UIDs by offset equal to existing UIDs of MCQ answers in lams_qb_tool_answer 								   
+SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
+UPDATE tl_lascrt11_answer_log SET uid = uid + @max_answer_uid ORDER BY uid DESC;
+
 -- rewrite references from Scratchie options to QB options
 UPDATE tl_lascrt11_answer_log AS sl, tl_lascrt11_scratchie_answer AS sa, lams_qb_tool_question AS tq, lams_qb_option AS qo
-	SET sl.qb_option_uid = qo.uid,
+	SET sl.scratchie_answer_uid = qo.uid,
 		sl.scratchie_item_uid = tq.tool_question_uid
 	WHERE sa.order_id + 1 = qo.display_order
-		AND sl.qb_option_uid = sa.uid
+		AND sl.scratchie_answer_uid = sa.uid
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND sa.scratchie_item_uid = tq.tool_question_uid;
-								   						   
-								   
-ALTER TABLE tl_lascrt11_answer_log ADD CONSTRAINT FK_tl_lascrt11_answer_log_1 FOREIGN KEY (scratchie_item_uid)
-										REFERENCES tl_lascrt11_scratchie_item (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-								   ADD CONSTRAINT FK_tl_lascrt11_answer_log_2 FOREIGN KEY (qb_option_uid)
-								   		REFERENCES lams_qb_option (uid) ON DELETE CASCADE ON UPDATE CASCADE;
-	
-	
+		
+-- prepare for answer inheritance
+INSERT INTO lams_qb_tool_answer
+	SELECT uid, scratchie_item_uid, scratchie_answer_uid FROM tl_lascrt11_answer_log;
+
+
 -- cleanup
 ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;
-
+ALTER TABLE tl_lascrt11_answer_log DROP FOREIGN KEY FK_NEW_610529188_693580A438BF8DFE,
+								   DROP KEY FK_NEW_lascrt11_30113BFC309ED321,
+								   DROP COLUMN scratchie_item_uid,
+								   DROP COLUMN scratchie_answer_uid;
+								   
 DROP TABLE tl_lascrt11_scratchie_answer,
 		   tmp_question,
 		   tmp_question_match,

@@ -28,16 +28,16 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 
 /**
  * <p>
@@ -49,14 +49,10 @@ import org.lamsfoundation.lams.qb.model.QbOption;
  */
 @Entity
 @Table(name = "tl_lamc11_usr_attempt")
-public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
-
+//in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
+@PrimaryKeyJoinColumn(name = "uid")
+public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparable<McUsrAttempt> {
     private static final long serialVersionUID = 4514268732673337338L;
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
 
     @Column(name = "attempt_time")
     private Date attemptTime;
@@ -69,10 +65,6 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 
     @Column
     private boolean passed;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mc_que_content_id")
-    private McQueContent mcQueContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "que_usr_id")
@@ -91,7 +83,7 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
     public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, QbOption qbOption, Integer mark,
 	    boolean passed, boolean attemptCorrect, int confidenceLevel) {
 	this.attemptTime = attemptTime;
-	this.mcQueContent = mcQueContent;
+	this.qbToolQuestion = mcQueContent;
 	this.mcQueUsr = mcQueUsr;
 	this.qbOption = qbOption;
 	this.mark = mark;
@@ -133,14 +125,6 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	return true;
     }
 
-    public Long getUid() {
-	return this.uid;
-    }
-
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
     public Date getAttemptTime() {
 	return this.attemptTime;
     }
@@ -149,12 +133,12 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 	this.attemptTime = attemptTime;
     }
 
-    public org.lamsfoundation.lams.tool.mc.model.McQueContent getMcQueContent() {
-	return this.mcQueContent;
+    public McQueContent getMcQueContent() {
+	return (McQueContent) Hibernate.unproxy(qbToolQuestion);
     }
 
-    public void setMcQueContent(org.lamsfoundation.lams.tool.mc.model.McQueContent mcQueContent) {
-	this.mcQueContent = mcQueContent;
+    public void setMcQueContent(McQueContent mcQueContent) {
+	this.qbToolQuestion = mcQueContent;
     }
 
     public org.lamsfoundation.lams.tool.mc.model.McQueUsr getMcQueUsr() {
@@ -163,14 +147,6 @@ public class McUsrAttempt implements Serializable, Comparable<McUsrAttempt> {
 
     public void setMcQueUsr(org.lamsfoundation.lams.tool.mc.model.McQueUsr mcQueUsr) {
 	this.mcQueUsr = mcQueUsr;
-    }
-
-    public QbOption getQbOption() {
-	return qbOption;
-    }
-
-    public void setQbOption(QbOption qbOption) {
-	this.qbOption = qbOption;
     }
 
     public McOptsContent getMcOptionsContent() {

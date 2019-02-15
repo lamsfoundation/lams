@@ -34,10 +34,10 @@ import org.springframework.stereotype.Repository;
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
 
     private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.scratchieItemUid.uid = ?";
+	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.qbToolQuestion.uid = ?";
 
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId=? and r.scratchieItemUid.uid = ?  order by r.accessDate asc";
+	    + " as r where r.sessionId=? and r.qbToolQuestion.uid = ?  order by r.accessDate asc";
 
     private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? order by r.accessDate asc";

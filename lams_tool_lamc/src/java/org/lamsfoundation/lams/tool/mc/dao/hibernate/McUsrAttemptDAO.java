@@ -50,14 +50,14 @@ import org.springframework.stereotype.Repository;
 public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
-	    + " and attempt.mcQueContent.uid=:mcQueContentId order by attempt.qbOption.uid";
+	    + " and attempt.qbToolQuestion.uid=:mcQueContentId order by attempt.qbOption.uid";
 
     private static final String LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION = "from attempt in class McUsrAttempt where "
-	    + " attempt.mcQueUsr.mcSessionId=:sessionUid AND attempt.mcQueContent.uid=:mcQueContentId "
+	    + " attempt.mcQueUsr.mcSessionId=:sessionUid AND attempt.qbToolQuestion.uid=:mcQueContentId "
 	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueUsr.uid";
 
     private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
-	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContent.uid, attempt.qbOption.uid";
+	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.qbToolQuestion.uid, attempt.qbOption.uid";
 
     private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from " + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.qbOption.uid=? AND attempt.mcQueUsr.responseFinalised = true";
@@ -68,7 +68,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     public McUsrAttempt getUserAttemptByUid(Long uid) {
-	return (McUsrAttempt) this.getSession().get(McUsrAttempt.class, uid);
+	return this.getSession().get(McUsrAttempt.class, uid);
     }
 
     @Override
@@ -81,21 +81,23 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setParameter("queUsrUid", userUid).list();
     }
-    
+
     @Override
     public List<Object[]> getFinalizedAttemptsBySessionId(final Long sessionId) {
-	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM " + McUsrAttempt.class.getName() 
-		+ " AS attempt, " + User.class.getName() + " as u WHERE attempt.mcQueUsr.mcSession.mcSessionId=:sessionId"
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM "
+		+ McUsrAttempt.class.getName() + " AS attempt, " + User.class.getName()
+		+ " as u WHERE attempt.mcQueUsr.mcSession.mcSessionId=:sessionId"
 		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
 
 	return getSessionFactory().getCurrentSession().createQuery(LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID)
 		.setParameter("sessionId", sessionId).list();
     }
-    
+
     @Override
     public List<Object[]> getLeadersFinalizedAttemptsByContentId(final Long contentId) {
-	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM " + McUsrAttempt.class.getName() 
-		+ " AS attempt, " + User.class.getName() + " as u WHERE attempt.mcQueUsr=attempt.mcQueUsr.mcSession.groupLeader "
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM "
+		+ McUsrAttempt.class.getName() + " AS attempt, " + User.class.getName()
+		+ " as u WHERE attempt.mcQueUsr=attempt.mcQueUsr.mcSession.groupLeader "
 		+ " AND attempt.mcQueContent.mcContent.mcContentId=:contentId "
 		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
 
@@ -133,8 +135,8 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     @SuppressWarnings("unchecked")
     public List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId) {
 	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION).setParameter("sessionUid", sessionUid)
-		.setParameter("mcQueContentId", mcQueContentId).list();
+		.createQuery(LOAD_FINAL_USER_QUESTION_ATTEMPTS_FOR_QUESTION_SESSION)
+		.setParameter("sessionUid", sessionUid).setParameter("mcQueContentId", mcQueContentId).list();
 	return userAttemptList;
     }
 
@@ -166,17 +168,17 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 	}
 	return ((Number) list.get(0)).intValue();
     }
-    
+
     @Override
     public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
-	
+
 	final String FIND_MARKS_FOR_CONTENT_ID = "SELECT user.queUsrId, user.lastAttemptTotalMark FROM "
 		+ McQueUsr.class.getName()
 		+ " user WHERE user.mcSession.mcContent.mcContentId = ? AND user.responseFinalised = true";
 
 	List<Object[]> list = (List<Object[]>) doFind(FIND_MARKS_FOR_CONTENT_ID, new Object[] { toolContentId });
-	
-	List<ToolOutputDTO> toolOutputDtos = new ArrayList<ToolOutputDTO>();
+
+	List<ToolOutputDTO> toolOutputDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
