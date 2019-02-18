@@ -35,7 +35,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -83,9 +82,8 @@ public class Scratchie implements Cloneable {
     private Date submissionDeadline;
 
     @OneToMany
-    @OrderBy("order_id ASC")
     @JoinColumn(name = "scratchie_uid")
-    private Set<ScratchieItem> scratchieItems = new HashSet<>();;
+    private Set<ScratchieItem> scratchieItems = new HashSet<>();
 
     @Column(name = "extra_point")
     private boolean extraPoint;

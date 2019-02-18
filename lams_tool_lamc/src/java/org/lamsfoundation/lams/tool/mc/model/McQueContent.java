@@ -59,12 +59,9 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
     @Column(name = "question_hash")
     private String questionHash;
 
-    @Column(name = "display_order")
-    private Integer displayOrder;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mc_content_id")
-    private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
+    private McContent mcContent;
 
     //DTO fields
     @Transient
@@ -114,20 +111,13 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 	this.questionHash = questionHash;
     }
 
-    public Integer getDisplayOrder() {
-	return this.displayOrder;
-    }
-
-    public void setDisplayOrder(Integer displayOrder) {
-	this.displayOrder = displayOrder;
-    }
-
     public org.lamsfoundation.lams.tool.mc.model.McContent getMcContent() {
 	return this.mcContent;
     }
 
-    public void setMcContent(org.lamsfoundation.lams.tool.mc.model.McContent mcContent) {
+    public void setMcContent(McContent mcContent) {
 	this.mcContent = mcContent;
+	this.toolContentId = mcContent.getMcContentId();
     }
 
     /**

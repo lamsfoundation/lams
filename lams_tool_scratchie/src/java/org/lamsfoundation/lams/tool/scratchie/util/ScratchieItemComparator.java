@@ -9,8 +9,8 @@ public class ScratchieItemComparator implements Comparator<ScratchieItem> {
     @Override
     public int compare(ScratchieItem o1, ScratchieItem o2) {
 
-	if (o1 != null && o2 != null & o1.getOrderId() != null && o2.getOrderId() != null) {
-	    if (o1.getOrderId() > o2.getOrderId()) {
+	if (o1 != null && o2 != null) {
+	    if (o1.getDisplayOrder() > o2.getDisplayOrder()) {
 		return 1;
 	    } else {
 		return -1;

@@ -340,7 +340,7 @@ public class McLearningController {
 
 	    AnswerDTO answerDto = new AnswerDTO();
 	    answerDto.setQuestion(question.getQuestion());
-	    answerDto.setDisplayOrder(question.getDisplayOrder().toString());
+	    answerDto.setDisplayOrder(String.valueOf(question.getDisplayOrder()));
 	    answerDto.setQuestionUid(question.getUid());
 	    answerDto.setFeedback(question.getFeedback() != null ? question.getFeedback() : "");
 

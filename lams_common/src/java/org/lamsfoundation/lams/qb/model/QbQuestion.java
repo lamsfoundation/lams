@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.qb.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -56,6 +57,9 @@ public class QbQuestion implements Serializable, Cloneable {
     // the same question can have multiple versions
     @Column
     private Integer version = 1;
+
+    @Column(name = "create_date")
+    private Date createDate = new Date();
 
     // text of the question
     @Column
@@ -155,6 +159,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setVersion(Integer version) {
 	this.version = version;
+    }
+
+    public Date getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
     }
 
     public String getName() {

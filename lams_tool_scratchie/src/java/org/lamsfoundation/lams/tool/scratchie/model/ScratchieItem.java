@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -52,9 +51,6 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
 
-    @Column(name = "order_id")
-    private Integer orderId;
-
     // ************************ DTO fields ***********************
     @Transient
     private boolean isUnraveled;
@@ -64,6 +60,10 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private List<ScratchieAnswer> answers = null;
     @Transient
     private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
+
+    public ScratchieItem() {
+
+    }
 
     @Override
     public Object clone() {
@@ -91,14 +91,6 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 
     public void setAnswers(List<ScratchieAnswer> answers) {
 	this.answers = answers;
-    }
-
-    public Integer getOrderId() {
-	return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-	this.orderId = orderId;
     }
 
     public boolean isUnraveled() {

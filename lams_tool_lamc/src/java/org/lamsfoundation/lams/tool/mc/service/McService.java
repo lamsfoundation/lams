@@ -315,12 +315,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    // new version of the old question gets created
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+		    qbQuestion.setCreateDate(new Date());
 		    break;
 		case IQbService.QUESTION_MODIFIED_ID_BUMP:
 		    // new question gets created
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(1);
 		    qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+		    qbQuestion.setCreateDate(new Date());
 		    break;
 	    }
 
@@ -563,7 +565,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 
 	    answerDto.setQuestion(question.getQuestion());
-	    answerDto.setDisplayOrder(question.getDisplayOrder().toString());
+	    answerDto.setDisplayOrder(String.valueOf(question.getDisplayOrder()));
 	    answerDto.setQuestionUid(question.getUid());
 
 	    answerDto.setMark(question.getMark());

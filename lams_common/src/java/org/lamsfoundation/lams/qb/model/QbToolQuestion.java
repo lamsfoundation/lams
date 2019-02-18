@@ -36,6 +36,12 @@ public abstract class QbToolQuestion {
     @JoinColumn(name = "qb_question_uid")
     protected QbQuestion qbQuestion;
 
+    @Column(name = "tool_content_id")
+    protected Long toolContentId;
+
+    @Column(name = "display_order")
+    protected int displayOrder = 1;
+
     public Long getUid() {
 	return this.uid;
     }
@@ -46,5 +52,21 @@ public abstract class QbToolQuestion {
 
     public void setQbQuestion(QbQuestion qbQuestion) {
 	this.qbQuestion = qbQuestion;
+    }
+
+    public Long getToolContentId() {
+	return toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+	this.toolContentId = toolContentId;
+    }
+
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
 }

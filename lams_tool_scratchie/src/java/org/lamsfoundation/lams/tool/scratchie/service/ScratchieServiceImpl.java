@@ -971,6 +971,8 @@ public class ScratchieServiceImpl
 	BurningQuestionItemDTO generalBurningQuestionItemDto = new BurningQuestionItemDTO();
 	ScratchieItem generalDummyItem = new ScratchieItem();
 	generalDummyItem.setQbQuestion(new QbQuestion());
+	releaseFromCache(generalDummyItem);
+	releaseFromCache(generalDummyItem.getQbQuestion());
 	// generalDummyItem.setUid(0L);
 	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
 	generalDummyItem.getQbQuestion().setName(generalQuestionMessage);
@@ -2300,9 +2302,10 @@ public class ScratchieServiceImpl
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
-	    item.setOrderId(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
+	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
 	    item.getQbQuestion().setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
 	    item.getQbQuestion().setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+	    item.setToolContentId(scratchie.getContentId());
 	    newItems.add(item);
 
 	    // set options

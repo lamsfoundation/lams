@@ -192,8 +192,8 @@ public class AuthoringController {
 	// If there is no order id, set it up
 	int i = 1;
 	for (ScratchieItem scratchieItem : itemList) {
-	    if (scratchieItem.getOrderId() == null || scratchieItem.getOrderId() != i) {
-		scratchieItem.setOrderId(i);
+	    if (scratchieItem.getDisplayOrder() != i) {
+		scratchieItem.setDisplayOrder(i);
 	    }
 	    i++;
 	}
@@ -286,6 +286,7 @@ public class AuthoringController {
 	while (iter.hasNext()) {
 	    ScratchieItem item = iter.next();
 	    if (item != null) {
+		item.setToolContentId(scratchiePO.getContentId());
 		removeNewLineCharacters(item);
 		items.add(item);
 		// modification status was already set in AuthoringController#saveItem()
@@ -296,6 +297,7 @@ public class AuthoringController {
 			item.setQbQuestion(qbQuestion);
 			qbQuestion.clearID();
 			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+			qbQuestion.setCreateDate(new Date());
 		    }
 			break;
 		    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
@@ -305,6 +307,7 @@ public class AuthoringController {
 			qbQuestion.clearID();
 			qbQuestion.setVersion(1);
 			qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+			qbQuestion.setCreateDate(new Date());
 		    }
 			break;
 		}
@@ -428,9 +431,9 @@ public class AuthoringController {
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
-		maxSeq = last.getOrderId() + 1;
+		maxSeq = last.getDisplayOrder() + 1;
 	    }
-	    item.setOrderId(maxSeq);
+	    item.setDisplayOrder(maxSeq);
 	    itemList.add(item);
 	} else { // edit
 	    List<ScratchieItem> rList = new ArrayList<>(itemList);
@@ -484,9 +487,9 @@ public class AuthoringController {
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
-		maxSeq = last.getOrderId() + 1;
+		maxSeq = last.getDisplayOrder() + 1;
 	    }
-	    item.setOrderId(maxSeq);
+	    item.setDisplayOrder(maxSeq);
 	    item.getQbQuestion().setName(question.getTitle());
 	    item.getQbQuestion().setDescription(QuestionParser.processHTMLField(question.getText(), false,
 		    contentFolderID, question.getResourcesFolderPath()));
@@ -665,9 +668,9 @@ public class AuthoringController {
 		repOption = rList.get(++itemIndex);
 	    }
 
-	    int upSeqId = repOption.getOrderId();
-	    repOption.setOrderId(item.getOrderId());
-	    item.setOrderId(upSeqId);
+	    int upSeqId = repOption.getDisplayOrder();
+	    repOption.setDisplayOrder(item.getDisplayOrder());
+	    item.setDisplayOrder(upSeqId);
 
 	    // put back list, it will be sorted again
 	    itemList.clear();
