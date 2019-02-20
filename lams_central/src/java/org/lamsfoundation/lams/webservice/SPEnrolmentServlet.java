@@ -138,6 +138,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    throw new ServletException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
 		}
 
+		Set<User> allUsersInSubcourses = new HashSet<>();
+		Set<User> allUsersParsed = new HashSet<>();
 		// create users
 		for (Entry<String, String> userEntry : users.entrySet()) {
 		    // email servers as login
@@ -175,6 +177,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // fill data for later usage
 		    existingRoles.put(login, userManagementService.getRolesForUser(user.getUserId()));
 		    userIDs.put(login, user.getUserId());
+		    // add user to a collection of all users in the parsed file
+		    allUsersParsed.add(user);
 		}
 
 		// go through each course
@@ -268,6 +272,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 			// get existing learners for given subcourse
 			Collection<User> subcourseLearners = userManagementService
 				.getUsersFromOrganisationByRole(subcourseId, Role.LEARNER, true);
+			// add users to set containing all users in any subcourse which is processed
+			allUsersInSubcourses.addAll(subcourseLearners);
 
 			// go through each user
 			for (String login : subcourseEntry.getValue()) {
@@ -331,6 +337,26 @@ public class SPEnrolmentServlet extends HttpServlet {
 			}
 		    }
 		}
+
+		// users who are part of courses but are not in the file anymore are eligible for disabling
+		allUsersInSubcourses.removeAll(allUsersParsed);
+		for (User user : allUsersInSubcourses) {
+		    // make a flat set of roles from all subcourses
+		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
+			    .collect(HashSet::new, Set::addAll, Set::addAll);
+		    // check if the user is staff in any course
+		    roles.remove(Role.ROLE_LEARNER);
+		    if (roles.isEmpty()) {
+			// he is only a learner, so disable
+			userManagementService.disableUser(user.getUserId());
+
+			String message = "Learner \"" + user.getLogin() + "\" disabled";
+			logger.info(message);
+			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				"SPEnrolment: " + message);
+		    }
+		}
+
 		logger.info("SP enrolments provisioning completed successfully");
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
