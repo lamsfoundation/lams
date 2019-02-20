@@ -172,6 +172,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 			    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 				    "SPEnrolment: " + message);
 			}
+			if (user.getDisabledFlag()) {
+			    // re-enable user who was disabled before
+			    user.setDisabledFlag(false);
+			    userManagementService.save(user);
+			}
 		    }
 
 		    // fill data for later usage
