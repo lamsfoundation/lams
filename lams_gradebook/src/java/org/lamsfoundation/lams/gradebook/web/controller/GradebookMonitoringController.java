@@ -136,8 +136,8 @@ public class GradebookMonitoringController {
 		log.error("User missing from session. ");
 		return "error";
 	    }
-	    if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
-		    "get course gradebook page", false)) {
+	    if (!securityService.hasOrgRole(organisationID, user.getUserID(),
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "get course gradebook page", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"User is not a course manager in the organisation");
 		return null;
