@@ -76,8 +76,8 @@ public interface IGradebookDAO extends IBaseDAO {
 
     long getMaxTimeTakenForGroupedActivity(Long activityID, Long groupID);
 
-    List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
+    List<Lesson> getLessonsByGroupAndUser(final Integer userId, boolean staffOnly, final Integer orgId, int page,
+	    int size, String sortBy, String sortOrder, String searchString);
 
     List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
