@@ -937,14 +937,6 @@ GeneralInitLib = {
 		
 		layout.dialogs.push(layout.ldStoreDialog);
 
-		$('#ldStoreDialogImportPartFrame').load(function() {
-			var frame = $(this);
-			if (!frame.attr('src')){
-				return;
-			}
-		    frame.height(+frame.contents().find('svg').attr('height') + 40);
-		});
-		
 		// there should be no focus, just highlight
 		YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
 		var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
@@ -2276,7 +2268,11 @@ GeneralLib = {
 				} else {
 					GeneralLib.resizePaper();
 				}
-
+				
+				var resizeImportPartFrame = window.parent.GeneralLib.resizeImportPartFrame;
+				if (resizeImportPartFrame) {
+					resizeImportPartFrame(+paper.attr('height'));
+				}
 
 				if (systemGate) {
 					// if system gate exists, it is Live Edit
@@ -2731,6 +2727,11 @@ GeneralLib = {
 			'branchMappings'     : branchMappings,
 			'annotations'		 : annotations
 		};
+	},
+	
+	
+	resizeImportPartFrame : function(svgHeight) {
+		$('#ldStoreDialogImportPartFrame').height(svgHeight + 40);
 	},
 	
 	

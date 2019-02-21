@@ -138,7 +138,8 @@ public class GradebookMonitoringController {
 	    }
 	    if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
 		    "get course gradebook page", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
+		response.sendError(HttpServletResponse.SC_FORBIDDEN,
+			"User is not a course manager in the organisation");
 		return null;
 	    }
 
