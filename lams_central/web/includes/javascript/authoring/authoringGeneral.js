@@ -2268,9 +2268,9 @@ GeneralLib = {
 					GeneralLib.resizePaper();
 				}
 				
-				var resizeImportPartFrame = window.parent.GeneralLib.resizeImportPartFrame;
-				if (resizeImportPartFrame) {
-					resizeImportPartFrame(+paper.attr('height'));
+				var parentFrame = window.parent.GeneralLib;
+				if (parentFrame) {
+					parentFrame.resizeImportPartFrame(+paper.attr('height'));
 				}
 
 				if (systemGate) {
