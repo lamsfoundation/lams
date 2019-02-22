@@ -1,9 +1,11 @@
 package org.lamsfoundation.lams.qb.service;
 
+import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+
 public interface IQbService {
 
     // statuses of comparing QB question coming from authoring with data existing in DB
-    
+
     // no change detected
     static final int QUESTION_MODIFIED_NONE = 0;
     // change is minor, so the original question will be modified
@@ -18,4 +20,6 @@ public interface IQbService {
 
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);
+
+    QbStatsDTO getStats(long qbQuestionUid);
 }
