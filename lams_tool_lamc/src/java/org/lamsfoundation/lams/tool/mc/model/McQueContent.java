@@ -71,7 +71,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 	this.qbQuestion = qbQuestion;
 	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
-	this.mcContent = mcContent;
+	setMcContent(mcContent);
     }
 
     public McQueContent() {
