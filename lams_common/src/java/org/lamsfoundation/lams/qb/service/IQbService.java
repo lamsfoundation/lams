@@ -1,5 +1,9 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+
 public interface IQbService {
 
     // statuses of comparing QB question coming from authoring with data existing in DB
@@ -12,10 +16,21 @@ public interface IQbService {
     static final int QUESTION_MODIFIED_VERSION_BUMP = 2;
     // it is a new question
     static final int QUESTION_MODIFIED_ID_BUMP = 3;
+    
+    /**
+     * @param qbQuestionUid
+     * @return QbQuestion object with the specified uid
+     */
+    QbQuestion getQbQuestionByUid(Long qbQuestionUid);
 
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
 
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);
+    
+    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+    
+    int getCountQbQuestions(Integer questionType, String searchString);
 }

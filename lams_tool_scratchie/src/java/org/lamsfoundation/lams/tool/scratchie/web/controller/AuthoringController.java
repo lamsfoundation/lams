@@ -127,10 +127,6 @@ public class AuthoringController {
 
     private String starting(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
-
-	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID));
-
 	List<ScratchieItem> items = null;
 	Scratchie scratchie = null;
 
@@ -143,6 +139,10 @@ public class AuthoringController {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	authoringForm.setContentFolderID(contentFolderID);
+	
+	// save toolContentID into HTTPSession
+	Long contentId = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID));
+	sessionMap.put(ScratchieConstants.PARAM_TOOL_CONTENT_ID, contentId);
 
 	try {
 	    scratchie = scratchieService.getScratchieByContentId(contentId);
@@ -404,6 +404,45 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "pages/authoring/parts/additem";
     }
+    
+    /**
+     * QB callback handler which adds selected QbQuestion into question list.
+     */
+    @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
+    private String importQbQuestion(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
+	
+	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	
+	//create new ScratchieItem and assign imported qbQuestion to it
+	ScratchieItem item = new ScratchieItem();
+	item.setQbQuestion(qbQuestion);
+	int maxSeq = 1;
+	if (itemList != null && itemList.size() > 0) {
+	    ScratchieItem last = itemList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
+	}
+	item.setDisplayOrder(maxSeq);
+	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
+	itemList.add(item);
+
+
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+//	scratchieService.releaseFromCache(item);
+//	scratchieService.releaseFromCache(item);
+//	scratchieService.releaseFromCache(item.getQbQuestion());
+	
+//	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
+
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return "pages/authoring/parts/itemlist";
+    }
 
     /**
      * This method will get necessary information from assessment question form and save or update into
@@ -411,7 +450,6 @@ public class AuthoringController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      */
-
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
     private String saveItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
 	    HttpServletRequest request) {

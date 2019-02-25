@@ -26,13 +26,27 @@
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
 		<div id="importExport" class="btn-group pull-right">
-			<a href="#" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs loffset5">
+			<a href="#" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs">
 				<fmt:message key="label.authoring.import.qti" /> 
 			</a>
-			<a href="#" onClick="javascript:exportQTI();return false;" class="btn btn-default btn-xs loffset5">
+			<a href="#" onClick="javascript:exportQTI();return false;" class="btn btn-default btn-xs">
 				<fmt:message key="label.authoring.export.qti" />
 			</a>
+		</div>
+
+		<div class="roffset5 pull-right">
+			<c:url var="tempUrl" value="">
+				<c:param name="output">
+					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}
+				</c:param>
+			</c:url>
+			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
+		
+			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
+				Import from question bank
+			</a>
 		</div> 
+		
 		<fmt:message key="label.questions"/>
 		
 	</div>
