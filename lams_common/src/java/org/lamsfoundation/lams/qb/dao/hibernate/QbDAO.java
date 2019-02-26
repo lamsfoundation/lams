@@ -33,17 +33,19 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	return max == null ? 1 : max + 1;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
+	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
 	final String SELECT_QUESTIONS = "SELECT DISTINCT question.* "
 		+ " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
 		+ " WHERE question.type = :questionType "
 		+ " AND question.local = 0 "
-		+ " AND (question.description LIKE CONCAT('%', :searchString, '%')"
+		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR qboption.name LIKE CONCAT('%', :searchString, '%')) ";
+		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 	final String ORDER_BY_NAME = "ORDER BY question.name ";
 	final String ORDER_BY_SMTH_ELSE = "ORDER BY question.question_id ";
 
@@ -65,43 +67,21 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	query.addEntity(QbQuestion.class);
 	List<QbQuestion> queryResults = (List<QbQuestion>) query.list();
 
-//	ArrayList<QbQuestion> userDtos = new ArrayList<QbQuestion>();
-//	if (queryResults != null && queryResults.size() > 0) {
-//	    for (Object[] element : queryResults) {
-//
-//		Long userId = ((Number) element[0]).longValue();
-//		String firstName = (String) element[1];
-//		String lastName = (String) element[2];
-//		String login = (String) element[3];
-//		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
-//		Long portraitId = element[5] == null ? null : ((Number) element[5]).longValue();
-//
-//		QbQuestion userDto = new QbQuestion();
-//		userDto.setUserId(userId);
-//		userDto.setFirstName(firstName);
-//		userDto.setLastName(lastName);
-//		userDto.setLogin(login);
-//		userDto.setGrade(grade);
-//		userDto.setPortraitId(portraitId);
-//		userDtos.add(userDto);
-//	    }
-//
-//	}
-
 	return queryResults;
     }
 
     @Override
     public int getCountQbQuestions(Integer questionType, String searchString) {
-	final String SELECT_QUESTIONS = "SELECT COUNT(*) "
+	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) "
 		+ " FROM lams_qb_question question "
 		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
-		+ " AND question.type = :questionType "
-		+ " AND (question.description LIKE CONCAT('%', :searchString, '%')"
+		+ " WHERE question.type = :questionType "
+		+ " AND question.local = 0 "
+		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
-		+ " OR qboption.name LIKE CONCAT('%', :searchString, '%')) ";
+		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createNativeQuery(SELECT_QUESTIONS);
+	Query<?> query = getSession().createNativeQuery(SELECT_QUESTIONS);
 	query.setParameter("questionType", questionType);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;

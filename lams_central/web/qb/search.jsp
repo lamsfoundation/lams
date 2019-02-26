@@ -18,8 +18,8 @@
 		.question-description-grid {
 			min-height: 10px;
 			max-height: 10px;
-			max-width: 97%;
     		overflow-x: hidden;
+    		margin-top: 4px;
 		}
 		
 		#close-button .fa {
@@ -28,6 +28,10 @@
 		}
 		#main-panel {
 			border: none; 
+			box-shadow: none;
+		}
+		#import-button {
+			display: none;
 		}
 		#search-widgets {
 			display: flex;
@@ -43,7 +47,7 @@
 		
 		/* jqGrid padding */
 		.ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow>td {
-			padding: 8px;
+			padding: 10px;
 		}
 		
 		/* padding of #grid-container's two columns */
@@ -51,9 +55,14 @@
 			padding: 0;
 		}
 		@media (min-width: 768px){
-		#question-detail-area {
-		    padding-left: 20px !important;
+			#question-detail-area {
+			    padding-left: 20px !important;
+			}
 		}
+		@media (max-width: 768px){
+			#question-detail-area {
+			    margin-top: 20px !important;
+			}
 		}
 		
 		#question-detail-area table {
@@ -70,7 +79,25 @@
 		}
 		
 		#question-type {
-		-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
+			-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
+		}
+		
+		/*----------STICKY FOOTER----------------*/
+		html {
+		    position: relative;
+		    min-height: 100%;
+		}
+		body {
+			margin-bottom: 44px;
+		}
+		footer {
+			position: absolute;
+		    bottom: 0;
+		    width: 100%;
+		    height: 44px;
+		}
+		footer > div {
+			height: 44px;
 		}
 	</style>
 
@@ -114,35 +141,28 @@
 		  	        	'<c:url value="/searchQB/displayQuestionDetails.do"/>',
 		  	        	{
 		  	        		questionUid: questionUid
+		  	       		},
+		  	       		function() {
+		  	       			$("#import-button").show();
 		  	       		}
 		  	       	);
 	  	  		},
-	  	  	gridComplete: function () {
-	  	      var filters, i, l, rules, rule, iCol, $this = $(this);
-	  	      //if (this.p.search === true) {
-	  	         // filters = $.parseJSON(this.p.postData.filters);
-	  	      //    if (filters !== null && typeof filters.rules !== 'undefined' &&
-	  	        //          filters.rules.length > 0) {
-	  	        //      rules = filters.rules;
-	  	        //      l = rules.length;
-	  	                  if ($("#filter-questions").val()) {
-	  	                      $('>tbody>tr.jqgrow>td:nth-child(2)', this).highlight($("#filter-questions").val());
-	  	                  }
-	  	       //       }
-	  	       //   }
-	  	     // }
-	  	  },
+		  	  	gridComplete: function () {
+			  	  	//highlight search results
+					if ($("#filter-questions").val()) {
+						$('>tbody>tr.jqgrow>td:nth-child(2)', this).highlight($("#filter-questions").val());
+					}
+				},
 			    loadError: function(xhr,st,err) {
-			    	jQuery("#questions-grid").clearGridData();
-			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			    },
-			    loadComplete: function () {
-			   	 	
+			    	$("#questions-grid").clearGridData();
+			    	$.jgrid.info_dialog.call("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    	$("#import-button").hide();
+			    	$("#question-detail-area").hide().html("");
 			    }
 			})
 			.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	
 
-	        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+	        //jqgrid autowidth
 	        $(window).bind('resize', function() {
 	            resizeJqgrid($(".ui-jqgrid-btable:visible"));
 	        });
@@ -154,60 +174,57 @@
 	    	    });
 	    	};
 
-	    	$(document).on("click", '#import-qbquestion-button', function() {
-	    		var qbQuestionUid = $(this).data("question-uid");
+	    	//handler for "Import" button
+	    	$("#import-button").on("click", function() {
+	    		var qbQuestionUid = $("#selected-question-uid").val();
 		    	
 	    		parent.jQuery("#itemArea").load(
-					"${param.returnUrl}", 
-						{
-							qbQuestionUid: qbQuestionUid
-						},
-						function() {
-	    	    			self.parent.refreshThickbox()
-	    	    			self.parent.tb_remove();
-						}
-					);
+					"${param.returnUrl}",
+					{
+						qbQuestionUid: qbQuestionUid
+					},
+					function() {
+	    	    		self.parent.refreshThickbox()
+	    	    		self.parent.tb_remove();
+					}
+				);
 	        });
 		});
 
-	        function userNameFormatter (cellvalue, options, rowObject) {
-	        	var questionDescription = rowObject[2] ? rowObject[2] : "";
+		//auxiliary formatter for jqGrid's question column
+		function userNameFormatter (cellvalue, options, rowObject) {
+	       	var questionDescription = rowObject[2] ? rowObject[2] : "";
 
-	        	var text = cellvalue + "<div class='question-description-grid small'>";
-	        	if (questionDescription.length > 0) {
-	        		text += questionDescription;
-		        }
-	        	text += "</div>"
-	        	
-				return text;
+	       	var text = cellvalue + "<div class='question-description-grid small'>";
+	       	if (questionDescription.length > 0) {
+	       		text += questionDescription;
 			}
+	        text += "</div>"
+	        	
+			return text;
+		}
 
-	      	//search field handler
-	        var timeoutHnd;
-	        function doSearch(ev){
-				//	var elem = ev.target||ev.srcElement;
-	        	if(timeoutHnd)
-	        		clearTimeout(timeoutHnd)
-	        	timeoutHnd = setTimeout(gridReload,500)
-	        }
+	    //search field handler
+	    var timeoutHnd;
+	    function doSearch(ev){
+			//	var elem = ev.target||ev.srcElement;
+	       	if(timeoutHnd)
+	       		clearTimeout(timeoutHnd)
+	       	timeoutHnd = setTimeout(gridSearch,500)
+	    }
+		function gridSearch(){
+			$("#questions-grid").jqGrid(
+				'setGridParam', 
+				{
+		           	postData: { searchString: $("#filter-questions").val() }
+		       	}, 
+				{ page: 1 }
+			).trigger('reloadGrid');
 
-	        function gridReload(){
-		        $("#questions-grid").jqGrid(
-					'setGridParam', 
-					{
-		            	postData: { searchString: $("#filter-questions").val() }
-		        	}, 
-					{ page: 1 }
-				).trigger('reloadGrid');
-
-		        $("#question-detail-area").hide("slow").html("");
-
-		        
-	        	//var nm_mask = jQuery("#item_nm").val();
-	        	//var cd_mask = jQuery("#search_cd").val();
-	        	//jQuery("#bigset").jqGrid('setGridParam',{url:"bigset.php?nm_mask="+nm_mask+"&cd_mask="+cd_mask,page:1}).trigger("reloadGrid");
-	        }
-
+		    $("#question-detail-area").hide("slow").html("");
+		    $("#import-button").hide("fast");
+	        //jQuery("#bigset").jqGrid('setGridParam',{url:"bigset.php?nm_mask="+nm_mask+"&cd_mask="+cd_mask,page:1}).trigger("reloadGrid");
+	    }
 	</script>
 </lams:head>
 <body>
@@ -229,60 +246,31 @@
 		
 				<span id="question-type" class="form-control loffset5">Type: Multiple choice</span>
 			</div>
-		
-		<!-- 
-		<a target="_blank" class="btn btn-xs btn-default pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
-		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Course+Monitor">
-			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
-		</a>
 
-		<div id="datesNotShown">
-			<a class="btn btn-xs btn-default pull-right " href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates" />">
-				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-				<fmt:message key="gradebook.monitor.show.dates" /></span>
-			</a>
-		</div>
-
-		<div id="datesShown" style="display:none">
-			<a class="btn btn-xs btn-default pull-right " href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates" />">
-				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
-				<fmt:message key="gradebook.monitor.hide.dates" /></span>
-			</a>
-		</div>			
-
-		<div>
-			<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default" title="<fmt:message key="gradebook.export.excel" />">
-				<i class="fa fa-download"></i><span class="hidden-xs">
-				<fmt:message key="gradebook.export.excel" />
-				</span>
-			</a>
-		</div>
-		-->
-
-		<div id="grid-container" style="min-height: 300px;">
-	 		<div class="grid-holder col-xs-12 col-sm-4">
-	 			<table id="questions-grid" class="scroll"></table>
-				<div id="questions-grid-pager" class="scroll"></div>
-			</div>
-			
-			<div id="question-detail-area" class="col-xs-12 col-sm-8"></div>
-		</div>
-		
-		<!--
-			<div class="voffset10 pull-right">
-			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
-					Close
-				</a>
-				 <a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					Import
-				</a> 
+			<div id="grid-container" style="min-height: 300px;">
+		 		<div class="grid-holder col-xs-12 col-sm-4">
+		 			<table id="questions-grid" class="scroll"></table>
+					<div id="questions-grid-pager" class="scroll"></div>
+				</div>
 				
+				<div id="question-detail-area" class="col-xs-12 col-sm-8"></div>
 			</div>
-		-->
-		
 		
 		</div>
-		
 	</div>
+	
+	<footer class="footer fixed-bottom">
+		<div class="panel-heading">
+        	<div class="pull-right">
+			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5" style="display: inline;">
+					<fmt:message key="label.cancel" />
+				</a>
+				<a id="import-button" class="btn btn-sm btn-default button-add-item" href="#nogo"
+					title="Import question from the question bank">
+					Import
+				</a>
+			</div>	
+      	</div>
+    </footer>
 </body>
 </lams:html>
