@@ -77,6 +77,7 @@ public class LogEvent implements Serializable {
     public static final int TYPE_TOOL_MARK_RELEASED = 23; // Mark released in tool
     public static final int TYPE_LOGIN = 24; // user logged in
     public static final int TYPE_LOGOUT = 25; // user logged out
+    public static final int TYPE_CONFIG_CHANGE = 26; // user logged out
 
     /** *************************************************************** */
 
