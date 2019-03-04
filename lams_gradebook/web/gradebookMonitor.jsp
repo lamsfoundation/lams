@@ -384,7 +384,7 @@
 										 autoencode:false,
 										 autowidth: true,
 									     datatype: "xml",
-									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
+									     url: "<lams:LAMSURL />gradebook/gradebook/getActivityArchiveGridData.do?lessonID=${lessonDetails.lessonID}&activityID="
 										      + activityID + "&view=monUserView&userID=" + userID,
 									     height: "100%",
 									     cmTemplate: { title: false },
@@ -612,7 +612,7 @@
 										 iconSet: 'fontAwesome',
 										 autoencode:false,
 									     datatype: "xml",
-									     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityArchiveGridData&lessonID=${lessonDetails.lessonID}&activityID="
+									     url: "<lams:LAMSURL />gradebook/gradebook/getActivityArchiveGridData.do?lessonID=${lessonDetails.lessonID}&activityID="
 										      + activityID + "&view=monActivityView&userID=" + userID,
 									     height: "100%",
 									     autowidth:true,
