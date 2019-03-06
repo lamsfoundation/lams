@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.contentrepository.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
@@ -444,7 +446,12 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	}
 
 	try {
-	    boolean isVirusFree = FileUtil.isVirusFree(iStream);
+	    // copy the stream contents as it has to be read twice - once for scan, then for file processing
+	    byte[] fileByteArray = IOUtils.toByteArray(iStream);
+	    iStream.close();
+	    iStream = new ByteArrayInputStream(fileByteArray);
+	    InputStream copy = new ByteArrayInputStream(fileByteArray);
+	    boolean isVirusFree = FileUtil.isVirusFree(copy);
 	    if (!isVirusFree) {
 		throw new InvalidParameterException("File contains a virus: " + filename);
 	    }
