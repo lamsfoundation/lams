@@ -233,7 +233,7 @@
 
 				<div class="form-group">
 					<label for="description"><fmt:message key="label.authoring.basic.question.text" /></label>
-					<lams:CKEditor id="description" value="${authoringForm.description}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
+					<lams:CKEditor id="description" value="${scratchieItemForm.description}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
 				</div>
 
 				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
