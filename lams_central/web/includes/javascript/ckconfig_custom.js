@@ -144,12 +144,8 @@ CKEDITOR.dtd.$removeEmpty['span'] = false;
 
 // ---- Additional scripts -----
 
-// Hides editor instaces until they are fully initialized
-CKEDITOR.on('instanceCreated', function(e){
-	e.editor.element.$.style.display = 'none';
-});
-
 CKEDITOR.on('instanceReady', function(e){
+	//set min-height CSS property
 	var height = e.editor.config.height;
 	if ( ! height ) {
 		height = "60px";
