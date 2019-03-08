@@ -17,8 +17,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.toolContentId = q.toolContentId AND a.learningDesign.lessons IS NOT EMPTY AND q.qbQuestion.uid = :qbQuestionUid";
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
-    private static final String FIND_ANSWER_STATS = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a "
+    private static final String FIND_ANSWER_STATS_BY_QB_QUESTION = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a "
 	    + "WHERE a.qbOption.qbQuestion.uid = :qbQuestionUid GROUP BY a.qbOption.uid";
+    private static final String FIND_ANSWER_STATS_BY_TOOL_QUESTION = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a "
+	    + "WHERE a.qbToolQuestion.uid = :qbToolQuestionUid GROUP BY a.qbOption.uid";
+    private static final String FIND_ANSWER_STATS_BY_ACTIVITY = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a, "
+	    + " ToolActivity AS act WHERE a.qbToolQuestion.toolContentId = act.toolContentId AND act.activityId = :activityId GROUP BY a.qbOption.uid";
 
     @Override
     public int getMaxQuestionId() {
@@ -51,9 +55,33 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Long, Long> getAnswerStats(long qbQuestionUid) {
-	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS)
+    public Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid) {
+	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_QB_QUESTION)
 		.setParameter("qbQuestionUid", qbQuestionUid).list();
+	Map<Long, Long> map = new HashMap<>(result.size());
+	for (Object[] answerStat : result) {
+	    map.put((Long) answerStat[0], (Long) answerStat[1]);
+	}
+	return map;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, Long> geAnswerStatsForQbToolQuestion(long qbToolQuestionUid) {
+	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_TOOL_QUESTION)
+		.setParameter("qbToolQuestionUid", qbToolQuestionUid).list();
+	Map<Long, Long> map = new HashMap<>(result.size());
+	for (Object[] answerStat : result) {
+	    map.put((Long) answerStat[0], (Long) answerStat[1]);
+	}
+	return map;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, Long> geAnswerStatsForActivity(long activityId) {
+	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_ACTIVITY)
+		.setParameter("activityId", activityId).list();
 	Map<Long, Long> map = new HashMap<>(result.size());
 	for (Object[] answerStat : result) {
 	    map.put((Long) answerStat[0], (Long) answerStat[1]);

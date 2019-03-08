@@ -22,14 +22,6 @@
 			font-weight: bold;
 		}
 		
-		 {
-			font-weight: bold;
-		}
-		
-		 {
-			font-weight: bold;
-		}
-		
 		#chartDiv {
 			height: 220px;
 		}
@@ -165,9 +157,12 @@
 						<th>
 							Tool type
 						</th>
+						<th>
+							Average correct selection<br>(as first choice)
+						</th>
 					</tr>
-					<c:forEach var="activity" items="${stats.activities}">
-						<c:set var="lesson" value="${activity.learningDesign.lessons.iterator().next()}" />
+					<c:forEach var="activityDTO" items="${stats.activities}">
+						<c:set var="lesson" value="${activityDTO.activity.learningDesign.lessons.iterator().next()}" />
 						<tr>
 							<td>
 								<c:out value="${lesson.organisation.name}" />
@@ -176,10 +171,13 @@
 								<c:out value="${lesson.lessonName}" />
 							</td>
 							<td>
-								<c:out value="${activity.title}" />
+								<c:out value="${activityDTO.activity.title}" />
 							</td>
 							<td>
-								<c:out value="${activity.tool.toolDisplayName}" />
+								<c:out value="${activityDTO.activity.tool.toolDisplayName}" />
+							</td>
+							<td>
+								<c:out value="${activityDTO.average}" />%
 							</td>
 						</tr>
 					</c:forEach>
