@@ -62,7 +62,7 @@
 						Title:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.name}" />
+						<c:out value="${question.name}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -70,7 +70,7 @@
 						Description:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.description}" />
+						<c:out value="${question.description}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -78,7 +78,7 @@
 						Feedback:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.feedback}" />
+						<c:out value="${question.feedback}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -113,7 +113,7 @@
 							${status.index + 1}
 						</td>
 						<td>
-							<c:out value="${option.name}" />
+							<c:out value="${option.name}" escapeXml="false" />
 						</td>
 						<td>
 							<c:if test="${option.correct}">

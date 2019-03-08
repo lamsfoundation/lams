@@ -11,6 +11,7 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.util.WebUtil;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -78,8 +79,10 @@ public class QbService implements IQbService {
 	    answerPercent.put(option.getUid(), value);
 
 	    ObjectNode answerJSON = JsonNodeFactory.instance.objectNode();
-	    answerJSON.put("name", (answerIndex + 1) + ". "
-		    + (option.getName().length() > 20 ? option.getName().substring(0, 20) + "..." : option.getName()));
+	    String name = (answerIndex + 1) + ". "
+		    + (option.getName().length() > 30 ? option.getName().substring(0, 30) + "..." : option.getName());
+	    name = WebUtil.removeHTMLtags(name);
+	    answerJSON.put("name", name);
 	    answerJSON.put("value", value);
 	    answersJSON.add(answerJSON);
 	}
