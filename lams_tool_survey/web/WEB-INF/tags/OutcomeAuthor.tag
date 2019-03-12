@@ -49,6 +49,7 @@
 		outcomeMappingIds${outcomeTagId} = [],
 		
 		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
+		outcomeCreateNewLabel = '<fmt:message key="outcome.authoring.create.new" />',
 		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
 	
 	$(document).ready(function(){
@@ -58,11 +59,24 @@
 			'minLength' : 2,
 			'response' : function(event, ui) {
 				// filter out already mapped outcomes
-				var index = ui.content.length;
+				var index = ui.content.length - 1,
+					term = ui.content[index] instanceof Object ? ui.content[index].label : ui.content[index],
+					sameNameFound = false;
+				ui.content.splice(index, 1);
 				while(index--) {
+					var label = ui.content[index].label;
+					if (label.split('(')[0].trim() == term) {
+						// do not offer to create an output which perfectly matches an existing one
+						sameNameFound = true;
+					}
 					if (outcomeMappingIds${outcomeTagId}.includes(ui.content[index].value)){
 						ui.content.splice(index, 1);
 					}
+				}
+				if (!sameNameFound) {
+					ui.content.push({
+						'label' : term + outcomeCreateNewLabel
+					});
 				}
 			},
 			'select' : function(event, ui){
@@ -70,7 +84,9 @@
 				$.ajax({
 					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do',
 					'data': $.extend({
-						'outcomeId' : ui.item.value
+						'outcomeId' : ui.item.value,
+						// if value is null, then it is a new outcome to create; remove ' [create new]' part before sending
+						'name'		: ui.item.value ? null : ui.item.label.replace(outcomeCreateNewLabel, '')
 					}, outcomeData${outcomeTagId}),
 					'method' : 'post',
 					'cache' : false,
