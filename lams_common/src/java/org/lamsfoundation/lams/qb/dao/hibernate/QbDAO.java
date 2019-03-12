@@ -19,6 +19,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
+    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
+	final String FIND_QUESTIONS_BY_QUESTION_ID = "FROM " + QbQuestion.class.getName()
+	    + " WHERE questionId = :questionId AND local = 0 ORDER BY version ASC";
+	
+	Query<QbQuestion> q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID,
+		QbQuestion.class);
+	q.setParameter("questionId", questionId);
+	return q.list();
+    }
+
+    @Override
     public int getMaxQuestionId() {
 	Object result = this.getSession().createQuery(FIND_MAX_QUESTION_ID).uniqueResult();
 	Integer max = (Integer) result;
@@ -40,14 +51,40 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
 	final String SELECT_QUESTIONS = "SELECT DISTINCT question.* "
 		+ " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
-		+ " WHERE question.type = :questionType "
+		+ " LEFT OUTER JOIN lams_qb_option qboption "
+		+ "	ON qboption.qb_question_uid = question.uid "
+		+ " LEFT JOIN ("//help finding questions with the max available version
+		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "  
+		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
+		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
+		+ "	WHERE biggerQuestion.type = :questionType "
+		+ " 	AND biggerQuestion.local = 0 "
+		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
+		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
+		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
+		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
+		+ " WHERE biggerQuestion.version is NULL "
+		+ " AND question.type = :questionType "
 		+ " AND question.local = 0 "
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 	final String ORDER_BY_NAME = "ORDER BY question.name ";
 	final String ORDER_BY_SMTH_ELSE = "ORDER BY question.question_id ";
+	
+	//TODO check the following query with real data. and see maybe it's better than the current (it's unlikely though) [https://stackoverflow.com/a/28090544/10331386 and https://stackoverflow.com/a/612268/10331386]
+//	SELECT t1.*
+//	FROM lams_qb_question t1
+//	INNER JOIN
+//	(
+//	    SELECT `question_id`, MAX(version) AS max_version
+//	    FROM lams_qb_question as t3
+//			LEFT OUTER JOIN lams_qb_option qboption 
+//				ON qboption.qb_question_uid = t3.uid
+//		WHERE REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')
+//	    GROUP BY `question_id`
+//	) t2
+//	    ON t1.`question_id` = t2.`question_id` AND t1.version = t2.max_version;
 
 	StringBuilder bldr = new StringBuilder(SELECT_QUESTIONS);
 	if ("smth_else".equalsIgnoreCase(sortBy)) {
@@ -73,9 +110,21 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public int getCountQbQuestions(Integer questionType, String searchString) {
 	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) "
-		+ " FROM lams_qb_question question "
-		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
-		+ " WHERE question.type = :questionType "
+		+ " FROM lams_qb_question question  "
+		+ " LEFT OUTER JOIN lams_qb_option qboption "
+		+ "	ON qboption.qb_question_uid = question.uid "
+		+ " LEFT JOIN ("//help finding questions with the max available version
+		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "  
+		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
+		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
+		+ "	WHERE biggerQuestion.type = :questionType "
+		+ " 	AND biggerQuestion.local = 0 "
+		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
+		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
+		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
+		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
+		+ " WHERE biggerQuestion.version is NULL "
+		+ " AND question.type = :questionType "
 		+ " AND question.local = 0 "
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "

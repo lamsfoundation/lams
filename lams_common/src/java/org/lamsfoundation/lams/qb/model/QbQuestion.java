@@ -32,6 +32,13 @@ public class QbQuestion implements Serializable, Cloneable {
     // questions can be of different type
     // not all tools can produce/consume all question types
     public static final int TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER = 1;
+    public static final int TYPE_MATCHING_PAIRS = 2;
+    public static final int TYPE_SHORT_ANSWER = 3;
+    public static final int TYPE_NUMERICAL = 4;
+    public static final int TYPE_TRUE_FALSE = 5;
+    public static final int TYPE_ESSAY = 6;
+    public static final int TYPE_ORDERING = 7;
+    public static final int TYPE_MARK_HEDGING = 8;
 
     // primary key
     // another candidate is questionId + version, but single uid can fe searched faster

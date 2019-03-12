@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
@@ -9,12 +10,39 @@
 <div class="panel-body">
 	<input type="hidden" id="selected-question-uid" value="${question.uid}">
 	
-	<div class="pull-right question-description" style="color: #969494">
-		Version: ${question.version}
+	<a id="import-button" class="btn btn-xs btn-default pull-right button-add-item" href="#nogo"
+		title="Import question from the question bank">
+		Import
+	</a>
+	
+	<div class="pull-right">
+		<c:choose>
+			<c:when test="${fn:length(otherVersions) == 1}">
+				<button class="btn btn-default btn-xs dropdown-toggle2" disabled="disabled">
+				    Version ${question.version}
+				</button>
+			</c:when>
+
+			<c:otherwise>
+				<div class="dropdown">
+					<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    	Version ${question.version}&nbsp;<span class="caret"></span>
+					</button>
+					
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+						<c:forEach items="${otherVersions}" var="otherVersion">
+				    		<li <c:if test="${question.version == otherVersion.version}">class="disabled"</c:if>>
+				    			<a href="#nogo" onclick="javascript:loadQuestionDetailsArea(${otherVersion.uid});">Version ${otherVersion.version}</a>
+				    		</li>
+				    	</c:forEach>
+					</ul>
+				</div>			
+			</c:otherwise>
+		</c:choose>
 	</div>
 
 	<div class="">
-		<c:out value="${question.name}"/>
+		<c:out value="${question.name}" escapeXml="false"/>
 	</div>
 	
 	<div class="question-description">				

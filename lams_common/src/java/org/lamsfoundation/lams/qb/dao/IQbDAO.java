@@ -13,6 +13,12 @@ public interface IQbDAO extends IBaseDAO {
      */
     QbQuestion getQbQuestionByUid(Long qbQuestionUid);
     
+    /**
+     * @param questionId
+     * @return questions sharing the same questionId
+     */
+    List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId);
+    
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
 

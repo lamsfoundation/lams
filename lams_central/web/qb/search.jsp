@@ -11,6 +11,7 @@
 	<lams:css />
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+	
 	<style>
 		#grid-holder {
 		    padding-top: 15px;
@@ -20,6 +21,9 @@
 			max-height: 10px;
     		overflow-x: hidden;
     		margin-top: 4px;
+		}
+		.question-title-grid {
+		    overflow-x: hidden;
 		}
 		
 		#close-button .fa {
@@ -31,7 +35,7 @@
 			box-shadow: none;
 		}
 		#import-button {
-			display: none;
+			margin-left: 5px;
 		}
 		#search-widgets {
 			display: flex;
@@ -78,8 +82,26 @@
 		    background-color: #FFFF88;
 		}
 		
-		#question-type {
+		.disabled-span {
 			-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
+		}
+		
+		.dropdown-menu {
+		    min-width: 90px;
+		}
+		
+		/* jqGrid header */
+		.ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th div {
+		    font-size: 14px;
+    		margin: 6px;
+		}
+		
+		/* question imported growl */
+		div.growlUI h1, div.growlUI h2 {
+			color: white;
+			margin: 5px 5px 5px 0px;
+			text-align: center;
+			font-size: 18px;
 		}
 		
 		/*----------STICKY FOOTER----------------*/
@@ -105,6 +127,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -118,7 +141,6 @@
 			    pager: 'questions-grid-pager',
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
-			    viewrecords:true,
 			    guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 			   	colNames:[
@@ -128,36 +150,26 @@
 				],
 			   	colModel:[
 			   		{name:'questionUid', index:'questionUid', width:0, hidden: true},
-			   		{name:'questionName', index:'questionName', width:570, search: true, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+			   		{name:'questionName', index:'questionName', width:570, search: true, searchoptions: { clearSearch: false }, formatter:questionNameFormatter},
 			   		{name:'questionDescription', index:'questionDescription', width:0, hidden: true}
 			   	],
-			  	onSelectRow: function(rowid) { 
-			  	    if(rowid == null) { 
-			  	    	rowid=0; 
-			  	    } 
+				onSelectRow: function(rowid, e) {
+				    //load up question details area
 			   		var questionUid = jQuery("#questions-grid").getCell(rowid, 'questionUid');
-
-		  	        $("#question-detail-area").show().load(
-		  	        	'<c:url value="/searchQB/displayQuestionDetails.do"/>',
-		  	        	{
-		  	        		questionUid: questionUid
-		  	       		},
-		  	       		function() {
-		  	       			$("#import-button").show();
-		  	       		}
-		  	       	);
-	  	  		},
+			   		loadQuestionDetailsArea(questionUid);
+				},
 		  	  	gridComplete: function () {
 			  	  	//highlight search results
 					if ($("#filter-questions").val()) {
 						$('>tbody>tr.jqgrow>td:nth-child(2)', this).highlight($("#filter-questions").val());
 					}
 				},
-			    loadError: function(xhr,st,err) {
+			    loadError: function(xhr,textStatus,errorThrown) {
 			    	$("#questions-grid").clearGridData();
-			    	$.jgrid.info_dialog.call("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
-			    	$("#import-button").hide();
 			    	$("#question-detail-area").hide().html("");
+
+			    	//display warning message
+			    	$(this).jqGrid("displayErrorMessage", "<fmt:message key="error.loaderror"/>");
 			    }
 			})
 			.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	
@@ -175,27 +187,39 @@
 	    	};
 
 	    	//handler for "Import" button
-	    	$("#import-button").on("click", function() {
-	    		var qbQuestionUid = $("#selected-question-uid").val();
+	    	$(document).on("click", '#import-button', function() {
+	    		//don't import if button is disabled 
+	    		if ($(this).is('[disabled=disabled]')) {
+	    			return;
+		    	}
+		    	//disabling the button
+	    		$(this).attr("disabled", "disabled");
 		    	
+		    	var qbQuestionUid = $("#selected-question-uid").val();
 	    		parent.jQuery("#itemArea").load(
 					"${param.returnUrl}",
 					{
 						qbQuestionUid: qbQuestionUid
 					},
 					function() {
-	    	    		self.parent.refreshThickbox()
-	    	    		self.parent.tb_remove();
+						//invoke refreshThickbox() only in case parent page has this method 
+						if (typeof self.parent.refreshThickbox === "function") {
+							self.parent.refreshThickbox();
+						}
+
+						//show successfull notification
+	                	$.growlUI('<i class="fa fa-lg fa-download"></i> Question successfully imported');
 					}
 				);
 	        });
 		});
 
 		//auxiliary formatter for jqGrid's question column
-		function userNameFormatter (cellvalue, options, rowObject) {
+		function questionNameFormatter (cellvalue, options, rowObject) {
 	       	var questionDescription = rowObject[2] ? rowObject[2] : "";
 
-	       	var text = cellvalue + "<div class='question-description-grid small'>";
+	       	var text = "<div class='question-title-grid'>" + cellvalue + "</div>";
+	       	text += "<div class='question-description-grid small'>";
 	       	if (questionDescription.length > 0) {
 	       		text += questionDescription;
 			}
@@ -222,9 +246,20 @@
 			).trigger('reloadGrid');
 
 		    $("#question-detail-area").hide("slow").html("");
-		    $("#import-button").hide("fast");
 	        //jQuery("#bigset").jqGrid('setGridParam',{url:"bigset.php?nm_mask="+nm_mask+"&cd_mask="+cd_mask,page:1}).trigger("reloadGrid");
 	    }
+
+		//load up question details area
+	    function loadQuestionDetailsArea(questionUid) {
+  	        $("#question-detail-area").show().load(
+	  	       	'<c:url value="/searchQB/displayQuestionDetails.do"/>',
+	  	       	{
+	  	       		questionUid: questionUid
+	  	    	},
+	  	    	function() {
+	  	    	}
+	  	    );
+		}
 	</script>
 </lams:head>
 <body>
@@ -244,7 +279,44 @@
 				<input type="text" id="filter-questions" class="form-control" placeholder="Contains text" 
 					onkeydown="doSearch(arguments[0]||event)" />
 		
-				<span id="question-type" class="form-control loffset5">Type: Multiple choice</span>
+				<c:if test="${!empty questionTypesAvailable}">
+					<span id="question-type" class="form-control loffset5 disabled-span">
+					Type:
+					<select id="questionType">
+						<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter"></c:forTokens>
+  						<option value="${questionTypeIter}"
+  							<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
+  							
+							<c:choose>
+								<c:when test="${questionTypeIter == 1}">
+									<fmt:message key="label.question.type.multiple.choice" />
+								</c:when>
+								<c:when test="${questionTypeIter == 2}">
+									<fmt:message key="label.question.type.matching.pairs" />
+								</c:when>
+								<c:when test="${questionTypeIter == 3}">
+									<fmt:message key="label.question.type.short.answer" />
+								</c:when>
+								<c:when test="${questionTypeIter == 4}">
+									<fmt:message key="label.question.type.numerical" />
+								</c:when>
+								<c:when test="${questionTypeIter == 5}">
+									<fmt:message key="label.question.type.true.false" />
+								</c:when>
+								<c:when test="${questionTypeIter == 6}">
+									<fmt:message key="label.question.type.essay" />
+								</c:when>
+								<c:when test="${questionTypeIter == 7}">
+									<fmt:message key="label.question.type.ordering" />
+								</c:when>
+								<c:when test="${questionTypeIter == 8}">
+									<fmt:message key="label.question.type.mark.hedging" />
+								</c:when>
+							</c:choose>
+						</option>
+					</select>
+					</span>
+				</c:if>
 			</div>
 
 			<div id="grid-container" style="min-height: 300px;">
@@ -263,11 +335,7 @@
 		<div class="panel-heading">
         	<div class="pull-right">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5" style="display: inline;">
-					<fmt:message key="label.cancel" />
-				</a>
-				<a id="import-button" class="btn btn-sm btn-default button-add-item" href="#nogo"
-					title="Import question from the question bank">
-					Import
+					Close
 				</a>
 			</div>	
       	</div>

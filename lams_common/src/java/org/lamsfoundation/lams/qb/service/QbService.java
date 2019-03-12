@@ -13,6 +13,11 @@ public class QbService implements IQbService {
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
 	return qbDAO.getQbQuestionByUid(qbQuestionUid);
     }
+    
+    @Override
+    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
+	return qbDAO.getQbQuestionsByQuestionId(questionId);
+    }
 
     @Override
     public int getMaxQuestionId() {

@@ -23,67 +23,26 @@
 
 package org.lamsfoundation.lams.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.questions.Answer;
-import org.lamsfoundation.lams.questions.Question;
-import org.lamsfoundation.lams.questions.QuestionExporter;
-import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
 import org.lamsfoundation.lams.tool.ToolContent;
-import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.service.LamsCoreToolService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -126,18 +85,41 @@ public class SearchQBController {
 	Tool tool = toolContent.getTool();
 	String toolSignature = tool.getToolSignature();
 
-	int questionType;
-	boolean questionTypeHidden;
+	//empty questionTypesAvailable means no other questionTypes available for this tool
+	StringBuilder questionTypesAvailable = new StringBuilder(); 
+	//by default show MCQ type of questions (except for Q&A tool)
+	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER;
 	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature) || CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-	    questionType = QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER;
-	    questionTypeHidden = true;
 	    
-	} else {
-	    questionType = 2;
-	    questionTypeHidden = false;
+	//CommonConstants.TOOL_SIGNATURE_SURVEY
+	} else if ("lasurv11".equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
+	    
+	} else if (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MATCHING_PAIRS);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_SHORT_ANSWER);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_NUMERICAL);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_TRUE_FALSE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ORDERING);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
+	   
+	//CommonConstants.TOOL_SIGNATURE_QA
+	} else if ("laqa11".equals(toolSignature)) {
+	    questionTypeDefault = QbQuestion.TYPE_ESSAY;
 	}
-	request.setAttribute("questionType", questionType);
-	request.setAttribute("questionTypeHidden", questionTypeHidden);
+	request.setAttribute("questionType", questionTypeDefault);
+	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	
 	return "qb/search";
     }
@@ -181,8 +163,9 @@ public class SearchQBController {
 
 	    ArrayNode questionData = JsonNodeFactory.instance.arrayNode();
 	    questionData.add(question.getUid());
-	    questionData.add(HtmlUtils.htmlEscape(question.getName()));
-	    String description = question.getDescription() == null ? "" : question.getDescription().replaceAll("\\<.*?\\>", "");
+	    String title = question.getName() == null ? "" : question.getName().replaceAll("\\<.*?\\>", "").replaceAll("\\n", " ").trim();
+	    questionData.add(HtmlUtils.htmlEscape(title));
+	    String description = question.getDescription() == null ? "" : question.getDescription().replaceAll("\\<.*?\\>", "").trim();
 	    questionData.add(HtmlUtils.htmlEscape(description));
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -207,6 +190,9 @@ public class SearchQBController {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	QbQuestion qbQuestion = (QbQuestion) userManagementService.findById(QbQuestion.class, questionUid);
 	request.setAttribute("question", qbQuestion);
+	
+	List<QbQuestion> otherVersions = qbService.getQbQuestionsByQuestionId(qbQuestion.getQuestionId());
+	request.setAttribute("otherVersions", otherVersions);
 	
 	return "qb/qbQuestionDetails";
     }
