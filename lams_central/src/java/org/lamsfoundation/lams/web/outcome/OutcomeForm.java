@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.web.outcome;
 
 public class OutcomeForm {
     private Long outcomeId;
-    private Integer organisationId;
     private Long scaleId;
     private String name;
     private String code;
@@ -37,14 +36,6 @@ public class OutcomeForm {
 
     public void setOutcomeId(Long outcomeId) {
 	this.outcomeId = outcomeId != null && outcomeId < 1 ? null : outcomeId;
-    }
-
-    public Integer getOrganisationId() {
-	return organisationId;
-    }
-
-    public void setOrganisationId(Integer organisationId) {
-	this.organisationId = organisationId != null && organisationId < 1 ? null : organisationId;
     }
 
     public Long getScaleId() {
