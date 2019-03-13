@@ -3,12 +3,10 @@ package org.lamsfoundation.lams.outcome.service;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -27,7 +25,6 @@ import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -40,28 +37,18 @@ public class OutcomeService implements IOutcomeService {
     private static Logger log = Logger.getLogger(OutcomeService.class);
 
     @Override
-    public String getContentFolderId(Integer organisationId) {
-	String contentFolderId = outcomeDAO.getContentFolderID(organisationId);
-	return contentFolderId == null ? FileUtil.generateUniqueContentFolderID() : contentFolderId;
+    public List<Outcome> getOutcomes() {
+	return outcomeDAO.getOutcomesSortedByName();
     }
 
     @Override
-    public List<Outcome> getOutcomes(Integer organisationId) {
-	return outcomeDAO.getOutcomesSortedByName(organisationId);
+    public List<OutcomeScale> getScales() {
+	return outcomeDAO.getScalesSortedByName();
     }
 
     @Override
-    public List<OutcomeScale> getScales(Integer organisationId) {
-	return outcomeDAO.getScalesSortedByName(organisationId);
-    }
-
-    @Override
-    public List<Outcome> getOutcomes(String search, Set<Integer> organisationIds) {
-	if (organisationIds == null) {
-	    Integer userId = OutcomeService.getUserDTO().getUserID();
-	    organisationIds = new HashSet<>(outcomeDAO.getAuthorOrganisations(userId));
-	}
-	return outcomeDAO.getOutcomesSortedByName(search, organisationIds);
+    public List<Outcome> getOutcomes(String search) {
+	return outcomeDAO.getOutcomesSortedByName(search);
     }
 
     @Override
@@ -123,7 +110,7 @@ public class OutcomeService implements IOutcomeService {
 	row[3] = new ExcelCell(messageService.getMessage("scale.manage.add.value"), true);
 	rowList.add(row);
 
-	List<OutcomeScale> scales = getScales(null);
+	List<OutcomeScale> scales = getScales();
 	for (OutcomeScale scale : scales) {
 	    row = new ExcelCell[4];
 	    row[0] = new ExcelCell(scale.getName(), false);
@@ -151,7 +138,7 @@ public class OutcomeService implements IOutcomeService {
 	row[3] = new ExcelCell(messageService.getMessage("outcome.manage.add.scale"), true);
 	rowList.add(row);
 
-	List<Outcome> outcomes = getOutcomes(null);
+	List<Outcome> outcomes = getOutcomes();
 	for (Outcome outcome : outcomes) {
 	    row = new ExcelCell[4];
 	    row[0] = new ExcelCell(outcome.getName(), false);
