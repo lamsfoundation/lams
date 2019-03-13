@@ -78,18 +78,18 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @SuppressWarnings("unchecked")
     public List<Outcome> getOutcomesSortedByName(String search, Set<Integer> organisationIds) {
 	String queryString = FIND_OUTCOMES_SORTED_BY_NAME;
-	if (organisationIds != null && !organisationIds.isEmpty()) {
-	    queryString = queryString.replace("?", "OR o.organisation.organisationId IN (:organisationIds) ? ");
-	}
+//	if (organisationIds != null && !organisationIds.isEmpty()) {
+//	    queryString = queryString.replace("?", "OR o.organisation.organisationId IN (:organisationIds) ? ");
+//	}
 	if (StringUtils.isNotBlank(search)) {
 	    queryString = queryString.replace("?", "AND (o.name LIKE :search OR o.code LIKE :search)");
 	}
 	queryString = queryString.replace("?", "");
 
 	Query<Outcome> query = getSession().createQuery(queryString);
-	if (organisationIds != null && !organisationIds.isEmpty()) {
-	    query.setParameterList("organisationIds", organisationIds);
-	}
+//	if (organisationIds != null && !organisationIds.isEmpty()) {
+//	    query.setParameterList("organisationIds", organisationIds);
+//	}
 	if (StringUtils.isNotBlank(search)) {
 	    query.setParameter("search", "%" + search + "%");
 	}
@@ -100,7 +100,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("lessonId", lessonId);
 	}
@@ -133,7 +133,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("mapping.outcome.lessonId", lessonId);
 	}
@@ -152,7 +152,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.userId", userId);
 	properties.put("mapping.mappingId", mappingId);
 	List<OutcomeResult> result = findByProperties(OutcomeResult.class, properties);

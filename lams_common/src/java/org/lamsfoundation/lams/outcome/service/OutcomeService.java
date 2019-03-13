@@ -2,10 +2,12 @@ package org.lamsfoundation.lams.outcome.service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -57,7 +59,7 @@ public class OutcomeService implements IOutcomeService {
     public List<Outcome> getOutcomes(String search, Set<Integer> organisationIds) {
 	if (organisationIds == null) {
 	    Integer userId = OutcomeService.getUserDTO().getUserID();
-	    organisationIds = new HashSet<Integer>(outcomeDAO.getAuthorOrganisations(userId));
+	    organisationIds = new HashSet<>(outcomeDAO.getAuthorOrganisations(userId));
 	}
 	return outcomeDAO.getOutcomesSortedByName(search, organisationIds);
     }
@@ -65,6 +67,13 @@ public class OutcomeService implements IOutcomeService {
     @Override
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
 	return outcomeDAO.getOutcomeMappings(lessonId, toolContentId, itemId);
+    }
+
+    @Override
+    public long countOutcomeMappings(Long outcomeId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("outcome.outcomeId", outcomeId);
+	return outcomeDAO.countByProperties(OutcomeMapping.class, properties);
     }
 
     @Override
@@ -103,10 +112,10 @@ public class OutcomeService implements IOutcomeService {
 
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportScales() {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 	ExcelCell[] row = new ExcelCell[4];
 	row[0] = new ExcelCell(messageService.getMessage("outcome.manage.add.name"), true);
 	row[1] = new ExcelCell(messageService.getMessage("outcome.manage.add.code"), true);
@@ -131,10 +140,10 @@ public class OutcomeService implements IOutcomeService {
 
     @Override
     public LinkedHashMap<String, ExcelCell[][]> exportOutcomes() {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	List<ExcelCell[]> rowList = new LinkedList<>();
 	ExcelCell[] row = new ExcelCell[4];
 	row[0] = new ExcelCell(messageService.getMessage("outcome.manage.add.name"), true);
 	row[1] = new ExcelCell(messageService.getMessage("outcome.manage.add.code"), true);
@@ -148,7 +157,7 @@ public class OutcomeService implements IOutcomeService {
 	    row[0] = new ExcelCell(outcome.getName(), false);
 	    row[1] = new ExcelCell(outcome.getCode(), false);
 	    row[2] = new ExcelCell(outcome.getDescription(), false);
-	    row[3] = new ExcelCell(outcome.getScale().getCode(), false);
+	    row[3] = new ExcelCell(outcome.getScale().getName(), false);
 	    rowList.add(row);
 	}
 
@@ -176,17 +185,18 @@ public class OutcomeService implements IOutcomeService {
 
 	    for (int i = startRow; i < (endRow + 1); i++) {
 		row = sheet.getRow(i);
+		cell = row.getCell(0);
+		String name = cell.getStringCellValue();
 		cell = row.getCell(1);
 		String code = cell.getStringCellValue();
-		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", code);
+		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "name", name);
 		if (!foundScales.isEmpty()) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome scale with existing code: " + code);
+			log.debug("Skipping an outcome scale with existing name: " + name);
 		    }
 		    continue;
 		}
-		cell = row.getCell(0);
-		String name = cell.getStringCellValue();
+
 		cell = row.getCell(2);
 		String description = cell == null ? null : cell.getStringCellValue();
 		cell = row.getCell(3);
@@ -239,27 +249,28 @@ public class OutcomeService implements IOutcomeService {
 
 	    for (int i = startRow; i < (endRow + 1); i++) {
 		row = sheet.getRow(i);
+		cell = row.getCell(0);
+		String name = cell.getStringCellValue();
 		cell = row.getCell(1);
 		String code = cell.getStringCellValue();
-		List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "code", code);
+		List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "name", name);
 		if (!foundOutcomes.isEmpty()) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome with existing code: " + code);
+			log.debug("Skipping an outcome with existing name: " + name);
 		    }
 		    continue;
 		}
 		cell = row.getCell(3);
-		String scaleCode = cell.getStringCellValue();
-		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", scaleCode);
+		String scaleName = cell.getStringCellValue();
+		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "name", scaleName);
 		OutcomeScale scale = foundScales.isEmpty() ? null : foundScales.get(0);
 		if (scale == null) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome with missing scale with code: " + scaleCode);
+			log.debug("Skipping an outcome with missing scale with name: " + scaleName);
 		    }
 		    continue;
 		}
-		cell = row.getCell(0);
-		String name = cell.getStringCellValue();
+
 		cell = row.getCell(2);
 		String description = cell == null ? null : cell.getStringCellValue();
 

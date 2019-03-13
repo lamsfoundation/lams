@@ -23,6 +23,8 @@ public interface IOutcomeService {
 
     List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId);
 
+    long countOutcomeMappings(Long outcomeId);
+
     List<OutcomeScale> getScales(Integer organisationId);
 
     List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId);

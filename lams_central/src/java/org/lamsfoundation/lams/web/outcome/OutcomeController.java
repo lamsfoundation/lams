@@ -38,7 +38,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
@@ -207,11 +206,11 @@ public class OutcomeController {
 		outcome.setCode(outcomeForm.getCode());
 		outcome.setDescription(outcomeForm.getDescription());
 		outcome.setContentFolderId(outcomeForm.getContentFolderId());
-		if (outcomeForm.getScaleId() != null) {
-		    OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class,
-			    outcomeForm.getScaleId());
-		    outcome.setScale(scale);
-		}
+		long scaleId = outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0
+			? IOutcomeService.DEFAULT_SCALE_ID
+			: outcomeForm.getScaleId();
+		OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
+		outcome.setScale(scale);
 		userManagementService.save(outcome);
 
 		if (log.isDebugEnabled()) {
@@ -269,7 +268,7 @@ public class OutcomeController {
 	Integer userId = getUserDTO().getUserID();
 	if (StringUtils.isNotBlank(organisationIdString)) {
 	    String[] split = organisationIdString.split(",");
-	    organisationIds = new HashSet<Integer>(split.length);
+	    organisationIds = new HashSet<>(split.length);
 	    for (String organisationId : split) {
 		organisationIds.add(Integer.valueOf(organisationId));
 	    }
@@ -292,9 +291,11 @@ public class OutcomeController {
 	for (Outcome outcome : outcomes) {
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("value", outcome.getOutcomeId());
-	    outcomeJSON.put("label", outcome.getName() + " (" + outcome.getCode() + ")");
+	    outcomeJSON.put("label",
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
+	responseJSON.add(search);
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -302,7 +303,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeMap")
     @ResponseBody
     public String outcomeMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Long outcomeId = WebUtil.readLongParam(request, "outcomeId");
+	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
 	if (lessonId == null && toolContentId == null) {
@@ -310,8 +311,40 @@ public class OutcomeController {
 		    "Either lesson ID or tool content ID must not be null when creating an outcome mapping");
 	}
 	Long itemId = WebUtil.readLongParam(request, "itemId", true);
+	Outcome outcome = null;
+	if (outcomeId == null) {
+	    // create a new outcome on the fly
+	    String name = WebUtil.readStrParam(request, "name");
+	    String code = null;
+	    // check if name contains code part
+	    String[] nameParts = name.split("\\(");
+	    if (nameParts.length > 1) {
+		name = nameParts[0].trim();
+		code = nameParts[1].replaceFirst("\\)", "").trim();
+	    }
+	    outcome = new Outcome();
 
-	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
+	    Integer userId = getUserDTO().getUserID();
+	    User user = (User) userManagementService.findById(User.class, userId);
+	    outcome.setCreateBy(user);
+	    outcome.setCreateDateTime(new Date());
+
+	    outcome.setName(name);
+	    outcome.setCode(code);
+	    outcome.setContentFolderId(outcomeService.getContentFolderId(null));
+	    OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class,
+		    IOutcomeService.DEFAULT_SCALE_ID);
+	    outcome.setScale(scale);
+	    userManagementService.save(outcome);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Saved outcome " + outcome.getOutcomeId());
+	    }
+
+	} else {
+	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
+	}
+
 	Integer organisationId = outcome.getOrganisation() == null ? null
 		: outcome.getOrganisation().getOrganisationId();
 	Integer userId = getUserDTO().getUserID();
@@ -370,11 +403,12 @@ public class OutcomeController {
 	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId);
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (OutcomeMapping outcomeMapping : outcomeMappings) {
+	    Outcome outcome = outcomeMapping.getOutcome();
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("mappingId", outcomeMapping.getMappingId());
-	    outcomeJSON.put("outcomeId", outcomeMapping.getOutcome().getOutcomeId());
+	    outcomeJSON.put("outcomeId", outcome.getOutcomeId());
 	    outcomeJSON.put("label",
-		    outcomeMapping.getOutcome().getName() + " (" + outcomeMapping.getOutcome().getCode() + ")");
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
 	response.setContentType("application/json;charset=utf-8");
@@ -400,9 +434,20 @@ public class OutcomeController {
 	    securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "remove outcome mapping",
 		    true);
 	}
+	Outcome outcome = outcomeMapping.getOutcome();
+	Long outcomeId = outcome.getOutcomeId();
 	userManagementService.delete(outcomeMapping);
+
 	if (log.isDebugEnabled()) {
-	    log.debug("Deleted outcome mapping " + outcomeMapping);
+	    log.debug("Deleted outcome mapping " + mappingId);
+	}
+	// if the outcome is not mapped to any activity, remove it
+	long mappingCount = outcomeService.countOutcomeMappings(outcomeId);
+	if (mappingCount == 0) {
+	    userManagementService.delete(outcome);
+	    if (log.isDebugEnabled()) {
+		log.debug("Deleted outcome " + outcomeId + " as it did not have any mappings");
+	    }
 	}
     }
 
@@ -419,7 +464,7 @@ public class OutcomeController {
 	if (lessonId == null) {
 	    ToolActivity toolActivity = ((List<ToolActivity>) userManagementService.findByProperty(ToolActivity.class,
 		    "toolContentId", outcomeMapping.getToolContentId())).get(0);
-	    lessonId = ((Lesson) toolActivity.getLearningDesign().getLessons().iterator().next()).getLessonId();
+	    lessonId = toolActivity.getLearningDesign().getLessons().iterator().next().getLessonId();
 	}
 	Integer userId = getUserDTO().getUserID();
 	securityService.isLessonMonitor(lessonId, userId, "set outcome result", true);
@@ -770,12 +815,16 @@ public class OutcomeController {
 	if (StringUtils.isBlank(outcomeForm.getName())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.name.blank"));
 	}
-	if (StringUtils.isBlank(outcomeForm.getCode())) {
-	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
-	}
-	if (outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0) {
-	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.scale.choose"));
-	}
+	/**
+	 * LDEV-4786 We allow blank code when creating an outcome straight from outcome select field
+	 * if (StringUtils.isBlank(outcomeForm.getCode())) {
+	 * errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
+	 * }
+	 * If no outcome is chosen, the default scale gets chosen
+	 * if (outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0) {
+	 * errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.scale.choose"));
+	 * }
+	 **/
     }
 
     private void validateScaleForm(OutcomeScaleForm scaleForm, MultiValueMap<String, String> errorMap) {
