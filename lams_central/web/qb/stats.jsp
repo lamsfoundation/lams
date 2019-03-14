@@ -167,17 +167,24 @@
 							<td>
 								<c:out value="${lesson.organisation.name}" />
 							</td>
-							<td>
+							<td title="${lesson.lessonId}">
 								<c:out value="${lesson.lessonName}" />
 							</td>
-							<td>
+							<td title="${activityDTO.activity.activityId}">
 								<c:out value="${activityDTO.activity.title}" />
 							</td>
 							<td>
 								<c:out value="${activityDTO.activity.tool.toolDisplayName}" />
 							</td>
 							<td>
-								<c:out value="${activityDTO.average}" />%
+								<c:choose>
+									<c:when test="${empty activityDTO.average}">
+										-
+									</c:when>
+									<c:otherwise>
+										<c:out value="${activityDTO.average}" />%
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
 					</c:forEach>

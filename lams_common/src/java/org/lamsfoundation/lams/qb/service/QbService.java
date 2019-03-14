@@ -57,7 +57,7 @@ public class QbService implements IQbService {
 		    correctCount = answerCount;
 		}
 	    }
-	    activityDTO.setAverage(Long.valueOf(Math.round(correctCount / total * 100)).intValue());
+	    activityDTO.setAverage(total == 0 ? null : Long.valueOf(Math.round(correctCount / total * 100)).intValue());
 	    activityDTOs.add(activityDTO);
 	}
 	stats.setActivities(activityDTOs);
