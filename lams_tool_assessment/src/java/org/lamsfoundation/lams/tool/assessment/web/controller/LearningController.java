@@ -766,13 +766,14 @@ public class LearningController {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
 			String answerString = request.getParameter(
-				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 			answerBoolean = !StringUtils.isBlank(answerString);
+			
 		    } else {
-			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-			if (answerString != null) {
-			    int optionSequenceId = Integer.parseInt(answerString);
-			    answerBoolean = (optionDto.getSequenceId() == optionSequenceId);
+			String optionUidSelectedStr = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+			if (optionUidSelectedStr != null) {
+			    Long optionUidSelected = Long.parseLong(optionUidSelectedStr);
+			    answerBoolean = optionDto.getUid().equals(optionUidSelected);
 			}
 		    }
 		    optionDto.setAnswerBoolean(answerBoolean);
@@ -781,7 +782,7 @@ public class LearningController {
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerInt = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 		    optionDto.setAnswerInt(answerInt);
 		}
 
@@ -808,7 +809,7 @@ public class LearningController {
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerSequenceId = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 		    optionDto.setSequenceId(answerSequenceId);
 		}
 		//sort accrording to the new sequenceIds
@@ -821,7 +822,7 @@ public class LearningController {
 		//store hedging marks
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    Integer markHedging = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId(), true);
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid(), true);
 		    if (markHedging != null) {
 			optionDto.setAnswerInt(markHedging);
 		    }

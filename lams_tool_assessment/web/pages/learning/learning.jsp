@@ -81,7 +81,7 @@
 								for (var i = 0; i < sortable.el.rows.length; i++) {
 									var tr = sortable.el.rows[i];
 									var input = $("input", $(tr));
-								    input.val(i+1);
+								    input.val(i);
 								}
 							}
 						}			            
