@@ -10,7 +10,7 @@
 			<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">
 				<tr>
 					<td class="ordering-option">
-						<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${ordStatus.index}" />
+						<input type="hidden" name="question${status.index}_${option.uid}" value="${ordStatus.index}" />
 						<c:out value="${option.optionString}" escapeXml="false" />
 					</td>
 				</tr>
