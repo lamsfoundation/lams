@@ -22,5 +22,7 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<Long, Long> geAnswerStatsForQbToolQuestion(long qbToolQuestionUid);
 
-    Map<Long, Long> geAnswerStatsForActivity(long activityId);
+    Map<Long, Long> getAnswerStatsForActivity(long activityId);
+
+    Map<String, Long> getBurningQuestions(long qbQuestionUid);
 }

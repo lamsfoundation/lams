@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.qb.dao.hibernate;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.qbToolQuestion.uid = :qbToolQuestionUid GROUP BY a.qbOption.uid";
     private static final String FIND_ANSWER_STATS_BY_ACTIVITY = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a, "
 	    + " ToolActivity AS act WHERE a.qbToolQuestion.toolContentId = act.toolContentId AND act.activityId = :activityId GROUP BY a.qbOption.uid";
+    private static final String FIND_BURNING_QUESTIONS = "SELECT bl.burningQuestion.question, COUNT(bl.uid) FROM BurningQuestionLike AS bl "
+	    + "WHERE bl.burningQuestion.scratchieItem.qbQuestion.uid = :qbQuestionUid GROUP BY bl.burningQuestion.question ORDER BY COUNT(bl.uid) DESC";
 
     @Override
     public int getMaxQuestionId() {
@@ -79,12 +82,24 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Long, Long> geAnswerStatsForActivity(long activityId) {
+    public Map<Long, Long> getAnswerStatsForActivity(long activityId) {
 	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_ACTIVITY)
 		.setParameter("activityId", activityId).list();
 	Map<Long, Long> map = new HashMap<>(result.size());
 	for (Object[] answerStat : result) {
 	    map.put((Long) answerStat[0], (Long) answerStat[1]);
+	}
+	return map;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Long> getBurningQuestions(long qbQuestionUid) {
+	List<Object[]> result = this.getSession().createQuery(FIND_BURNING_QUESTIONS)
+		.setParameter("qbQuestionUid", qbQuestionUid).list();
+	Map<String, Long> map = new LinkedHashMap<>(result.size());
+	for (Object[] burningQuestion : result) {
+	    map.put((String) burningQuestion[0], (Long) burningQuestion[1]);
 	}
 	return map;
     }

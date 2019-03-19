@@ -37,6 +37,8 @@ public class QbService implements IQbService {
 	QbQuestion qbQuestion = (QbQuestion) qbDAO.find(QbQuestion.class, qbQuestionUid);
 	List<QbOption> qbOptions = qbQuestion.getQbOptions();
 	stats.setQuestion(qbQuestion);
+	Map<String, Long> burningQuestions = qbDAO.getBurningQuestions(qbQuestionUid);
+	stats.setBurningQuestions(burningQuestions);
 
 	List<ToolActivity> activities = qbDAO.getQuestionActivities(qbQuestionUid);
 	List<QbStatsActivityDTO> activityDTOs = new LinkedList<>();
@@ -44,7 +46,7 @@ public class QbService implements IQbService {
 	for (ToolActivity activity : activities) {
 	    QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
 	    activityDTO.setActivity(activity);
-	    Map<Long, Long> activityAnswersRaw = qbDAO.geAnswerStatsForActivity(activity.getActivityId());
+	    Map<Long, Long> activityAnswersRaw = qbDAO.getAnswerStatsForActivity(activity.getActivityId());
 	    double total = 0;
 	    long correctCount = 0;
 	    for (QbOption option : qbOptions) {

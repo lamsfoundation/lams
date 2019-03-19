@@ -140,6 +140,34 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
+			Burning questions
+		</div>
+		<div class="panel-body">
+			<table class="table table-striped qb-stats-table">
+				<tr>
+					<th>
+						Question
+					</th>
+					<th>
+						Likes
+					</th>
+				</tr>
+				<c:forEach var="question" items="${stats.burningQuestions}">
+					<tr>
+						<td>
+							<c:out value="${question.key}" />
+						</td>
+						<td>
+							<c:out value="${question.value}" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
 			Usage
 		</div>
 		<div class="panel-body">

@@ -34,6 +34,7 @@ public class QbStatsDTO {
     private String answersJSON;
     private List<QbStatsActivityDTO> activities;
     private List<QbQuestion> versions;
+    private Map<String, Long> burningQuestions;
 
     public QbQuestion getQuestion() {
 	return question;
@@ -81,5 +82,13 @@ public class QbStatsDTO {
 
     public void setVersions(List<QbQuestion> versions) {
 	this.versions = versions;
+    }
+
+    public Map<String, Long> getBurningQuestions() {
+	return burningQuestions;
+    }
+
+    public void setBurningQuestions(Map<String, Long> burningQuestions) {
+	this.burningQuestions = burningQuestions;
     }
 }
