@@ -25,6 +25,8 @@ public interface IOutcomeService {
 
     long countOutcomeMappings(Long outcomeId);
 
+    long countScaleUse(Long scaleId);
+
     List<OutcomeScale> getScales();
 
     List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId);

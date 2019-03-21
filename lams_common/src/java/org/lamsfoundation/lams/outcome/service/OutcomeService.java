@@ -64,6 +64,13 @@ public class OutcomeService implements IOutcomeService {
     }
 
     @Override
+    public long countScaleUse(Long scaleId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("scale.scaleId", scaleId);
+	return outcomeDAO.countByProperties(Outcome.class, properties);
+    }
+
+    @Override
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
 	return outcomeDAO.getOutcomeResults(userId, lessonId, toolContentId, itemId);
     }
@@ -177,9 +184,11 @@ public class OutcomeService implements IOutcomeService {
 		cell = row.getCell(1);
 		String code = cell.getStringCellValue();
 		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "name", name);
+		foundScales.addAll(outcomeDAO.findByProperty(OutcomeScale.class, "code", code));
 		if (!foundScales.isEmpty()) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome scale with existing name: " + name);
+			log.debug("Skipping an outcome scale with existing name \"" + name + "\" or code \"" + code
+				+ "\"");
 		    }
 		    continue;
 		}
@@ -241,9 +250,10 @@ public class OutcomeService implements IOutcomeService {
 		cell = row.getCell(1);
 		String code = cell.getStringCellValue();
 		List<Outcome> foundOutcomes = outcomeDAO.findByProperty(Outcome.class, "name", name);
+		foundOutcomes.addAll(outcomeDAO.findByProperty(Outcome.class, "code", code));
 		if (!foundOutcomes.isEmpty()) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome with existing name: " + name);
+			log.debug("Skipping an outcome with existing name \"" + name + "\" or code \"" + code + "\"");
 		    }
 		    continue;
 		}

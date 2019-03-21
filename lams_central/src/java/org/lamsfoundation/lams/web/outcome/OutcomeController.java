@@ -87,6 +87,9 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+
 	List<Outcome> outcomes = outcomeService.getOutcomes();
 	request.setAttribute("outcomes", outcomes);
 	return "outcome/outcomeManage";
@@ -95,6 +98,9 @@ public class OutcomeController {
     @RequestMapping("/outcomeEdit")
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 
@@ -164,15 +170,27 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeRemove")
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 	if (outcome == null) {
 	    throw new IllegalArgumentException("Can not find an outcome with ID " + outcomeId);
 	}
-	userManagementService.delete(outcome);
-	if (log.isDebugEnabled()) {
-	    log.debug("Deleted outcome " + outcomeId);
+
+	long mappingCount = outcomeService.countOutcomeMappings(outcomeId);
+	if (mappingCount == 0) {
+	    userManagementService.delete(outcome);
+	    if (log.isDebugEnabled()) {
+		log.debug("Deleted outcome " + outcomeId);
+	    }
+	} else {
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
+	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.remove.error.in.use"));
+	    request.setAttribute("errorMap", errorMap);
 	}
+
 	return outcomeManage(request, response);
     }
 
@@ -300,20 +318,10 @@ public class OutcomeController {
 	Long mappingId = WebUtil.readLongParam(request, "mappingId");
 	OutcomeMapping outcomeMapping = (OutcomeMapping) userManagementService.findById(OutcomeMapping.class,
 		mappingId);
-	Outcome outcome = outcomeMapping.getOutcome();
-	Long outcomeId = outcome.getOutcomeId();
 	userManagementService.delete(outcomeMapping);
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Deleted outcome mapping " + mappingId);
-	}
-	// if the outcome is not mapped to any activity, remove it
-	long mappingCount = outcomeService.countOutcomeMappings(outcomeId);
-	if (mappingCount == 0) {
-	    userManagementService.delete(outcome);
-	    if (log.isDebugEnabled()) {
-		log.debug("Deleted outcome " + outcomeId + " as it did not have any mappings");
-	    }
 	}
     }
 
@@ -438,15 +446,16 @@ public class OutcomeController {
 	if (scale == null) {
 	    throw new IllegalArgumentException("Can not find an outcome scale with ID " + scaleId);
 	}
-	try {
+
+	long scaleUseCount = outcomeService.countScaleUse(scaleId);
+	if (scaleUseCount == 0) {
 	    userManagementService.delete(scale);
 	    if (log.isDebugEnabled()) {
 		log.debug("Deleted outcome scale " + scaleId);
 	    }
-	} catch (Exception e) {
-	    log.error("Error while removing an outcome scale", e);
+	} else {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
-	    errorMap.add("GLOBAL", messageService.getMessage("scale.manage.remove.scale"));
+	    errorMap.add("GLOBAL", messageService.getMessage("scale.manage.remove.error.in.use"));
 	    request.setAttribute("errorMap", errorMap);
 	}
 
