@@ -9,6 +9,13 @@
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
+<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
+<c:set var="authenticationMethodId">
+	<lams:user property="authenticationMethodId" />
+</c:set>
+<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
+							
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -44,8 +51,6 @@
 
 		<lams:errors path="*"/>
 
-		<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
-		<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
 		<div style="clear: both;"></div>
 		<div class="container">
 			<div class="row vertical-center-row">
@@ -53,16 +58,17 @@
 					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 					<div class="panel">
 						<div class="panel-body">
-							<c:set var="authenticationMethodId">
-								<lams:user property="authenticationMethodId" />
-							</c:set>
-							<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
-									<span class="lead"><label><fmt:message
-												key="label.username" /></label>: ${UserForm.login}</span>
+									<span class="lead">
+										<label>
+											<fmt:message key="label.username" />
+										</label>: 
+										${newForm.login}
+									</span>
 								</div>
+								
 								<div class="form-group">
 									<label><fmt:message key="label.title" />:</label>
 									<form:input path="title" size="32" maxlength="32"
