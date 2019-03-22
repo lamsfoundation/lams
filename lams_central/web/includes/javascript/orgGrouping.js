@@ -2,7 +2,7 @@
 
 function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
-		document.location.href = "organisationGroup/removeGrouping.do?organisationID="
+		document.location.href = LAMS_URL + "organisationGroup/removeGrouping.do?organisationID="
 			+ organisationId + "&groupingId=" + groupingId;
 	}
 }
