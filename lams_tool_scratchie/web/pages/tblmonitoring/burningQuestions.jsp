@@ -37,12 +37,12 @@
 <!-- Header -->
 <div class="row no-gutter">
 	<div class="col-xs-12">
-        <a id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right voffset20" data-expanded="false" href="#nogo">
+        <button type="button" id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right voffset20" data-expanded="false">
            	<i class="fa fa-plus-circle"></i> 
            	<span class="hidden-xs">
            		<fmt:message key='label.expand.all' />
            	</span>
-        </a>
+        </button>
             
 		<h3>
 			<fmt:message key="label.burning.questions"/>
