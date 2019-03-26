@@ -2457,7 +2457,10 @@ GeneralLib = {
 						             activity instanceof ActivityDefs.ParallelActivity ? 5 : 1,
 				iconPath = null,
 				isGrouped = activity.grouping ? true : false,
-				parentActivityID = activity.parentActivity ? activity.parentActivity.id : null;
+				parentActivityID = activity.parentActivity ? activity.parentActivity.id : null,
+				gateActivityCompletionBased = false,
+				activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
+						activity.end.transitions : activity.transitions;
 			
 			if (activity.toolID) {
 				activityTypeID = 1;
@@ -2507,7 +2510,13 @@ GeneralLib = {
 			} else if (activity instanceof  ActivityDefs.GateActivity){
 				switch(activity.gateType) {
 					case 'sync'       : activityTypeID = 3; break;
-					case 'schedule'   : activityTypeID = 4; break;
+					case 'schedule'   : 
+						activityTypeID = 4; 
+						gateActivityCompletionBased = activity.gateActivityCompletionBased
+							//check the previous activity is available as well
+							&& (activityTransitions && activityTransitions.to && activityTransitions.to.length > 0);
+						break;
+						
 					case 'permission' : activityTypeID = 5; break;
 					case 'system' 	  : activityTypeID = 9; systemGate = activity; break;
 					case 'condition'  :
@@ -2639,7 +2648,7 @@ GeneralLib = {
 				'defaultActivityUIID'    : activity.defaultActivityUIID,
 				'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 											activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
-				'gateActivityCompletionBased' : activity.gateActivityCompletionBased,
+				'gateActivityCompletionBased' : gateActivityCompletionBased,
 				'gateActivityLevelID'    : activity instanceof ActivityDefs.GateActivity ? 1 : null,
 				'minOptions'			 : activity.minOptions || null,
 				'maxOptions'			 : activity.maxOptions || null,
@@ -2649,9 +2658,6 @@ GeneralLib = {
 														null : activity.gradebookToolOutputDefinitionName,
 				'gradebookToolOutputWeight' : activity.gradebookToolOutputWeight
 			});
-	
-			var activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
-					activity.end.transitions : activity.transitions;
 			
 			if (activityTransitions) {
 				// iterate over transitions and create a list
