@@ -39,11 +39,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  * will be overiding the methods that defined in the abstract level.
  *
  * @author Jacky Fang
- * @since 2005-4-6
- * @version 1.1
- *
  */
 public class ScheduleGateActivityStrategy extends GateActivityStrategy {
+    private static final long serialVersionUID = -6702911163273937832L;
+
     public ScheduleGateActivityStrategy(GateActivity gateActivity) {
 	super(gateActivity);
     }
@@ -91,7 +90,6 @@ public class ScheduleGateActivityStrategy extends GateActivityStrategy {
 	return super.shouldOpenGateFor(learner, expectedLearnerCount, waitingLearnerCount);
     }
 
-    @SuppressWarnings({ "unchecked" })
     public static Date getPreviousActivityCompletionDate(ScheduleGateActivity scheduleGate, User learner) {
 	Activity previousActivity = scheduleGate.getTransitionTo().getFromActivity();
 	if (previousActivity != null) {

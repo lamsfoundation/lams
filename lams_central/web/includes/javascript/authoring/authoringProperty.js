@@ -279,7 +279,9 @@ var PropertyDefs = {
 		if (activity.transitions.to.length == 0){
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('checked', null)
+				.prop('checked', false)
 				.attr('disabled', 'disabled');
+
 		} else {
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('disabled', null);
