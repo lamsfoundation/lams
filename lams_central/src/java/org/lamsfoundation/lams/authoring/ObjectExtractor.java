@@ -1233,10 +1233,12 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildScheduleGateActivity(ScheduleGateActivity activity, ObjectNode activityDetails) {
 	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
 	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
-	activity.setGateActivityCompletionBased(
-		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED));
-	SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
-	activity.setSystemTool(systemTool);
+	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
+	
+	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
+	//check the previous activity is available as well
+	isGateActivityCompletionBased &= activity.getTransitionTo() != null;
+	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
     }
 
     private void createLessonClass(LessonClass lessonClass, ObjectNode groupingDetails) {
