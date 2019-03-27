@@ -192,7 +192,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws InvalidParameterException, RepositoryCheckedException {
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId)
+	    throws InvalidParameterException, RepositoryCheckedException {
 	resourceToolContentHandler.deleteFile(fileUuid);
     }
 
@@ -743,7 +744,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -799,6 +800,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    criteria.setToolContentId(toolContentId);
+		}
+	    }
+
+	    // Calling DAO method below causes flush. That is why we need to reset tool content ID in rating criteria before it happens.
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(newUserUid.longValue(), toolContentId);
 	    if (user == null) {
 		user = new ResourceUser();
@@ -817,13 +827,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    for (ResourceItem item : items) {
 		item.setCreateBy(user);
 		useRatings = useRatings || item.isAllowRating();
-	    }
-
-	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
-	    if (criterias != null) {
-		for (LearnerItemRatingCriteria criteria : criterias) {
-		    criteria.setToolContentId(toolContentId);
-		}
 	    }
 
 	    resourceDao.saveObject(toolContentObj);
@@ -930,14 +933,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug(
-		    "Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
+	    log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (resource == null) {
-	    log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -1004,8 +1005,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    session.setStatus(ResourceConstants.COMPLETED);
 	    resourceSessionDao.saveObject(session);
 	} else {
-	    log.error("Fail to leave tool Session.Could not find shared resources "
-		    + "session by given session id: " + toolSessionId);
+	    log.error("Fail to leave tool Session.Could not find shared resources " + "session by given session id: "
+		    + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find shared resource session by given session id: " + toolSessionId);
 	}
