@@ -804,6 +804,15 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    criteria.setToolContentId(toolContentId);
+		}
+	    }
+
+	    // Calling DAO method below causes flush. That is why we need to reset tool content ID in rating criteria before it happens.
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(newUserUid.longValue(), toolContentId);
 	    if (user == null) {
 		user = new ResourceUser();
@@ -822,13 +831,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    for (ResourceItem item : items) {
 		item.setCreateBy(user);
 		useRatings = useRatings || item.isAllowRating();
-	    }
-
-	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
-	    if (criterias != null) {
-		for (LearnerItemRatingCriteria criteria : criterias) {
-		    criteria.setToolContentId(toolContentId);
-		}
 	    }
 
 	    resourceDao.saveObject(toolContentObj);
