@@ -50,7 +50,8 @@
 		
 		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
 		outcomeCreateNewLabel = '<fmt:message key="outcome.authoring.create.new" />',
-		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
+		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>',
+		outcomeMappingRemoveConfirm = '<fmt:message key="outcome.authoring.remove.confirm" />';
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
@@ -75,7 +76,7 @@
 				}
 				if (!sameNameFound) {
 					ui.content.push({
-						'label' : term + outcomeCreateNewLabel
+						'label' : term + ' ' + outcomeCreateNewLabel
 					});
 				}
 			},
@@ -126,10 +127,12 @@
 						// cache already mapped outcomes
 						outcomeMappingIds${outcomeTagId}.push(this.outcomeId);
 						// add a label with outcome information
-						var outcomeButton = $('<button type="button" class="roffset10 btn btn-primary outcomeButton" />').attr('mappingId', this.mappingId)
+						var outcomeButton = $('<button type="button" class="roffset10 btn btn-xs btn-info outcomeButton" />').attr('mappingId', this.mappingId)
 												.html(this.label + outcomeMappingRemoveButton).appendTo(mappingDiv);
 						outcomeButton.click(function(){
-							removeOutcomeMapping(this);
+							if (confirm(outcomeMappingRemoveConfirm)) {
+								removeOutcomeMapping(this);
+							}
 						});
 					});
 				}
