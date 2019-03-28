@@ -126,9 +126,9 @@ function lamslesson_update_instance($lamslesson) {
        	$lamslesson->displaydesign = 0;
     }
     
-    // if the allowLearnerRestart setting is unchecked with make sure we do that
-    if (isset($originallamslesson->allowLearnerRestart) && !isset($lamslesson->allowLearnerRestart)) {
-       	$lamslesson->allowLearnerRestart = 0;
+    // if the allowlearnerrestart setting is unchecked with make sure we do that
+    if (isset($originallamslesson->allowlearnerrestart) && !isset($lamslesson->allowlearnerrestart)) {
+       	$lamslesson->allowlearnerrestart = 0;
     }
 
     return $DB->update_record('lamslesson', $lamslesson);
@@ -460,7 +460,7 @@ function lamslesson_add_lesson($form) {
     // start the lesson
     $form->lesson_id = lamslesson_get_lesson(
         $USER->username, $form->sequence_id, $form->course, 
-        $form->name, $form->intro, $form->allowLearnerRestart, 'start',
+        $form->name, $form->intro, $form->allowlearnerrestart, 'start',
         $USER->country, $USER->lang, $form->customCSV, $form->displaydesign
     );
 
@@ -552,7 +552,7 @@ function lamslesson_get_members($form) {
  * @param string $lang The Language's ISO code
  * @return int lesson id
  */
-function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowLearnerRestart,$method,$country,$lang,$customcsv='',$displaydesign) {
+function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowlearnerrestart,$method,$country,$lang,$customcsv='',$displaydesign) {
 
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
@@ -582,7 +582,7 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$allowLear
 		'desc'				  =>	$desc,
 		'country'			  =>	$country,
 		'lang'				  =>	$lang,
-		'allowLearnerRestart' =>	isset($allowLearnerRestart) && $allowLearnerRestart ? 'true' : 'false'
+		'allowlearnerrestart' =>	isset($allowlearnerrestart) && $allowlearnerrestart ? 'true' : 'false'
 	);
 
 
