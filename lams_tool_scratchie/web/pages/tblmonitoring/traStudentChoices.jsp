@@ -1,4 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
+<style>
+	/* show horizontal scroller for iPads */
+	body {
+	    -webkit-overflow-scrolling: touch;
+	}
+</style>
 
 <script>
 	function exportExcel(){
