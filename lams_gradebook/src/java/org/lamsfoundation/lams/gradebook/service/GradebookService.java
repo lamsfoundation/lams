@@ -1443,8 +1443,8 @@ public class GradebookService implements IGradebookFullService {
 			Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
 			activityDataRow[2] = new ExcelCell(finishDate == null ? ""
 				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate), false);
-			activityDataRow[3] = new ExcelCell(getActivityDuration(learnerProgress, activity) / 1000,
-				false);
+			Long duration = getActivityDuration(learnerProgress, activity);
+			activityDataRow[3] = new ExcelCell(duration == null ? "" : duration / 1000, false);
 			activityDataRow[4] = new ExcelCell(activityArchive == null ? "" : activityArchive.getMark(),
 				false);
 
