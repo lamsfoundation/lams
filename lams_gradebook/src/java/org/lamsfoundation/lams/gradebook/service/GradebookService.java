@@ -2135,7 +2135,7 @@ public class GradebookService implements IGradebookFullService {
 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
 		processLearnerActivity(childUrl, toolActivities, false);
 	    }
-	} else if (activity instanceof OptionsActivity) {
+	} else if (activity instanceof OptionsActivity || activity instanceof SequenceActivity) {
 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
 		processLearnerActivity(childUrl, toolActivities, true);
 	    }
