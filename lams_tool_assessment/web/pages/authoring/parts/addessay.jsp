@@ -131,7 +131,7 @@
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
-					<div class="form-group">
+					<div class="form-group form-group-cke">
 						<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.enter.question.description"/></c:set>
 						<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" 
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
@@ -153,12 +153,15 @@
 					</div>
 	
 					<c:if test="${!isAuthoringRestricted}">
-						<div class="form-group form-inline">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						<div class="form-group row form-inline">
+						    <label for="defaultGrade" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    </div>
 						</div>
 					</c:if>
 					
@@ -169,24 +172,30 @@
 						</label>
 					</div>
 					
-					<div class="checkbox">
-					    <label for="max-words-limit-checkbox">
+					<div class="form-group row form-inline" style="display: flex; align-items: center;">
+					    <label for="max-words-limit-checkbox" class="col-sm-3">
 							<input type="checkbox" id="max-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.maximum.number.words" />
 					    </label>
-					    <form:input path="maxWordsLimit" id="max-words-limit"/>
-					    <label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
+					    
+					    <div class="col-sm-9">
+					   		<form:input path="maxWordsLimit" id="max-words-limit"/>
+					    	<label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
+					    </div>
 					</div>
 					
-					<div class="checkbox">
-					    <label for="min-words-limit-checkbox">
+					<div class="form-group row form-inline" style="display: flex; align-items: center;">
+					    <label for="min-words-limit-checkbox" class="col-sm-3">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.minimum.number.words" />
 					    </label>
-					    <form:input path="minWordsLimit" id="min-words-limit"/>
-					    <label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="minWordsLimit" id="min-words-limit"/>
+					    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
+					    </div>
 					</div>
 	
 					<div class="voffset5 form-group">

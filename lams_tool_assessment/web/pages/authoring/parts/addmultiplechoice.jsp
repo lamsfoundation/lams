@@ -165,32 +165,41 @@
 						</label>
 					</div>
 					
-					<div class="form-group form-inline">
-						<c:if test="${!isAuthoringRestricted}">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					<c:if test="${!isAuthoringRestricted}">
+						<div class="form-group row">
+						    <label for="defaultGrade" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" style="vertical-align: super;" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-					    </c:if>
-					</div>
-					
-					<div class="form-group form-inline">
-					    <label for="penaltyFactor"> 
-					    	<fmt:message key="label.authoring.basic.penalty.factor" />:
-							  <i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    </div>
+						</div>
+					</c:if>
+					    					
+					<div class="form-group row">
+					    <label for="penaltyFactor" class="col-sm-3"> 
+					    	<fmt:message key="label.authoring.basic.penalty.factor" />
+							<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 					    </label>
-					    <form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    </div>
 					</div>
 					
-					<div class="form-inline form-group">
-						<label for="multipleAnswersAllowed">
+					<div class="form-group row form-inline">
+						<label for="multipleAnswersAllowed" class="col-sm-3">
 							<fmt:message key="label.authoring.choice.one.multiple.answers" />
 						</label>
-						<form:select path="multipleAnswersAllowed" id="multipleAnswersAllowed" cssClass="form-control input-sm">
-							<form:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></form:option>
-							<form:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></form:option>
-						</form:select>
+						
+						<div class="col-sm-9">
+							<form:select path="multipleAnswersAllowed" id="multipleAnswersAllowed" cssClass="form-control input-sm">
+								<form:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></form:option>
+								<form:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></form:option>
+							</form:select>
+						</div>
 					</div>
 					
 					<div class="checkbox" id="incorrect-answer-nullifies-mark-area">
@@ -213,36 +222,32 @@
 							<span id="prefixAnswersWithLettersText"><fmt:message key="label.prefix.sequential.letters.for.each.answer" /></span>
 						</label>
 					</div>
+				
+					<!-- Overall feedback -->
+					<!-- <h5 style="margin-top: 20px;">Feedbacks</h5> -->
 	
-					<div class="voffset5 form-group">
-						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
+					<div class="form-group">
+						<c:set var="GENERAL_FEEDBACK_LABEL">General Feedback</c:set>
 						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
-				
-					<!-- Overall feedback -->
-					<div class="overallFeedback">
-					  <fmt:message key="label.authoring.choice.overall.feedback" />
-		
-						<div id="overall-feedback">				
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_CORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.correct"/></c:set>
-								<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
-									placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
+					
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_CORRECT_LABEL">Feedback on any correct response</c:set>
+						<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
+							placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>
+					
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL">Feedback on any partially correct response</c:set>
+						<lams:CKEditor id="feedbackOnPartiallyCorrect" value="${assessmentQuestionForm.feedbackOnPartiallyCorrect}" 
+							placeholder="${FEEDBACK_ON_PARTICALLY_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>
 							
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.partially.correct" /></c:set>
-								<lams:CKEditor id="feedbackOnPartiallyCorrect" value="${assessmentQuestionForm.feedbackOnPartiallyCorrect}" 
-									placeholder="${FEEDBACK_ON_PARTICALLY_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
-							
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_INCORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.incorrect" /></c:set>
-								<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
-									placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
-						</div>
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_INCORRECT_LABEL">Feedback on any incorrect response</c:set>
+						<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
+							placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>
 				</div><!-- settings tab ends -->
 			</form:form>

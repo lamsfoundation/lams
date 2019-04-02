@@ -17,7 +17,7 @@ table.alternative-color td {
 	padding-left: 0;
 }
 .short-input-text {
-	width:10% !important;
+	max-width: 100px;
 }
 
 #max-words-limit-checkbox, #min-words-limit-checkbox {
@@ -37,8 +37,17 @@ table.alternative-color td {
 #hasOptionFilled-error {
 	display: table;
 }
+i.fa-asterisk.text-danger {
+	vertical-align: super;
+}
 
 /* overwriting bootstrap values */
+.checkbox + .checkbox, .radio + .radio {
+	margin-top: 0;
+}
+.checkbox, .radio {
+    margin-bottom: 15px;
+}
 .panel {
 	margin-bottom: 0 !important;
 }
@@ -133,14 +142,6 @@ label {
 	visibility:visible;
 }
 
-/* hover effect for options area */
-.delete-button, .settings-on-hover-hidden{
-	visibility:hidden;
-}	
-#option-table.hover-active tr:hover .delete-button, #option-table.hover-active tr:hover .settings-on-hover-hidden {
-	visibility:visible;
-}
-
 /* Overwrite default CKEditor style */
 div[contenteditable] {
     display: block;
@@ -220,11 +221,12 @@ footer > div {
 /*----------SLIDER----------------*/
 
 .ui-widget-content.ui-slider {
-	border: 0.03em solid #bdc3c7;
+	border: 0.02em solid #bdc3c7;
 	background: #e1e1e1;
 	color: #222222;
-	margin-top: -0.03em;
+	margin-top: -0.02em;
 	padding: 0.08em;
+	opacity:0.8;
 }
 
 .ui-state-default, .ui-widget-content.ui-slider .ui-state-default{
@@ -287,4 +289,32 @@ footer > div {
 .grade-slider>div:first-child {
 	margin-top: -7px;
 	padding: 0;
+}
+
+/*----------CKEDITOR FLOATING LABEL----------------*/
+
+.cke-div {
+    position: relative;
+}
+
+/*
+div[contenteditable].placeholder-shown {
+	margin-top: 22px;
+}*/
+
+.cke-label-floating {
+    will-change: left,top,contents;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 400;
+    position: absolute;
+    pointer-events: none;
+    transition: all .3s ease;
+    color: #999 !important;
+    top: 0;
+}
+div[contenteditable]:focus + .cke-label-floating, div[contenteditable].cke_filled + .cke-label-floating {
+    top: -1rem;
+    left: 0;
+    font-size: .9rem;
 }

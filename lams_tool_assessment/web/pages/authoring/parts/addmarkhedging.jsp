@@ -183,12 +183,15 @@ input:checked ~ .switch-slider:before {
 					</label>
 	
 					<c:if test="${!isAuthoringRestricted}">
-						<div class="form-group form-inline">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						<div class="form-group row form-inline">
+						    <label for="defaultGrade" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    </div>
 						</div>
 					</c:if>
 					

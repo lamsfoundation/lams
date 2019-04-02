@@ -60,7 +60,6 @@ function prepareOptionEditorForAjaxSubmit(ckeditor){
 }
 
 function initializeAnswers() {
-	
 
 	//check if jquery-ui.slider.js library is loaded
 	if (typeof(jQuery.ui.slider) != 'undefined'){
@@ -112,14 +111,14 @@ function initializeAnswers() {
 	    direction: 'vertical',
 		onStart: function (evt) {
 			//stop answers' hover effect, once element dragging started
-			$("#option-table").removeClass("hover-active");
+			//$("#option-table").removeClass("hover-active");
 		},
 		onEnd: function (evt) {
 			//activate answers' hover effect, once element dragging ended
-			$("#option-table").delay(50).queue(function(next){
-			    $(this).addClass("hover-active");
-			    next();
-			});
+			//$("#option-table").delay(50).queue(function(next){
+			//    $(this).addClass("hover-active");
+			//    next();
+			//});
 		},
 		store: {
 			set: function (sortable) {

@@ -146,7 +146,7 @@ CKEDITOR.dtd.$removeEmpty['span'] = false;
 
 // Hides editor instaces until they are fully initialized
 CKEDITOR.on('instanceCreated', function(e){
-	e.editor.element.$.style.display = 'none';
+	//e.editor.element.$.style.display = 'none';
 });
 
 CKEDITOR.on('instanceReady', function(e){
@@ -154,7 +154,11 @@ CKEDITOR.on('instanceReady', function(e){
 	//add custom classes
 	var classes = e.editor.config.classes;
 	if (classes) {
-		e.editor._.editable.$.classList.add(classes);
+		for (classIter of classes.split(' ')) {
+			if (classIter) {
+				e.editor._.editable.$.classList.add(classIter);
+			}
+	    }
 	}
 	
 	var height = e.editor.config.height;
@@ -179,5 +183,17 @@ CKEDITOR.on('instanceReady', function(e){
 		}
 		
 		f.data.dataValue = tempDiv.innerHTML;
+	});
+	
+	//add cke_filled class, when editor gets filled
+	e.editor.on('change', function(event) {
+		var ckeditorData = event.editor.getData();
+		
+		var isEmpty = (ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0);
+		if (isEmpty) {
+			event.editor._.editable.$.classList.remove("cke_filled");
+		} else {
+			event.editor._.editable.$.classList.add("cke_filled");
+		}
 	});
 });
