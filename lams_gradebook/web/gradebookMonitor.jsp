@@ -195,6 +195,8 @@
 						     pager: subgrid_table_id + "_pager",
 						     rowList:[10,20,30,40,50,100],
 							 rowNum:10,
+							 sortorder: "asc", 
+							 sortname: "sequence", 
 						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: [
 						     	'',
@@ -389,6 +391,8 @@
 									     height: "100%",
 									     cmTemplate: { title: false },
 									     cellEdit:false,
+										 sortorder: "asc", 
+										 sortname: "sequence",
 									     pager: false,
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
@@ -447,7 +451,7 @@
 				    rowList:[10,20,30,40,50,100],
 				    rowNum:10,
 				    sortorder: "asc", 
-				    sortname: "activityId", 
+				    sortname: "sequence", 
 				    colNames:[
 				    	'', 
 				    	'',
@@ -618,6 +622,8 @@
 									     autowidth:true,
 									     cellEdit:false,
 									     pager: false,
+										 sortorder: "asc", 
+										 sortname: "sequence", 
 									     colNames: [
 									    	"<fmt:message key="gradebook.columntitle.attempt"/>",
 									     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 

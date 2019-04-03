@@ -109,7 +109,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     // find Learners for the given Lesson first, then see if they have Progress, i.e. started the lesson
     private final static String LOAD_LEARNERS_BY_MOST_PROGRESS = "SELECT u.*, COUNT(comp.activity_id) AS comp_count FROM lams_lesson AS lesson "
-	    + "JOIN lams_grouping AS grouping ON lesson.class_grouping_id = grouping.grouping_id "
+	    + "JOIN lams_grouping AS grping ON lesson.class_grouping_id = grping.grouping_id "
 	    + "JOIN lams_group AS g USING (grouping_id) JOIN lams_user_group AS ug USING (group_id) "
 	    + "JOIN lams_user AS u ON ug.user_id = u.user_id "
 	    + "LEFT JOIN lams_learner_progress AS prog ON prog.lesson_id = lesson.lesson_id AND prog.user_id = u.user_id "

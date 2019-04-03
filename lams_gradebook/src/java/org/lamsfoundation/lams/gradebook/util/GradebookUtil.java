@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.util;
 
 import java.io.StringWriter;
@@ -138,7 +137,7 @@ public class GradebookUtil {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, gridRow.getId().toString());
 
 		// Work out which grid we want to put the data into
-		ArrayList<String> gridRowStringArray = new ArrayList<String>();
+		ArrayList<String> gridRowStringArray = new ArrayList<>();
 
 		gridRowStringArray = gridRow.toStringArray(view);
 
@@ -172,30 +171,33 @@ public class GradebookUtil {
 
     public static String niceFormatting(Double mark, boolean displayAsPercentage) {
 	String markStr = new DecimalFormat("##0.00").format(mark);
-	if ( displayAsPercentage )
+	if (displayAsPercentage) {
 	    markStr += "%";
+	}
 	return markStr;
     }
 
     public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
-	return createPercentageCell(mark, markConversionNeeded, false, 0);
+	return GradebookUtil.createPercentageCell(mark, markConversionNeeded, false, 0);
     }
 
 //    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold) {
 //	return createPercentageCell(mark, markConversionNeeded, isBold, 0);
 //    }
-    
+
     // if markConversionNeeded is true then mark is divided by 100. Otherwise assumes already a percentage.
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold, int borderStyle) {
+    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold,
+	    int borderStyle) {
 	Double convertedMark = null;
-	if ( mark != null )
+	if (mark != null) {
 	    convertedMark = markConversionNeeded ? mark / 100.0 : mark;
-	
+	}
+
 	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
 	userMarkCell.setIsPercentage(true);
 	return userMarkCell;
     }
-    
+
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();
@@ -248,6 +250,8 @@ public class GradebookUtil {
 		Collections.sort(gridRows, new GBAverageMarkComparator());
 	    } else if (sortBy.equals(GradebookConstants.PARAM_START_DATE)) {
 		Collections.sort(gridRows, new GBStartDateComparator());
+	    } else if (sortBy.equals(GradebookConstants.PARAM_SEQUENCE)) {
+		// do not sort at all
 	    } else {
 		Collections.sort(gridRows, new GBRowNameComparator());
 	    }
@@ -280,7 +284,7 @@ public class GradebookUtil {
      */
     private static List doRowNameSearch(List gradebookRows, String searchField, String searchOper,
 	    String searchString) {
-	List<GradebookGridRowDTO> ret = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> ret = new ArrayList<>();
 
 	if (searchField.equals(GradebookConstants.PARAM_ROW_NAME)) {
 	    Iterator it = gradebookRows.iterator();
