@@ -96,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</lams:Alert>
 						</c:if>
 		
-						<table class="table table-condensed table-striped3">
+						<table class="table table-condensed table-hover">
 						<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL" varStatus="loop">
 							<tr><td>
 								<c:set var="numActivities" value="${loop.count}" />
@@ -113,7 +113,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:when>
 									
 									<c:when test="${activityURL.complete}">
-										<div class="loffset20">
+										<div class="radio loffset20">
 											<i class="fa fa-lg fa-check text-success radio-button-offset"></i>
 										
 											<c:choose>
@@ -122,9 +122,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												</c:when>
 												
 												<c:when test="${empty activityURL.url}"><!-- sequence activity -->
-													<c:out value="${activityURL.title}" />
+													<span class="text-muted">
+														<c:out value="${activityURL.title}" />
+													</span>
 													
-													<div class="loffset10">
+													<div class="loffset20">
 													<c:forEach items="${activityURL.childActivities}" var="childActivityURL">
 														
 														<a href="${childActivityURL.url}"><c:out value="${childActivityURL.title}" /></a>
