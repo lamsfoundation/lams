@@ -46,7 +46,10 @@ public class ConfigurationDAO extends LAMSBaseDAO implements IConfigurationDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<ConfigurationItem> getAllItems() {
-	return super.findAll(ConfigurationItem.class);
+	List<ConfigurationItem> result = super.findAll(ConfigurationItem.class);
+	// close session here because of LDEV-4801
+	getSession().close();
+	return result;
     }
 
     /**
