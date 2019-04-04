@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -71,7 +72,7 @@ public class DisplayOptionsActivityController {
 	    HttpServletResponse response) {
 
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+	var activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	if (!(activity instanceof OptionsActivity)) {
 	    log.error("activity not OptionsActivity " + activity.getActivityId());
 	    return "error";
@@ -82,14 +83,30 @@ public class DisplayOptionsActivityController {
 	form.setActivityID(activity.getActivityId());
 
 	List<ActivityURL> activityURLs = new ArrayList<>();
-	Set<Activity> subActivities = optionsActivity.getActivities();
-	Iterator<Activity> i = subActivities.iterator();
+	Set<Activity> optionsChildActivities = optionsActivity.getActivities();
+	Iterator<Activity> i = optionsChildActivities.iterator();
 	int completedCount = 0;
 	while (i.hasNext()) {
-	    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress, i.next(), false,
+	    Activity optionsChildActivity = i.next();
+	    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress, optionsChildActivity, false,
 		    false);
+
 	    if (activityURL.isComplete()) {
 		completedCount++;
+
+		//create list of activityURLs of all children activities
+		if (optionsChildActivity instanceof SequenceActivity) {
+		    activityURL.setUrl(null);
+		    
+		    List<ActivityURL> childActivities = new ArrayList<>();
+		    Set<Activity> sequenceChildActivities = ((SequenceActivity) optionsChildActivity).getActivities();
+		    for (Activity sequenceChildActivity : sequenceChildActivities) {
+			ActivityURL sequenceActivityURL = LearningWebUtil.getActivityURL(activityMapping,
+				learnerProgress, sequenceChildActivity, false, false);
+			childActivities.add(sequenceActivityURL);
+		    }
+		    activityURL.setChildActivities(childActivities);
+		}
 	    }
 	    activityURLs.add(activityURL);
 	}

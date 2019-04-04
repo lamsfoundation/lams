@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.NullActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,14 +75,22 @@ public class SequenceActivityController {
 
 	String forward = null;
 	SequenceActivity sequenceActivity = (SequenceActivity) activity;
-	Activity firstActivityInSequence = sequenceActivity.getNextActivityByParent(new NullActivity());
 
-	if ((firstActivityInSequence != null) && !firstActivityInSequence.isNull()) {
-	    // Set the first activity as the current activity and display it
+	Activity firstIncompletedActivity = null;
+	// getActivities is ordered by order id
+	for (Activity activityIter : sequenceActivity.getActivities()) {
+	    if (!learnerProgress.getCompletedActivities().containsKey(activityIter)) {
+		firstIncompletedActivity = activityIter;
+		break;
+	    }
+	}
+
+	if (firstIncompletedActivity != null) {
+	    // Set the first incompleted activity as the current activity and display it
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
-		    firstActivityInSequence, true);
-	    forward = activityMapping.getActivityForward(firstActivityInSequence, learnerProgress, true);
-	    return forward;
+		    firstIncompletedActivity, true);
+	    return activityMapping.getActivityForward(firstIncompletedActivity, learnerProgress, true);
+
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.
 	    return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
