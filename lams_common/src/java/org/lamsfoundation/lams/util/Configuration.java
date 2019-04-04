@@ -201,6 +201,8 @@ public class Configuration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+	// it should be wrapped in HibernateSessionManager.openSession() and closeSession(),
+	// but ConfigurationDAO.getAllItems() does session closing anyway - see LDEV-4801
 	Configuration.refreshCache();
 
 	new Thread("LAMSConfigurationServerStateCheckThread") {
@@ -262,7 +264,7 @@ public class Configuration implements InitializingBean {
      */
     public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems(int filter) {
 	List<ConfigurationItem> originalList = Configuration.getAllItems();
-	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<String, ArrayList<ConfigurationItem>>();
+	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<>();
 
 	for (int i = 0; i < originalList.size(); i++) {
 	    ConfigurationItem item = originalList.get(i);
