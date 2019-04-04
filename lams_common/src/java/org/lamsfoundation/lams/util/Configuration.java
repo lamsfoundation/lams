@@ -201,6 +201,8 @@ public class Configuration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+	// it should be wrapped in HibernateSessionManager.openSession() and closeSession(),
+	// but ConfigurationDAO.getAllItems() does session closing anyway - see LDEV-4801
 	Configuration.refreshCache();
 
 	new Thread("LAMSConfigurationServerStateCheckThread") {

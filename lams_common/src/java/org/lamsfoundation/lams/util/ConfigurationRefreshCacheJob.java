@@ -33,6 +33,8 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 public class ConfigurationRefreshCacheJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+	// it should be wrapped in HibernateSessionManager.openSession() and closeSession(),
+	// but ConfigurationDAO.getAllItems() does session closing anyway - see LDEV-4801
 	Configuration.refreshCache();
     }
 }
