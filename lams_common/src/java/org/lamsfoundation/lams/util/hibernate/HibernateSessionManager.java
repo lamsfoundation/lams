@@ -21,7 +21,7 @@ public class HibernateSessionManager {
     /**
      * Makes sure that an open Hibernate session is bound to current thread.
      */
-    public static void openSession() {
+    public static void openSession() throws IllegalStateException {
 	SessionFactory sessionFactory = HibernateSessionManager.getSessionFactory();
 	// this call does not only fetch current session
 	// if an open session is missing from Context, it creates it and binds it
@@ -39,15 +39,10 @@ public class HibernateSessionManager {
 	}
     }
 
-    public static void closeSession() {
-	try {
-	    Session session = HibernateSessionManager.getSessionFactory().getCurrentSession();
-	    if (session.isOpen()) {
-		session.close();
-	    }
-	} catch (IllegalStateException e) {
-	    // ignore this as session is already in closed state, that's why we got the exception
-	    // it usually happens on server shutdown - see LDEV-4802
+    public static void closeSession() throws IllegalStateException {
+	Session session = HibernateSessionManager.getSessionFactory().getCurrentSession();
+	if (session.isOpen()) {
+	    session.close();
 	}
     }
 

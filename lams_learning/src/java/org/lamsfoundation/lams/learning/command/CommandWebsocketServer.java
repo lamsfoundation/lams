@@ -42,14 +42,15 @@ public class CommandWebsocketServer {
 	// how ofter the thread runs
 	private static final long CHECK_INTERVAL = 5000;
 	// mapping lessonId -> timestamp when the check was last performed, so the thread does not run too often
-	private final Map<Long, Long> lastSendTimes = new TreeMap<Long, Long>();
+	private final Map<Long, Long> lastSendTimes = new TreeMap<>();
 
 	@Override
 	public void run() {
 	    while (!stopFlag) {
-		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		HibernateSessionManager.openSession();
 		try {
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
+		    
 		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets
 			    .entrySet().iterator();
 
@@ -75,16 +76,18 @@ public class CommandWebsocketServer {
 		    } while (entry != null);
 
 		    Thread.sleep(SendWorker.CHECK_INTERVAL);
+		} catch (IllegalStateException e) {
+		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    CommandWebsocketServer.log.error("Error in Command Websocket Server worker thread", e);
 		} finally {
-		    HibernateSessionManager.closeSession();
 		    try {
+			HibernateSessionManager.closeSession();
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (InterruptedException e) {
-			log.warn("Stopping Command Websocket worker thread");
+		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
+			log.warn("Stopping Command Websocket worker thread");
 		    }
 		}
 	    }
@@ -115,7 +118,7 @@ public class CommandWebsocketServer {
     private static Logger log = Logger.getLogger(CommandWebsocketServer.class);
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Map<String, Session>> websockets = new ConcurrentHashMap<Long, Map<String, Session>>();
+    private static final Map<Long, Map<String, Session>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread
@@ -130,7 +133,7 @@ public class CommandWebsocketServer {
 	Long lessonId = Long.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
 	Map<String, Session> sessionWebsockets = CommandWebsocketServer.websockets.get(lessonId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = new ConcurrentHashMap<String, Session>();
+	    sessionWebsockets = new ConcurrentHashMap<>();
 	    CommandWebsocketServer.websockets.put(lessonId, sessionWebsockets);
 	}
 

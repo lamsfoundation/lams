@@ -404,10 +404,6 @@ public class LearnerService implements ILearnerFullService {
 	return builder.getActivityList();
     }
 
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User,
-     *      java.lang.Long, org.lamsfoundation.lams.learningdesign.Activity)
-     */
     @Override
     public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity,
 	    Boolean clearCompletedFlag) {

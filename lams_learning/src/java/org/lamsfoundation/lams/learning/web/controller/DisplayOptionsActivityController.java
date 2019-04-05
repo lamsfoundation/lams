@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -85,13 +86,29 @@ public class DisplayOptionsActivityController {
 	form.setActivityID(activity.getActivityId());
 
 	List<ActivityURL> activityURLs = new ArrayList<>();
-	Set<Activity> subActivities = optionsActivity.getActivities();
-	Iterator<Activity> i = subActivities.iterator();
+	Set<Activity> optionsChildActivities = optionsActivity.getActivities();
+	Iterator<Activity> i = optionsChildActivities.iterator();
 	int completedCount = 0;
 	while (i.hasNext()) {
-	    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, i.next(), false, false);
+	    Activity optionsChildActivity = i.next();
+	    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, optionsChildActivity, false, false);
+
 	    if (activityURL.isComplete()) {
 		completedCount++;
+
+		//create list of activityURLs of all children activities
+		if (optionsChildActivity instanceof SequenceActivity) {
+		    activityURL.setUrl(null);
+		    
+		    List<ActivityURL> childActivities = new ArrayList<>();
+		    Set<Activity> sequenceChildActivities = ((SequenceActivity) optionsChildActivity).getActivities();
+		    for (Activity sequenceChildActivity : sequenceChildActivities) {
+			ActivityURL sequenceActivityURL = activityMapping.getActivityURL(learnerProgress,
+				sequenceChildActivity, false, false);
+			childActivities.add(sequenceActivityURL);
+		    }
+		    activityURL.setChildActivities(childActivities);
+		}
 	    }
 	    activityURLs.add(activityURL);
 	}
