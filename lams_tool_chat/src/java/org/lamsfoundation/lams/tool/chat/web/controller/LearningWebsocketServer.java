@@ -85,6 +85,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
+		    
 		    Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go throus Tool Session and update registered users with messages and roster
@@ -104,16 +105,18 @@ public class LearningWebsocketServer {
 			    lastSendTimes.remove(toolSessionId);
 			}
 		    }
+		} catch (IllegalStateException e) {
+		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Chat worker thread", e);
 		} finally {
-		    HibernateSessionManager.closeSession();
 		    try {
+			HibernateSessionManager.closeSession();
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (InterruptedException e) {
-			LearningWebsocketServer.log.warn("Stopping Chat worker thread");
+		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
+			LearningWebsocketServer.log.warn("Stopping Chat worker thread");
 		    }
 		}
 	    }
@@ -183,7 +186,7 @@ public class LearningWebsocketServer {
 	private long lastDBCheckTime = 0;
 
 	// Learners who are currently active
-	private final TreeMap<String, Long[]> activeUsers = new TreeMap<String, Long[]>();
+	private final TreeMap<String, Long[]> activeUsers = new TreeMap<>();
 
 	private Roster(Long toolSessionId) {
 	    this.toolSessionId = toolSessionId;
@@ -196,7 +199,7 @@ public class LearningWebsocketServer {
 	 * @throws JsonProcessingException
 	 */
 	private ArrayNode getRosterJSON() throws JsonProcessingException, IOException {
-	    TreeMap<String, Long[]> localActiveUsers = new TreeMap<String, Long[]>();
+	    TreeMap<String, Long[]> localActiveUsers = new TreeMap<>();
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    // find out who is active locally
 	    for (Websocket websocket : sessionWebsockets) {

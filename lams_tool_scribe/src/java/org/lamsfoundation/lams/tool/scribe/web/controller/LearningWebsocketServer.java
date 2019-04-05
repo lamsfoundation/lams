@@ -66,6 +66,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
+		    
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -89,16 +90,18 @@ public class LearningWebsocketServer {
 
 			SendWorker.send(toolSessionId, null);
 		    }
+		} catch (IllegalStateException e) {
+		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Scribe worker thread", e);
 		} finally {
-		    HibernateSessionManager.closeSession();
 		    try {
+			HibernateSessionManager.closeSession();
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (InterruptedException e) {
-			LearningWebsocketServer.log.warn("Stopping Scribe worker thread");
+		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
+			LearningWebsocketServer.log.warn("Stopping Scribe worker thread");
 		    }
 		}
 	    }
@@ -140,7 +143,7 @@ public class LearningWebsocketServer {
 
 	    ArrayNode reportsJSON = JsonNodeFactory.instance.arrayNode();
 	    synchronized (sessionCache) {
-		for (ScribeReportEntry storedReport : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
+		for (ScribeReportEntry storedReport : scribeSession.getScribeReportEntries()) {
 		    Long uid = storedReport.getUid();
 		    String cachedReportText = sessionCache.reports.get(uid);
 		    String storedReportText = HtmlUtils.htmlEscape(storedReport.getEntryText());
@@ -259,7 +262,7 @@ public class LearningWebsocketServer {
 
     /**
      * Receives a message sent by Learner via a websocket.
-     * 
+     *
      * @throws IOException
      * @throws JsonProcessingException
      */

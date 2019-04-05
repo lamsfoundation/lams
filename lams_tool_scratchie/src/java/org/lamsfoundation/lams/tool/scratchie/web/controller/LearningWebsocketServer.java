@@ -56,6 +56,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
+		    
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -122,16 +123,18 @@ public class LearningWebsocketServer {
 			    SendWorker.send(toolSessionId);
 			}
 		    }
+		} catch (IllegalStateException e) {
+		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    log.error("Error in Scratchie worker thread", e);
 		} finally {
-		    HibernateSessionManager.closeSession();
 		    try {
+			HibernateSessionManager.closeSession();
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (InterruptedException e) {
-			log.warn("Stopping Scratchie worker thread");
+		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
+			LearningWebsocketServer.log.warn("Stopping Scratchie worker thread");
 		    }
 		}
 	    }
@@ -140,7 +143,6 @@ public class LearningWebsocketServer {
 	/**
 	 * Feeds websockets with scratched answers.
 	 */
-	@SuppressWarnings("unchecked")
 	private static void send(Long toolSessionId) throws IOException {
 	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 
@@ -152,7 +154,7 @@ public class LearningWebsocketServer {
 		// do not init variables below until it's really needed
 		Map<Long, Boolean> itemCache = null;
 		ObjectNode itemJSON = null;
-		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		for (ScratchieAnswer answer : item.getAnswers()) {
 		    if (answer.isScratched()) {
 			// answer is scratched, check if it is present in cache
 			if (itemCache == null) {
@@ -227,8 +229,8 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " entered Scratchie with toolSessionId: " + toolSessionId);
+	    log.debug("User " + websocket.getUserPrincipal().getName() + " entered Scratchie with toolSessionId: "
+		    + toolSessionId);
 	}
     }
 
@@ -243,8 +245,8 @@ public class LearningWebsocketServer {
 
 	if (log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
-	    log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " left Scratchie with Tool Session ID: " + toolSessionId
+	    log.debug("User " + websocket.getUserPrincipal().getName() + " left Scratchie with Tool Session ID: "
+		    + toolSessionId
 		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
 			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
 				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
