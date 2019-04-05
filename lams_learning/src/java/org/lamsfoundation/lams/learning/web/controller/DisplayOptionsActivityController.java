@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -85,22 +87,32 @@ public class DisplayOptionsActivityController {
 	List<ActivityURL> activityURLs = new ArrayList<>();
 	Set<Activity> optionsChildActivities = optionsActivity.getActivities();
 	Iterator<Activity> i = optionsChildActivities.iterator();
-	int completedCount = 0;
+	int completedActivitiesCount = 0;
 	while (i.hasNext()) {
 	    Activity optionsChildActivity = i.next();
 	    ActivityURL activityURL = LearningWebUtil.getActivityURL(activityMapping, learnerProgress, optionsChildActivity, false,
 		    false);
 
 	    if (activityURL.isComplete()) {
-		completedCount++;
+		completedActivitiesCount++;
 
 		//create list of activityURLs of all children activities
-		if (optionsChildActivity instanceof SequenceActivity) {
+		if (optionsChildActivity.isSequenceActivity()) {
 		    activityURL.setUrl(null);
 		    
+		    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
+		    // it here again
+		    SequenceActivity optionsChildActivityInit;
+		    Hibernate.initialize(activity);
+		    if (optionsChildActivity instanceof HibernateProxy) {
+			optionsChildActivityInit = (SequenceActivity) ((HibernateProxy) optionsChildActivity).getHibernateLazyInitializer()
+				.getImplementation();
+		    } else {
+			optionsChildActivityInit = (SequenceActivity) optionsChildActivity;
+		    }
+		    
 		    List<ActivityURL> childActivities = new ArrayList<>();
-		    Set<Activity> sequenceChildActivities = ((SequenceActivity) optionsChildActivity).getActivities();
-		    for (Activity sequenceChildActivity : sequenceChildActivities) {
+		    for (Activity sequenceChildActivity : optionsChildActivityInit.getActivities()) {
 			ActivityURL sequenceActivityURL = LearningWebUtil.getActivityURL(activityMapping,
 				learnerProgress, sequenceChildActivity, false, false);
 			childActivities.add(sequenceActivityURL);
@@ -112,16 +124,22 @@ public class DisplayOptionsActivityController {
 	}
 	form.setActivityURLs(activityURLs);
 
-	if (optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount) {
-	    form.setFinished(true);
+	if (completedActivitiesCount >= optionsActivity.getMinNumberOfOptionsNotNull().intValue()) {
+	    form.setMinimumLimitReached(true);
+	}
+	
+	if (completedActivitiesCount > 0) {
+	    form.setHasCompletedActivities(true);
 	}
 
-	if (completedCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()) {
+	if (completedActivitiesCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()) {
 	    form.setMaxActivitiesReached(true);
 	}
 
-	form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
-	form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
+	int minNumberOfOptions = optionsActivity.getMinNumberOfOptions() == null ? 0 : optionsActivity.getMinNumberOfOptions();
+	form.setMinimum(minNumberOfOptions);
+	int maxNumberOfOptions = optionsActivity.getMaxNumberOfOptions() == null ? 0 : optionsActivity.getMaxNumberOfOptions();
+	form.setMaximum(maxNumberOfOptions);
 	form.setDescription(optionsActivity.getDescription());
 	form.setTitle(optionsActivity.getTitle());
 	form.setLessonID(learnerProgress.getLesson().getLessonId());
