@@ -191,8 +191,7 @@ public class HomeController {
 	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	    applicationcontext.getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/welcome.jsp?lessonID=" + lessonId).forward(req, res);
+	    res.sendRedirect(serverURLContextPath + "learning/welcome.jsp?lessonID=" + lessonId);
 	    return null;
 
 	} catch (Exception e) {
@@ -293,7 +292,7 @@ public class HomeController {
 	// find lessons which can be set as preceding ones for newly created lesson
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	Set<LessonDTO> availableLessons = new TreeSet<>(new LessonDTOComparator());
-	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
+	for (Lesson availableLesson : organisation.getLessons()) {
 	    Integer availableLessonState = availableLesson.getLessonStateId();
 	    if (!Lesson.REMOVED_STATE.equals(availableLessonState)
 		    && !Lesson.FINISHED_STATE.equals(availableLessonState)) {
@@ -372,5 +371,5 @@ public class HomeController {
 
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
-    } 
+    }
 }
