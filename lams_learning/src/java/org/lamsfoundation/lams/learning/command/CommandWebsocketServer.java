@@ -122,7 +122,7 @@ public class CommandWebsocketServer {
 
     static {
 	// run the singleton thread
-	CommandWebsocketServer.sendWorker.start();
+//	 CommandWebsocketServer.sendWorker.start();
     }
 
     /**

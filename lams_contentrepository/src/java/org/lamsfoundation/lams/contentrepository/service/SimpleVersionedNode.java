@@ -54,14 +54,13 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.PropertyType;
-import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
-import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
 import org.lamsfoundation.lams.contentrepository.exception.ValidationException;
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 
 /**
@@ -106,9 +105,10 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     private ITicket ticket = null; // transient data - using for grouping nodes in a session
 
     /* Spring configured varibles */
-    private INodeDAO nodeDAO = null;
-    private IFileDAO fileDAO = null;
-    private INodeFactory nodeFactory = null;
+    private IRepositoryService repositoryService;
+    private IUserManagementService userManagementService;
+
+    private INodeFactory nodeFactory;
 
     // TODO This is a case for AOP!
     /**
@@ -125,12 +125,9 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	    throw new RepositoryRuntimeException("Node details missing (nodeVersion=null). " + specialisedMessage);
 	}
 
-	if (nodeDAO == null) {
-	    throw new RepositoryRuntimeException("Node details missing (nodeDAO=null). " + specialisedMessage);
-	}
-
-	if (fileDAO == null) {
-	    throw new RepositoryRuntimeException("Node details missing (fileDAO=null). " + specialisedMessage);
+	if (repositoryService == null) {
+	    throw new RepositoryRuntimeException(
+		    "Node details missing (repositoryService=null). " + specialisedMessage);
 	}
     }
 
@@ -391,7 +388,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
 	if (isNodeType(NodeType.FILENODE)) {
 
-	    return fileDAO.getFile(node.getNodeId(), nodeVersion.getVersionId());
+	    return repositoryService.daoGetFile(node.getNodeId(), nodeVersion.getVersionId());
 
 	} else if (isNodeType(NodeType.PACKAGENODE)) {
 
@@ -525,7 +522,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 		    // if it is a new node or a new version then it must have a file, otherwise check on disk.
 		    // version id will always be set. uuid isn't set until the record is written to the db,
 		    // but don't want to rely on that if we can help it in case it changes in future.
-		    if (newIStream == null && (uuid == null || !fileDAO.fileExists(uuid, versionId))) {
+		    if (newIStream == null && (uuid == null || !repositoryService.daoFileExists(uuid, versionId))) {
 			errors = errors + "\nNode is a file node but the file is missing. ";
 		    }
 		} catch (FileException fe) {
@@ -621,7 +618,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 		    SimpleVersionedNode element = (SimpleVersionedNode) writtenIter.next();
 		    int delStatus = -1;
 		    try {
-			delStatus = fileDAO.delete(element.getUUID(), element.getVersion());
+			delStatus = repositoryService.daoDelete(element.getUUID(), element.getVersion());
 		    } catch (Exception e2) {
 			// things are getting bad - throwing exceptions on the delete!
 		    }
@@ -666,7 +663,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	// nodeDAO to take care of insert or update (uses saveOrUpdate)
 	// the nodeVersion and nodeVersionProperty collections cascade
 	// updates and deletes, so we can just save the node!
-	nodeDAO.saveOrUpdate(node);
+	userManagementService.save(node);
 
 	// child nodes are done manually as the set is lazy loaded
 	// and can't work out how to do that properly using the DAO template!
@@ -675,7 +672,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	    Iterator iter = childNodes.iterator();
 	    while (iter.hasNext()) {
 		SimpleVersionedNode node = (SimpleVersionedNode) iter.next();
-		nodeDAO.saveOrUpdate(node.getNode());
+		userManagementService.save(node.getNode());
 	    }
 	}
 
@@ -689,7 +686,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
     private void writeFile() throws FileException {
 	String filePath = null;
 	if (newIStream != null) {
-	    filePath = fileDAO.writeFile(node.getNodeId(), nodeVersion.getVersionId(), newIStream);
+	    filePath = repositoryService.daoWriteFile(node.getNodeId(), nodeVersion.getVersionId(), newIStream);
 	}
 	setFilePath(filePath);
     }
@@ -723,7 +720,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	    log.debug("getNode for path " + relPath + " start.");
 	}
 
-	CrNode childNode = nodeDAO.findChildNode(nodeVersion, relPath);
+	CrNode childNode = repositoryService.daoFindChildNode(nodeVersion, relPath);
 
 	if (childNode != null) {
 	    return nodeFactory.getNode(childNode, null);
@@ -740,7 +737,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      */
     @Override
     public Set getChildNodes() {
-	List childCrNodes = nodeDAO.findChildNodes(nodeVersion);
+	List childCrNodes = repositoryService.daoFindChildNodes(nodeVersion);
 	Set childNodes = new HashSet();
 
 	if (childCrNodes != null) {
@@ -791,7 +788,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      */
     @Override
     public boolean hasNodes() {
-	List childNodes = nodeDAO.findChildNodes(nodeVersion);
+	List childNodes = repositoryService.daoFindChildNodes(nodeVersion);
 	return (childNodes != null && childNodes.size() > 0);
     }
 
@@ -845,9 +842,9 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	while (iter.hasNext()) {
 	    NodeKey nk = (NodeKey) iter.next();
 	    try {
-		int delStatus = fileDAO.delete(nk.getUuid(), nk.getVersion());
+		int delStatus = repositoryService.daoDelete(nk.getUuid(), nk.getVersion());
 		if (delStatus == -1) {
-		    failedList.add(fileDAO.getFilePath(nk.getUuid(), nk.getVersion()));
+		    failedList.add(repositoryService.daoGetFilePath(nk.getUuid(), nk.getVersion()));
 		}
 	    } catch (FileException e) {
 		log.error("FileException occured while deleting files for " + nodeDescription, e);
@@ -898,7 +895,7 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 
 	// if this was the last version for the node, delete the node
 	if (node.getCrNodeVersions() == null || node.getCrNodeVersions().size() == 0) {
-	    nodeDAO.delete(node);
+	    userManagementService.delete(node);
 	}
 
     }
@@ -1080,42 +1077,16 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
      * **********************************************************
      */
 
-    /**
-     * @return Returns the nodeDAO.
-     */
-    public INodeDAO getNodeDAO() {
-	return nodeDAO;
-    }
-
-    /**
-     * @param nodeDAO
-     *            The nodeDAO to set.
-     */
-    public void setNodeDAO(INodeDAO nodeDAO) {
-	this.nodeDAO = nodeDAO;
-    }
-
-    /**
-     * @return Returns the fileDAO.
-     */
-    public IFileDAO getFileDAO() {
-	return fileDAO;
-    }
-
-    /**
-     * @param fileDAO
-     *            The fileDAO to set.
-     */
-    public void setFileDAO(IFileDAO fileDAO) {
-	this.fileDAO = fileDAO;
-    }
-
-    public INodeFactory getNodeFactory() {
-	return nodeFactory;
+    public void setRepositoryService(IRepositoryService repositoryService) {
+	this.repositoryService = repositoryService;
     }
 
     public void setNodeFactory(INodeFactory nodeFactory) {
 	this.nodeFactory = nodeFactory;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
     }
 
     /**
@@ -1133,5 +1104,4 @@ public class SimpleVersionedNode implements IVersionedNodeAdmin {
 	    log.debug("Unable to close stream - was it already closed perhaps?", e);
 	}
     }
-
 }

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.InputStream;
@@ -37,11 +36,11 @@ import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.IValue;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
-import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -60,15 +59,11 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     protected Logger log = Logger.getLogger(NodeFactory.class);
 
     private BeanFactory beanFactory = null;
-    private INodeDAO nodeDAO = null;
-
-    public NodeFactory() {
-	super();
-    }
+    private IUserManagementService userManagementService = null;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createFileNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode,
      * java.lang.String, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
@@ -87,7 +82,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createPackageNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, java.lang.String, java.lang.String)
      */
@@ -104,7 +99,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createDataNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode,
      * java.lang.String)
@@ -144,7 +139,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(org.lamsfoundation.lams.contentrepository.
      * CrNode, java.lang.Long)
@@ -159,7 +154,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(java.lang.Long, java.lang.Long,
      * java.lang.Long)
      */
@@ -176,7 +171,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
 	CrNode node = null;
 
-	node = (CrNode) nodeDAO.find(CrNode.class, uuid);
+	node = (CrNode) getUserManagementService().findById(CrNode.class, uuid);
 	if (node == null) {
 
 	    throw new ItemNotFoundException("Node " + uuid + " not found.");
@@ -194,7 +189,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(java.lang.Long, java.lang.Long,
      * java.lang.Long, java.lang.String)
      */
@@ -220,7 +215,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#copy(org.lamsfoundation.lams.contentrepository.
      * service.SimpleVersionedNode)
@@ -235,7 +230,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     /**
      * Private method to handle the recursive copy. The parent node is needed to set up the
      * node -> parent link in the CrNode object.
-     * 
+     *
      * @param originalNode
      * @param parentNode
      * @return new Node
@@ -268,7 +263,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    }
 	}
 
-	// copy any attached file. don't actually copy the file - set up 
+	// copy any attached file. don't actually copy the file - set up
 	// and input stream and the file will be copied when the node is saved.
 	// this is likely to recopy the Filename and Mimetype properties.
 	if (originalNode.isNodeType(NodeType.FILENODE)) {
@@ -298,31 +293,10 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
      * **********************************************************
      */
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNodeDAO()
-     */
-    @Override
-    public INodeDAO getNodeDAO() {
-	return nodeDAO;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#setNodeDAO(org.lamsfoundation.lams.
-     * contentrepository.dao.INodeDAO)
-     */
-    @Override
-    public void setNodeDAO(INodeDAO nodeDAO) {
-	this.nodeDAO = nodeDAO;
-    }
-
     /* **** Method for BeanFactoryAware interface *****************/
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#setBeanFactory(org.springframework.beans.factory.
      * BeanFactory)
@@ -330,6 +304,14 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 	this.beanFactory = beanFactory;
+    }
+
+    public IUserManagementService getUserManagementService() {
+	// this can not be done by injection as bean factory is not fully initialised when it happens and we get an exception on start up
+	if (userManagementService == null) {
+	    userManagementService = beanFactory.getBean("userManagementService", IUserManagementService.class);
+	}
+	return userManagementService;
     }
 
 }

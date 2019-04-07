@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.lamsfoundation.lams.contentrepository.CrNode;
+import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -485,4 +487,43 @@ public interface IRepositoryService {
     public boolean workspaceExists(ICredentials credentials, Long workspaceId);
 
     public boolean workspaceExists(ICredentials credentials, String workspaceName);
+
+    // Below are methods which are just transactional proxy to DAO metods
+    // They are prefixed DAO so CheckCredentialTicketBeforeAdvice does not pick them up
+
+    /**
+     * Write out a file to the repository. Closes the stream. Overwrites any existing files.
+     *
+     * @return the path to which the file was written
+     */
+    public String daoWriteFile(Long uuid, Long versionId, InputStream is) throws FileException;
+
+    /**
+     * Gets a file from the repository.
+     */
+    public InputStream daoGetFile(Long uuid, Long versionId) throws FileException;
+
+    /**
+     * Delete a file from the repository. If this makes the directory
+     * empty, then the directory should be deleted.
+     *
+     * @return 1 if deleted okay, 0 if file not found, -1 if file found but a delete error occured.
+     */
+    public int daoDelete(Long uuid, Long versionId) throws FileException;
+
+    /**
+     * Get the actual path of the file ie the path on disk
+     */
+    public String daoGetFilePath(Long uuid, Long versionId) throws FileException;
+
+    /**
+     * Is there a file on disk?
+     * <p>
+     * Used to validate file nodes.
+     */
+    public boolean daoFileExists(Long uuid, Long versionId) throws FileException;
+
+    public List daoFindChildNodes(CrNodeVersion parentNodeVersion);
+
+    public CrNode daoFindChildNode(CrNodeVersion parentNodeVersion, String relPath);
 }

@@ -195,8 +195,7 @@ public class HomeController {
 	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	    applicationcontext.getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/welcome.jsp?lessonID=" + lessonId).forward(req, res);
+	    res.sendRedirect(serverURLContextPath + "learning/welcome.jsp?lessonID=" + lessonId);
 	    return null;
 
 	} catch (Exception e) {

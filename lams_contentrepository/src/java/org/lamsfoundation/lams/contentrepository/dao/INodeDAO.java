@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.dao;
 
 import java.util.List;
@@ -36,8 +35,6 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
  * @author Fiona Malikoff
  */
 public interface INodeDAO extends IBaseDAO {
-
-    public void saveOrUpdate(Object object);
 
     public List findChildNodes(CrNodeVersion parentNodeVersion);
 
