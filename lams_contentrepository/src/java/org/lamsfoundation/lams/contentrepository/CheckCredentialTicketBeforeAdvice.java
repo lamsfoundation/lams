@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import java.lang.reflect.Method;
@@ -63,8 +62,8 @@ public class CheckCredentialTicketBeforeAdvice implements MethodBeforeAdvice {
 		    + (args != null && args.length > 0 ? args[0] : "null"));
 	}
 
-	if (m != null && "toString".equals(m.getName())) {
-	    // don't check toString - let it through
+	if (m != null && ("toString".equals(m.getName()) || m.getName().startsWith("dao"))) {
+	    // don't check toString and dao* methods - let them through
 	    return;
 	}
 
