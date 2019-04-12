@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.dao.file;
 
 import java.io.BufferedInputStream;
@@ -80,7 +79,7 @@ public class FileDAO implements IFileDAO {
     // with a larger buffer
     /**
      * Write out a file to the repository. Closes the stream. Overwrites any existing files.
-     * 
+     *
      * @return the path to which the file was written
      */
     @Override
@@ -144,7 +143,7 @@ public class FileDAO implements IFileDAO {
 
     /**
      * Gets a file from the repository.
-     * 
+     *
      * @param uuid
      *            node id
      * @param versionId
@@ -157,16 +156,15 @@ public class FileDAO implements IFileDAO {
 	try {
 	    return new FileInputStream(paths[1]);
 	} catch (IOException e) {
-	    e.printStackTrace();
-	    throw new FileException("Unable to read file for uuid " + uuid + " versionId " + versionId
-		    + " due to an IOException. Generated path was " + paths[1], e);
+	    log.debug(e.getMessage());
 	}
+	return null;
     }
 
     /**
      * Delete a file from the repository. If this makes the directory
      * empty, then the directory should be deleted.
-     * 
+     *
      * @return 1 if deleted okay, 0 if file not found, -1 if file found but a delete error occured.
      */
     @Override
@@ -204,7 +202,7 @@ public class FileDAO implements IFileDAO {
 
     /**
      * Get the actual path of the file ie the path on disk
-     * 
+     *
      * @throws FileException
      */
     @Override

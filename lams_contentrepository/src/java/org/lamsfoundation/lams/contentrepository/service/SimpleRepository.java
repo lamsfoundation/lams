@@ -788,6 +788,9 @@ public class SimpleRepository implements IRepositoryAdmin {
     private void saveSigleFile(String toFileName, IVersionedNode node)
 	    throws FileException, ValueFormatException, FileUtilException, FileNotFoundException, IOException {
 	InputStream is = node.getFile();
+	if (is == null) {
+	    throw new FileException("File not found");
+	}
 	if (toFileName == null) {
 	    IValue prop = node.getProperty(PropertyName.FILENAME);
 	    toFileName = prop != null ? prop.getString() : null;

@@ -268,6 +268,9 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	// this is likely to recopy the Filename and Mimetype properties.
 	if (originalNode.isNodeType(NodeType.FILENODE)) {
 	    InputStream istream = originalNode.getFile();
+	    if (istream == null) {
+		throw new FileException("File not found");
+	    }
 	    IValue filenameProperty = originalNode.getProperty(PropertyName.FILENAME);
 	    IValue mimetypeProperty = originalNode.getProperty(PropertyName.MIMETYPE);
 	    newNode.setFile(istream, filenameProperty != null ? filenameProperty.getString() : null,

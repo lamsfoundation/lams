@@ -557,6 +557,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    String fileName = file.getOriginalFilename();
 
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
+	    if (originalIS == null) {
+		throw new UploadImageGalleryFileException("File not found");
+	    }
 	    BufferedImage originalImage = ImageIO.read(originalIS);
 	    //throw exception if image was not successfully read
 	    if (originalImage == null) {
@@ -638,7 +641,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);

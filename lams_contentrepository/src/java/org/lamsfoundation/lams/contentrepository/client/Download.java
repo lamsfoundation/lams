@@ -295,7 +295,11 @@ public abstract class Download extends HttpServlet {
 	    response.addHeader("Content-Description", filename);
 	}
 
-	InputStream in = new BufferedInputStream(fileNode.getFile());
+	InputStream in = fileNode.getFile();
+	if (in == null) {
+	    throw new FileException("File not found: " + filename);
+	}
+	in = new BufferedInputStream(in);
 	OutputStream out = response.getOutputStream();
 	try {
 	    int count = 0;
