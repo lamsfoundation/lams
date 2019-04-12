@@ -1460,10 +1460,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	baseDAO.insertOrUpdateAll(allCompetenceMappings);
 
 	// Process annotations (regions and labels)
-	for (LearningDesignAnnotation annotation : dto.getAnnotations()) {
-	    annotation.setUid(null);
-	    annotation.setLearningDesignId(ld.getLearningDesignId());
-	    baseDAO.insert(annotation);
+	if (dto.getAnnotations() != null) {
+	    for (LearningDesignAnnotation annotation : dto.getAnnotations()) {
+		annotation.setUid(null);
+		annotation.setLearningDesignId(ld.getLearningDesignId());
+		baseDAO.insert(annotation);
+	    }
 	}
 
 	return ld.getLearningDesignId();
