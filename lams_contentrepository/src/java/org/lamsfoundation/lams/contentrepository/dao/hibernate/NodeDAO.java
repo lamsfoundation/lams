@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 
+
 package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 
 import java.util.List;
@@ -40,6 +41,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class NodeDAO extends LAMSBaseDAO implements INodeDAO {
     protected Logger log = Logger.getLogger(NodeDAO.class);
+
+    @Override
+    public void saveOrUpdate(Object object) {
+	insertOrUpdate(object);
+    }
 
     /**
      * Get all child nodes for a node/version.

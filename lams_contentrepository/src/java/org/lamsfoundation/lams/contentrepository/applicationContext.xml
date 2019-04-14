@@ -46,7 +46,6 @@
 				<prop key="getVersionHistory">PROPAGATION_REQUIRED</prop>
 				<prop key="getNodeList">PROPAGATION_REQUIRED</prop>
 				<prop key="workspaceExists">PROPAGATION_REQUIRED</prop>
-				<prop key="dao*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 		<property name="preInterceptors">
@@ -60,19 +59,20 @@
 	<bean id="repositoryTarget" class="org.lamsfoundation.lams.contentrepository.service.SimpleRepository">
 		<property name="workspaceDAO"><ref bean="workspaceDAO"/></property>
 		<property name="credentialDAO"><ref bean="credentialDAO"/></property>
-		<property name="fileDAO"><ref bean="fileDAO"/></property>
-		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
 		<property name="nodeFactory"><ref bean="nodeFactory"/></property>
 	</bean>
 
-	<bean id="checkCredentialTicketBeforeAdvice" class="org.lamsfoundation.lams.contentrepository.CheckCredentialTicketBeforeAdvice" />
+	<bean id="checkCredentialTicketBeforeAdvice" class="org.lamsfoundation.lams.contentrepository.CheckCredentialTicketBeforeAdvice">
+	</bean>
 
-	<bean id="nodeFactory" class="org.lamsfoundation.lams.contentrepository.service.NodeFactory" />
+	<bean id="nodeFactory" class="org.lamsfoundation.lams.contentrepository.service.NodeFactory">
+		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
+	</bean>
 
 	<bean id="node" class="org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode" scope="prototype"
 		destroy-method="destroy">
-		<property name="repositoryService"><ref bean="repositoryService"/></property>
-		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="nodeDAO"><ref bean="nodeDAO"/></property>
+		<property name="fileDAO"><ref bean="fileDAO"/></property>
 		<property name="nodeFactory"><ref bean="nodeFactory"/></property>
 	</bean>
 
