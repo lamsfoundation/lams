@@ -27,7 +27,7 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="login">PROPAGATION_SUPPORTS</prop>
+				<prop key="login">PROPAGATION_REQUIRED</prop>
 				<prop key="addWorkspace">PROPAGATION_REQUIRED</prop>
 				<prop key="createCredentials">PROPAGATION_REQUIRED</prop>
 				<prop key="assignCredentials">PROPAGATION_REQUIRED</prop>
