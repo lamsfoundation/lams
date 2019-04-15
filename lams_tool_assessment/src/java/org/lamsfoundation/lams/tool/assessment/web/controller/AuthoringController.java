@@ -55,6 +55,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -85,6 +87,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,6 +107,9 @@ public class AuthoringController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
+
+    @Autowired
+    private IQbService qbService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -139,7 +145,6 @@ public class AuthoringController {
      */
     private String readDatabaseData(AssessmentForm assessmentForm, HttpServletRequest request, ToolAccessMode mode)
 	    throws ServletException {
-	// save toolContentID into HTTPSession
 	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
 	List<AssessmentQuestion> questions = null;
@@ -445,6 +450,62 @@ public class AuthoringController {
 	} else {
 	    return "pages/authoring/parts/questionlist";
 	}
+    }
+    
+    /**
+     * QB callback handler which adds selected QbQuestion into question list.
+     */
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
+    private String importQbQuestion(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	
+	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	
+	
+	
+//	// check whether it is "edit(old Question)" or "add(new Question)"
+//	extractFormToAssessmentQuestion(request, questionList, questionForm, isAuthoringRestricted);
+//
+//	reinitializeAvailableQuestions(sessionMap);
+//	
+//	
+//	
+//	
+//	//create new ScratchieItem and assign imported qbQuestion to it
+//	ScratchieItem item = new ScratchieItem();
+//	item.setQbQuestion(qbQuestion);
+//	int maxSeq = 1;
+//	if (itemList != null && itemList.size() > 0) {
+//	    ScratchieItem last = itemList.last();
+//	    maxSeq = last.getDisplayOrder() + 1;
+//	}
+//	item.setDisplayOrder(maxSeq);
+//	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
+//	itemList.add(item);
+	
+	
+	
+	
+	
+	
+
+
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+//	scratchieService.releaseFromCache(item);
+//	scratchieService.releaseFromCache(item);
+//	scratchieService.releaseFromCache(item.getQbQuestion());
+	
+//	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
+
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
@@ -807,77 +868,6 @@ public class AuthoringController {
 	option.setSequenceId(maxSeq);
 	option.setGrade(0);
 	optionList.add(option);
-
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
-		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return "pages/authoring/parts/optionlist";
-    }
-
-    /**
-     * Ajax call, remove the given line of instruction of resource item.
-     */
-    @RequestMapping("/removeOption")
-    public String removeOption(HttpServletRequest request) {
-	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
-	    rList.remove(optionIndex);
-	    optionList.clear();
-	    optionList.addAll(rList);
-	}
-
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
-		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	return "pages/authoring/parts/optionlist";
-    }
-
-    /**
-     * Move up current option.
-     */
-    @RequestMapping("/upOption")
-    public String upOption(HttpServletRequest request) {
-	return switchOption(request, true);
-    }
-
-    /**
-     * Move down current option.
-     */
-    @RequestMapping("/downOption")
-    public String downOption(HttpServletRequest request) {
-	return switchOption(request, false);
-    }
-
-    private String switchOption(HttpServletRequest request, boolean up) {
-	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-
-	int optionIndex = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<>(optionList);
-
-	    // get current and the target item, and switch their sequnece
-	    AssessmentQuestionOption option = rList.get(optionIndex);
-	    AssessmentQuestionOption repOption;
-	    if (up) {
-		repOption = rList.get(--optionIndex);
-	    } else {
-		repOption = rList.get(++optionIndex);
-	    }
-
-	    int upSeqId = repOption.getSequenceId();
-	    repOption.setSequenceId(option.getSequenceId());
-	    option.setSequenceId(upSeqId);
-
-	    // put back list, it will be sorted again
-	    optionList.clear();
-	    optionList.addAll(rList);
-	}
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
@@ -1271,12 +1261,19 @@ public class AuthoringController {
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
 	    AssessmentQuestionOption option = new AssessmentQuestionOption();
+	    
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
+	    //sequenceId is null, in case this item was removed using Remove button
+	    if (sequenceId == null) {
+		continue;
+	    } else {
+		option.setSequenceId(NumberUtils.toInt(sequenceId));
+	    }
+	    
 	    String uid = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uid != null) {
 		option.setUid(NumberUtils.toLong(uid));
 	    }
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-	    option.setSequenceId(NumberUtils.toInt(sequenceId));
 	    
 	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {

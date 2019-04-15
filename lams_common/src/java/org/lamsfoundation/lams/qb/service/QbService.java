@@ -16,6 +16,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class QbService implements IQbService {
 
     private IQbDAO qbDAO;
+    
+    @Override
+    public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
+	return qbDAO.getQbQuestionByUid(qbQuestionUid);
+    }
+    
+    @Override
+    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
+	return qbDAO.getQbQuestionsByQuestionId(questionId);
+    }
 
     @Override
     public int getMaxQuestionId() {
@@ -25,6 +35,17 @@ public class QbService implements IQbService {
     @Override
     public int getMaxQuestionVersion(Integer qbQuestionId) {
 	return qbDAO.getMaxQuestionVersion(qbQuestionId);
+    }
+    
+    @Override
+    public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
+	    String sortOrder, String searchString) {
+	return qbDAO.getPagedQbQuestions(questionType, page, size, sortBy, sortOrder, searchString);
+    }
+    
+    @Override
+    public int getCountQbQuestions(Integer questionType, String searchString) {
+	return qbDAO.getCountQbQuestions(questionType, searchString);
     }
 
     @Override

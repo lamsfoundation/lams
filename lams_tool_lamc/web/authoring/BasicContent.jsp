@@ -7,7 +7,7 @@
 		document.forms.mcAuthoringForm.action='removeQuestion.do'; 
 		
 		$('#mcAuthoringForm').ajaxSubmit({ 
-    		target:  $('#resourceListArea'),
+    		target:  $('#itemArea'),
     		data: { 
 				sessionMapId: '${sessionMapId}'
 			},
@@ -32,7 +32,7 @@
     	var form = $(formHTML);
     	form.prop("action", '<lams:WebAppURL />authoring/saveQTI.do?sessionMapId=${sessionMapId}').appendTo(document.body);
     	form.ajaxSubmit({ 
-    		target:  $('#resourceListArea'),
+    		target:  $('#itemArea'),
     		iframe: true,
     		success:    function() { 
     			document.forms.mcAuthoringForm.action="submitAllContent.do";
@@ -62,7 +62,7 @@
     <lams:CKEditor id="instructions" value="${mcAuthoringForm.instructions}" contentFolderID="${sessionMap.contentFolderID}"/>
 </div>
 
-<div id="resourceListArea">
+<div id="itemArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
   

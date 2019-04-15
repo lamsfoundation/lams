@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
+<%@ attribute name="placeholder" required="false" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
 <%@ attribute name="height" required="false" rtexprvalue="true"%>

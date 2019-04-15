@@ -1,6 +1,10 @@
 package org.lamsfoundation.lams.qb.service;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import java.util.List;
+
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+
 
 public interface IQbService {
 
@@ -14,6 +18,18 @@ public interface IQbService {
     static final int QUESTION_MODIFIED_VERSION_BUMP = 2;
     // it is a new question
     static final int QUESTION_MODIFIED_ID_BUMP = 3;
+    
+    /**
+     * @param qbQuestionUid
+     * @return QbQuestion object with the specified uid
+     */
+    QbQuestion getQbQuestionByUid(Long qbQuestionUid);
+    
+    /**
+     * @param questionId
+     * @return questions sharing the same questionId
+     */
+    List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId);
 
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
@@ -22,4 +38,9 @@ public interface IQbService {
     int getMaxQuestionVersion(Integer qbQuestionId);
 
     QbStatsDTO getStats(long qbQuestionUid);
+    
+    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+    
+    int getCountQbQuestions(Integer questionType, String searchString);
 }

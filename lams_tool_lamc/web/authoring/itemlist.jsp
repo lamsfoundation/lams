@@ -28,7 +28,8 @@
 	
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.questions" />
-		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
+		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
+		
 		<div class="btn-group btn-group-xs pull-right">
 			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
 				<fmt:message key="label.authoring.import.qti" />
@@ -37,6 +38,19 @@
 				<fmt:message key="label.authoring.export.qti" />
 			</a>
 		</div>
+		
+		<div class="roffset5 pull-right">
+			<c:url var="tempUrl" value="">
+				<c:param name="output">
+					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapId=${sessionMapId}
+				</c:param>
+			</c:url>
+			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
+		
+			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
+				Import from question bank
+			</a>
+		</div> 
 	</div>
 
 	<table id="itemTable" class="table table-striped table-condensed">

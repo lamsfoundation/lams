@@ -224,24 +224,16 @@ public class AuthoringUtil {
     public static List<McQuestionDTO> buildDefaultQuestions(McContent mcContent) {
 	List<McQuestionDTO> questionDtos = new LinkedList<>();
 
-	Long mapIndex = new Long(1);
-
 	for (McQueContent question : mcContent.getMcQueContents()) {
 	    McQuestionDTO questionDto = new McQuestionDTO();
-
-	    String feedback = "";
-	    if (question.getFeedback() != null) {
-		feedback = question.getFeedback();
-	    }
-
-	    String questionText = question.getQuestion();
-
 	    questionDto.setUid(question.getUid());
 	    questionDto.setQbQuestionUid(question.getQbQuestion().getUid());
-	    questionDto.setQuestion(questionText);
+	    questionDto.setQuestion(question.getQuestion());
 	    questionDto.setDisplayOrder(question.getDisplayOrder());
+	    String feedback = question.getFeedback() == null ? "" : question.getFeedback();
 	    questionDto.setFeedback(feedback);
-	    questionDto.setMark(question.getMark().toString());
+	    String mark = question.getMark() == null ? "1" : question.getMark().toString();
+	    questionDto.setMark(mark);
 
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<>();
@@ -252,8 +244,6 @@ public class AuthoringUtil {
 
 	    questionDto.setOptionDtos(optionDtos);
 	    questionDtos.add(questionDto);
-
-	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 
 	return questionDtos;

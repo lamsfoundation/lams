@@ -36,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
@@ -62,6 +64,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Action class that controls the logic of tool behavior.
@@ -76,6 +79,9 @@ public class McController {
 
     @Autowired
     private IMcService mcService;
+    
+    @Autowired
+    private IQbService qbService;
 
     @Autowired
     @Qualifier("lamcMessageService")
@@ -420,6 +426,52 @@ public class McController {
 	}
 
 	return tempQuestionDtos;
+    }
+    
+    /**
+     * Adds QbQuestion, selected in the question bank, to the current question list.
+     */
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
+    private String importQbQuestion(HttpServletRequest request) {
+	String sessionMapId = WebUtil.readStrParam(request, McAppConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
+	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+	List<McQuestionDTO> questionDtos = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
+
+	//get QbQuestion from DB
+	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);	
+	
+	//finding max displayOrder
+	int maxDisplayOrder = 0;
+	for (McQuestionDTO questionDto : questionDtos) {
+	    int displayOrder = questionDto.getDisplayOrder();
+	    if (displayOrder > maxDisplayOrder) {
+		maxDisplayOrder = displayOrder;
+	    }
+	}
+	
+	// build candidate dtos
+	List<McOptionDTO> optionDtos = new LinkedList<>();
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    McOptionDTO optionDTO = new McOptionDTO(option);
+	    optionDtos.add(optionDTO);
+	}
+
+	//create new McQuestionDTO and assign imported qbQuestion to it
+	McQuestionDTO questionDto = new McQuestionDTO();
+	questionDto.setQuestion(qbQuestion.getName());
+	questionDto.setQbQuestionUid(qbQuestionUid);
+	questionDto.setFeedback(qbQuestion.getFeedback());
+	questionDto.setDisplayOrder(maxDisplayOrder + 1);
+	questionDto.setOptionDtos(optionDtos);
+	questionDto.setMark(qbQuestion.getMark() == null ? "1" : String.valueOf(qbQuestion.getMark()));
+	questionDto.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
+	questionDtos.add(questionDto);
+	
+	return "authoring/itemlist";
     }
 
     @RequestMapping("/saveQuestion")
