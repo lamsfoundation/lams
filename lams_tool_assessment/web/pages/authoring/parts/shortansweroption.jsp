@@ -7,7 +7,7 @@
 		value="<c:out value='${option.optionString}' />" placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"/>
 </div>
 
-<div class="settings-on-hover-hidden">
+<div class="option-settings-hidden" style="display: none;">
 	<%@ include file="gradeselector.jsp"%>
 	
 	<div class="voffset5-bottom">

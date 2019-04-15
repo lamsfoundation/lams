@@ -15,7 +15,7 @@
 		</td>
 	</tr>
 
-	<tr class="settings-on-hover-hidden">
+	<tr class="option-settings-hidden" style="display: none;">
 		<td class="greyed-out-label">
 			<fmt:message key="label.authoring.basic.option.accepted.error"></fmt:message>
 		</td>
@@ -29,12 +29,12 @@
 	</tr>
 </table>
 
-<div class="settings-on-hover-hidden">
+<div class="option-settings-hidden" style="display: none;">
 	<%@ include file="gradeselector.jsp"%>
 	
 	<div class="voffset5-bottom">
 	   	<c:set var="FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.option.feedback"/></c:set>
 	   	<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" 
-	     	placeholder="${FEEDBACK_LABEL}" contentFolderID="${contentFolderID}" height="40px"/>
+	     	placeholder="${FEEDBACK_LABEL}" contentFolderID="${contentFolderID}" height="50px"/>
 	</div>
 </div>

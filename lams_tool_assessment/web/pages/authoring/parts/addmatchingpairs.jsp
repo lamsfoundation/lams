@@ -119,20 +119,28 @@
 						</label>
 					</div>
 	
-					<div class="form-group form-inline">
-						<c:if test="${!isAuthoringRestricted}">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					<c:if test="${!isAuthoringRestricted}">
+						<div class="form-group row form-inline">
+						    <label for="defaultGrade" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-					    </c:if>
-					    
-					    <label class="loffset10" for="penaltyFactor"> 
-					    	<fmt:message key="label.authoring.basic.penalty.factor" />:
-							  <i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    </div>
+						</div>
+					</c:if>
+					
+					<div class="form-group row form-inline">
+					    <label for="penaltyFactor" class="col-sm-3"> 
+					    	<fmt:message key="label.authoring.basic.penalty.factor" />
+							  <i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 					    </label>
-					    <form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    </div>
 					</div>
 	
 					<div class="checkbox">
