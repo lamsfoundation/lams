@@ -40,6 +40,8 @@ public class ExtServerForm {
 
     private String lessonFinishUrl;
 
+    private String logoutUrl;
+
     private String extGroupsUrl;
 
     private boolean disabled = false;
@@ -135,6 +137,14 @@ public class ExtServerForm {
 
     public void setLessonFinishUrl(String lessonFinishUrl) {
 	this.lessonFinishUrl = lessonFinishUrl;
+    }
+
+    public String getLogoutUrl() {
+	return logoutUrl;
+    }
+
+    public void setLogoutUrl(String logoutUrl) {
+	this.logoutUrl = logoutUrl;
     }
 
     public String getExtGroupsUrl() {
