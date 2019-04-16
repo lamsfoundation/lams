@@ -9,7 +9,7 @@
 
 <div class="option-settings-hidden" style="display: none;">
 
-	<div class="voffset5-bottom" style="margin-top: 5px;">
+	<div class="voffset10-bottom" style="margin-top: 5px;">
 		<input type="checkbox" name="optionCorrect" value="${option.sequenceId}" id="option-correct-${status.index}" data-toggle="toggle" data-on="Correct" data-off="Wrong" data-size="mini"
 			<c:if test="${option.correct}">checked="checked"</c:if>>
 	</div>

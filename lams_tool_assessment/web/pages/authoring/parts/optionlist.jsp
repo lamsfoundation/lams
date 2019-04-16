@@ -37,10 +37,15 @@
 
 					closeExpandedAreas();
 
+					//hide toolbar until area is not expanded. otherwise it laggs during position change
+					$("#cke_" + id).hide();
+
 					$(".option-settings-hidden.delete-button", $("#" + tableId)).show();
-					$(".option-settings-hidden:not(.delete-button)", $("#" + tableId)).slideDown("slow")
-					//it's hack to make toolbar reposition in case it overlapped CKEditor after area expansion
+					$(".option-settings-hidden:not(.delete-button)", $("#" + tableId)).slideDown()
 					.promise().done(function() {
+						//show toolbar after area got expanded
+						$("#cke_" + id).show();
+						//it's hack to make toolbar reposition in case it overlapped CKEditor after area expansion	
 						CKEDITOR.instances[id].fire( 'change');
 					});
 
@@ -111,14 +116,21 @@
 			closeExpandedAreas();
 
 			$(".option-settings-hidden.delete-button", $("#" + tableId)).show();
-			$(".option-settings-hidden:not(.delete-button)", $("#" + tableId)).slideDown("slow");
+			$(".option-settings-hidden:not(.delete-button)", $("#" + tableId)).slideDown();
 
 			expandedTable = tableId;
 		});
 
 		// close all expanded areas on clicking anywhere outside of expanded table
 		$(document).click(function(event) {
-		    if (expandedTable && !$(event.target).closest("#" + expandedTable).length) {
+		    if (expandedTable
+				    // allow clicking inside CKEditor area
+				    && !$(event.target).closest("#" + expandedTable).length
+				    // clicking on CKEditor toolbar
+				    && !$(event.target).closest(".cke_top").length
+				    // clicking on CKEditor toolbar
+				    && !$(event.target).closest(".cke_dialog").length
+				    ) {
 		    	closeExpandedAreas();
 		    }
 		});
@@ -128,7 +140,7 @@
 	var expandedTable = "";
 	function closeExpandedAreas() {
 		//close all other expanded areas
-		$(".option-settings-hidden").slideUp("slow");
+		$(".option-settings-hidden").slideUp();
 		expandedTable = "";
 	}
 	 
@@ -140,7 +152,7 @@
 	
 	<div id="option-table">
 		<c:forEach var="option" items="${optionList}" varStatus="status">
-			<table id="option-table-${status.index}" data-id="${status.index}" tabindex="1">
+			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
 				<tr>
 					<td>
 						<span>${status.index+1}</span>

@@ -185,15 +185,21 @@ CKEDITOR.on('instanceReady', function(e){
 		f.data.dataValue = tempDiv.innerHTML;
 	});
 	
-	//add cke_filled class, when editor gets filled
-	e.editor.on('change', function(event) {
-		var ckeditorData = event.editor.getData();
+	//function adds "cke_filled" class to CKEditor, if it's not empty. And removes it otherwise.
+	var placeholderLessenHandler = function(editor) {
+		var ckeditorData = editor.getData();
 		
 		var isEmpty = (ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0);
 		if (isEmpty) {
-			event.editor._.editable.$.classList.remove("cke_filled");
+			editor._.editable.$.classList.remove("cke_filled");
 		} else {
-			event.editor._.editable.$.classList.add("cke_filled");
+			editor._.editable.$.classList.add("cke_filled");
 		}
+	}
+	//add cke_filled class on editor's instanceReady
+	placeholderLessenHandler(e.editor);
+	//add cke_filled class on editor gets changed
+	e.editor.on('change', function(event) {
+		placeholderLessenHandler(event.editor);
 	});
 });
