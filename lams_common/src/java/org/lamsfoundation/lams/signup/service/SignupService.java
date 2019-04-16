@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.signup.dao.ISignupDAO;
@@ -43,7 +44,7 @@ public class SignupService implements ISignupService {
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);
 
-	ArrayList<String> rolesList = new ArrayList<String>();
+	ArrayList<String> rolesList = new ArrayList<>();
 	rolesList.add(Role.ROLE_LEARNER.toString());
 	if (signup.getAddAsStaff()) {
 	    rolesList.add(Role.ROLE_MONITOR.toString());
@@ -80,7 +81,7 @@ public class SignupService implements ISignupService {
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);
 
-	ArrayList<String> rolesList = new ArrayList<String>();
+	ArrayList<String> rolesList = new ArrayList<>();
 	rolesList.add(Role.ROLE_LEARNER.toString());
 	if (signup.getAddAsStaff()) {
 	    rolesList.add(Role.ROLE_MONITOR.toString());
@@ -115,7 +116,10 @@ public class SignupService implements ISignupService {
 
     @Override
     public SignupOrganisation getSignupOrganisation(String context) {
-	return signupDAO.getSignupOrganisation(context);
+	SignupOrganisation result = signupDAO.getSignupOrganisation(context);
+	// initialize lazy-loaded organisation here, so it can be used in JSP produced by SignupController#execute()
+	Hibernate.initialize(result.getOrganisation());
+	return result;
     }
 
     @Override
@@ -198,7 +202,7 @@ public class SignupService implements ISignupService {
     private SupportedLocale getSupportedLocaleOrNull(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 
 	if (StringUtils.isNotBlank(countryIsoCode)) {
 	    properties.put("countryIsoCode", countryIsoCode.trim());
