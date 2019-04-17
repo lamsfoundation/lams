@@ -112,9 +112,12 @@
 						</lams:Alert>	
 				    </div>
 				
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
@@ -143,9 +146,12 @@
 					    </div>
 					</div>
 	
-					<div class="checkbox">
-						<label for="shuffle">
+					<div>
+						<label class="switch">
 							<form:checkbox path="shuffle" id="shuffle"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="shuffle">		
 							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 						</label>
 					</div>

@@ -321,3 +321,65 @@ div[contenteditable]:focus + .cke-label-floating, div[contenteditable].cke_fille
     left: 0;
     font-size: .9rem;
 }
+
+/*----------SWITCH (https://www.w3schools.com/howto/howto_css_switch.asp)----------------*/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 23px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 3px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked ~ .switch-slider {
+  background-color: #2196F3;
+}
+
+input:focus ~ .switch-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked ~ .switch-slider:before {
+  -webkit-transform: translateX(17px);
+  -ms-transform: translateX(17px);
+  transform: translateX(17px);
+}
+
+/* Rounded switch-sliders */
+.switch-slider.round {
+  border-radius: 23px;
+}
+
+.switch-slider.round:before {
+  border-radius: 50%;
+}
