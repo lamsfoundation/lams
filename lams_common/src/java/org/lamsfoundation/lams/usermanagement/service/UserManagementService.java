@@ -640,14 +640,13 @@ public class UserManagementService implements IUserManagementService {
 
 	UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
 	if (uo == null) {
+	    if (rolesList.isEmpty()) {
+		// user has no roles and shoud have none, so nothing to do
+		return;
+	    }
 	    uo = new UserOrganisation(user, org);
 	    save(uo);
 	    log.debug("added " + user.getLogin() + " to " + org.getName());
-	    Set uos;
-	    if ((uos = org.getUserOrganisations()) == null) {
-		uos = new HashSet();
-	    }
-	    uos.add(uo);
 	}
 
 	// if user is to be added to a class, make user a member of parent
@@ -696,8 +695,12 @@ public class UserManagementService implements IUserManagementService {
 		}
 	    }
 	}
-	uo.setUserOrganisationRoles(uors);
-	saveUser(user);
+	if (uors.isEmpty()) {
+	    delete(uo);
+	} else {
+	    uo.setUserOrganisationRoles(uors);
+	    save(uo);
+	}
 	// make sure group managers have monitor and learner in each subgroup
 	checkGroupManager(user, org);
     }
