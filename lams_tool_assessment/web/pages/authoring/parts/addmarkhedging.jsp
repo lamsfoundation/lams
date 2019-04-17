@@ -5,72 +5,12 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/authoringQuestionHeader.jsp"%>
-	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+	<link href="<lams:WebAppURL/>includes/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/bootstrap-toggle.js"></script>
 	<style>
-	
-	/* --- SWITCH --- */
-	
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 23px;
-}
-
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.switch-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.switch-slider:before {
-  position: absolute;
-  content: "";
-  height: 17px;
-  width: 17px;
-  left: 3px;
-  bottom: 0.2em;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked ~ .switch-slider {
-  background-color: #2196F3;
-}
-
-input:focus ~ .switch-slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked ~ .switch-slider:before {
-  -webkit-transform: translateX(17px);
-  -ms-transform: translateX(17px);
-  transform: translateX(17px);
-}
-
-/* Rounded switch-sliders */
-.switch-slider.round {
-  border-radius: 23px;
-}
-
-.switch-slider.round:before {
-  border-radius: 50%;
-}
-	
+	.toggle.btn-xs {
+		min-width: 59px;
+	}
 	</style>
 	
     <script>
@@ -119,7 +59,14 @@ input:checked ~ .switch-slider:before {
 		    		    				
 		    		$('#assessmentQuestionForm').ajaxSubmit(options);
 		    	}
-		  	});    	
+		  	});
+
+		    //enforce only one correct option
+		    $(document).on("change", "input[type='checkbox'][name='optionCorrect']", function() {
+		        if(this.checked) {
+		        	$("input[type='checkbox'][name='optionCorrect']").not(this).bootstrapToggle('off');
+		        }
+		    });	
 		});   
  	</script>
 </lams:head>

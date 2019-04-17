@@ -158,9 +158,12 @@
 						</lams:Alert>	
 				    </div>
 				
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
@@ -201,24 +204,33 @@
 							</form:select>
 						</div>
 					</div>
-					
-					<div class="checkbox" id="incorrect-answer-nullifies-mark-area">
-						<label for="incorrectAnswerNullifiesMark">
+
+					<div id="incorrect-answer-nullifies-mark-area">
+						<label class="switch">
 							<form:checkbox path="incorrectAnswerNullifiesMark" id="incorrectAnswerNullifiesMark"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="incorrectAnswerNullifiesMark">		
 							<fmt:message key="label.incorrect.answer.nullifies.mark" />
 						</label>
-					</div>		
+					</div>
 		
-					<div class="checkbox">
-						<label for="shuffle">
+					<div>
+						<label class="switch">
 							<form:checkbox path="shuffle" id="shuffle"/>
-							<span id="shuffleText"><fmt:message key="label.authoring.basic.shuffle.the.choices" /></span>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="shuffle">		
+							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 						</label>
 					</div>
-					
-					<div class="checkbox" id="prefixAnswersWithLettersDiv">
-						<label for="prefixAnswersWithLetters">
+
+					<div id="prefixAnswersWithLettersDiv">
+						<label class="switch">
 							<form:checkbox path="prefixAnswersWithLetters" id="prefixAnswersWithLetters"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="prefixAnswersWithLetters">		
 							<span id="prefixAnswersWithLettersText"><fmt:message key="label.prefix.sequential.letters.for.each.answer" /></span>
 						</label>
 					</div>

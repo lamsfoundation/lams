@@ -139,15 +139,18 @@
 				</div>
 				
 				<div class="settings-tab">
-					 <div class="error">
+					<div class="error">
 				    	<lams:Alert id="errorMessages" type="danger" close="false" >
 							<span></span>
 						</lams:Alert>	
 				    </div>
 				    
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
@@ -164,10 +167,13 @@
 						    </div>
 						</div>
 					</c:if>
-					
-					<div class="checkbox">
-						<label for="allow-rich-editor">
+
+					<div>
+						<label class="switch">
 							<form:checkbox path="allowRichEditor" id="allow-rich-editor"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="allow-rich-editor">		
 							<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
 						</label>
 					</div>

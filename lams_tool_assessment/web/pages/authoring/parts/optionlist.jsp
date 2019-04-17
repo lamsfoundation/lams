@@ -1,28 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <script type="text/javascript">
 	$(document).ready(function(){
-		/*
-		var focusingOutSemaphor = false;
-		$("#option-table-0x").focusin(function(event) {
-			focusingOutSemaphor = false;
-			$(".option-feedback", this).slideDown("slow");
-			console.log("focusin" + event);
-		});
-
-		$("#option-table-0x").focusout(function(event) {
-			focusingOutSemaphor = true;
-			setTimeout(
-				function(){ 
-					//if (focusingOutSemaphor) {
-						$(".option-feedback", $("#option-table-0")).slideUp("slow");
-						console.log("focusout" + event.target.outerHTML);
-					//}
-				}, 
-				500
-			);
-		});
-		*/
-
 		CKEDITOR.on('instanceLoaded', function(e){
 			//apply to only option title CKEditors
 			var id = e.editor.element.$.id;
@@ -51,57 +30,6 @@
 
 					expandedTable = tableId;
 			    } );
-
-/*			    e.editor.on( 'blurx', function() {
-					focusingOutSemaphor = true;
-					setTimeout(
-						function(){ 
-							if (focusingOutSemaphor) {
-								var tableId = id.replace("optionString", "option-table-");
-								$(".option-feedback", $("#" + tableId)).slideUp("slow");
-								console.log("focusout");
-							}
-						}, 
-						500
-					);
-
-					//console.log(e.editor.focusManager); 
-			    } ); 
-
-				e.editor.editable().on('focusx', function (event) {
-					var tableId = id.replace("optionString", "option-table-");
-					$(".option-feedback", $("#" + tableId)).slideDown("slow");
-					//.removeClass("hidden", 3000);
-				});
-
-				e.editor.editable().on('blurx', function (event) {
-					var tableId = id.replace("optionString", "option-table-");
-					$(".option-feedback", $("#" + tableId)).slideUp("slow", function() {
-						console.log("e.editor.editable().on('blur");
-					   // $(this).addClass("hidden");
-					});
-				});
-
-				e.editor.editable().on('activex', function (event) {
-				});
-				
-				e.editor.on( 'contentDom', function() {
-					console.log('contentDom');
-				    this.document.on('click', function(event){
-				    	console.log('Click Event');
-				    });
-
-				    this.document.on('blur', function(event){
-				    	console.log("doc blur");
-				    });
-
-					
-				    var editable = e.editor.editable();
-				    editable.attachListener( editable, 'click', function() {
-				    	console.log('contentDom2');
-				    });
-				});
-*/
 			}
 		});
 
@@ -134,6 +62,9 @@
 		    	closeExpandedAreas();
 		    }
 		});
+
+		//init all toogles (required in case of adding/removing options)
+		$("input[type='checkbox'][name='optionCorrect']").bootstrapToggle();
 	});
 
 	//store which table is expanded
@@ -143,7 +74,6 @@
 		$(".option-settings-hidden").slideUp();
 		expandedTable = "";
 	}
-	 
 </script>
 
 <div id="optionArea">
