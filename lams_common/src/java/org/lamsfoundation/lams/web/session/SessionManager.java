@@ -202,10 +202,17 @@ public class SessionManager {
     }
 
     /**
-     * Returns number of sessions stored in the container.
+     * Returns number of all sessions stored in the container.
      */
-    public static int getSessionCount() {
+    public static int getSessionTotalCount() {
 	return SessionManager.sessionIdMapping.size();
+    }
+
+    /**
+     * Returns number of authenticated sessions stored in the container.
+     */
+    public static int getSessionUserCount() {
+	return SessionManager.loginMapping.size();
     }
 
     /**

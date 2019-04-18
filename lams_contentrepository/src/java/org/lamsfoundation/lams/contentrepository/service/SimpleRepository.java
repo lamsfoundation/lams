@@ -21,6 +21,7 @@
  * ****************************************************************
  */
 
+
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.FileNotFoundException;
@@ -42,7 +43,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrCredential;
 import org.lamsfoundation.lams.contentrepository.CrNode;
-import org.lamsfoundation.lams.contentrepository.CrNodeVersion;
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -54,8 +54,6 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.NodeType;
 import org.lamsfoundation.lams.contentrepository.PropertyName;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
-import org.lamsfoundation.lams.contentrepository.dao.IFileDAO;
-import org.lamsfoundation.lams.contentrepository.dao.INodeDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
@@ -89,7 +87,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * run separately and without suitable AOP support then
  * each transaction method must check that the credential is okay
  * or that the ticket is a known ticket (isTicketOkay() method).
- *
+ * 
  * This class also depends on the transactions defined in the
  * application context for the hibernate sessions to work properly.
  * If the method isn't transactioned, then there won't be a proper
@@ -110,8 +108,6 @@ public class SimpleRepository implements IRepositoryAdmin {
     private ICredentialDAO credentialDAO = null;
     private IWorkspaceDAO workspaceDAO = null;
     private INodeFactory nodeFactory = null;
-    private IFileDAO fileDAO = null;
-    private INodeDAO nodeDAO = null;
 
     private Set ticketIdSet = new HashSet(); // set of currently known tickets.
 
@@ -138,10 +134,10 @@ public class SimpleRepository implements IRepositoryAdmin {
 	    }
 	    return user.getUserID();
 	}
-	throw new AccessDeniedException(
-		"Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
+	    throw new AccessDeniedException(
+		    "Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
 
-    }
+	}
 
     /**
      * @param workspaceId
@@ -159,7 +155,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#login(org.lamsfoundation.lams.contentrepository.
      * ICredentials, java.lang.String)
      */
@@ -186,7 +182,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	}
 
 	// okay, we should now be able to create a ticket
-	// 	make ticket, create new credentials without the password
+	// 	make ticket, create new credentials without the password 
 	ITicket ticket = new SimpleTicket(workspace.getWorkspaceId());
 	ticketIdSet.add(ticket.getTicketId());
 	return ticket;
@@ -195,7 +191,7 @@ public class SimpleRepository implements IRepositoryAdmin {
     /**
      * Add a workspace, giving the credentials as the user of this workspace.
      * It does not clear the password in the credentials
-     *
+     * 
      * @param credentials
      *            this user/password must already exist in the repository. Password will be checked.
      * @param workspaceName
@@ -270,7 +266,7 @@ public class SimpleRepository implements IRepositoryAdmin {
      * The password must be at least 6 chars.
      * Possibly this should only be available to an internal management tool
      * *** Security Risk - I'm converting the password to a string... ***
-     *
+     * 
      * @throws LoginException
      *             if the oldCredential fails login test (e.g. wrong password)
      * @throws RepositoryCheckedException
@@ -308,9 +304,9 @@ public class SimpleRepository implements IRepositoryAdmin {
     /**
      * Checks that a password meets our password criteria. This could be implemented
      * as a Strategy, but that's overkill!
-     *
+     * 
      * Checks that the password is six or more characters.
-     *
+     * 
      * @param password
      * @throws RepositoryCheckedException
      *             if
@@ -408,7 +404,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#logout(org.lamsfoundation.lams.contentrepository.ITicket)
      */
@@ -430,7 +426,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#addFileItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
      */
@@ -456,7 +452,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#addPackageItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.String, java.lang.String, java.lang.String)
@@ -490,7 +486,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#getFileItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.Long, java.lang.Long)
      */
@@ -503,7 +499,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#getFileItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.Long, java.lang.Long, java.lang.String)
      */
@@ -534,7 +530,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#getFileItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.Long, java.lang.Long, java.lang.String)
      */
@@ -560,7 +556,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.lamsfoundation.lams.contentrepository.IRepository#getNodeList(org.lamsfoundation.lams.contentrepository.
      * ITicket)
      */
@@ -586,7 +582,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#getVersionHistory(org.lamsfoundation.lams.contentrepository
      * .ITicket, java.lang.Long)
@@ -600,7 +596,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#updateFileItem(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.Long, java.lang.String, java.io.InputStream, java.lang.String, java.lang.String)
@@ -631,7 +627,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository
      * .ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
@@ -694,7 +690,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#copyNodeVersion(org.lamsfoundation.lams.contentrepository.
      * ITicket, java.lang.Long, java.lang.Long)
@@ -727,7 +723,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#saveFile(org.lamsfoundation.lams.contentrepository.ITicket,
      * java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
@@ -808,7 +804,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository
      * .ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
@@ -834,7 +830,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.lamsfoundation.lams.contentrepository.IRepository#updatePackageItem(org.lamsfoundation.lams.contentrepository
      * .ITicket, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)
@@ -854,52 +850,21 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     }
 
-    @Override
     public boolean workspaceExists(ICredentials credentials, Long workspaceId) {
 	return workspaceDAO.find(CrWorkspace.class, workspaceId) != null;
     }
 
-    @Override
     public boolean workspaceExists(ICredentials credentials, String workspaceName) {
 	return workspaceDAO.findByName(workspaceName) != null;
     }
 
-    @Override
-    public InputStream daoGetFile(Long uuid, Long versionId) throws FileException {
-	return fileDAO.getFile(uuid, versionId);
-    }
-
-    @Override
-    public String daoWriteFile(Long uuid, Long versionId, InputStream is) throws FileException {
-	return fileDAO.writeFile(uuid, versionId, is);
-    }
-
-    @Override
-    public int daoDelete(Long uuid, Long versionId) throws FileException {
-	return fileDAO.delete(uuid, versionId);
-    }
-
-    @Override
-    public String daoGetFilePath(Long uuid, Long versionId) throws FileException {
-	return fileDAO.getFilePath(uuid, versionId);
-    }
-
-    @Override
-    public boolean daoFileExists(Long uuid, Long versionId) throws FileException {
-	return fileDAO.fileExists(uuid, versionId);
-    }
-
-    @Override
-    public List daoFindChildNodes(CrNodeVersion parentNodeVersion) {
-	return nodeDAO.findChildNodes(parentNodeVersion);
-    }
-
-    @Override
-    public CrNode daoFindChildNode(CrNodeVersion parentNodeVersion, String relPath) {
-	return nodeDAO.findChildNode(parentNodeVersion, relPath);
-    }
-
     /* ********** setters and getters for DAOs *******************/
+    /**
+     * @return Returns the workspaceDAO.
+     */
+    public IWorkspaceDAO getWorkspaceDAO() {
+	return workspaceDAO;
+    }
 
     /**
      * @param workspaceDAO
@@ -910,6 +875,13 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
+     * @return Returns the credentialDAO.
+     */
+    public ICredentialDAO getCredentialDAO() {
+	return credentialDAO;
+    }
+
+    /**
      * @param credentialDAO
      *            The credentialDAO to set.
      */
@@ -917,15 +889,12 @@ public class SimpleRepository implements IRepositoryAdmin {
 	this.credentialDAO = credentialDAO;
     }
 
+    public INodeFactory getNodeFactory() {
+	return nodeFactory;
+    }
+
     public void setNodeFactory(INodeFactory nodeFactory) {
 	this.nodeFactory = nodeFactory;
     }
 
-    public void setFileDAO(IFileDAO fileDAO) {
-	this.fileDAO = fileDAO;
-    }
-
-    public void setNodeDAO(INodeDAO nodeDAO) {
-	this.nodeDAO = nodeDAO;
-    }
 }

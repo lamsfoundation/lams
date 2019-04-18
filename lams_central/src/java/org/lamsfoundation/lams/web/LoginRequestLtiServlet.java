@@ -50,7 +50,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
- * The LoginRequestLtiServlet handles login request by LTI tool consumers. This servlet checks for the correctly signed by OAuth parameters,
+ * The LoginRequestLtiServlet handles login request by LTI tool consumers. This servlet checks for the correctly signed
+ * by OAuth parameters,
  * and if it's valid it redirects it to LoginRequestServlet for actual authentication.
  *
  * @author Andrey Balan
@@ -58,13 +59,13 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @SuppressWarnings("serial")
 public class LoginRequestLtiServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LoginRequestLtiServlet.class);
-    
+
     @Autowired
     private IntegrationService integrationService = null;
 
     private final String DEFAULT_FIRST_NAME = "John";
     private final String DEFAULT_LAST_NAME = "Doe";
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -123,7 +124,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	if (StringUtils.isBlank(firstName)) {
 	    firstName = DEFAULT_FIRST_NAME;
 	}
-	if (StringUtils.isBlank(firstName)) {
+	if (StringUtils.isBlank(lastName)) {
 	    lastName = DEFAULT_LAST_NAME;
 	}
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
@@ -139,7 +140,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	} else {
 	    method = LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
 	}
-	
+
 	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
 	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
 
@@ -149,12 +150,11 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	// regular case: [ts + uid + method + serverID + serverKey]
 	String plaintext = timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim()
 		+ method.toLowerCase().trim()
-		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId
-			: "")
+		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha1(plaintext);
 
-	// constructing redirectUrl by getting request.getQueryString() for POST requests 
+	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
 	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
@@ -164,7 +164,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
 		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
 		String paramValue = request.getParameter(paramName);
-		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName, URLEncoder.encode(paramValue, "UTF-8"));
+		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName,
+			URLEncoder.encode(paramValue, "UTF-8"));
 	    }
 	}
 
@@ -195,27 +196,29 @@ public class LoginRequestLtiServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param localeStr
      *            the full balckboard locale string
      * @return the language
      */
     private static String getLanguage(String localeStr) {
-	if (localeStr == null)
+	if (localeStr == null) {
 	    return "xx";
+	}
 	String[] split = localeStr.split("_");
 	return split[0];
     }
 
     /**
-     * 
+     *
      * @param localeStr
      *            the full balckboard locale string
      * @return the country
      */
     private static String getCountry(String localeStr) {
-	if (localeStr == null)
+	if (localeStr == null) {
 	    return "XX";
+	}
 	String[] split = localeStr.split("_");
 
 	//default country set to AU
