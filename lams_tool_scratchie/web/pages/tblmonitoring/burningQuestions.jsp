@@ -62,19 +62,31 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title panel-collapse">
+					
+					<!-- Don't display number prior to general burning question -->
+					<c:set var="itemTitle">
+						<c:choose>
+							<c:when test="${burningQuestionItemDto.scratchieItem.uid == 0}">
+								<c:out value="${item.title}" escapeXml="false"/>
+							</c:when>
+							<c:otherwise>
+								Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/> 
+							</c:otherwise>
+						</c:choose>
+					</c:set>
+				
 					<c:choose>
-						<c:when test="${burningQsCount != 0}">
+						<c:when test="${burningQsCount > 0}">
 							<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
-								Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/>
+								${itemTitle}
 							</a>
+							
+							<span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>
 						</c:when>
 						<c:otherwise>
-							Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/> 
+							${itemTitle} 
 						</c:otherwise>
 					</c:choose>
-                    <c:if test="${burningQsCount > 0}">
-					   <span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>
-                    </c:if>    
 				</h4>
 			</div>
 		
