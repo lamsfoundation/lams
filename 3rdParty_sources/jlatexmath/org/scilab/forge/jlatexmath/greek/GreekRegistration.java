@@ -28,8 +28,6 @@
 
 package org.scilab.forge.jlatexmath.greek;
 
-import java.lang.Character.UnicodeBlock;
-
 import org.scilab.forge.jlatexmath.AlphabetRegistration;
 
 public class GreekRegistration implements AlphabetRegistration {
@@ -38,14 +36,14 @@ public class GreekRegistration implements AlphabetRegistration {
     }
 
     public Character.UnicodeBlock[] getUnicodeBlock() {
-	return new Character.UnicodeBlock[]{Character.UnicodeBlock.GREEK, Character.UnicodeBlock.GREEK_EXTENDED};
+        return new Character.UnicodeBlock[] {Character.UnicodeBlock.GREEK, Character.UnicodeBlock.GREEK_EXTENDED};
     }
 
     public Object getPackage() {
-	return this;
+        return this;
     }
 
     public String getTeXFontFileName() {
-	return "fonts/language_greek.xml";
+        return "fonts/language_greek.xml";
     }
 }

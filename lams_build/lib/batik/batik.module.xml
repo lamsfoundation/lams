@@ -22,11 +22,19 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.5" name="org.scilab.forge.jlatexmath">
+<module xmlns="urn:jboss:module:1.3" name="org.apache.batik">
   <resources>
-    <resource-root path="jlatexmath-1.0.8.jar"/>
+    <resource-root path="batik-all-1.7.jar"/>
   </resources>
+  
   <dependencies>
-    <module name="javax.api" />
+ 	<system>
+  		<paths>
+  			<path name="org/w3c/dom"/>
+  			<path name="org/w3c/dom/css"/>
+  			<path name="org/w3c/dom/traversal"/>
+  		</paths>
+  	</system>
+  	<module name="org.apache.xmlcommons" />
   </dependencies>
 </module>

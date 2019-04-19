@@ -33,7 +33,7 @@ jakarta-commons   commons-digester-2.1.jar              2.1                    A
                   commons-discovery-0.5.jar             0.5	                   Apache License 2.0            The Apache Software Foundation
                   commons-compress-1.18.jar             1.18                   Apache License 2.0            The Apache Software Foundation   Defines an API for working with ar, cpio, Unix dump, tar, zip, gzip, XZ, Pack200, bzip2, 7z, arj, lzma, snappy, DEFLATE, lz4, Brotli, Zstandard, DEFLATE64 and Z files
 
-jlatexmath		  jlatexmath-1.0.6.jar                  1.0.6
+jlatexmath		  jlatexmath-1.0.8.jar                  1.0.8                  GPL                           scilab.org                       A Java API to render LaTeX
 
 json-simple       json-simple-1.1.1.jar                 1.1.1                  Apache License 2.0            fangyidong                       A simple Java toolkit for JSON
 
