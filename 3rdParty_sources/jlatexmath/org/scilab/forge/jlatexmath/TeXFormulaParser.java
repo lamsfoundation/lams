@@ -25,23 +25,23 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *
- * Linking this library statically or dynamically with other modules 
- * is making a combined work based on this library. Thus, the terms 
- * and conditions of the GNU General Public License cover the whole 
+ * Linking this library statically or dynamically with other modules
+ * is making a combined work based on this library. Thus, the terms
+ * and conditions of the GNU General Public License cover the whole
  * combination.
- * 
- * As a special exception, the copyright holders of this library give you 
- * permission to link this library with independent modules to produce 
- * an executable, regardless of the license terms of these independent 
- * modules, and to copy and distribute the resulting executable under terms 
- * of your choice, provided that you also meet, for each linked independent 
- * module, the terms and conditions of the license of that module. 
- * An independent module is a module which is not derived from or based 
- * on this library. If you modify this library, you may extend this exception 
- * to your version of the library, but you are not obliged to do so. 
- * If you do not wish to do so, delete this exception statement from your 
+ *
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce
+ * an executable, regardless of the license terms of these independent
+ * modules, and to copy and distribute the resulting executable under terms
+ * of your choice, provided that you also meet, for each linked independent
+ * module, the terms and conditions of the license of that module.
+ * An independent module is a module which is not derived from or based
+ * on this library. If you modify this library, you may extend this exception
+ * to your version of the library, but you are not obliged to do so.
+ * If you do not wish to do so, delete this exception statement from your
  * version.
- * 
+ *
  */
 
 package org.scilab.forge.jlatexmath;
@@ -49,11 +49,10 @@ package org.scilab.forge.jlatexmath;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Parses a "TeXFormula"-element representing a predefined TeXFormula's from an XML-file.
@@ -66,7 +65,7 @@ public class TeXFormulaParser {
 
     private interface ArgumentValueParser { // NOPMD
         public Object parseValue(String value, String type)
-            throws ResourceParseException;
+        throws ResourceParseException;
     }
 
     private class MethodInvocationParser implements ActionParser {
@@ -91,7 +90,7 @@ public class TeXFormulaParser {
                 // parse arguments
                 NodeList args = el.getElementsByTagName("Argument");
                 // get argument classes and values
-                Class[] argClasses = getArgumentClasses(args);
+                Class<?>[] argClasses = getArgumentClasses(args);
                 Object[] argValues = getArgumentValues(args);
                 // invoke method
                 try {
@@ -119,11 +118,11 @@ public class TeXFormulaParser {
             // parse arguments
             NodeList args = el.getElementsByTagName("Argument");
             // get argument classes and values
-            Class[] argClasses = getArgumentClasses(args);
+            Class<?>[] argClasses = getArgumentClasses(args);
             Object[] argValues = getArgumentValues(args);
             // create TeXFormula object
-	    //String code = "TeXFormula.predefinedTeXFormulasAsString.put(\"%s\", \"%s\");";
-	    //System.out.println(String.format(code, formulaName, argValues[0]));
+            //String code = "TeXFormula.predefinedTeXFormulasAsString.put(\"%s\", \"%s\");";
+            //System.out.println(String.format(code, formulaName, argValues[0]));
             try {
                 TeXFormula f = TeXFormula.class.getConstructor(argClasses).newInstance(argValues);
                 // succesfully created, so add to "temporary formula's"-hashtable
@@ -149,7 +148,7 @@ public class TeXFormulaParser {
             // parse arguments
             NodeList args = el.getElementsByTagName("Argument");
             // get argument classes and values
-            Class[] argClasses = getArgumentClasses(args);
+            Class<?>[] argClasses = getArgumentClasses(args);
             Object[] argValues = getArgumentValues(args);
             // create TeXFormula object
             try {
@@ -157,19 +156,19 @@ public class TeXFormulaParser {
                 // succesfully created, so add to "temporary formula's"-hashtable
                 tempCommands.put(name, f);
             } catch (IllegalArgumentException e) {
-		String err = "IllegalArgumentException:\n";
-		err += "ClassLoader to load this class (TeXFormulaParser): " + this.getClass().getClassLoader() + "\n";
-		for (Class cl : argClasses) {
-		    err += "Created class: " + cl + " loaded with the ClassLoader: " + cl.getClassLoader() + "\n";
-		}
-		for (Object obj : argValues) {
-		    err += "Created object: " + obj + "\n";
-		}
-		throw new XMLResourceParseException(
+                String err = "IllegalArgumentException:\n";
+                err += "ClassLoader to load this class (TeXFormulaParser): " + this.getClass().getClassLoader() + "\n";
+                for (Class<?> cl : argClasses) {
+                    err += "Created class: " + cl + " loaded with the ClassLoader: " + cl.getClassLoader() + "\n";
+                }
+                for (Object obj : argValues) {
+                    err += "Created object: " + obj + "\n";
+                }
+                throw new XMLResourceParseException(
                     "Error creating the temporary command '" + name
                     + "' while constructing the predefined command '"
                     + formulaName + "'!\n" + err);
-	    } catch (Exception e) {
+            } catch (Exception e) {
                 throw new XMLResourceParseException(
                     "Error creating the temporary command '" + name
                     + "' while constructing the predefined command '"
@@ -185,7 +184,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             try {
                 return new Float(Float.parseFloat(value));
@@ -205,7 +204,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             if (value.length() == 1) {
                 return new Character(value.charAt(0));
@@ -225,7 +224,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             if ("true".equals(value)) {
                 return Boolean.TRUE;
@@ -247,7 +246,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             try {
                 int val = Integer.parseInt(value);
@@ -290,7 +289,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             return value;
         }
     }
@@ -302,7 +301,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             if (value == null) {// null pointer argument
                 return null;
             } else {
@@ -327,12 +326,12 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             try {
                 // get constant value (if present)
                 int constant = TeXConstants.class.getDeclaredField(value).getInt(
-                    null);
+                                   null);
                 // return constant integer value
                 return Integer.valueOf(constant);
             } catch (Exception e) {
@@ -351,7 +350,7 @@ public class TeXFormulaParser {
         }
 
         public Object parseValue(String value, String type)
-            throws ResourceParseException {
+        throws ResourceParseException {
             checkNullValue(value, type);
             try {
                 // return Color constant (if present)
@@ -367,7 +366,7 @@ public class TeXFormulaParser {
     }
 
     private static final String ARG_VAL_ATTR = "value", RETURN_EL = "Return",
-        ARG_OBJ_ATTR = "formula";
+                                ARG_OBJ_ATTR = "formula";
 
     private static Map<String,Class<?>> classMappings = new HashMap<String,Class<?>>();
 
@@ -455,9 +454,9 @@ public class TeXFormulaParser {
         return res;
     }
 
-    private static Class[] getArgumentClasses(NodeList args)
-        throws ResourceParseException {
-        Class[] res = new Class[args.getLength()];
+    private static Class<?>[] getArgumentClasses(NodeList args)
+    throws ResourceParseException {
+        Class<?>[] res = new Class<?>[args.getLength()];
         int i = 0;
         for (int j = 0; j < args.getLength(); j++) {
             Element arg = (Element)args.item(j);
@@ -470,7 +469,7 @@ public class TeXFormulaParser {
                     PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument", "type",
                     "has an invalid class name value!");
             } else {
-                res[i] = (Class) cl;
+                res[i] = (Class<?>) cl;
             }
             i++;
         }
@@ -478,7 +477,7 @@ public class TeXFormulaParser {
     }
 
     private static void checkNullValue(String value, String type)
-        throws ResourceParseException {
+    throws ResourceParseException {
         if (value.equals("")) {
             throw new XMLResourceParseException(
                 PredefinedTeXFormulaParser.RESOURCE_NAME, "Argument",
@@ -488,7 +487,7 @@ public class TeXFormulaParser {
     }
 
     private static String getAttrValueAndCheckIfNotNull(String attrName,
-                                                        Element element) throws ResourceParseException {
+            Element element) throws ResourceParseException {
         String attrValue = element.getAttribute(attrName);
         if (attrValue.equals("")) {
             throw new XMLResourceParseException(

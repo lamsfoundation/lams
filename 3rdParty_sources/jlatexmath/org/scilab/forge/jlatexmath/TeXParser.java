@@ -24,30 +24,28 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *
- * Linking this library statically or dynamically with other modules 
- * is making a combined work based on this library. Thus, the terms 
- * and conditions of the GNU General Public License cover the whole 
+ * Linking this library statically or dynamically with other modules
+ * is making a combined work based on this library. Thus, the terms
+ * and conditions of the GNU General Public License cover the whole
  * combination.
- * 
- * As a special exception, the copyright holders of this library give you 
- * permission to link this library with independent modules to produce 
- * an executable, regardless of the license terms of these independent 
- * modules, and to copy and distribute the resulting executable under terms 
- * of your choice, provided that you also meet, for each linked independent 
- * module, the terms and conditions of the license of that module. 
- * An independent module is a module which is not derived from or based 
- * on this library. If you modify this library, you may extend this exception 
- * to your version of the library, but you are not obliged to do so. 
- * If you do not wish to do so, delete this exception statement from your 
+ *
+ * As a special exception, the copyright holders of this library give you
+ * permission to link this library with independent modules to produce
+ * an executable, regardless of the license terms of these independent
+ * modules, and to copy and distribute the resulting executable under terms
+ * of your choice, provided that you also meet, for each linked independent
+ * module, the terms and conditions of the license of that module.
+ * An independent module is a module which is not derived from or based
+ * on this library. If you modify this library, you may extend this exception
+ * to your version of the library, but you are not obliged to do so.
+ * If you do not wish to do so, delete this exception statement from your
  * version.
- * 
+ *
  */
 
 package org.scilab.forge.jlatexmath;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.lang.Character.UnicodeBlock;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,7 +68,6 @@ public class TeXParser {
     private boolean arrayMode;
     private boolean ignoreWhiteSpace = true;
     private boolean isPartial;
-    private boolean autoNumberBreaking;
 
     // the escape character
     private static final char ESCAPE = '\\';
@@ -85,10 +82,6 @@ public class TeXParser {
 
     // Percent char for comments
     private static final char PERCENT = '%';
-
-    // used as second index in "delimiterNames" table (over or under)
-    private static final int OVER_DEL = 0;
-    private static final int UNDER_DEL = 1;
 
     // script characters (for parsing)
     private static final char SUB_SCRIPT = '_';
@@ -202,7 +195,7 @@ public class TeXParser {
     }
 
     /**
-     * Create a new TeXParser in the context of an array. When the parser meets a & a new atom is added in the current line and when a \\ is met, a new line is created.
+     * Create a new TeXParser in the context of an array. When the parser meets a &amp; a new atom is added in the current line and when a \\ is met, a new line is created.
      *
      * @param isPartial if true certains exceptions are not thrown
      * @param parseString the string to be parsed
@@ -216,7 +209,7 @@ public class TeXParser {
     }
 
     /**
-     * Create a new TeXParser in the context of an array. When the parser meets a & a new atom is added in the current line and when a \\ is met, a new line is created.
+     * Create a new TeXParser in the context of an array. When the parser meets a &amp; a new atom is added in the current line and when a \\ is met, a new line is created.
      *
      * @param isPartial if true certains exceptions are not thrown
      * @param parseString the string to be parsed
@@ -230,7 +223,7 @@ public class TeXParser {
     }
 
     /**
-     * Create a new TeXParser in the context of an array. When the parser meets a & a new atom is added in the current line and when a \\ is met, a new line is created.
+     * Create a new TeXParser in the context of an array. When the parser meets a &amp; a new atom is added in the current line and when a \\ is met, a new line is created.
      *
      * @param parseString the string to be parsed
      * @param aoa an ArrayOfAtoms where to put the elements
@@ -491,7 +484,7 @@ public class TeXParser {
                     pos = spos;
                     break;
                 case DEGRE :
-                    parseString.replace(pos, pos + 1, "^\\circ");
+                    parseString.replace(pos, pos + 1, "^{\\circ}");
                     len = parseString.length();
                     pos++;
                     break;
@@ -1092,7 +1085,7 @@ public class TeXParser {
         if (pos == len)
             return null;
 
-        int ogroup = 1, spos;
+        int spos;
         char ch = '\0';
 
         skipWhiteSpace();
@@ -1128,11 +1121,11 @@ public class TeXParser {
 
             String symbolName = TeXFormula.symbolMappings[c];
             if (symbolName == null && (TeXFormula.symbolFormulaMappings == null || TeXFormula.symbolFormulaMappings[c] == null)) {
-		TeXFormula.FontInfos fontInfos = null;
-		boolean isLatin = Character.UnicodeBlock.BASIC_LATIN.equals(block);
-		if ((isLatin && TeXFormula.isRegisteredBlock(Character.UnicodeBlock.BASIC_LATIN)) || !isLatin) {
-		    fontInfos = TeXFormula.getExternalFont(block);
-		}
+                TeXFormula.FontInfos fontInfos = null;
+                boolean isLatin = Character.UnicodeBlock.BASIC_LATIN.equals(block);
+                if ((isLatin && TeXFormula.isRegisteredBlock(Character.UnicodeBlock.BASIC_LATIN)) || !isLatin) {
+                    fontInfos = TeXFormula.getExternalFont(block);
+                }
                 if (fontInfos != null) {
                     if (oneChar) {
                         return new JavaFontRenderingAtom(Character.toString(c), fontInfos);
@@ -1279,8 +1272,7 @@ public class TeXParser {
                         skipWhiteSpace();
                         args[j] = getGroup(L_BRACK, R_BRACK);
                     }
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     args[j] = null;
                 }
             }
@@ -1293,8 +1285,7 @@ public class TeXParser {
                 if (parseString.charAt(pos) != '\\') {
                     args[1] = "" + parseString.charAt(pos);
                     pos++;
-                }
-                else
+                } else
                     args[1] = getCommandWithArgs(getCommand());
             }
 
@@ -1306,8 +1297,7 @@ public class TeXParser {
                         skipWhiteSpace();
                         args[j] = getGroup(L_BRACK, R_BRACK);
                     }
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     args[j] = null;
                 }
             }
@@ -1321,8 +1311,7 @@ public class TeXParser {
                     if (parseString.charAt(pos) != '\\') {
                         args[i] = "" + parseString.charAt(pos);
                         pos++;
-                    }
-                    else {
+                    } else {
                         args[i] = getCommandWithArgs(getCommand());
                     }
                 }
@@ -1342,7 +1331,7 @@ public class TeXParser {
      * @author Juan Enrique Escobar Robles
      */
     private String getCommandWithArgs(String command) {
-        if (command.equals("left")){
+        if (command.equals("left")) {
             return getGroup("\\left", "\\right");
         }
 
@@ -1424,9 +1413,9 @@ public class TeXParser {
         return Character.isLetter(c);
     }
 
-    /** Test the validity of a character in a command. It must contains only alpha characters and eventually a @ if makeAtletter activated
-     * @param com the command's name
-     * @return the validity of the name
+    /** Test the validity of a character in a command. It must contains only alpha characters and eventually a @ if makeAtletter activated.
+     * @param ch character to test
+     * @return the validity of the character
      */
     public final boolean isValidCharacterInCommand(char ch) {
         return Character.isLetter(ch) || (atIsLetter != 0 && ch == '@');
