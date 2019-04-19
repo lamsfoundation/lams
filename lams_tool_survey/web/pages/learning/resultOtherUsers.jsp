@@ -15,7 +15,7 @@
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
-	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
+	<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
 table.alternative-color td:first-child {
 	width: 25%;
