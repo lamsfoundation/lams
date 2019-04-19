@@ -8,7 +8,6 @@
         <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
-        <archive path="/lams_build/lib/batik/batik-all-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/fckeditor/fckeditor-java-core-2.6.jar" source="/3rdParty_sources/ckeditor"/>
         <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
