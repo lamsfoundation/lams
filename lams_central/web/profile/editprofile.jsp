@@ -50,6 +50,7 @@
 		<form:hidden path="userId" />
 		<form:hidden path="login" />
 		<form:hidden path="password" />
+		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
 		<lams:errors path="*"/>
 
