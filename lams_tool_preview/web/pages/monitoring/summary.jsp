@@ -1,12 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="webapp"><lams:WebAppURL/></c:set>
-
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
 <style type="text/css">
@@ -32,7 +30,15 @@
 	COMMENT_TEXTAREA_TIP_LABEL = '',
 	WARN_COMMENTS_IS_BLANK_LABEL = '',
 	WARN_MIN_NUMBER_WORDS_LABEL = '';
-	
+</script>
+<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
+<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
+<script type="text/javascript">
+	function exportResults() {
+		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
+		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+	}
 	function sendResults(sessionId) {
 		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
 		$("#messageArea").html("");
@@ -52,21 +58,6 @@
 			}
 		);
 		return false;
-	}
-	
-</script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
-<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
-<script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
-<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-
-<script type="text/javascript">
-	function exportResults() {
-		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
-		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
 </script>
 

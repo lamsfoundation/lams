@@ -2,12 +2,11 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.taskList.TaskListConstants"%>
-		<%-- param has higher level for request attribute --%>
-		<c:if test="${not empty param.sessionMapID}">
-			<c:set var="sessionMapID" value="${param.sessionMapID}" />
-		</c:if>
-	
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		
 <lams:html>
 	<lams:head>
@@ -27,22 +26,6 @@
 		</script>
 		<%@ include file="/common/monitorheader.jsp" %>
 		
-		<style media="screen,projection" type="text/css">
-			 .ui-jqgrid {
-				border-left-style: none !important;
-				border-right-style: none !important;
-				border-bottom-style: none !important;
-			}
-			
-			.ui-jqgrid tr {
-				border-left-style: none !important;
-			}
-			
-			.ui-jqgrid td {
-				border-style: none !important;
-			}
-		</style>
-		
 		<script>
 	        function init(){
 	        	var initialTabId = "${initialTabId}";
@@ -57,7 +40,6 @@
 		    	// end optional tab controller stuff
 		    	selectTab(tabId);
 	        } 
-
 	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
