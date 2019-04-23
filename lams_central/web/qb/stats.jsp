@@ -22,14 +22,6 @@
 			font-weight: bold;
 		}
 		
-		 {
-			font-weight: bold;
-		}
-		
-		 {
-			font-weight: bold;
-		}
-		
 		#chartDiv {
 			height: 220px;
 		}
@@ -70,7 +62,7 @@
 						Title:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.name}" />
+						<c:out value="${question.name}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -78,7 +70,7 @@
 						Description:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.description}" />
+						<c:out value="${question.description}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -86,7 +78,7 @@
 						Feedback:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.feedback}" />
+						<c:out value="${question.feedback}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
@@ -121,7 +113,7 @@
 							${status.index + 1}
 						</td>
 						<td>
-							<c:out value="${option.name}" />
+							<c:out value="${option.name}" escapeXml="false" />
 						</td>
 						<td>
 							<c:if test="${option.correct}">
@@ -148,6 +140,34 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
+			Burning questions
+		</div>
+		<div class="panel-body">
+			<table class="table table-striped qb-stats-table">
+				<tr>
+					<th>
+						Question
+					</th>
+					<th>
+						Likes
+					</th>
+				</tr>
+				<c:forEach var="question" items="${stats.burningQuestions}">
+					<tr>
+						<td>
+							<c:out value="${question.key}" />
+						</td>
+						<td>
+							<c:out value="${question.value}" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
 			Usage
 		</div>
 		<div class="panel-body">
@@ -165,21 +185,34 @@
 						<th>
 							Tool type
 						</th>
+						<th>
+							Average correct selection<br>(as first choice)
+						</th>
 					</tr>
-					<c:forEach var="activity" items="${stats.activities}">
-						<c:set var="lesson" value="${activity.learningDesign.lessons.iterator().next()}" />
+					<c:forEach var="activityDTO" items="${stats.activities}">
+						<c:set var="lesson" value="${activityDTO.activity.learningDesign.lessons.iterator().next()}" />
 						<tr>
 							<td>
 								<c:out value="${lesson.organisation.name}" />
 							</td>
-							<td>
+							<td title="${lesson.lessonId}">
 								<c:out value="${lesson.lessonName}" />
 							</td>
-							<td>
-								<c:out value="${activity.title}" />
+							<td title="${activityDTO.activity.activityId}">
+								<c:out value="${activityDTO.activity.title}" />
 							</td>
 							<td>
-								<c:out value="${activity.tool.toolDisplayName}" />
+								<c:out value="${activityDTO.activity.tool.toolDisplayName}" />
+							</td>
+							<td>
+								<c:choose>
+									<c:when test="${empty activityDTO.average}">
+										-
+									</c:when>
+									<c:otherwise>
+										<c:out value="${activityDTO.average}" />%
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
 					</c:forEach>

@@ -7,12 +7,34 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public class QbStatsDTO {
+    public static class QbStatsActivityDTO {
+	public ToolActivity activity;
+	public Integer average;
+
+	public ToolActivity getActivity() {
+	    return activity;
+	}
+
+	public void setActivity(ToolActivity activity) {
+	    this.activity = activity;
+	}
+
+	public Integer getAverage() {
+	    return average;
+	}
+
+	public void setAverage(Integer average) {
+	    this.average = average;
+	}
+    }
+
     private QbQuestion question;
     private Map<Long, Long> answersRaw;
     private Map<Long, Integer> answersPercent;
     private String answersJSON;
-    private List<ToolActivity> activities;
+    private List<QbStatsActivityDTO> activities;
     private List<QbQuestion> versions;
+    private Map<String, Long> burningQuestions;
 
     public QbQuestion getQuestion() {
 	return question;
@@ -46,11 +68,11 @@ public class QbStatsDTO {
 	this.answersJSON = answersJSON;
     }
 
-    public List<ToolActivity> getActivities() {
+    public List<QbStatsActivityDTO> getActivities() {
 	return activities;
     }
 
-    public void setActivities(List<ToolActivity> activities) {
+    public void setActivities(List<QbStatsActivityDTO> activities) {
 	this.activities = activities;
     }
 
@@ -60,5 +82,13 @@ public class QbStatsDTO {
 
     public void setVersions(List<QbQuestion> versions) {
 	this.versions = versions;
+    }
+
+    public Map<String, Long> getBurningQuestions() {
+	return burningQuestions;
+    }
+
+    public void setBurningQuestions(Map<String, Long> burningQuestions) {
+	this.burningQuestions = burningQuestions;
     }
 }
