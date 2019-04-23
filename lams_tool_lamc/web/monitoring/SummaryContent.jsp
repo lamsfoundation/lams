@@ -3,23 +3,8 @@
 
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-<style type="text/css">
-	.ui-jqgrid {
-		border-left-style: none !important;
-		border-right-style: none !important;
-		border-bottom-style: none !important;
-	}
-	
-	.ui-jqgrid tr {
-		border-left-style: none !important;
-	}
-	
-	.ui-jqgrid td {
-		border-style: none !important;
-	}
-</style>
 
 <script type="text/javascript"> 
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -35,6 +20,7 @@
 	};	
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js" ></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
@@ -53,7 +39,8 @@
 				rowList:[2,10,20,30,40,50,100],
 				rowNum:10,
 				viewrecords:true,
-			   	/* caption: "${sessionDto.sessionName}", */
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 					'userUid',
 					'userId',
@@ -74,18 +61,18 @@
 			   	},
 			   	loadComplete: function () {
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
-			    	},
+			    },
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
-			  	    		rowid=0; 
+			  	    	rowid=0; 
 			  	    } 
 			   		var userUid = jQuery("#group${sessionDto.sessionId}").getCell(rowid, 'userUid');
 					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
 		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
-		  	        		userMasterDetailUrl,
-		  	        		{
-		  	        			userUid: userUid
+		  	        	userMasterDetailUrl,
+		  	        	{
+		  	        		userUid: userUid
 		  	       		}
 		  	       	);
 	  	  		} 
@@ -98,13 +85,14 @@
 	        var oldValue = 0;
 			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
 				datatype: "local",
+				autoencode:false,
 				rowNum: 10000,
 				gridstate:"hidden",
-				//hiddengrid:true,
 				height: 110,
 				autowidth: true,
 				shrinkToFit: true,
-				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'#',
 					'userAttemptUid',
@@ -119,7 +107,7 @@
 	  			   	{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   	{name:'userAttemptUid', index:'userAttemptUid', width:0, hidden: true},
 	  			   	{name:'title', index:'title', width: 200},
-	  			   	{name:'response', index:'response', width:443, sortable:false},
+	  			   	{name:'response', index:'response', width:473, sortable:false},
 	  			   	<c:if test="${enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
@@ -186,11 +174,10 @@
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
         
-    		function userNameFormatter (cellvalue, options, rowObject) {
-	    		return definePortraitPopover(rowObject[4], rowObject[0],  rowObject[2]);
-    		}
+    	function userNameFormatter (cellvalue, options, rowObject) {
+	    	return definePortraitPopover(rowObject[4], rowObject[0],  rowObject[2]);
+    	}
 	});
-
 </script>
 
 <div class="panel">
@@ -216,23 +203,14 @@
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="message-area-busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="message-area"></div>
-
 </div>
 
-<%@ include file="parts/advanceQuestions.jsp"%>
-
 <c:if test="${not empty sessionDtos}">
-	<button onclick="return downloadMarks()" class="btn btn-default btn-xs btn-disable-on-submit pull-right">
-		<i class="fa fa-download" aria-hidden="true"></i> 
-		<fmt:message key="label.monitoring.downloadMarks.button" />
-	</button>
-
-	<h4>    
-		<fmt:message key="label.studentMarks"/>
-	</h4>
-
-	<div id="masterDetailArea">
-		<%@ include file="masterDetailLoadUp.jsp"%>
+	<div style="height: 30px;">
+		<button onclick="return downloadMarks()" class="btn btn-default btn-xs btn-disable-on-submit pull-right">
+			<i class="fa fa-download" aria-hidden="true"></i> 
+			<fmt:message key="label.monitoring.downloadMarks.button" />
+		</button>
 	</div>
 
 	<c:if test="${isGroupedActivity}">
@@ -257,8 +235,8 @@
 			<table id="group${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 			<div id="pager-${sessionDto.sessionId}" class="scroll"></div>
 			
-			<div style="margin-top: 10px; width:99%;">
-				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+			<div style="margin-top: 10px;">
+				<table id="userSummary${sessionDto.sessionId}" class="scroll jqgrid-no-borders" cellpadding="0" cellspacing="0"></table>
 			</div>
 			
 		<c:if test="${isGroupedActivity}">
@@ -275,9 +253,14 @@
 
 </c:if>
 
+<div id="masterDetailArea">
+	<%@ include file="masterDetailLoadUp.jsp"%>
+</div>
+
 <c:if test="${not empty reflectionsContainerDTO}"> 							
 	<jsp:include page="/monitoring/Reflections.jsp" />
 </c:if>
 
+<%@ include file="parts/advanceQuestions.jsp"%>
 <%@ include file="parts/advanceOptions.jsp"%>
 <%@ include file="parts/dateRestriction.jsp"%>

@@ -3,22 +3,15 @@
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet"/>
+<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"/>
-<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
-
-<style media="screen,projection" type="text/css">
-	 .ui-jqgrid {
-		border-left-style: none !important;
-		border-right-style: none !important;
-		border-bottom-style: none !important;
-	}
-	
-	.ui-jqgrid tr {
-		border-left-style: none !important;
-	}
-	
-	.ui-jqgrid td {
-		border-style: none !important;
+<style>
+	/* remove jqGrid border radius */
+	.ui-jqgrid.ui-jqgrid-bootstrap {
+	    border-radius:0;
+	    -moz-border-radius:0;
+	    -webkit-border-radius:0;
+	    -khtml-border-radius:0;
 	}
 </style>
 
@@ -36,15 +29,50 @@
 	};
 
 	$(document).ready(function(){
- 
+		
 		<c:forEach var="sessionEntry" items="${notebookDTO.sessions}">
 			<c:set var="sessionId" value ="${sessionEntry.key}"/>
 			<c:set var="sessionName" value ="${sessionEntry.value}"/>
 			
 			jQuery("#group${sessionId}").jqGrid({
-			
-				url: "<c:url value='/monitoring/getUsers.do?toolSessionID=${sessionId}'/>",
 				datatype: 'json',
+				url: "<c:url value='/monitoring/getUsers.do?toolSessionID=${sessionId}'/>",
+				autoencode:false,
+				pager : '#group${sessionId}pager',
+				pagerpos: "left",
+				rowNum: 10,
+				rowList:[10,20,30,40,50,100],
+				height: 'auto',
+				autowidth: true,
+				shrinkToFit: false,
+			   	multiselect: false,
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+			   	colNames:['#',
+						'userUid',
+ 						"<fmt:message key="label.user.name" />",
+ 					    "<fmt:message key="label.lastModified" />",
+					    "<fmt:message key="label.lastModified" />",
+					    "<fmt:message key="label.lastModified" />",
+	 				    'entry',
+					    "<fmt:message key="label.comment" />",  // comment summary for sorting
+					    'actualComment',
+	 					'userId',
+						'portraitId'
+				],
+			   	colModel:[
+			   		{name:'id',index:'id', width:10, hidden: true, search: false},
+			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
+ 			   		{name:'userName',index:'userName', width:200, formatter:userNameFormatter},
+ 			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
+			   		{name:'lastEditedTimeago',index:'lastEditedTimeago', hidden: true, width:0,  search: false},		
+			   		{name:'lastEditedTimeagoOutput',index:'lastEditedTimeagoOutput', width:120, search: false},		
+ 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
+			   		{name:'commentsort',index:'commentsort', width:40, search: false },
+			   		{name:'comment',index:'comment', hidden: true, width:0, search: false},
+ 			   		{name:'userId',index:'userId', width:0, hidden: true, search: false},
+			   		{name:'portraitId',index:'portraitId', width:0, hidden: true, search: false}
+			   	],
 				jsonReader : {
 				     root: "rows",
 				     page: "page",
@@ -52,17 +80,14 @@
 				     records: "total_rows",
 				     repeatitems: false,
 				     id: "id",
-				   },
-				   
+				},
 				loadError: function(xhr, status, error){ 
 					alert("Error has occured "+error);
 				},	
-				
  				subGrid: true,
 			    subGridOptions: {
 			        reloadOnExpand: false, // Prevent jqGrid from wiping out the subgrid data.
 			    },
-
  				gridComplete: function() {	
   					initializePortraitPopover('${lams}');
 					var dop = $("#group${sessionId}");
@@ -124,44 +149,7 @@
  					    okButton: "<fmt:message key='button.ok' />",
  					    cancelButton: "<fmt:message key='button.cancel' />"
  					});
- 				},
- 
-				pager : '#group${sessionId}pager',
-				pagerpos: "left",
-				rowNum: 10,
-				rowList:[10,20,30,40,50,100],
-				
-				height: 'auto',
-				autowidth: true,
-				shrinkToFit: false,
-				
-			   	colNames:['#',
-						'userUid',
- 						"<fmt:message key="label.user.name" />",
- 					    "<fmt:message key="label.lastModified" />",
-					    "<fmt:message key="label.lastModified" />",
-					    "<fmt:message key="label.lastModified" />",
-	 				    'entry',
-					    "<fmt:message key="label.comment" />",  // comment summary for sorting
-					    'actualComment',
-	 					'userId',
-						'portraitId'],
-					    
-			   	colModel:[
-			   		{name:'id',index:'id', width:10, hidden: true, search: false},
-			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
- 			   		{name:'userName',index:'userName', width:200, formatter:userNameFormatter},
- 			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
-			   		{name:'lastEditedTimeago',index:'lastEditedTimeago', hidden: true, width:0,  search: false},		
-			   		{name:'lastEditedTimeagoOutput',index:'lastEditedTimeagoOutput', width:120, search: false},		
- 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
-			   		{name:'commentsort',index:'commentsort', width:40, search: false },
-			   		{name:'comment',index:'comment', hidden: true, width:0, search: false},
- 			   		{name:'userId',index:'userId', width:0, hidden: true, search: false},
-			   		{name:'portraitId',index:'portraitId', width:0, hidden: true, search: false}
-			   	],
-			   	
-			   	multiselect: false,
+ 				}
 			}).jqGrid('filterToolbar',{searchOnEnter: false});
 		</c:forEach>
 		 
@@ -186,8 +174,8 @@
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
         function userNameFormatter (cellvalue, options, rowObject) {
-    			return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
-	    	}
+    		return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+	    }
 	});
 
 </script>
