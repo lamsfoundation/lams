@@ -12,6 +12,7 @@
 			jQuery("#group${sessionDto.sessionId}").jqGrid({
 				datatype: "json",
 				url: "<c:url value='/monitoring/getPagedUsers.do'/>?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}",
+				autoencode:false,
 				height: '100%',
 				autowidth: true,
 				shrinkToFit: false,
@@ -19,7 +20,8 @@
 				rowList:[10,20,30,40,50,100],
 				rowNum:10,
 				viewrecords:true,
-//			   	caption: "${sessionDto.sessionName}",
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 						'userUid'
 						,"<fmt:message key="label.monitoring.summary.user" />"
@@ -30,7 +32,7 @@
 							,'<fmt:message key="label.monitoring.summary.confirm.completion" />'
 						</c:if>
 						,'portraitId'
-						],
+				],
 			   	colModel:[
 			   		{name:'userUid',index:'userUid', width:0, hidden: true}
 			   		,{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter}
@@ -48,7 +50,7 @@
 			   	},
 			    loadComplete: function () {
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
-			    	}
+			    }
 			})
 			.jqGrid('filterToolbar', { 
  	 			searchOnEnter: false
@@ -87,7 +89,6 @@
 	}
 	
 	function setVerifiedByMonitor(link, userUid) {
-
 		$.ajax({
 			type: "POST",
 			url: '<c:url value="/monitoring/setVerifiedByMonitor.do"/>',
@@ -114,15 +115,12 @@
 			 <fmt:message key="message.monitoring.summary.no.session" />
 		</lams:Alert>
 	</c:if>
-	
 </div>
-
 
 <%-- Summary list  --%>
 <c:if test="${sessionMap.isGroupedActivity}">
 <div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
-
 
 <c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 			
@@ -139,8 +137,8 @@
 	       <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
 	</c:if>
 			
-		<table id="group${sessionDto.sessionId}"></table>
-		<div id="pager-${sessionDto.sessionId}"></div>
+	<table id="group${sessionDto.sessionId}"></table>
+	<div id="pager-${sessionDto.sessionId}"></div>
 
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-        
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>

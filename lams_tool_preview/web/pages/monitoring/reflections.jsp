@@ -9,23 +9,17 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.monitoring.heading" />
-	</title>
+	<title><fmt:message key="label.monitoring.heading" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
-	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
+	<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 	
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-
+	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-
 	<script type="text/javascript">
-	
 	$(document).ready(function(){
 
 			jQuery("#group${toolSessionId}").jqGrid({
@@ -34,6 +28,8 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 						'itemId',
 						'<fmt:message key="label.user.name" />',
@@ -88,10 +84,9 @@
 		}
 
 	});
-	
     </script>
-        
 </lams:head>
+
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="title.reflection"/></c:set>

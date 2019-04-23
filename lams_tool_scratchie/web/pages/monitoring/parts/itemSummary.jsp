@@ -9,35 +9,44 @@
 		<%@ include file="/common/header.jsp"%>
 		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css">
 		<style type="text/css">
+			/* remove jqGrid borders */
 			.ui-jqgrid {
 				border-left-style: none !important;
 				border-right-style: none !important;
 				border-bottom-style: none !important;
 			}
-			
 			.ui-jqgrid tr {
 				border-left-style: none !important;
 			}
-			
 			.ui-jqgrid td {
 				border-style: none !important;
+			}
+			
+			/* remove jqGrid border radius */
+			.ui-jqgrid.ui-jqgrid-bootstrap {
+			    border-radius:0;
+			    -moz-border-radius:0;
+			    -webkit-border-radius:0;
+			    -khtml-border-radius:0;
 			}
 		</style>
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
   	    <script>
 	  	  	$(document).ready(function(){
 	  			<c:forEach var="summary" items="${summaryList}" varStatus="status">
 		  			
 	  				jQuery("#session${summary.sessionId}").jqGrid({
 	  					datatype: "local",
+	  					autoencode:false,
 	  					rowNum: 10000,
 	  					height: 'auto',
 	  					width: '100%',
+	  					guiStyle: "bootstrap",
+	  					iconSet: 'fontAwesome',
 	  				   	colNames:["<fmt:message key="label.monitoring.summary.answer" />"
 		  			  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
 		  			  	   	 			,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i.index + 1}"

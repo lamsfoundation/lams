@@ -5,7 +5,7 @@
 
 <lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet"/>
-<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="<lams:WebAppURL/>css/monitor.css" rel="stylesheet" />
 
 <script type="text/javascript">
@@ -19,8 +19,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
 <script type="text/javascript">
@@ -35,10 +34,13 @@
 		
 			jQuery("#group${groupSummary.sessionId}").jqGrid({
 				datatype: "local",
+				autoencode:false,
 				rowNum: 10000,
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:['#',
 						'itemUid',
 						"<fmt:message key="monitoring.label.title" />",
@@ -69,7 +71,6 @@
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
 			   	<c:if test="${sessionsExist}">
-			   	// caption: "${groupSummary.sessionName}",
 				subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 					var subgridTableId = subgrid_id+"_t";
@@ -87,6 +88,8 @@
 						rowList:[10,20,30,40,50,100],
 						rowNum:10,
 						viewrecords:true,
+						guiStyle: "bootstrap",
+						iconSet: 'fontAwesome',
 						colNames: [
 						   '',
 						   "<fmt:message key="monitoring.label.user.name"/>",
@@ -258,9 +261,7 @@
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="message-area-busy"/>
 	<div id="message-area"></div>
-
 </div>
-
 
 <c:if test="${sessionMap.isGroupedActivity}">
 <div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
@@ -294,8 +295,6 @@
 	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 	
 </c:forEach>
-
- 
 
 <c:if test="${sessionMap.isGroupedActivity}">
 </div> <!--  end accordianSessions --> 
