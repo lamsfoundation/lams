@@ -70,10 +70,6 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
     @JoinColumn(name = "que_usr_id")
     private McQueUsr mcQueUsr;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qb_option_uid")
-    private QbOption qbOption;
-
     @Column(name = "confidence_level")
     private int confidenceLevel;
 
