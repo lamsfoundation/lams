@@ -26,8 +26,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.qbToolQuestion.uid = :qbToolQuestionUid GROUP BY a.qbOption.uid";
     private static final String FIND_ANSWER_STATS_BY_ACTIVITY = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a, "
 	    + " ToolActivity AS act WHERE a.qbToolQuestion.toolContentId = act.toolContentId AND act.activityId = :activityId GROUP BY a.qbOption.uid";
-    private static final String FIND_BURNING_QUESTIONS = "SELECT bl.burningQuestion.question, COUNT(bl.uid) FROM BurningQuestionLike AS bl "
-	    + "WHERE bl.burningQuestion.scratchieItem.qbQuestion.uid = :qbQuestionUid GROUP BY bl.burningQuestion.question ORDER BY COUNT(bl.uid) DESC";
+    private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
+	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
+	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
