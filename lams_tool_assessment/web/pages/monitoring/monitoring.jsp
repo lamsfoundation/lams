@@ -13,7 +13,6 @@
 		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css" >
  		<lams:css suffix="chart"/>
  		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
- 		<link href="${lams}includes/css/monitoring.css" rel="stylesheet" type="text/css">	
  		<style>
  		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
 			background-color: #f5f5f5;
