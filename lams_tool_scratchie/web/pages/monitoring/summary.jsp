@@ -19,9 +19,6 @@
 	}
 	
 	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
 	    padding-top:2px;
 	}
 	.ui-jqgrid tr.jqgrow td {

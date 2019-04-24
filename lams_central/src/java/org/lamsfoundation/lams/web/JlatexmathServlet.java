@@ -100,8 +100,6 @@ public class JlatexmathServlet extends HttpServlet {
         DefaultTeXFont.registerAlphabet(new GreekRegistration());
 
         g2.setSVGCanvasSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
-        g2.setColor(Color.white);
-        g2.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
 
         JLabel jl = new JLabel();
         jl.setForeground(new Color(0, 0, 0));
