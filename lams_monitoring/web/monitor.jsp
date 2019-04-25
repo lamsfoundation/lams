@@ -24,28 +24,7 @@
   
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >
-		$(document).bind("mobileinit", function(){
-		  $.mobile.loadingMessage = false;
-		  $.mobile.ignoreContentEnabled = true;
-		  $('body').attr('data-enhance', 'false');
-		});
-	</script>
-	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
-	
-	<script type="text/javascript">
+		<!-- Some of the following settings will be used in progressBar.js -->
 		var lessonId = ${lesson.lessonID},
 			userId = '<lams:user property="userID"/>',
 			ldId = ${lesson.learningDesignID},
@@ -63,10 +42,8 @@
 			presenceEnabled =  false,
 			hasDialog = false,
 			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
-			tourInProgress = false;
-			
+			tourInProgress = false,
 			LAMS_URL = '<lams:LAMSURL/>',
-			
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
@@ -74,7 +51,7 @@
 				<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
 				FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
 				<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
-                FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
+		        FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
 				<fmt:message key="force.complete.end.lesson.confirm" var="FORCE_COMPLETE_END_LESSON_CONFIRM_VAR"/>
 				FORCE_COMPLETE_END_LESSON_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
@@ -89,8 +66,8 @@
 				LEARNER_GROUP_SHOW : '<c:out value="${LEARNER_GROUP_SHOW_VAR}" />',
 				<fmt:message key="learner.group.remove.progress" var="LEARNER_GROUP_REMOVE_PROGRESS_VAR"/>
 				LEARNER_GROUP_REMOVE_PROGRESS : decoderDiv.html('<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />').text(),
-                <fmt:message key="button.email" var="EMAIL_BUTTON_VAR"/>
-                EMAIL_BUTTON : '<c:out value="${EMAIL_BUTTON_VAR}" />',
+		        <fmt:message key="button.email" var="EMAIL_BUTTON_VAR"/>
+		        EMAIL_BUTTON : '<c:out value="${EMAIL_BUTTON_VAR}" />',
 				<fmt:message key="email.notifications" var="NOTIFCATIONS_VAR"/>
 				NOTIFCATIONS : '<c:out value="${NOTIFCATIONS_VAR}" />',
 				<fmt:message key="button.save" var="SAVE_BUTTON_VAR"/>
@@ -223,7 +200,28 @@
 				LIVE_EDIT_TOOLTIP: '<c:out value="${LIVE_EDIT_TOOLTIP_VAR}" />',
 				<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
 				LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
-		}
+			};
+	</script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
+	<script type="text/javascript">
+		$(document).bind("mobileinit", function(){
+			$.mobile.loadingMessage = false;
+			$.mobile.ignoreContentEnabled = true;
+			 $('body').attr('data-enhance', 'false');
+		});
 				
 		$(document).ready(function(){
 			initLessonTab();
@@ -243,44 +241,44 @@
 		});
 			
         function doSelectTab(tabId) {
-	        	if ( tourInProgress )  {
-	        		alert(LABELS.TOUR_DISABLED_ELEMENT);
-	        		return;
-	        	}
-	        	actualDoSelectTab(tabId);
+	        if ( tourInProgress )  {
+	        	alert(LABELS.TOUR_DISABLED_ELEMENT);
+	        	return;
+	        }
+	        actualDoSelectTab(tabId);
         }
 
         function actualDoSelectTab(tabId) {
-	    		selectTab(tabId);
+	    	selectTab(tabId);
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
-	    		if ( tabId == '2' ) {
+	    	if ( tabId == '2' ) {
 				if (sequenceTabShowInfo) {
 					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
                 }
+                
 			} else {
 				sequenceInfoDialog.modal("hide");
             }
-	    		if ( tabId == '4' ) {
-	    			updateGradebookTab();
-	    		}
+            
+	    	if ( tabId == '4' ) {
+	    		updateGradebookTab();
+	    	}
         }
 
         function switchToTblMonitor() {
-        	$("#content").load(LAMS_URL + 'monitoring/tblmonitor/start.do', 
-        	{
-        		lessonID: ${lesson.lessonID}
-        	});
+        	$("#content").load(
+                LAMS_URL + 'monitoring/tblmonitor/start.do', 
+        		{
+        			lessonID: ${lesson.lessonID}
+        		}
+        	);
         }
         
     	<%@ include file="monitorTour.jsp" %> 
-
 	</script>
-	
-	
-	<!-- Some settings need to be done in the script first and only then this file can be included -->
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
+
 <body>
 	
 	<%-- "loading..." screen, gets removed on page full load --%>
@@ -565,6 +563,7 @@
 						</c:forEach>
 					</table>
 				</lams:TabBody>
+				
 				<lams:TabBody id="2" titleKey="label.advanced">
 					<span class="pull-left" style="display:none" id="liveEditWarning"></span>
 					
@@ -600,6 +599,7 @@
 					<img id="sequenceSearchedLearnerHighlighter"
 					     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
 				</lams:TabBody>
+				
 				<lams:TabBody id="3" titleKey="label.conditions">
 					<table id="tabLearnerControlTable">
 						<tr>
@@ -655,6 +655,7 @@
 						</div>
 					</div>
 				</lams:TabBody>
+				
 				<lams:TabBody id="4" titleKey="label.gradebook">
 					<div id="gradebookTopButtonsContainer" class="topButtonsContainer pull-right">
 						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
