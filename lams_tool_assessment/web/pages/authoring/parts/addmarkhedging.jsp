@@ -4,14 +4,9 @@
 
 <lams:html>
 <lams:head>
-	<%@ include file="/common/authoringQuestionHeader.jsp"%>
 	<link href="<lams:WebAppURL/>includes/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
+	<%@ include file="/common/authoringQuestionHeader.jsp"%>
 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/bootstrap-toggle.js"></script>
-	<style>
-	.toggle.btn-xs {
-		min-width: 59px;
-	}
-	</style>
 	
     <script>
 		$(document).ready(function(){
@@ -40,9 +35,6 @@
 		    			required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    		}
 		    	},
-		    	   invalidHandler: formInvalidHandler,
-		    	debug: true,
-		    	errorClass: "alert alert-danger",
      			submitHandler: function(form) {
      			   	prepareOptionEditorsForAjaxSubmit();
 		    		$("#optionList").val($("#optionForm").serialize(true));
@@ -58,7 +50,13 @@
 		    	    }; 				
 		    		    				
 		    		$('#assessmentQuestionForm').ajaxSubmit(options);
-		    	}
+		    	},
+	    		invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
 		  	});
 
 		    //enforce only one correct option
@@ -78,7 +76,8 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
@@ -101,7 +100,7 @@
 					
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255" 
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
@@ -111,7 +110,9 @@
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 					</div>
 					
-					<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					<div>
+						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					</div>
 				</div>
 				
 				<div class="settings-tab">
