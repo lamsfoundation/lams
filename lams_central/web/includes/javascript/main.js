@@ -275,6 +275,7 @@ function showMonitorLessonDialog(lessonID) {
 	var id = "dialogMonitorLesson" + lessonID,
 		dialog = showDialog(id, {
 			'data' : {
+				'isMonitorDialog' : true,
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,

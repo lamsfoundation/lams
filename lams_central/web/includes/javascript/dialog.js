@@ -286,6 +286,19 @@ function restoreMinimisedDialog(dialog) {
     }
     //disable scrolling of the parent's content
     dialog.parent().addClass("modal-open");
+
+	// in case of monitor dialog reload its content. It's required as all monitor dialogs use the same ids for their HTML elements
+	var isMonitorDialog = dialog.data('isMonitorDialog');
+	if (isMonitorDialog) {
+		//hide iframe until it gets loaded
+		$('iframe', dialog).hide();
+		$('iframe', dialog).load(function() {
+			$('iframe', dialog).show();
+		});
+		
+		//reload iframe
+	    $('iframe', dialog)["0"].contentWindow.location.reload();
+	}   
 }
 
 /**

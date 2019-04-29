@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.logevent.dao.hibernate;
 
 import java.util.Date;
@@ -53,7 +52,8 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
     private static final String GET_LOG_EVENTS_OCCURED_BETWEEN_DATES = "from " + LogEvent.class.getName()
 	    + " where occurred_date_time > ? and occurred_date_time <= ? order by occurred_date_time asc";
 
-    private static final String GET_OLDEST_LOG_EVENT_DATE = "select min(occurredDateTime) from " + LogEvent.class.getName();
+    private static final String GET_OLDEST_LOG_EVENT_DATE = "select min(occurredDateTime) from "
+	    + LogEvent.class.getName();
 
     private static final String GET_LOG_EVENT_TYPES = "from " + LogEventType.class.getName();
 
@@ -86,20 +86,23 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
     }
 
     /** Get the generic event types */
+    @Override
     @SuppressWarnings("unchecked")
     public List<LogEventType> getEventTypes() {
 	return (List<LogEventType>) doFind(GET_LOG_EVENT_TYPES);
     }
-    
+
     /** Get the date of the oldest log event (and not the time) */
+    @Override
     @SuppressWarnings("rawtypes")
     public Date getOldestEventDate() {
 	List list = doFind(GET_OLDEST_LOG_EVENT_DATE);
-	if ( list.size() > 0 )
+	if (list.size() > 0) {
 	    return (Date) list.get(0);
+	}
 	return null;
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     /**
@@ -125,22 +128,22 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	    case ILogEventService.SORT_BY_TARGET_ASC:
 		sortingOrder = "target.login ASC";
 		break;
-	    case ILogEventService. SORT_BY_TARGET_DESC:
+	    case ILogEventService.SORT_BY_TARGET_DESC:
 		sortingOrder = "target.login DESC";
 		break;
 	    default:
 		sortingOrder = "occurred_date_time ASC";
 	}
 
-	if ( searchUser != null && searchUser.isBlank()) {
+	if (searchUser != null && searchUser.isBlank()) {
 	    searchUser = null;
-    	}
-	if ( searchTarget != null && searchTarget.isBlank()) {
+	}
+	if (searchTarget != null && searchTarget.isBlank()) {
 	    searchTarget = null;
-    	}
-	if ( searchRemarks != null && searchRemarks.isBlank()) {
+	}
+	if (searchRemarks != null && searchRemarks.isBlank()) {
 	    searchRemarks = null;
-    	}
+	}
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
@@ -149,22 +152,24 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 		.append(" FROM lams_log_event le ")
 		.append(" LEFT JOIN lams_lesson lesson ON le.lesson_id = lesson.lesson_id")
 		.append(" LEFT JOIN lams_learning_activity activity ON le.activity_id = activity.activity_id");
-	
-	if ( searchUser != null || sorting == ILogEventService.SORT_BY_USER_ASC || sorting == ILogEventService.SORT_BY_USER_DESC ) {
+
+	if (searchUser != null || sorting == ILogEventService.SORT_BY_USER_ASC
+		|| sorting == ILogEventService.SORT_BY_USER_DESC) {
 	    queryText.append(" LEFT JOIN lams_user user ON user.user_id = le.user_id");
 	}
-	if ( searchTarget != null || sorting == ILogEventService.SORT_BY_TARGET_ASC || sorting == ILogEventService.SORT_BY_TARGET_DESC  ) {
+	if (searchTarget != null || sorting == ILogEventService.SORT_BY_TARGET_ASC
+		|| sorting == ILogEventService.SORT_BY_TARGET_DESC) {
 	    queryText.append(" LEFT JOIN lams_user target ON target.user_id = le.target_user_id");
 	}
 
 	boolean hasAWhereClause = addWhereClause(startDate, endDate, area, typeId, queryText);
-	if ( searchUser != null ) {
+	if (searchUser != null) {
 	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchUser.strip(), "user");
 	}
-	if ( searchTarget != null ) {
+	if (searchTarget != null) {
 	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchTarget.strip(), "target");
 	}
-	if ( searchRemarks != null ) {
+	if (searchRemarks != null) {
 	    hasAWhereClause = buildRemarksSearch(hasAWhereClause, queryText, searchRemarks.strip());
 	}
 
@@ -191,12 +196,14 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 		needAnd = true;
 	    }
 	    if (typeId != null) {
-		if (needAnd)
+		if (needAnd) {
 		    queryText.append(" AND ");
+		}
 		queryText.append(" log_event_type_id = :typeId ");
 	    } else if (area != null) {
-		if (needAnd)
+		if (needAnd) {
 		    queryText.append(" AND ");
+		}
 		queryText.append(
 			" log_event_type_id in (SELECT log_event_type_id FROM lams_log_event_type WHERE area = :area) ");
 	    }
@@ -235,7 +242,7 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	}
 	return true;
     }
-    
+
     /* Returns true if a WHERE clause has been added */
     private boolean buildRemarksSearch(boolean hasAWhereClause, StringBuilder queryText, String searchString) {
 	if (!hasAWhereClause) {
@@ -252,40 +259,41 @@ public class LogEventDAO extends LAMSBaseDAO implements ILogEventDAO {
 	return true;
     }
 
-
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate, Date endDate, String area, Integer typeId) {
+    public int countEventsWithRestrictions(String searchUser, String searchTarget, String searchRemarks, Date startDate,
+	    Date endDate, String area, Integer typeId) {
 
-	if ( searchUser != null && searchUser.isBlank()) {
+	if (searchUser != null && searchUser.isBlank()) {
 	    searchUser = null;
-    	}
-	if ( searchTarget != null && searchTarget.isBlank()) {
+	}
+	if (searchTarget != null && searchTarget.isBlank()) {
 	    searchTarget = null;
-    	}
-	if ( searchRemarks != null && searchRemarks.isBlank()) {
+	}
+	if (searchRemarks != null && searchRemarks.isBlank()) {
 	    searchRemarks = null;
-    	}
+	}
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
-	queryText.append("SELECT count(*) FROM lams_log_event le ");
-	if ( searchUser != null  ) {
+	// explicitly name the index to use as otherwise MySQL uses FK_event_log_event_type_idx and the query is slow
+	queryText.append("SELECT count(*) FROM lams_log_event le USE INDEX (event_log_occurred_date_time) ");
+	if (searchUser != null) {
 	    queryText.append(" LEFT JOIN lams_user user ON user.user_id = le.user_id");
 	}
-	if ( searchTarget != null  ) {
+	if (searchTarget != null) {
 	    queryText.append(" LEFT JOIN lams_user target ON target.user_id = le.target_user_id");
 	}
 
 	boolean hasAWhereClause = addWhereClause(startDate, endDate, area, typeId, queryText);
-	if ( searchUser != null ) {
-		hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchUser.strip(), "user");
+	if (searchUser != null) {
+	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchUser.strip(), "user");
 	}
-	if ( searchTarget != null ) {
-		hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchTarget.strip(), "target");
+	if (searchTarget != null) {
+	    hasAWhereClause = buildNameSearch(hasAWhereClause, queryText, searchTarget.strip(), "target");
 	}
-	if ( searchRemarks != null ) {
+	if (searchRemarks != null) {
 	    hasAWhereClause = buildRemarksSearch(hasAWhereClause, queryText, searchRemarks.strip());
 	}
 
