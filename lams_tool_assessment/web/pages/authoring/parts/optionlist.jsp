@@ -64,7 +64,9 @@
 		});
 
 		//init all toogles (required in case of adding/removing options)
-		$("input[type='checkbox'][name='optionCorrect']").bootstrapToggle();
+		if (${questionType == 8}) {
+			$("input[type='checkbox'][name='optionCorrect']").bootstrapToggle();
+		}
 	});
 
 	//store which table is expanded

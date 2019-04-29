@@ -39,9 +39,6 @@
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			}
 	    		},
-	    	    invalidHandler: formInvalidHandler,
-	    		debug: true,
-	    		errorClass: "alert alert-danger",
    			    submitHandler: function(form) {
 	    			$("#question").val(CKEDITOR.instances.question.getData());
 	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
@@ -52,7 +49,13 @@
 	    		    }; 				
 
 	    			$('#assessmentQuestionForm').ajaxSubmit(options);
-	    		}
+	    		},
+	    		invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
 		  	});
 		    	
 		   	//spinner
@@ -106,7 +109,8 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm" 
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
@@ -127,7 +131,7 @@
 					
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255" 
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				

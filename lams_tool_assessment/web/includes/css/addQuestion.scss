@@ -4,11 +4,6 @@ div.error {
 	display:none;
 }
 
-em { 
-	font-weight: bold; 
-	padding-right: 1em; 
-	vertical-align: top; 
-}
 #content {
 	width: 91%; 
 	margin-bottom: 10px;
@@ -92,7 +87,6 @@ label {
 }
 
 #title {
-	width: 100%;
 	height: 34px;
 	font-weight: bold;
 }
@@ -100,25 +94,27 @@ label {
     padding-right: 80px;
 }
 
-/*Style for text input fields*/
-.borderless-text-input {
+/*Style for text input fields. Rule does not apply in case this input has an error*/
+:not(.has-error) > input.borderless-text-input{
     border: 0;
+    box-shadow: none;
+    padding: 0;
 }
 
 /* Remove bold style from title field */
-.borderless-text-input::-webkit-input-placeholder {
+input.borderless-text-input::-webkit-input-placeholder {
     font-weight: normal;
     color:#999;
 }
-.borderless-text-input::-moz-placeholder {
+input.borderless-text-input::-moz-placeholder {
     font-weight: normal;
     color:#999;
 }
-.borderless-text-input:-ms-input-placeholder {
+input.borderless-text-input:-ms-input-placeholder {
     font-weight: normal;
     color:#999;
 }
-.borderless-text-input:-o-input-placeholder {
+input.borderless-text-input:-o-input-placeholder {
     font-weight: normal;
     color:#999;
 }
@@ -382,4 +378,17 @@ input:checked ~ .switch-slider:before {
 
 .switch-slider.round:before {
   border-radius: 50%;
+}
+
+/*----------Modifications to bootstrap-toggle----------------*/
+.toggle.btn-xs {
+	min-width: 59px;
+}
+
+/*----------Validation rules----------------*/
+#title-container .form-control-feedback {
+    right: 80px;
+}
+.col-sm-9.has-feedback .form-control-feedback {
+    left: 80px;
 }
