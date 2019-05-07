@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 
 /**
  * Import filter class for different version of Assessment content.
@@ -74,7 +74,15 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	this.removeField(AssessmentQuestion.class, "penalty");
 	this.removeField(AssessmentQuestion.class, "answerTotalGrade");
 	
-	this.removeField(AssessmentQuestionOption.class, "answerInt");
-	this.removeField(AssessmentQuestionOption.class, "answerBoolean");
+//	this.removeField(AssessmentQuestionOption.class, "answerInt");
+//	this.removeField(AssessmentQuestionOption.class, "answerBoolean");
+    }
+    
+    /**
+     * Import 20140428 version content to 20140707 version tool server.
+     */
+    public void up20170315To20190110() {
+	this.renameField(QuestionReference.class, "defaultGrade", "maxMark");
+	this.renameField(QuestionReference.class, "sequenceId", "displayOrder");
     }
 }

@@ -38,7 +38,7 @@
 							<c:forEach var="option" items="${question.optionDtos}">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
-										${option.optionString}
+										${option.name}
 									</c:if>
 								</c:forEach>					
 							</c:forEach>						
@@ -48,7 +48,7 @@
 								<c:forEach var="option" items="${question.optionDtos}">
 									<tr>
 										<td style="width:40%; background: none; padding: 0px; margin: 0px; border: none;">
-											${option.question}
+											${option.matchingPair}
 										</td>
 										<td style="background: none; padding: 0px; margin: 0px; border: none; vertical-align: middle;">
 											- 
@@ -56,7 +56,7 @@
 												<c:if test="${option.uid == optionAnswer.optionUid}">
 													<c:forEach var="questionOption2" items="${question.optionDtos}">
 														<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
-															${questionOption2.optionString}
+															${questionOption2.name}
 														</c:if>
 													</c:forEach>
 												</c:if>
@@ -86,7 +86,7 @@
 									<c:if test="${optionAnswer.answerInt == i}">		
 										<c:forEach var="option" items="${question.optionDtos}">
 											<c:if test="${optionAnswer.optionUid == option.uid}">
-												${option.optionString}
+												${option.name}
 											</c:if>
 										</c:forEach>
 									</c:if>								

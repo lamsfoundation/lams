@@ -38,11 +38,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolAnswer;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 
 /**
  * Assessment Question Result
@@ -51,12 +55,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 @Entity
 @Table(name = "tl_laasse10_question_result")
-public class AssessmentQuestionResult {
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
+//in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
+@PrimaryKeyJoinColumn(name = "uid")
+public class AssessmentQuestionResult extends QbToolAnswer implements Comparable<AssessmentQuestionResult> {
     
     @Column(name = "answer_string")
     private String answerString;
@@ -67,8 +68,8 @@ public class AssessmentQuestionResult {
     @Column(name = "answer_boolean")
     private boolean answerBoolean;
     
-    @Column(name = "submitted_option_uid")
-    private Long submittedOptionUid;
+//    @Column(name = "submitted_option_uid")
+//    private Long submittedOptionUid;
     
     @Column
     private float mark;
@@ -85,9 +86,9 @@ public class AssessmentQuestionResult {
     @Column(name = "confidence_level")
     private int confidenceLevel;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assessment_question_uid")
-    private AssessmentQuestion assessmentQuestion;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "assessment_question_uid")
+//    private AssessmentQuestion assessmentQuestion;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
@@ -103,6 +104,8 @@ public class AssessmentQuestionResult {
     private AssessmentUser user;
     @Transient
     private String answerStringEscaped;
+    @Transient
+    private QuestionDTO questionDto;
 
     @Override
     public int hashCode() {
@@ -122,20 +125,18 @@ public class AssessmentQuestionResult {
 	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).isEquals();
     }
 
-    public Long getUid() {
-	return uid;
+    public QbQuestion getQbQuestion() {
+	return qbToolQuestion.getQbQuestion();
     }
-
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
+    
+    //TODO remove
     public AssessmentQuestion getAssessmentQuestion() {
-	return assessmentQuestion;
+	return null;
     }
 
+    //TODO remove
     public void setAssessmentQuestion(AssessmentQuestion question) {
-	this.assessmentQuestion = question;
+//	this.assessmentQuestion = question;
     }
 
     public AssessmentResult getAssessmentResult() {
@@ -178,13 +179,15 @@ public class AssessmentQuestionResult {
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
     }
-
+    
+    //TODO REMOVE
     public Long getSubmittedOptionUid() {
-	return submittedOptionUid;
+	return qbOption.getUid();
     }
 
+    //TODO REMOVE
     public void setSubmittedOptionUid(Long submittedOptionUid) {
-	this.submittedOptionUid = submittedOptionUid;
+	this.qbOption.setUid(submittedOptionUid);
     }
 
     public Float getMark() {
@@ -261,6 +264,23 @@ public class AssessmentQuestionResult {
 
     public void setAnswerStringEscaped(String answerStringEscaped) {
 	this.answerStringEscaped = answerStringEscaped;
+    } 
+    
+    public QuestionDTO getQuestionDto() {
+	return questionDto;
+    }
+
+    public void setQuestionDto(QuestionDTO questionDto) {
+	this.questionDto = questionDto;
+    }
+
+    @Override
+    public int compareTo(AssessmentQuestionResult o) {
+	if (o != null) {
+	    return qbToolQuestion.getDisplayOrder() - o.qbToolQuestion.getDisplayOrder();
+	} else {
+	    return 1;
+	}
     }
 
 }

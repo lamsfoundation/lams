@@ -59,7 +59,7 @@ public class QuestionReference implements Cloneable, Sequencable {
     private int sequenceId;
 
     @Column(name = "default_grade")
-    private int defaultGrade;
+    private int maxMark;
 
     @Column(name = "random_question")
     private boolean randomQuestion;
@@ -146,12 +146,12 @@ public class QuestionReference implements Cloneable, Sequencable {
 	this.sequenceId = sequenceId;
     }
 
-    public int getDefaultGrade() {
-	return defaultGrade;
+    public int getMaxMark() {
+	return maxMark;
     }
 
-    public void setDefaultGrade(int defaultGrade) {
-	this.defaultGrade = defaultGrade;
+    public void setMaxMark(int maxMark) {
+	this.maxMark = maxMark;
     }
 
     public boolean isRandomQuestion() {

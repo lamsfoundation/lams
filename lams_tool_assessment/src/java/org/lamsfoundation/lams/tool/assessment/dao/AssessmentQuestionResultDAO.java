@@ -43,9 +43,9 @@ public interface AssessmentQuestionResultDAO extends DAO {
      *
      * @param assessmentUid
      * @param userId
-     * @param questionSequenceId
+     * @param questionDisplayOrder
      * @return
      */
-    Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId);
+    Float getQuestionResultMark(Long assessmentUid, Long userId, int questionDisplayOrder);
 
 }

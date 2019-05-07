@@ -9,11 +9,11 @@
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
 				<td>
-					<c:out value="${option.question}" escapeXml="false" />
+					<c:out value="${option.matchingPair}" escapeXml="false" />
 				</td>
 				
 				<td style="width: 100px;">
-					<select name="question${status.index}_${option.sequenceId}" <c:if test="${!hasEditRight}">disabled="disabled"</c:if>>
+					<select name="question${status.index}_${option.displayOrder}" <c:if test="${!hasEditRight}">disabled="disabled"</c:if>>
 						<option value="-1">
 							<fmt:message key="label.learning.matching.pairs.choose" />
 						</option>
@@ -21,7 +21,7 @@
 						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
 							<option value="${selectOption.uid}"
 								<c:if test="${option.answerInt == selectOption.uid}">selected="selected"</c:if>>
-								${selectOption.optionString}
+								${selectOption.name}
 							</option>
 						</c:forEach>
 					</select>

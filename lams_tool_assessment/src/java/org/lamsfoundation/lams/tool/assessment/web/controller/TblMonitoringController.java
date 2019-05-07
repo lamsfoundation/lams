@@ -11,23 +11,25 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionResultDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
-import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,7 @@ public class TblMonitoringController {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
 	//prepare list of the questions, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> questionList = new TreeSet<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
@@ -81,32 +83,32 @@ public class TblMonitoringController {
 	    }
 	}
 	//keep only MCQ type of questions
-	Set<AssessmentQuestion> mcqQuestions = new TreeSet<AssessmentQuestion>();
+	Set<QuestionDTO> questionDtos = new TreeSet<>();
 	int maxOptionsInQuestion = 0;
 	for (AssessmentQuestion question : questionList) {
-	    if (AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE == question.getType()) {
-		mcqQuestions.add(question);
+	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()) {
+		questionDtos.add(new QuestionDTO(question));
 
 		//calculate maxOptionsInQuestion
-		if (question.getOptions().size() > maxOptionsInQuestion) {
-		    maxOptionsInQuestion = question.getOptions().size();
+		if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
+		    maxOptionsInQuestion = question.getQbQuestion().getQbOptions().size();
 		}
 	    }
 	}
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
 	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
-	for (AssessmentQuestion question : mcqQuestions) {
+	for (QuestionDTO questionDto : questionDtos) {
 
 	    // build candidate dtos
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		int optionAttemptCount = assessmentService.countAttemptsPerOption(option.getUid());
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		int optionAttemptCount = assessmentService.countAttemptsPerOption(optionDto.getUid());
 
 		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
-		option.setPercentage(percentage);
+		optionDto.setPercentage(percentage);
 	    }
 	}
-	request.setAttribute("questions", mcqQuestions);
+	request.setAttribute("questions", questionDtos);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	return "pages/tblmonitoring/iraAssessmentStudentChoices";
@@ -141,7 +143,7 @@ public class TblMonitoringController {
 
     private Set<AssessmentQuestion> prepareQuestionsList(Assessment assessment) {
 	// question list to display
-	Set<AssessmentQuestion> questions = new TreeSet<AssessmentQuestion>();
+	Set<AssessmentQuestion> questions = new TreeSet<>();
 	boolean hasRandomQuestion = false;
 	for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
 	    hasRandomQuestion |= reference.isRandomQuestion();
@@ -155,7 +157,7 @@ public class TblMonitoringController {
 	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
 		//sort questions the same way references are sorted (as per LKC request)
 		AssessmentQuestion question = reference.getQuestion();
-		question.setSequenceId(reference.getSequenceId());
+		question.setDisplayOrder(reference.getSequenceId());
 		questions.add(question);
 	    }
 	}
@@ -190,12 +192,11 @@ public class TblMonitoringController {
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment);
 	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<TblAssessmentQuestionDTO>();
 	for (QuestionSummary questionSummary : questionSummaries.values()) {
-	    AssessmentQuestion question = questionSummary.getQuestion();
+	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
-	    tblQuestionDto.setQuestion(question);
-	    tblQuestionDto.setQuestionTypeLabel(TblMonitoringController.getAssessmentQuestionTypeLabel(question.getType()));
-	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(question));
+	    tblQuestionDto.setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLabel(questionDto.getType()));
+	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<TblAssessmentQuestionResultDTO>();
 	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
@@ -221,7 +222,7 @@ public class TblMonitoringController {
 	    tblQuestionDtos.add(tblQuestionDto);
 	}
 
-	SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
+	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 	sessions.addAll(assessmentService.getSessionsByContentId(assessment.getContentId()));
 
 	request.setAttribute("sessions", sessions);
@@ -233,81 +234,51 @@ public class TblMonitoringController {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private static String getAssessmentQuestionTypeLabel(short type) {
-	switch (type) {
-	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		return "Essay";
-	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		return "Matching Pairs";
-	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		return "Multiple Choice";
-	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		return "Numerical";
-	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		return "Ordering";
-	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		return "Short Answer";
-	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		return "True/False";
-	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		return "Mark Hedging";
-	    default:
-		return null;
-	}
-    }
-
-    /**
-     * Used only for excell export (for getUserSummaryData() method).
-     */
-    private String getAssessmentCorrectAnswer(AssessmentQuestion question) {
+    private String getAssessmentCorrectAnswer(QuestionDTO questionDto) {
 	StringBuilder sb = new StringBuilder();
 
-	if (question != null) {
-	    switch (question.getType()) {
-		case AssessmentConstants.QUESTION_TYPE_ESSAY:
+	if (questionDto != null) {
+	    switch (questionDto.getType()) {
+		case QbQuestion.TYPE_ESSAY:
 		    return "N.A.";
 
-		case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-		    for (AssessmentQuestionOption option : question.getOptions()) {
-			sb.append((option.getQuestion() + " - " + option.getOptionString()).replaceAll("\\<.*?\\>", "")
+		case QbQuestion.TYPE_MATCHING_PAIRS:
+		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			sb.append((optionDto.getMatchingPair() + " - " + optionDto.getName()).replaceAll("\\<.*?\\>", "")
 				+ " <br>");
 		    }
 		    return sb.toString();
 
-		case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		    for (AssessmentQuestionOption option : question.getOptions()) {
-			if (option.getGrade() == 1f) {
-			    return option.getOptionString();
+		case QbQuestion.TYPE_MULTIPLE_CHOICE:
+		case QbQuestion.TYPE_SHORT_ANSWER:
+		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			if (optionDto.getMaxMark() == 1f) {
+			    return optionDto.getName();
 			}
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		    for (AssessmentQuestionOption option : question.getOptions()) {
-			if (option.getGrade() == 1f) {
-			    return "" + option.getOptionFloat();
+		case QbQuestion.TYPE_NUMERICAL:
+		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			if (optionDto.getMaxMark() == 1f) {
+			    return "" + optionDto.getNumericalOption();
 			}
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_ORDERING:
-		    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
-			    new SequencableComparator());
-		    correctOptionSet.addAll(question.getOptions());
-
-		    for (AssessmentQuestionOption option : question.getOptions()) {
-			sb.append(option.getOptionString() + "\n");
+		case QbQuestion.TYPE_ORDERING:
+		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			sb.append(optionDto.getName() + "\n");
 		    }
 		    return sb.toString();
 
-		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-		    return String.valueOf(question.getCorrectAnswer());
+		case QbQuestion.TYPE_TRUE_FALSE:
+		    return String.valueOf(questionDto.getCorrectAnswer());
 
-		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		    for (AssessmentQuestionOption option : question.getOptions()) {
-			if (option.isCorrect()) {
-			    return option.getOptionString();
+		case QbQuestion.TYPE_MARK_HEDGING:
+		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			if (optionDto.isCorrect()) {
+			    return optionDto.getName();
 			}
 		    }
 		    break;

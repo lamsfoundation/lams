@@ -464,7 +464,7 @@ public class AuthoringController {
 	if (itemIdx == -1) { // add
 	    item = new ScratchieItem();
 	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    item.setQbQuestion(qbQuestion);
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {

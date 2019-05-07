@@ -34,7 +34,7 @@ function formValidationInvalidHandler(form, validator) {
         //show/hide settings tab, if it contains an error
         var showSettingsTab = true;
         $.each(validator.errorMap, function(key, value) {
-        	showSettingsTab &= key == "defaultGrade" || key == "penaltyFactor";
+        	showSettingsTab &= key == "maxMark" || key == "penaltyFactor";
         });
         if (showSettingsTab) {
         	$("#question-settings-link.btn-default").trigger( "click" );

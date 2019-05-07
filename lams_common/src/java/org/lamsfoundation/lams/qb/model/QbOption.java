@@ -41,6 +41,25 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     @ManyToOne(optional = false)
     @JoinColumn(name = "qb_question_uid")
     private QbQuestion qbQuestion;
+    
+    // **********************************************************
+    // Properties used only in Assessment
+    // **********************************************************
+
+    @Column(name = "matching_pair")
+    private String matchingPair;
+
+    @Column(name = "numerical_option")
+    private float numericalOption;
+
+    @Column(name = "max_mark")
+    private float maxMark;
+
+    @Column(name = "accepted_error")
+    private float acceptedError;
+
+    @Column
+    private String feedback;
 
     @Override
     public QbOption clone() {
@@ -75,6 +94,10 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     public Long getUid() {
 	return uid;
     }
+    
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
     public String getName() {
 	return name;
@@ -106,5 +129,45 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
 
     public void setQbQuestion(QbQuestion question) {
 	this.qbQuestion = question;
+    }
+
+    public String getMatchingPair() {
+	return matchingPair;
+    }
+
+    public void setMatchingPair(String matchingPair) {
+	this.matchingPair = matchingPair;
+    }
+
+    public float getNumericalOption() {
+	return numericalOption;
+    }
+
+    public void setNumericalOption(float numericalOption) {
+	this.numericalOption = numericalOption;
+    }
+
+    public float getAcceptedError() {
+	return acceptedError;
+    }
+
+    public void setAcceptedError(float acceptedError) {
+	this.acceptedError = acceptedError;
+    }
+
+    public float getMaxMark() {
+	return maxMark;
+    }
+
+    public void setMaxMark(float maxMark) {
+	this.maxMark = maxMark;
+    }
+
+    public String getFeedback() {
+	return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+	this.feedback = feedback;
     }
 }

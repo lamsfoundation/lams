@@ -15,8 +15,8 @@
 			<tr>
 			
 				<td class="ordering-option">
-					<input type="hidden" name="question${status.index}_${option.sequenceId}" value="${option.sequenceId}" />
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<input type="hidden" name="question${status.index}_${option.displayOrder}" value="${option.displayOrder}" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>
 								
 				<c:if test="${(mode != 'teacher') || !hasEditRight}">

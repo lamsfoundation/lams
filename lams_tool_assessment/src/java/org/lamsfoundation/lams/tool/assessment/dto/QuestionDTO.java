@@ -4,32 +4,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
-import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
-public class QuestionDTO {
+public class QuestionDTO implements Comparable<QuestionDTO>{
 
     // ============= immutable properties copied from AssessmentQuestion question =============
 
     private Long uid;
+    
+    private Long qbQuestionUid;
 
-    private short type;
+    private Integer type;
 
     private String title;
 
     private String question;
 
-    private int sequenceId;
+    private int displayOrder;
 
-    private int defaultGrade;
+    private int maxMark;
 
     private float penaltyFactor;
 
     private boolean answerRequired;
-
-    private String generalFeedback;
 
     private String feedback;
 
@@ -53,7 +52,7 @@ public class QuestionDTO {
 
     private boolean allowRichEditor;
 
-    private Set<AssessmentUnit> units;
+    private List<QbQuestionUnit> units;
 
     private int maxWordsLimit;
 
@@ -66,6 +65,8 @@ public class QuestionDTO {
     private boolean groupsAnswersDisclosed;
 
     // ============= variable properties =============
+    
+    private String titleEscaped;
 
     private String answerString;
 
@@ -77,13 +78,11 @@ public class QuestionDTO {
 
     private boolean responseSubmitted;
 
-    private int grade;
-
     private float mark;
 
     private float penalty;
 
-    private float answerTotalGrade;
+    private float optionMaxMark;
 
     private Set<OptionDTO> optionDtos;
 
@@ -95,36 +94,40 @@ public class QuestionDTO {
 
     public QuestionDTO(AssessmentQuestion question) {
 	this.uid = question.getUid();
-	this.type = question.getType();
-	this.title = question.getTitle();
-	this.question = question.getQuestion();
-	this.sequenceId = question.getSequenceId();
-	this.defaultGrade = question.getDefaultGrade();
-	this.penaltyFactor = question.getPenaltyFactor();
-	this.answerRequired = question.isAnswerRequired();
-	this.generalFeedback = question.getGeneralFeedback();
-	this.feedback = question.getFeedback();
-	this.multipleAnswersAllowed = question.isMultipleAnswersAllowed();
-	this.incorrectAnswerNullifiesMark = question.isIncorrectAnswerNullifiesMark();
-	this.feedbackOnCorrect = question.getFeedbackOnCorrect();
-	this.feedbackOnPartiallyCorrect = question.getFeedbackOnPartiallyCorrect();
-	this.feedbackOnIncorrect = question.getFeedbackOnIncorrect();
-	this.shuffle = question.isShuffle();
-	this.prefixAnswersWithLetters = question.isPrefixAnswersWithLetters();
-	this.caseSensitive = question.isCaseSensitive();
-	this.correctAnswer = question.getCorrectAnswer();
-	this.allowRichEditor = question.isAllowRichEditor();
-	this.units = question.getUnits();
-	this.maxWordsLimit = question.getMaxWordsLimit();
-	this.minWordsLimit = question.getMinWordsLimit();
-	this.hedgingJustificationEnabled = question.isHedgingJustificationEnabled();
+	this.type = question.getQbQuestion().getType();
+	this.title = question.getQbQuestion().getName();
+	this.question = question.getQbQuestion().getDescription();
+	this.displayOrder = question.getDisplayOrder();
+	this.maxMark = question.getQbQuestion().getMaxMark();
+	this.penaltyFactor = question.getQbQuestion().getPenaltyFactor();
+	this.answerRequired = question.getQbQuestion().isAnswerRequired();
+	this.feedback = question.getQbQuestion().getFeedback();
+	this.multipleAnswersAllowed = question.getQbQuestion().isMultipleAnswersAllowed();
+	this.incorrectAnswerNullifiesMark = question.getQbQuestion().isIncorrectAnswerNullifiesMark();
+	this.feedbackOnCorrect = question.getQbQuestion().getFeedbackOnCorrect();
+	this.feedbackOnPartiallyCorrect = question.getQbQuestion().getFeedbackOnPartiallyCorrect();
+	this.feedbackOnIncorrect = question.getQbQuestion().getFeedbackOnIncorrect();
+	this.shuffle = question.getQbQuestion().isShuffle();
+	this.prefixAnswersWithLetters = question.getQbQuestion().isPrefixAnswersWithLetters();
+	this.caseSensitive = question.getQbQuestion().isCaseSensitive();
+	this.correctAnswer = question.getQbQuestion().getCorrectAnswer();
+	this.allowRichEditor = question.getQbQuestion().isAllowRichEditor();
+	this.units = question.getQbQuestion().getUnits();
+	this.maxWordsLimit = question.getQbQuestion().getMaxWordsLimit();
+	this.minWordsLimit = question.getQbQuestion().getMinWordsLimit();
+	this.hedgingJustificationEnabled = question.getQbQuestion().isHedgingJustificationEnabled();
 	this.correctAnswersDisclosed = question.isCorrectAnswersDisclosed();
 	this.groupsAnswersDisclosed = question.isGroupsAnswersDisclosed();
 
-	optionDtos = new TreeSet<OptionDTO>(new SequencableComparator());
-	for (AssessmentQuestionOption option : question.getOptions()) {
+	optionDtos = new TreeSet<>();
+	for (QbOption option : question.getQbQuestion().getQbOptions()) {
 	    optionDtos.add(new OptionDTO(option));
 	}
+    }
+    
+    @Override
+    public int compareTo(QuestionDTO anotherQuestion) {
+	return displayOrder - anotherQuestion.getDisplayOrder();
     }
 
     public Long getUid() {
@@ -134,12 +137,20 @@ public class QuestionDTO {
     public void setUid(Long userID) {
 	this.uid = userID;
     }
+    
+    public Long getQbQuestionUid() {
+	return qbQuestionUid;
+    }
 
-    public short getType() {
+    public void setQbQuestionUid(Long qaQuestionId) {
+	this.qbQuestionUid = qaQuestionId;
+    }
+
+    public Integer getType() {
 	return type;
     }
 
-    public void setType(short type) {
+    public void setType(Integer type) {
 	this.type = type;
     }
 
@@ -159,20 +170,20 @@ public class QuestionDTO {
 	this.question = question;
     }
 
-    public int getSequenceId() {
-	return sequenceId;
+    public int getDisplayOrder() {
+	return displayOrder;
     }
 
-    public void setSequenceId(int sequenceId) {
-	this.sequenceId = sequenceId;
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
 
-    public int getDefaultGrade() {
-	return defaultGrade;
+    public int getMaxMark() {
+	return maxMark;
     }
 
-    public void setDefaultGrade(int defaultGrade) {
-	this.defaultGrade = defaultGrade;
+    public void setMaxMark(int maxMark) {
+	this.maxMark = maxMark;
     }
 
     public float getPenaltyFactor() {
@@ -189,14 +200,6 @@ public class QuestionDTO {
 
     public void setAnswerRequired(boolean answerRequired) {
 	this.answerRequired = answerRequired;
-    }
-
-    public String getGeneralFeedback() {
-	return generalFeedback;
-    }
-
-    public void setGeneralFeedback(String generalFeedback) {
-	this.generalFeedback = generalFeedback;
     }
 
     public String getFeedback() {
@@ -279,11 +282,11 @@ public class QuestionDTO {
 	this.allowRichEditor = allowRichEditor;
     }
 
-    public Set<AssessmentUnit> getUnits() {
+    public List<QbQuestionUnit> getUnits() {
 	return units;
     }
 
-    public void setUnits(Set<AssessmentUnit> units) {
+    public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
     }
 
@@ -352,14 +355,6 @@ public class QuestionDTO {
 	return questionFeedback;
     }
 
-    public int getGrade() {
-	return grade;
-    }
-
-    public void setGrade(int grade) {
-	this.grade = grade;
-    }
-
     public Float getMark() {
 	return mark;
     }
@@ -408,12 +403,12 @@ public class QuestionDTO {
 	this.responseSubmitted = responseSubmitted;
     }
 
-    public float getAnswerTotalGrade() {
-	return answerTotalGrade;
+    public float getOptionMaxMark() {
+	return optionMaxMark;
     }
 
-    public void setAnswerTotalGrade(float answerTotalGrade) {
-	this.answerTotalGrade = answerTotalGrade;
+    public void setOptionMaxMark(float optionMaxMark) {
+	this.optionMaxMark = optionMaxMark;
     }
 
     public Set<OptionDTO> getOptionDtos() {
@@ -430,5 +425,13 @@ public class QuestionDTO {
 
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+    }
+    
+    public String getTitleEscaped() {
+	return titleEscaped;
+    }
+
+    public void setTitleEscaped(String titleEscaped) {
+	this.titleEscaped = titleEscaped;
     }
 }

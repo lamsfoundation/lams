@@ -13,7 +13,7 @@
 
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#questionListArea";
-	function deleteQuestion(questionSequenceId){
+	function deleteQuestion(questionDisplayOrder){
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 
 		if (deletionConfirmed) {
@@ -21,9 +21,9 @@
 			$(questionListTargetDiv).load(
 				url,
 				{
-					questionSequenceId: questionSequenceId, 
+					questionDisplayOrder: questionDisplayOrder, 
 					sessionMapID: "${sessionMapID}",
-					referenceGrades: serializeReferenceGrades()
+					referenceMaxMarks: serializeReferenceMaxMarks()
 				},
 				function(){
 					reinitializePassingMarkSelect(false);
@@ -42,7 +42,7 @@
 			{
 				questionIndex: idx, 
 				sessionMapID: "${sessionMapID}",
-				referenceGrades: serializeReferenceGrades()
+				referenceMaxMarks: serializeReferenceMaxMarks()
 			},
 			function(){
 				reinitializePassingMarkSelect(false);
@@ -57,7 +57,7 @@
 			{
 				questionReferenceIndex: idx, 
 				sessionMapID: "${sessionMapID}",
-				referenceGrades: serializeReferenceGrades()
+				referenceMaxMarks: serializeReferenceMaxMarks()
 			},
 			function(){
 				reinitializePassingMarkSelect(false);
@@ -72,7 +72,7 @@
 			{
 				questionReferenceIndex: idx, 
 				sessionMapID: "${sessionMapID}",
-				referenceGrades: serializeReferenceGrades()
+				referenceMaxMarks: serializeReferenceMaxMarks()
 			},
 			function(){
 				refreshThickbox();
@@ -86,19 +86,19 @@
 			{
 				questionReferenceIndex: idx, 
 				sessionMapID: "${sessionMapID}",
-				referenceGrades: serializeReferenceGrades()
+				referenceMaxMarks: serializeReferenceMaxMarks()
 			},
 			function(){
 				refreshThickbox();
 			}
 		);
 	}
-	function serializeReferenceGrades(){
-		var serializedGrades = "";
-		$("[name^=grade]").each(function() {
-			serializedGrades += "&" + this.name + "="  + this.value;
+	function serializeReferenceMaxMarks(){
+		var serializedMaxMarks = "";
+		$("[name^=maxMark]").each(function() {
+			serializedMaxMarks += "&" + this.name + "="  + this.value;
 		});
-		return serializedGrades;
+		return serializedMaxMarks;
 	}
 	
 	function exportQuestions(){   
@@ -110,7 +110,7 @@
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&modal=true";
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
 	function refreshThickbox(){
@@ -121,12 +121,12 @@
 		$('#passingMark').empty();
 		$('#passingMark').append( new Option("<fmt:message key='label.authoring.advance.passing.mark.none' />",0) );
 		
-		var maxGrade = 0;
-		$("[name^=grade]").each(function() {
-			maxGrade += eval(this.value);
+		var sumMaxMark = 0;
+		$("[name^=maxMark]").each(function() {
+			sumMaxMark += eval(this.value);
 		});
 		
-		for (var i = 1; i<=maxGrade; i++) {
+		for (var i = 1; i<=sumMaxMark; i++) {
 			var isSelected = (oldValue == i);
 		    $('#passingMark').append( new Option(i, i, isSelected, isSelected) );
 		}

@@ -45,10 +45,10 @@
 					
 					var questionIndex = $(this).data("question-index");					
 					var selects = $("select[name^=question" + questionIndex + "_]");
-					var grade = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
+					var maxMark = selects.length == 0 ? 0 : eval(selects.first().find('option:last-child').val())
 					var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 					
-					var isButtonEnabled = (totalSelected == grade);
+					var isButtonEnabled = (totalSelected == maxMark);
 					
 					//check if hedging justification is enabled
 					var justificationTextarea = $("#justification-question" + questionIndex);
@@ -56,7 +56,7 @@
 						isButtonEnabled = isButtonEnabled && $.trim(justificationTextarea.val());
 					}
 					
-					//if totalSelected equals to question's grade - show button
+					//if totalSelected equals to question's maxMark - show button
 					if (isButtonEnabled) {
 						$("[type=button][name=submit-hedging-question" + questionIndex + "]").prop("disabled", "").removeClass("button-disabled");
 					} else {
@@ -388,11 +388,11 @@
 						}
 						
 					} else {
-						var grade = ${question.grade};
+						var maxMark = ${question.maxMark};
 						var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 				
-						//if totalSelected not equals to question's grade OR textarea is empty or contains only white-space - show warning
-						if (totalSelected != grade) {
+						//if totalSelected not equals to question's maxMark OR textarea is empty or contains only white-space - show warning
+						if (totalSelected != maxMark) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
 						}
 						if(${question.hedgingJustificationEnabled} && !$.trim($("#justification-question" + questionIndex).val())){

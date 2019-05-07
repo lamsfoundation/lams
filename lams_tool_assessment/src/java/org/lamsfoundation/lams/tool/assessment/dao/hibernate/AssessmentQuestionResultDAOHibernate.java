@@ -48,7 +48,7 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 
     private static final String GET_ANSWER_MARK = "SELECT q.mark FROM  " + AssessmentQuestionResult.class.getName()
 	    + " AS q, " + AssessmentResult.class.getName() + " AS r "
-	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = :assessmentUid AND (r.finishDate != null) AND r.user.userId =:userId AND q.assessmentQuestion.sequenceId =:questionSequenceId ORDER BY r.startDate DESC";
+	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = :assessmentUid AND (r.finishDate != null) AND r.user.userId =:userId AND q.assessmentQuestion.displayOrder =:questionDisplayOrder ORDER BY r.startDate DESC";
 
     @Override
     public int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid) {
@@ -77,11 +77,11 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
     }
 
     @Override
-    public Float getQuestionResultMark(final Long assessmentUid, final Long userId, final int questionSequenceId) {
+    public Float getQuestionResultMark(final Long assessmentUid, final Long userId, final int questionDisplayOrder) {
 	Query<Number> q = getSession().createQuery(GET_ANSWER_MARK, Number.class);
 	q.setParameter("assessmentUid", assessmentUid);
 	q.setParameter("userId", userId);
-	q.setParameter("questionSequenceId", questionSequenceId);
+	q.setParameter("questionDisplayOrder", questionDisplayOrder);
 	q.setMaxResults(1);
 	Number result = q.uniqueResult();
 	return result != null ? result.floatValue() : null;

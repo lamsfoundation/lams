@@ -289,7 +289,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    if (qbQuestion == null) {
 		// if it does not exist, create a new one
 		qbQuestion = new QbQuestion();
-		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		qbQuestion.setQuestionId(qbService.getMaxQuestionId());
 	    }
 	    // make a clone to check if data changed
@@ -297,7 +297,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    // set clone's data to current values
 	    qbQuestionClone.setName(currentQuestionText);
-	    qbQuestionClone.setMark(Integer.valueOf(currentMark));
+	    qbQuestionClone.setMaxMark(Integer.valueOf(currentMark));
 	    qbQuestionClone.setFeedback(currentFeedback);
 
 	    // modification status was already set in McController#saveQuestion()
@@ -2025,9 +2025,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
 	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
-	    qbQuestion.setMark(1);
+	    qbQuestion.setMaxMark(1);
 	    McQueContent question = new McQueContent(qbQuestion, null,
 		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 
@@ -2072,7 +2072,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	// set clone's data to current values
 	modifiedQuestion.setName(currentQuestionText);
-	modifiedQuestion.setMark(Integer.valueOf(currentMark));
+	modifiedQuestion.setMaxMark(Integer.valueOf(currentMark));
 	modifiedQuestion.setFeedback(currentFeedback);
 
 	List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();

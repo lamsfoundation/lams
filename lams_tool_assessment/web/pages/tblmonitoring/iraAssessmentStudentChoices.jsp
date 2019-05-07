@@ -69,7 +69,7 @@
 					</td>
 					
 					<c:forEach var="option" items="${question.options}">
-						<td class="normal <c:if test='${option.grade == 1}'>success</c:if>">
+						<td class="normal <c:if test='${option.maxMark == 1}'>success</c:if>">
 							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
 						</td>
 					</c:forEach>
@@ -105,13 +105,13 @@
 						<tbody>
 						
 							<c:forEach var="option" items="${question.options}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${option.grade == 1}'>bg-success</c:if></c:set>
+								<c:set var="cssClass"><c:if test='${option.maxMark == 1}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${option.optionString}" escapeXml="false"/>
+										<c:out value="${option.name}" escapeXml="false"/>
 									</td>
 									<td class="${cssClass}">
 										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%

@@ -27,17 +27,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 public class AssessmentEscapeUtils {
 
@@ -81,25 +80,27 @@ public class AssessmentEscapeUtils {
 	    String answerStringEscaped = StringEscapeUtils.escapeJavaScript(answerString);
 	    questionResult.setAnswerStringEscaped(answerStringEscaped);
 	}
+	
+	QuestionDTO questionDto = new QuestionDTO(questionResult.getAssessmentQuestion());
+	questionResult.setQuestionDto(questionDto);
 
-	AssessmentQuestion question = questionResult.getAssessmentQuestion();
-	String title = question.getTitle();
+	String title = questionDto.getTitle();
 	if (title != null) {
 	    String titleEscaped = StringEscapeUtils.escapeJavaScript(title);
-	    question.setTitleEscaped(titleEscaped);
+	    questionDto.setTitleEscaped(titleEscaped);
 	}
 
-	for (AssessmentQuestionOption option : question.getOptions()) {
-	    String questionStr = option.getQuestion();
-	    if (questionStr != null) {
-		String questionEscaped = StringEscapeUtils.escapeJavaScript(questionStr);
-		option.setQuestionEscaped(questionEscaped);
+	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+	    String matchingPair = optionDto.getMatchingPair();
+	    if (matchingPair != null) {
+		String matchingPairEscaped = StringEscapeUtils.escapeJavaScript(matchingPair);
+		optionDto.setMatchingPairEscaped(matchingPairEscaped);
 	    }
 
-	    String optionStr = option.getOptionString();
-	    if (optionStr != null) {
-		String optionEscaped = StringEscapeUtils.escapeJavaScript(optionStr);
-		option.setOptionStringEscaped(optionEscaped);
+	    String name = optionDto.getName();
+	    if (name != null) {
+		String nameEscaped = StringEscapeUtils.escapeJavaScript(name);
+		optionDto.setNameEscaped(nameEscaped);
 	    }
 	}
     }
@@ -110,26 +111,26 @@ public class AssessmentEscapeUtils {
 
 	if (questionResult != null) {
 
-	    Set<AssessmentQuestionOption> options = questionResult.getAssessmentQuestion().getOptions();
+	    List<QbOption> options = questionResult.getQbQuestion().getQbOptions();
 	    Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 
-	    switch (questionResult.getAssessmentQuestion().getType()) {
-		case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+	    switch (questionResult.getQbQuestion().getType()) {
+		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    String str = "";
 		    if (optionAnswers != null) {
-			for (AssessmentQuestionOption option : options) {
+			for (QbOption option : options) {
 			    str += "<div>";
 			    str += "	<div style='float: left;'>";
-			    str += option.getQuestion();
+			    str += option.getMatchingPair();
 			    str += "	</div>";
 			    str += "	<div style=' float: right; width: 50%;'>";
 			    str += " 		- ";
 
 			    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				    for (AssessmentQuestionOption option2 : options) {
+				    for (QbOption option2 : options) {
 					if (option2.getUid() == optionAnswer.getAnswerInt()) {
-					    str += option2.getOptionString();
+					    str += option2.getName();
 					}
 				    }
 				}
@@ -143,14 +144,14 @@ public class AssessmentEscapeUtils {
 		    }
 		    return str;
 
-		case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+		case QbQuestion.TYPE_MULTIPLE_CHOICE:
 
 		    if (optionAnswers != null) {
 			for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			    if (optionAnswer.getAnswerBoolean()) {
-				for (AssessmentQuestionOption option : options) {
+				for (QbOption option : options) {
 				    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-					responseStr.append(option.getOptionString() + DELIMITER);
+					responseStr.append(option.getName() + DELIMITER);
 				    }
 				}
 			    }
@@ -158,20 +159,20 @@ public class AssessmentEscapeUtils {
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-		case AssessmentConstants.QUESTION_TYPE_ESSAY:
+		case QbQuestion.TYPE_NUMERICAL:
+		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_ESSAY:
 		    responseStr.append(questionResult.getAnswerString());
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_ORDERING:
+		case QbQuestion.TYPE_ORDERING:
 		    if (optionAnswers != null) {
 			for (int i = 0; i < optionAnswers.size(); i++) {
 			    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 				if (optionAnswer.getAnswerInt() == i) {
-				    for (AssessmentQuestionOption option : options) {
+				    for (QbOption option : options) {
 					if (option.getUid().equals(optionAnswer.getOptionUid())) {
-					    responseStr.append(option.getOptionString());
+					    responseStr.append(option.getName());
 					}
 				    }
 				}
@@ -180,19 +181,19 @@ public class AssessmentEscapeUtils {
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+		case QbQuestion.TYPE_TRUE_FALSE:
 		    if (questionResult.getAnswerString() != null) {
 			responseStr.append(questionResult.getAnswerBoolean());
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+		case QbQuestion.TYPE_MARK_HEDGING:
 
 		    if (optionAnswers != null) {
-			for (AssessmentQuestionOption option : options) {
+			for (QbOption option : options) {
 			    responseStr.append("<div>");
 			    responseStr.append("	<div style='float: left;'>");
-			    responseStr.append(option.getOptionString());
+			    responseStr.append(option.getName());
 			    responseStr.append("	</div>");
 
 			    responseStr.append("	<div style='float: right; width: 20%;'>");
@@ -209,7 +210,7 @@ public class AssessmentEscapeUtils {
 
 			}
 
-			if (questionResult.getAssessmentQuestion().isHedgingJustificationEnabled()) {
+			if (questionResult.getQbQuestion().isHedgingJustificationEnabled()) {
 			    responseStr.append(questionResult.getAnswerString());
 			    responseStr.append(DELIMITER);
 			}
@@ -230,27 +231,27 @@ public class AssessmentEscapeUtils {
 	Object ret = null;
 
 	if (questionResult != null) {
-	    switch (questionResult.getAssessmentQuestion().getType()) {
-		case AssessmentConstants.QUESTION_TYPE_ESSAY:
+	    switch (questionResult.getQbQuestion().getType()) {
+		case QbQuestion.TYPE_ESSAY:
 		    String answerString = questionResult.getAnswerString();
 		    return (answerString == null) ? ""
 			    : answerString.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
-		case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
-		case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+			    QbQuestion.TYPE_MATCHING_PAIRS);
+		case QbQuestion.TYPE_MULTIPLE_CHOICE:
 		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
+			    QbQuestion.TYPE_MULTIPLE_CHOICE);
+		case QbQuestion.TYPE_NUMERICAL:
 		    return questionResult.getAnswerString();
-		case AssessmentConstants.QUESTION_TYPE_ORDERING:
+		case QbQuestion.TYPE_ORDERING:
 		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    AssessmentConstants.QUESTION_TYPE_ORDERING);
-		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
+			    QbQuestion.TYPE_ORDERING);
+		case QbQuestion.TYPE_SHORT_ANSWER:
 		    return questionResult.getAnswerString();
-		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+		case QbQuestion.TYPE_TRUE_FALSE:
 		    return questionResult.getAnswerBoolean();
-		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+		case QbQuestion.TYPE_MARK_HEDGING:
 		    //taken care beforehand
 		default:
 		    return null;
@@ -262,35 +263,35 @@ public class AssessmentEscapeUtils {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private static String getOptionResponse(AssessmentQuestionResult questionResult, short type) {
+    private static String getOptionResponse(AssessmentQuestionResult questionResult, int type) {
 
 	StringBuilder sb = new StringBuilder();
 	//whether there is a need to remove last comma
 	boolean trimLastComma = false;
 
-	Set<AssessmentQuestionOption> options = questionResult.getAssessmentQuestion().getOptions();
+	List<QbOption> options = questionResult.getQbQuestion().getQbOptions();
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	if (optionAnswers != null) {
 
-	    if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 		    if (optionAnswer.getAnswerBoolean()) {
-			for (AssessmentQuestionOption option : options) {
+			for (QbOption option : options) {
 			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				sb.append(option.getOptionString() + ", ");
+				sb.append(option.getName() + ", ");
 				trimLastComma = true;
 			    }
 			}
 		    }
 		}
 
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    } else if (type == QbQuestion.TYPE_ORDERING) {
 		for (int i = 0; i < optionAnswers.size(); i++) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (optionAnswer.getAnswerInt() == i) {
-			    for (AssessmentQuestionOption option : options) {
+			    for (QbOption option : options) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				    sb.append(option.getOptionString() + ", ");
+				    sb.append(option.getName() + ", ");
 				    trimLastComma = true;
 				}
 			    }
@@ -298,16 +299,16 @@ public class AssessmentEscapeUtils {
 		    }
 		}
 
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+	    } else if (type == QbQuestion.TYPE_MATCHING_PAIRS) {
 
-		for (AssessmentQuestionOption option : options) {
-		    sb.append("[" + option.getOptionString() + ", ");
+		for (QbOption option : options) {
+		    sb.append("[" + option.getName() + ", ");
 
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    for (AssessmentQuestionOption option2 : options) {
+			    for (QbOption option2 : options) {
 				if (option2.getUid() == optionAnswer.getAnswerInt()) {
-				    sb.append(option2.getOptionString() + "] ");
+				    sb.append(option2.getName() + "] ");
 				}
 			    }
 			}
@@ -315,7 +316,7 @@ public class AssessmentEscapeUtils {
 
 		}
 
-	    } else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    } else if (type == QbQuestion.TYPE_MARK_HEDGING) {
 		//taken care beforehand
 	    }
 

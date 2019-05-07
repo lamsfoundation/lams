@@ -1,9 +1,9 @@
-<input type="hidden" name="optionSequenceId${status.index}" value="${option.sequenceId}">
+<input type="hidden" name="optionDisplayOrder${status.index}" value="${option.displayOrder}">
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <div class="option-ckeditor">
 	<c:set var="OPTION_LABEL"><fmt:message key="label.authoring.basic.option.answer"/></c:set>
-	<lams:CKEditor id="optionString${status.index}" value="${option.optionString}" 
+	<lams:CKEditor id="optionName${status.index}" value="${option.name}" 
 		placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}" contentFolderID="${contentFolderID}" height="50px"/>
 </div>
 

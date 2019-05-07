@@ -38,23 +38,6 @@ public class AssessmentConstants {
 
     public static final String EXPORT_QUESTIONS_FILENAME = "questions.xml";
 
-    // question type;
-    public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 1;
-
-    public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
-
-    public static final short QUESTION_TYPE_SHORT_ANSWER = 3;
-
-    public static final short QUESTION_TYPE_NUMERICAL = 4;
-
-    public static final short QUESTION_TYPE_TRUE_FALSE = 5;
-
-    public static final short QUESTION_TYPE_ESSAY = 6;
-
-    public static final short QUESTION_TYPE_ORDERING = 7;
-
-    public static final short QUESTION_TYPE_MARK_HEDGING = 8;
-
     // for parameters' name
     
     public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
@@ -69,7 +52,7 @@ public class AssessmentConstants {
 
     public static final String PARAM_QUESTION_INDEX = "questionIndex";
     
-    public static final String PARAM_QUESTION_SEQUENCE_ID = "questionSequenceId";
+    public static final String PARAM_QUESTION_DISPLAY_ORDER = "questionDisplayOrder";
 
     public static final String PARAM_QUESTION_REFERENCE_INDEX = "questionReferenceIndex";
 
@@ -82,6 +65,8 @@ public class AssessmentConstants {
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
     public static final String PARAM_GRADE = "grade";
+    
+    public static final String PARAM_MAX_MARK = "maxMark";
 
     public static final String PARAM_SESSION_ID = "sessionId";
 
@@ -108,13 +93,13 @@ public class AssessmentConstants {
 
     public static final String ATTR_OPTION_COUNT = "optionCount";
 
-    public static final String ATTR_OPTION_STRING_PREFIX = "optionString";
+    public static final String ATTR_OPTION_NAME_PREFIX = "optionName";
 
-    public static final String ATTR_OPTION_GRADE_PREFIX = "optionGrade";
+    public static final String ATTR_OPTION_MAX_MARK_PREFIX = "optionMaxMark";
 
     public static final String ATTR_OPTION_CORRECT = "optionCorrect";
 
-    public static final String ATTR_OPTION_FLOAT_PREFIX = "optionFloat";
+    public static final String ATTR_NUMERICAL_OPTION_PREFIX = "numericalOption";
 
     public static final String ATTR_OPTION_ACCEPTED_ERROR_PREFIX = "optionAcceptedError";
 
@@ -122,9 +107,9 @@ public class AssessmentConstants {
     
     public static final String ATTR_OPTION_UID_PREFIX = "optionUid";
 
-    public static final String ATTR_OPTION_SEQUENCE_ID_PREFIX = "optionSequenceId";
+    public static final String ATTR_OPTION_DISPLAY_ORDER_PREFIX = "optionDisplayOrder";
 
-    public static final String ATTR_OPTION_QUESTION_PREFIX = "optionQuestion";
+    public static final String ATTR_MATCHING_PAIR_PREFIX = "matchingPair";
 
     public static final String ATTR_QUESTION_PREFIX = "question";
     
@@ -144,7 +129,7 @@ public class AssessmentConstants {
 
     public static final String ATTR_UNIT_LIST = "unitList";
 
-    public static final String ATTR_QUESTION_REFERENCES_GRADES = "referenceGrades";
+    public static final String ATTR_QUESTION_REFERENCES_MAX_MARKS = "referenceMaxMarks";
     
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
     
@@ -153,12 +138,14 @@ public class AssessmentConstants {
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_UNIT_COUNT = "unitCount";
+    
+    public static final String ATTR_UNIT_UID_PREFIX = "unitUid";
 
-    public static final String ATTR_UNIT_UNIT_PREFIX = "unitUnit";
+    public static final String ATTR_UNIT_NAME_PREFIX = "unitName";
 
     public static final String ATTR_UNIT_MULTIPLIER_PREFIX = "unitMultiplier";
 
-    public static final String ATTR_UNIT_SEQUENCE_ID_PREFIX = "unitSequenceId";
+    public static final String ATTR_UNIT_DISPLAY_ORDER_PREFIX = "unitDisplayOrder";
 
     public static final String ATTR_OVERALL_FEEDBACK_LIST = "overallFeedbackList";
 
@@ -250,15 +237,6 @@ public class AssessmentConstants {
     public static final String OUTPUT_NAME_BEST_SCORE = "best.score";
     public static final String OUTPUT_NAME_FIRST_SCORE = "first.score";
     public static final String OUTPUT_NAME_AVERAGE_SCORE = "average.score";
-
-    // error message keys
-    public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";
-
-    public static final String ERROR_MSG_QUESTION_TEXT_BLANK = "error.question.text.blank";
-
-    public static final String ERROR_MSG_DEFAULT_GRADE_WRONG_FORMAT = "error.default.grade.wrong.format";
-
-    public static final String ERROR_MSG_PENALTY_FACTOR_WRONG_FORMAT = "error.penalty.factor.wrong.format";
 
     public static final String ATTR_USER_UID = "userUid";
 

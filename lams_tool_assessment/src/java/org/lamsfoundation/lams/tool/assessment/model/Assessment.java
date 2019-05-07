@@ -150,10 +150,9 @@ public class Assessment implements Cloneable {
     private AssessmentUser createdBy;
 
     // Question bank questions
-    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "assessment_uid")
     @OrderBy("sequence_id ASC")
-    private Set<AssessmentQuestion> questions = new TreeSet<>(new SequencableComparator());
+    private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list
     @OneToMany(cascade = CascadeType.ALL)
@@ -192,7 +191,7 @@ public class Assessment implements Cloneable {
 	    // clone questions
 	    if (questions != null) {
 		Iterator<AssessmentQuestion> iter = questions.iterator();
-		TreeSet<AssessmentQuestion> set = new TreeSet<>(new SequencableComparator());
+		TreeSet<AssessmentQuestion> set = new TreeSet<>();
 		while (iter.hasNext()) {
 		    AssessmentQuestion question = iter.next();
 		    AssessmentQuestion newQuestion = (AssessmentQuestion) question.clone();
@@ -213,7 +212,7 @@ public class Assessment implements Cloneable {
 		    // update questionReferences with new cloned question
 		    if (newQuestionReference.getQuestion() != null) {
 			for (AssessmentQuestion newQuestion : assessment.questions) {
-			    if (newQuestion.getSequenceId() == newQuestionReference.getQuestion().getSequenceId()) {
+			    if (newQuestion.getDisplayOrder() == newQuestionReference.getQuestion().getDisplayOrder()) {
 				newQuestionReference.setQuestion(newQuestion);
 				break;
 			    }

@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -289,7 +290,7 @@ public class LearningController {
 	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
 
 	    QuestionDTO questionDto = question.getQuestionDTO();
-	    questionDto.setGrade(questionReference.getDefaultGrade());
+	    questionDto.setMaxMark(questionReference.getMaxMark());
 
 	    questionDtos.add(questionDto);
 	}
@@ -301,24 +302,24 @@ public class LearningController {
 	    questionDtos = new LinkedList<>(shuffledList);
 	}
 	for (QuestionDTO questionDto : questionDtos) {
-	    if (questionDto.isShuffle() || (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
+	    if (questionDto.isShuffle() || (questionDto.getType() == QbQuestion.TYPE_ORDERING)) {
 		ArrayList<OptionDTO> shuffledList = new ArrayList<>(questionDto.getOptionDtos());
 		Collections.shuffle(shuffledList);
 		questionDto.setOptionDtos(new LinkedHashSet<>(shuffledList));
 	    }
-	    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+	    if (questionDto.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 		//sort answer options alphanumerically (as per LDEV-4326)
-		ArrayList<OptionDTO> optionsSortedByOptionString = new ArrayList<>(questionDto.getOptionDtos());
-		optionsSortedByOptionString.sort(new Comparator<OptionDTO>() {
+		ArrayList<OptionDTO> optionsSortedByName = new ArrayList<>(questionDto.getOptionDtos());
+		optionsSortedByName.sort(new Comparator<OptionDTO>() {
 		    @Override
 		    public int compare(OptionDTO o1, OptionDTO o2) {
-			String optionString1 = o1.getOptionString() != null ? o1.getOptionString() : "";
-			String optionString2 = o2.getOptionString() != null ? o2.getOptionString() : "";
+			String name1 = o1.getName() != null ? o1.getName() : "";
+			String name2 = o2.getName() != null ? o2.getName() : "";
 
-			return AlphanumComparator.compareAlphnumerically(optionString1, optionString2);
+			return AlphanumComparator.compareAlphnumerically(name1, name2);
 		    }
 		});
-		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByOptionString));
+		questionDto.setMatchingPairOptions(new LinkedHashSet<>(optionsSortedByName));
 	    }
 	}
 
@@ -817,58 +818,58 @@ public class LearningController {
 	    }
 
 	    int questionType = questionDto.getType();
-	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    if (questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
 			String answerString = request.getParameter(
-				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder());
 			answerBoolean = !StringUtils.isBlank(answerString);
 		    } else {
 			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 			if (answerString != null) {
-			    int optionSequenceId = Integer.parseInt(answerString);
-			    answerBoolean = (optionDto.getSequenceId() == optionSequenceId);
+			    int optionDisplayOrder = Integer.parseInt(answerString);
+			    answerBoolean = (optionDto.getDisplayOrder() == optionDisplayOrder);
 			}
 		    }
 		    optionDto.setAnswerBoolean(answerBoolean);
 		}
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerInt = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder());
 		    optionDto.setAnswerInt(answerInt);
 		}
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+	    } else if (questionType == QbQuestion.TYPE_SHORT_ANSWER) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		questionDto.setAnswerString(answerString);
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    } else if (questionType == QbQuestion.TYPE_NUMERICAL) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		questionDto.setAnswerString(answerString);
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+	    } else if (questionType == QbQuestion.TYPE_TRUE_FALSE) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		if (answerString != null) {
 		    questionDto.setAnswerBoolean(Boolean.parseBoolean(answerString));
 		    questionDto.setAnswerString("answered");
 		}
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
+	    } else if (questionType == QbQuestion.TYPE_ESSAY) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		answerString = answerString.replaceAll("[\n\r\f]", "");
 		questionDto.setAnswerString(answerString);
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
 
 		//store hedging marks
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    Integer markHedging = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId(), true);
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder(), true);
 		    if (markHedging != null) {
 			optionDto.setAnswerInt(markHedging);
 		    }
@@ -918,38 +919,38 @@ public class LearningController {
 
 		//enforce all hedging marks question type to be answered as well
 		if (questionDto.isAnswerRequired()
-			|| (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
+			|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
 
 		    boolean isAnswered = false;
 
-		    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		    if (questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			    isAnswered |= optionDto.getAnswerBoolean();
 			}
 
-		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+		    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			    isAnswered |= optionDto.getAnswerInt() != 0;
 			}
 
-		    } else if ((questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-			    || (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
-			    || (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)
-			    || (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
+		    } else if ((questionType == QbQuestion.TYPE_SHORT_ANSWER)
+			    || (questionType == QbQuestion.TYPE_NUMERICAL)
+			    || (questionType == QbQuestion.TYPE_TRUE_FALSE)
+			    || (questionType == QbQuestion.TYPE_ESSAY)) {
 			isAnswered |= StringUtils.isNotBlank(questionDto.getAnswerString());
 
-		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		    } else if (questionType == QbQuestion.TYPE_ORDERING) {
 			isAnswered = true;
 
-		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+		    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
 
-			//verify sum of all hedging marks is equal to question's grade
+			//verify sum of all hedging marks is equal to question's maxMark
 			int sumMarkHedging = 0;
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			    sumMarkHedging += optionDto.getAnswerInt();
 			}
-			isAnswered = sumMarkHedging == questionDto.getGrade();
+			isAnswered = sumMarkHedging == questionDto.getMaxMark();
 
 			//verify justification of hedging is provided if it was enabled
 			if (questionDto.isHedgingJustificationEnabled()) {
@@ -965,7 +966,7 @@ public class LearningController {
 
 		}
 
-		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY)
+		if ((questionDto.getType() == QbQuestion.TYPE_ESSAY)
 			&& (questionDto.getMinWordsLimit() > 0)) {
 
 		    if (questionDto.getAnswerString() == null) {
@@ -1016,7 +1017,7 @@ public class LearningController {
 
 		    // find corresponding questionResult
 		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			if (questionDto.getUid().equals(questionResult.getQbQuestion().getUid())) {
 
 			    // copy questionResult's info to the question
 			    questionDto.setMark(questionResult.getMark());
@@ -1030,12 +1031,12 @@ public class LearningController {
 				}
 			    }
 			    // required for showing right/wrong answers icons on results page correctly
-			    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
-				    || questionDto.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+			    if (questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER
+				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL) {
 				boolean isAnsweredCorrectly = false;
 				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 				    if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
-					isAnsweredCorrectly = optionDto.getGrade() > 0;
+					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
 					break;
 				    }
 				}
