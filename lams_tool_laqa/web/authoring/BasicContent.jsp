@@ -38,8 +38,9 @@
            	type: $("#newQuestionForm").attr('method'),
 			url: $("#newQuestionForm").attr('action'),
 			success: function(data) {
-				$('#resourceListArea').html($(data).find('#itemList'));
+				$('#itemArea').html($(data).find('#itemList'));
 				hideMessage();
+				refreshThickbox();
 			}
 	    });
 	}
@@ -59,7 +60,7 @@
 </div>
 
 
-<div id="resourceListArea">
+<div id="itemArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
 

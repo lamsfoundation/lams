@@ -40,6 +40,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
@@ -68,6 +71,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -82,6 +86,9 @@ public class QaAuthoringController implements QaAppConstants {
 
     @Autowired
     private IQaService qaService;
+
+    @Autowired
+    private IQbService qbService;
 
     @Autowired
     @Qualifier("qaMessageService")
@@ -105,16 +112,14 @@ public class QaAuthoringController implements QaAppConstants {
 
 	validateDefaultContent(request, authoringForm);
 
-	//no problems getting the default content, will render authoring screen
-	String strToolContentID = "";
-	/* the authoring url must be passed a tool content id */
-	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	authoringForm.setToolContentID(strToolContentID);
 
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, strToolContentID);
 	authoringForm.setHttpSessionID(sessionMap.getSessionID());
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
@@ -590,6 +595,46 @@ public class QaAuthoringController implements QaAppConstants {
 	qaService.updateQaContent(qaContent);
 
 	return qaContent;
+    }
+    
+    /**
+     * Adds QbQuestion, selected in the question bank, to the current question list.
+     */
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
+    private String importQbQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm authoringForm,
+	    HttpServletRequest request) {
+	String httpSessionID = WebUtil.readStrParam(request, "httpSessionID");
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
+	
+	//get QbQuestion from DB
+	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+
+	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
+	boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, qbQuestion.getName());
+	if (!duplicates) {
+	    String displayOrder = String.valueOf(questionDTOs.size() + 1);
+	    boolean requiredBoolean = false;
+	    int minWordsLimit = 0;
+	    QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qbQuestion.getName(), displayOrder, qbQuestion.getFeedback(),
+		    requiredBoolean, minWordsLimit);
+	    questionDTOs.add(qaQuestionDTO);
+	} else {
+	    //entry duplicate, not adding
+	}
+
+	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	String toolContentID = (String) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	authoringForm.setContentFolderID(contentFolderID);
+	authoringForm.setHttpSessionID(httpSessionID);
+	authoringForm.setToolContentID(toolContentID);
+	request.setAttribute("authoringForm", authoringForm);
+	return "authoring/itemlist";
     }
 
     /**

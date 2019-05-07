@@ -118,6 +118,7 @@
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.question.bank.title" />
+		
 		<div class="btn-group btn-group-xs pull-right" role="group">
 			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
 				<fmt:message key="label.authoring.basic.import.qti" /> 
@@ -126,6 +127,7 @@
 				<fmt:message key="label.authoring.basic.export.qti" />
 			</a>
 		</div>
+		
 		<div class="btn-group btn-group-xs pull-right roffset5" role="group">		
 			<c:set var="importInitUrl" >
 				<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true
@@ -137,6 +139,21 @@
 				<fmt:message key="label.authoring.basic.export.questions" />
 			</a>
 		</div>
+<!--		
+		<div class="pull-right roffset5">
+			<c:url var="tempUrl" value="">
+				<c:param name="output">
+					<c:url value='/authoring/importQbQuestion.do'/>?httpSessionID=${httpSessionID}
+				</c:param>
+			</c:url>
+			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
+		
+			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.assessmentForm.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true" 
+				class="btn btn-default btn-xs thickbox"> 
+				Import from question bank
+			</a>
+		</div> 
+-->
 	</div>
 
 	<table class="table table-condensed" id="questionTable">

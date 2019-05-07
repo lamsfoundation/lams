@@ -210,7 +210,10 @@ public class ScratchieServiceImpl
     @Override
     public void saveOrUpdateScratchie(Scratchie scratchie) {
 	for (ScratchieItem item : scratchie.getScratchieItems()) {
-	    scratchieItemDao.saveObject(item.getQbQuestion());
+	    //update only in case QbQuestion was modified, to prevent updating the same QbQuestions received from SesssionMap
+	    if (item.getQbQuestionModified() != IQbService.QUESTION_MODIFIED_NONE) {
+		scratchieItemDao.saveObject(item.getQbQuestion());
+	    }
 	    scratchieItemDao.saveObject(item);
 	}
 	scratchieDao.saveObject(scratchie);

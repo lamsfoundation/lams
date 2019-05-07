@@ -88,7 +88,7 @@ ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FROM lams_qb_question);
 
 INSERT INTO lams_qb_question SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-									mcq.question, NULL, mcq.mark, mcq.feedback, q.target_uid
+									mcq.question, NULL, IFNULL(mcq.mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 TRIM(question) AS question,
 				 mark,

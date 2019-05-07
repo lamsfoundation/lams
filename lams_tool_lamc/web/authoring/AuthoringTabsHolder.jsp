@@ -34,7 +34,7 @@
 				data: { 
 					sessionMapId: '${sessionMapId}'
 				},
-				target:  $('#resourceListArea'),
+				target:  $('#itemArea'),
 	    		iframe: true,
 	    		success:    function() { 
 	    			document.forms.mcAuthoringForm.action="submitAllContent.do";

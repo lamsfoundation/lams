@@ -2,25 +2,23 @@
         
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 
 <lams:html>		
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
+	
 	<lams:css/>
 	<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
-	
+	<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 	<script type="text/JavaScript">
 	  function submitMethod(actionMethod) {
 		   var form = document.forms.authoringForm;
@@ -39,6 +37,10 @@
 		  function doSelectTab(tabId) {
 			selectTab(tabId);
 		  }
+
+		function refreshThickbox() {
+			tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
+		};
 	</script>
 </lams:head>
 

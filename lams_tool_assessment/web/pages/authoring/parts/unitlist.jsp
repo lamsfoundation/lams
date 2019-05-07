@@ -17,9 +17,9 @@
 							</td>
 							<td>	
 								<input type="hidden" name="unitSequenceId${status.index}" value="${unit.sequenceId}" 
-										id="unitSequenceId${status.index}">						
+									id="unitSequenceId${status.index}">						
 								<input type="text" name="unitUnit${status.index}" value="${unit.unit}"
-										id="unitUnit${status.index}" class="form-control input-sm">
+									id="unitUnit${status.index}" class="form-control input-sm">
 							</td>									
 						</tr>
 						<tr>
@@ -34,8 +34,8 @@
 									</c:when>
 									<c:otherwise>
 										<input type="text" name="unitMultiplier${status.index}" value="${unit.multiplier}"
-												id="unitMultiplier${status.index}" class="number form-control short-input-text input-sm" 
-												title="<fmt:message key='label.authoring.choice.enter.float'/>">
+											id="unitMultiplier${status.index}" class="number form-control short-input-text input-sm" 
+											title="<fmt:message key='label.authoring.choice.enter.float'/>">
 									</c:otherwise>
 								</c:choose>							
 							</td>									

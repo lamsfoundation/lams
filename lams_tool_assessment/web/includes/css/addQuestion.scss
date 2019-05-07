@@ -3,17 +3,7 @@
 div.error {
 	display:none;
 }
-// label.error { 
-// 	color: brand-danger; 
-// 	font-weight: bold; 
-// 	margin-left: 0px;
-// 	display: inline-block;
-// }
-em { 
-	font-weight: bold; 
-	padding-right: 1em; 
-	vertical-align: top; 
-}
+
 #content {
 	width: 91%; 
 	margin-bottom: 10px;
@@ -22,7 +12,7 @@ table.alternative-color td {
 	padding-left: 0;
 }
 .short-input-text {
-	width:10%;
+	max-width: 100px;
 }
 
 #max-words-limit-checkbox, #min-words-limit-checkbox {
@@ -36,7 +26,369 @@ table.alternative-color td {
 	float: right !important;
 }
 
-/* overwriting bootstrap value. */
+.greyed-out-label {
+	opacity: 0.55;
+}
+#hasOptionFilled-error {
+	display: table;
+}
+i.fa-asterisk.text-danger {
+	vertical-align: super;
+}
+
+/* overwriting bootstrap values */
+.checkbox + .checkbox, .radio + .radio {
+	margin-top: 0;
+}
+.checkbox, .radio {
+    margin-bottom: 15px;
+}
 .panel {
 	margin-bottom: 0 !important;
+}
+.panel-default>.panel-heading {
+	border-color: transparent;
+}
+#unitArea .table>tbody>tr>td {
+    border-top: none;
+}
+label.alert {
+	display: initial;
+}
+.input-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+
+/* overwriting jqeury-ui values */
+.ui-spinner .ui-icon {
+	left: 50%;
+}
+
+/* Remove focus effect from title */
+:focus {
+    outline: 0;
+    /* or */
+    outline: none;
+}
+
+label {
+   	font-weight: initial;
+}
+
+.voffset5-bottom {
+	margin-bottom: 5px;
+}
+.voffset10-bottom {
+	margin-bottom: 10px;
+}
+
+#title {
+	height: 34px;
+	font-weight: bold;
+}
+#title-container, div.error {
+    padding-right: 80px;
+}
+
+/*Style for text input fields. Rule does not apply in case this input has an error*/
+:not(.has-error) > input.borderless-text-input{
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* Remove bold style from title field */
+input.borderless-text-input::-webkit-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+input.borderless-text-input::-moz-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+input.borderless-text-input:-ms-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+input.borderless-text-input:-o-input-placeholder {
+    font-weight: normal;
+    color:#999;
+}
+
+.settings-tab {
+	display:none;
+}
+.delete-button {
+	opacity: 0.6;
+	cursor: pointer;
+}
+
+/* hover effect for Settings button  */
+#question-settings-link{
+	margin-top: -10px;
+   	margin-bottom: 5px;
+   	position: absolute;
+   	top: 60px;
+    right: 20px;
+   	z-index: 2;
+   	visibility:hidden;
+}	
+#assessmentQuestionForm:hover #question-settings-link, #question-settings-link.btn-primary {
+	visibility:visible;
+}
+
+/* Overwrite default CKEditor style */
+div[contenteditable] {
+    display: block;
+    width: 100%;
+    padding: 0;
+	font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 0;
+    border-radius: 0;
+    -webkit-box-shadow: inset 0 0 0 rgba(0,0,0,0.075);
+    box-shadow: 0;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    overflow: hidden;
+    min-height: 60px;
+    -webkit-appearance: textfield;
+}
+
+/*----------STICKY FOOTER----------------*/
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+	margin-bottom: 44px;
+}
+footer {
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 44px;
+    background-color: #f9f9f9;
+}
+footer > div {
+	height: 44px;
+}
+
+/*----------numbers before answers----------------*/
+#option-table table {
+	width: 100%;
+}
+#option-table td:first-child {
+	width: 60px;
+	vertical-align: top;
+}
+#option-table td:first-child span{
+	display: inline-block;
+	width: 4rem;
+	height: 4rem;
+	text-align: center;
+	line-height: 2em;
+	font-size: 1.8rem;
+	color: #fff;
+	border: .2rem solid #313537;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+	border-color: #337ab7 !important;
+	background-color: #337ab7 !important;
+}
+
+/*----------SORTABLE----------------*/
+/* prevent inserting text into CKEditors */
+.sortable-placeholder .option-ckeditor {
+	pointer-events: none
+}
+.sortable-chosen {
+	background-color: #fff;
+}
+.sortable-placeholder {
+	background-color: rgba(241, 241, 241, 0.7);
+}
+
+/*----------SLIDER----------------*/
+
+.ui-widget-content.ui-slider {
+	border: 0.02em solid #bdc3c7;
+	background: #e1e1e1;
+	color: #222222;
+	margin-top: -0.02em;
+	padding: 0.08em;
+	opacity:0.8;
+}
+
+.ui-state-default, .ui-widget-content.ui-slider .ui-state-default{
+	background:transparent !important;
+	border:none !important;
+}
+.ui-slider .ui-slider-handle label{
+    background: #c3c3c3;
+    border-radius: 20px;
+    width:5.2em;
+}
+
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 5.2em;
+	height: 100px;
+	cursor: default;
+	margin: 0 -40px auto !important;
+	text-align: center;	
+	line-height: 28px;
+	color: #FFFFFF;
+}
+
+.ui-slider .ui-slider-handle .fa {
+	color: #FFFFFF;
+    margin: 0 3px;
+    font-size: 18px;
+    opacity: 0.5;
+    font-weight: bolder;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	top: -.9em;
+}
+
+.ui-state-default, .ui-widget-content.ui-slider .ui-state-default {
+	border: 1px solid #f9f9f9;
+	background: #3498db;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	margin-left: -0.5em;
+}
+
+.ui-slider .ui-slider-handle {
+	cursor: pointer;
+}
+
+.ui-slider a, .ui-slider a:focus {
+	cursor: pointer;
+	outline: none;
+}
+
+.grade-slider {
+    height: 30px;
+    padding-top: 15px;
+}
+
+.grade-slider>div:first-child {
+	margin-top: -7px;
+	padding: 0;
+}
+
+/*----------CKEDITOR FLOATING LABEL----------------*/
+
+.cke-div {
+    position: relative;
+}
+
+/*
+div[contenteditable].placeholder-shown {
+	margin-top: 22px;
+}*/
+
+.cke-label-floating {
+    will-change: left,top,contents;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 400;
+    position: absolute;
+    pointer-events: none;
+    transition: all .3s ease;
+    color: #999 !important;
+    top: 0;
+}
+div[contenteditable]:focus + .cke-label-floating, div[contenteditable].cke_filled + .cke-label-floating {
+    top: -1rem;
+    left: 0;
+    font-size: .9rem;
+}
+
+/*----------SWITCH (https://www.w3schools.com/howto/howto_css_switch.asp)----------------*/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 23px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 3px;
+  bottom: 0.2em;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked ~ .switch-slider {
+  background-color: #2196F3;
+}
+
+input:focus ~ .switch-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked ~ .switch-slider:before {
+  -webkit-transform: translateX(17px);
+  -ms-transform: translateX(17px);
+  transform: translateX(17px);
+}
+
+/* Rounded switch-sliders */
+.switch-slider.round {
+  border-radius: 23px;
+}
+
+.switch-slider.round:before {
+  border-radius: 50%;
+}
+
+/*----------Modifications to bootstrap-toggle----------------*/
+.toggle.btn-xs {
+	min-width: 59px;
+}
+
+/*----------Validation rules----------------*/
+#title-container .form-control-feedback {
+    right: 80px;
+}
+.col-sm-9.has-feedback .form-control-feedback {
+    left: 80px;
 }

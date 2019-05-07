@@ -4,23 +4,11 @@
 
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<link href="<lams:WebAppURL/>includes/css/addQuestion.css" rel="stylesheet" type="text/css">
-
-		<script type="text/javascript">
-			var questionType = ${questionType};
-			var addOptionUrl = "<c:url value='/authoring/addOption.do'/>";
-		   	var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
-    	    var upOptionUrl = "<c:url value='/authoring/upOption.do'/>";
-    	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
-		</script>
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/assessmentoption.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+		<%@ include file="/common/authoringQuestionHeader.jsp"%>
   	    <script>
 			$(document).ready(function(){
-				
 		    	$("#assessmentQuestionForm").validate({
+		    		ignore: 'hidden',
 		    		rules: {
 		    			title: "required",
 		    			defaultGrade: {
@@ -39,8 +27,8 @@
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
 		    					var hasOneHundredGrade = false;
-		    					$("select[name^='optionGrade']").each(function() {
-		    						hasOneHundredGrade = hasOneHundredGrade || (this.value == '1.0');
+		    					$("input[name^='optionGrade']").each(function() {
+		    						hasOneHundredGrade = hasOneHundredGrade || (eval(this.value) == 1);
 		    					});
 	    			    		return !hasOneHundredGrade;
 			    		    }			    		    
@@ -59,21 +47,6 @@
 		    			hasOptionFilled: "<fmt:message key='label.authoring.numerical.error.answer'/>",
 		    			hasOneHundredGrade: "<fmt:message key='error.form.validation.hundred.score'/>"
 		    		},
-		    	    invalidHandler: function(form, validator) {
-		    		      var errors = validator.numberOfInvalids();
-		    		      if (errors) {
-		    		          var message = errors == 1
-		    		          	  ? "<fmt:message key='error.form.validation.error'/>"
-		    		          	  : "<fmt:message key='error.form.validation.errors'><fmt:param >" + errors + "</fmt:param></fmt:message>";
-	    		          	  
-		    		          $("div.error span").html(message);
-		    		          $("div.error").show();
-		    		      } else {
-		    		          $("div.error").hide();
-		    		      }
-		    		},
-		    		debug: true,
-		    		errorClass: "alert alert-danger",
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();     			    
 		    			$("#optionList").val($("#optionForm").serialize(true));
@@ -86,33 +59,27 @@
 		    		    }; 				
 		    		    				
 		    			$('#assessmentQuestionForm').ajaxSubmit(options);
-		    		}
+		    		},
+		    		invalidHandler: formValidationInvalidHandler,
+					errorElement: "em",
+					errorPlacement: formValidationErrorPlacement,
+					success: formValidationSuccess,
+					highlight: formValidationHighlight,
+					unhighlight: formValidationUnhighlight
 		  		});
 			});
-    		// post-submit callback 
-    		function afterRatingSubmit(responseText, statusText)  { 
-    			self.parent.refreshThickbox()
-    			self.parent.tb_remove();
-    		}    
   		</script>
-		
 </lams:head>
-	
 <body>
-	<div class="panel panel-default add-file">
+	<div class="panel-default add-file">
 		<div class="panel-heading panel-title">
 			<fmt:message key="label.authoring.basic.type.short.answer" />
 		</div>
 
 		<div class="panel-body">
-			<lams:errors/>
-		    <div class="error">
-		    	<lams:Alert id="errorMessages" type="danger" close="false" >
-					<span></span>
-				</lams:Alert>	
-		    </div>
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
@@ -120,95 +87,127 @@
 				<input type="hidden" name="optionList" id="optionList" />
 				<form:hidden path="sequenceId" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
-				
-				<div class="form-group">
-				    <label for="title">
-				    	<fmt:message key="label.authoring.basic.question.name"/>
-				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="* <fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-				    </label>
-				    <form:input path="title" maxlength="255" id="title" cssClass="form-control" tabindex="1"/>
-				</div>
-			
-				<div class="form-group">
-					<label for="question">
-						<fmt:message key="label.authoring.basic.question.text" />
-					</label>
-		            	
-					<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
-				</div>
-				
-				<div class="checkbox">
-					<label for="answer-required">
-						<form:checkbox path="answerRequired" id="answer-required"/>
-						<fmt:message key="label.authoring.answer.required" />
-					</label>
-				</div>
-				
-				<div class="form-group form-inline">
-					<c:if test="${!isAuthoringRestricted}">
-					    <label for="defaultGrade">
-					    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-					    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-					    </label>
-					    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-				    </c:if>
-				    
-				    <label class="loffset10" for="penaltyFactor"> 
-				    	<fmt:message key="label.authoring.basic.penalty.factor" />:
-						<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-				    </label>
-				    <form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
-				</div>
-																	
-				<div class="form-inline form-group">
-					<label for="caseSensitive">
-						<fmt:message key="label.authoring.short.answer.case.sensitivity" />:
-					</label>
-					<form:select path="caseSensitive" cssClass="form-control input-sm">
-						<form:option value="false"><fmt:message key="label.authoring.short.answer.no.case.unimportant" /></form:option>
-						<form:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></form:option>
-					</form:select>
-				</div>
 
-				<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback" href="#general-fdback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
-					<div id="general-feedback"  class="voffset5 collapse <c:if test="${not empty assessmentQuestionForm.generalFeedback}">in</c:if> form-group">
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
+				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
+					<fmt:message key="label.settings" />
+				</button>
+				
+				<div class="question-tab">
+					<lams:errors/>
+					 <div class="error">
+				    	<lams:Alert id="errorMessages" type="danger" close="false" >
+							<span></span>
+						</lams:Alert>	
+				    </div>
+					
+					<div id="title-container" class="form-group">
+						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255"
+					    	placeholder="${TITLE_LABEL}"/>
+					</div>
+				
+					<div class="form-group">
+						<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.enter.question.description"/></c:set>
+						<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" 
+							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
+					</div>
+					
+					<div>
+						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					</div>
+					<div>
+						<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
 					</div>
 				</div>
 				
-				<h5 class="voffset20">
-					<fmt:message key="label.authoring.short.answer.answers" />
-				</h5>
-				<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
-				<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
+				<div class="settings-tab">
+					 <div class="error">
+				    	<lams:Alert id="errorMessages" type="danger" close="false" >
+							<span></span>
+						</lams:Alert>	
+				    </div>
+				
+					<div>
+						<label class="switch">
+							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
+							<fmt:message key="label.authoring.answer.required" />
+						</label>
+					</div>>
+					
+					<c:if test="${!isAuthoringRestricted}">
+						<div class="form-group row form-inline">
+						    <label for="defaultGrade" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						    </label>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    </div>
+						</div>
+					</c:if>
+					
+					<div class="form-group row form-inline">
+					    <label for="penaltyFactor" class="col-sm-3"> 
+					    	<fmt:message key="label.authoring.basic.penalty.factor" />
+							  <i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					    </label>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    </div>
+					</div>
+					
+					<div class="form-group row form-inline">
+						<label for="caseSensitive" class="col-sm-3">
+							<fmt:message key="label.authoring.short.answer.case.sensitivity" />
+						</label>
+						
+						<div class="col-sm-9">
+							<form:select path="caseSensitive" id="caseSensitive" cssClass="form-control input-sm">
+								<form:option value="false"><fmt:message key="label.authoring.short.answer.no.case.unimportant" /></form:option>
+								<form:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></form:option>
+							</form:select>
+						</div>
+					</div>
+	
+					<div class="voffset5 form-group">
+						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
+						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
+					</div>
+				</div>
+
 			</form:form>
 			
 			<!-- Options -->
-			<form id="optionForm" name="optionForm">
-				<%@ include file="optionlist.jsp"%>
-				
-				<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-default button-add-item pull-right">
-					<fmt:message key="label.authoring.short.answer.add.answer" />  
-				</a>
-			</form>
+			<div class="question-tab">
+				<form id="optionForm" name="optionForm">
+					<%@ include file="optionlist.jsp"%>
+					
+					<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-default button-add-item pull-right">
+						<fmt:message key="label.authoring.short.answer.add.answer" />  
+					</a>
+				</form>	
+			</div>	
 
-			<div class="voffset10 pull-right clear-both">
+		</div>	
+	</div>	
+	
+	<footer class="footer fixed-bottom">
+		<div class="panel-heading">
+        	<div class="pull-right">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" />
 				</a>
 				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
 					<fmt:message key="label.authoring.save.button" />
 				</a>
-				
-			</div>			
-
-		</div>
-		<!--closes content-->
-	
-		<div id="footer">
-		</div>
-		<!--closes footer-->		
-	</div>	
+			</div>	
+      	</div>
+    </footer>
 </body>
 </lams:html>

@@ -2,24 +2,18 @@
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <div class="form-group">
-	<label for="optionString${status.index}">
-		<fmt:message key="label.authoring.basic.option.answer"/>&nbsp;${status.index+1}
-	</label>
-	<input type="text" name="optionString${status.index}" value="<c:out value='${option.optionString}' />" class="form-control input-sm"/>
+	<c:set var="OPTION_LABEL"><fmt:message key="label.authoring.basic.option.answer"/></c:set>
+	<input type="text" name="optionString${status.index}" class="borderless-text-input"
+		value="<c:out value='${option.optionString}' />" placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"/>
 </div>
 
-<div class="form-group form-inline">
-	<label>
-		<fmt:message key="label.authoring.basic.option.grade"></fmt:message>:
-	</label>
+<div class="option-settings-hidden" style="display: none;">
 	<%@ include file="gradeselector.jsp"%>
+	
+	<div class="voffset5-bottom">
+	   	<c:set var="FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.option.feedback"/></c:set>
+	   	<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" 
+	     	placeholder="${FEEDBACK_LABEL}" contentFolderID="${contentFolderID}" height="50px"/>
+	</div>
 </div>
 
-<div class="form-group">
-    <label for="optionFeedback${status.index}">
-    	<a data-toggle="collapse" data-target="#feedback${status.index}" href="#fback${status.index}"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"/></a>
-    </label>
-    <div id="feedback${status.index}" class="collapse <c:if test="${not empty option.feedback}">in</c:if>">
-    	<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" contentFolderID="${contentFolderID}"/>
-    </div>	
-</div>

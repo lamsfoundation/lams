@@ -44,7 +44,7 @@
 						data: { 
 							sessionMapId: '${sessionMapId}',
 						},
-	    	    		target:  parent.jQuery('#resourceListArea'), 
+	    	    		target:  parent.jQuery('#itemArea'), 
 	    	    		success: function() { 
 	    	    			self.parent.refreshThickbox();
 	    	    			self.parent.tb_remove();
