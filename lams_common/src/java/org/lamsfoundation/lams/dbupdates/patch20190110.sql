@@ -201,7 +201,8 @@ INSERT INTO tmp_question
 	GROUP BY q.uid;
 	
 -- create a similar mapping for existing questions in QB
-CREATE TABLE tmp_qb_question
+CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
+						      content TEXT)
 	AS SELECT q.uid AS question_uid,
 			  GROUP_CONCAT(TRIM(q.name), TRIM(o.name) ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
@@ -209,6 +210,8 @@ CREATE TABLE tmp_qb_question
 		ON q.uid = o.qb_question_uid
 	WHERE q.type = 1
 	GROUP BY q.uid;
+	
+ALTER TABLE tmp_qb_question ADD INDEX (content(500));
 
 -- create a mapping of Scratchie question UID -> UID of one of Scratchie questions which holds the same content
 INSERT INTO tmp_question_match
@@ -287,7 +290,6 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
 	FROM tl_lascrt11_scratchie_answer AS o
 	JOIN lams_qb_question AS q
 		ON o.scratchie_item_uid = q.tmp_question_id
-	WHERE o.scratchie_item_uid IS NOT NULL
 	ORDER BY o.scratchie_item_uid, o.order_id;
 	
 
@@ -307,8 +309,7 @@ UPDATE tl_lascrt11_answer_log AS sl, tl_lascrt11_scratchie_answer AS sa, lams_qb
 	WHERE   sa.order_id = qo.display_order
 		AND sl.scratchie_answer_uid = sa.uid
 		AND qo.qb_question_uid = tq.qb_question_uid
-		AND sa.scratchie_item_uid = tq.tool_question_uid
-		AND sa.scratchie_item_uid IS NOT NULL;
+		AND sa.scratchie_item_uid = tq.tool_question_uid;
 		
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
@@ -356,6 +357,17 @@ INSERT INTO tmp_qb_question
 		ON q.uid = o.qb_question_uid
 	WHERE q.type = 1
 	GROUP BY q.uid;
+	
+-- set up references to QB question UIDs for existing questions
+INSERT INTO lams_qb_tool_question
+	SELECT q.question_uid, qb.question_uid, assess.content_id, aq.sequence_id
+	FROM tmp_question AS q
+	JOIN tmp_qb_question qb
+		USING (content)
+	JOIN tl_laasse10_assessment_question AS aq
+		ON q.question_uid = aq.uid
+	JOIN tl_laasse10_assessment AS assess
+		ON aq.assessment_uid = assess.uid;
 
 -- create a mapping of Assessment question UID -> UID of one of Assessment questions which holds the same content
 INSERT INTO tmp_question_match
@@ -374,9 +386,11 @@ DELETE FROM tmp_question;
 
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question_type, TRIM(q.title), q.correct_answer, COALESCE(CONCAT(IFNULL(TRIM(o.question), ''),IFNULL(TRIM(o.option_string), ''), o.option_float, o.correct), '') ORDER BY o.sequence_id)
+		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(q.title), ''), q.correct_answer,
+						IFNULL(CONCAT(IFNULL(TRIM(o.question), ''), IFNULL(TRIM(o.option_string), ''), o.option_float, o.correct), '') 
+						ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
-	JOIN tl_laasse10_question_option AS o
+	LEFT JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
 	WHERE q.question_type != 1
 	GROUP BY q.uid;
@@ -436,17 +450,6 @@ INSERT INTO lams_qb_tool_question
 	JOIN tl_laasse10_assessment AS assess
 		ON aq.assessment_uid = assess.uid;
 	
--- set up references to QB question UIDs for existing questions
-INSERT INTO lams_qb_tool_question
-	SELECT q.question_uid, qb.question_uid, assess.content_id, aq.sequence_id
-	FROM tmp_question AS q
-	JOIN tmp_qb_question qb
-		USING (content)
-	JOIN tl_laasse10_assessment_question AS aq
-		ON q.question_uid = aq.uid
-	JOIN tl_laasse10_assessment AS assess
-		ON aq.assessment_uid = assess.uid;
-		
 -- delete obsolete columns
 ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F52D1F93EC0D3147, 
 									   DROP COLUMN title,
@@ -476,11 +479,10 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, TRIM(o.option_string), o.correct, o.question, o.option_float, o.grade, o.accepted_error, o.feedback
+	SELECT q.uid, o.sequence_id, IFNULL(TRIM(o.option_string), ''), o.correct, o.question, o.option_float, o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
 		ON o.question_uid = q.tmp_question_id
-	WHERE o.question_uid IS NOT NULL
 	ORDER BY o.question_uid, o.sequence_id;
 	
 	
@@ -490,7 +492,6 @@ INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, u
 	FROM tl_laasse10_assessment_unit AS u
 	JOIN lams_qb_question AS q
 		ON u.question_uid = q.tmp_question_id
-	WHERE u.question_uid IS NOT NULL
 	ORDER BY u.question_uid, u.sequence_id;
 
 
@@ -507,8 +508,7 @@ UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams
 	WHERE   o.sequence_id = qo.display_order
 		AND sl.submitted_option_uid = o.uid
 		AND qo.qb_question_uid = tq.qb_question_uid
-		AND o.question_uid = tq.tool_question_uid
-		AND o.question_uid IS NOT NULL;
+		AND o.question_uid = tq.tool_question_uid;
 		
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
