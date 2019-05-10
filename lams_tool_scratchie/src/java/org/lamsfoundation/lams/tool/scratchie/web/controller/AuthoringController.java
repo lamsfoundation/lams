@@ -283,6 +283,7 @@ public class AuthoringController {
 	Set<ScratchieItem> items = new LinkedHashSet<>();
 	SortedSet<ScratchieItem> newItems = getItemList(sessionMap);
 	Iterator<ScratchieItem> iter = newItems.iterator();
+	int maxQuestionId = qbService.getMaxQuestionId();
 	while (iter.hasNext()) {
 	    ScratchieItem item = iter.next();
 	    if (item != null) {
@@ -306,7 +307,7 @@ public class AuthoringController {
 			item.setQbQuestion(qbQuestion);
 			qbQuestion.clearID();
 			qbQuestion.setVersion(1);
-			qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+			qbQuestion.setQuestionId(maxQuestionId++);
 			qbQuestion.setCreateDate(new Date());
 		    }
 			break;
@@ -509,7 +510,6 @@ public class AuthoringController {
     /**
      * Parses questions extracted from IMS QTI file and adds them as new items.
      */
-    @SuppressWarnings("rawtypes")
     @RequestMapping("/saveQTI")
     private String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
 	// big part of code was taken from saveItem() method
@@ -522,14 +522,18 @@ public class AuthoringController {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    ScratchieItem item = new ScratchieItem();
+	    item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
+	    QbQuestion qbQuestion = new QbQuestion();
+	    item.setQbQuestion(qbQuestion);
+	    
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
 		maxSeq = last.getDisplayOrder() + 1;
 	    }
 	    item.setDisplayOrder(maxSeq);
-	    item.getQbQuestion().setName(question.getTitle());
-	    item.getQbQuestion().setDescription(QuestionParser.processHTMLField(question.getText(), false,
+	    qbQuestion.setName(question.getTitle());
+	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false,
 		    contentFolderID, question.getResourcesFolderPath()));
 
 	    TreeSet<QbOption> answerList = new TreeSet<>();
@@ -569,7 +573,7 @@ public class AuthoringController {
 		continue;
 	    }
 
-	    item.getQbQuestion().setQbOptions(new ArrayList<>(answerList));
+	    qbQuestion.setQbOptions(new ArrayList<>(answerList));
 	    itemList.add(item);
 	    if (log.isDebugEnabled()) {
 		log.debug("Added question: " + question.getText());
@@ -595,14 +599,15 @@ public class AuthoringController {
 
 	for (ScratchieItem item : itemList) {
 	    Question question = new Question();
+	    QbQuestion qbQuestion = item.getQbQuestion();
 
 	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-	    question.setTitle(item.getQbQuestion().getName());
-	    question.setText(item.getQbQuestion().getDescription());
+	    question.setTitle(qbQuestion.getName());
+	    question.setText(qbQuestion.getDescription());
 
 	    List<Answer> answers = new ArrayList<>();
 	    Set<QbOption> scratchieAnswers = new TreeSet<>();
-	    scratchieAnswers.addAll(item.getQbQuestion().getQbOptions());
+	    scratchieAnswers.addAll(qbQuestion.getQbOptions());
 
 	    for (QbOption itemAnswer : scratchieAnswers) {
 		Answer answer = new Answer();
