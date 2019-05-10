@@ -628,16 +628,20 @@ public class LearningController {
 
 	    final String burningQuestion = request
 		    .getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX + itemUid);
-	    // update question in sessionMap
-	    item.setBurningQuestion(burningQuestion);
+	    if (StringUtils.isNotBlank(burningQuestion)) {
+		// update question in sessionMap
+		item.setBurningQuestion(burningQuestion);
 
-	    // update new entry
-	    scratchieService.saveBurningQuestion(sessionId, itemUid, burningQuestion);
+		// update new entry
+		scratchieService.saveBurningQuestion(sessionId, itemUid, burningQuestion);
+	    }
 	}
 
 	// handle general burning question
 	final String generalQuestion = request.getParameter(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION);
-	scratchieService.saveBurningQuestion(sessionId, null, generalQuestion);
+	if (StringUtils.isNotBlank(generalQuestion)) {
+	    scratchieService.saveBurningQuestion(sessionId, null, generalQuestion);
+	}
 	// update general question in sessionMap
 	sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalQuestion);
     }
