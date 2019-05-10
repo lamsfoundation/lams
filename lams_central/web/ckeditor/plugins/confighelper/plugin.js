@@ -176,6 +176,7 @@
 				editor.on('mode', addPlaceholder, null, placeholder);
 				editor.on('contentDom', addPlaceholder, null, placeholder);
 
+				//**LAMS** commented out the following line
 				editor.on('focus', removePlaceholder);
 				editor.on('key', removePlaceholder);
 				editor.on('beforeModeUnload', removePlaceholder);

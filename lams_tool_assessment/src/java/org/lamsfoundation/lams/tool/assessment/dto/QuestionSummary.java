@@ -47,17 +47,21 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
  */
 public class QuestionSummary {
 
-    private AssessmentQuestion question;
+    private QuestionDTO questionDto;
     private float averageMark;
 
     private List<List<AssessmentQuestionResult>> questionResultsPerSession;
-
-    public AssessmentQuestion getQuestion() {
-	return question;
+    
+    public QuestionSummary(AssessmentQuestion question) {
+	this.questionDto = new QuestionDTO(question);
     }
 
-    public void setQuestion(AssessmentQuestion question) {
-	this.question = question;
+    public QuestionDTO getQuestionDto() {
+	return questionDto;
+    }
+
+    public void setQuestionDto(QuestionDTO question) {
+	this.questionDto = question;
     }
 
     public float getAverageMark() {

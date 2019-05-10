@@ -47,19 +47,19 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
  */
 public class UserSummaryItem {
 
-    private AssessmentQuestion question;
+    private QuestionDTO questionDto;
     private List<AssessmentQuestionResult> questionResults;
 
     public UserSummaryItem(AssessmentQuestion question) {
-	this.question = question;
+	this.questionDto = new QuestionDTO(question);
     }
 
-    public AssessmentQuestion getQuestion() {
-	return question;
+    public QuestionDTO getQuestionDto() {
+	return questionDto;
     }
 
-    public void setQuestion(AssessmentQuestion question) {
-	this.question = question;
+    public void setQuestionDto(QuestionDTO question) {
+	this.questionDto = question;
     }
 
     public List<AssessmentQuestionResult> getQuestionResults() {

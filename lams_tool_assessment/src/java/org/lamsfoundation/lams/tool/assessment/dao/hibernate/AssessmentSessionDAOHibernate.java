@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.springframework.stereotype.Repository;

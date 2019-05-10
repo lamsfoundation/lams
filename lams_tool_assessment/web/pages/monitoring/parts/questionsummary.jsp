@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="questionDto" value="${questionSummary.questionDto}"/>
 
 <lams:html>
 	<lams:head>
@@ -26,7 +27,7 @@
 		  			
 	  				jQuery("#session${sessionDto.sessionId}").jqGrid({
 	  					datatype: "json",
-	  					url: "<c:url value="/monitoring/getUsersByQuestion.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}&questionUid=${questionSummary.question.uid}",
+	  					url: "<c:url value="/monitoring/getUsersByQuestion.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}&questionUid=${questionDto.uid}",
 	  					height: 'auto',
 	  					autowidth: true,
 	  					shrinkToFit: false,
@@ -153,26 +154,26 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
-				<fmt:message key="label.monitoring.question.summary.question" />: <c:out value="${questionSummary.question.title}" escapeXml="true"/>
+				<fmt:message key="label.monitoring.question.summary.question" />: <c:out value="${questionDto.title}" escapeXml="true"/>
 			</div>
 		</div>
 			
 		<div class="panel-body">
 			<lams:errors/>
                 
-            <c:out value="${questionSummary.question.question}" escapeXml="false"/>
+            <c:out value="${questionDto.question}" escapeXml="false"/>
 
 
             <div class="row"><div class="col-xs-12 col-sm-6">
             <h5><fmt:message key="label.question.options"/></h5>    
 			<table class="table table-condensed table-striped">
-				<c:if test="${questionSummary.question.type == 1}">
+				<c:if test="${questionDto.type == 1}">
 					<tr>
 						<td>
 							<fmt:message key="label.incorrect.answer.nullifies.mark" />:
 						</td>
 						<td style="text-align: right;">
-							<c:out value="${questionSummary.question.incorrectAnswerNullifiesMark}" escapeXml="false"/>
+							<c:out value="${questionDto.incorrectAnswerNullifiesMark}" escapeXml="false"/>
 						</td>
 					</tr>
 				</c:if>
@@ -181,7 +182,7 @@
 						<fmt:message key="label.monitoring.question.summary.default.mark" />:
 					</td>
 					<td style="text-align: right;">
-						<c:out value="${questionSummary.question.defaultGrade}" escapeXml="true"/>
+						<c:out value="${questionDto.maxMark}" escapeXml="true"/>
 					</td>
 				</tr>
 					
@@ -190,7 +191,7 @@
 						<fmt:message key="label.monitoring.question.summary.penalty" />:
 					</td>
 					<td style="text-align: right;">
-						<c:out value="${questionSummary.question.penaltyFactor}" escapeXml="true"/>
+						<c:out value="${questionDto.penaltyFactor}" escapeXml="true"/>
 					</td>
 				</tr>			
 			</table>

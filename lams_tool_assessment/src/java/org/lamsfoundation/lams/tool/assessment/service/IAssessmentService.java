@@ -31,6 +31,9 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
@@ -367,10 +370,10 @@ public interface IAssessmentService extends ICommonToolService {
      *
      * @param assessmentUid
      * @param userId
-     * @param questionSequenceId
+     * @param questionDisplayOrder
      * @return
      */
-    Float getQuestionResultMark(Long assessmentUid, Long userId, int questionSequenceId);
+    Float getQuestionResultMark(Long assessmentUid, Long userId, int questionDisplayOrder);
 
     Long createNotebookEntry(Long sessionId, Integer userId, String entryText);
 
@@ -529,5 +532,11 @@ public interface IAssessmentService extends ICommonToolService {
      * to refresh page because new data is available
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
+    
+    int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion);
+    
+    QbOption getQbOptionByUid(Long optionUid);
+    
+    QbQuestionUnit getQbQuestionUnitByUid(Long unitUid);
 
 }

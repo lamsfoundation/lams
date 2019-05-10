@@ -18,17 +18,17 @@
 				</td>
 						
 				<td>
-					<c:out value="${option.question}" escapeXml="false" />
+					<c:out value="${option.matchingPair}" escapeXml="false" />
 				</td>
 				
 				<td style="width: 100px;">
-					<select name="question${status.index}_${option.sequenceId}" disabled="disabled">
+					<select name="question${status.index}_${option.displayOrder}" disabled="disabled">
 						<option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></option>
 
 						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
 							<option value="${selectOption.uid}"
 									<c:if test="${option.answerInt == selectOption.uid}">selected="selected"</c:if>>
-								${selectOption.optionString}</option>
+								${selectOption.name}</option>
 						</c:forEach>
 					</select>
 				</td>

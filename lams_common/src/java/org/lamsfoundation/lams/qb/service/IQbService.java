@@ -1,13 +1,15 @@
 package org.lamsfoundation.lams.qb.service;
 
+import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import java.util.List;
 
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 
+
 public interface IQbService {
 
     // statuses of comparing QB question coming from authoring with data existing in DB
-    
+
     // no change detected
     static final int QUESTION_MODIFIED_NONE = 0;
     // change is minor, so the original question will be modified
@@ -34,6 +36,8 @@ public interface IQbService {
 
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);
+
+    QbStatsDTO getStats(long qbQuestionUid);
     
     List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
 	    String sortOrder, String searchString);

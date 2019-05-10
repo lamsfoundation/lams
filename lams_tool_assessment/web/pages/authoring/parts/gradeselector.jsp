@@ -6,6 +6,6 @@
 	</div>
     <div class="col-sm-5">
        	<div class="slider"></div>
-       	<input type="hidden" name="optionGrade${status.index}" id="optionGrade${status.index}" value="${option.grade}">
+       	<input type="hidden" name="optionMaxMark${status.index}" id="optionMaxMark${status.index}" value="${option.maxMark}">
     </div>
 </div>

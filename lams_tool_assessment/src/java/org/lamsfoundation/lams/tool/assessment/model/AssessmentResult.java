@@ -40,8 +40,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
-
 /**
  * Assessment Result
  *
@@ -89,7 +87,7 @@ public class AssessmentResult {
     
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "result_uid")
-    private Set<AssessmentQuestionResult> questionResults = new TreeSet<>(new AssessmentQuestionResultComparator());
+    private Set<AssessmentQuestionResult> questionResults = new TreeSet<>();
 
     // *************** NON Persist Fields ********************
     @Transient

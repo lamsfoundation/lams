@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * A question in Question Bank.
@@ -31,7 +33,7 @@ public class QbQuestion implements Serializable, Cloneable {
 
     // questions can be of different type
     // not all tools can produce/consume all question types
-    public static final int TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER = 1;
+    public static final int TYPE_MULTIPLE_CHOICE = 1;
     public static final int TYPE_MATCHING_PAIRS = 2;
     public static final int TYPE_SHORT_ANSWER = 3;
     public static final int TYPE_NUMERICAL = 4;
@@ -41,7 +43,7 @@ public class QbQuestion implements Serializable, Cloneable {
     public static final int TYPE_MARK_HEDGING = 8;
 
     // primary key
-    // another candidate is questionId + version, but single uid can fe searched faster
+    // another candidate is questionId + version, but single uid can be searched faster
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,14 +77,68 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column
     private String description;
 
-    @Column
-    private Integer mark;
+    @Column(name = "max_mark")
+    private Integer maxMark;
 
     @Column
     private String feedback;
 
+    @Column(name = "penalty_factor")
+    private float penaltyFactor;
+
+    @Column(name = "answer_required")
+    private boolean answerRequired;
+
+    @Column(name = "multiple_answers_allowed")
+    private boolean multipleAnswersAllowed;
+
+    @Column(name = "incorrect_answer_nullifies_mark")
+    private boolean incorrectAnswerNullifiesMark;
+
+    @Column(name = "feedback_on_correct")
+    private String feedbackOnCorrect;
+
+    @Column(name = "feedback_on_partially_correct")
+    private String feedbackOnPartiallyCorrect;
+
+    @Column(name = "feedback_on_incorrect")
+    private String feedbackOnIncorrect;
+
+    // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
+    @Column
+    private boolean shuffle;
+    
+    @Column(name = "prefix_answers_with_letters")
+    private boolean prefixAnswersWithLetters;
+
+    @Column(name = "case_sensitive")
+    private boolean caseSensitive;
+
+    @Column(name = "correct_answer")
+    private boolean correctAnswer;
+
+    @Column(name = "allow_rich_editor")
+    private boolean allowRichEditor;
+
+    // only for essay type of question
+    @Column(name = "max_words_limit")
+    private int maxWordsLimit;
+    
+    // only for essay type of question
+    @Column(name = "min_words_limit")
+    private int minWordsLimit;
+
+    // only for hedging maxMark type of question
+    @Column(name = "hedging_justification_enabled")
+    private boolean hedgingJustificationEnabled;
+
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<QbOption> qbOptions = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<QbQuestionUnit> units = new ArrayList<>();
 
     // compares if current question data and the other one (probably modified with new data) are the same
     // it detects if question is the same or should another question/version be created
@@ -96,13 +152,14 @@ public class QbQuestion implements Serializable, Cloneable {
 	QbQuestion other = (QbQuestion) o;
 	// options are also checked if they are equal
 	return new EqualsBuilder().append(name, other.name).append(description, other.description)
-		.append(feedback, other.feedback).append(mark, other.mark)
-		.append(qbOptions.toArray(), other.getQbOptions().toArray()).isEquals();
+		.append(feedback, other.feedback).append(maxMark, other.maxMark)
+		.append(qbOptions.toArray(), other.getQbOptions().toArray())
+		.append(units.toArray(), other.getUnits().toArray()).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(name).append(description).append(feedback).append(mark).toHashCode();
+	return new HashCodeBuilder().append(name).append(description).append(feedback).append(maxMark).toHashCode();
     }
 
     @Override
@@ -122,6 +179,14 @@ public class QbQuestion implements Serializable, Cloneable {
 	    optionClone.setQbQuestion(clone);
 	    optionsClone.add(optionClone);
 	}
+	// make a deep copy of units
+	List<QbQuestionUnit> unitsClone = new ArrayList<>(units.size());
+	clone.setUnits(unitsClone);
+	for (QbQuestionUnit unit : units) {
+	    QbQuestionUnit unitClone = unit.clone();
+	    unitClone.setQbQuestion(clone);
+	    unitsClone.add(unitClone);
+	}
 	return clone;
     }
 
@@ -129,6 +194,9 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.uid = null;
 	for (QbOption option : qbOptions) {
 	    option.uid = null;
+	}
+	for (QbQuestionUnit unit : units) {
+	    unit.uid = null;
 	}
     }
 
@@ -192,12 +260,12 @@ public class QbQuestion implements Serializable, Cloneable {
 	this.description = description;
     }
 
-    public Integer getMark() {
-	return mark;
+    public Integer getMaxMark() {
+	return maxMark;
     }
 
-    public void setMark(Integer mark) {
-	this.mark = mark;
+    public void setMaxMark(Integer maxMark) {
+	this.maxMark = maxMark;
     }
 
     public String getFeedback() {
@@ -207,6 +275,141 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setFeedback(String feedback) {
 	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
     }
+    
+
+    public float getPenaltyFactor() {
+	return penaltyFactor;
+    }
+
+    public void setPenaltyFactor(float penaltyFactor) {
+	this.penaltyFactor = penaltyFactor;
+    }
+
+    public boolean isAnswerRequired() {
+	return answerRequired;
+    }
+
+    public void setAnswerRequired(boolean answerRequired) {
+	this.answerRequired = answerRequired;
+    }
+
+    public boolean isMultipleAnswersAllowed() {
+	return multipleAnswersAllowed;
+    }
+
+    public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
+	this.multipleAnswersAllowed = multipleAnswersAllowed;
+    }
+
+    public boolean isIncorrectAnswerNullifiesMark() {
+	return incorrectAnswerNullifiesMark;
+    }
+
+    public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
+	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
+    }
+
+    public String getFeedbackOnCorrect() {
+	return feedbackOnCorrect;
+    }
+
+    public void setFeedbackOnCorrect(String feedbackOnCorrect) {
+	this.feedbackOnCorrect = feedbackOnCorrect;
+    }
+
+    public String getFeedbackOnPartiallyCorrect() {
+	return feedbackOnPartiallyCorrect;
+    }
+
+    public void setFeedbackOnPartiallyCorrect(String feedbackOnPartiallyCorrect) {
+	this.feedbackOnPartiallyCorrect = feedbackOnPartiallyCorrect;
+    }
+
+    public String getFeedbackOnIncorrect() {
+	return feedbackOnIncorrect;
+    }
+
+    public void setFeedbackOnIncorrect(String feedbackOnIncorrect) {
+	this.feedbackOnIncorrect = feedbackOnIncorrect;
+    }
+
+    public boolean isShuffle() {
+	return shuffle;
+    }
+
+    public void setShuffle(boolean shuffle) {
+	this.shuffle = shuffle;
+    }
+
+    public boolean isCaseSensitive() {
+	return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+	this.caseSensitive = caseSensitive;
+    }
+
+    public boolean getCorrectAnswer() {
+	return correctAnswer;
+    }
+
+    public void setCorrectAnswer(boolean correctAnswer) {
+	this.correctAnswer = correctAnswer;
+    }
+
+    public boolean isAllowRichEditor() {
+	return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+	this.allowRichEditor = allowRichEditor;
+    }
+
+    /**
+     * maxWordsLimit set in author. Used only for essay type of questions
+     */
+    public int getMaxWordsLimit() {
+	return maxWordsLimit;
+    }
+
+    /**
+     * @param maxWordsLimit
+     *            set in author. Used only for essay type of questions
+     */
+    public void setMaxWordsLimit(int maxWordsLimit) {
+	this.maxWordsLimit = maxWordsLimit;
+    }
+
+    /**
+     * minWordsLimit set in author. Used only for essay type of questions
+     */
+    public int getMinWordsLimit() {
+	return minWordsLimit;
+    }
+
+    /**
+     * @param minWordsLimit
+     *            set in author. Used only for essay type of questions
+     */
+    public void setMinWordsLimit(int minWordsLimit) {
+	this.minWordsLimit = minWordsLimit;
+    }
+
+    public boolean isHedgingJustificationEnabled() {
+	return hedgingJustificationEnabled;
+    }
+
+    public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
+	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
+
+    public boolean isPrefixAnswersWithLetters() {
+        return prefixAnswersWithLetters;
+    }
+
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+    }
 
     public List<QbOption> getQbOptions() {
 	return qbOptions;
@@ -214,5 +417,13 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setQbOptions(List<QbOption> options) {
 	this.qbOptions = options;
+    }
+    
+    public List<QbQuestionUnit> getUnits() {
+	return units;
+    }
+
+    public void setUnits(List<QbQuestionUnit> units) {
+	this.units = units;
     }
 }

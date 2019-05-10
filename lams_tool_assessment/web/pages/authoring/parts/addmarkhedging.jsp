@@ -4,74 +4,9 @@
 
 <lams:html>
 <lams:head>
+	<link href="<lams:WebAppURL/>includes/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
 	<%@ include file="/common/authoringQuestionHeader.jsp"%>
-	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-	<style>
-	
-	/* --- SWITCH --- */
-	
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 23px;
-}
-
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.switch-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.switch-slider:before {
-  position: absolute;
-  content: "";
-  height: 17px;
-  width: 17px;
-  left: 3px;
-  bottom: 0.2em;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked ~ .switch-slider {
-  background-color: #2196F3;
-}
-
-input:focus ~ .switch-slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked ~ .switch-slider:before {
-  -webkit-transform: translateX(17px);
-  -ms-transform: translateX(17px);
-  transform: translateX(17px);
-}
-
-/* Rounded switch-sliders */
-.switch-slider.round {
-  border-radius: 23px;
-}
-
-.switch-slider.round:before {
-  border-radius: 50%;
-}
-	
-	</style>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/bootstrap-toggle.js"></script>
 	
     <script>
 		$(document).ready(function(){
@@ -79,20 +14,20 @@ input:checked ~ .switch-slider:before {
 		    	ignore: 'hidden',
 		    	rules: {
 		    		title: "required",
-		    		defaultGrade: {
+		    		maxMark: {
 		    		      required: true,
 		    		      digits: true
 		    		},
 		    		hasOptionFilled: {
 		    			required: function(element) {
 				   			prepareOptionEditorsForAjaxSubmit();
-		    	        	return $("textarea[name^=optionString]:filled").length < 1;
+		    	        	return $("textarea[name^=optionName]:filled").length < 1;
 			    	    }			    		    
 	    		    }
 		    	},
 		    	messages: {
 		    		title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    		defaultGrade: {
+		    		maxMark: {
 		    			required: "<fmt:message key='label.authoring.choice.field.required'/>",
 		    			digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 		    		},
@@ -100,14 +35,11 @@ input:checked ~ .switch-slider:before {
 		    			required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    		}
 		    	},
-		    	   invalidHandler: formInvalidHandler,
-		    	debug: true,
-		    	errorClass: "alert alert-danger",
      			submitHandler: function(form) {
      			   	prepareOptionEditorsForAjaxSubmit();
 		    		$("#optionList").val($("#optionForm").serialize(true));
 		    		$("#question").val(CKEDITOR.instances.question.getData());
-		    		$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+		    		$("#feedback").val(CKEDITOR.instances.feedback.getData());
 		    		$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 		    		$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
 		    		$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
@@ -118,8 +50,21 @@ input:checked ~ .switch-slider:before {
 		    	    }; 				
 		    		    				
 		    		$('#assessmentQuestionForm').ajaxSubmit(options);
-		    	}
-		  	});    	
+		    	},
+	    		invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
+		  	});
+
+		    //enforce only one correct option
+		    $(document).on("change", "input[type='checkbox'][name='optionCorrect']", function() {
+		        if(this.checked) {
+		        	$("input[type='checkbox'][name='optionCorrect']").not(this).bootstrapToggle('off');
+		        }
+		    });	
 		});   
  	</script>
 </lams:head>
@@ -131,13 +76,14 @@ input:checked ~ .switch-slider:before {
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
@@ -154,7 +100,7 @@ input:checked ~ .switch-slider:before {
 					
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255" 
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
@@ -164,7 +110,9 @@ input:checked ~ .switch-slider:before {
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 					</div>
 					
-					<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					<div>
+						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					</div>
 				</div>
 				
 				<div class="settings-tab">
@@ -183,12 +131,15 @@ input:checked ~ .switch-slider:before {
 					</label>
 	
 					<c:if test="${!isAuthoringRestricted}">
-						<div class="form-group form-inline">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						<div class="form-group row form-inline">
+						    <label for="maxMark" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
+						    </div>
 						</div>
 					</c:if>
 					
@@ -214,7 +165,7 @@ input:checked ~ .switch-slider:before {
 	
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 			

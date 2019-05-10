@@ -29,7 +29,7 @@ public abstract class QbToolAnswer {
     @JoinColumn(name = "tool_question_uid")
     protected QbToolQuestion qbToolQuestion;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qb_option_uid")
     protected QbOption qbOption;
 

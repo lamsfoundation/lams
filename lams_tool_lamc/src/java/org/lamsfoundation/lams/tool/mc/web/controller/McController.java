@@ -467,7 +467,7 @@ public class McController {
 	questionDto.setFeedback(qbQuestion.getFeedback());
 	questionDto.setDisplayOrder(maxDisplayOrder + 1);
 	questionDto.setOptionDtos(optionDtos);
-	questionDto.setMark(qbQuestion.getMark() == null ? "1" : String.valueOf(qbQuestion.getMark()));
+	questionDto.setMark(qbQuestion.getMaxMark() == null ? "1" : String.valueOf(qbQuestion.getMaxMark()));
 	questionDto.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
 	questionDtos.add(questionDto);
 	

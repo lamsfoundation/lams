@@ -11,7 +11,7 @@
 		    	ignore: 'hidden',
 		    	rules: {
 		    		title: "required",
-		    		defaultGrade: {
+		    		maxMark: {
 		    	    	required: true,
 		    		    digits: true
 		    		},
@@ -22,13 +22,13 @@
 		    		hasOptionFilled: {
 		    			required: function(element) {
 		    				prepareOptionEditorsForAjaxSubmit();	    				
-		    		       	return $("textarea[name^=optionQuestion]:filled").length < 1;
+		    		       	return $("textarea[name^=matchingPair]:filled").length < 1;
 			    	    }
 	    			   }
 		    	},
 	    		messages: {
 	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			defaultGrade: {
+	    			maxMark: {
 	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			},
@@ -38,13 +38,10 @@
 	    			},
 	    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
 	    		},
-	    	    invalidHandler: formInvalidHandler,
-	    		debug: true,
-	    		errorClass: "alert alert-danger",
    			    submitHandler: function(form) {
 	    			$("#optionList").val($("#optionForm").serialize(true));
 	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 		    			
 	    	    	var options = { 
 	    	    		target:  parent.jQuery('#questionListArea'), 
@@ -52,7 +49,13 @@
 	    		    }; 				
 		    		    				
 	    			$('#assessmentQuestionForm').ajaxSubmit(options);
-	    		}
+	    		},
+	    		invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
 	  		});
 		}); 
 	</script>
@@ -65,13 +68,14 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>				
 				<form:hidden path="feedbackOnCorrect" />
 				<form:hidden path="feedbackOnPartiallyCorrect" />
@@ -91,7 +95,7 @@
 	
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255" 
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
@@ -101,8 +105,10 @@
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 					</div>
 					
-					<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
-					<label for="hasOptionFilled" class="error" style="display: none;"></label>
+					<div>
+						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+						<label for="hasOptionFilled" class="error" style="display: none;"></label>
+					</div>
 				</div>
 				
 				<div class="settings-tab">
@@ -112,39 +118,53 @@
 						</lams:Alert>	
 				    </div>
 				
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
 	
-					<div class="form-group form-inline">
-						<c:if test="${!isAuthoringRestricted}">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					<c:if test="${!isAuthoringRestricted}">
+						<div class="form-group row form-inline">
+						    <label for="maxMark" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-					    </c:if>
-					    
-					    <label class="loffset10" for="penaltyFactor"> 
-					    	<fmt:message key="label.authoring.basic.penalty.factor" />:
-							  <i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
+						    </div>
+						</div>
+					</c:if>
+					
+					<div class="form-group row form-inline">
+					    <label for="penaltyFactor" class="col-sm-3"> 
+					    	<fmt:message key="label.authoring.basic.penalty.factor" />
+							  <i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 					    </label>
-					    <form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    </div>
 					</div>
 	
-					<div class="checkbox">
-						<label for="shuffle">
+					<div>
+						<label class="switch">
 							<form:checkbox path="shuffle" id="shuffle"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="shuffle">		
 							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 						</label>
 					</div>
 	
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 				</div>

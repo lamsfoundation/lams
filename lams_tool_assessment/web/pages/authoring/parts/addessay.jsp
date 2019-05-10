@@ -21,7 +21,7 @@
 		    	ignore: 'hidden',
 		    	rules: {
 		    		title: "required",
-		    		defaultGrade: {
+		    		maxMark: {
 		    			required: true,
 		    		    digits: true
 		    		},
@@ -34,17 +34,14 @@
 		    	},
 	    		messages: {
 	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			defaultGrade: {
+	    			maxMark: {
 	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			}
 	    		},
-	    	    invalidHandler: formInvalidHandler,
-	    		debug: true,
-	    		errorClass: "alert alert-danger",
    			    submitHandler: function(form) {
 	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 	     			    
 	    	    	var options = { 
 	    	    		target:  parent.jQuery('#questionListArea'), 
@@ -52,7 +49,13 @@
 	    		    }; 				
 
 	    			$('#assessmentQuestionForm').ajaxSubmit(options);
-	    		}
+	    		},
+	    		invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
 		  	});
 		    	
 		   	//spinner
@@ -106,12 +109,13 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm" 
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="questionType" value="6"/>
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />
@@ -127,11 +131,11 @@
 					
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255" 
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
-					<div class="form-group">
+					<div class="form-group form-group-cke">
 						<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.enter.question.description"/></c:set>
 						<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" 
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
@@ -139,59 +143,74 @@
 				</div>
 				
 				<div class="settings-tab">
-					 <div class="error">
+					<div class="error">
 				    	<lams:Alert id="errorMessages" type="danger" close="false" >
 							<span></span>
 						</lams:Alert>	
 				    </div>
 				    
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
 	
 					<c:if test="${!isAuthoringRestricted}">
-						<div class="form-group form-inline">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						<div class="form-group row form-inline">
+						    <label for="maxMark" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
+						    </div>
 						</div>
 					</c:if>
-					
-					<div class="checkbox">
-						<label for="allow-rich-editor">
+
+					<div>
+						<label class="switch">
 							<form:checkbox path="allowRichEditor" id="allow-rich-editor"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="allow-rich-editor">		
 							<fmt:message key="label.authoring.basic.allow.learners.rich.editor" />
 						</label>
 					</div>
 					
-					<div class="checkbox">
-					    <label for="max-words-limit-checkbox">
+					<div class="form-group row form-inline" style="display: flex; align-items: center;">
+					    <label for="max-words-limit-checkbox" class="col-sm-3">
 							<input type="checkbox" id="max-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.maximum.number.words" />
 					    </label>
-					    <form:input path="maxWordsLimit" id="max-words-limit"/>
-					    <label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
+					    
+					    <div class="col-sm-9">
+					   		<form:input path="maxWordsLimit" id="max-words-limit"/>
+					    	<label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
+					    </div>
 					</div>
 					
-					<div class="checkbox">
-					    <label for="min-words-limit-checkbox">
+					<div class="form-group row form-inline" style="display: flex; align-items: center;">
+					    <label for="min-words-limit-checkbox" class="col-sm-3">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.minimum.number.words" />
 					    </label>
-					    <form:input path="minWordsLimit" id="min-words-limit"/>
-					    <label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="minWordsLimit" id="min-words-limit"/>
+					    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
+					    </div>
 					</div>
 	
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 				</div>

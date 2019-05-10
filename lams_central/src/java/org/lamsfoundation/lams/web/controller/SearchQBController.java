@@ -88,17 +88,17 @@ public class SearchQBController {
 	//empty questionTypesAvailable means no other questionTypes available for this tool
 	StringBuilder questionTypesAvailable = new StringBuilder(); 
 	//by default show MCQ type of questions (except for Q&A tool)
-	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER;
+	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE;
 	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature) || CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 	    
 	//CommonConstants.TOOL_SIGNATURE_SURVEY
 	} else if ("lasurv11".equals(toolSignature)) {
-	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
 	    
 	} else if (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
-	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE_SINGLE_ANSWER);
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_MATCHING_PAIRS);
 	    questionTypesAvailable.append(",");

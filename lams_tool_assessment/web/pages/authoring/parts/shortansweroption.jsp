@@ -1,13 +1,13 @@
-<input type="hidden" name="optionSequenceId${status.index}" value="${option.sequenceId}">
+<input type="hidden" name="optionDisplayOrder${status.index}" value="${option.displayOrder}">
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <div class="form-group">
 	<c:set var="OPTION_LABEL"><fmt:message key="label.authoring.basic.option.answer"/></c:set>
-	<input type="text" name="optionString${status.index}" class="borderless-text-input"
-		value="<c:out value='${option.optionString}' />" placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"/>
+	<input type="text" name="optionName${status.index}" class="borderless-text-input"
+		value="<c:out value='${option.name}' />" placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"/>
 </div>
 
-<div class="settings-on-hover-hidden">
+<div class="option-settings-hidden" style="display: none;">
 	<%@ include file="gradeselector.jsp"%>
 	
 	<div class="voffset5-bottom">

@@ -11,7 +11,7 @@
 		    	ignore: 'hidden',
 	    		rules: {
 	    			title: "required",
-	    			defaultGrade: {
+	    			maxMark: {
 	    			    required: true,
 	    			    digits: true
 	    			},
@@ -22,22 +22,22 @@
 	    			hasOptionFilled: {
 	    				required: function(element) {
 			    			prepareOptionEditorsForAjaxSubmit();
-	    		        	return $("textarea[name^=optionString]:filled").length < 1;
+	    		        	return $("textarea[name^=optionName]:filled").length < 1;
 		    		    }			    		    
     			    },
-    			    hasOneHundredGrade: {
+    			    hasOneHundredMaxMark: {
 	    				required: function(element) {
-	    					var hasOneHundredGrade = false;
-	    					$("input[name^='optionGrade']").each(function() {
-	    						hasOneHundredGrade = hasOneHundredGrade || (eval(this.value) == 1);
+	    					var hasOneHundredMaxMark = false;
+	    					$("input[name^='optionMaxMark']").each(function() {
+	    						hasOneHundredMaxMark = hasOneHundredMaxMark || (eval(this.value) == 1);
 	    					});
-    			    		return !hasOneHundredGrade && !eval($("#multipleAnswersAllowed").val());
+    			    		return !hasOneHundredMaxMark && !eval($("#multipleAnswersAllowed").val());
 		    		    }		    		    
     			    }
 	    		},
 	    		messages: {
 	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			defaultGrade: {
+	    			maxMark: {
 	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			},
@@ -48,18 +48,15 @@
 	    			hasOptionFilled: {
 	    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 	    			},
-	    			hasOneHundredGrade: {
+	    			hasOneHundredMaxMark: {
 	    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
 	    			}
 	    		},
-	    	    invalidHandler: formInvalidHandler,
-	    		debug: true,
-	    		errorClass: "alert alert-danger",
    			    submitHandler: function(form) {
    			    	prepareOptionEditorsForAjaxSubmit();
 	    			$("#optionList").val($("#optionForm").serialize(true));
 	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 	    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 	    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
 	    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
@@ -70,7 +67,13 @@
 	    		    }; 				
 		    		    				
 	    			$('#assessmentQuestionForm').ajaxSubmit(options);
-	    		}
+	    		},
+	    	    invalidHandler: formValidationInvalidHandler,
+				errorElement: "em",
+				errorPlacement: formValidationErrorPlacement,
+				success: formValidationSuccess,
+				highlight: formValidationHighlight,
+				unhighlight: formValidationUnhighlight
 		  	});
 		    	
 			$("#multipleAnswersAllowed").on('change', function() {
@@ -114,13 +117,14 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" method="post" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm">
+			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+				method="post" autocomplete="off">
 				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
@@ -137,7 +141,7 @@
 				
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
-					    <form:input path="title" id="title" cssClass="borderless-text-input" tabindex="1" maxlength="255"  
+					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255"  
 					    	placeholder="${TITLE_LABEL}"/>
 					</div>
 				
@@ -147,8 +151,12 @@
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 					</div>
 				
-					<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
-					<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
+					<div>
+						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
+					</div>
+					<div>
+						<input type="text" name="hasOneHundredMaxMark" id="hasOneHundredMaxMark" class="fake-validation-input">
+					</div>
 				</div>
 
 				<div class="settings-tab">
@@ -158,91 +166,108 @@
 						</lams:Alert>	
 				    </div>
 				
-					<div class="checkbox">
-						<label for="answer-required">
+					<div>
+						<label class="switch">
 							<form:checkbox path="answerRequired" id="answer-required"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
 					
-					<div class="form-group form-inline">
-						<c:if test="${!isAuthoringRestricted}">
-						    <label for="defaultGrade">
-						    	<fmt:message key="label.authoring.basic.default.question.grade" />:
-						    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+					<c:if test="${!isAuthoringRestricted}">
+						<div class="form-group row">
+						    <label for="maxMark" class="col-sm-3">
+						    	<fmt:message key="label.authoring.basic.default.question.grade" />
+						    	<i class="fa fa-xs fa-asterisk text-danger" style="vertical-align: super;" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
-						    <form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
-					    </c:if>
-					</div>
-					
-					<div class="form-group form-inline">
-					    <label for="penaltyFactor"> 
-					    	<fmt:message key="label.authoring.basic.penalty.factor" />:
-							  <i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+						    
+						    <div class="col-sm-9">
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
+						    </div>
+						</div>
+					</c:if>
+					    					
+					<div class="form-group row">
+					    <label for="penaltyFactor" class="col-sm-3"> 
+					    	<fmt:message key="label.authoring.basic.penalty.factor" />
+							<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 					    </label>
-					    <form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    
+					    <div class="col-sm-9">
+					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
+					    </div>
 					</div>
 					
-					<div class="form-inline form-group">
-						<label for="multipleAnswersAllowed">
+					<div class="form-group row form-inline">
+						<label for="multipleAnswersAllowed" class="col-sm-3">
 							<fmt:message key="label.authoring.choice.one.multiple.answers" />
 						</label>
-						<form:select path="multipleAnswersAllowed" id="multipleAnswersAllowed" cssClass="form-control input-sm">
-							<form:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></form:option>
-							<form:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></form:option>
-						</form:select>
+						
+						<div class="col-sm-9">
+							<form:select path="multipleAnswersAllowed" id="multipleAnswersAllowed" cssClass="form-control input-sm">
+								<form:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></form:option>
+								<form:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></form:option>
+							</form:select>
+						</div>
 					</div>
-					
-					<div class="checkbox" id="incorrect-answer-nullifies-mark-area">
-						<label for="incorrectAnswerNullifiesMark">
+
+					<div id="incorrect-answer-nullifies-mark-area">
+						<label class="switch">
 							<form:checkbox path="incorrectAnswerNullifiesMark" id="incorrectAnswerNullifiesMark"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="incorrectAnswerNullifiesMark">		
 							<fmt:message key="label.incorrect.answer.nullifies.mark" />
 						</label>
-					</div>		
+					</div>
 		
-					<div class="checkbox">
-						<label for="shuffle">
+					<div>
+						<label class="switch">
 							<form:checkbox path="shuffle" id="shuffle"/>
-							<span id="shuffleText"><fmt:message key="label.authoring.basic.shuffle.the.choices" /></span>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="shuffle">		
+							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
 						</label>
 					</div>
-					
-					<div class="checkbox" id="prefixAnswersWithLettersDiv">
-						<label for="prefixAnswersWithLetters">
+
+					<div id="prefixAnswersWithLettersDiv">
+						<label class="switch">
 							<form:checkbox path="prefixAnswersWithLetters" id="prefixAnswersWithLetters"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="prefixAnswersWithLetters">		
 							<span id="prefixAnswersWithLettersText"><fmt:message key="label.prefix.sequential.letters.for.each.answer" /></span>
 						</label>
 					</div>
-	
-					<div class="voffset5 form-group">
-						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
-							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
-					</div>
 				
 					<!-- Overall feedback -->
-					<div class="overallFeedback">
-					  <fmt:message key="label.authoring.choice.overall.feedback" />
-		
-						<div id="overall-feedback">				
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_CORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.correct"/></c:set>
-								<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
-									placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
+					<!-- <h5 style="margin-top: 20px;">Feedbacks</h5> -->
+	
+					<div class="form-group">
+						<c:set var="GENERAL_FEEDBACK_LABEL">General Feedback</c:set>
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
+							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
+					</div>
+					
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_CORRECT_LABEL">Feedback on any correct response</c:set>
+						<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
+							placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>
+					
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL">Feedback on any partially correct response</c:set>
+						<lams:CKEditor id="feedbackOnPartiallyCorrect" value="${assessmentQuestionForm.feedbackOnPartiallyCorrect}" 
+							placeholder="${FEEDBACK_ON_PARTICALLY_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>
 							
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.partially.correct" /></c:set>
-								<lams:CKEditor id="feedbackOnPartiallyCorrect" value="${assessmentQuestionForm.feedbackOnPartiallyCorrect}" 
-									placeholder="${FEEDBACK_ON_PARTICALLY_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
-							
-							<div class="form-group">
-								<c:set var="FEEDBACK_ON_INCORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.incorrect" /></c:set>
-								<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
-									placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
-							</div>
-						</div>
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_INCORRECT_LABEL">Feedback on any incorrect response</c:set>
+						<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
+							placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>
 				</div><!-- settings tab ends -->
 			</form:form>

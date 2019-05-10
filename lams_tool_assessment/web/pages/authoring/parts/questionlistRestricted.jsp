@@ -61,14 +61,14 @@
 							<fmt:message key="label.authoring.basic.random.question" />
 						</c:when>
 						<c:otherwise>
-							<c:out value="${question.title}" escapeXml="true"/>
+							<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
 				</td>
 				
 				<td>
-					<input name="grade${questionReference.sequenceId}" value="${questionReference.defaultGrade}"
-						id="grade${questionReference.sequenceId}" class="form-control input-sm" style="width: 50%;">
+					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
+						id="maxMark${questionReference.sequenceId}" class="form-control input-sm" style="width: 50%;">
 				</td>
 				
 				<td class="arrows">
@@ -85,7 +85,7 @@
 				<td width="30px">
 					<c:if test="${!questionReference.randomQuestion}">
 						<c:set var="editQuestionUrl" >
-							<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionSequenceId=${questionReference.question.sequenceId}&KeepThis=true&TB_iframe=true&modal=true
+							<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionDisplayOrder=${questionReference.question.displayOrder}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>
 						<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
 							<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>

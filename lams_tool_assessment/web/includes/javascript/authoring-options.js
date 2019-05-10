@@ -38,12 +38,12 @@ function addOption(){
 //in order to be able to use option's value, copy it from CKEditor to textarea
 function prepareOptionEditorsForAjaxSubmit(){
 	if ((QUESTION_TYPE == 1) || (QUESTION_TYPE == 7) || (QUESTION_TYPE == 8)) {
-		$("textarea[name^=optionString], textarea[name^=optionFeedback]").each(function()  {
+		$("textarea[name^=optionName], textarea[name^=optionFeedback]").each(function()  {
 			prepareOptionEditorForAjaxSubmit(this);
 		});
 			
 	} else if (QUESTION_TYPE == 2) {
-		$("[name^=optionQuestion]").each(function() {
+		$("[name^=matchingPair]").each(function() {
 			prepareOptionEditorForAjaxSubmit(this);
 		});
 			
@@ -60,7 +60,6 @@ function prepareOptionEditorForAjaxSubmit(ckeditor){
 }
 
 function initializeAnswers() {
-	
 
 	//check if jquery-ui.slider.js library is loaded
 	if (typeof(jQuery.ui.slider) != 'undefined'){
@@ -112,22 +111,22 @@ function initializeAnswers() {
 	    direction: 'vertical',
 		onStart: function (evt) {
 			//stop answers' hover effect, once element dragging started
-			$("#option-table").removeClass("hover-active");
+			//$("#option-table").removeClass("hover-active");
 		},
 		onEnd: function (evt) {
 			//activate answers' hover effect, once element dragging ended
-			$("#option-table").delay(50).queue(function(next){
-			    $(this).addClass("hover-active");
-			    next();
-			});
+			//$("#option-table").delay(50).queue(function(next){
+			//    $(this).addClass("hover-active");
+			//    next();
+			//});
 		},
 		store: {
 			set: function (sortable) {
-				//update all sequenceIds in order to later save it as options' order
+				//update all displayOrders in order to later save it as options' order
 				var order = sortable.toArray();
 				for (var i = 0; i < order.length; i++) {
 				    var optionIndex = order[i];
-				    $('input[name="optionSequenceId' + optionIndex + '"]').val(i+1);
+				    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
 				}
 			}
 		}

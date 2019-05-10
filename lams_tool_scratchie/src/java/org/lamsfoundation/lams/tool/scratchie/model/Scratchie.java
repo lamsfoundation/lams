@@ -297,6 +297,9 @@ public class Scratchie implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
+	for (ScratchieItem item : scratchieItems) {
+	    item.setToolContentId(contentId);
+	}
     }
 
     public String getReflectInstructions() {

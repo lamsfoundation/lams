@@ -20,7 +20,7 @@
   	    	var previousCellValue = "";  	    	
 	  	  	$(document).ready(function(){
 	  			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
-	  				<c:set var="question" value="${userSummaryItem.question}"/>
+	  				<c:set var="question" value="${userSummaryItem.questionDto}"/>
 	  			
 	  				jQuery("#user${question.uid}").jqGrid({
 	  					datatype: "local",
@@ -205,7 +205,7 @@
 								<fmt:message key="label.monitoring.user.summary.title" />
 							</td>
 							<td>
-								 <c:out value="${userSummaryItem.question.title}" escapeXml="true"/>
+								 <c:out value="${userSummaryItem.questionDto.title}" escapeXml="true"/>
 							</td>
 						</tr>					
 						<tr>
@@ -213,7 +213,7 @@
 								<fmt:message key="label.monitoring.user.summary.question" />
 							</td>
 							<td>
-								<c:out value="${userSummaryItem.question.question}" escapeXml="false"/>
+								<c:out value="${userSummaryItem.questionDto.question}" escapeXml="false"/>
 							</td>
 						</tr>
 					</table>
@@ -222,7 +222,7 @@
 				
 
 					
-					<table id="user${userSummaryItem.question.uid}"></table>
+					<table id="user${userSummaryItem.questionDto.uid}"></table>
 					</div>
 				</div>
 			</c:forEach>

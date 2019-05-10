@@ -388,7 +388,7 @@
 						isMultipleChoice="${question.type == 1}"
 						correctDisclosed="${question.correctAnswersDisclosed}"
 						groupsDisclosed="${question.groupsAnswersDisclosed}">
-					<c:out value="${question.title}" escapeXml="true"/>
+					<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 				</option>
 				<c:set var="allCorrectDisclosed"
 					   value="${allCorrectDisclosed && (question.type != 1 || question.correctAnswersDisclosed)}" />

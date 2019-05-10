@@ -2,7 +2,7 @@
 
 <div class="question-type">
 	<fmt:message key="label.assign.hedging.mark">
-		<fmt:param>${question.grade}</fmt:param>
+		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
 </div>
 
@@ -11,15 +11,15 @@
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
 				<td>
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>
 				
 				<td style="width: 100px;">
-					<select name="question${questionIndex}_${option.sequenceId}" class="mark-hedging-select" data-question-index="${questionIndex}"
+					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>				
 					>
 						
-						<c:forEach var="i" begin="0" end="${question.grade}">
+						<c:forEach var="i" begin="0" end="${question.maxMark}">
 							<option
 								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
 							>${i}</option>

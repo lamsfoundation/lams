@@ -175,7 +175,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">
-							<span class="float-left space-right">Q${i.index+1})</span> <c:out value="${question.title}" escapeXml="false"/>
+							<span class="float-left space-right">Q${i.index+1})</span> <c:out value="${question.qbQuestion.name}" escapeXml="false"/>
 							<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
 								<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
 									<%-- Allow disclosing correct answers only for multiple choice questions --%>
@@ -216,7 +216,7 @@
 														${ALPHABET[j.index]}.
 													</td>									
 													<td>
-														<c:out value="${questionOption.optionString}" escapeXml="false"/>
+														<c:out value="${questionOption.name}" escapeXml="false"/>
 													</td>
 												</tr>
 																		
@@ -238,11 +238,11 @@
 													<td>
 														<span class="pull-left">${ALPHABET[j.index]}.</span>
 																
-														<c:out value="${questionOption.question}" escapeXml="false"/>
+														<c:out value="${questionOption.matchingPair}" escapeXml="false"/>
 													</td>
 																
 													<td>
-														<c:out value="${questionOption.optionString}" escapeXml="false"/>
+														<c:out value="${questionOption.name}" escapeXml="false"/>
 													</td>
 												</tr>
 											</c:forEach>
@@ -278,7 +278,7 @@
 														${ALPHABET[j.index]}.
 													</td>
 													<td>
-														<c:out value="${questionOption.optionString}" escapeXml="false"/>
+														<c:out value="${questionOption.name}" escapeXml="false"/>
 													</td>
 												</tr>
 												

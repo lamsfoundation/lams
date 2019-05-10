@@ -15,11 +15,12 @@
 							<td width="80px">
 								<fmt:message key="label.authoring.basic.unit.unit"/>
 							</td>
-							<td>	
-								<input type="hidden" name="unitSequenceId${status.index}" value="${unit.sequenceId}" 
-									id="unitSequenceId${status.index}">						
-								<input type="text" name="unitUnit${status.index}" value="${unit.unit}"
-									id="unitUnit${status.index}" class="form-control input-sm">
+							<td>
+								<input type="hidden" name="unitUid${status.index}" value="${unit.uid}">
+								<input type="hidden" name="unitDisplayOrder${status.index}" value="${unit.displayOrder}" 
+									id="unitDisplayOrder${status.index}">						
+								<input type="text" name="unitName${status.index}" value="${unit.name}"
+									id="unitName${status.index}" class="form-control input-sm">
 							</td>									
 						</tr>
 						<tr>
