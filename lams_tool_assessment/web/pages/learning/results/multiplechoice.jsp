@@ -17,11 +17,11 @@
 			<c:set var="isCorrect" 
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
-				    		 && (option.grade > 0)}" />
+				    		 && (option.maxMark > 0)}" />
 			<c:set var="isWrong"
 				   value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
-				    		&& (option.grade <= 0)}" />
+				    		&& (option.maxMark <= 0)}" />
 			<tr ${isCorrect ? 'class="bg-success"' : '' }>
 				<td class="complete-item-gif">
 				    <c:if test="${option.answerBoolean && isCorrect}">
@@ -34,13 +34,13 @@
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}"
+							<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								disabled="disabled"
 							/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.sequenceId}"
+							<input type="radio" name="question${status.index}" value="${option.displayOrder}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						disabled="disabled"
 							/>
@@ -52,7 +52,7 @@
 				</td>
 				
 				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>
 				
 				<c:if test="${assessment.allowQuestionFeedback}">
@@ -104,10 +104,10 @@
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">
 		<c:choose>
-			<c:when test="${question.answerTotalGrade >= 1}">
+			<c:when test="${question.optionMaxMark >= 1}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</c:when>
-			<c:when test="${question.answerTotalGrade > 0}">
+			<c:when test="${question.optionMaxMark > 0}">
 				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
 			</c:when>
 			<c:otherwise>

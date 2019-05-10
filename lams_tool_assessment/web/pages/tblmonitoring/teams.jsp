@@ -1,13 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
-	<c:set var="question" value="${questionResult.assessmentQuestion}"/>
+	<c:set var="question" value="${questionResult.questionDto}"/>
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
 				<span class="float-left space-right">Q${i.index+1})</span> 
-				<c:out value="${questionResult.assessmentQuestion.title}" escapeXml="false"/>
+				<c:out value="${questionResult.questionDto.title}" escapeXml="false"/>
 			</h4> 
 		</div>
 	              

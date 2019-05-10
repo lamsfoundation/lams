@@ -31,17 +31,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -55,19 +54,17 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
-import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
@@ -147,9 +144,6 @@ public class AuthoringController {
 	    throws ServletException {
 	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
-	List<AssessmentQuestion> questions = null;
-	Assessment assessment = null;
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -158,8 +152,10 @@ public class AuthoringController {
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 	assessmentForm.setContentFolderID(contentFolderID);
 
+	Assessment assessment = null;
 	try {
 	    assessment = service.getAssessmentByContentId(contentId);
 	    // if assessment does not exist, try to use default content instead.
@@ -173,6 +169,7 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
+	List<AssessmentQuestion> questions = null;
 	if (assessment.getQuestions() != null) {
 	    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
 	} else {
@@ -239,16 +236,6 @@ public class AuthoringController {
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
 	
-	//allow using old and modified questions and references altogether
-	if (mode.isTeacher()) {
-	    for (AssessmentQuestion question : oldQuestions) {
-		service.releaseFromCache(question);
-	    }
-	    for (QuestionReference reference : oldReferences) {
-		service.releaseFromCache(reference);
-	    }
-	}
-	
 	AssessmentUser assessmentUser = null;
 
 	if (assessmentPO == null) {
@@ -257,6 +244,17 @@ public class AuthoringController {
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
 
 	} else {
+	    // copyProperties() below sets assessmentPO items to empty collection
+	    // but the items still exist in Hibernate cache, so we need to evict them now
+	    for (AssessmentQuestion question : oldQuestions) {
+		service.releaseFromCache(question);
+//		service.releaseFromCache(question.getQbQuestion());
+	    }
+	    for (QuestionReference reference : oldReferences) {
+		service.releaseFromCache(reference);
+	    }
+	    assessmentPO.getQuestions().clear();
+	    
 	    Long uid = assessmentPO.getUid();
 	    assessmentUser = assessmentPO.getCreatedBy();
 	    PropertyUtils.copyProperties(assessmentPO, assessment);
@@ -291,12 +289,36 @@ public class AuthoringController {
 
 	// ************************* Handle assessment questions *******************
 	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
+	int maxQuestionId = qbService.getMaxQuestionId();
 	for (AssessmentQuestion question : newQuestions) {
+	    question.setToolContentId(assessmentPO.getContentId());
 	    removeNewLineCharacters(question);
+	    // modification status was already set in AuthoringController#saveItem()
+	    switch (question.getQbQuestionModified()) {
+		case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
+		    // new version of the old question gets created
+		    QbQuestion qbQuestion = question.getQbQuestion().clone();
+		    question.setQbQuestion(qbQuestion);
+		    qbQuestion.clearID();
+		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+		    qbQuestion.setCreateDate(new Date());
+		}
+		    break;
+		case IQbService.QUESTION_MODIFIED_ID_BUMP: {
+		    // new question gets created
+		    QbQuestion qbQuestion = question.getQbQuestion().clone();
+		    question.setQbQuestion(qbQuestion);
+		    qbQuestion.clearID();
+		    qbQuestion.setVersion(1);
+		    qbQuestion.setQuestionId(maxQuestionId++);
+		    qbQuestion.setCreateDate(new Date());
+		}
+		    break;
+	    }
 	}
 	assessmentPO.setQuestions(newQuestions);
 
-	Set<QuestionReference> newReferences = updateQuestionReferencesGrades(request, sessionMap, true);	
+	Set<QuestionReference> newReferences = updateQuestionReferencesMaxMarks(request, sessionMap, true);	
 	
 	//recalculate results in case content is edited from monitoring and it's been already attempted by a student
 	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
@@ -353,38 +375,37 @@ public class AuthoringController {
 	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	questionForm.setSessionMapID(sessionMapID);
-	questionForm.setSequenceId(-1);//which signifies it's a new question
+	questionForm.setDisplayOrder(-1);//which signifies it's a new question
 	questionForm.setContentFolderID(contentFolderID);
-	questionForm.setDefaultGrade("1");
+	questionForm.setMaxMark("1");
 	questionForm.setPenaltyFactor("0");
 	questionForm.setAnswerRequired(true);
 
-	List<AssessmentQuestionOption> optionList = new ArrayList<>();
+	List<QbOption> optionList = new ArrayList<>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
-	    AssessmentQuestionOption option = new AssessmentQuestionOption();
-	    option.setSequenceId(i + 1);
-	    option.setGrade(0);
+	    QbOption option = new QbOption();
+	    option.setDisplayOrder(i + 1);
 	    optionList.add(option);
 	}
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 
-	List<AssessmentUnit> unitList = new ArrayList<>();
-	AssessmentUnit unit = new AssessmentUnit();
-	unit.setSequenceId(1);
+	List<QbQuestionUnit> unitList = new ArrayList<>();
+	QbQuestionUnit unit = new QbQuestionUnit();
+	unit.setDisplayOrder(1);
 	unit.setMultiplier(1);
 	unitList.add(unit);
 	for (int i = 1; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
-	    unit = new AssessmentUnit();
-	    unit.setSequenceId(i + 1);
+	    unit = new QbQuestionUnit();
+	    unit.setDisplayOrder(i + 1);
 	    unit.setMultiplier(0);
 	    unitList.add(unit);
 	}
 	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 
-	short type = (short) NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
+	Integer type = NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return findForward(type);
@@ -397,19 +418,19 @@ public class AuthoringController {
     public String editQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
 	    HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	int questionSequenceId = WebUtil.readIntParam(request, AssessmentConstants.PARAM_QUESTION_SEQUENCE_ID);
+	int questionDisplayOrder = WebUtil.readIntParam(request, AssessmentConstants.PARAM_QUESTION_DISPLAY_ORDER);
 	AssessmentQuestion question = null;
 	for (AssessmentQuestion questionIter : questionList) {
-	    if (questionIter.getSequenceId() == questionSequenceId) {
+	    if (questionIter.getDisplayOrder() == questionDisplayOrder) {
 		question = questionIter;
 		break;
 	    }
 	}
 	if (question == null) {
-	    throw new RuntimeException("Question with sequenceId:" + questionSequenceId + " was not found!");
+	    throw new RuntimeException("Question with displayOrder:" + questionDisplayOrder + " was not found!");
 	}
 	populateQuestionToForm(question, questionForm, request);
 
@@ -466,42 +487,19 @@ public class AuthoringController {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
 	
+	//create new ScratchieItem and assign imported qbQuestion to it
+	AssessmentQuestion question = new AssessmentQuestion();
+	question.setQbQuestion(qbQuestion);
+	int maxSeq = 1;
+	if (questionList != null && questionList.size() > 0) {
+	    AssessmentQuestion last = questionList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
+	}
+	question.setDisplayOrder(maxSeq);
+	question.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
+	questionList.add(question);
 	
-	
-//	// check whether it is "edit(old Question)" or "add(new Question)"
-//	extractFormToAssessmentQuestion(request, questionList, questionForm, isAuthoringRestricted);
-//
-//	reinitializeAvailableQuestions(sessionMap);
-//	
-//	
-//	
-//	
-//	//create new ScratchieItem and assign imported qbQuestion to it
-//	ScratchieItem item = new ScratchieItem();
-//	item.setQbQuestion(qbQuestion);
-//	int maxSeq = 1;
-//	if (itemList != null && itemList.size() > 0) {
-//	    ScratchieItem last = itemList.last();
-//	    maxSeq = last.getDisplayOrder() + 1;
-//	}
-//	item.setDisplayOrder(maxSeq);
-//	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
-//	itemList.add(item);
-	
-	
-	
-	
-	
-	
-
-
-	// evict everything manually as we do not use DTOs, just real entities
-	// without eviction changes would be saved immediately into DB
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item.getQbQuestion());
-	
-//	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
+	reinitializeAvailableQuestions(sessionMap);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -548,15 +546,15 @@ public class AuthoringController {
     @RequestMapping("/removeQuestion")
     public String removeQuestion(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
-	int deletedQuestionSequenceId = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_SEQUENCE_ID), -1);
+	int deletedQuestionDisplayOrder = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_DISPLAY_ORDER), -1);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	Iterator<AssessmentQuestion> iterator = questionList.iterator();
 	AssessmentQuestion deletedQuestion = null;
 	while (iterator.hasNext()) {
 	    AssessmentQuestion questionIter = iterator.next();
-	    if (questionIter.getSequenceId() == deletedQuestionSequenceId) {
+	    if (questionIter.getDisplayOrder() == deletedQuestionDisplayOrder) {
 		deletedQuestion = questionIter;
 		iterator.remove();
 	    }
@@ -571,7 +569,7 @@ public class AuthoringController {
 	QuestionReference questionReferenceToDelete = null;
 	for (QuestionReference questionReference : questionReferences) {
 	    if ((questionReference.getQuestion() != null)
-		    && (questionReference.getQuestion().getSequenceId() == deletedQuestionSequenceId)) {
+		    && (questionReference.getQuestion().getDisplayOrder() == deletedQuestionDisplayOrder)) {
 		questionReferenceToDelete = questionReference;
 	    }
 	}
@@ -603,7 +601,7 @@ public class AuthoringController {
     @RequestMapping("/addQuestionReference")
     public String addQuestionReference(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
@@ -622,19 +620,19 @@ public class AuthoringController {
 	reference.setRandomQuestion(isRandomQuestion);
 
 	if (isRandomQuestion) {
-	    reference.setDefaultGrade(1);
+	    reference.setMaxMark(1);
 	} else {
 	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	    AssessmentQuestion question = null;
 	    for (AssessmentQuestion questionFromList : questionList) {
-		if (questionFromList.getSequenceId() == questionIdx) {
+		if (questionFromList.getDisplayOrder() == questionIdx) {
 		    question = questionFromList;
 		    break;
 		}
 	    }
 	    reference.setQuestion(question);
 
-	    reference.setDefaultGrade(question.getDefaultGrade());
+	    reference.setMaxMark(question.getQbQuestion().getMaxMark());
 	}
 	references.add(reference);
 
@@ -650,7 +648,7 @@ public class AuthoringController {
     @RequestMapping("/removeQuestionReference")
     public String removeQuestionReference(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
@@ -688,7 +686,7 @@ public class AuthoringController {
 
     private String switchQuestionReferences(HttpServletRequest request, boolean up) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesGrades(request, sessionMap, false);
+	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
@@ -766,9 +764,9 @@ public class AuthoringController {
 		    int maxSeq = 1;
 		    if ((oldQuestions != null) && (oldQuestions.size() > 0)) {
 			AssessmentQuestion last = oldQuestions.last();
-			maxSeq = last.getSequenceId() + 1;
+			maxSeq = last.getDisplayOrder() + 1;
 		    }
-		    question.setSequenceId(maxSeq);
+		    question.setDisplayOrder(maxSeq);
 		    oldQuestions.add(question);
 		}
 	    }
@@ -858,15 +856,14 @@ public class AuthoringController {
      */
     @RequestMapping("/addOption")
     public String addOption(HttpServletRequest request) {
-	TreeSet<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-	AssessmentQuestionOption option = new AssessmentQuestionOption();
+	TreeSet<QbOption> optionList = getOptionsFromRequest(request, false);
+	QbOption option = new QbOption();
 	int maxSeq = 1;
 	if ((optionList != null) && (optionList.size() > 0)) {
-	    AssessmentQuestionOption last = optionList.last();
-	    maxSeq = last.getSequenceId() + 1;
+	    QbOption last = optionList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
 	}
-	option.setSequenceId(maxSeq);
-	option.setGrade(0);
+	option.setDisplayOrder(maxSeq);
 	optionList.add(option);
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
@@ -882,14 +879,14 @@ public class AuthoringController {
      */
     @RequestMapping("/newUnit")
     public String newUnit(HttpServletRequest request) {
-	TreeSet<AssessmentUnit> unitList = getUnitsFromRequest(request, false);
-	AssessmentUnit unit = new AssessmentUnit();
+	TreeSet<QbQuestionUnit> unitList = getUnitsFromRequest(request, false);
+	QbQuestionUnit unit = new QbQuestionUnit();
 	int maxSeq = 1;
 	if ((unitList != null) && (unitList.size() > 0)) {
-	    AssessmentUnit last = unitList.last();
-	    maxSeq = last.getSequenceId() + 1;
+	    QbQuestionUnit last = unitList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
 	}
-	unit.setSequenceId(maxSeq);
+	unit.setDisplayOrder(maxSeq);
 	unitList.add(unit);
 
 	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
@@ -959,7 +956,7 @@ public class AuthoringController {
 	    questionsFromList.add(reference.getQuestion());
 	}
 
-	Set<AssessmentQuestion> availableQuestions = new TreeSet<>(new SequencableComparator());
+	Set<AssessmentQuestion> availableQuestions = new TreeSet<>();
 	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
 
 	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
@@ -973,7 +970,7 @@ public class AuthoringController {
 	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
 		.get(AssessmentConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
-	    list = new TreeSet<>(new SequencableComparator());
+	    list = new TreeSet<>();
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
 	}
 	return list;
@@ -1024,31 +1021,31 @@ public class AuthoringController {
     /**
      * Get back jsp name.
      */
-    private String findForward(short type) {
+    private String findForward(Integer type) {
 	String forward;
 	switch (type) {
-	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+	    case QbQuestion.TYPE_MULTIPLE_CHOICE:
 		forward = "pages/authoring/parts/addmultiplechoice";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+	    case QbQuestion.TYPE_MATCHING_PAIRS:
 		forward = "pages/authoring/parts/addmatchingpairs";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
+	    case QbQuestion.TYPE_SHORT_ANSWER:
 		forward = "pages/authoring/parts/addshortanswer";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
+	    case QbQuestion.TYPE_NUMERICAL:
 		forward = "pages/authoring/parts/addnumerical";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+	    case QbQuestion.TYPE_TRUE_FALSE:
 		forward = "pages/authoring/parts/addtruefalse";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
+	    case QbQuestion.TYPE_ESSAY:
 		forward = "pages/authoring/parts/addessay";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
+	    case QbQuestion.TYPE_ORDERING:
 		forward = "pages/authoring/parts/addordering";
 		break;
-	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+	    case QbQuestion.TYPE_MARK_HEDGING:
 		forward = "pages/authoring/parts/addmarkhedging";
 		break;
 	    default:
@@ -1063,40 +1060,39 @@ public class AuthoringController {
      */
     private void populateQuestionToForm(AssessmentQuestion question, AssessmentQuestionForm form,
 	    HttpServletRequest request) {
-	form.setTitle(question.getTitle());
-	form.setQuestion(question.getQuestion());
-	form.setDefaultGrade(String.valueOf(question.getDefaultGrade()));
-	form.setPenaltyFactor(String.valueOf(question.getPenaltyFactor()));
-	form.setAnswerRequired(question.isAnswerRequired());
-	form.setGeneralFeedback(question.getGeneralFeedback());
-	form.setFeedback(question.getFeedback());
-	form.setMultipleAnswersAllowed(question.isMultipleAnswersAllowed());
-	form.setIncorrectAnswerNullifiesMark(question.isIncorrectAnswerNullifiesMark());
-	form.setFeedbackOnCorrect(question.getFeedbackOnCorrect());
-	form.setFeedbackOnPartiallyCorrect(question.getFeedbackOnPartiallyCorrect());
-	form.setFeedbackOnIncorrect(question.getFeedbackOnIncorrect());
-	form.setShuffle(question.isShuffle());
-	form.setPrefixAnswersWithLetters(question.isPrefixAnswersWithLetters());
-	form.setCaseSensitive(question.isCaseSensitive());
-	form.setCorrectAnswer(question.getCorrectAnswer());
-	form.setAllowRichEditor(question.isAllowRichEditor());
-	form.setMaxWordsLimit(question.getMaxWordsLimit());
-	form.setMinWordsLimit(question.getMinWordsLimit());
-	form.setHedgingJustificationEnabled(question.isHedgingJustificationEnabled());
-	form.setSequenceId(question.getSequenceId());
+	form.setTitle(question.getQbQuestion().getName());
+	form.setQuestion(question.getQbQuestion().getDescription());
+	form.setMaxMark(String.valueOf(question.getQbQuestion().getMaxMark()));
+	form.setPenaltyFactor(String.valueOf(question.getQbQuestion().getPenaltyFactor()));
+	form.setAnswerRequired(question.getQbQuestion().isAnswerRequired());
+	form.setFeedback(question.getQbQuestion().getFeedback());
+	form.setMultipleAnswersAllowed(question.getQbQuestion().isMultipleAnswersAllowed());
+	form.setIncorrectAnswerNullifiesMark(question.getQbQuestion().isIncorrectAnswerNullifiesMark());
+	form.setFeedbackOnCorrect(question.getQbQuestion().getFeedbackOnCorrect());
+	form.setFeedbackOnPartiallyCorrect(question.getQbQuestion().getFeedbackOnPartiallyCorrect());
+	form.setFeedbackOnIncorrect(question.getQbQuestion().getFeedbackOnIncorrect());
+	form.setShuffle(question.getQbQuestion().isShuffle());
+	form.setPrefixAnswersWithLetters(question.getQbQuestion().isPrefixAnswersWithLetters());
+	form.setCaseSensitive(question.getQbQuestion().isCaseSensitive());
+	form.setCorrectAnswer(question.getQbQuestion().getCorrectAnswer());
+	form.setAllowRichEditor(question.getQbQuestion().isAllowRichEditor());
+	form.setMaxWordsLimit(question.getQbQuestion().getMaxWordsLimit());
+	form.setMinWordsLimit(question.getQbQuestion().getMinWordsLimit());
+	form.setHedgingJustificationEnabled(question.getQbQuestion().isHedgingJustificationEnabled());
+	form.setDisplayOrder(question.getDisplayOrder());
 
-	short questionType = question.getType();
-	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
-		|| (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
-	    Set<AssessmentQuestionOption> optionList = question.getOptions();
+	Integer questionType = question.getType();
+	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		|| (questionType == QbQuestion.TYPE_ORDERING)
+		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS)
+		|| (questionType == QbQuestion.TYPE_SHORT_ANSWER)
+		|| (questionType == QbQuestion.TYPE_NUMERICAL)
+		|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
+	    List<QbOption> optionList = question.getQbQuestion().getQbOptions();
 	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	}
-	if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-	    Set<AssessmentUnit> unitList = question.getUnits();
+	if (questionType == QbQuestion.TYPE_NUMERICAL) {
+	    List<QbQuestionUnit> unitList = question.getQbQuestion().getUnits();
 	    request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 	}
     }
@@ -1114,127 +1110,138 @@ public class AuthoringController {
 	//find according question
 	AssessmentQuestion question = null;
 	// add
-	if (questionForm.getSequenceId() == -1) { 
+	if (questionForm.getDisplayOrder() == -1) { 
 	    question = new AssessmentQuestion();
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setType(questionForm.getQuestionType());
+	    question.setQbQuestion(qbQuestion);
 	    int maxSeq = 1;
 	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
-		maxSeq = last.getSequenceId() + 1;
+		maxSeq = last.getDisplayOrder() + 1;
 	    }
-	    question.setSequenceId(maxSeq);
+	    question.setDisplayOrder(maxSeq);
 	    questionList.add(question);
 	    
 	// edit
 	} else {
 	    for (AssessmentQuestion questionIter : questionList) {
-		if (questionIter.getSequenceId() == questionForm.getSequenceId()) {
+		if (questionIter.getDisplayOrder() == questionForm.getDisplayOrder()) {
 		    question = questionIter;
 		    break;
 		}
 	    }
 	}
 	
-	short type = questionForm.getQuestionType();
-	question.setType(type);
+	QbQuestion qbQuestion = question.getQbQuestion();
+	QbQuestion baseLine = qbQuestion.clone();
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+	service.releaseFromCache(question);
+	service.releaseFromCache(baseLine);
+	service.releaseFromCache(qbQuestion);
 
-	question.setTitle(questionForm.getTitle());
-	question.setQuestion(questionForm.getQuestion());
+	qbQuestion.setName(questionForm.getTitle());
+	qbQuestion.setDescription(questionForm.getQuestion());
 
 	if (!isAuthoringRestricted) {
-	    question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
+	    qbQuestion.setMaxMark(Integer.parseInt(questionForm.getMaxMark()));
 	}
-	question.setGeneralFeedback(questionForm.getGeneralFeedback());
-	question.setAnswerRequired(questionForm.isAnswerRequired());
+	qbQuestion.setFeedback(questionForm.getFeedback());
+	qbQuestion.setAnswerRequired(questionForm.isAnswerRequired());
 
-	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
+	Integer type = questionForm.getQuestionType();
+	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+	    qbQuestion.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
 	    boolean incorrectAnswerNullifiesMark = questionForm.isMultipleAnswersAllowed()
 		    ? questionForm.isIncorrectAnswerNullifiesMark()
 		    : false;
-	    question.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setShuffle(questionForm.isShuffle());
-	    question.setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
-	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setShuffle(questionForm.isShuffle());
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setCaseSensitive(questionForm.isCaseSensitive());
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setCorrectAnswer(questionForm.isCorrectAnswer());
-	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
-	    question.setAllowRichEditor(questionForm.isAllowRichEditor());
-	    question.setMaxWordsLimit(questionForm.getMaxWordsLimit());
-	    question.setMinWordsLimit(questionForm.getMinWordsLimit());
-	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-	    question.setShuffle(questionForm.isShuffle());
-	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	    question.setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
+	    qbQuestion.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setShuffle(questionForm.isShuffle());
+	    qbQuestion.setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setShuffle(questionForm.isShuffle());
+	} else if ((type == QbQuestion.TYPE_SHORT_ANSWER)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setCaseSensitive(questionForm.isCaseSensitive());
+	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setCorrectAnswer(questionForm.isCorrectAnswer());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	} else if ((type == QbQuestion.TYPE_ESSAY)) {
+	    qbQuestion.setAllowRichEditor(questionForm.isAllowRichEditor());
+	    qbQuestion.setMaxWordsLimit(questionForm.getMaxWordsLimit());
+	    qbQuestion.setMinWordsLimit(questionForm.getMinWordsLimit());
+	} else if (type == QbQuestion.TYPE_ORDERING) {
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
+	    qbQuestion.setShuffle(questionForm.isShuffle());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    qbQuestion.setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
 	}
 
 	// set options
-	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
-		|| (type == AssessmentConstants.QUESTION_TYPE_ORDERING)
-		|| (type == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS)
-		|| (type == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
-		|| (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
-		|| (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
-	    Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, true);
-	    Set<AssessmentQuestionOption> options = new LinkedHashSet<>();
-	    int seqId = 0;
-	    for (AssessmentQuestionOption option : optionList) {
-		option.setSequenceId(seqId++);
+	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		|| (type == QbQuestion.TYPE_ORDERING)
+		|| (type == QbQuestion.TYPE_MATCHING_PAIRS)
+		|| (type == QbQuestion.TYPE_SHORT_ANSWER)
+		|| (type == QbQuestion.TYPE_NUMERICAL)
+		|| (type == QbQuestion.TYPE_MARK_HEDGING)) {
+	    Set<QbOption> optionList = getOptionsFromRequest(request, true);
+	    List<QbOption> options = new ArrayList<>();
+	    int displayOrder = 0;
+	    for (QbOption option : optionList) {
+		option.setDisplayOrder(displayOrder++);
 		options.add(option);
 	    }
-	    question.setOptions(options);
+	    qbQuestion.setQbOptions(options);
 	}
 	// set units
-	if (type == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-	    Set<AssessmentUnit> unitList = getUnitsFromRequest(request, true);
-	    Set<AssessmentUnit> units = new LinkedHashSet<>();
-	    int seqId = 0;
-	    for (AssessmentUnit unit : unitList) {
-		unit.setSequenceId(seqId++);
+	if (type == QbQuestion.TYPE_NUMERICAL) {
+	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
+	    List<QbQuestionUnit> units = new ArrayList<>();
+	    int displayOrder = 0;
+	    for (QbQuestionUnit unit : unitList) {
+		unit.setDisplayOrder(displayOrder++);
 		units.add(unit);
 	    }
-	    question.setUnits(units);
+	    qbQuestion.setUnits(units);
 	}
-
+	
+	question.setQbQuestionModified(service.isQbQuestionModified(baseLine, qbQuestion));
+	request.setAttribute("qbQuestionModified", question.getQbQuestionModified());
     }
 
-    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request,
+    private Set<QuestionReference> updateQuestionReferencesMaxMarks(HttpServletRequest request,
 	    SessionMap<String, Object> sessionMap, boolean isFormSubmit) {
 	Map<String, String> paramMap = splitRequestParameter(request,
-		AssessmentConstants.ATTR_QUESTION_REFERENCES_GRADES);
+		AssessmentConstants.ATTR_QUESTION_REFERENCES_MAX_MARKS);
 
 	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 	for (QuestionReference questionReference : questionReferences) {
 	    try {
-		int grade;
+		int maxMark;
 		if (isFormSubmit) {
-		    grade = WebUtil.readIntParam(request,
-			    AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
+		    maxMark = WebUtil.readIntParam(request,
+			    AssessmentConstants.PARAM_MAX_MARK + questionReference.getSequenceId());
 		} else {
-		    String gradeStr = paramMap.get(AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
-		    grade = Integer.valueOf(gradeStr);
+		    String maxMarkStr = paramMap.get(AssessmentConstants.PARAM_MAX_MARK + questionReference.getSequenceId());
+		    maxMark = Integer.valueOf(maxMarkStr);
 		}
 
-		questionReference.setDefaultGrade(grade);
+		questionReference.setMaxMark(maxMark);
 	    } catch (Exception e) {
 		log.debug(e.getMessage());
 	    }
@@ -1250,7 +1257,7 @@ public class AuthoringController {
      * @param isForSaving
      *            whether the blank options will be preserved or not
      */
-    private TreeSet<AssessmentQuestionOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
+    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
 	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
@@ -1258,58 +1265,62 @@ public class AuthoringController {
 	Integer correctOptionIndex = (paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT) == null) ? null
 		: NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT));
 	
-	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
+	TreeSet<QbOption> optionList = new TreeSet<>();
 	for (int i = 0; i < count; i++) {
-	    AssessmentQuestionOption option = new AssessmentQuestionOption();
 	    
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
-	    //sequenceId is null, in case this item was removed using Remove button
-	    if (sequenceId == null) {
+	    String displayOrder = paramMap.get(AssessmentConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i);
+	    //displayOrder is null, in case this item was removed using Remove button
+	    if (displayOrder == null) {
 		continue;
+	    }
+	    
+	    QbOption option = null;
+	    String uidStr = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
+	    if (uidStr != null) {
+		Long uid = NumberUtils.toLong(uidStr);
+		option = service.getQbOptionByUid(uid);
+		service.releaseFromCache(option.getQbQuestion());
+		
 	    } else {
-		option.setSequenceId(NumberUtils.toInt(sequenceId));
+		option = new QbOption();
 	    }
+	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
 	    
-	    String uid = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
-	    if (uid != null) {
-		option.setUid(NumberUtils.toLong(uid));
-	    }
-	    
-	    if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
-		    || (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)) {
-		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
-		if ((optionString == null) && isForSaving) {
+	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		    || (questionType == QbQuestion.TYPE_SHORT_ANSWER)) {
+		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
 		    continue;
 		}
 
-		option.setOptionString(optionString);
-		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		option.setGrade(grade);
+		option.setName(name);
+		float maxMark = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
+		option.setMaxMark(maxMark);
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		String question = paramMap.get(AssessmentConstants.ATTR_OPTION_QUESTION_PREFIX + i);
-		if ((question == null) && isForSaving) {
+	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
+		String matchingPair = paramMap.get(AssessmentConstants.ATTR_MATCHING_PAIR_PREFIX + i);
+		if ((matchingPair == null) && isForSaving) {
 		    continue;
 		}
 
-		option.setOptionString(paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
-		option.setQuestion(question);
+		option.setName(paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i));
+		option.setMatchingPair(matchingPair);
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-		String optionFloatStr = paramMap.get(AssessmentConstants.ATTR_OPTION_FLOAT_PREFIX + i);
+	    } else if (questionType == QbQuestion.TYPE_NUMERICAL) {
+		String numericalOptionStr = paramMap.get(AssessmentConstants.ATTR_NUMERICAL_OPTION_PREFIX + i);
 		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
-		String gradeStr = paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i);
-		if (optionFloatStr.equals("0.0") && optionFloatStr.equals("0.0") && gradeStr.equals("0.0")
+		String maxMarkStr = paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i);
+		if (numericalOptionStr.equals("0.0") && numericalOptionStr.equals("0.0") && maxMarkStr.equals("0.0")
 			&& isForSaving) {
 		    continue;
 		}
 
 		try {
-		    float optionFloat = Float.valueOf(optionFloatStr);
-		    option.setOptionFloat(optionFloat);
+		    float numericalOption = Float.valueOf(numericalOptionStr);
+		    option.setNumericalOption(numericalOption);
 		} catch (Exception e) {
-		    option.setOptionFloat(0);
+		    option.setNumericalOption(0);
 		}
 		try {
 		    float acceptedError = Float.valueOf(acceptedErrorStr);
@@ -1317,28 +1328,26 @@ public class AuthoringController {
 		} catch (Exception e) {
 		    option.setAcceptedError(0);
 		}
-		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		option.setGrade(grade);
+		float maxMark = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
+		option.setMaxMark(maxMark);
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
-		if ((optionString == null) && isForSaving) {
+	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
+		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
 		    continue;
 		}
 
-		option.setOptionString(optionString);
-		//TODO check the following line is not required
-		//option.setAnswerInt(i);
+		option.setName(name);
 		
-	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
-		if ((optionString == null) && isForSaving) {
+	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
+		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
+		if ((name == null) && isForSaving) {
 		    continue;
 		}
 
-		option.setOptionString(optionString);
-		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(sequenceId))) {
+		option.setName(name);
+		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(displayOrder))) {
 		    option.setCorrect(true);
 		}
 		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
@@ -1354,21 +1363,30 @@ public class AuthoringController {
      *
      * @param request
      */
-    private TreeSet<AssessmentUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
+    private TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
 
 	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
-	TreeSet<AssessmentUnit> unitList = new TreeSet<>(new SequencableComparator());
+	TreeSet<QbQuestionUnit> unitList = new TreeSet<>();
 	for (int i = 0; i < count; i++) {
-	    String unitStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UNIT_PREFIX + i);
-	    if (StringUtils.isBlank(unitStr) && isForSaving) {
+	    String name = paramMap.get(AssessmentConstants.ATTR_UNIT_NAME_PREFIX + i);
+	    if (StringUtils.isBlank(name) && isForSaving) {
 		continue;
 	    }
 
-	    AssessmentUnit unit = new AssessmentUnit();
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);
-	    unit.setSequenceId(NumberUtils.toInt(sequenceId));
-	    unit.setUnit(unitStr);
+	    QbQuestionUnit unit = null;
+	    String uidStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UID_PREFIX + i);
+	    if (uidStr != null) {
+		Long uid = NumberUtils.toLong(uidStr);
+		unit = service.getQbQuestionUnitByUid(uid);
+		service.releaseFromCache(unit.getQbQuestion());
+		
+	    } else {
+		unit = new QbQuestionUnit();
+	    }
+	    String displayOrder = paramMap.get(AssessmentConstants.ATTR_UNIT_DISPLAY_ORDER_PREFIX + i);
+	    unit.setDisplayOrder(NumberUtils.toInt(displayOrder));
+	    unit.setName(name);
 	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
 	    unit.setMultiplier(multiplier);
 	    unitList.add(unit);
@@ -1477,20 +1495,19 @@ public class AuthoringController {
      * @param question
      */
     private void removeNewLineCharacters(AssessmentQuestion question) {
-	Set<AssessmentQuestionOption> options = question.getOptions();
+	Collection<QbOption> options = question.getQbQuestion().getQbOptions();
 	if (options != null) {
-	    for (AssessmentQuestionOption option : options) {
-		String optionString = option.getOptionString();
-		if (optionString != null) {
-		    option.setOptionString(optionString.replaceAll("[\n\r\f]", ""));
+	    for (QbOption option : options) {
+		String name = option.getName();
+		if (name != null) {
+		    option.setName(name.replaceAll("[\n\r\f]", ""));
 		}
 
-		String questionStr = option.getQuestion();
-		if (questionStr != null) {
-		    option.setQuestion(questionStr.replaceAll("[\n\r\f]", ""));
+		String matchingPair = option.getMatchingPair();
+		if (matchingPair != null) {
+		    option.setMatchingPair(matchingPair.replaceAll("[\n\r\f]", ""));
 		}
 	    }
-
 	}
     }
     

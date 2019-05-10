@@ -2,6 +2,27 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="availableQuestions" value="${sessionMap.availableQuestions}" />
 
+<%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
+<script>
+	// Inform author whether the QB question was modified
+	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
+		qbMessage = null;
+	switch (qbQuestionModified) {
+		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.update" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.version" />';
+			break;
+		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
+			qbMessage = '<fmt:message key="message.qb.modified.new" />';
+			break;
+	}
+	if (qbMessage) {
+		alert(qbMessage);
+	}
+</script>
+
 <div class="panel panel-default voffset5">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.question.list.title" />
@@ -61,14 +82,14 @@
 							<fmt:message key="label.authoring.basic.random.question" />
 						</c:when>
 						<c:otherwise>
-							<c:out value="${question.title}" escapeXml="true"/>
+							<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
 				</td>
 				
 				<td>
-					<input name="grade${questionReference.sequenceId}" value="${questionReference.defaultGrade}"
-						id="grade${questionReference.sequenceId}" class="form-control input-sm" style="width: 50%;">
+					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
+						id="maxMark${questionReference.sequenceId}" class="form-control input-sm" style="width: 50%;">
 				</td>
 				
 				<td class="arrows">
@@ -103,8 +124,8 @@
 			</c:if>
 				
 			<c:forEach var="question" items="${availableQuestions}" varStatus="status">
-				<option value="${question.sequenceId}">
-					<c:out value="${question.title}" escapeXml="true"/>
+				<option value="${question.displayOrder}">
+					<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 				</option>
 			</c:forEach>
 		</select>
@@ -139,21 +160,21 @@
 				<fmt:message key="label.authoring.basic.export.questions" />
 			</a>
 		</div>
-<!--		
+
 		<div class="pull-right roffset5">
 			<c:url var="tempUrl" value="">
 				<c:param name="output">
-					<c:url value='/authoring/importQbQuestion.do'/>?httpSessionID=${httpSessionID}
+					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}
 				</c:param>
 			</c:url>
 			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
 		
-			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.assessmentForm.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true" 
+			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" 
 				class="btn btn-default btn-xs thickbox"> 
 				Import from question bank
 			</a>
 		</div> 
--->
+
 	</div>
 
 	<table class="table table-condensed" id="questionTable">
@@ -197,19 +218,19 @@
 					</c:choose>
 				</td>
 				<td>
-					<c:out value="${question.title}" escapeXml="true" />
+					<c:out value="${question.qbQuestion.name}" escapeXml="true" />
 				</td>
 				
 				<td class="text-right">
 					<c:set var="editQuestionUrl" >
-						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionSequenceId=${question.sequenceId}&KeepThis=true&TB_iframe=true&modal=true
+						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionDisplayOrder=${question.displayOrder}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
 					<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 20px;"> 
 						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>
 						
 					<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
-						onclick="javascript:deleteQuestion(${question.sequenceId})"></i>
+						onclick="javascript:deleteQuestion(${question.displayOrder})"></i>
 				</td>
 			</tr>
 		</c:forEach>

@@ -1,25 +1,24 @@
 package org.lamsfoundation.lams.tool.assessment.dto;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
-import org.lamsfoundation.lams.tool.assessment.model.Sequencable;
+import org.lamsfoundation.lams.qb.model.QbOption;
 
-public class OptionDTO implements Sequencable{
+public class OptionDTO implements Comparable<OptionDTO> {
     
-    // ============= immutable properties copied from AssessmentQuestion question =============
+    // ============= immutable properties copied from AssessmentQuestion =============
     
     private Long uid;
 
-    private Integer sequenceId;
+    private Integer displayOrder;
 
-    private String question;
+    private String matchingPair;
 
-    private String optionString;
+    private String name;
 
-    private float optionFloat;
+    private float numericalOption;
 
     private float acceptedError;
 
-    private float grade;
+    private float maxMark;
 
     private boolean correct;
 
@@ -31,16 +30,27 @@ public class OptionDTO implements Sequencable{
 
     private boolean answerBoolean;
     
-    public OptionDTO(AssessmentQuestionOption option) {
-	this.uid = option.getUid();
-	this.sequenceId = option.getSequenceId();
-	this.question = option.getQuestion();
-	this.optionString = option.getOptionString();
-	this.optionFloat = option.getOptionFloat();
-	this.acceptedError = option.getAcceptedError();
-	this.grade = option.getGrade();
-	this.correct = option.isCorrect();
-	this.feedback = option.getFeedback();
+    private float percentage;
+    
+    private String matchingPairEscaped;
+
+    private String nameEscaped;
+    
+    public OptionDTO(QbOption qbOption) {
+	this.uid = qbOption.getUid();
+	this.displayOrder = qbOption.getDisplayOrder();
+	this.matchingPair = qbOption.getMatchingPair();
+	this.name = qbOption.getName();
+	this.numericalOption = qbOption.getNumericalOption();
+	this.acceptedError = qbOption.getAcceptedError();
+	this.maxMark = qbOption.getMaxMark();
+	this.correct = qbOption.isCorrect();
+	this.feedback = qbOption.getFeedback();
+    }
+    
+    @Override
+    public int compareTo(OptionDTO o) {
+	return Integer.compare(this.displayOrder, o.displayOrder);
     }
     
     public Long getUid() {
@@ -50,34 +60,32 @@ public class OptionDTO implements Sequencable{
 	uid = uuid;
     }
 
-    @Override
-    public int getSequenceId() {
-	return sequenceId;
+    public int getDisplayOrder() {
+	return displayOrder;
     }
-    @Override
-    public void setSequenceId(int sequenceId) {
-	this.sequenceId = sequenceId;
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
 
-    public String getQuestion() {
-	return question;
+    public String getMatchingPair() {
+	return matchingPair;
     }
-    public void setQuestion(String question) {
-	this.question = question;
-    }
-
-    public String getOptionString() {
-	return optionString;
-    }
-    public void setOptionString(String optionString) {
-	this.optionString = optionString;
+    public void setMatchingPair(String matchingPair) {
+	this.matchingPair = matchingPair;
     }
 
-    public float getOptionFloat() {
-	return optionFloat;
+    public String getName() {
+	return name;
     }
-    public void setOptionFloat(float optionFloat) {
-	this.optionFloat = optionFloat;
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    public float getNumericalOption() {
+	return numericalOption;
+    }
+    public void setNumericalOption(float numericalOption) {
+	this.numericalOption = numericalOption;
     }
 
     public float getAcceptedError() {
@@ -87,11 +95,11 @@ public class OptionDTO implements Sequencable{
 	this.acceptedError = acceptedError;
     }
 
-    public float getGrade() {
-	return grade;
+    public float getMaxMark() {
+	return maxMark;
     }
-    public void setGrade(float grade) {
-	this.grade = grade;
+    public void setMaxMark(float maxMark) {
+	this.maxMark = maxMark;
     }
 
     public boolean isCorrect() {
@@ -128,5 +136,29 @@ public class OptionDTO implements Sequencable{
 
     public String formatPrefixLetter(int index) {
 	return new String(Character.toChars(97 + index)) + ")";
+    }
+    
+    public float getPercentage() {
+	return percentage;
+    }
+    
+    public void setPercentage(float percentage) {
+	this.percentage = percentage;
+    }
+    
+    public String getMatchingPairEscaped() {
+	return matchingPairEscaped;
+    }
+
+    public void setMatchingPairEscaped(String matchingPairEscaped) {
+	this.matchingPairEscaped = matchingPairEscaped;
+    }
+
+    public String getNameEscaped() {
+	return nameEscaped;
+    }
+
+    public void setNameEscaped(String nameEscaped) {
+	this.nameEscaped = nameEscaped;
     }
 }

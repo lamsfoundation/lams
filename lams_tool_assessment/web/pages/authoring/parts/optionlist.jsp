@@ -5,8 +5,8 @@
 		CKEDITOR.on('instanceLoaded', function(e){
 			//apply to only option title CKEditors
 			var id = e.editor.element.$.id;
-			if (id.startsWith("optionString")) {
-				var tableId = id.replace("optionString", "option-table-");
+			if (id.startsWith("optionName")) {
+				var tableId = id.replace("optionName", "option-table-");
 				
 				e.editor.on( 'focus', function() {
 					//prevent expanding the already expanded table
@@ -34,8 +34,8 @@
 		});
 
 		//take care about short answer and numerical 
-		$("[name^=optionString], [name^=optionFloat]").on("focus", function() {
-			var tableId = $(this).attr("name").replace("optionString", "option-table-").replace("optionFloat", "option-table-");
+		$("[name^=optionName], [name^=numericalOption]").on("focus", function() {
+			var tableId = $(this).attr("name").replace("optionName", "option-table-").replace("numericalOption", "option-table-");
 			//prevent expanding the already expanded table
 			if (expandedTable == tableId) {
 				return;

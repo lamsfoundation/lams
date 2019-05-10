@@ -2,28 +2,28 @@
 					
 <c:choose>
 	<c:when test="${question.type == 1}">
-		<c:forEach var="option" items="${question.options}">
+		<c:forEach var="option" items="${question.optionDtos}">
 			<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 				<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
-					${option.optionString}
+					${option.name}
 				</c:if>
 			</c:forEach>					
 		</c:forEach>						
 	</c:when>
 						
 	<c:when test="${question.type == 2}">
-		<c:forEach var="option" items="${question.options}">
+		<c:forEach var="option" items="${question.optionDtos}">
 			<div>
 				<div style="float: left;">
-					${option.question}
+					${option.matchingPair}
 				</div>
 				<div style=" float: right; width: 50%;">
 								 - 
 					<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 						<c:if test="${option.uid == optionAnswer.optionUid}">
-							<c:forEach var="questionOption2" items="${question.options}">
+							<c:forEach var="questionOption2" items="${question.optionDtos}">
 								<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
-									${questionOption2.optionString}
+									${questionOption2.name}
 								</c:if>
 							</c:forEach>
 						</c:if>
@@ -56,9 +56,9 @@
 		<c:forEach var="j" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 			<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 				<c:if test="${optionAnswer.answerInt == j}">		
-					<c:forEach var="option" items="${question.options}">
+					<c:forEach var="option" items="${question.optionDtos}">
 						<c:if test="${optionAnswer.optionUid == option.uid}">
-							${option.optionString}
+							${option.name}
 						</c:if>
 					</c:forEach>
 				</c:if>								
@@ -67,10 +67,10 @@
 	</c:when>
 						
 	<c:when test="${question.type == 8}">
-		<c:forEach var="option" items="${question.options}">
+		<c:forEach var="option" items="${question.optionDtos}">
 			<div>';
 				<div style="float: left;">
-					${option.optionString}
+					${option.name}
 				</div>
 				<div style=" float: right; width: 20%;">
 					- 

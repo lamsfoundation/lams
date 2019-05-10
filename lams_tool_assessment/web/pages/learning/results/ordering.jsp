@@ -15,16 +15,16 @@
 			<tr>
 
 				<td class="complete-item-gif">
-					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.sequenceId == ordStatus.index)}">
+					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.displayOrder == ordStatus.index)}">
 						<i class="fa fa-check text-success"></i>	
 					</c:if>
-					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.sequenceId != ordStatus.index)}">
+					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.displayOrder != ordStatus.index)}">
 						<i class="fa fa-times text-danger"></i>	
 					</c:if>			
 				</td>											
 			
 				<td class="ordering-option">
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>		
 			</tr>
 		</c:forEach>

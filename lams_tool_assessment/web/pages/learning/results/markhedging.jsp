@@ -2,7 +2,7 @@
 
 <div class="question-type">
 	<fmt:message key="label.assign.hedging.mark">
-		<fmt:param>${question.grade}</fmt:param>
+		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
 </div>
 
@@ -22,15 +22,15 @@
 				</td>
 				
 				<td>
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>
 				
 				<td style="width: 100px;">
 				
-					<select name="question${questionIndex}_${option.sequenceId}" class="mark-hedging-select" data-question-index="${questionIndex}"
+					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
 							disabled="disabled">
 						
-						<c:forEach var="i" begin="0" end="${question.grade}">
+						<c:forEach var="i" begin="0" end="${question.maxMark}">
 							<option
 								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
 							>${i}</option>
@@ -63,7 +63,7 @@
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">
 		<c:choose>
-			<c:when test="${question.mark == question.grade}">
+			<c:when test="${question.mark == question.maxMark}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</c:when>
 			<c:when test="${question.mark > 0}">
@@ -76,18 +76,18 @@
 	</div>
 </c:if>
 
-<c:if test="${assessment.allowQuestionFeedback && (question.generalFeedback != null)}">
+<c:if test="${assessment.allowQuestionFeedback && (question.feedback != null)}">
 	<div class="feedback">
-		<c:out value="${question.generalFeedback}" escapeXml="false" />
+		<c:out value="${question.feedback}" escapeXml="false" />
 	</div>
 </c:if>
 	
 <div class="question-feedback" style="padding-bottom: 10px;">
 	<fmt:message key="label.learning.marks" >
 		<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
-		<fmt:param>${question.grade}</fmt:param>
+		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
-	<c:if test="${(question.mark != question.grade) && (fn:length(question.questionResults) > 1)}">
+	<c:if test="${(question.mark != question.maxMark) && (fn:length(question.questionResults) > 1)}">
 		<fmt:message key="label.learning.penalty" >
 			<fmt:param><fmt:formatNumber value="${question.penalty}" maxFractionDigits="2"/></fmt:param>
 		</fmt:message>

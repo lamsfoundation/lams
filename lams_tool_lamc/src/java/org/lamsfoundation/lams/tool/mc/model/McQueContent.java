@@ -168,7 +168,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      * @return Returns the mark.
      */
     public Integer getMark() {
-	return qbQuestion.getMark();
+	return qbQuestion.getMaxMark();
     }
 
     /**
@@ -176,7 +176,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      *            The mark to set.
      */
     public void setMark(Integer mark) {
-	qbQuestion.setMark(mark);
+	qbQuestion.setMaxMark(mark);
     }
 
     public String getEscapedQuestion() {

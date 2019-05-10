@@ -6,9 +6,9 @@
 		jQuery("#userSummary${assessmentResult.sessionId}").clearGridData().setGridParam({scrollOffset: 18});
 
  	    <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
-	       	<c:set var="question" value="${questionResult.assessmentQuestion}"/>
+	       	<c:set var="question" value="${questionResult.questionDto}"/>
 	       	<c:set var="title">
-	       		<c:out value="${questionResult.assessmentQuestion.titleEscaped}" escapeXml="true"/>
+	       		<c:out value="${questionResult.questionDto.titleEscaped}" escapeXml="true"/>
 	       	</c:set>	
  	        var responseStr = "";
  	       	<%@ include file="userresponse.jsp"%>

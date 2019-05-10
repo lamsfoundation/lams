@@ -11,7 +11,7 @@
 		    	ignore: 'hidden',
 	    		rules: {
 	    			title: "required",
-	    			defaultGrade: {
+	    			maxMark: {
 	    			    required: true,
 	    			    digits: true
 	    			},
@@ -22,22 +22,22 @@
 	    			hasOptionFilled: {
 	    				required: function(element) {
 			    			prepareOptionEditorsForAjaxSubmit();
-	    		        	return $("textarea[name^=optionString]:filled").length < 1;
+	    		        	return $("textarea[name^=optionName]:filled").length < 1;
 		    		    }			    		    
     			    },
-    			    hasOneHundredGrade: {
+    			    hasOneHundredMaxMark: {
 	    				required: function(element) {
-	    					var hasOneHundredGrade = false;
-	    					$("input[name^='optionGrade']").each(function() {
-	    						hasOneHundredGrade = hasOneHundredGrade || (eval(this.value) == 1);
+	    					var hasOneHundredMaxMark = false;
+	    					$("input[name^='optionMaxMark']").each(function() {
+	    						hasOneHundredMaxMark = hasOneHundredMaxMark || (eval(this.value) == 1);
 	    					});
-    			    		return !hasOneHundredGrade && !eval($("#multipleAnswersAllowed").val());
+    			    		return !hasOneHundredMaxMark && !eval($("#multipleAnswersAllowed").val());
 		    		    }		    		    
     			    }
 	    		},
 	    		messages: {
 	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			defaultGrade: {
+	    			maxMark: {
 	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			},
@@ -48,7 +48,7 @@
 	    			hasOptionFilled: {
 	    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
 	    			},
-	    			hasOneHundredGrade: {
+	    			hasOneHundredMaxMark: {
 	    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
 	    			}
 	    		},
@@ -56,13 +56,13 @@
    			    	prepareOptionEditorsForAjaxSubmit();
 	    			$("#optionList").val($("#optionForm").serialize(true));
 	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 	    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 	    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
 	    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			
 	    	    	var options = { 
-	    	    		target:  parent.jQuery('#questionListArea'), 
+	    	    		target:  parent.jQuery('#itemArea'), 
 	    		   		success: afterRatingSubmit  // post-submit callback
 	    		    }; 				
 		    		    				
@@ -124,7 +124,7 @@
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
@@ -155,7 +155,7 @@
 						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
 					</div>
 					<div>
-						<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
+						<input type="text" name="hasOneHundredMaxMark" id="hasOneHundredMaxMark" class="fake-validation-input">
 					</div>
 				</div>
 
@@ -178,13 +178,13 @@
 					
 					<c:if test="${!isAuthoringRestricted}">
 						<div class="form-group row">
-						    <label for="defaultGrade" class="col-sm-3">
+						    <label for="maxMark" class="col-sm-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
 						    	<i class="fa fa-xs fa-asterisk text-danger" style="vertical-align: super;" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
 						    
 						    <div class="col-sm-9">
-						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
 						    </div>
 						</div>
 					</c:if>
@@ -248,7 +248,7 @@
 	
 					<div class="form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL">General Feedback</c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 					

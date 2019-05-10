@@ -1,4 +1,4 @@
-<input type="hidden" name="optionSequenceId${status.index}" value="${option.sequenceId}">
+<input type="hidden" name="optionDisplayOrder${status.index}" value="${option.displayOrder}">
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <table class="table-row-spacing" style="margin-left: -4px;">
@@ -8,8 +8,8 @@
 		</td>
 		<td>
 			<div class="form-inline">    	
-				<input type="text" name="optionFloat${status.index}" value="${option.optionFloat}" 
-					id="optionFloat${status.index}" class="number form-control short-input-text input-xs" 
+				<input type="text" name="numericalOption${status.index}" value="${option.numericalOption}" 
+					id="numericalOption${status.index}" class="number form-control short-input-text input-xs" 
 					title="<fmt:message key='label.authoring.choice.enter.float'/>">
 			</div>
 		</td>

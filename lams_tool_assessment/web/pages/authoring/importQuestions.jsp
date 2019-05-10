@@ -50,7 +50,7 @@
 
 			document.getElementById('itemAttachment_Busy').style.display = '';
 			var options = { 
-		    	   	target:  parent.jQuery('#questionListArea'), 
+		    	   	target:  parent.jQuery('#itemArea'), 
 		    	   	success: afterRatingSubmit  // post-submit callback
 	    	}; 							
 	    	$('#importForm').ajaxSubmit(options);

@@ -21,7 +21,7 @@
 		    	ignore: 'hidden',
 		    	rules: {
 		    		title: "required",
-		    		defaultGrade: {
+		    		maxMark: {
 		    			required: true,
 		    		    digits: true
 		    		},
@@ -34,17 +34,17 @@
 		    	},
 	    		messages: {
 	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			defaultGrade: {
+	    			maxMark: {
 	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
 	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
 	    			}
 	    		},
    			    submitHandler: function(form) {
 	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 	     			    
 	    	    	var options = { 
-	    	    		target:  parent.jQuery('#questionListArea'), 
+	    	    		target:  parent.jQuery('#itemArea'), 
 	    		   		success: afterRatingSubmit  // post-submit callback
 	    		    }; 				
 
@@ -115,7 +115,7 @@
 				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="questionType" value="6"/>
-				<form:hidden path="sequenceId" />
+				<form:hidden path="displayOrder" />
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />
@@ -161,13 +161,13 @@
 	
 					<c:if test="${!isAuthoringRestricted}">
 						<div class="form-group row form-inline">
-						    <label for="defaultGrade" class="col-sm-3">
+						    <label for="maxMark" class="col-sm-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
 						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
 						    
 						    <div class="col-sm-9">
-						    	<form:input path="defaultGrade" cssClass="form-control short-input-text input-sm"/>
+						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
 						    </div>
 						</div>
 					</c:if>
@@ -210,7 +210,7 @@
 	
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
-						<lams:CKEditor id="generalFeedback" value="${assessmentQuestionForm.generalFeedback}" 
+						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 				</div>

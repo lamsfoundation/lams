@@ -18,13 +18,13 @@
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}"
+							<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.sequenceId}"
+							<input type="radio" name="question${status.index}" value="${option.displayOrder}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
@@ -36,7 +36,7 @@
 				</td>
 				
 				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
-					<c:out value="${option.optionString}" escapeXml="false" />
+					<c:out value="${option.name}" escapeXml="false" />
 				</td>
 			</tr>
 		</c:forEach>

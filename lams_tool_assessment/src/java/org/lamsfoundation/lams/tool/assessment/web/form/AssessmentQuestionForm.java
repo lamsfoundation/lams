@@ -31,20 +31,19 @@ package org.lamsfoundation.lams.tool.assessment.web.form;
  */
 public class AssessmentQuestionForm {
 
-    private int sequenceId;
+    private int displayOrder;
     private String sessionMapID;
     private String contentFolderID;
 
     // tool access mode;
     private String mode;
 
-    private short questionType;
+    private Integer questionType;
     private String title;
     private String question;
-    private String defaultGrade;
+    private String maxMark;
     private String penaltyFactor;
     private boolean answerRequired;
-    private String generalFeedback;
     private String feedback;
     private boolean multipleAnswersAllowed;
     private boolean incorrectAnswerNullifiesMark;
@@ -101,28 +100,28 @@ public class AssessmentQuestionForm {
 	this.question = question;
     }
 
-    public int getSequenceId() {
-	return sequenceId;
+    public int getDisplayOrder() {
+	return displayOrder;
     }
 
-    public void setSequenceId(int sequenceId) {
-	this.sequenceId = sequenceId;
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
 
-    public short getQuestionType() {
+    public Integer getQuestionType() {
 	return questionType;
     }
 
-    public void setQuestionType(short type) {
+    public void setQuestionType(Integer type) {
 	this.questionType = type;
     }
 
-    public String getDefaultGrade() {
-	return defaultGrade;
+    public String getMaxMark() {
+	return maxMark;
     }
 
-    public void setDefaultGrade(String defaultGrade) {
-	this.defaultGrade = defaultGrade;
+    public void setMaxMark(String maxMark) {
+	this.maxMark = maxMark;
     }
 
     public String getPenaltyFactor() {
@@ -139,14 +138,6 @@ public class AssessmentQuestionForm {
 
     public void setAnswerRequired(boolean answerRequired) {
 	this.answerRequired = answerRequired;
-    }
-
-    public String getGeneralFeedback() {
-	return generalFeedback;
-    }
-
-    public void setGeneralFeedback(String generalFeedback) {
-	this.generalFeedback = generalFeedback;
     }
 
     public String getFeedback() {

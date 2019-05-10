@@ -65,7 +65,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	    Long totalMarksPossible = 0L;
 	    for (QuestionReference questionReference : questionReferences) {
-		totalMarksPossible += questionReference.getDefaultGrade();
+		totalMarksPossible += questionReference.getMaxMark();
 	    }
 	    definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE, 0L,
 		    totalMarksPossible, true);
@@ -90,8 +90,8 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    int randomQuestionsCount = 1;
 	    for (QuestionReference questionReference : questionReferences) {
 		Long markAvailable = null;
-		if (questionReference.getDefaultGrade() != 0) {
-		    markAvailable = Long.valueOf(questionReference.getDefaultGrade());
+		if (questionReference.getMaxMark() != 0) {
+		    markAvailable = Long.valueOf(questionReference.getMaxMark());
 		}
 
 		String description = getI18NText("output.user.score.for.question", false);
@@ -99,7 +99,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 		    description += getI18NText("label.authoring.basic.type.random.question", false) + " "
 			    + randomQuestionsCount++;
 		} else {
-		    description += questionReference.getQuestion().getTitle();
+		    description += questionReference.getQuestion().getQbQuestion().getName();
 		}
 
 		definition = buildRangeDefinition(String.valueOf(questionReference.getSequenceId()), 0L, markAvailable);
@@ -147,9 +147,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    }
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
 	    for (AssessmentQuestion question : questions) {
-		if (names == null || names.contains(String.valueOf(question.getSequenceId()))) {
+		if (names == null || names.contains(String.valueOf(question.getDisplayOrder()))) {
 		    output.put(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS,
-			    getQuestionScore(assessmentService, learnerId, assessment, question.getSequenceId()));
+			    getQuestionScore(assessmentService, learnerId, assessment, question.getDisplayOrder()));
 		}
 	    }
 	}
@@ -186,8 +186,8 @@ public class AssessmentOutputFactory extends OutputFactory {
 		} else {
 		    Set<AssessmentQuestion> questions = assessment.getQuestions();
 		    for (AssessmentQuestion question : questions) {
-			if (name.equals(String.valueOf(question.getSequenceId()))) {
-			    return getQuestionScore(assessmentService, learnerId, assessment, question.getSequenceId());
+			if (name.equals(String.valueOf(question.getDisplayOrder()))) {
+			    return getQuestionScore(assessmentService, learnerId, assessment, question.getDisplayOrder());
 			}
 		    }
 		}
@@ -225,7 +225,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 		Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 		Set<AssessmentQuestion> questions = assessment.getQuestions();
 		for (AssessmentQuestion question : questions) {
-		    if (name.equals(String.valueOf(question.getSequenceId()))) {
+		    if (name.equals(String.valueOf(question.getDisplayOrder()))) {
 			return null;
 		    }
 		}
@@ -326,12 +326,12 @@ public class AssessmentOutputFactory extends OutputFactory {
      * Get user's score for the question. Will always return a ToolOutput object.
      */
     private ToolOutput getQuestionScore(IAssessmentService assessmentService, Long learnerId, Assessment assessment,
-	    int questionSequenceId) {
+	    int questionDisplayOrder) {
 	Float questionResultMarkDB = assessmentService.getQuestionResultMark(assessment.getUid(), learnerId,
-		questionSequenceId);
+		questionDisplayOrder);
 
 	float questionResultMark = (questionResultMarkDB == null) ? 0 : questionResultMarkDB;
-	return new ToolOutput(String.valueOf(questionSequenceId), "description", questionResultMark);
+	return new ToolOutput(String.valueOf(questionDisplayOrder), "description", questionResultMark);
     }
 
 }

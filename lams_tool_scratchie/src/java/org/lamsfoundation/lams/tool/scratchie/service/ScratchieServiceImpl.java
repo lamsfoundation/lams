@@ -2272,7 +2272,6 @@ public class ScratchieServiceImpl
      * "questionText", "displayOrder" (Integer) and a ArrayNode "answers". The answers entry should be ArrayNode
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 

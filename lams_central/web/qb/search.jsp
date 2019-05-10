@@ -134,7 +134,10 @@
 			jQuery("#questions-grid").jqGrid({
 			   	multiselect: false,
 				datatype: "json",
-				url: "<c:url value="/searchQB/getPagedQuestions.do"/>?questionType=${questionType}",
+				url: "<c:url value="/searchQB/getPagedQuestions.do"/>",
+				postData: { 
+	           		questionType: ${questionType} 
+		        },
 				height: '100%',
 				autowidth: true,
 				shrinkToFit: true,
@@ -238,9 +241,11 @@
 	    }
 		function gridSearch(){
 			$("#questions-grid").jqGrid(
-				'setGridParam', 
-				{
-		           	postData: { searchString: $("#filter-questions").val() }
+				'setGridParam', {
+		           	postData: { 
+		           		questionType: $("#question-type").val(),
+			           	searchString: $("#filter-questions").val() 
+			        }
 		       	}, 
 				{ page: 1 }
 			).trigger('reloadGrid');
@@ -280,40 +285,41 @@
 					onkeydown="doSearch(arguments[0]||event)" />
 		
 				<c:if test="${!empty questionTypesAvailable}">
-					<span id="question-type" class="form-control loffset5 disabled-span">
+					<span class="form-control loffset5 disabled-span">
 					Type:
-					<select id="questionType">
-						<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter"></c:forTokens>
-  						<option value="${questionTypeIter}"
-  							<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
-  							
-							<c:choose>
-								<c:when test="${questionTypeIter == 1}">
-									<fmt:message key="label.question.type.multiple.choice" />
-								</c:when>
-								<c:when test="${questionTypeIter == 2}">
-									<fmt:message key="label.question.type.matching.pairs" />
-								</c:when>
-								<c:when test="${questionTypeIter == 3}">
-									<fmt:message key="label.question.type.short.answer" />
-								</c:when>
-								<c:when test="${questionTypeIter == 4}">
-									<fmt:message key="label.question.type.numerical" />
-								</c:when>
-								<c:when test="${questionTypeIter == 5}">
-									<fmt:message key="label.question.type.true.false" />
-								</c:when>
-								<c:when test="${questionTypeIter == 6}">
-									<fmt:message key="label.question.type.essay" />
-								</c:when>
-								<c:when test="${questionTypeIter == 7}">
-									<fmt:message key="label.question.type.ordering" />
-								</c:when>
-								<c:when test="${questionTypeIter == 8}">
-									<fmt:message key="label.question.type.mark.hedging" />
-								</c:when>
-							</c:choose>
-						</option>
+					<select id="question-type" onchange="gridSearch();">
+						<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter">
+	  						<option value="${questionTypeIter}"
+	  							<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
+	  							
+								<c:choose>
+									<c:when test="${questionTypeIter == 1}">
+										<fmt:message key="label.question.type.multiple.choice" />
+									</c:when>
+									<c:when test="${questionTypeIter == 2}">
+										<fmt:message key="label.question.type.matching.pairs" />
+									</c:when>
+									<c:when test="${questionTypeIter == 3}">
+										<fmt:message key="label.question.type.short.answer" />
+									</c:when>
+									<c:when test="${questionTypeIter == 4}">
+										<fmt:message key="label.question.type.numerical" />
+									</c:when>
+									<c:when test="${questionTypeIter == 5}">
+										<fmt:message key="label.question.type.true.false" />
+									</c:when>
+									<c:when test="${questionTypeIter == 6}">
+										<fmt:message key="label.question.type.essay" />
+									</c:when>
+									<c:when test="${questionTypeIter == 7}">
+										<fmt:message key="label.question.type.ordering" />
+									</c:when>
+									<c:when test="${questionTypeIter == 8}">
+										<fmt:message key="label.question.type.mark.hedging" />
+									</c:when>
+								</c:choose>
+							</option>
+						</c:forTokens>
 					</select>
 					</span>
 				</c:if>

@@ -12,12 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
-import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 
 public class QTIUtil {
     private static Logger log = Logger.getLogger(QTIUtil.class);
@@ -25,19 +26,20 @@ public class QTIUtil {
     public static List<Question> exportQTI(SortedSet<AssessmentQuestion> questionList) {
 	List<Question> questions = new LinkedList<>();
 	for (AssessmentQuestion assessmentQuestion : questionList) {
+	    QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 	    Question question = new Question();
 	    List<Answer> answers = new ArrayList<>();
 
 	    switch (assessmentQuestion.getType()) {
 
-		case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+		case QbQuestion.TYPE_MULTIPLE_CHOICE:
 
-		    if (assessmentQuestion.isMultipleAnswersAllowed()) {
+		    if (qbQuestion.isMultipleAnswersAllowed()) {
 			question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
 			int correctAnswerCount = 0;
 
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
-			    if (assessmentAnswer.getGrade() > 0) {
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			    if (assessmentAnswer.getMaxMark() > 0) {
 				correctAnswerCount++;
 			    }
 			}
@@ -45,96 +47,96 @@ public class QTIUtil {
 			Float correctAnswerScore = correctAnswerCount > 0
 				? Integer.valueOf(100 / correctAnswerCount).floatValue()
 				: null;
-			int incorrectAnswerCount = assessmentQuestion.getOptions().size() - correctAnswerCount;
+			int incorrectAnswerCount = qbQuestion.getQbOptions().size() - correctAnswerCount;
 			Float incorrectAnswerScore = incorrectAnswerCount > 0
 				? Integer.valueOf(-100 / incorrectAnswerCount).floatValue()
 				: null;
 
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
 			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getGrade() > 0;
+			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() > 0;
 
-			    answer.setText(assessmentAnswer.getOptionString());
+			    answer.setText(assessmentAnswer.getName());
 			    answer.setScore(isCorrectAnswer ? correctAnswerScore : incorrectAnswerScore);
-			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				    : assessmentQuestion.getFeedbackOnIncorrect());
+			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				    : qbQuestion.getFeedbackOnIncorrect());
 
-			    answers.add(assessmentAnswer.getSequenceId(), answer);
+			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
 			}
 
 		    } else {
 			question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 
-			for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
 			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getGrade() == 1F;
+			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() == 1F;
 
-			    answer.setText(assessmentAnswer.getOptionString());
+			    answer.setText(assessmentAnswer.getName());
 			    answer.setScore(
-				    isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue()
+				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue()
 					    : 0);
-			    answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				    : assessmentQuestion.getFeedbackOnIncorrect());
+			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				    : qbQuestion.getFeedbackOnIncorrect());
 
-			    answers.add(assessmentAnswer.getSequenceId(), answer);
+			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
 			}
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_SHORT_ANSWER:
 		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
 
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
 			// only answer which has more than 0% is considered a correct one
-			if (assessmentAnswer.getGrade() > 0) {
+			if (assessmentAnswer.getMaxMark() > 0) {
 			    Answer answer = new Answer();
-			    answer.setText(assessmentAnswer.getOptionString());
-			    answer.setScore(Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue());
+			    answer.setText(assessmentAnswer.getName());
+			    answer.setScore(Integer.valueOf(qbQuestion.getMaxMark()).floatValue());
 
 			    answers.add(answer);
 			}
 		    }
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+		case QbQuestion.TYPE_TRUE_FALSE:
 		    question.setType(Question.QUESTION_TYPE_TRUE_FALSE);
-		    boolean isTrueCorrect = assessmentQuestion.getCorrectAnswer();
+		    boolean isTrueCorrect = qbQuestion.getCorrectAnswer();
 
 		    // true/false question is basically the same for QTI, just with special answers
 		    Answer trueAnswer = new Answer();
 		    trueAnswer.setText("True");
 		    trueAnswer.setScore(
-			    isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-		    trueAnswer.setFeedback(isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
-			    : assessmentQuestion.getFeedbackOnIncorrect());
+			    isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    trueAnswer.setFeedback(isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
+			    : qbQuestion.getFeedbackOnIncorrect());
 		    answers.add(trueAnswer);
 
 		    Answer falseAnswer = new Answer();
 		    falseAnswer.setText("False");
 		    falseAnswer.setScore(
-			    !isTrueCorrect ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-		    falseAnswer.setFeedback(!isTrueCorrect ? assessmentQuestion.getFeedbackOnCorrect()
-			    : assessmentQuestion.getFeedbackOnIncorrect());
+			    !isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    falseAnswer.setFeedback(!isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
+			    : qbQuestion.getFeedbackOnIncorrect());
 		    answers.add(falseAnswer);
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    question.setType(Question.QUESTION_TYPE_MATCHING);
 
 		    int answerIndex = 0;
-		    float score = assessmentQuestion.getDefaultGrade() / assessmentQuestion.getOptions().size();
-		    question.setMatchAnswers(new ArrayList<Answer>(assessmentQuestion.getOptions().size()));
+		    float score = qbQuestion.getMaxMark() / qbQuestion.getQbOptions().size();
+		    question.setMatchAnswers(new ArrayList<Answer>(qbQuestion.getQbOptions().size()));
 		    question.setMatchMap(new TreeMap<Integer, Integer>());
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
 			Answer answer = new Answer();
 
-			answer.setText(assessmentAnswer.getQuestion());
+			answer.setText(assessmentAnswer.getMatchingPair());
 			answer.setScore(score);
 			answer.setFeedback(assessmentAnswer.getFeedback());
 			answers.add(answer);
 
 			Answer matchingAnswer = new Answer();
-			matchingAnswer.setText(assessmentAnswer.getOptionString());
+			matchingAnswer.setText(assessmentAnswer.getName());
 			question.getMatchAnswers().add(matchingAnswer);
 			question.getMatchMap().put(answerIndex, answerIndex);
 			answerIndex++;
@@ -142,27 +144,27 @@ public class QTIUtil {
 
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_ESSAY:
+		case QbQuestion.TYPE_ESSAY:
 		    // not much to do with essay
 		    question.setType(Question.QUESTION_TYPE_ESSAY);
 		    answers = null;
 		    break;
 
-		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+		case QbQuestion.TYPE_MARK_HEDGING:
 
 		    question.setType(Question.QUESTION_TYPE_MARK_HEDGING);
 
-		    for (AssessmentQuestionOption assessmentAnswer : assessmentQuestion.getOptions()) {
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
 			Answer answer = new Answer();
 			boolean isCorrectAnswer = assessmentAnswer.isCorrect();
 
-			answer.setText(assessmentAnswer.getOptionString());
+			answer.setText(assessmentAnswer.getName());
 			answer.setScore(
-				isCorrectAnswer ? Integer.valueOf(assessmentQuestion.getDefaultGrade()).floatValue() : 0);
-			answer.setFeedback(isCorrectAnswer ? assessmentQuestion.getFeedbackOnCorrect()
-				: assessmentQuestion.getFeedbackOnIncorrect());
+				isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+			answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				: qbQuestion.getFeedbackOnIncorrect());
 
-			answers.add(assessmentAnswer.getSequenceId(), answer);
+			answers.add(assessmentAnswer.getDisplayOrder(), answer);
 		    }
 		    break;
 
@@ -170,9 +172,9 @@ public class QTIUtil {
 		    continue;
 	    }
 
-	    question.setTitle(assessmentQuestion.getTitle());
-	    question.setText(assessmentQuestion.getQuestion());
-	    question.setFeedback(assessmentQuestion.getGeneralFeedback());
+	    question.setTitle(qbQuestion.getName());
+	    question.setText(qbQuestion.getDescription());
+	    question.setFeedback(qbQuestion.getFeedback());
 	    question.setAnswers(answers);
 
 	    questions.add(question);
@@ -186,20 +188,23 @@ public class QTIUtil {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    int maxSeq = 0;
+	    assessmentQuestion.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
+	    QbQuestion qbQuestion = new QbQuestion();
+	    assessmentQuestion.setQbQuestion(qbQuestion);
+	    int maxDisplayOrder = 0;
 	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
-		maxSeq = last.getSequenceId() + 1;
+		maxDisplayOrder = last.getDisplayOrder() + 1;
 	    }
-	    assessmentQuestion.setSequenceId(maxSeq);
-	    assessmentQuestion.setTitle(question.getTitle());
-	    assessmentQuestion.setQuestion(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+	    assessmentQuestion.setDisplayOrder(maxDisplayOrder);
+	    qbQuestion.setName(question.getTitle());
+	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
-	    assessmentQuestion.setGeneralFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
+	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
 		    contentFolderID, question.getResourcesFolderPath()));
-	    assessmentQuestion.setPenaltyFactor(0);
+	    qbQuestion.setPenaltyFactor(0);
 
-	    int questionGrade = 1;
+	    int questionMark = 1;
 
 	    // options are different depending on the type
 	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
@@ -210,22 +215,22 @@ public class QTIUtil {
 
 		// setting answers is very similar in both types, so they were put together here
 		if (isMarkHedgingType) {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
+		    qbQuestion.setType(QbQuestion.TYPE_MARK_HEDGING);
 
 		} else if (isMultipleChoice) {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		    assessmentQuestion.setMultipleAnswersAllowed(false);
-		    assessmentQuestion.setShuffle(false);
-		    assessmentQuestion.setPrefixAnswersWithLetters(false);
+		    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		    qbQuestion.setMultipleAnswersAllowed(false);
+		    qbQuestion.setShuffle(false);
+		    qbQuestion.setPrefixAnswersWithLetters(false);
 
 		} else {
-		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER);
-		    assessmentQuestion.setCaseSensitive(false);
+		    qbQuestion.setType(QbQuestion.TYPE_SHORT_ANSWER);
+		    qbQuestion.setCaseSensitive(false);
 		}
 
 		String correctAnswer = null;
 		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
+		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 0;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
@@ -234,32 +239,32 @@ public class QTIUtil {
 			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
+			QbOption option = new QbOption();
+			option.setName(answerText);
+			option.setDisplayOrder(orderId++);
+			option.setFeedback(answer.getFeedback());
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full grade
+			    // for fill in blanks question all answers are correct and get full mark
 			    if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
-				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 				// 100% goes to the correct answer
-				assessmentAnswer.setGrade(1);
+				option.setMaxMark(1);
 				correctAnswer = answerText;
 			    } else {
 				log.warn("Choosing only first correct answer, despite another one was found: "
 					+ answerText);
-				assessmentAnswer.setGrade(0);
+				option.setMaxMark(0);
 			    }
 			} else {
-			    assessmentAnswer.setGrade(0);
+			    option.setMaxMark(0);
 			}
 
-			optionList.add(assessmentAnswer);
+			optionList.add(option);
 		    }
 
-		    assessmentQuestion.setOptions(optionList);
+		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
 		}
 
 		if (correctAnswer == null) {
@@ -268,10 +273,10 @@ public class QTIUtil {
 		}
 
 	    } else if (Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		assessmentQuestion.setMultipleAnswersAllowed(true);
-		assessmentQuestion.setShuffle(false);
-		assessmentQuestion.setPrefixAnswersWithLetters(false);
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		qbQuestion.setMultipleAnswersAllowed(true);
+		qbQuestion.setShuffle(false);
+		qbQuestion.setPrefixAnswersWithLetters(false);
 
 		if (question.getAnswers() != null) {
 		    float totalScore = 0;
@@ -281,32 +286,32 @@ public class QTIUtil {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
 
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
+		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = answer.getText();
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
+			QbOption assessmentAnswer = new QbOption();
+			assessmentAnswer.setName(answerText);
+			assessmentAnswer.setDisplayOrder(orderId++);
 			assessmentAnswer.setFeedback(answer.getFeedback());
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // set the factor of score for correct answers
-			    assessmentAnswer.setGrade(answer.getScore() / totalScore);
+			    assessmentAnswer.setMaxMark(answer.getScore() / totalScore);
 			} else {
-			    assessmentAnswer.setGrade(0);
+			    assessmentAnswer.setMaxMark(0);
 			}
 
 			optionList.add(assessmentAnswer);
 		    }
 
-		    assessmentQuestion.setOptions(optionList);
+		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
 		}
 
 	    } else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_TRUE_FALSE);
+		qbQuestion.setType(QbQuestion.TYPE_TRUE_FALSE);
 
 		if (question.getAnswers() == null) {
 		    log.warn("Answers missing from true-false question: " + question.getText());
@@ -314,22 +319,22 @@ public class QTIUtil {
 		} else {
 		    for (Answer answer : question.getAnswers()) {
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    assessmentQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
-			    questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    qbQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
+			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 			}
 			if (!StringUtils.isBlank(answer.getFeedback())) {
 			    // set feedback for true/false answers
 			    if (Boolean.parseBoolean(answer.getText())) {
-				assessmentQuestion.setFeedbackOnCorrect(answer.getFeedback());
+				qbQuestion.setFeedbackOnCorrect(answer.getFeedback());
 			    } else {
-				assessmentQuestion.setFeedbackOnIncorrect(answer.getFeedback());
+				qbQuestion.setFeedbackOnIncorrect(answer.getFeedback());
 			    }
 			}
 		    }
 		}
 	    } else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
-		assessmentQuestion.setShuffle(true);
+		qbQuestion.setType(QbQuestion.TYPE_MATCHING_PAIRS);
+		qbQuestion.setShuffle(true);
 
 		if (question.getAnswers() != null) {
 		    // the question score information is stored as sum of answer scores
@@ -339,9 +344,9 @@ public class QTIUtil {
 			    totalScore += answer.getScore();
 			}
 		    }
-		    questionGrade = Double.valueOf(Math.round(totalScore)).intValue();
+		    questionMark = Double.valueOf(Math.round(totalScore)).intValue();
 
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
+		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 1;
 		    for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
 			// QTI allows answers without a match, but LAMS assessment tool does not
@@ -352,30 +357,30 @@ public class QTIUtil {
 			if (matchAnswer != null) {
 			    Answer answer = question.getAnswers().get(answerIndex);
 			    String answerText = answer.getText();
-			    AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			    assessmentAnswer.setQuestion(answerText);
-			    assessmentAnswer.setOptionString(matchAnswer.getText());
-			    assessmentAnswer.setSequenceId(orderId++);
+			    QbOption assessmentAnswer = new QbOption();
+			    assessmentAnswer.setMatchingPair(answerText);
+			    assessmentAnswer.setName(matchAnswer.getText());
+			    assessmentAnswer.setDisplayOrder(orderId++);
 			    assessmentAnswer.setFeedback(answer.getFeedback());
 
 			    optionList.add(assessmentAnswer);
 			}
 		    }
 
-		    assessmentQuestion.setOptions(optionList);
+		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
 		}
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_ESSAY);
-		assessmentQuestion.setAllowRichEditor(false);
+		qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+		qbQuestion.setAllowRichEditor(false);
 
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
-		assessmentQuestion.setShuffle(false);
-		assessmentQuestion.setPrefixAnswersWithLetters(false);
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		qbQuestion.setShuffle(false);
+		qbQuestion.setPrefixAnswersWithLetters(false);
 
 		String correctAnswer = null;
 		if (question.getAnswers() != null) {
-		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<>(new SequencableComparator());
+		    TreeSet<QbOption> optionList = new TreeSet<>();
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
@@ -384,32 +389,32 @@ public class QTIUtil {
 			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			    continue;
 			}
-			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
-			assessmentAnswer.setOptionString(answerText);
-			assessmentAnswer.setSequenceId(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
+			QbOption option = new QbOption();
+			option.setName(answerText);
+			option.setDisplayOrder(orderId++);
+			option.setFeedback(answer.getFeedback());
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full grade
+			    // for fill in blanks question all answers are correct and get full mark
 			    if (correctAnswer == null) {
 				// whatever the correct answer holds, it becomes the question score
-				questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
 				// 100% goes to the correct answer
-				assessmentAnswer.setGrade(1);
+				option.setMaxMark(1);
 				correctAnswer = answerText;
 			    } else {
 				log.warn("Choosing only first correct answer, despite another one was found: "
 					+ answerText);
-				assessmentAnswer.setGrade(0);
+				option.setMaxMark(0);
 			    }
 			} else {
-			    assessmentAnswer.setGrade(0);
+			    option.setMaxMark(0);
 			}
 
-			optionList.add(assessmentAnswer);
+			optionList.add(option);
 		    }
 
-		    assessmentQuestion.setOptions(optionList);
+		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
 		}
 
 		if (correctAnswer == null) {
@@ -422,11 +427,11 @@ public class QTIUtil {
 		continue;
 	    }
 
-	    assessmentQuestion.setDefaultGrade(questionGrade);
+	    qbQuestion.setMaxMark(questionMark);
 
 	    questionList.add(assessmentQuestion);
 	    if (log.isDebugEnabled()) {
-		log.debug("Added question: " + assessmentQuestion.getTitle());
+		log.debug("Added question: " + qbQuestion.getName());
 	    }
 	}
     }
