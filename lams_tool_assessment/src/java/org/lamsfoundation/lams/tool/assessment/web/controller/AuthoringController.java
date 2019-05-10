@@ -144,9 +144,6 @@ public class AuthoringController {
 	    throws ServletException {
 	Long contentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
-	List<AssessmentQuestion> questions = null;
-	Assessment assessment = null;
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -155,8 +152,10 @@ public class AuthoringController {
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 	assessmentForm.setContentFolderID(contentFolderID);
 
+	Assessment assessment = null;
 	try {
 	    assessment = service.getAssessmentByContentId(contentId);
 	    // if assessment does not exist, try to use default content instead.
@@ -170,6 +169,7 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
+	List<AssessmentQuestion> questions = null;
 	if (assessment.getQuestions() != null) {
 	    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
 	} else {
@@ -487,42 +487,19 @@ public class AuthoringController {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
 	
+	//create new ScratchieItem and assign imported qbQuestion to it
+	AssessmentQuestion question = new AssessmentQuestion();
+	question.setQbQuestion(qbQuestion);
+	int maxSeq = 1;
+	if (questionList != null && questionList.size() > 0) {
+	    AssessmentQuestion last = questionList.last();
+	    maxSeq = last.getDisplayOrder() + 1;
+	}
+	question.setDisplayOrder(maxSeq);
+	question.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
+	questionList.add(question);
 	
-	
-//	// check whether it is "edit(old Question)" or "add(new Question)"
-//	extractFormToAssessmentQuestion(request, questionList, questionForm, isAuthoringRestricted);
-//
-//	reinitializeAvailableQuestions(sessionMap);
-//	
-//	
-//	
-//	
-//	//create new ScratchieItem and assign imported qbQuestion to it
-//	ScratchieItem item = new ScratchieItem();
-//	item.setQbQuestion(qbQuestion);
-//	int maxSeq = 1;
-//	if (itemList != null && itemList.size() > 0) {
-//	    ScratchieItem last = itemList.last();
-//	    maxSeq = last.getDisplayOrder() + 1;
-//	}
-//	item.setDisplayOrder(maxSeq);
-//	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
-//	itemList.add(item);
-	
-	
-	
-	
-	
-	
-
-
-	// evict everything manually as we do not use DTOs, just real entities
-	// without eviction changes would be saved immediately into DB
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item.getQbQuestion());
-	
-//	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
+	reinitializeAvailableQuestions(sessionMap);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -1156,62 +1133,63 @@ public class AuthoringController {
 	    }
 	}
 	
-	QbQuestion baseLine = question.getQbQuestion().clone();
+	QbQuestion qbQuestion = question.getQbQuestion();
+	QbQuestion baseLine = qbQuestion.clone();
 	// evict everything manually as we do not use DTOs, just real entities
 	// without eviction changes would be saved immediately into DB
 	service.releaseFromCache(question);
 	service.releaseFromCache(baseLine);
-	service.releaseFromCache(question.getQbQuestion());
+	service.releaseFromCache(qbQuestion);
 
-	question.getQbQuestion().setName(questionForm.getTitle());
-	question.getQbQuestion().setDescription(questionForm.getQuestion());
+	qbQuestion.setName(questionForm.getTitle());
+	qbQuestion.setDescription(questionForm.getQuestion());
 
 	if (!isAuthoringRestricted) {
-	    question.getQbQuestion().setMaxMark(Integer.parseInt(questionForm.getMaxMark()));
+	    qbQuestion.setMaxMark(Integer.parseInt(questionForm.getMaxMark()));
 	}
-	question.getQbQuestion().setFeedback(questionForm.getFeedback());
-	question.getQbQuestion().setAnswerRequired(questionForm.isAnswerRequired());
+	qbQuestion.setFeedback(questionForm.getFeedback());
+	qbQuestion.setAnswerRequired(questionForm.isAnswerRequired());
 
 	Integer type = questionForm.getQuestionType();
 	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
-	    question.getQbQuestion().setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
+	    qbQuestion.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
 	    boolean incorrectAnswerNullifiesMark = questionForm.isMultipleAnswersAllowed()
 		    ? questionForm.isIncorrectAnswerNullifiesMark()
 		    : false;
-	    question.getQbQuestion().setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.getQbQuestion().setShuffle(questionForm.isShuffle());
-	    question.getQbQuestion().setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
-	    question.getQbQuestion().setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.getQbQuestion().setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    question.getQbQuestion().setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    qbQuestion.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setShuffle(questionForm.isShuffle());
+	    qbQuestion.setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.getQbQuestion().setShuffle(questionForm.isShuffle());
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setShuffle(questionForm.isShuffle());
 	} else if ((type == QbQuestion.TYPE_SHORT_ANSWER)) {
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.getQbQuestion().setCaseSensitive(questionForm.isCaseSensitive());
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setCaseSensitive(questionForm.isCaseSensitive());
 	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.getQbQuestion().setCorrectAnswer(questionForm.isCorrectAnswer());
-	    question.getQbQuestion().setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.getQbQuestion().setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setCorrectAnswer(questionForm.isCorrectAnswer());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	} else if ((type == QbQuestion.TYPE_ESSAY)) {
-	    question.getQbQuestion().setAllowRichEditor(questionForm.isAllowRichEditor());
-	    question.getQbQuestion().setMaxWordsLimit(questionForm.getMaxWordsLimit());
-	    question.getQbQuestion().setMinWordsLimit(questionForm.getMinWordsLimit());
+	    qbQuestion.setAllowRichEditor(questionForm.isAllowRichEditor());
+	    qbQuestion.setMaxWordsLimit(questionForm.getMaxWordsLimit());
+	    qbQuestion.setMinWordsLimit(questionForm.getMinWordsLimit());
 	} else if (type == QbQuestion.TYPE_ORDERING) {
-	    question.getQbQuestion().setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    question.getQbQuestion().setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.getQbQuestion().setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
-	    question.getQbQuestion().setShuffle(questionForm.isShuffle());
-	    question.getQbQuestion().setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.getQbQuestion().setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    question.getQbQuestion().setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	    question.getQbQuestion().setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
+	    qbQuestion.setShuffle(questionForm.isShuffle());
+	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
+	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
+	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
+	    qbQuestion.setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
 	}
 
 	// set options
@@ -1228,7 +1206,7 @@ public class AuthoringController {
 		option.setDisplayOrder(displayOrder++);
 		options.add(option);
 	    }
-	    question.getQbQuestion().setQbOptions(options);
+	    qbQuestion.setQbOptions(options);
 	}
 	// set units
 	if (type == QbQuestion.TYPE_NUMERICAL) {
@@ -1239,10 +1217,10 @@ public class AuthoringController {
 		unit.setDisplayOrder(displayOrder++);
 		units.add(unit);
 	    }
-	    question.getQbQuestion().setUnits(units);
+	    qbQuestion.setUnits(units);
 	}
 	
-	question.setQbQuestionModified(service.isQbQuestionModified(baseLine, question.getQbQuestion()));
+	question.setQbQuestionModified(service.isQbQuestionModified(baseLine, qbQuestion));
 	request.setAttribute("qbQuestionModified", question.getQbQuestionModified());
     }
 

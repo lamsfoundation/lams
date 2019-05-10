@@ -54,7 +54,7 @@
 			<table class="table table-striped table-hover table-condensed">
 				<c:forEach var="option" items="${question.qbOptions}" varStatus="i">
 					<tr>
-						<td width="5px" style="    padding-right: 0;">
+						<td width="5px" style="padding-right: 0;">
 							<c:if test="${option.correct}">
 								<i class="fa fa-check text-success"></i>
 							</c:if>

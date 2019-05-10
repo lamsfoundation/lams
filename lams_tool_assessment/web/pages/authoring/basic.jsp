@@ -12,7 +12,7 @@
 	});
 
 	//The panel of assessment list panel
-	var questionListTargetDiv = "#questionListArea";
+	var questionListTargetDiv = "#itemArea";
 	function deleteQuestion(questionDisplayOrder){
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 
@@ -181,7 +181,7 @@
 	</lams:CKEditor>
 </div>
 
-<div id="questionListArea">
+<div id="itemArea">
 	<c:set var="sessionMapID" value="${assessmentForm.sessionMapID}" />
 	<c:choose>
 		<c:when test="${isAuthoringRestricted}">

@@ -62,7 +62,7 @@
 	    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			
 	    	    	var options = { 
-	    	    		target:  parent.jQuery('#questionListArea'), 
+	    	    		target:  parent.jQuery('#itemArea'), 
 	    		   		success: afterRatingSubmit  // post-submit callback
 	    		    }; 				
 		    		    				

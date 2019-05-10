@@ -160,21 +160,21 @@
 				<fmt:message key="label.authoring.basic.export.questions" />
 			</a>
 		</div>
-<!--		
+
 		<div class="pull-right roffset5">
 			<c:url var="tempUrl" value="">
 				<c:param name="output">
-					<c:url value='/authoring/importQbQuestion.do'/>?httpSessionID=${httpSessionID}
+					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}
 				</c:param>
 			</c:url>
 			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
 		
-			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.assessmentForm.assessment.contentId}&KeepThis=true&TB_iframe=true&modal=true" 
+			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" 
 				class="btn btn-default btn-xs thickbox"> 
 				Import from question bank
 			</a>
 		</div> 
--->
+
 	</div>
 
 	<table class="table table-condensed" id="questionTable">

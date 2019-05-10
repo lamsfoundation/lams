@@ -6,7 +6,7 @@ SET AUTOCOMMIT = 0;
 
 -- Create QB question table
 CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT, 
-							   `local` TINYINT(1) NOT NULL DEFAULT 1,
+							   `local` TINYINT(1) NOT NULL DEFAULT 0,
 							   `type` TINYINT NOT NULL,
 							   `question_id` INT NOT NULL,
 							   `version` SMALLINT NOT NULL DEFAULT 1,
@@ -117,7 +117,7 @@ ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FROM lams_qb_question);
 							   
 INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
-	SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
+	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
 		mcq.question, NULL, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 TRIM(question) AS question,
@@ -228,7 +228,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id)
-	SELECT NULL, 1, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
+	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
 		sq.question, sq.description, NULL, NULL, q.target_uid
 	FROM (SELECT uid,
 				 TRIM(title) AS question,
@@ -406,7 +406,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
-INSERT INTO lams_qb_question SELECT NULL, aq.question_type, 1, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 
+INSERT INTO lams_qb_question SELECT NULL, 0, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 
 				aq.question, aq.description, IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
 				aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
