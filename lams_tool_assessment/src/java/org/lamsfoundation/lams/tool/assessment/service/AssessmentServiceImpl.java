@@ -447,16 +447,6 @@ public class AssessmentServiceImpl
     public void releaseFromCache(Object object) {
 	assessmentDao.releaseFromCache(object);
 
-//	if (object instanceof AssessmentQuestion) {
-//	    AssessmentQuestion question = (AssessmentQuestion) object;
-//	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
-//		assessmentDao.releaseFromCache(option);
-//	    }
-//	    for (QbQuestionUnit unit : question.getQbQuestion().getUnits()) {
-//		assessmentDao.releaseFromCache(unit);
-//	    }
-//	}
-
 	if (object instanceof QuestionReference) {
 	    QuestionReference reference = (QuestionReference) object;
 	    if (reference.getQuestion() != null) {
@@ -2034,7 +2024,7 @@ public class AssessmentServiceImpl
 	    }
 	} else if (question.getType() == QbQuestion.TYPE_SHORT_ANSWER
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
-	    Long submittedOptionUid = questionResult.getQbOption().getUid();
+	    Long submittedOptionUid = questionResult.getQbOption() == null ? null : questionResult.getQbOption().getUid();
 	    if (submittedOptionUid != null) {
 		Integer currentCount = summaryOfAnswers.get(submittedOptionUid);
 		if (currentCount == null) {

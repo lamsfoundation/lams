@@ -1024,23 +1024,28 @@ public class LearningController {
 			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 			    questionDto.setPenalty(questionResult.getPenalty());
 			    questionDto.setQuestionFeedback(null);
-			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-				    questionDto.setQuestionFeedback(optionDto.getFeedback());
-				    break;
-				}
-			    }
-			    // required for showing right/wrong answers icons on results page correctly
-			    if (questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER
-				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL) {
-				boolean isAnsweredCorrectly = false;
+			    questionDto.setAnswerBoolean(false);
+
+			    if ((questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER
+				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
+				    && questionResult.getQbOption() != null) {
+
+				// required for showing right/wrong answers icons on results page correctly
 				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
+					boolean isAnsweredCorrectly = optionDto.getMaxMark() > 0;
+					questionDto.setAnswerBoolean(isAnsweredCorrectly);
 					break;
 				    }
 				}
-				questionDto.setAnswerBoolean(isAnsweredCorrectly);
+
+				//question feedback
+				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+					questionDto.setQuestionFeedback(optionDto.getFeedback());
+					break;
+				    }
+				}
 			    }
 
 			    // required for markandpenalty area and if it's on - on question's summary page

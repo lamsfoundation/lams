@@ -236,17 +236,6 @@ public class AuthoringController {
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
 	
-	//TODO remove
-//	//allow using old and modified questions and references altogether
-//	if (mode.isTeacher()) {
-//	    for (AssessmentQuestion question : oldQuestions) {
-//		service.releaseFromCache(question);
-//	    }
-//	    for (QuestionReference reference : oldReferences) {
-//		service.releaseFromCache(reference);
-//	    }
-//	}
-	
 	AssessmentUser assessmentUser = null;
 
 	if (assessmentPO == null) {
@@ -259,7 +248,7 @@ public class AuthoringController {
 	    // but the items still exist in Hibernate cache, so we need to evict them now
 	    for (AssessmentQuestion question : oldQuestions) {
 		service.releaseFromCache(question);
-		service.releaseFromCache(question.getQbQuestion());
+//		service.releaseFromCache(question.getQbQuestion());
 	    }
 	    for (QuestionReference reference : oldReferences) {
 		service.releaseFromCache(reference);
@@ -1254,7 +1243,6 @@ public class AuthoringController {
 	}
 	
 	question.setQbQuestionModified(service.isQbQuestionModified(baseLine, question.getQbQuestion()));
-	//TODO ????qbQuestionModified
 	request.setAttribute("qbQuestionModified", question.getQbQuestionModified());
     }
 
