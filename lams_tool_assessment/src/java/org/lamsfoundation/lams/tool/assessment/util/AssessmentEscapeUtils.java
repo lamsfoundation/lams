@@ -81,7 +81,7 @@ public class AssessmentEscapeUtils {
 	    questionResult.setAnswerStringEscaped(answerStringEscaped);
 	}
 	
-	QuestionDTO questionDto = new QuestionDTO(questionResult.getAssessmentQuestion());
+	QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
 	questionResult.setQuestionDto(questionDto);
 
 	String title = questionDto.getTitle();

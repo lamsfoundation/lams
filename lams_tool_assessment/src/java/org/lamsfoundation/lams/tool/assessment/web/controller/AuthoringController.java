@@ -300,6 +300,7 @@ public class AuthoringController {
 
 	// ************************* Handle assessment questions *******************
 	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
+	int maxQuestionId = qbService.getMaxQuestionId();
 	for (AssessmentQuestion question : newQuestions) {
 	    question.setToolContentId(assessmentPO.getContentId());
 	    removeNewLineCharacters(question);
@@ -320,7 +321,7 @@ public class AuthoringController {
 		    question.setQbQuestion(qbQuestion);
 		    qbQuestion.clearID();
 		    qbQuestion.setVersion(1);
-		    qbQuestion.setQuestionId(qbService.getMaxQuestionId());
+		    qbQuestion.setQuestionId(maxQuestionId++);
 		    qbQuestion.setCreateDate(new Date());
 		}
 		    break;

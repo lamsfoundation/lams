@@ -1017,7 +1017,7 @@ public class LearningController {
 
 		    // find corresponding questionResult
 		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			if (questionDto.getUid().equals(questionResult.getQbQuestion().getUid())) {
+			if (questionDto.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
 
 			    // copy questionResult's info to the question
 			    questionDto.setMark(questionResult.getMark());
@@ -1025,7 +1025,7 @@ public class LearningController {
 			    questionDto.setPenalty(questionResult.getPenalty());
 			    questionDto.setQuestionFeedback(null);
 			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
 				    questionDto.setQuestionFeedback(optionDto.getFeedback());
 				    break;
 				}
@@ -1035,7 +1035,7 @@ public class LearningController {
 				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL) {
 				boolean isAnsweredCorrectly = false;
 				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				    if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
 					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
 					break;
 				    }

@@ -235,8 +235,10 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		" LEFT OUTER JOIN tl_laasse10_assessment_result result " + " ON result.user_uid = user.uid"
 		+ " 	AND result.finish_date IS NOT NULL" + " 	AND result.latest = 1" +
 
+		" INNER JOIN lams_qb_tool_answer qbToolAnswer " + " ON qbToolAnswer.tool_question_uid = :questionUid " +
+
 		" INNER JOIN tl_laasse10_question_result question_result " + " ON result.uid=question_result.result_uid"
-		+ " 	AND question_result.assessment_question_uid = :questionUid" +
+		+ " 	AND question_result.uid = qbToolAnswer.answer_uid" +
 
 		" WHERE session.session_id = :sessionId "
 		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) ";

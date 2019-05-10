@@ -150,8 +150,8 @@ public class Assessment implements Cloneable {
     private AssessmentUser createdBy;
 
     // Question bank questions
+    @OneToMany
     @JoinColumn(name = "assessment_uid")
-    @OrderBy("sequence_id ASC")
     private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list
@@ -481,6 +481,9 @@ public class Assessment implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
+	for (AssessmentQuestion question : questions) {
+	    question.setToolContentId(contentId);
+	}
     }
 
     public boolean isAllowQuestionFeedback() {

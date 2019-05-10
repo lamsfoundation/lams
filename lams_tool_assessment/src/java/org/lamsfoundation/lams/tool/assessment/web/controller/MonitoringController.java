@@ -380,7 +380,7 @@ public class MonitoringController {
 		Long questionResultUid = null;
 		if (assessmentResult != null) {
 		    for (AssessmentQuestionResult dbQuestionResult : assessmentResult.getQuestionResults()) {
-			if (dbQuestionResult.getQbQuestion().getUid().equals(questionUid)) {
+			if (dbQuestionResult.getQbToolQuestion().getUid().equals(questionUid)) {
 			    questionResultUid = dbQuestionResult.getUid();
 			    break;
 			}

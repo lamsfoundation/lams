@@ -5,7 +5,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 
 public class QuestionDTO implements Comparable<QuestionDTO>{
@@ -92,35 +94,52 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 
     private int confidenceLevel;
 
-    public QuestionDTO(AssessmentQuestion question) {
-	this.uid = question.getUid();
-	this.type = question.getQbQuestion().getType();
-	this.title = question.getQbQuestion().getName();
-	this.question = question.getQbQuestion().getDescription();
-	this.displayOrder = question.getDisplayOrder();
-	this.maxMark = question.getQbQuestion().getMaxMark();
-	this.penaltyFactor = question.getQbQuestion().getPenaltyFactor();
-	this.answerRequired = question.getQbQuestion().isAnswerRequired();
-	this.feedback = question.getQbQuestion().getFeedback();
-	this.multipleAnswersAllowed = question.getQbQuestion().isMultipleAnswersAllowed();
-	this.incorrectAnswerNullifiesMark = question.getQbQuestion().isIncorrectAnswerNullifiesMark();
-	this.feedbackOnCorrect = question.getQbQuestion().getFeedbackOnCorrect();
-	this.feedbackOnPartiallyCorrect = question.getQbQuestion().getFeedbackOnPartiallyCorrect();
-	this.feedbackOnIncorrect = question.getQbQuestion().getFeedbackOnIncorrect();
-	this.shuffle = question.getQbQuestion().isShuffle();
-	this.prefixAnswersWithLetters = question.getQbQuestion().isPrefixAnswersWithLetters();
-	this.caseSensitive = question.getQbQuestion().isCaseSensitive();
-	this.correctAnswer = question.getQbQuestion().getCorrectAnswer();
-	this.allowRichEditor = question.getQbQuestion().isAllowRichEditor();
-	this.units = question.getQbQuestion().getUnits();
-	this.maxWordsLimit = question.getQbQuestion().getMaxWordsLimit();
-	this.minWordsLimit = question.getQbQuestion().getMinWordsLimit();
-	this.hedgingJustificationEnabled = question.getQbQuestion().isHedgingJustificationEnabled();
-	this.correctAnswersDisclosed = question.isCorrectAnswersDisclosed();
-	this.groupsAnswersDisclosed = question.isGroupsAnswersDisclosed();
+    /**
+     * Expanded version of the constructor which also sets correctAnswersDisclosed and groupsAnswersDisclosed.
+     * 
+     * @param assessmentQuestion
+     */
+    public QuestionDTO(AssessmentQuestion assessmentQuestion) {
+	this((QbToolQuestion) assessmentQuestion);
+	
+	this.correctAnswersDisclosed = assessmentQuestion.isCorrectAnswersDisclosed();
+	this.groupsAnswersDisclosed = assessmentQuestion.isGroupsAnswersDisclosed();
+    }
+    
+    /**
+     * Same as above, but skips setting correctAnswersDisclosed and groupsAnswersDisclosed
+     * 
+     * @param qbToolQuestion
+     */
+    public QuestionDTO(QbToolQuestion qbToolQuestion) {
+	this.uid = qbToolQuestion.getUid();
+	this.displayOrder = qbToolQuestion.getDisplayOrder();
+	
+	QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
+	this.type = qbQuestion.getType();
+	this.title = qbQuestion.getName();
+	this.question = qbQuestion.getDescription();
+	this.maxMark = qbQuestion.getMaxMark();
+	this.penaltyFactor = qbQuestion.getPenaltyFactor();
+	this.answerRequired = qbQuestion.isAnswerRequired();
+	this.feedback = qbQuestion.getFeedback();
+	this.multipleAnswersAllowed = qbQuestion.isMultipleAnswersAllowed();
+	this.incorrectAnswerNullifiesMark = qbQuestion.isIncorrectAnswerNullifiesMark();
+	this.feedbackOnCorrect = qbQuestion.getFeedbackOnCorrect();
+	this.feedbackOnPartiallyCorrect = qbQuestion.getFeedbackOnPartiallyCorrect();
+	this.feedbackOnIncorrect = qbQuestion.getFeedbackOnIncorrect();
+	this.shuffle = qbQuestion.isShuffle();
+	this.prefixAnswersWithLetters = qbQuestion.isPrefixAnswersWithLetters();
+	this.caseSensitive = qbQuestion.isCaseSensitive();
+	this.correctAnswer = qbQuestion.getCorrectAnswer();
+	this.allowRichEditor = qbQuestion.isAllowRichEditor();
+	this.units = qbQuestion.getUnits();
+	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
+	this.minWordsLimit = qbQuestion.getMinWordsLimit();
+	this.hedgingJustificationEnabled = qbQuestion.isHedgingJustificationEnabled();
 
 	optionDtos = new TreeSet<>();
-	for (QbOption option : question.getQbQuestion().getQbOptions()) {
+	for (QbOption option : qbQuestion.getQbOptions()) {
 	    optionDtos.add(new OptionDTO(option));
 	}
     }

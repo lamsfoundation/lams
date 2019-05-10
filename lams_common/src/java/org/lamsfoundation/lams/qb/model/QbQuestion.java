@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * A question in Question Bank.
@@ -131,9 +133,11 @@ public class QbQuestion implements Serializable, Cloneable {
     private boolean hedgingJustificationEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<QbOption> qbOptions = new ArrayList<>();
     
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
     // compares if current question data and the other one (probably modified with new data) are the same

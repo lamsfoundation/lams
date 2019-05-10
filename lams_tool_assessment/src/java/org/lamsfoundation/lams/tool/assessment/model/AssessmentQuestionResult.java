@@ -32,9 +32,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -68,9 +65,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     @Column(name = "answer_boolean")
     private boolean answerBoolean;
     
-//    @Column(name = "submitted_option_uid")
-//    private Long submittedOptionUid;
-    
     @Column
     private float mark;
     
@@ -85,10 +79,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     
     @Column(name = "confidence_level")
     private int confidenceLevel;
-    
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "assessment_question_uid")
-//    private AssessmentQuestion assessmentQuestion;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
@@ -127,16 +117,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 
     public QbQuestion getQbQuestion() {
 	return qbToolQuestion.getQbQuestion();
-    }
-    
-    //TODO remove
-    public AssessmentQuestion getAssessmentQuestion() {
-	return null;
-    }
-
-    //TODO remove
-    public void setAssessmentQuestion(AssessmentQuestion question) {
-//	this.assessmentQuestion = question;
     }
 
     public AssessmentResult getAssessmentResult() {
@@ -178,16 +158,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
-    }
-    
-    //TODO REMOVE
-    public Long getSubmittedOptionUid() {
-	return qbOption.getUid();
-    }
-
-    //TODO REMOVE
-    public void setSubmittedOptionUid(Long submittedOptionUid) {
-	this.qbOption.setUid(submittedOptionUid);
     }
 
     public Float getMark() {

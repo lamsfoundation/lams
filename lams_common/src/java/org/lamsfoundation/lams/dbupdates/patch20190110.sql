@@ -48,12 +48,12 @@ CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
 CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
 							 `qb_question_uid` BIGINT NOT NULL,
 							 `display_order` TINYINT NOT NULL DEFAULT 1,
-							 `name` TEXT NOT NULL,
+							 `name` TEXT,
 							 `correct` TINYINT(1) NOT NULL DEFAULT 0,
 							 `matching_pair` TEXT,
-							 `numerical_option` float,
-							 `max_mark` float,
-							 `accepted_error` float,
+							 `numerical_option` float DEFAULT 0,
+							 `max_mark` float DEFAULT 0,
+							 `accepted_error` float DEFAULT 0,
 							 `feedback` TEXT,
 							 PRIMARY KEY (uid),
 							 INDEX (display_order),
@@ -64,7 +64,7 @@ CREATE TABLE lams_qb_question_unit (`uid` BIGINT AUTO_INCREMENT,
 									`qb_question_uid` BIGINT NOT NULL,
 									`display_order` TINYINT NOT NULL DEFAULT 1,
 									`multiplier` float DEFAULT 0,
-									`unit` varchar(255),
+									`name` varchar(255),
 									PRIMARY KEY (uid),
 									CONSTRAINT FK_lams_qb_question_unit_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE);
 
@@ -487,7 +487,7 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, match
 	
 	
 -- fill table with units matching unique QB questions inserted above
-INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, unit)
+INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, name)
 	SELECT q.uid, u.sequence_id, u.multiplier, u.unit
 	FROM tl_laasse10_assessment_unit AS u
 	JOIN lams_qb_question AS q
