@@ -3,6 +3,9 @@
 	.font-weight-bold {
 		font-weight: bold;
 	}
+	.group-title {
+	   	cursor: pointer;
+	}
 </style>
 
 <!-- ChartJS-->
@@ -30,6 +33,13 @@
 					}
 	            }
 	       	});
+		});
+
+		//use jqeury toggle instead of bootstrap collapse 
+		$(".group-title").on('click', function () {
+			var div =  $("#collapse-" + $(this).data("groupid"));
+			div.toggleClass("in");
+			$(this).toggleClass("collapsed");
 		});
 
 		//Comparison button modal window
@@ -174,7 +184,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title panel-collapse">
-					<a data-toggle="collapse" data-target="#collapse-${groupDto.groupID}" href="#collapse-${groupDto.groupID}" class="collapsed" id="group-name-${groupDto.groupID}">
+					<a data-toggle="collapse" data-groupid="${groupDto.groupID}" class="collapsed group-title" id="group-name-${groupDto.groupID}">
 						${groupDto.groupName}
 					</a>
 				</h4>
