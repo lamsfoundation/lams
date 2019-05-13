@@ -12,14 +12,14 @@
 	
 	<a id="import-button" class="btn btn-xs btn-default pull-right button-add-item" href="#nogo"
 		title="Import question from the question bank">
-		Import
+		<fmt:message key="button.import"/>
 	</a>
 	
 	<div class="pull-right">
 		<c:choose>
 			<c:when test="${fn:length(otherVersions) == 1}">
 				<button class="btn btn-default btn-xs dropdown-toggle2" disabled="disabled">
-				    Version ${question.version}
+				    <fmt:message key="label.version"/> &nbsp; ${question.version}
 				</button>
 			</c:when>
 
@@ -50,29 +50,39 @@
 	</div>
  		
 	<c:choose>
-		<c:when test="${question.type == 1}">
+		<c:when test="${question.type == 1 || question.type == 3 || question.type == 4 || question.type == 8}">
 			<table class="table table-striped table-hover table-condensed">
 				<c:forEach var="option" items="${question.qbOptions}" varStatus="i">
+					<c:set var="isOptionCorrect" value="${option.correct || option.maxMark == 1}"/>
 					<tr>
 						<td width="5px" style="padding-right: 0;">
-							<c:if test="${option.correct}">
+							<c:if test="${isOptionCorrect}">
 								<i class="fa fa-check text-success"></i>
 							</c:if>
 						</td>
-							
+
 						<td width="10px">
 							<span 
-								<c:if test="${option.correct}">class="text-success"</c:if>>
+								<c:if test="${isOptionCorrect}">class="text-success"</c:if>>
 								${i.index+1})
 							</span>
 						</td>
 							
 						<td>
-							<c:if test="${option.correct}">
+							<c:if test="${isOptionCorrect}">
 								<div class="text-success">
 							</c:if>
-							<c:out value="${option.name}" escapeXml="false"/>
-							<c:if test="${option.correct}">
+							
+							<c:choose>
+								<c:when test="${question.type == 1 || question.type == 3 || question.type == 8}">
+									<c:out value="${option.name}" escapeXml="false"/>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${option.numericalOption}" escapeXml="false"/>
+								</c:otherwise>
+							</c:choose>
+							
+							<c:if test="${isOptionCorrect}">
 								</div>
 							</c:if>
 						</td>
@@ -80,8 +90,55 @@
 				</c:forEach>
 			</table>
 		</c:when>
-		<c:otherwise>
-		</c:otherwise>
+		
+		<c:when test="${question.type == 2}">
+			<table class="table table-hover table-condensed">
+				<c:forEach var="option" items="${question.qbOptions}" varStatus="i">
+					<tr>
+						<td width="10px">
+							<span 
+								<c:if test="${option.correct}">class="text-success"</c:if>>
+								${i.index+1})
+							</span>
+						</td>	
+						<td style="width: 100px;">
+							<c:out value="${option.matchingPair}" escapeXml="false" />
+						</td>
+						
+						<td >
+							<c:out value="${option.name}" escapeXml="false" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:when>
+		
+		<c:when test="${question.type == 5}">
+			<div class="voffset10">
+				Correct answer: ${question.correctAnswer}
+			</div>
+		</c:when>
+		
+		<c:when test="${question.type == 6}">
+		</c:when>
+		
+		<c:when test="${question.type == 7}">
+			<table class="table table-striped table-hover table-condensed">
+				<c:forEach var="option" items="${question.qbOptions}" varStatus="i">
+					<tr>
+						<td width="10px">
+							<span>
+								${i.index+1})
+							</span>
+						</td>
+							
+						<td>
+							<c:out value="${option.name}" escapeXml="false"/>
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</c:when>
 	</c:choose>
 </div>
 </div>
