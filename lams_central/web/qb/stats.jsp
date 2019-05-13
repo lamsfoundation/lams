@@ -86,7 +86,7 @@
 						Mark:
 					</div>
 					<div class="col-sm-11">
-						<c:out value="${question.mark}" />
+						<c:out value="${question.maxMark}" />
 					</div>
 				</div>
 			</div>
