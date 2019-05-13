@@ -104,6 +104,10 @@
 			font-size: 18px;
 		}
 		
+		#question-type {
+			display: inline-flex;
+		}
+		
 		/*----------STICKY FOOTER----------------*/
 		html {
 		    position: relative;
@@ -148,8 +152,8 @@
 				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'questionUid',
-					"Questions",
-					"questionDescription"
+					'<fmt:message key="authoring.section.questions"/>',
+					'questionDescription'
 				],
 			   	colModel:[
 			   		{name:'questionUid', index:'questionUid', width:0, hidden: true},
@@ -211,7 +215,7 @@
 						}
 
 						//show successfull notification
-	                	$.growlUI('<i class="fa fa-lg fa-download"></i> Question successfully imported');
+	                	$.growlUI('<i class="fa fa-lg fa-download"></i> <fmt:message key="label.question.successfully.imported" />');
 					}
 				);
 	        });
@@ -270,7 +274,7 @@
 <body>
 	<div id="main-panel" class="panel panel-default">
 		<div class="panel-heading panel-title">
-			Search question bank
+			<fmt:message key="label.search.question.bank"/>
 			
 			<button type="button" id="close-button" class="close" data-dismiss="modal" aria-label="Close"
 				onclick="javascript:self.parent.tb_remove();">
@@ -280,48 +284,48 @@
 			
 		<div class="panel-body">
 		
-			<div id="search-widgets">
+			<div id="search-widgets" class="input-group-sm">
 				<input type="text" id="filter-questions" class="form-control" placeholder="Contains text" 
 					onkeydown="doSearch(arguments[0]||event)" />
 		
 				<c:if test="${!empty questionTypesAvailable}">
-					<span class="form-control loffset5 disabled-span">
-					Type:
-					<select id="question-type" onchange="gridSearch();">
-						<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter">
-	  						<option value="${questionTypeIter}"
-	  							<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
-	  							
-								<c:choose>
-									<c:when test="${questionTypeIter == 1}">
-										<fmt:message key="label.question.type.multiple.choice" />
-									</c:when>
-									<c:when test="${questionTypeIter == 2}">
-										<fmt:message key="label.question.type.matching.pairs" />
-									</c:when>
-									<c:when test="${questionTypeIter == 3}">
-										<fmt:message key="label.question.type.short.answer" />
-									</c:when>
-									<c:when test="${questionTypeIter == 4}">
-										<fmt:message key="label.question.type.numerical" />
-									</c:when>
-									<c:when test="${questionTypeIter == 5}">
-										<fmt:message key="label.question.type.true.false" />
-									</c:when>
-									<c:when test="${questionTypeIter == 6}">
-										<fmt:message key="label.question.type.essay" />
-									</c:when>
-									<c:when test="${questionTypeIter == 7}">
-										<fmt:message key="label.question.type.ordering" />
-									</c:when>
-									<c:when test="${questionTypeIter == 8}">
-										<fmt:message key="label.question.type.mark.hedging" />
-									</c:when>
-								</c:choose>
-							</option>
-						</c:forTokens>
-					</select>
-					</span>
+					<div class="loffset10 input-group-sm">
+						<fmt:message key="label.question.type" />
+						<select id="question-type" onchange="gridSearch();" class="form-control">
+							<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter">
+		  						<option value="${questionTypeIter}"
+		  							<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
+		  							
+									<c:choose>
+										<c:when test="${questionTypeIter == 1}">
+											<fmt:message key="label.question.type.multiple.choice" />
+										</c:when>
+										<c:when test="${questionTypeIter == 2}">
+											<fmt:message key="label.question.type.matching.pairs" />
+										</c:when>
+										<c:when test="${questionTypeIter == 3}">
+											<fmt:message key="label.question.type.short.answer" />
+										</c:when>
+										<c:when test="${questionTypeIter == 4}">
+											<fmt:message key="label.question.type.numerical" />
+										</c:when>
+										<c:when test="${questionTypeIter == 5}">
+											<fmt:message key="label.question.type.true.false" />
+										</c:when>
+										<c:when test="${questionTypeIter == 6}">
+											<fmt:message key="label.question.type.essay" />
+										</c:when>
+										<c:when test="${questionTypeIter == 7}">
+											<fmt:message key="label.question.type.ordering" />
+										</c:when>
+										<c:when test="${questionTypeIter == 8}">
+											<fmt:message key="label.question.type.mark.hedging" />
+										</c:when>
+									</c:choose>
+								</option>
+							</c:forTokens>
+						</select>
+					</div>
 				</c:if>
 			</div>
 
@@ -341,7 +345,7 @@
 		<div class="panel-heading">
         	<div class="pull-right">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5" style="display: inline;">
-					Close
+					<fmt:message key="button.close" />
 				</a>
 			</div>	
       	</div>

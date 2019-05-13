@@ -171,7 +171,7 @@
 		
 			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" 
 				class="btn btn-default btn-xs thickbox"> 
-				Import from question bank
+				<fmt:message key="label.import.from.question.bank" />
 			</a>
 		</div> 
 
