@@ -139,6 +139,7 @@
 			$(document).ready(function(){
 				
 		    	$("#scratchieItemForm").validate({
+		    		ignore : 'div.cke_editable',
 		    		rules: {
 		    			title: "required",
 		    			hasAnswerFilled: {
@@ -182,7 +183,7 @@
 		    		          $("div.error").hide();
 		    		      }
 		    		},
-		    		debug: true,
+		    		debug: false,
      			    submitHandler: function(form) {
      			    	prepareAnswerEditorsForAjaxSubmit();
 		    			$("#answerList").val($("#answerForm").serialize(true));
