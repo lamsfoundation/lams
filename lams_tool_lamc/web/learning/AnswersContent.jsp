@@ -74,7 +74,7 @@
         function verifyAllQuestionsAnswered() {
           // in case oneQuestionPerPage option is ON user has to select 1 answer, and all answers otherwise
           var isOneQuestionPerPage = ${sessionMap.content.questionsSequenced};
-          var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.learnerAnswersDTOList)};
+          var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.learnerAnswerDtos)};
 
           //check each question is answered
           if ($(':radio:checked').length == answersRequiredNumber) {

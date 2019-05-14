@@ -226,11 +226,11 @@ public class McLearningController {
 	}
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
-	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
-	// should we show the marks for each question - we show the marks if any of the questions
+	List<AnswerDTO> learnerAnswerDtos = mcService.getAnswersFromDatabase(mcContent, user);
+	request.setAttribute(McAppConstants.LEARNER_ANSWER_DTOS, learnerAnswerDtos);
+	// should we show the marks for each questionDescription - we show the marks if any of the questions
 	// have a mark > 1.
-	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswersDTOList);
+	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswerDtos);
 	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 
 	/* find out if the content is being modified at the moment. */
@@ -339,7 +339,8 @@ public class McLearningController {
 	    int questionMark = question.getMark().intValue();
 
 	    AnswerDTO answerDto = new AnswerDTO();
-	    answerDto.setQuestion(question.getQuestion());
+	    answerDto.setQuestionName(question.getName());
+	    answerDto.setQuestionDescription(question.getDescription());
 	    answerDto.setDisplayOrder(String.valueOf(question.getDisplayOrder()));
 	    answerDto.setQuestionUid(question.getUid());
 	    answerDto.setFeedback(question.getFeedback() != null ? question.getFeedback() : "");
@@ -482,8 +483,8 @@ public class McLearningController {
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
 
-	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
-	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
+	List<AnswerDTO> learnerAnswerDtos = mcService.getAnswersFromDatabase(mcContent, user);
+	request.setAttribute(McAppConstants.LEARNER_ANSWER_DTOS, learnerAnswerDtos);
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
@@ -524,22 +525,20 @@ public class McLearningController {
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
 	Map mapQuestionsUidContent = new TreeMap(new McComparator());
-	if (mcContent != null) {
-	    List list = mcService.refreshQuestionContent(mcContent.getUid());
+	List<McQueContent> questions = mcService.getQuestionsByContentUid(mcContent.getUid());
 
-	    Iterator listIterator = list.iterator();
-	    Long mapIndex = new Long(1);
-	    while (listIterator.hasNext()) {
-		McQueContent mcQueContent = (McQueContent) listIterator.next();
-		mapQuestionsUidContent.put(mapIndex.toString(), mcQueContent.getUid());
-		mapIndex = new Long(mapIndex.longValue() + 1);
-	    }
+	Iterator listIterator = questions.iterator();
+	Long mapIndex = new Long(1);
+	while (listIterator.hasNext()) {
+	    McQueContent mcQueContent = (McQueContent) listIterator.next();
+	    mapQuestionsUidContent.put(mapIndex.toString(), mcQueContent.getUid());
+	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 
 	//builds a map to hold all the candidate answers for all the questions by accessing the db
 	Map mapStartupGeneralOptionsContent = new TreeMap(new McComparator());
 	Iterator itMap = mapQuestionsUidContent.entrySet().iterator();
-	Long mapIndex = new Long(1);
+	mapIndex = new Long(1);
 	while (itMap.hasNext()) {
 	    Map.Entry pairs = (Map.Entry) itMap.next();
 	    String currentQuestionUid = pairs.getValue().toString();
@@ -561,31 +560,14 @@ public class McLearningController {
 	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 	mcGeneralLearnerFlowDTO.setMapGeneralOptionsContent(mapStartupGeneralOptionsContent);
-
-	//builds a map to hold question texts
-	Map mapQuestionsContent = new TreeMap(new McComparator());
-	List list = mcService.refreshQuestionContent(mcContent.getUid());
-	Iterator iter = list.iterator();
-	Long mapIndex3 = new Long(1);
-	while (iter.hasNext()) {
-	    McQueContent question = (McQueContent) iter.next();
-	    mapQuestionsContent.put(mapIndex3.toString(), question.getQuestion());
-	    mapIndex3 = new Long(mapIndex3.longValue() + 1);
-	}
-	mcGeneralLearnerFlowDTO.setMapQuestionsContent(mapQuestionsContent);
+	mcGeneralLearnerFlowDTO.setQuestions(questions);
 
 	//rebuildFeedbackMapfromDB
 	Map mapFeedbackContent = new TreeMap(new McComparator());
-	List list2 = mcService.refreshQuestionContent(mcContent.getUid());
-	Iterator iter2 = list2.iterator();
-	Long mapIndex4 = new Long(1);
-	while (iter2.hasNext()) {
-	    McQueContent question = (McQueContent) iter2.next();
-
+	int i = 1;
+	for(McQueContent question : questions) {
 	    String feedback = question.getFeedback();
-
-	    mapFeedbackContent.put(mapIndex4.toString(), feedback);
-	    mapIndex4 = new Long(mapIndex4.longValue() + 1);
+	    mapFeedbackContent.put(String.valueOf(i++), feedback);
 	}
 	mcGeneralLearnerFlowDTO.setMapFeedbackContent(mapFeedbackContent);
 
@@ -595,7 +577,7 @@ public class McLearningController {
 
 	//create attemptMap for displaying on jsp
 	Map<String, McUsrAttempt> attemptMap = new TreeMap<String, McUsrAttempt>(new McComparator());
-	for (int i = 1; i <= mcContent.getMcQueContents().size(); i++) {
+	for (i = 1; i <= mcContent.getMcQueContents().size(); i++) {
 	    McQueContent question = mcService.getQuestionByDisplayOrder(i, toolContentUID);
 
 	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(user.getUid(), question.getUid());
@@ -665,8 +647,8 @@ public class McLearningController {
 	List<String> sequentialCheckedCa = new LinkedList<>();
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
 
-	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, mcQueUsr);
-	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
+	List<AnswerDTO> learnerAnswerDtos = mcService.getAnswersFromDatabase(mcContent, mcQueUsr);
+	request.setAttribute(McAppConstants.LEARNER_ANSWER_DTOS, learnerAnswerDtos);
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
@@ -684,9 +666,9 @@ public class McLearningController {
 
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 
-	// should we show the marks for each question - we show the marks if any of the questions
+	// should we show the marks for each questionDescription - we show the marks if any of the questions
 	// have a mark > 1.
-	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswersDTOList);
+	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswerDtos);
 	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 
 	request.setAttribute("sessionMapID", mcLearningForm.getHttpSessionID());

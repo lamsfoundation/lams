@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * <p>
- * Persistent object/bean that defines the question content for the MCQ tool. Provides accessors and mutators to get/set
+ * Persistent object/bean that defines the questionDescription content for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_que_content
  * </p>
  *
@@ -54,7 +54,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
     private static final long serialVersionUID = 4022287106119453962L;
 
     /**
-     * It stores sha1(question) value that allows us to search for the McQueContentc with the same question
+     * It stores sha1(questionDescription) value that allows us to search for the McQueContentc with the same questionDescription
      */
     @Column(name = "question_hash")
     private String questionHash;
@@ -65,7 +65,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 
     //DTO fields
     @Transient
-    private String escapedQuestion;
+    private String escapedDescription;
 
     public McQueContent(QbQuestion qbQuestion, String questionHash, Integer displayOrder, McContent mcContent) {
 	this.qbQuestion = qbQuestion;
@@ -82,26 +82,34 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      *
      * Copy constructor
      *
-     * @param queContent
-     *            the original qa question content
-     * @return the new qa question content object
+     * @param questionDescription
+     *            the original qa questionDescription content
+     * @return the new qa questionDescription content object
      */
-    public static McQueContent newInstance(McQueContent queContent, McContent newMcContent) {
-	McQueContent newQueContent = new McQueContent(queContent.getQbQuestion(), queContent.getQuestionHash(),
-		queContent.getDisplayOrder(), newMcContent);
+    public static McQueContent newInstance(McQueContent question, McContent newMcContent) {
+	McQueContent newQueContent = new McQueContent(question.getQbQuestion(), question.getQuestionHash(),
+		question.getDisplayOrder(), newMcContent);
 	return newQueContent;
     }
-
-    public String getQuestion() {
+    
+    public String getName() {
 	return this.qbQuestion.getName();
     }
 
-    public void setQuestion(String question) {
-	this.qbQuestion.setName(question);
+    public void setName(String name) {
+	this.qbQuestion.setName(name);
+    }
+
+    public String getDescription() {
+	return this.qbQuestion.getDescription();
+    }
+
+    public void setDescription(String description) {
+	this.qbQuestion.setDescription(description);
     }
 
     /**
-     * Returns sha1(question) value that allows us to search for the McQueContent with the same question
+     * Returns sha1(questionDescription) value that allows us to search for the McQueContent with the same questionDescription
      */
     public String getQuestionHash() {
 	return questionHash;
@@ -111,7 +119,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 	this.questionHash = questionHash;
     }
 
-    public org.lamsfoundation.lams.tool.mc.model.McContent getMcContent() {
+    public McContent getMcContent() {
 	return this.mcContent;
     }
 
@@ -179,11 +187,11 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 	qbQuestion.setMaxMark(mark);
     }
 
-    public String getEscapedQuestion() {
-	return this.escapedQuestion;
+    public String getEscapedDescription() {
+	return this.escapedDescription;
     }
 
-    public void setEscapedQuestion(String escapedQuestion) {
-	this.escapedQuestion = escapedQuestion;
+    public void setEscapedDescription(String escapedDescription) {
+	this.escapedDescription = escapedDescription;
     }
 }

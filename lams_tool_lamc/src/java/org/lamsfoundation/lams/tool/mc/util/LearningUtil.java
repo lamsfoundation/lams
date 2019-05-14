@@ -70,7 +70,7 @@ public class LearningUtil {
     }
 
     /**
-     * Should we show the marks for each question - we show the marks if any of the questions have a mark > 1.
+     * Should we show the marks for each questionDescription - we show the marks if any of the questions have a mark > 1.
      */
     public static Boolean isShowMarksOnQuestion(List<AnswerDTO> listQuestionAndCandidateAnswersDTO) {
 	Iterator iter = listQuestionAndCandidateAnswersDTO.iterator();

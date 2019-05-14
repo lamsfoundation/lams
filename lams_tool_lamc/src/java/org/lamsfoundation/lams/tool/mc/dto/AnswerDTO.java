@@ -30,17 +30,20 @@ import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 
 /**
  * <p>
- * DTO that holds question and candidate answers for the learner environment
+ * DTO that holds questionDescription and candidate answers for the learner environment
  * </p>
  *
  * @author Ozgur Demirtas
  */
 public class AnswerDTO implements Comparable<AnswerDTO> {
-    protected String question;
 
     protected String displayOrder;
 
     protected Long questionUid;
+    
+    protected String questionName;
+    
+    protected String questionDescription;
 
     protected Integer mark;
 
@@ -74,25 +77,26 @@ public class AnswerDTO implements Comparable<AnswerDTO> {
     public void setOptions(List<McOptsContent> options) {
         this.options = options;
     }
-
-    /**
-     * @return Returns the question.
-     */
-    public String getQuestion() {
-	return question;
+    
+    public String getQuestionName() {
+	return questionName;
     }
 
-    /**
-     * @param question
-     *            The question to set.
-     */
-    public void setQuestion(String question) {
-	this.question = question;
+    public void setQuestionName(String questionName) {
+	this.questionName = questionName;
+    }
+
+    public String getQuestionDescription() {
+	return questionDescription;
+    }
+
+    public void setQuestionDescription(String questionDescription) {
+	this.questionDescription = questionDescription;
     }
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("question: ", getQuestion()).append("displayOrder: ", getDisplayOrder())
+	return new ToStringBuilder(this).append("questionDescription: ", getQuestionDescription()).append("displayOrder: ", getDisplayOrder())
 		.append("answerOption: ", getAnswerOption()).toString();
     }
 

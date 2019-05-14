@@ -97,12 +97,12 @@ public interface IMcUsrAttemptDAO {
     List<Object[]> getLeadersFinalizedAttemptsByContentId(final Long contentId);
 
     /**
-     * Get the highest attempt order for a user for a particular question
+     * Get the highest attempt order for a user for a particular questionDescription
      */
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
 
     /**
-     * Get the highest attempt order for a all users in a session for a particular question
+     * Get the highest attempt order for a all users in a session for a particular questionDescription
      */
     List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId);
     

@@ -37,11 +37,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
 
-    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContent.uid=:mcContentId order by mcQueContent.displayOrder";
+    private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContent.uid=:contentUid order by mcQueContent.displayOrder";
 
     private static final String FIND_QUESTION_CONTENT_BY_UID = "from mcQueContent in class McQueContent where mcQueContent.uid=:uid";
-
-    private static final String REFRESH_QUESTION_CONTENT = "from mcQueContent in class McQueContent where mcQueContent.mcContent.uid=:mcContentId order by mcQueContent.displayOrder";
 
     private static final String LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER = "from mcQueContent in class McQueContent where mcQueContent.displayOrder=:displayOrder and mcQueContent.mcContent.uid=:mcContentUid";
 
@@ -65,15 +63,7 @@ public class McQueContentDAO extends LAMSBaseDAO implements IMcQueContentDAO {
     @SuppressWarnings("unchecked")
     public List<McQueContent> getQuestionsByContentUid(final long contentUid) {
 	List<McQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("mcContentId", contentUid).list();
-
-	return list;
-    }
-
-    @Override
-    public List<?> refreshQuestionContent(final Long mcContentId) {
-	List<?> list = getSessionFactory().getCurrentSession().createQuery(REFRESH_QUESTION_CONTENT)
-		.setParameter("mcContentId", mcContentId).list();
+		.createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setParameter("contentUid", contentUid).list();
 
 	return list;
     }

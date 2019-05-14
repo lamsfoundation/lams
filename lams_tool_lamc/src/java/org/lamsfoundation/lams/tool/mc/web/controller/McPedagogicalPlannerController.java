@@ -88,7 +88,7 @@ public class McPedagogicalPlannerController {
 	    String question = null;
 
 	    do {
-		question = plannerForm.getQuestion(questionIndex - 1);
+		question = plannerForm.getDescription(questionIndex - 1);
 		List<McOptionDTO> candidateAnswerDTOList = plannerForm.extractCandidateAnswers(request, questionIndex);
 		boolean removeQuestion = true;
 		if (!StringUtils.isEmpty(question)) {
@@ -107,7 +107,7 @@ public class McPedagogicalPlannerController {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
 			McQueContent mcQueContent = mcService.getQuestionByDisplayOrder(questionIndex,
 				mcContent.getUid());
-			mcQueContent.setQuestion(question);
+			mcQueContent.setDescription(question);
 			int candidateAnswerDTOIndex = 0;
 			List<QbOption> candidateAnswers = mcQueContent.getQbQuestion().getQbOptions();
 			Iterator<QbOption> candidateAnswerIter = candidateAnswers.iterator();
@@ -127,10 +127,10 @@ public class McPedagogicalPlannerController {
 		    } else {
 			McQueContent mcQueContent = new McQueContent();
 			mcQueContent.setQbQuestion(new QbQuestion());
-			// TODO Set question ID and version
+			// TODO Set questionDescription ID and version
 			mcQueContent.setDisplayOrder(questionIndex);
 			mcQueContent.setMcContent(mcContent);
-			mcQueContent.setQuestion(question);
+			mcQueContent.setDescription(question);
 			mcQueContent.setMark(McAppConstants.QUESTION_DEFAULT_MARK);
 			List<QbOption> candidateAnswers = mcQueContent.getQbQuestion().getQbOptions();
 			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList
@@ -172,7 +172,7 @@ public class McPedagogicalPlannerController {
 	    int count = NumberUtils.toInt(param[0]);
 	    plannerForm.getCandidateAnswerCount().add(count);
 	}
-	plannerForm.setQuestion(questionDisplayOrder - 1, "");
+	plannerForm.setDescription(questionDisplayOrder - 1, "");
 	plannerForm.getCandidateAnswerCount().add(McAppConstants.CANDIDATE_ANSWER_DEFAULT_COUNT);
 	plannerForm.setCorrect(questionDisplayOrder - 1, "1");
 

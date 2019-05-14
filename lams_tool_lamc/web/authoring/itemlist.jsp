@@ -27,7 +27,6 @@
 	<div class="panel panel-default add-file">
 	
 	<div class="panel-heading panel-title">
-		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
 		
 		<div class="btn-group btn-group-xs pull-right">
@@ -48,16 +47,13 @@
 			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
 		
 			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
-				Import from question bank
+				<fmt:message key="label.import.from.question.bank"/>
 			</a>
 		</div> 
 	</div>
 
 	<table id="itemTable" class="table table-striped table-condensed">
-		<c:set var="queIndex" scope="request" value="0" />
-
 		<tr>
-			<c:if test="${fn:length(questionDtos) > 0}">
 			<th>
 				<fmt:message key="label.questions" />
 			</th>
@@ -69,25 +65,27 @@
 			<th colspan="3">
 				&nbsp;
 			</th>
-			</c:if>
 		</tr>
 
-		<c:forEach items="${questionDtos}" var="currentDTO" varStatus="status">
-			<c:set var="queIndex" scope="request" value="${queIndex +1}" />
-			<c:set var="question" scope="request" value="${currentDTO.question}" />
-			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
-			<c:set var="mark" scope="request" value="${currentDTO.mark}" />
-			<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}" />
+		<c:forEach items="${questionDtos}" var="questionDto" varStatus="status">
+			<c:set var="queIndex" scope="request" value="${status.index + 1}" />
 
 			<tr>
 				<td>
 					<div style="overflow: auto;">
-						<c:out value="${question}" escapeXml="false" />
+						<c:out value="${questionDto.name}" escapeXml="false" />
+						
+						<!-- handle old questions, that have generic question name 'MCQ question'-->
+						<c:if test="${questionDto.name == 'MCQ question'}">
+							<div class="small">
+								<c:out value="${questionDto.description}" escapeXml="false" />
+							</div>
+						</c:if>
 					</div>
 				</td>
 
 				<td width="70px" class="text-center question-max-mark">
-					<c:out value="${mark}" />
+					<c:out value="${questionDto.mark}" />
 				</td>
 
 				<td class="arrows" style="width:5%">

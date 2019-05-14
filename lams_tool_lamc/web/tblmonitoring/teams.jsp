@@ -5,7 +5,9 @@
 		<div class="panel-heading">
 			<h4 class="panel-title">
 				<span class="float-left space-right">Q${i.index+1})</span> 
-				<c:out value="${userAttempt.mcQueContent.question}" escapeXml="false"/>
+				<c:out value="${userAttempt.mcQueContent.name}" escapeXml="false"/>
+				<br>
+				<c:out value="${userAttempt.mcQueContent.description}" escapeXml="false"/>
 			</h4> 
 		</div>
 	              

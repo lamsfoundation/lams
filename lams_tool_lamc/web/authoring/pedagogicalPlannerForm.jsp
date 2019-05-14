@@ -58,15 +58,14 @@
 			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			var questionIndex = 0;
 			do{
-				var question = document.getElementById("question["+questionIndex+"]");
-				if (question!=null){
-					var content = CKEDITOR.instances["question["+questionIndex+"]"].getData();
-					question.value=content;
+				var description = document.getElementById("description["+questionIndex+"]");
+				if (description!=null){
+					var content = CKEDITOR.instances["description["+questionIndex+"]"].getData();
+					description.value=content;
 					questionIndex++;
 				}
-			} while (question!=null);
+			} while (description!=null);
 		}
-  		
 
   		function fillForm(){
   			var candidateAnswersString = $("#candidateAnswersString").val();
@@ -86,14 +85,12 @@
 		}
 		
 		function clearEntry(questionIndex){
-			CKEDITOR.instances["question["+questionIndex+"]"].setData("");
+			CKEDITOR.instances["description["+questionIndex+"]"].setData("");
 		}
 				
 		$(document).ready(function(){
 			fillForm();
 		});
-		
-		
   	</script>
 </lams:head>
 <body id="body">
@@ -110,10 +107,11 @@
 		
 		<table id="questionTable" cellpadding="0" cellspacing="0">
 			<c:forEach var="questionIndex"  begin="1" end="${plannerForm.questionCount}">
+			
 				<tr>
 					<td class="FCKcell">
-						<lams:CKEditor id="question[${questionIndex-1}]"
-							value="${plannerForm.questionList[questionIndex-1]}"
+						<lams:CKEditor id="description[${questionIndex-1}]"
+							value="${plannerForm.descriptionList[questionIndex-1]}"
 							contentFolderID="${sessionMap.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
 			                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
@@ -125,6 +123,7 @@
 							onclick="javascript:clearEntry(${questionIndex-1})" />
 					</td>
 				</tr>
+				
 				<tr>
 					<td class="space-left" colspan="2">
 						<c:forEach var="candidateAnswerIndex" begin="1" end="${plannerForm.candidateAnswerCount[questionIndex-1]}" >
@@ -136,9 +135,14 @@
 						<input type="hidden" name="candidateAnswerCount${questionIndex}" value="${plannerForm.candidateAnswerCount[questionIndex-1]}" />
 					</td>
 				</tr>
+				
 			</c:forEach>
 		</table>
 	</form:form>
-	<a class="button" href="javascript:createQuestion();"><fmt:message key="label.addNewQuestion" /></a>
+	
+	<a class="button" href="javascript:createQuestion();">
+		<fmt:message key="label.addNewQuestion" />
+	</a>
+	
 </body>
 </lams:html>

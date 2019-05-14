@@ -53,7 +53,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
     @Qualifier("lamcMessageService")
     private static MessageService messageService;
 
-    private List<String> question;
+    private List<String> descriptions;
     private List<Integer> candidateAnswerCount;
     private String candidateAnswersString;
     private List<String> correct;
@@ -63,9 +63,9 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	boolean allEmpty = true;
 
-	if (question != null && !question.isEmpty()) {
+	if (descriptions != null && !descriptions.isEmpty()) {
 	    int questionIndex = 1;
-	    for (String item : question) {
+	    for (String item : descriptions) {
 		if (item != null || !StringUtils.isEmpty(item)) {
 		    try {
 			List<McOptionDTO> candidateAnswerList = extractCandidateAnswers(request, questionIndex);
@@ -96,7 +96,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	if (allEmpty) {
 	    errorMap.clear();
 	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
-	    question = null;
+	    descriptions = null;
 	    setCandidateAnswersString("");
 	} else if (!errorMap.isEmpty()) {
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
@@ -128,11 +128,11 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();
 	    setCandidateAnswerCount(new ArrayList<Integer>(questionDtos.size()));
 	    for (int questionIndex = 1; questionIndex <= questionDtos.size(); questionIndex++) {
-		McQuestionDTO item = questionDtos.get(questionIndex - 1);
-		int questionDisplayOrder = item.getDisplayOrder();
-		String questionText = item.getQuestion();
-		setQuestion(questionDisplayOrder - 1, questionText);
-		List<McOptionDTO> candidateAnswers = item.getOptionDtos();
+		McQuestionDTO questionDto = questionDtos.get(questionIndex - 1);
+		int questionDisplayOrder = questionDto.getDisplayOrder();
+		String description = questionDto.getDescription();
+		setDescription(questionDisplayOrder - 1, description);
+		List<McOptionDTO> candidateAnswers = questionDto.getOptionDtos();
 
 		for (int candidateAnswerIndex = 1; candidateAnswerIndex <= candidateAnswers
 			.size(); candidateAnswerIndex++) {
@@ -152,32 +152,32 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	}
     }
 
-    public void setQuestion(int number, String Questions) {
-	if (question == null) {
-	    question = new ArrayList<>();
+    public void setDescription(int number, String description) {
+	if (descriptions == null) {
+	    descriptions = new ArrayList<>();
 	}
-	while (number >= question.size()) {
-	    question.add(null);
+	while (number >= descriptions.size()) {
+	    descriptions.add(null);
 	}
-	question.set(number, Questions);
+	descriptions.set(number, description);
     }
 
-    public String getQuestion(int number) {
-	if (question == null || number >= question.size()) {
+    public String getDescription(int number) {
+	if (descriptions == null || number >= descriptions.size()) {
 	    return null;
 	}
-	return question.get(number);
+	return descriptions.get(number);
     }
 
     public Integer getQuestionCount() {
-	return question == null ? 0 : question.size();
+	return descriptions == null ? 0 : descriptions.size();
     }
 
     public boolean removeQuestion(int number) {
-	if (question == null || number >= question.size()) {
+	if (descriptions == null || number >= descriptions.size()) {
 	    return false;
 	}
-	question.remove(number);
+	descriptions.remove(number);
 	return true;
     }
 
@@ -239,7 +239,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	this.candidateAnswerCount = candidateAnswerCount;
     }
 
-    public List<String> getQuestionList() {
-	return question;
+    public List<String> getDescriptionList() {
+	return descriptions;
     }
 }

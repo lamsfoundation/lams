@@ -31,7 +31,7 @@
 			}
 				
 			function saveQuestion() {
-				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
+				$("#description").val(CKEDITOR.instances.description.getData());
 				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
 					var value = CKEDITOR.instances[name].getData();
@@ -68,7 +68,7 @@
 			function validateSingleCorrectAnswer() {
 				
 				//question.blank
-				if (!$("#newQuestion").val()) {
+				if (!$("#name").val()) {
 					var msg = "<fmt:message key="question.blank"/>";
 					alert(msg);
 					return false;
@@ -152,10 +152,21 @@
 
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
 		<lams:Page title="${title}" type="learner" formID="mcAuthoringForm">
+		
+			<div class="form-group">
+				<label for="name">
+					<fmt:message key="label.authoring.title" />
+				</label>
+				<input type="text" id="name" name="name" value="${questionDto.name}" class="form-control"/>
+			</div>
 
 			<div class="form-group">
-				<lams:CKEditor id="newQuestion"
-					value="${questionDto.question}"
+				<label for="description">
+					<fmt:message key="label.question" />
+				</label>
+			
+				<lams:CKEditor id="description"
+					value="${questionDto.description}"
 					contentFolderID="${sessionMap.contentFolderID}">
 				</lams:CKEditor>
 			</div>

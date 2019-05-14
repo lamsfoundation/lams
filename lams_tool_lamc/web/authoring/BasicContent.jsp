@@ -1,5 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
+<style>
+	#itemList .panel-heading.panel-title {
+		overflow:hidden;
+	}
+</style>
 
 <script type="text/javascript">
 	function removeQuestion(questionIndex) {

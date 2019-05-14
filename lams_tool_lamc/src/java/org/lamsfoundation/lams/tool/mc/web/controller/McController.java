@@ -226,7 +226,7 @@ public class McController {
     }
 
     /**
-     * opens up an new screen within the current page for editing a question
+     * opens up an new screen within the current page for editing a questionDescription
      */
     @RequestMapping("/editQuestionBox")
     public String editQuestionBox(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
@@ -240,7 +240,7 @@ public class McController {
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
 
 	McQuestionDTO questionDto = null;
-	//editing existing question
+	//editing existing questionDescription
 	if (questionIndex != null) {
 	    mcAuthoringForm.setQuestionIndex(questionIndex);
 
@@ -254,9 +254,9 @@ public class McController {
 		}
 	    }
 
-	    //adding new question
+	    //adding new questionDescription
 	} else {
-	    // prepare question for adding new question page
+	    // prepare questionDescription for adding new questionDescription page
 	    questionDto = new McQuestionDTO();
 	    List<McOptionDTO> newOptions = new ArrayList<>();
 	    McOptionDTO newOption1 = new McOptionDTO();
@@ -272,8 +272,9 @@ public class McController {
     }
 
     /**
-     * removes a question from the questions map
+     * removes a questionDescription from the questions map
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/removeQuestion")
     public String removeQuestion(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
 
@@ -285,38 +286,38 @@ public class McController {
 	Integer questionIndexToDelete = WebUtil.readIntParam(request, "questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndexToDelete);
 
-	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
+	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	//exclude Question with questionIndex From List
 	List<McQuestionDTO> tempQuestionDtos = new LinkedList<>();
 	int queIndex = 0;
-	for (McQuestionDTO questionDTO : questionDTOs) {
+	for (McQuestionDTO questionDto : questionDtos) {
 
-	    String questionText = questionDTO.getQuestion();
-	    Integer displayOrder = questionDTO.getDisplayOrder();
-	    if ((questionText != null) && !questionText.isEmpty()) {
+	    String name = questionDto.getName();
+	    Integer displayOrder = questionDto.getDisplayOrder();
+	    if ((name != null) && !name.isEmpty()) {
 
 		if (!displayOrder.equals(questionIndexToDelete)) {
 		    ++queIndex;
-		    questionDTO.setDisplayOrder(queIndex);
-		    tempQuestionDtos.add(questionDTO);
+		    questionDto.setDisplayOrder(queIndex);
+		    tempQuestionDtos.add(questionDto);
 
 		} else {
 		    List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
 			    .get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
-		    deletedQuestionDTOs.add(questionDTO);
+		    deletedQuestionDTOs.add(questionDto);
 		    sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
 		}
 	    }
 	}
-	questionDTOs = tempQuestionDtos;
-	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
+	questionDtos = tempQuestionDtos;
+	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDtos);
 
 	return "authoring/itemlist";
     }
 
     /**
-     * moves a question down in the list
+     * moves a questionDescription down in the list
      */
     @RequestMapping("/moveQuestionDown")
     public String moveQuestionDown(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
@@ -408,15 +409,17 @@ public class McController {
 	while (iter.hasNext()) {
 	    McQuestionDTO questionDto = iter.next();
 
-	    String question = questionDto.getQuestion();
+	    String name = questionDto.getName();
+	    String description = questionDto.getDescription();
 	    String feedback = questionDto.getFeedback();
 	    String mark = questionDto.getMark();
 
 	    List<McOptionDTO> optionDtos = questionDto.getOptionDtos();
-	    if ((question != null) && (!question.equals(""))) {
+	    if ((name != null) && (!name.equals(""))) {
 		++queIndex;
 
-		questionDto.setQuestion(question);
+		questionDto.setName(name);
+		questionDto.setDescription(description);
 		questionDto.setDisplayOrder(queIndex);
 		questionDto.setFeedback(feedback);
 		questionDto.setOptionDtos(optionDtos);
@@ -429,7 +432,7 @@ public class McController {
     }
     
     /**
-     * Adds QbQuestion, selected in the question bank, to the current question list.
+     * Adds QbQuestion, selected in the questionDescription bank, to the current questionDescription list.
      */
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
@@ -438,7 +441,7 @@ public class McController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-	List<McQuestionDTO> questionDtos = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
+	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	//get QbQuestion from DB
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
@@ -462,7 +465,8 @@ public class McController {
 
 	//create new McQuestionDTO and assign imported qbQuestion to it
 	McQuestionDTO questionDto = new McQuestionDTO();
-	questionDto.setQuestion(qbQuestion.getName());
+	questionDto.setName(qbQuestion.getName());
+	questionDto.setDescription(qbQuestion.getDescription());
 	questionDto.setQbQuestionUid(qbQuestionUid);
 	questionDto.setFeedback(qbQuestion.getFeedback());
 	questionDto.setDisplayOrder(maxDisplayOrder + 1);
@@ -474,6 +478,7 @@ public class McController {
 	return "authoring/itemlist";
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("/saveQuestion")
     public String saveQuestion(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
 
@@ -498,38 +503,40 @@ public class McController {
 
 	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
-	String newQuestion = request.getParameter("newQuestion");
+	String name = request.getParameter("name");
+	String description = request.getParameter("description");
 	String feedback = request.getParameter("feedback");
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid", true);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
-	if ((newQuestion != null) && (newQuestion.length() > 0)) {
-	    // adding new question
+	if ((name != null) && (name.length() > 0)) {
+	    // adding new questionDescription
 	    if (questionIndex == null) {
 
 		//finding max displayOrder
 		int maxDisplayOrder = 0;
 		for (McQuestionDTO questionDTO : questionDTOs) {
-		    int displayOrder = new Integer(questionDTO.getDisplayOrder());
+		    int displayOrder = questionDTO.getDisplayOrder();
 		    if (displayOrder > maxDisplayOrder) {
 			maxDisplayOrder = displayOrder;
 		    }
 		}
 
-		McQuestionDTO questionDTO = new McQuestionDTO();
-		questionDTO.setQuestion(newQuestion);
-		questionDTO.setQbQuestionUid(qbQuestionUid);
-		questionDTO.setFeedback(feedback);
-		questionDTO.setDisplayOrder(maxDisplayOrder + 1);
-		questionDTO.setOptionDtos(options);
-		questionDTO.setMark(mark);
-		questionDTO.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
-		request.setAttribute("qbQuestionModified", questionDTO.getQbQuestionModified());
+		McQuestionDTO questionDto = new McQuestionDTO();
+		questionDto.setName(name);
+		questionDto.setDescription(description);
+		questionDto.setQbQuestionUid(qbQuestionUid);
+		questionDto.setFeedback(feedback);
+		questionDto.setDisplayOrder(maxDisplayOrder + 1);
+		questionDto.setOptionDtos(options);
+		questionDto.setMark(mark);
+		questionDto.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
+		request.setAttribute("qbQuestionModified", questionDto.getQbQuestionModified());
 
-		questionDTOs.add(questionDTO);
+		questionDTOs.add(questionDto);
 
-		// updating existing question
+		// updating existing questionDescription
 	    } else {
 		McQuestionDTO questionDto = null;
 		for (McQuestionDTO questionDtoIter : questionDTOs) {
@@ -541,13 +548,13 @@ public class McController {
 		    }
 		}
 
-		questionDto.setQuestion(newQuestion);
+		questionDto.setName(name);
+		questionDto.setDescription(description);
 		questionDto.setQbQuestionUid(qbQuestionUid);
 		questionDto.setFeedback(feedback);
 		questionDto.setDisplayOrder(questionIndex);
 		questionDto.setOptionDtos(options);
 		questionDto.setMark(mark);
-
 		questionDto.setQbQuestionModified(mcService.isQbQuestionModified(questionDto));
 		request.setAttribute("qbQuestionModified", questionDto.getQbQuestionModified());
 	    }
@@ -562,10 +569,10 @@ public class McController {
     }
 
     /**
-     * Parses questions extracted from IMS QTI file and adds them to currently edited question.
+     * Parses questions extracted from IMS QTI file and adds them to currently edited questionDescription.
      */
     @RequestMapping("/saveQTI")
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     public String saveQTI(HttpServletRequest request) throws IOException, ServletException {
 
 	// big part of code was taken from addSingleQuestion() and saveQuestion() methods
@@ -580,15 +587,12 @@ public class McController {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 
 	for (Question question : questions) {
-	    // quietly do same verification as in other question-adding methods
-	    String questionText = question.getText();
-	    if (StringUtils.isBlank(questionText)) {
-		logger.warn("Skipping a blank question.");
+	    // quietly do same verification as in other questionDescription-adding methods
+	    String questionTitle = question.getTitle();
+	    if (StringUtils.isBlank(questionTitle)) {
+		logger.warn("Skipping a blank question title.");
 		continue;
 	    }
-
-	    questionText = QuestionParser.processHTMLField(questionText, false, contentFolderID,
-		    question.getResourcesFolderPath());
 
 	    List<McOptionDTO> optionDtos = new ArrayList<>();
 	    String correctAnswer = null;
@@ -618,7 +622,7 @@ public class McController {
 			    // marks are integer numbers
 			    correctAnswerScore = Math.min(new Double(Math.ceil(answer.getScore())).intValue(), 10);
 			} else {
-			    // there can be only one correct answer in a MCQ question
+			    // there can be only one correct answer in a MCQ questionDescription
 			    logger.warn(
 				    "Choosing only first correct answer, despite another one was found: " + answerText);
 			    optionDto.setCorrect("Incorrect");
@@ -632,13 +636,15 @@ public class McController {
 	    }
 
 	    if (correctAnswer == null) {
-		logger.warn("No correct answer found for question: " + questionText);
+		logger.warn("No correct answer found for question title: " + questionTitle);
 		continue;
 	    }
 
 	    McQuestionDTO questionDto = new McQuestionDTO();
 	    questionDto.setDisplayOrder(questionDtos.size() + 1);
-	    questionDto.setQuestion(questionText);
+	    questionDto.setName(question.getTitle());
+	    questionDto.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
 	    questionDto.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), true, null, null));
 	    questionDto.setOptionDtos(optionDtos);
 	    questionDto.setMark(correctAnswerScore.toString());
@@ -646,7 +652,7 @@ public class McController {
 	    questionDtos.add(questionDto);
 
 	    if (logger.isDebugEnabled()) {
-		logger.debug("Added question: " + questionText);
+		logger.debug("Added questionDescription: " + questionTitle);
 	    }
 	}
 
@@ -672,8 +678,8 @@ public class McController {
 	    Question question = new Question();
 
 	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-	    question.setTitle("Question " + mcQuestion.getDisplayOrder());
-	    question.setText(mcQuestion.getQuestion());
+	    question.setTitle(mcQuestion.getName());
+	    question.setText(mcQuestion.getDescription());
 	    question.setFeedback(mcQuestion.getFeedback());
 	    List<Answer> answers = new ArrayList<>();
 
@@ -687,7 +693,7 @@ public class McController {
 		question.setAnswers(answers);
 	    }
 
-	    // put the question in the right place
+	    // put the questionDescription in the right place
 	    questions.add(mcQuestion.getDisplayOrder() - 1, question);
 	}
 

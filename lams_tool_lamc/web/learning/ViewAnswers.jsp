@@ -94,7 +94,7 @@
 
 		<!--  QUESTIONS  -->
 		<c:set var="mainQueIndex" scope="request" value="0" />
-		<c:forEach var="questionEntry" varStatus="status" items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
+		<c:forEach var="question" varStatus="status" items="${mcGeneralLearnerFlowDTO.questions}">
 			<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
 			<div class="row no-gutter">
@@ -103,11 +103,18 @@
 						<div class="panel-heading">
 							<table>
 								<tr>
-									<td>${status.count})</td>
-									<td width="100%" style="padding: 5px"><c:out value="${questionEntry.value}" escapeXml="false" /></td>
+									<td>
+										${status.count})
+									</td>
+									<td width="100%" style="padding: 5px">
+										<c:out value="${question.name}" escapeXml="false" />
+										<br>
+										<c:out value="${question.description}" escapeXml="false" />
+									</td>
 								</tr>
 							</table>
 						</div>
+						
 						<div class="panel-body">
 
 							<!--  CANDIDATE ANSWERS  -->
