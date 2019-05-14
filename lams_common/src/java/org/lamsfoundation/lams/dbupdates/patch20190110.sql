@@ -118,7 +118,7 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
 							   
 INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-		mcq.question, NULL, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
+		'MCQ question', mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 TRIM(question) AS question,
 				 mark AS max_mark,

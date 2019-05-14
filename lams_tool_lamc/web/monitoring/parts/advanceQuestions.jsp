@@ -15,13 +15,17 @@
 			<c:forEach var="question" items="${content.mcQueContents}" varStatus="i">
 	
 				<tr>			
-					<td><b>  <fmt:message key="label.question.only"/>&nbsp;${i.index + 1}:</b> (<fmt:message key="label.mark"/>&nbsp;<c:out value="${question.mark}"/>)<br/>
-						<c:out value="${question.question}" escapeXml="false"/>						
+					<td>
+						<b>  <fmt:message key="label.question.only"/>&nbsp;${i.index + 1}:</b> (<fmt:message key="label.mark"/>&nbsp;<c:out value="${question.mark}"/>)<br/>
+						<c:out value="${question.name}" escapeXml="false"/>
+						<br>
+						<c:out value="${question.description}" escapeXml="false"/>						
 					</td>
 				</tr>
 							
 				<tr>					
-					<td>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
+					<td>  
+						<b> <fmt:message key="label.mc.options.col"/>  </b> 
 						<table class="table table-condensed" style="margin-bottom:0px">
 							<c:forEach var="option" items="${question.qbQuestion.qbOptions}" varStatus="optionStatus">
 								<tr>			

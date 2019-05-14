@@ -247,18 +247,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void saveOrUpdateMcQueContent(McQueContent mcQueContent) {
+    public void saveOrUpdateMcQueContent(McQueContent question) {
 	//update questions' hash
-	String newHash = mcQueContent.getQuestion() == null ? null : HashUtil.sha1(mcQueContent.getQuestion());
-	mcQueContent.setQuestionHash(newHash);
+	String newHash = question.getDescription() == null ? null : HashUtil.sha1(question.getDescription());
+	question.setQuestionHash(newHash);
 
-	mcQueContentDAO.insertOrUpdate(mcQueContent.getQbQuestion());
+	mcQueContentDAO.insertOrUpdate(question.getQbQuestion());
 
-	for (QbOption option : mcQueContent.getQbQuestion().getQbOptions()) {
+	for (QbOption option : question.getQbQuestion().getQbOptions()) {
 	    mcQueContentDAO.insertOrUpdate(option);
 	}
 
-	mcQueContentDAO.saveOrUpdateMcQueContent(mcQueContent);
+	mcQueContentDAO.saveOrUpdateMcQueContent(question);
     }
 
     @Override
@@ -266,10 +266,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	int displayOrder = 0;
 	for (McQuestionDTO questionDTO : questionDTOs) {
-	    String currentQuestionText = questionDTO.getQuestion();
-
 	    // skip empty questions
-	    if (currentQuestionText.isEmpty()) {
+	    if (questionDTO.getName().isEmpty()) {
 		continue;
 	    }
 
@@ -283,7 +281,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    McQueContent question = getQuestionByUid(questionDTO.getUid());
 
-	    // get the QB question from DB
+	    // get the QB questionDescription from DB
 	    QbQuestion qbQuestion = questionDTO.getQbQuestionUid() == null ? null
 		    : (QbQuestion) mcQueContentDAO.find(QbQuestion.class, questionDTO.getQbQuestionUid());
 	    if (qbQuestion == null) {
@@ -296,7 +294,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    QbQuestion qbQuestionClone = qbQuestion.clone();
 
 	    // set clone's data to current values
-	    qbQuestionClone.setName(currentQuestionText);
+	    qbQuestionClone.setName(questionDTO.getName());
+	    qbQuestionClone.setDescription(questionDTO.getDescription());
 	    qbQuestionClone.setMaxMark(Integer.valueOf(currentMark));
 	    qbQuestionClone.setFeedback(currentFeedback);
 
@@ -307,18 +306,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    releaseQbQuestionFromCache(qbQuestionClone);
 		    break;
 		case IQbService.QUESTION_MODIFIED_UPDATE:
-		    // simply accept the modified clone as new version of the question
+		    // simply accept the modified clone as new version of the questionDescription
 		    // this option is not supported yet
 		    qbQuestion = qbQuestionClone;
 		    break;
 		case IQbService.QUESTION_MODIFIED_VERSION_BUMP:
-		    // new version of the old question gets created
+		    // new version of the old questionDescription gets created
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
 		    qbQuestion.setCreateDate(new Date());
 		    break;
 		case IQbService.QUESTION_MODIFIED_ID_BUMP:
-		    // new question gets created
+		    // new questionDescription gets created
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(1);
 		    qbQuestion.setQuestionId(qbService.getMaxQuestionId());
@@ -326,18 +325,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    break;
 	    }
 
-	    // in case question doesn't exist
+	    // in case questionDescription doesn't exist
 	    if (question == null) {
 		question = new McQueContent(qbQuestion, null, new Integer(displayOrder), content);
 
-		// adding a new question to content
+		// adding a new questionDescription to content
 		content.getMcQueContents().add(question);
 		question.setMcContent(content);
 
-		// in case question exists already
+		// in case questionDescription exists already
 	    } else {
 		question.setDisplayOrder(new Integer(displayOrder));
-		// this is needed, if we took the clone as the new question
+		// this is needed, if we took the clone as the new questionDescription
 		question.setQbQuestion(qbQuestion);
 	    }
 
@@ -391,13 +390,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // make removed options orphaned, so they will be removed from DB
 	    qbQuestion.getQbOptions().removeAll(qbOptionsToRemove);
 	    qbOptionsToRemove.clear();
-	    // if clone is the real question, clear its IDs so it is saved as a new question or version
+	    // if clone is the real questionDescription, clear its IDs so it is saved as a new questionDescription or version
 	    // it needs to happen only now as above we used option UID matching
 	    if (questionDTO.getQbQuestionModified() > IQbService.QUESTION_MODIFIED_UPDATE) {
 		qbQuestion.clearID();
 	    }
 
-	    // updating the existing question content
+	    // updating the existing questionDescription content
 	    saveOrUpdateMcQueContent(question);
 
 	}
@@ -495,7 +494,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    McQueContent question = this.getQuestionByUid(questionUid);
 	    if (question == null) {
 		throw new McApplicationException(
-			"Can't find question with specified question uid: " + answerDto.getQuestionUid());
+			"Can't find questionDescription with specified questionDescription uid: " + answerDto.getQuestionUid());
 	    }
 
 	    QbOption answerOption = answerDto.getAnswerOption();
@@ -549,27 +548,26 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	for (McQueContent question : questions) {
 	    AnswerDTO answerDto = new AnswerDTO();
-	    List<QbOption> optionList = question.getQbQuestion().getQbOptions();
+	    List<QbOption> qbOptions = question.getQbQuestion().getQbOptions();
 	    List<McOptsContent> mcOptsContentList = new ArrayList<>();
 
 	    boolean randomize = mcContent.isRandomize();
 	    if (randomize) {
-		ArrayList<QbOption> shuffledList = new ArrayList<>(optionList);
+		ArrayList<QbOption> shuffledList = new ArrayList<>(qbOptions);
 		Collections.shuffle(shuffledList);
-		optionList = new LinkedList<>(shuffledList);
+		qbOptions = new LinkedList<>(shuffledList);
 	    }
-	    for (QbOption option : optionList) {
-		McOptsContent mcOptsContent = new McOptsContent();
-		mcOptsContent.setQbOption(option);
-		mcOptsContentList.add(mcOptsContent);
+	    for (QbOption qbOption : qbOptions) {
+		McOptsContent option = new McOptsContent();
+		option.setQbOption(qbOption);
+		mcOptsContentList.add(option);
 	    }
 
-	    answerDto.setQuestion(question.getQuestion());
+	    answerDto.setQuestionName(question.getName());
+	    answerDto.setQuestionDescription(question.getDescription());
 	    answerDto.setDisplayOrder(String.valueOf(question.getDisplayOrder()));
 	    answerDto.setQuestionUid(question.getUid());
-
 	    answerDto.setMark(question.getMark());
-
 	    answerDto.setOptions(mcOptsContentList);
 
 	    answerDtos.add(answerDto);
@@ -633,15 +631,15 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		if (isFullAttemptDetailsRequired) {
 
-		    // The marks for the user must be listed in the display order of the question.
+		    // The marks for the user must be listed in the display order of the questionDescription.
 		    // Other parts of the code assume that the questions will be in consecutive display
 		    // order starting 1 (e.g. 1, 2, 3, not 1, 3, 4) so we set up an array and use
 		    // the ( display order - 1) as the index (arrays start at 0, rather than 1 hence -1)
 		    // The user must answer all questions, so we can assume that they will have marks
 		    // for all questions or no questions.
-		    // At present there can only be one answer for each question but there may be more
+		    // At present there can only be one answer for each questionDescription but there may be more
 		    // than one in the future and if so, we don't want to count the mark twice hence
-		    // we need to check if we've already processed this question in the total.
+		    // we need to check if we've already processed this questionDescription in the total.
 		    Integer[] userMarks = new Integer[numQuestions];
 		    String[] answeredOptions = new String[numQuestions];
 		    Date attemptTime = null;
@@ -721,23 +719,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public List refreshQuestionContent(final Long mcContentId) throws McApplicationException {
-	try {
-	    return mcQueContentDAO.refreshQuestionContent(mcContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is refreshing  mc question content: " + e.getMessage(), e);
-	}
-
-    }
-
-    @Override
     public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException {
 	try {
 	    mcQueContentDAO.removeMcQueContent(mcQueContent);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
-		    "Exception occured when lams is removing mc question content: " + e.getMessage(), e);
+		    "Exception occured when lams is removing mc questionDescription content: " + e.getMessage(), e);
 	}
     }
 
@@ -871,7 +858,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	// create list of modified questions
 	List<McQuestionDTO> modifiedQuestions = new ArrayList<>();
-	// create list of modified question marks
+	// create list of modified questionDescription marks
 	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<>();
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
@@ -879,9 +866,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		    boolean isQuestionModified = false;
 		    boolean isQuestionMarkModified = false;
+		    
+		    // question name is different
+		    if (!oldQuestion.getName().equals(questionDTO.getName())) {
+			isQuestionModified = true;
+		    }
 
-		    // question is different
-		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
+		    // question description is different
+		    if (!oldQuestion.getDescription().equals(questionDTO.getDescription())) {
 			isQuestionModified = true;
 		    }
 
@@ -935,7 +927,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		    boolean isRemoveQuestionResult = false;
 
-		    // [+] if the question mark is modified
+		    // [+] if the questionDescription mark is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestionsMarksOnly) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
 			    Integer newQuestionMark = new Integer(modifiedQuestion.getMark());
@@ -944,7 +936,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 			    newTotalMark += newActualMark - userAttempt.getMark();
 
-			    // update question answer's mark
+			    // update questionDescription answer's mark
 			    userAttempt.setMark(newActualMark);
 			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
@@ -953,7 +945,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		    }
 
-		    // [+] if the question is modified
+		    // [+] if the questionDescription is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestions) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
 			    isRemoveQuestionResult = true;
@@ -961,7 +953,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			}
 		    }
 
-		    // [+] if the question was removed
+		    // [+] if the questionDescription was removed
 		    for (McQuestionDTO deletedQuestion : deletedQuestions) {
 			if (question.getUid().equals(deletedQuestion.getUid())) {
 			    isRemoveQuestionResult = true;
@@ -980,7 +972,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			mcUsrAttemptDAO.removeAttempt(userAttempt);
 		    }
 
-		    // [+] doing nothing if the new question was added
+		    // [+] doing nothing if the new questionDescription was added
 
 		}
 
@@ -1025,7 +1017,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
 	greenColor.setFont(whiteFont);
 
-	// ======================================================= Report by question IRA page
+	// ======================================================= Report by questionDescription IRA page
 	// =======================================
 
 	HSSFSheet sheet = wb.createSheet(messageService.getMessage("label.report.by.question"));
@@ -1620,7 +1612,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
 	    Long userId = userAttempt.getMcQueUsr().getQueUsrId();
 
-	    //fill in question's and user answer's hashes
+	    //fill in questionDescription's and user answer's hashes
 	    McQueContent question = userAttempt.getMcQueContent();
 	    String answer = userAttempt.getQbOption().getName();
 
@@ -1628,7 +1620,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    confidenceLevelDto.setUserId(userId.intValue());
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
-	    confidenceLevelDto.setQuestion(question.getQuestion());
+	    confidenceLevelDto.setQuestion(question.getDescription());
 	    confidenceLevelDto.setAnswer(answer);
 
 	    confidenceLevelDtos.add(confidenceLevelDto);
@@ -2046,10 +2038,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public int isQbQuestionModified(McQuestionDTO questionDTO) {
-	String currentQuestionText = questionDTO.getQuestion();
+	String name = questionDTO.getName();
 
 	// skip empty questions
-	if (currentQuestionText.isEmpty()) {
+	if (name.isEmpty()) {
 	    return IQbService.QUESTION_MODIFIED_NONE;
 	}
 	QbQuestion baseLine = questionDTO.getQbQuestionUid() == null ? null
@@ -2063,7 +2055,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	QbQuestion modifiedQuestion = baseLine.clone();
 	releaseQbQuestionFromCache(modifiedQuestion);
 
-	String currentFeedback = questionDTO.getFeedback();
 	String currentMark = questionDTO.getMark();
 	/* set the default mark in case it is not provided */
 	if (currentMark == null) {
@@ -2071,9 +2062,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	}
 
 	// set clone's data to current values
-	modifiedQuestion.setName(currentQuestionText);
+	modifiedQuestion.setName(name);
+	modifiedQuestion.setDescription(questionDTO.getDescription());
 	modifiedQuestion.setMaxMark(Integer.valueOf(currentMark));
-	modifiedQuestion.setFeedback(currentFeedback);
+	modifiedQuestion.setFeedback(questionDTO.getFeedback());
 
 	List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	boolean isModified = baseLine.isModified(modifiedQuestion)

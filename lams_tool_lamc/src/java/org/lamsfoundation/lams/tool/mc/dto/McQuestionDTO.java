@@ -36,7 +36,8 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
     private Long uid;
     private Long qbQuestionUid;
     private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
-    private String question;
+    private String name;
+    private String description;
     private Integer displayOrder;
     private String feedback;
     private String mark;
@@ -113,20 +114,35 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
-
+    
     /**
-     * @return Returns the question.
+     * @return Returns the name.
      */
-    public String getQuestion() {
-	return question;
+    public String getName() {
+	return name;
     }
 
     /**
-     * @param question
-     *            The question to set.
+     * @param name
+     *            The name to set.
      */
-    public void setQuestion(String question) {
-	this.question = question;
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * @return Returns the description.
+     */
+    public String getDescription() {
+	return description;
+    }
+
+    /**
+     * @param description
+     *            The description to set.
+     */
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     /**

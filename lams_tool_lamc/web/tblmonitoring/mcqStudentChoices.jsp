@@ -97,7 +97,12 @@
 	
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${questionDto.question}</h4>
+				<h4 class="panel-title">
+					<span class="float-left space-right">Q${i.index+1})</span> 
+					${questionDto.name}
+					<br>
+					${questionDto.description}
+				</h4>
 			</div>
 			<div class="panel-body">
 				<div class="table-responsive">

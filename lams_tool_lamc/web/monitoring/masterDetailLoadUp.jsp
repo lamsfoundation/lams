@@ -10,7 +10,7 @@
  	     	table.addRowData(${i.index + 1}, {
 				id: "${i.index + 1}",
  	   	   		userAttemptUid: "${userAttempt.uid}",
- 	   	   		title: "${userAttempt.mcQueContent.escapedQuestion}",
+ 	   	   		title: "${userAttempt.mcQueContent.escapedDescription}",
  	   	   		response: "${userAttempt.mcOptionsContent.escapedOptionText}",
  	   	   		<c:if test="${content.enableConfidenceLevels}">
 	   	   			confidence: "${userAttempt.confidenceLevel}",

@@ -108,8 +108,6 @@ public interface IMcService extends ICommonToolService {
 
     void releaseQuestionsFromCache(McContent content);
 
-    List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
-
     List getAllQuestionsSorted(final long mcContentId);
 
     McQueContent getQuestionByUid(Long uid);
@@ -180,7 +178,7 @@ public interface IMcService extends ICommonToolService {
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * for a particular activity such as the answer to the third questionDescription contains the word Koala and hence the need for
      * the toolContentId
      *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
@@ -268,7 +266,7 @@ public interface IMcService extends ICommonToolService {
     List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
     /**
-     * Checks if data in DTO is the same as in the corresponding QB question and options in DB.
+     * Checks if data in DTO is the same as in the corresponding QB questionDescription and options in DB.
      * Returns one of statuses from IQbService.QUESTION_MODIFIED_*
      */
     int isQbQuestionModified(McQuestionDTO questionDTO);

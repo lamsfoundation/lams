@@ -18,7 +18,7 @@
 		}
 		.question-description-grid {
 			min-height: 10px;
-			max-height: 10px;
+			max-height: 12px;
     		overflow-x: hidden;
     		margin-top: 4px;
 		}

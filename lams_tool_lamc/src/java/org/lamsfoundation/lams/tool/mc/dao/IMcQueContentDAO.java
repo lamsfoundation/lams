@@ -28,7 +28,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 
 /**
- * Interface for the McQueContent DAO, defines methods needed to access/modify mc question content
+ * Interface for the McQueContent DAO, defines methods needed to access/modify mc questionDescription content
  *
  * @author Ozgur Demirtas
  */
@@ -48,25 +48,14 @@ public interface IMcQueContentDAO extends IBaseDAO {
 
     /**
      * <p>
-     * Return a list of McQueContent with the given identifier <code>question</code> and <code>mcContentUid</code>,
+     * Return a list of McQueContent with the given identifier <code>questionDescription</code> and <code>mcContentUid</code>,
      * returns null if not found.
      * </p>
      *
      * @param mcContentUid
      * @return List
      */
-    List<McQueContent> getQuestionsByContentUid(final long mcContentId);
-
-    /**
-     * <p>
-     * Return a list of McQueContent with the given identifier <code>question</code> and <code>mcContentUid</code>,
-     * returns null if not found.
-     * </p>
-     *
-     * @param mcContentUid
-     * @return List
-     */
-    List refreshQuestionContent(final Long mcContentId);
+    List<McQueContent> getQuestionsByContentUid(final long contentUid);
 
     /**
      * <p>

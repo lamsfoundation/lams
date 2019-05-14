@@ -124,7 +124,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", queUsrUid)
 		.setParameter("mcQueContentId", mcQueContentId).list();
 	if (userAttemptList.size() > 1) {
-	    throw new RuntimeException("There are more than 1 latest question attempt");
+	    throw new RuntimeException("There are more than 1 latest questionDescription attempt");
 	}
 
 	McUsrAttempt userAttempt = (userAttemptList.size() == 0) ? null : userAttemptList.get(0);

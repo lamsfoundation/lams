@@ -182,8 +182,8 @@ public class MCOutputFactory extends OutputFactory {
 		getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
     }
 
-    // written to cope with more than one correct option for each question but only tested with
-    // one correct option for a question.
+    // written to cope with more than one correct option for each questionDescription but only tested with
+    // one correct option for a questionDescription.
     private boolean allQuestionsCorrect(IMcService mcService, McQueUsr user) {
 
 	// Build a list of all the correct answers. If we hit any options that are not a correct option

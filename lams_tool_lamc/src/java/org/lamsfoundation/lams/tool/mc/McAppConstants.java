@@ -80,7 +80,7 @@ public interface McAppConstants {
     public static final String CORRECT = "Correct";
 
     /* learner mode contants */
-    public static final String LEARNER_ANSWERS_DTO_LIST = "learnerAnswersDTOList";
+    public static final String LEARNER_ANSWER_DTOS = "learnerAnswerDtos";
     public static final String MC_GENERAL_LEARNER_FLOW_DTO = "mcGeneralLearnerFlowDTO";
     public static final String NOTEBOOK = "notebook";
     public static final String ENTRY_TEXT = "entryText";

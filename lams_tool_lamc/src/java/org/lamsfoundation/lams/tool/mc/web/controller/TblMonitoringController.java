@@ -57,7 +57,7 @@ public class TblMonitoringController {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(toolContentId);
 
-	// ======================================================= Report by question IRA page
+	// ======================================================= Report by questionDescription IRA page
 	// =======================================
 
 	Set<McQueContent> questions = mcContent.getMcQueContents();
@@ -91,7 +91,8 @@ public class TblMonitoringController {
 
 	    McQuestionDTO questionDto = new McQuestionDTO();
 	    questionDto.setUid(question.getUid());
-	    questionDto.setQuestion(question.getQuestion());
+	    questionDto.setName(question.getName());
+	    questionDto.setDescription(question.getDescription());
 	    questionDto.setOptionDtos(optionDtos);
 
 	    questionDtos.add(questionDto);

@@ -372,10 +372,10 @@ public class McMonitoringController {
 		McQueContent question = userAttempt.getMcQueContent();
 		McOptsContent option = userAttempt.getMcOptionsContent();
 
-		String questionText = question.getQuestion();
-		if (questionText != null) {
-		    String escapedQuestion = StringEscapeUtils.escapeJavaScript(questionText);
-		    question.setEscapedQuestion(escapedQuestion);
+		String description = question.getDescription();
+		if (description != null) {
+		    String escapedDescription = StringEscapeUtils.escapeJavaScript(description);
+		    question.setEscapedDescription(escapedDescription);
 		}
 
 		String optionText = option.getQbOption().getName();

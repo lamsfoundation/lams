@@ -22,9 +22,11 @@
 
 package org.lamsfoundation.lams.tool.mc.dto;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.mc.model.McQueContent;
 import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 
 /**
@@ -82,7 +84,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapGeneralOptionsContent;
 
-    protected Map mapQuestionsContent;
+    protected List<McQueContent> questions;
 
     protected String toolSessionId;
 
@@ -422,18 +424,18 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the mapQuestionsContent.
+     * @return Returns the questions.
      */
-    public Map getMapQuestionsContent() {
-	return mapQuestionsContent;
+    public List<McQueContent> getQuestions() {
+	return questions;
     }
 
     /**
-     * @param mapQuestionsContent
-     *            The mapQuestionsContent to set.
+     * @param questions
+     *            The questions to set.
      */
-    public void setMapQuestionsContent(Map mapQuestionsContent) {
-	this.mapQuestionsContent = mapQuestionsContent;
+    public void setQuestions(List<McQueContent> questions) {
+	this.questions = questions;
     }
 
     /**
@@ -529,7 +531,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     /**
      * If using for a display screen then showMarks controls whether or not to show the average and top marks for the
      * session. If using for the "get answers" screens, then this controls whether or not to show the marks for each
-     * question - this allows us to NOT show the marks if ALL of the questions have a mark of 1.
+     * questionDescription - this allows us to NOT show the marks if ALL of the questions have a mark of 1.
      *
      * @return Returns the showMarks.
      */

@@ -228,7 +228,8 @@ public class AuthoringUtil {
 	    McQuestionDTO questionDto = new McQuestionDTO();
 	    questionDto.setUid(question.getUid());
 	    questionDto.setQbQuestionUid(question.getQbQuestion().getUid());
-	    questionDto.setQuestion(question.getQuestion());
+	    questionDto.setName(question.getName());
+	    questionDto.setDescription(question.getDescription());
 	    questionDto.setDisplayOrder(question.getDisplayOrder());
 	    String feedback = question.getFeedback() == null ? "" : question.getFeedback();
 	    questionDto.setFeedback(feedback);

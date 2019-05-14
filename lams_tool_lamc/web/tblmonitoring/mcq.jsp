@@ -49,7 +49,10 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-				<span class="float-left space-right">Q${i.index + 1})</span> <c:out value="${question.question}" escapeXml="false"/>
+				<span class="float-left space-right">Q${i.index + 1})</span> 
+				<c:out value="${question.name}" escapeXml="false"/>
+				<br>
+				<c:out value="${question.description}" escapeXml="false"/>
 			</h4>
 		</div>
 		

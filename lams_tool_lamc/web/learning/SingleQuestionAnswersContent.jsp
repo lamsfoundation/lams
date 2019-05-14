@@ -6,8 +6,8 @@
 <form:hidden path="continueOptionsCombined" />
 <form:hidden path="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
-<c:forEach var="dto" varStatus="status" items="${requestScope.learnerAnswersDTOList}">
-	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
+<c:forEach var="answerDto" varStatus="status" items="${requestScope.learnerAnswerDtos}">
+	<c:if test="${answerDto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 
 		<div class="row no-gutter">
 			<div class="col-xs-12">
@@ -15,13 +15,19 @@
 					<div class="panel-heading">
 						<table>
 							<tr>
-								<td style="vertical-align: top;">${dto.displayOrder})</td>
-								<td width="100%" style="padding-left: 5px"><c:out value="${dto.question}" escapeXml="false" /></td>
+								<td style="vertical-align: top;">
+									${answerDto.displayOrder})
+								</td>
+								<td width="100%" style="padding-left: 5px">
+									<c:out value="${answerDto.questionName}" escapeXml="false" />
+                					<br>
+                					<c:out value="${answerDto.questionDescription}" escapeXml="false" />
+								</td>
 							</tr>
 							<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
 								<tr>
-									<td width="100%" colspan="2">[ <strong><fmt:message key="label.mark" /></strong> <c:out
-											value="${dto.mark}" /> ]
+									<td width="100%" colspan="2">
+										[ <strong><fmt:message key="label.mark" /></strong> <c:out value="${answerDto.mark}" /> ]
 									</td>
 								</tr>
 							</c:if>
@@ -32,11 +38,11 @@
 						<div class="table-responsive">
 							<table class="table table-hover table-condensed">
 								<tbody>
-									<c:forEach var="option" varStatus="status" items="${dto.options}">
+									<c:forEach var="option" varStatus="status" items="${answerDto.options}">
 										<tr>
 											<td class="text-nowrap" style="vertical-align: top;">
-												<input type="radio"	id="${dto.questionUid}-${option.qbOption.uid}" name="checkedCa" class="noBorder"
-														value="${dto.questionUid}-${option.qbOption.uid}" 
+												<input type="radio"	id="${answerDto.questionUid}-${option.qbOption.uid}" name="checkedCa" class="noBorder"
+														value="${answerDto.questionUid}-${option.qbOption.uid}" 
 														<c:if test="${option.selected}">checked="checked"</c:if> 
 												/> 
 												<c:if test="${isPrefixAnswersWithLetters}">
@@ -46,7 +52,7 @@
                               				</td>
 
 											<td width="100%">
-												<label for="${dto.questionUid}-${option.qbOption.uid}"> <c:out
+												<label for="${answerDto.questionUid}-${option.qbOption.uid}"> <c:out
 														value="${option.qbOption.name}" escapeXml="false" />
 												</label>
 											</td>
@@ -62,10 +68,10 @@
 											</div>
 						
 											<div>
-												<input name="confidenceLevel${dto.questionUid}" class="bootstrap-slider" type="text" 
+												<input name="confidenceLevel${answerDto.questionUid}" class="bootstrap-slider" type="text" 
 													data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
 													data-slider-enabled="true" data-slider-tooltip="hide"
-													<c:if test="${dto.confidenceLevel != -1}">data-slider-value="${dto.confidenceLevel}"</c:if>
+													<c:if test="${answerDto.confidenceLevel != -1}">data-slider-value="${answerDto.confidenceLevel}"</c:if>
 												/>
 											</div>
 						                  </td>
