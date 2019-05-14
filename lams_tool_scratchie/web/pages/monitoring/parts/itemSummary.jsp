@@ -57,7 +57,7 @@
 	  				
 	  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			answer:"${answer.description}<c:if test='${answer.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
+	  	   	     			answer:"${answer.qbOption.name}<c:if test='${answer.qbOption.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
 	  	   	     			
 	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.answers)}">
 	  	   	     				,choice${j}:"${answer.attempts[j]}"
@@ -99,10 +99,11 @@
 		</c:set>
 		<lams:Page type="learning" title="${title}">
 		
-			<h3>
-				<c:out value="${item.description}" escapeXml="false"/>
-			</h3>	
-			<lams:errors/>
+			<h4>
+				<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+			</h4>
+			<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
+			<br>
 			
 			<c:forEach var="summary" items="${summaryList}" varStatus="status">
 				<div class="panel panel-default" >

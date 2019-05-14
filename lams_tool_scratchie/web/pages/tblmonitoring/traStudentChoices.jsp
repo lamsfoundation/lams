@@ -107,9 +107,9 @@
 							<c:forEach var="itemDto" items="${sessionDto.itemDtos}">
 								<td class="text-center">
 									<c:forEach var="answer" items="${itemDto.answers}">
-										<c:if test="${answer.description != ''}">
-											<span class="user-response <c:if test="${answer.correct}">successful-response</c:if> <c:if test="${!answer.correct}">wrong-response</c:if>">
-												<c:out value="${answer.description}"></c:out>
+										<c:if test="${answer.qbOption.name != ''}">
+											<span class="user-response <c:if test="${answer.qbOption.correct}">successful-response</c:if> <c:if test="${!answer.qbOption.correct}">wrong-response</c:if>">
+												<c:out value="${answer.qbOption.name}"></c:out>
 											</span>
 										</c:if>
 									</c:forEach>
@@ -144,12 +144,12 @@
 	
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${item.title}</h4>
+				<h4 class="panel-title"><span class="float-left space-right">Q${i.index+1})</span> ${item.qbQuestion.name}</h4>
 			</div>
 			<div class="panel-body">
 			
 				<div>
-					${item.description}
+					${item.qbQuestion.description}
 				</div>
 			
 				<div class="table-responsive voffset10">
@@ -157,13 +157,13 @@
 						<tbody>
 						
 							<c:forEach var="answer" items="${item.answers}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${answer.correct}'>bg-success</c:if></c:set>
+								<c:set var="cssClass"><c:if test='${answer.qbOption.correct}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${answer.description}" escapeXml="false"/>
+										<c:out value="${answer.qbOption.name}" escapeXml="false"/>
 									</td>
 								</tr>
 							</c:forEach>

@@ -24,15 +24,15 @@
 					<c:choose>
 						<c:when test="${burningQsCount != 0}">
 							<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
-								Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/>
+								Q${i.index+1}) <c:out value="${item.qbQuestion.name}" escapeXml="false"/>
 							</a>
 						</c:when>
 						<c:otherwise>
-							Q${i.index+1}) <c:out value="${item.title}" escapeXml="false"/> 
+							Q${i.index+1}) <c:out value="${item.qbQuestion.name}" escapeXml="false"/> 
 						</c:otherwise>
 					</c:choose>
 					<span class="burning-question-description">
-						<c:out value="${item.description}" escapeXml="false"/> 
+						<c:out value="${item.qbQuestion.description}" escapeXml="false"/> 
 					</span>
                     <c:if test="${burningQsCount > 0}">
 					   <span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>

@@ -6,7 +6,7 @@
 		<div class="panel-heading">
 			<h4 class="panel-title">
 				<span class="float-left space-right">Q${i.index+1})</span> 
-				<c:out value="${item.title}" escapeXml="false"/>
+				<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
 			</h4> 
 		</div>
 				
@@ -22,10 +22,10 @@
 										${ALPHABET[j.index]}.
 									</td>
 									<td>
-										<c:out value="${answer.description}" escapeXml="false"/>
+										<c:out value="${answer.qbOption.name}" escapeXml="false"/>
 										
 										<c:choose>
-											<c:when test="${answer.correct}">
+											<c:when test="${answer.qbOption.correct}">
 												<i class="fa fa-check-square"></i>
 											</c:when>
 											<c:otherwise>

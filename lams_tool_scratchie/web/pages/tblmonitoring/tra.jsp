@@ -78,7 +78,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-				Q${i.index+1}) <c:out value="${item.description}" escapeXml="false"/>
+				Q${i.index+1}) <c:out value="${item.qbQuestion.description}" escapeXml="false"/>
 			</h4> 
 		</div>
 		
@@ -92,7 +92,7 @@
 									${ALPHABET[j.index]}.
 								</td>
 								<td>
-									<c:out value="${answer.description}" escapeXml="false"/>
+									<c:out value="${answer.qbOption.name}" escapeXml="false"/>
 								</td>
 							</tr>
 						</c:forEach>

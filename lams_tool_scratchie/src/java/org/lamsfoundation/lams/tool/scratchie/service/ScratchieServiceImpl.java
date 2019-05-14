@@ -302,7 +302,7 @@ public class ScratchieServiceImpl
 		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
 
 		    //find according answer
-		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		    for (ScratchieAnswer answer : item.getAnswers()) {
 			String answerText = answer.getQbOption().getName().replaceAll("(\\r|\\n)", "");
 			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
 			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
@@ -1179,7 +1179,7 @@ public class ScratchieServiceImpl
 	    // find out the correct answer's sequential letter - A,B,C...
 	    String correctAnswerLetter = "";
 	    int answerCount = 1;
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 		if (answer.getQbOption().isCorrect()) {
 		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
@@ -1803,7 +1803,7 @@ public class ScratchieServiceImpl
 	String sequencialLetter = "";
 
 	int answerCount = 1;
-	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	for (ScratchieAnswer answer : item.getAnswers()) {
 	    if (answer.getQbOption().getUid().equals(asnwer.getUid())) {
 		sequencialLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		break;

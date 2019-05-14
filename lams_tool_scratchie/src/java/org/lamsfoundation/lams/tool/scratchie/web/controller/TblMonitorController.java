@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
@@ -168,8 +169,10 @@ public class TblMonitorController {
 		    String correctAnswerLetter = correctAnswersRow[i].getCellValue().toString();
 
 		    ScratchieAnswer answer = new ScratchieAnswer();
-		    answer.getQbOption().setName(answerLetter);
-		    answer.getQbOption().setCorrect(correctAnswerLetter.equals(answerLetter));
+		    QbOption qbOption = new QbOption();
+		    answer.setQbOption(qbOption);
+		    qbOption.setName(answerLetter);
+		    qbOption.setCorrect(correctAnswerLetter.equals(answerLetter));
 
 		    answers.add(answer);
 		}
