@@ -52,21 +52,27 @@
 						<div>
 							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
 							
-								<div class="c100 p${confidenceLevelDto.level}0 small">
+								<div class="c100 p${confidenceLevelDto.level}0 small" style="">
+									<div class="confidence-level-username" style="">
+										${confidenceLevelDto.userName}
+									</div>
+								
 									<span>
 										<c:choose>
-										<c:when test="${confidenceLevelDto.portraitUuid == null}">
-											<div class="portrait-generic-sm portrait-color-${confidenceLevelDto.userId % 7}"></div>
-										</c:when>
-										<c:otherwise>
+											<c:when test="${confidenceLevelDto.portraitUuid == null}">
+												<div class="portrait-generic-sm portrait-color-${confidenceLevelDto.userId % 7}"></div>
+											</c:when>
+											<c:otherwise>
 			    								<img class="portrait-sm portrait-round" src="${lams}download/?uuid=${confidenceLevelDto.portraitUuid}&preferDownload=false&version=4" alt="">
-										</c:otherwise>
+											</c:otherwise>
 										</c:choose>
 									</span>
+									
 									<div class="slice">
 										<div class="bar"></div>
 										<div class="fill"></div>
 									</div>
+									
 									<div class="confidence-level-percentage">
 										${confidenceLevelDto.level}0%
 									</div>

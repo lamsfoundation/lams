@@ -1537,14 +1537,16 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
 	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
-	    Long userId = userAttempt.getMcQueUsr().getQueUsrId();
+	    McQueUsr user = userAttempt.getMcQueUsr();
 
 	    //fill in question's and user answer's hashes
 	    McQueContent question = userAttempt.getMcQueContent();
 	    String answer = userAttempt.getMcOptionsContent().getMcQueOptionText();
 
 	    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-	    confidenceLevelDto.setUserId(userId.intValue());
+	    confidenceLevelDto.setUserId(user.getQueUsrId().intValue());
+	    String userName = StringUtils.isBlank(user.getFullname()) ? user.getUsername() : user.getFullname();
+	    confidenceLevelDto.setUserName(userName);
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
 	    confidenceLevelDto.setQuestion(question.getQuestion());

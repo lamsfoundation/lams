@@ -39,6 +39,13 @@
 			font-size: 41px;
 			margin-right: 5px;
 			margin-bottom: 23px;
+			margin-top: 35px;
+		}
+		.confidence-level-username {
+		    overflow: hidden;
+		    margin-top: -35px;
+		    font-size: 13px;
+		    text-align: center;
 		}
 		.confidence-level-percentage {
 			font-size: 13px;

@@ -4,6 +4,8 @@ public class ConfidenceLevelDTO {
 
     private Integer userId;
     
+    private String userName;
+    
     private Long portraitUuid;
 
     private int level;
@@ -20,6 +22,16 @@ public class ConfidenceLevelDTO {
 
     public void setUserId(Integer userId) {
 	this.userId = userId;
+    }
+    
+    /**
+     */
+    public void setUserName(String userName) {
+	this.userName = userName;
+    }
+
+    public String getUserName() {
+	return this.userName;
     }
 
     /**
