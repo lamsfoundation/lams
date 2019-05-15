@@ -47,6 +47,7 @@
 		},
 		// keep mapped outcome IDs for search result filtering
 		outcomeMappingIds${outcomeTagId} = [],
+		outcomeAddEnabled = true,
 		
 		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
 		outcomeCreateNewLabel = '<fmt:message key="outcome.authoring.create.new" />',
@@ -61,9 +62,15 @@
 			'response' : function(event, ui) {
 				// filter out already mapped outcomes
 				var index = ui.content.length - 1,
-					term = ui.content[index] instanceof Object ? ui.content[index].label : ui.content[index],
+					// if result is empty, term and outcome add enabled come as objects (label, value)
+					// if there are results, they come as simple values
+					outcomeAddEnabled = ui.content[index] instanceof Object ? ui.content[index].label : ui.content[index],
+					// convert to boolean
+					outcomeAddEnabled = outcomeAddEnabled == 'true',
+					term = ui.content[index - 1] instanceof Object ? ui.content[index - 1].label : ui.content[index - 1],
 					sameNameFound = false;
-				ui.content.splice(index, 1);
+				index--;
+				ui.content.splice(index, 2);
 				while(index--) {
 					var label = ui.content[index].label;
 					if (label.split('(')[0].trim() == term) {
@@ -74,7 +81,7 @@
 						ui.content.splice(index, 1);
 					}
 				}
-				if (!sameNameFound) {
+				if (outcomeAddEnabled && !sameNameFound) {
 					ui.content.push({
 						'label' : term + ' ' + outcomeCreateNewLabel
 					});

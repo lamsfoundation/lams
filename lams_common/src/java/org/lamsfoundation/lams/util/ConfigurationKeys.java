@@ -47,7 +47,7 @@ public class ConfigurationKeys {
     public static String LAMS_EAR_DIR = "EARDir";
 
     public static String SMTP_SERVER = "SMTPServer";
-    
+
     public static String SMTP_PORT = "SMTPPort";
 
     public static String LAMS_ADMIN_EMAIL = "LamsSupportEmail";
@@ -86,7 +86,7 @@ public class ConfigurationKeys {
 
     /** Default locale for the server. Originally en_AU */
     public static String SERVER_LANGUAGE = "ServerLanguage";
-    
+
     /**
      * Default country for the server. Originally AU
      */
@@ -115,11 +115,11 @@ public class ConfigurationKeys {
     public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
-    
+
     public static String ALLOW_KUMALIVE = "AllowKumalive";
-    
+
     public static String DISPLAY_PORTRAIT = "DisplayPortrait";
-    
+
     public static String ENABLE_PORTRAIT_EDITING = "EnablePortraitEditing";
 
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
@@ -221,11 +221,11 @@ public class ConfigurationKeys {
     public static String SMTP_AUTH_USER = "SMTPUser";
 
     public static String SMTP_AUTH_PASSWORD = "SMTPPassword";
-    
+
     public static String SMTP_AUTH_SECURITY = "SMTPAuthSecurity";
 
     public static String PROFILE_EDIT_ENABLE = "ProfileEditEnable";
-    
+
     public static String FORGOT_YOUR_PASSWORD_LINK_ENABLE = "EnableForgotYourPasswordLink";
 
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
@@ -260,24 +260,24 @@ public class ConfigurationKeys {
 
     // LDEV-3961
     public static String SITE_NAME = "SiteName";
-    
-    // LDEV-4023 Password policy    
+
+    // LDEV-4023 Password policy
     public static String PASSWORD_POLICY_MINIMUM_CHARACTERS = "PasswordPolicyMinChars";
 
     public static String PASSWORD_POLICY_UPPERCASE = "PasswordPolicyUppercase";
-    
+
     public static String PASSWORD_POLICY_LOWERCASE = "PasswordPolicyLowercase";
-    
+
     public static String PASSWORD_POLICY_NUMERICS = "PasswordPolicyNumerics";
-    
+
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
-    
+
     // LDEV-4049 Option for not displaying stacktraces in config settings
     public static String ERROR_STACK_TRACE = "ErrorStackTrace";
-    
+
     // LDEV-4030 Disable login for a few minutes after X number of attempts
     public static String FAILED_ATTEMPTS = "FailedAttempts";
-    
+
     public static String LOCK_OUT_TIME = "LockOutTime";
 
     // LDEV-4144
@@ -285,11 +285,13 @@ public class ConfigurationKeys {
 
     // LDEV-4594 / LDEV-4583 Allow/Block access to index.do for integration learners. Default to false - do not allow direct access.
     public static String ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS = "AllowDirectAccessIntgrtnLrnr";
-    
+
     // LDEV-4755 Antivirus
     public static String ANTIVIRUS_ENABLE = "AntivirusEnable";
     public static String ANTIVIRUS_HOST = "AntivirusHost";
     public static String ANTIVIRUS_PORT = "AntivirusPort";
-    
+
+    // LDEV-4819
+    public static String LEARNING_OUTCOME_QUICK_ADD_ENABLE = "LearningOutcomeQuickAddEnable";
 
 }

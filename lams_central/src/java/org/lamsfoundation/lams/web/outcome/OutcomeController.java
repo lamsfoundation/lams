@@ -48,6 +48,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -198,6 +200,7 @@ public class OutcomeController {
     @ResponseBody
     public String outcomeSearch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String search = WebUtil.readStrParam(request, "term", true);
+	boolean addEnabled = Configuration.getAsBoolean(ConfigurationKeys.LEARNING_OUTCOME_QUICK_ADD_ENABLE);
 
 	List<Outcome> outcomes = outcomeService.getOutcomes(search);
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
@@ -209,6 +212,7 @@ public class OutcomeController {
 	    responseJSON.add(outcomeJSON);
 	}
 	responseJSON.add(search);
+	responseJSON.add(String.valueOf(addEnabled));
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -226,6 +230,10 @@ public class OutcomeController {
 	Long itemId = WebUtil.readLongParam(request, "itemId", true);
 	Outcome outcome = null;
 	if (outcomeId == null) {
+	    boolean addEnabled = Configuration.getAsBoolean(ConfigurationKeys.LEARNING_OUTCOME_QUICK_ADD_ENABLE);
+	    if (!addEnabled) {
+		throw new SecurityException("Adding Learning Outcomes on the fly is disabled");
+	    }
 	    // create a new outcome on the fly
 	    String name = WebUtil.readStrParam(request, "name");
 	    String code = null;
