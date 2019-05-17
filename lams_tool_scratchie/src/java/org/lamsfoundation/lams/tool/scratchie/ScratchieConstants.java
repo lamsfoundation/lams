@@ -30,7 +30,7 @@ public class ScratchieConstants {
 
     public static final int COMPLETED = 1;
 
-    public static final int INITIAL_ANSWERS_NUMBER = 4;
+    public static final int INITIAL_OPTIONS_NUMBER = 4;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -54,9 +54,9 @@ public class ScratchieConstants {
 
     public static final String PARAM_ITEM_UID = "itemUid";
 
-    public static final String PARAM_ANSWER_UID = "answerUid";
+    public static final String PARAM_OPTION_UID = "optionUid";
 
-    public static final String PARAM_ANSWER_INDEX = "answerIndex";
+    public static final String PARAM_OPTION_INDEX = "optionIndex";
 
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
@@ -83,25 +83,25 @@ public class ScratchieConstants {
 
     public static final String ATTR_ITEM_DESCRIPTION_PREFIX = "itemDescription";
 
-    public static final String ATTR_ANSWER_CORRECT = "answerCorrect";
+    public static final String ATTR_OPTION_CORRECT = "optionCorrect";
 
     public static final String ATTR_ITEM_COUNT = "itemCount";
 
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
-    public static final String ATTR_ANSWER_LIST = "answerList";
+    public static final String ATTR_OPTION_LIST = "optionList";
 
-    public static final String ATTR_ANSWER_COUNT = "answerCount";
+    public static final String ATTR_OPTION_COUNT = "optionCount";
 
-    public static final String ATTR_ANSWER_DESCRIPTION_PREFIX = "answerDescription";
+    public static final String ATTR_OPTION_DESCRIPTION_PREFIX = "optionDescription";
 
-    public static final String ATTR_ANSWER_ORDER_ID_PREFIX = "answerOrderId";
+    public static final String ATTR_OPTION_ORDER_ID_PREFIX = "optionOrderId";
 
-    public static final String ATTR_ANSWER_UID_PREFIX = "answerUid";
+    public static final String ATTR_OPTION_UID_PREFIX = "optionUid";
 
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
 
-    public static final String ATTR_DELETED_ANSWER_LIST = "deleteAnswerList";
+    public static final String ATTR_DELETED_OPTION_LIST = "deleteOptionList";
 
     public static final String ATTR_SCRATCHIE = "scratchie";
 
@@ -181,7 +181,7 @@ public class ScratchieConstants {
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
-    public static final String ATTR_ANSWER_UIDS = "answerUids";
+    public static final String ATTR_OPTION_UIDS = "optionUids";
     
     public static final String ATTR_CONFIDENCE_LEVELS_ACTIVITIES = "confidenceLevelsActivities";
 

@@ -358,13 +358,13 @@ public class AuthoringController {
 	scratchieItemForm.setSessionMapID(sessionMapID);
 	scratchieItemForm.setContentFolderID(contentFolderID);
 
-	List<QbOption> answerList = new ArrayList<>();
-	for (int i = 0; i < ScratchieConstants.INITIAL_ANSWERS_NUMBER; i++) {
-	    QbOption answer = new QbOption();
-	    answer.setDisplayOrder(i + 1);
-	    answerList.add(answer);
+	List<QbOption> optionList = new ArrayList<>();
+	for (int i = 0; i < ScratchieConstants.INITIAL_OPTIONS_NUMBER; i++) {
+	    QbOption option = new QbOption();
+	    option.setDisplayOrder(i + 1);
+	    optionList.add(option);
 	}
-	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
+	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "pages/authoring/parts/additem";
@@ -396,8 +396,8 @@ public class AuthoringController {
 		    scratchieItemForm.setItemIndex(new Integer(itemIdx).toString());
 		}
 
-		List<QbOption> answerList = item.getQbQuestion().getQbOptions();
-		request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
+		List<QbOption> optionList = item.getQbQuestion().getQbOptions();
+		request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
 
 		scratchieItemForm.setContentFolderID(contentFolderID);
 	    }
@@ -490,14 +490,14 @@ public class AuthoringController {
 	item.getQbQuestion().setDescription(scratchieItemForm.getDescription());
 
 	// set options
-	Set<QbOption> answerList = getAnswersFromRequest(request, true);
-	List<QbOption> answers = new ArrayList<>();
+	Set<QbOption> optionList = getOptionsFromRequest(request, true);
+	List<QbOption> options = new ArrayList<>();
 	int orderId = 0;
-	for (QbOption answer : answerList) {
-	    answer.setDisplayOrder(orderId++);
-	    answers.add(answer);
+	for (QbOption option : optionList) {
+	    option.setDisplayOrder(orderId++);
+	    options.add(option);
 	}
-	item.getQbQuestion().setQbOptions(answers);
+	item.getQbQuestion().setQbOptions(options);
 
 	item.setQbQuestionModified(scratchieService.isQbQuestionModified(baseLine, item.getQbQuestion()));
 	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
@@ -536,44 +536,44 @@ public class AuthoringController {
 	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false,
 		    contentFolderID, question.getResourcesFolderPath()));
 
-	    TreeSet<QbOption> answerList = new TreeSet<>();
-	    String correctAnswer = null;
+	    TreeSet<QbOption> optionList = new TreeSet<>();
+	    String correctOption = null;
 	    int orderId = 1;
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
 			    question.getResourcesFolderPath());
-		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
+		    if (correctOption != null && correctOption.equals(answerText)) {
 			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			continue;
 		    }
-		    QbOption scratchieAnswer = new QbOption();
-		    scratchieAnswer.setName(answerText);
-		    scratchieAnswer.setDisplayOrder(orderId++);
+		    QbOption option = new QbOption();
+		    option.setName(answerText);
+		    option.setDisplayOrder(orderId++);
 
 		    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			if (correctAnswer == null) {
-			    scratchieAnswer.setCorrect(true);
-			    correctAnswer = answerText;
+			if (correctOption == null) {
+			    option.setCorrect(true);
+			    correctOption = answerText;
 			} else {
 			    log.warn(
-				    "Choosing only first correct answer, despite another one was found: " + answerText);
-			    scratchieAnswer.setCorrect(false);
+				    "Choosing only the first correct option, despite another one was found: " + answerText);
+			    option.setCorrect(false);
 			}
 		    } else {
-			scratchieAnswer.setCorrect(false);
+			option.setCorrect(false);
 		    }
 
-		    answerList.add(scratchieAnswer);
+		    optionList.add(option);
 		}
 	    }
 
-	    if (correctAnswer == null) {
-		log.warn("No correct answer found for question: " + question.getText());
+	    if (correctOption == null) {
+		log.warn("No correct option found for question: " + question.getText());
 		continue;
 	    }
 
-	    qbQuestion.setQbOptions(new ArrayList<>(answerList));
+	    qbQuestion.setQbOptions(new ArrayList<>(optionList));
 	    itemList.add(item);
 	    if (log.isDebugEnabled()) {
 		log.debug("Added question: " + question.getText());
@@ -606,10 +606,10 @@ public class AuthoringController {
 	    question.setText(qbQuestion.getDescription());
 
 	    List<Answer> answers = new ArrayList<>();
-	    Set<QbOption> scratchieAnswers = new TreeSet<>();
-	    scratchieAnswers.addAll(qbQuestion.getQbOptions());
+	    Set<QbOption> scratchieOptions = new TreeSet<>();
+	    scratchieOptions.addAll(qbQuestion.getQbOptions());
 
-	    for (QbOption itemAnswer : scratchieAnswers) {
+	    for (QbOption itemAnswer : scratchieOptions) {
 		Answer answer = new Answer();
 		answer.setText(itemAnswer.getName());
 		// there is no LAMS interface to adjust, so use the default 1 point
@@ -724,7 +724,7 @@ public class AuthoringController {
 	return "pages/authoring/parts/itemlist";
     }
 
-    // ----------------------- Answers functions ---------------
+    // ----------------------- Options functions ---------------
 
     /**
      * Ajax call, will add one more input line for new resource item instruction.
@@ -738,25 +738,25 @@ public class AuthoringController {
     @RequestMapping("/addAnswer")
     private String addAnswer(HttpServletRequest request) {
 
-	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
 
-	QbOption answer = new QbOption();
+	QbOption option = new QbOption();
 	int maxSeq = 1;
-	if (answerList != null && answerList.size() > 0) {
-	    QbOption last = answerList.last();
+	if (optionList != null && optionList.size() > 0) {
+	    QbOption last = optionList.last();
 	    maxSeq = last.getDisplayOrder() + 1;
 	}
-	answer.setDisplayOrder(maxSeq);
-	answerList.add(answer);
+	option.setDisplayOrder(maxSeq);
+	optionList.add(option);
 
-	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
+	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	return "pages/authoring/parts/answerlist";
+	return "pages/authoring/parts/optionlist";
     }
 
     /**
-     * Ajax call, remove the given answer.
+     * Ajax call, remove the given option.
      *
      * @param mapping
      * @param form
@@ -767,24 +767,24 @@ public class AuthoringController {
     @RequestMapping("/removeAnswer")
     private String removeAnswer(HttpServletRequest request) {
 
-	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
 
-	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
-	if (answerIndex != -1) {
-	    List<QbOption> rList = new ArrayList<>(answerList);
-	    rList.remove(answerIndex);
-	    answerList.clear();
-	    answerList.addAll(rList);
+	int optionIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_OPTION_INDEX), -1);
+	if (optionIndex != -1) {
+	    List<QbOption> rList = new ArrayList<>(optionList);
+	    rList.remove(optionIndex);
+	    optionList.clear();
+	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
+	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	return "pages/authoring/parts/answerlist";
+	return "pages/authoring/parts/optionlist";
     }
 
     /**
-     * Move up current answer.
+     * Move up current option.
      *
      * @param mapping
      * @param form
@@ -794,11 +794,11 @@ public class AuthoringController {
      */
     @RequestMapping("/upAnswer")
     private String upAnswer(HttpServletRequest request) {
-	return switchAnswer(request, true);
+	return switchOption(request, true);
     }
 
     /**
-     * Move down current answer.
+     * Move down current option.
      *
      * @param mapping
      * @param form
@@ -808,36 +808,36 @@ public class AuthoringController {
      */
     @RequestMapping("/downAnswer")
     private String downAnswer(HttpServletRequest request) {
-	return switchAnswer(request, false);
+	return switchOption(request, false);
     }
 
-    private String switchAnswer(HttpServletRequest request, boolean up) {
-	SortedSet<QbOption> answerList = getAnswersFromRequest(request, false);
+    private String switchOption(HttpServletRequest request, boolean up) {
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
 
-	int answerIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
-	if (answerIndex != -1) {
-	    List<QbOption> rList = new ArrayList<>(answerList);
+	int optionIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_OPTION_INDEX), -1);
+	if (optionIndex != -1) {
+	    List<QbOption> rList = new ArrayList<>(optionList);
 
 	    // get current and the target item, and switch their sequnece
-	    QbOption answer = rList.get(answerIndex);
-	    QbOption repAnswer;
+	    QbOption option = rList.get(optionIndex);
+	    QbOption repOption;
 	    if (up) {
-		repAnswer = rList.get(--answerIndex);
+		repOption = rList.get(--optionIndex);
 	    } else {
-		repAnswer = rList.get(++answerIndex);
+		repOption = rList.get(++optionIndex);
 	    }
 
-	    int upSeqId = repAnswer.getDisplayOrder();
-	    repAnswer.setDisplayOrder(answer.getDisplayOrder());
-	    answer.setDisplayOrder(upSeqId);
+	    int upSeqId = repOption.getDisplayOrder();
+	    repOption.setDisplayOrder(option.getDisplayOrder());
+	    option.setDisplayOrder(upSeqId);
 
 	    // put back list, it will be sorted again
-	    answerList.clear();
-	    answerList.addAll(rList);
+	    optionList.clear();
+	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(ScratchieConstants.ATTR_ANSWER_LIST, answerList);
-	return "pages/authoring/parts/answerlist";
+	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	return "pages/authoring/parts/optionlist";
     }
 
     // ----------------------- PedagogicalPlannerForm ---------------
@@ -914,49 +914,49 @@ public class AuthoringController {
     }
 
     /**
-     * Get answer options from <code>HttpRequest</code>
+     * Get options from <code>HttpRequest</code>
      *
      * @param request
      * @param isForSaving
      *            whether the blank options will be preserved or not
      *
      */
-    private TreeSet<QbOption> getAnswersFromRequest(HttpServletRequest request, boolean isForSaving) {
-	Map<String, String> paramMap = splitRequestParameter(request, ScratchieConstants.ATTR_ANSWER_LIST);
-	Integer correctAnswerIndex = (paramMap.get(ScratchieConstants.ATTR_ANSWER_CORRECT) == null) ? null
-		: NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_CORRECT));
+    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
+	Map<String, String> paramMap = splitRequestParameter(request, ScratchieConstants.ATTR_OPTION_LIST);
+	Integer correctOptionIndex = (paramMap.get(ScratchieConstants.ATTR_OPTION_CORRECT) == null) ? null
+		: NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_OPTION_CORRECT));
 
-	int count = NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_ANSWER_COUNT));
-	TreeSet<QbOption> answerList = new TreeSet<>();
+	int count = NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_OPTION_COUNT));
+	TreeSet<QbOption> optionList = new TreeSet<>();
 	for (int i = 0; i < count; i++) {
 
-	    String answerDescription = paramMap.get(ScratchieConstants.ATTR_ANSWER_DESCRIPTION_PREFIX + i);
-	    if ((answerDescription == null) && isForSaving) {
+	    String optionDescription = paramMap.get(ScratchieConstants.ATTR_OPTION_DESCRIPTION_PREFIX + i);
+	    if ((optionDescription == null) && isForSaving) {
 		continue;
 	    }
 
-	    QbOption answer = null;
-	    String uidStr = paramMap.get(ScratchieConstants.ATTR_ANSWER_UID_PREFIX + i);
+	    QbOption option = null;
+	    String uidStr = paramMap.get(ScratchieConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		answer = scratchieService.getQbOptionByUid(uid);
-		scratchieService.releaseFromCache(answer.getQbQuestion());
+		option = scratchieService.getQbOptionByUid(uid);
+		scratchieService.releaseFromCache(option.getQbQuestion());
 	    } else {
-		answer = new QbOption();
+		option = new QbOption();
 	    }
 
-	    String orderIdStr = paramMap.get(ScratchieConstants.ATTR_ANSWER_ORDER_ID_PREFIX + i);
+	    String orderIdStr = paramMap.get(ScratchieConstants.ATTR_OPTION_ORDER_ID_PREFIX + i);
 	    Integer orderId = NumberUtils.toInt(orderIdStr);
-	    answer.setDisplayOrder(orderId);
-	    answer.setName(answerDescription);
-	    if ((correctAnswerIndex != null) && correctAnswerIndex.equals(orderId)) {
-		answer.setCorrect(true);
+	    option.setDisplayOrder(orderId);
+	    option.setName(optionDescription);
+	    if ((correctOptionIndex != null) && correctOptionIndex.equals(orderId)) {
+		option.setCorrect(true);
 	    }
-	    answerList.add(answer);
+	    optionList.add(option);
 
 	}
 
-	return answerList;
+	return optionList;
     }
 
     /**
@@ -994,13 +994,13 @@ public class AuthoringController {
      * monitor)
      */
     private void removeNewLineCharacters(ScratchieItem item) {
-	Collection<QbOption> answers = item.getQbQuestion().getQbOptions();
-	if (answers != null) {
-	    for (QbOption answer : answers) {
-		String answerDescription = answer.getName();
-		if (answerDescription != null) {
-		    answerDescription = answerDescription.replaceAll("[\n\r\f]", "");
-		    answer.setName(answerDescription);
+	Collection<QbOption> options = item.getQbQuestion().getQbOptions();
+	if (options != null) {
+	    for (QbOption option : options) {
+		String optionDescription = option.getName();
+		if (optionDescription != null) {
+		    optionDescription = optionDescription.replaceAll("[\n\r\f]", "");
+		    option.setName(optionDescription);
 		}
 	    }
 

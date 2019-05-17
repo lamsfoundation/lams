@@ -164,15 +164,15 @@ public class LearningController {
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, isReflectOnActivity);
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_INSTRUCTION, scratchie.getReflectInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
-	// add all answer uids to one set
+	// add all option uids to one set
 	if (isUserLeader) {
-	    Set<Long> answerUids = new HashSet<>();
+	    Set<Long> optionUids = new HashSet<>();
 	    for (ScratchieItem item : scratchie.getScratchieItems()) {
-		for (QbOption answer : item.getQbQuestion().getQbOptions()) {
-		    answerUids.add(answer.getUid());
+		for (QbOption option : item.getQbQuestion().getQbOptions()) {
+		    optionUids.add(option.getUid());
 		}
 	    }
-	    sessionMap.put(ScratchieConstants.ATTR_ANSWER_UIDS, answerUids);
+	    sessionMap.put(ScratchieConstants.ATTR_OPTION_UIDS, optionUids);
 	}
 
 	// add define later support
@@ -283,7 +283,7 @@ public class LearningController {
     }
 
     /**
-     * Stores into session map all data needed to display scratchies and answers
+     * Stores into session map all data needed to display scratchies and options
      */
     private void storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie, SessionMap<String, Object> sessionMap,
 	    boolean showOrder) {
@@ -345,7 +345,7 @@ public class LearningController {
     }
 
     /**
-     * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not.
+     * Record in DB that leader has scratched specified option. And return whether scratchie option is correct or not.
      */
     @RequestMapping("/recordItemScratched")
     private String recordItemScratched(HttpServletRequest request, HttpServletResponse response)
@@ -354,31 +354,31 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	final Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
+	final Long optionUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_OPTION_UID));
 	final Long itemUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ITEM_UID));
 
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
 
 	ScratchieUser leader = getCurrentUser(toolSessionId);
-	// only leader is allowed to scratch answers
+	// only leader is allowed to scratch options
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
 
-	// check answer is belong to current session
-	Set<Long> answerUids = (Set<Long>) sessionMap.get(ScratchieConstants.ATTR_ANSWER_UIDS);
-	if (!answerUids.contains(answerUid)) {
+	// check option is belong to current session
+	Set<Long> optionUids = (Set<Long>) sessionMap.get(ScratchieConstants.ATTR_OPTION_UIDS);
+	if (!optionUids.contains(optionUid)) {
 	    return null;
 	}
 
-	// Return whether scratchie answer is correct or not
-	QbOption answer = scratchieService.getQbOptionByUid(answerUid);
-	if (answer == null) {
+	// Return whether option is correct or not
+	QbOption option = scratchieService.getQbOptionByUid(optionUid);
+	if (option == null) {
 	    return null;
 	}
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
-	ObjectNode.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
+	ObjectNode.put(ScratchieConstants.ATTR_OPTION_CORRECT, option.isCorrect());
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(ObjectNode);
 
@@ -387,7 +387,7 @@ public class LearningController {
 	Thread recordItemScratchedThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
-		scratchieService.recordItemScratched(toolSessionId, itemUid, answerUid);
+		scratchieService.recordItemScratched(toolSessionId, itemUid, optionUid);
 	    }
 	}, "LAMS_recordItemScratched_thread");
 	recordItemScratchedThread.start();
@@ -524,7 +524,7 @@ public class LearningController {
 	Long burningQuestionUid = WebUtil.readLongParam(request, ScratchieConstants.PARAM_BURNING_QUESTION_UID);
 
 	ScratchieUser leader = this.getCurrentUser(sessionId);
-	// only leader is allowed to scratch answers
+	// only leader is allowed to scratch options
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
@@ -551,7 +551,7 @@ public class LearningController {
 	Long burningQuestionUid = WebUtil.readLongParam(request, ScratchieConstants.PARAM_BURNING_QUESTION_UID);
 
 	ScratchieUser leader = this.getCurrentUser(sessionId);
-	// only leader is allowed to scratch answers
+	// only leader is allowed to scratch options
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}

@@ -7,50 +7,50 @@
 	</div>
 
 	<table id="scratches" class="table table-hover">
-		<c:forEach var="answer" items="${item.answers}" varStatus="status">
-			<tr id="tr${answer.qbOption.uid}">
+		<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
+			<tr id="tr${optionDto.qbOption.uid}">
 				<td style="width: 40px;">
 					<c:choose>
-						<c:when test="${answer.scratched && answer.qbOption.correct}">
+						<c:when test="${optionDto.scratched && optionDto.qbOption.correct}">
 							<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.qbOption.uid}">
+								 id="image-${item.uid}-${optionDto.qbOption.uid}">
 						</c:when>
-						<c:when test="${answer.scratched && !answer.qbOption.correct}">
+						<c:when test="${optionDto.scratched && !optionDto.qbOption.correct}">
 							<img src="<lams:WebAppURL/>includes/images/scratchie-wrong.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.qbOption.uid}">
+								 id="image-${item.uid}-${optionDto.qbOption.uid}">
 						</c:when>
 						<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
 							<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-								 id="image-${item.uid}-${answer.qbOption.uid}">
+								 id="image-${item.uid}-${optionDto.qbOption.uid}">
 						</c:when>
 						<c:otherwise>
-							<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.qbOption.uid}); return false;"
-								id="imageLink-${item.uid}-${answer.qbOption.uid}"> <img
+							<a href="#nogo" onclick="scratchItem(${item.uid}, ${optionDto.qbOption.uid}); return false;"
+								id="imageLink-${item.uid}-${optionDto.qbOption.uid}"> <img
 								src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-								id="image-${item.uid}-${answer.qbOption.uid}" />
+								id="image-${item.uid}-${optionDto.qbOption.uid}" />
 							</a>
 						</c:otherwise>
 					</c:choose> 
 					
-					<c:if test="${(showResults || mode == 'teacher') && (answer.attemptOrder != -1)}">
+					<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
 						<div style="text-align: center; margin-top: 2px;">
 							<fmt:message key="label.choice.number">
-								<fmt:param>${answer.attemptOrder}</fmt:param>
+								<fmt:param>${optionDto.attemptOrder}</fmt:param>
 							</fmt:message>
 						</div>
 					</c:if>
 				</td>
 
 				<td 
-					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
+					<c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
 				>
 					<div class="answer-description">
-						<c:out value="${answer.qbOption.name}" escapeXml="false" />
+						<c:out value="${optionDto.qbOption.name}" escapeXml="false" />
 					</div>
 					
 					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
 						<div>
-							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
+							<c:forEach var="confidenceLevelDto" items="${optionDto.confidenceLevelDtos}" varStatus="status">
 							
 								<div class="c100 p${confidenceLevelDto.level}0 small">
 									<span>

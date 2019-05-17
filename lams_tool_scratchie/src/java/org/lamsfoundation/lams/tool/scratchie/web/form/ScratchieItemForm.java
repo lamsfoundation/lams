@@ -24,7 +24,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.form;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 
 /**
  *

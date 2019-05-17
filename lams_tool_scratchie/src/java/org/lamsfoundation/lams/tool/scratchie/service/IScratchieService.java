@@ -220,7 +220,7 @@ public interface IScratchieService extends ICommonToolService {
     void saveOrUpdateScratchieSession(ScratchieSession resSession);
 
     /**
-     * Fills in which order the student selects answers
+     * Fills in which order the student selects options
      *
      * @param items
      * @param user
@@ -228,7 +228,7 @@ public interface IScratchieService extends ICommonToolService {
     void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
 
     /**
-     * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their
+     * Fill in scratchieItems with information about whether they were unraveled; and options with information on their
      * scratched.
      *
      * @param scratchieItemList
@@ -254,6 +254,12 @@ public interface IScratchieService extends ICommonToolService {
      */
     void recordItemScratched(Long toolSessionId, Long itemUid, Long scratchieItemUid);
 
+    /**
+     * Recalculate mark for leader and sets it to all members of a group
+     *
+     * @param sessionId
+     * @param isPropagateToGradebook
+     */
     void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook);
 
     /**

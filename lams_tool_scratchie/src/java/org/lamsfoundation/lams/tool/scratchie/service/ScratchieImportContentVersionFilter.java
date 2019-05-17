@@ -24,8 +24,8 @@
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -46,7 +46,7 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 
 	this.removeField(Scratchie.class, "createdBy");
 
-	this.removeField(ScratchieAnswer.class, "scratchieItem");
+	this.removeField(QbOptionDTO.class, "scratchieItem");
 
 	this.addField(ScratchieSession.class, "mark", "0");
 	this.addField(ScratchieSession.class, "scratchingFinished", "0");

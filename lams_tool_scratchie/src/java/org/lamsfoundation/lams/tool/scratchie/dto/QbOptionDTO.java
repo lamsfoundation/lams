@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.scratchie.model;
+package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.List;
 
@@ -28,11 +28,11 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
 
 /**
- * Tool may contain several questions. Which in turn contain answers.
+ * Tool may contain several questions. Which in turn contain options.
  *
  * @author Andrey Balan
  */
-public class ScratchieAnswer implements Comparable<ScratchieAnswer> {
+public class QbOptionDTO implements Comparable<QbOptionDTO> {
     private QbOption qbOption;
 
     private boolean scratched;
@@ -41,7 +41,7 @@ public class ScratchieAnswer implements Comparable<ScratchieAnswer> {
     private List<ConfidenceLevelDTO> confidenceLevelDtos;
 
     @Override
-    public int compareTo(ScratchieAnswer o) {
+    public int compareTo(QbOptionDTO o) {
 	return this.qbOption.compareTo(o.qbOption);
     }
 

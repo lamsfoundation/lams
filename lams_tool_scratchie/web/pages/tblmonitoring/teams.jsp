@@ -14,18 +14,18 @@
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<tbody>
-						<c:forEach var="answer" items="${item.answers}" varStatus="j">
-							<c:if test="${answer.scratched}">
+						<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
+							<c:if test="${optionDto.scratched}">
 									
 								<tr>
 									<td width="5px">
 										${ALPHABET[j.index]}.
 									</td>
 									<td>
-										<c:out value="${answer.qbOption.name}" escapeXml="false"/>
+										<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
 										
 										<c:choose>
-											<c:when test="${answer.qbOption.correct}">
+											<c:when test="${optionDto.qbOption.correct}">
 												<i class="fa fa-check-square"></i>
 											</c:when>
 											<c:otherwise>

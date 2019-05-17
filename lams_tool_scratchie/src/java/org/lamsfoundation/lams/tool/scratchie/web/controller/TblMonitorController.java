@@ -46,9 +46,9 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -133,7 +133,7 @@ public class TblMonitorController {
 	LinkedHashMap<String, ExcelCell[][]> excelDoc = scratchieService.exportExcel(toolContentId);
 	ExcelCell[][] secondPageData = null;
 	for (ExcelCell[][] excelPage : excelDoc.values()) {
-	    //check last row string starts with "*" (i.e. the string "*- Denotes the correct answer")
+	    //check last row string starts with "*" (i.e. the string "*- Denotes the correct option")
 	    if (excelPage.length > 0) {
 		ExcelCell lastRow = excelPage[excelPage.length - 1][0];
 		if (lastRow != null && ((String) lastRow.getCellValue()).startsWith("*")) {
@@ -143,11 +143,11 @@ public class TblMonitorController {
 	    }
 	}
 
-	//correct answers
-	ExcelCell[] correctAnswersRow = secondPageData[4];
-	request.setAttribute("correctAnswers", correctAnswersRow);
+	//correct options
+	ExcelCell[] correctOptionsRow = secondPageData[4];
+	request.setAttribute("correctOptions", correctOptionsRow);
 
-	//prepare data for displaying user answers table
+	//prepare data for displaying user option table
 	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
 	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
 	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
@@ -160,24 +160,24 @@ public class TblMonitorController {
 	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
 	    for (int i = 1; i <= items.size(); i++) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
-		String answersSequence = groupRow[i].getCellValue().toString();
-		String[] answerLetters = answersSequence.split(", ");
+		String optionsSequence = groupRow[i].getCellValue().toString();
+		String[] optionLetters = optionsSequence.split(", ");
 
-		List<ScratchieAnswer> answers = new LinkedList<>();
-		for (int j = 0; j < answerLetters.length; j++) {
-		    String answerLetter = answerLetters[j];
-		    String correctAnswerLetter = correctAnswersRow[i].getCellValue().toString();
+		List<QbOptionDTO> optionDtos = new LinkedList<>();
+		for (int j = 0; j < optionLetters.length; j++) {
+		    String optionLetter = optionLetters[j];
+		    String correctOptionLetter = correctOptionsRow[i].getCellValue().toString();
 
-		    ScratchieAnswer answer = new ScratchieAnswer();
+		    QbOptionDTO optionDto = new QbOptionDTO();
 		    QbOption qbOption = new QbOption();
-		    answer.setQbOption(qbOption);
-		    qbOption.setName(answerLetter);
-		    qbOption.setCorrect(correctAnswerLetter.equals(answerLetter));
+		    optionDto.setQbOption(qbOption);
+		    qbOption.setName(optionLetter);
+		    qbOption.setCorrect(correctOptionLetter.equals(optionLetter));
 
-		    answers.add(answer);
+		    optionDtos.add(optionDto);
 		}
 
-		itemDto.setAnswers(answers);
+		itemDto.setOptionDtos(optionDtos);
 		itemDtos.add(itemDto);
 	    }
 	    groupSummary.setItemDtos(itemDtos);

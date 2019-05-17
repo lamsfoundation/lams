@@ -24,8 +24,8 @@
     		var answerTargetDiv = "#answerArea";
     		function addAnswer(){
 
-    			//check maximum number of answers
-    			var numberOfAnswers = $("textarea[name^=answerDescription]").length;
+    			//check maximum number of options
+    			var numberOfAnswers = $("textarea[name^=optionDescription]").length;
     			if (numberOfAnswers >= 10) {
     				alert("<fmt:message key="label.authoring.maximum.answers.warning" />");
     				return;
@@ -40,13 +40,13 @@
     			var url= addAnswerUrl;
     			var contentFolderID= $("#contentFolderID").val();
     			prepareAnswerEditorsForAjaxSubmit();
-    			var answerList = $("#answerForm").serialize(true);
+    			var optionList = $("#answerForm").serialize(true);
     			$.ajaxSetup({ cache: true });
     			$(answerTargetDiv).load(
     				url,
     				{
     					contentFolderID: contentFolderID,
-    					answerList: answerList 
+    					optionList: optionList 
     				},
     				function(){
     					reinitializeAnswerEditors(oldAnswerIds);
@@ -57,13 +57,13 @@
     	 		var url= removeAnswerUrl;
     			var contentFolderID= $("#contentFolderID").val();
     			prepareAnswerEditorsForAjaxSubmit();
-    	 		var answerList = $("#answerForm").serialize(true);
+    	 		var optionList = $("#answerForm").serialize(true);
     			$(answerTargetDiv).load(
     					url,
     					{
     						contentFolderID: contentFolderID,
-    						answerIndex: idx,
-    						answerList: answerList 
+    						optionIndex: idx,
+    						optionList: optionList 
     					},
     					function(){
     						reinitializeAnswerEditors(null);
@@ -74,13 +74,13 @@
     	 		var url= upAnswerUrl;
     			var contentFolderID= $("#contentFolderID").val();
     			prepareAnswerEditorsForAjaxSubmit();
-    	 		var answerList = $("#answerForm").serialize(true);
+    	 		var optionList = $("#answerForm").serialize(true);
     			$(answerTargetDiv).load(
     					url,
     					{
     						contentFolderID: contentFolderID,
-    						answerIndex: idx,
-    						answerList: answerList 
+    						optionIndex: idx,
+    						optionList: optionList 
     					},
     					function(){
     						reinitializeAnswerEditors(null);
@@ -91,13 +91,13 @@
     	 		var url= downAnswerUrl;
     			var contentFolderID= $("#contentFolderID").val(); 	
     			prepareAnswerEditorsForAjaxSubmit();
-    	 		var answerList = $("#answerForm").serialize(true);
+    	 		var optionList = $("#answerForm").serialize(true);
     	 		$(answerTargetDiv).load(
     					url,
     					{
     						contentFolderID: contentFolderID,
-    						answerIndex: idx,
-    						answerList: answerList 
+    						optionIndex: idx,
+    						optionList: optionList 
     					},
     					function(){
     						reinitializeAnswerEditors(null);
@@ -105,7 +105,7 @@
     			);
     		}
     		
-    		//reinitialize all CKEditors responsible for answers after Ajax call has done
+    		//reinitialize all CKEditors responsible for options after Ajax call has done
     		function reinitializeAnswerEditors(answerIds){
     			return;
     			if (answerIds == null) {
@@ -130,7 +130,7 @@
     		
     		//in order to be able to use answer's value, copy it from CKEditor to textarea
     		function prepareAnswerEditorsForAjaxSubmit(){
-    			$("textarea[name^=answerDescription]").each(function() {
+    			$("textarea[name^=optionDescription]").each(function() {
     	    		var ckeditorData = CKEDITOR.instances[this.name].getData();
     	    		//skip out empty values
     	    		this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
@@ -146,7 +146,7 @@
 		    				required: function(element) {
 		    					//check there should be at least one answer filled
 				    			prepareAnswerEditorsForAjaxSubmit();
-		    		        	return $("textarea[name^=answerDescription]:filled").length < 1;
+		    		        	return $("textarea[name^=optionDescription]:filled").length < 1;
 			    		    }
 	    			    },
 	    			    hasFilledCorrectAnswer: {
@@ -155,10 +155,10 @@
 		    					prepareAnswerEditorsForAjaxSubmit();
 		    					
 		    					var hasFilledCorrectAnswer = false;
-		    					$("input[name^=answerCorrect]:checked").each(function() {
+		    					$("input[name^=optionCorrect]:checked").each(function() {
 		    						var statusIndex = this.alt;
-		    						var answerDescription = $("textarea[name=answerDescription" + statusIndex + "]");
-		    						hasFilledCorrectAnswer = answerDescription.val() != "";
+		    						var optionDescription = $("textarea[name=optionDescription" + statusIndex + "]");
+		    						hasFilledCorrectAnswer = optionDescription.val() != "";
 		    					});
 		    					
 		    		        	return !hasFilledCorrectAnswer;
@@ -186,10 +186,10 @@
 		    		debug: false,
      			    submitHandler: function(form) {
      			    	prepareAnswerEditorsForAjaxSubmit();
-		    			$("#answerList").val($("#answerForm").serialize(true));
+		    			$("#optionList").val($("#answerForm").serialize(true));
 		    			$("#description").val(CKEDITOR.instances.description.getData());
 		    			
-		    	    	var answers = { 
+		    	    	var items = { 
 		    	    		target:  parent.jQuery('#itemArea'), 
 		    		   		success: function (responseText, statusText)  { 
 		    	    			self.parent.refreshThickbox()
@@ -197,7 +197,7 @@
 		    	    		} 
 		    		    };
 		    		    				
-		    			$('#scratchieItemForm').ajaxSubmit(answers);
+		    			$('#scratchieItemForm').ajaxSubmit(items);
 		    		}
 		  		});
 			});   
@@ -223,7 +223,7 @@
 			
 			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
 				<form:hidden path="sessionMapID" />
-				<input type="hidden" name="answerList" id="answerList" />
+				<input type="hidden" name="optionList" id="optionList" />
 				<form:hidden path="itemIndex" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 	
@@ -246,9 +246,9 @@
 			
 			</form:form>
 			
-			<!-- Answers -->
+			<!-- Options -->
 			<form id="answerForm" name="answerForm">
- 				<%@ include file="answerlist.jsp"%>
+ 				<%@ include file="optionlist.jsp"%>
  				<a href="javascript:;" onclick="addAnswer();" class="btn btn-default btn-sm" style="margin-right: 40px; margin-top:0px">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.add.blank.answer" /> 
 				</a>

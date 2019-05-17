@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.Collection;
 
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
@@ -39,7 +38,7 @@ public class GroupSummary {
 
     private Collection<ScratchieUser> users;
     private Collection<ScratchieItemDTO> itemDtos;
-    private Collection<ScratchieAnswer> answers;
+    private Collection<QbOptionDTO> optionDtos;
 
     public GroupSummary() {
     }
@@ -115,11 +114,11 @@ public class GroupSummary {
 	this.users = users;
     }
 
-    public Collection<ScratchieAnswer> getAnswers() {
-	return answers;
+    public Collection<QbOptionDTO> getOptionDtos() {
+	return optionDtos;
     }
 
-    public void setAnswers(Collection<ScratchieAnswer> answers) {
-	this.answers = answers;
+    public void setOptionDtos(Collection<QbOptionDTO> optionDtos) {
+	this.optionDtos = optionDtos;
     }
 }

@@ -75,9 +75,9 @@
 						<fmt:message key="label.correct.answer"/>
 					</b>
 				</td>
-				<c:forEach begin="1" end="${fn:length(correctAnswers) - 1}" var="i">
+				<c:forEach begin="1" end="${fn:length(correctOptions) - 1}" var="i">
 					<td class="text-center">
-						${correctAnswers[i].cellValue}
+						${correctOptions[i].cellValue}
 					</td>
 				</c:forEach>
 				<td class="text-center"></td>
@@ -106,10 +106,10 @@
 						<c:otherwise>
 							<c:forEach var="itemDto" items="${sessionDto.itemDtos}">
 								<td class="text-center">
-									<c:forEach var="answer" items="${itemDto.answers}">
-										<c:if test="${answer.qbOption.name != ''}">
-											<span class="user-response <c:if test="${answer.qbOption.correct}">successful-response</c:if> <c:if test="${!answer.qbOption.correct}">wrong-response</c:if>">
-												<c:out value="${answer.qbOption.name}"></c:out>
+									<c:forEach var="optionDto" items="${itemDto.optionDtos}">
+										<c:if test="${optionDto.qbOption.name != ''}">
+											<span class="user-response <c:if test="${optionDto.qbOption.correct}">successful-response</c:if> <c:if test="${!optionDto.qbOption.correct}">wrong-response</c:if>">
+												<c:out value="${optionDto.qbOption.name}"></c:out>
 											</span>
 										</c:if>
 									</c:forEach>
@@ -156,14 +156,14 @@
 					<table class="table table-striped table-hover">
 						<tbody>
 						
-							<c:forEach var="answer" items="${item.answers}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${answer.qbOption.correct}'>bg-success</c:if></c:set>
+							<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${optionDto.qbOption.correct}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${answer.qbOption.name}" escapeXml="false"/>
+										<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
 									</td>
 								</tr>
 							</c:forEach>

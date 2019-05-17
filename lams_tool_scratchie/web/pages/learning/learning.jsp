@@ -63,10 +63,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
-		function scratchImage(itemUid, answerUid, isCorrect) {
+		function scratchImage(itemUid, optionUid, isCorrect) {
 			// first show animation, then put static image
 			var imageSuffix = isCorrect ? 'correct' : 'wrong';
-	    		$('#image-' + itemUid + '-' + answerUid).load(function(){
+	    		$('#image-' + itemUid + '-' + optionUid).load(function(){
 	    			var image = $(this).off("load");
 	    			// show static image after animation
 	    			setTimeout(
@@ -78,10 +78,10 @@
 	    		}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
 		}
 
-		function scratchItem(itemUid, answerUid){
+		function scratchItem(itemUid, optionUid){
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid + '&itemUid=' + itemUid,
+	            data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -89,16 +89,16 @@
 		            		return false;
 		            	}
 		            	
-		            	scratchImage(itemUid, answerUid, json.answerCorrect);
+		            	scratchImage(itemUid, optionUid, json.optionCorrect);
 		            	
-		            	if (json.answerCorrect) {
+		            	if (json.optionCorrect) {
 		            		//disable scratching
 		            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
 		            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
 		            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
 		            	} else {
-		            		var id = '-' + itemUid + '-' + answerUid;
+		            		var id = '-' + itemUid + '-' + optionUid;
 		            		$('#imageLink' + id).removeAttr('onclick');
 		            		$('#imageLink' + id).css('cursor','default');
 		            	}

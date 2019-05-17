@@ -21,7 +21,7 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -138,7 +138,7 @@ public class LearningWebsocketServer {
 	}
 
 	/**
-	 * Feeds websockets with scratched answers.
+	 * Feeds websockets with scratched options.
 	 */
 	@SuppressWarnings("unchecked")
 	private static void send(Long toolSessionId) throws IOException {
@@ -152,7 +152,7 @@ public class LearningWebsocketServer {
 		// do not init variables below until it's really needed
 		Map<Long, Boolean> itemCache = null;
 		ObjectNode itemJSON = null;
-		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		for (QbOptionDTO answer : (Set<QbOptionDTO>) item.getOptionDtos()) {
 		    if (answer.isScratched()) {
 			// answer is scratched, check if it is present in cache
 			if (itemCache == null) {
@@ -163,17 +163,17 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			Long answerUid = answer.getQbOption().getUid();
+			Long optionUid = answer.getQbOption().getUid();
 			Boolean answerStoredIsCorrect = answer.getQbOption().isCorrect();
-			Boolean answerCache = itemCache.get(answerUid);
+			Boolean answerCache = itemCache.get(optionUid);
 			// check if the correct answer is stored in cache
 			if ((answerCache == null) || !answerCache.equals(answerStoredIsCorrect)) {
 			    // send only updates, nothing Learners are already aware of
-			    itemCache.put(answerUid, answerStoredIsCorrect);
+			    itemCache.put(optionUid, answerStoredIsCorrect);
 			    if (itemJSON == null) {
 				itemJSON = JsonNodeFactory.instance.objectNode();
 			    }
-			    itemJSON.put(answerUid.toString(), answerStoredIsCorrect);
+			    itemJSON.put(optionUid.toString(), answerStoredIsCorrect);
 			}
 		    }
 		}
@@ -200,7 +200,7 @@ public class LearningWebsocketServer {
     private static IScratchieService scratchieService;
 
     private static final SendWorker sendWorker = new SendWorker();
-    // maps toolSessionId -> itemUid -> answerUid -> isCorrect
+    // maps toolSessionId -> itemUid -> optionUid -> isCorrect
     private static final Map<Long, Map<Long, Map<Long, Boolean>>> cache = new ConcurrentHashMap<>();
     private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
 

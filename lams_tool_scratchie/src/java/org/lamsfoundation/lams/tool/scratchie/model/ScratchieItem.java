@@ -36,9 +36,10 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 
 /**
- * Tool may contain several questions. Which in turn contain answers.
+ * Tool may contain several questions. Which in turn contain optionDtos.
  *
  * @author Andrey Balan
  */
@@ -57,7 +58,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     @Transient
     private String burningQuestion;
     @Transient
-    private List<ScratchieAnswer> answers = null;
+    private List<QbOptionDTO> optionDtos = null;
     @Transient
     private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
 
@@ -77,20 +78,20 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	return item;
     }
 
-    public List<ScratchieAnswer> getAnswers() {
-	if (answers == null) {
-	    answers = new LinkedList<>();
+    public List<QbOptionDTO> getOptionDtos() {
+	if (optionDtos == null) {
+	    optionDtos = new LinkedList<>();
 	    for (QbOption option : qbQuestion.getQbOptions()) {
-		ScratchieAnswer answer = new ScratchieAnswer();
+		QbOptionDTO answer = new QbOptionDTO();
 		answer.setQbOption(option);
-		answers.add(answer);
+		optionDtos.add(answer);
 	    }
 	}
-	return answers;
+	return optionDtos;
     }
 
-    public void setAnswers(List<ScratchieAnswer> answers) {
-	this.answers = answers;
+    public void setOptionDtos(List<QbOptionDTO> optionDtos) {
+	this.optionDtos = optionDtos;
     }
 
     public boolean isUnraveled() {

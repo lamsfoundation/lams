@@ -84,10 +84,10 @@ import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
@@ -287,10 +287,10 @@ public class ScratchieServiceImpl
 	//populate Scratchie items with confidence levels
 	for (ScratchieItem item : items) {
 
-	    //init answers' confidenceLevelDtos list
-	    for (ScratchieAnswer answer : item.getAnswers()) {
+	    //init options' confidenceLevelDtos list
+	    for (QbOptionDTO optionDto : item.getOptionDtos()) {
 		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<>();
-		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
+		optionDto.setConfidenceLevelDtos(confidenceLevelDtosTemp);
 	    }
 
 	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
@@ -301,11 +301,11 @@ public class ScratchieServiceImpl
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
 		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
 
-		    //find according answer
-		    for (ScratchieAnswer answer : item.getAnswers()) {
-			String answerText = answer.getQbOption().getName().replaceAll("(\\r|\\n)", "");
-			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
-			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
+		    //find according option
+		    for (QbOptionDTO option : item.getOptionDtos()) {
+			String optionText = option.getQbOption().getName().replaceAll("(\\r|\\n)", "");
+			if (optionText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
+			    option.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }
 
@@ -437,16 +437,16 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void recordItemScratched(Long sessionId, Long itemUid, Long answerUid) {
-	QbOption answer = this.getQbOptionByUid(answerUid);
-	if (answer == null) {
+    public void recordItemScratched(Long sessionId, Long itemUid, Long optionUid) {
+	QbOption option = this.getQbOptionByUid(optionUid);
+	if (option == null) {
 	    return;
 	}
 
-	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, itemUid, sessionId);
+	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(optionUid, itemUid, sessionId);
 	if (log == null) {
 	    log = new ScratchieAnswerVisitLog();
-	    log.setQbOption(answer);
+	    log.setQbOption(option);
 	    log.setSessionId(sessionId);
 	    QbToolQuestion qbToolQuestion = (QbToolQuestion) scratchieDao.find(QbToolQuestion.class, itemUid);
 	    log.setQbToolQuestion(qbToolQuestion);
@@ -457,12 +457,6 @@ public class ScratchieServiceImpl
 	this.recalculateMarkForSession(sessionId, false);
     }
 
-    /**
-     * Recalculate mark for leader and sets it to all members of a group
-     *
-     * @param leader
-     * @param answerUid
-     */
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
 	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
@@ -512,14 +506,14 @@ public class ScratchieServiceImpl
 		    }
 
 		    // options are different
-		    List<QbOption> oldAnswers = oldItem.getQbQuestion().getQbOptions();
-		    List<QbOption> newAnswers = newItem.getQbQuestion().getQbOptions();
-		    for (QbOption oldAnswer : oldAnswers) {
-			for (QbOption newAnswer : newAnswers) {
-			    if (oldAnswer.getUid().equals(newAnswer.getUid())) {
+		    List<QbOption> oldOptions = oldItem.getQbQuestion().getQbOptions();
+		    List<QbOption> newOptions = newItem.getQbQuestion().getQbOptions();
+		    for (QbOption oldOption : oldOptions) {
+			for (QbOption newOption : newOptions) {
+			    if (oldOption.getUid().equals(newOption.getUid())) {
 
-				if (!StringUtils.equals(oldAnswer.getName(), newAnswer.getName())
-					|| (oldAnswer.isCorrect() != newAnswer.isCorrect())) {
+				if (!StringUtils.equals(oldOption.getName(), newOption.getName())
+					|| (oldOption.isCorrect() != newOption.isCorrect())) {
 				    isItemModified = true;
 				}
 			    }
@@ -712,10 +706,10 @@ public class ScratchieServiceImpl
 	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    item.getUid());
 
-	    for (ScratchieAnswer answer : item.getAnswers()) {
+	    for (QbOptionDTO optionDto : item.getOptionDtos()) {
 
 		int attemptNumber;
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getQbOption().getUid(),
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(optionDto.getQbOption().getUid(),
 			item.getUid(), sessionId);
 		if (log == null) {
 		    // -1 if there is no log
@@ -725,7 +719,7 @@ public class ScratchieServiceImpl
 		    attemptNumber = itemLogs.indexOf(log) + 1;
 		}
 
-		answer.setAttemptOrder(attemptNumber);
+		optionDto.setAttemptOrder(attemptNumber);
 	    }
 	}
     }
@@ -747,21 +741,21 @@ public class ScratchieServiceImpl
 
 	for (ScratchieItem item : items) {
 
-	    for (ScratchieAnswer answer : item.getAnswers()) {
+	    for (QbOptionDTO optionDto : item.getOptionDtos()) {
 
 		// find according log if it exists
 		ScratchieAnswerVisitLog log = null;
 		for (ScratchieAnswerVisitLog userLog : userLogs) {
-		    if (userLog.getQbOption().getUid().equals(answer.getQbOption().getUid())
+		    if (userLog.getQbOption().getUid().equals(optionDto.getQbOption().getUid())
 			    && userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
 			log = userLog;
 			break;
 		    }
 		}
 		if (log == null) {
-		    answer.setScratched(false);
+		    optionDto.setScratched(false);
 		} else {
-		    answer.setScratched(true);
+		    optionDto.setScratched(true);
 		}
 	    }
 
@@ -784,18 +778,18 @@ public class ScratchieServiceImpl
     private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
-	for (QbOption answer : item.getQbQuestion().getQbOptions()) {
+	for (QbOption option : item.getQbQuestion().getQbOptions()) {
 
 	    ScratchieAnswerVisitLog log = null;
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
-		if (userLog.getQbOption().getUid().equals(answer.getUid())) {
+		if (userLog.getQbOption().getUid().equals(option.getUid())) {
 		    log = userLog;
 		    break;
 		}
 	    }
 
 	    if (log != null) {
-		isItemUnraveled |= answer.isCorrect();
+		isItemUnraveled |= option.isCorrect();
 	    }
 	}
 
@@ -854,7 +848,7 @@ public class ScratchieServiceImpl
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
-	List<QbOption> answers = item.getQbQuestion().getQbOptions();
+	List<QbOption> options = item.getQbQuestion().getQbOptions();
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -862,15 +856,15 @@ public class ScratchieServiceImpl
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
 
-	    Map<Long, ScratchieAnswer> answerMap = new HashMap<>();
-	    for (QbOption dbAnswer : answers) {
+	    Map<Long, QbOptionDTO> optionMap = new HashMap<>();
+	    for (QbOption dbOption : options) {
 
 		// clone it so it doesn't interfere with values from other sessions
-		ScratchieAnswer answer = new ScratchieAnswer();
-		answer.setQbOption(dbAnswer);
-		int[] attempts = new int[answers.size()];
-		answer.setAttempts(attempts);
-		answerMap.put(dbAnswer.getUid(), answer);
+		QbOptionDTO optionDto = new QbOptionDTO();
+		optionDto.setQbOption(dbOption);
+		int[] attempts = new int[options.size()];
+		optionDto.setAttempts(attempts);
+		optionMap.put(dbOption.getUid(), optionDto);
 	    }
 	    List<ScratchieAnswerVisitLog> sessionAttempts = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    itemUid);
@@ -882,16 +876,16 @@ public class ScratchieServiceImpl
 		int attemptNumber = 0;
 
 		for (ScratchieAnswerVisitLog attempt : sessionAttempts) {
-		    ScratchieAnswer answer = answerMap.get(attempt.getQbOption().getUid());
-		    int[] attempts = answer.getAttempts();
+		    QbOptionDTO optionDto = optionMap.get(attempt.getQbOption().getUid());
+		    int[] attempts = optionDto.getAttempts();
 		    // +1 for corresponding choice
 		    attempts[attemptNumber++]++;
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new LinkedList<>();
-	    sortedAnswers.addAll(answerMap.values());
-	    groupSummary.setAnswers(sortedAnswers);
+	    Collection<QbOptionDTO> sortedOptions = new LinkedList<>();
+	    sortedOptions.addAll(optionMap.values());
+	    groupSummary.setOptionDtos(sortedOptions);
 	    groupSummaryList.add(groupSummary);
 	}
 
@@ -902,33 +896,33 @@ public class ScratchieServiceImpl
 	    groupSummaryTotal.setSessionName("Summary");
 	    groupSummaryTotal.setMark(0);
 
-	    Map<Long, ScratchieAnswer> answerMapTotal = new HashMap<>();
-	    for (QbOption dbAnswer : answers) {
+	    Map<Long, QbOptionDTO> optionMapTotal = new HashMap<>();
+	    for (QbOption dbOption : options) {
 
 		// clone it so it doesn't interfere with values from other sessions
-		ScratchieAnswer answer = new ScratchieAnswer();
-		answer.setQbOption(dbAnswer);
-		int[] attempts = new int[answers.size()];
-		answer.setAttempts(attempts);
-		answerMapTotal.put(dbAnswer.getUid(), answer);
+		QbOptionDTO optionDto = new QbOptionDTO();
+		optionDto.setQbOption(dbOption);
+		int[] attempts = new int[options.size()];
+		optionDto.setAttempts(attempts);
+		optionMapTotal.put(dbOption.getUid(), optionDto);
 	    }
 
 	    for (GroupSummary groupSummary : groupSummaryList) {
-		Collection<ScratchieAnswer> sortedAnswers = groupSummary.getAnswers();
-		for (ScratchieAnswer sortedAnswer : sortedAnswers) {
-		    int[] attempts = sortedAnswer.getAttempts();
+		Collection<QbOptionDTO> sortedOptionDtos = groupSummary.getOptionDtos();
+		for (QbOptionDTO sortedOptionDto : sortedOptionDtos) {
+		    int[] attempts = sortedOptionDto.getAttempts();
 
-		    ScratchieAnswer answerTotal = answerMapTotal.get(sortedAnswer.getQbOption().getUid());
-		    int[] attemptsTotal = answerTotal.getAttempts();
+		    QbOptionDTO optionTotal = optionMapTotal.get(sortedOptionDto.getQbOption().getUid());
+		    int[] attemptsTotal = optionTotal.getAttempts();
 		    for (int i = 0; i < attempts.length; i++) {
 			attemptsTotal[i] += attempts[i];
 		    }
 		}
 	    }
 
-	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<>();
-	    sortedAnswers.addAll(answerMapTotal.values());
-	    groupSummaryTotal.setAnswers(sortedAnswers);
+	    Collection<QbOptionDTO> sortedOptions = new TreeSet<>();
+	    sortedOptions.addAll(optionMapTotal.values());
+	    groupSummaryTotal.setOptionDtos(sortedOptions);
 	    groupSummaryList.add(0, groupSummaryTotal);
 	}
 
@@ -1177,16 +1171,16 @@ public class ScratchieServiceImpl
 	for (ScratchieItem item : items) {
 
 	    // find out the correct answer's sequential letter - A,B,C...
-	    String correctAnswerLetter = "";
-	    int answerCount = 1;
-	    for (ScratchieAnswer answer : item.getAnswers()) {
-		if (answer.getQbOption().isCorrect()) {
-		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
+	    String correctOptionLetter = "";
+	    int optionCount = 1;
+	    for (QbOptionDTO optionDto : item.getOptionDtos()) {
+		if (optionDto.getQbOption().isCorrect()) {
+		    correctOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 		    break;
 		}
-		answerCount++;
+		optionCount++;
 	    }
-	    row[columnCount++] = new ExcelCell(correctAnswerLetter, false);
+	    row[columnCount++] = new ExcelCell(correctOptionLetter, false);
 	}
 	rowList.add(row);
 
@@ -1210,7 +1204,7 @@ public class ScratchieServiceImpl
 		    color = IndexedColors.GREEN;
 		    numberOfFirstChoiceEvents++;
 		}
-		row[columnCount++] = new ExcelCell(itemDto.getAnswersSequence(), color);
+		row[columnCount++] = new ExcelCell(itemDto.getOptionsSequence(), color);
 	    }
 	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
 	    int percentage = (numberOfItems == 0) ? 0 : (100 * numberOfFirstChoiceEvents) / numberOfItems;
@@ -1381,26 +1375,26 @@ public class ScratchieServiceImpl
 		rowList.add(row);
 
 		GroupSummary allTeamSummary = itemSummary.get(0);
-		Collection<ScratchieAnswer> answers = allTeamSummary.getAnswers();
+		Collection<QbOptionDTO> optionDtos = allTeamSummary.getOptionDtos();
 
-		row = new ExcelCell[1 + answers.size()];
-		for (int i = 0; i < answers.size(); i++) {
+		row = new ExcelCell[1 + optionDtos.size()];
+		for (int i = 0; i < optionDtos.size(); i++) {
 		    row[i + 1] = new ExcelCell((long) i + 1, IndexedColors.YELLOW);
 		}
 		rowList.add(row);
 
-		for (ScratchieAnswer answer : answers) {
-		    row = new ExcelCell[1 + answers.size()];
-		    String answerTitle = removeHtmlMarkup(answer.getQbOption().getName());
+		for (QbOptionDTO optionDto : optionDtos) {
+		    row = new ExcelCell[1 + optionDtos.size()];
+		    String optionTitle = removeHtmlMarkup(optionDto.getQbOption().getName());
 		    IndexedColors color = null;
-		    if (answer.getQbOption().isCorrect()) {
-			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
+		    if (optionDto.getQbOption().isCorrect()) {
+			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 			color = IndexedColors.GREEN;
 		    }
 		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(answerTitle, color);
+		    row[columnCount++] = new ExcelCell(optionTitle, color);
 
-		    for (int numberAttempts : answer.getAttempts()) {
+		    for (int numberAttempts : optionDto.getAttempts()) {
 			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
 		    }
 		    rowList.add(row);
@@ -1417,28 +1411,28 @@ public class ScratchieServiceImpl
 		    continue;
 		}
 
-		Collection<ScratchieAnswer> answers = groupSummary.getAnswers();
+		Collection<QbOptionDTO> optionDtos = groupSummary.getOptionDtos();
 
 		row = new ExcelCell[1];
 		row[0] = new ExcelCell(groupSummary.getSessionName(), true);
 		rowList.add(row);
 
-		row = new ExcelCell[1 + answers.size()];
-		for (int i = 0; i < answers.size(); i++) {
+		row = new ExcelCell[1 + optionDtos.size()];
+		for (int i = 0; i < optionDtos.size(); i++) {
 		    row[i + 1] = new ExcelCell(new Long(i + 1), false);
 		}
 		rowList.add(row);
 
-		for (ScratchieAnswer answer : answers) {
-		    row = new ExcelCell[1 + answers.size()];
-		    String answerTitle = removeHtmlMarkup(answer.getQbOption().getName());
-		    if (answer.getQbOption().isCorrect()) {
-			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
+		for (QbOptionDTO optionDto : optionDtos) {
+		    row = new ExcelCell[1 + optionDtos.size()];
+		    String optionTitle = removeHtmlMarkup(optionDto.getQbOption().getName());
+		    if (optionDto.getQbOption().isCorrect()) {
+			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 		    }
 		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(answerTitle, false);
+		    row[columnCount++] = new ExcelCell(optionTitle, false);
 
-		    for (int numberAttempts : answer.getAttempts()) {
+		    for (int numberAttempts : optionDto.getAttempts()) {
 			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
 		    }
 		    rowList.add(row);
@@ -1491,8 +1485,8 @@ public class ScratchieServiceImpl
 		    for (ScratchieAnswerVisitLog log : logs) {
 			row = new ExcelCell[4];
 			row[0] = new ExcelCell(new Long(i++), false);
-			String answerDescr = removeHtmlMarkup(log.getQbOption().getName());
-			row[1] = new ExcelCell(answerDescr, false);
+			String optionDescr = removeHtmlMarkup(log.getQbOption().getName());
+			row[1] = new ExcelCell(optionDescr, false);
 			row[3] = new ExcelCell(fullDateFormat.format(log.getAccessDate()), false);
 			rowList.add(row);
 		    }
@@ -1512,14 +1506,14 @@ public class ScratchieServiceImpl
 
 	// Table header------------------------------------
 
-	int maxAnswers = 0;
+	int maxOptions = 0;
 	for (ScratchieItem item : items) {
-	    if (item.getAnswers().size() > maxAnswers) {
-		maxAnswers = item.getAnswers().size();
+	    if (item.getOptionDtos().size() > maxOptions) {
+		maxOptions = item.getOptionDtos().size();
 	    }
 	}
 
-	row = new ExcelCell[10 + (maxAnswers * 2)];
+	row = new ExcelCell[10 + (maxOptions * 2)];
 	columnCount = 0;
 	row[columnCount++] = new ExcelCell(getMessage("label.student.name"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.student.username"), true);
@@ -1530,11 +1524,11 @@ public class ScratchieServiceImpl
 	row[columnCount++] = new ExcelCell(getMessage("label.first.choice.accuracy"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.number.of.attempts"), true);
 	row[columnCount++] = new ExcelCell(getMessage("label.mark.awarded"), true);
-	for (int i = 0; i < maxAnswers; i++) {
+	for (int i = 0; i < maxOptions; i++) {
 	    row[columnCount++] = new ExcelCell(getMessage("label." + (i + 1) + ".answer.selected"), true);
 	}
 	row[columnCount++] = new ExcelCell(getMessage("label.date"), true);
-	for (int i = 0; i < maxAnswers; i++) {
+	for (int i = 0; i < maxOptions; i++) {
 	    row[columnCount++] = new ExcelCell(getMessage("label.time.of.selection." + (i + 1)), true);
 	}
 	rowList.add(row);
@@ -1550,7 +1544,7 @@ public class ScratchieServiceImpl
 		int questionCount = 1;
 		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 
-		    row = new ExcelCell[10 + (maxAnswers * 2)];
+		    row = new ExcelCell[10 + (maxOptions * 2)];
 		    columnCount = 0;
 		    // learner name
 		    row[columnCount++] = new ExcelCell(user.getFirstName() + " " + user.getLastName(), false);
@@ -1563,15 +1557,15 @@ public class ScratchieServiceImpl
 		    // question title
 		    row[columnCount++] = new ExcelCell(itemDto.getTitle(), false);
 
-		    // correct answer
-		    String correctAnswer = "";
-		    List<ScratchieAnswer> answers = itemDto.getAnswers();
-		    for (ScratchieAnswer answer : answers) {
-			if (answer.getQbOption().isCorrect()) {
-			    correctAnswer = removeHtmlMarkup(answer.getQbOption().getName());
+		    // correct option
+		    String correctOption = "";
+		    List<QbOptionDTO> options = itemDto.getOptionDtos();
+		    for (QbOptionDTO option : options) {
+			if (option.getQbOption().isCorrect()) {
+			    correctOption = removeHtmlMarkup(option.getQbOption().getName());
 			}
 		    }
-		    row[columnCount++] = new ExcelCell(correctAnswer, false);
+		    row[columnCount++] = new ExcelCell(correctOption, false);
 
 		    // isFirstChoice
 		    int attempts = itemDto.getUserAttempts();
@@ -1590,7 +1584,7 @@ public class ScratchieServiceImpl
 		    Object mark = (itemDto.getUserMark() == -1) ? "" : new Long(itemDto.getUserMark());
 		    row[columnCount++] = new ExcelCell(mark, false);
 
-		    // Answers selected
+		    // options selected
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 			    itemDto.getUid());
 		    if (logs == null) {
@@ -1598,13 +1592,13 @@ public class ScratchieServiceImpl
 		    }
 
 		    for (ScratchieAnswerVisitLog log : logs) {
-			String answer = removeHtmlMarkup(log.getQbOption().getName());
-			row[columnCount++] = new ExcelCell(answer, false);
+			String optionText = removeHtmlMarkup(log.getQbOption().getName());
+			row[columnCount++] = new ExcelCell(optionText, false);
 		    }
-		    for (int i = logs.size(); i < itemDto.getAnswers().size(); i++) {
+		    for (int i = logs.size(); i < itemDto.getOptionDtos().size(); i++) {
 			row[columnCount++] = new ExcelCell(getMessage("label.none"), false);
 		    }
-		    for (int i = answers.size(); i < maxAnswers; i++) {
+		    for (int i = options.size(); i < maxOptions; i++) {
 			row[columnCount++] = new ExcelCell("", false);
 		    }
 
@@ -1624,7 +1618,7 @@ public class ScratchieServiceImpl
 			String timeStr = timeFormat.format(accessDate);
 			row[columnCount++] = new ExcelCell(timeStr, false);
 		    }
-		    for (int i = logs.size(); i < maxAnswers; i++) {
+		    for (int i = logs.size(); i < maxOptions; i++) {
 			row[columnCount++] = new ExcelCell("", false);
 		    }
 
@@ -1743,48 +1737,48 @@ public class ScratchieServiceImpl
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
-	    List<ScratchieAnswerVisitLog> answerLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+	    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
 		int numberOfAttempts = 0;
 		int mark = -1;
 		boolean isUnraveledOnFirstAttempt = false;
-		String answersSequence = "";
+		String optionsSequence = "";
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
 
 		    //create a list of attempts user done for the current item
-		    List<ScratchieAnswerVisitLog> itemAttempts = new ArrayList<>();
-		    for (ScratchieAnswerVisitLog answerLog : answerLogs) {
-			if (answerLog.getQbToolQuestion().getUid().equals(item.getUid())) {
-			    itemAttempts.add(answerLog);
+		    List<ScratchieAnswerVisitLog> itemLogs = new ArrayList<>();
+		    for (ScratchieAnswerVisitLog log : logs) {
+			if (log.getQbToolQuestion().getUid().equals(item.getUid())) {
+			    itemLogs.add(log);
 			}
 		    }
-		    numberOfAttempts = itemAttempts.size();
+		    numberOfAttempts = itemLogs.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, answerLogs, presetMarks);
+		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, logs, presetMarks);
 
-		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, answerLogs);
+		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, logs);
 
-		    // find out answers' sequential letters - A,B,C...
-		    for (ScratchieAnswerVisitLog itemAttempt : itemAttempts) {
+		    // find out options' sequential letters - A,B,C...
+		    for (ScratchieAnswerVisitLog itemAttempt : itemLogs) {
 			String sequencialLetter = ScratchieServiceImpl.getSequencialLetter(item,
 				itemAttempt.getQbOption());
-			answersSequence += answersSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
+			optionsSequence += optionsSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
 		    }
 
 		}
 
 		itemDto.setUid(item.getUid());
 		itemDto.setTitle(item.getQbQuestion().getName());
-		itemDto.setAnswers(item.getAnswers());
+		itemDto.setOptionDtos(item.getOptionDtos());
 		itemDto.setUserAttempts(numberOfAttempts);
 		itemDto.setUserMark(mark);
 		itemDto.setUnraveledOnFirstAttempt(isUnraveledOnFirstAttempt);
-		itemDto.setAnswersSequence(answersSequence);
+		itemDto.setOptionsSequence(optionsSequence);
 
 		itemDtos.add(itemDto);
 	    }
@@ -1797,18 +1791,18 @@ public class ScratchieServiceImpl
     }
 
     /**
-     * Return specified answer's sequential letter (e.g. A,B,C) among other possible answers
+     * Return specified option's sequential letter (e.g. A,B,C) among other possible options
      */
     private static String getSequencialLetter(ScratchieItem item, QbOption asnwer) {
 	String sequencialLetter = "";
 
-	int answerCount = 1;
-	for (ScratchieAnswer answer : item.getAnswers()) {
-	    if (answer.getQbOption().getUid().equals(asnwer.getUid())) {
-		sequencialLetter = String.valueOf((char) ((answerCount + 'A') - 1));
+	int optionCount = 1;
+	for (QbOptionDTO option : item.getOptionDtos()) {
+	    if (option.getQbOption().getUid().equals(asnwer.getUid())) {
+		sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 		break;
 	    }
-	    answerCount++;
+	    optionCount++;
 	}
 
 	return sequencialLetter;
@@ -1920,13 +1914,13 @@ public class ScratchieServiceImpl
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
 
-	// wipe out the links from ScratchieAnswer back to ScratchieItem, or it will try to
+	// wipe out the links from QbOptionDTO back to ScratchieItem, or it will try to
 	// include the hibernate object version of the ScratchieItem within the XML
 	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
 	for (ScratchieItem item : items) {
-	    Collection<QbOption> answers = item.getQbQuestion().getQbOptions();
-	    for (QbOption answer : answers) {
-		answer.setQbQuestion(null);
+	    Collection<QbOption> options = item.getQbQuestion().getQbOptions();
+	    for (QbOption option : options) {
+		option.setQbQuestion(null);
 	    }
 	}
 
@@ -2174,7 +2168,6 @@ public class ScratchieServiceImpl
 	if ((session == null) || (session.getScratchie() == null)) {
 	    return;
 	}
-	Scratchie scratchie = session.getScratchie();
 
 	// as long as leader aware feature is always ON - copy answers from leader to non-leader user
 
@@ -2311,23 +2304,23 @@ public class ScratchieServiceImpl
 	    newItems.add(item);
 
 	    // set options
-	    List<QbOption> newAnswers = new LinkedList<>();
+	    List<QbOption> newOptions = new LinkedList<>();
 
 	    ArrayNode answersData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (int j = 0; j < answersData.size(); j++) {
 		ObjectNode answerData = (ObjectNode) answersData.get(j);
-		QbOption answer = new QbOption();
+		QbOption option = new QbOption();
 		// Removes redundant new line characters from options left by CKEditor (otherwise it will break
 		// Javascript in monitor). Copied from AuthoringAction.
-		String answerDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
-		answer.setName(answerDescription != null ? answerDescription.replaceAll("[\n\r\f]", "") : "");
-		answer.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
-		answer.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		answer.setQbQuestion(item.getQbQuestion());
-		newAnswers.add(answer);
+		String optionDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
+		option.setName(optionDescription != null ? optionDescription.replaceAll("[\n\r\f]", "") : "");
+		option.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
+		option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+		option.setQbQuestion(item.getQbQuestion());
+		newOptions.add(option);
 	    }
 
-	    item.getQbQuestion().setQbOptions(newAnswers);
+	    item.getQbQuestion().setQbOptions(newOptions);
 
 	}
 

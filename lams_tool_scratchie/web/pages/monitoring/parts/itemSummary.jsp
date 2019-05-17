@@ -39,14 +39,14 @@
 	  					height: 'auto',
 	  					width: '100%',
 	  				   	colNames:["<fmt:message key="label.monitoring.summary.answer" />"
-		  			  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
+		  			  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 		  			  	   	 			,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i.index + 1}"
 					  		        </c:forEach>
 	  							],
 	  						    
 	  				   	colModel:[
-							{name:'answer',index:'userName', width:180}
-  			  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
+							{name:'option',index:'option', width:180}
+  			  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 			  	   	 			,{name:'choice${i.index}', index:'${i.index}choice', align:"center", sorttype:"int"}
 		  		        	</c:forEach>		
 	  				   	],
@@ -55,12 +55,12 @@
 	  				   	//caption: "<fmt:message key="label.monitoring.item.summary.group" /> ${summary.sessionName}"
 	  				});
 	  				
-	  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
+	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			answer:"${answer.qbOption.name}<c:if test='${answer.qbOption.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
+	  	   	     			option:"${optionDto.qbOption.name}<c:if test='${optionDto.qbOption.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
 	  	   	     			
-	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.answers)}">
-	  	   	     				,choice${j}:"${answer.attempts[j]}"
+	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)}">
+	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>
 	  	   	     			
 	  	   	   	   	    });

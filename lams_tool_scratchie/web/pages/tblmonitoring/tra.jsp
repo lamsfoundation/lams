@@ -86,13 +86,13 @@
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<tbody>
-						<c:forEach var="answer" items="${item.answers}" varStatus="j">
+						<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
 							<tr>
 								<td width="5px">
 									${ALPHABET[j.index]}.
 								</td>
 								<td>
-									<c:out value="${answer.qbOption.name}" escapeXml="false"/>
+									<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
 								</td>
 							</tr>
 						</c:forEach>

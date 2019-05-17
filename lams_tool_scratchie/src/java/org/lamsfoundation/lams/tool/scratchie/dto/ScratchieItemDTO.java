@@ -3,8 +3,6 @@ package org.lamsfoundation.lams.tool.scratchie.dto;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
-
 /**
  * ScratchieItem's DTO.
  *
@@ -14,18 +12,18 @@ public class ScratchieItemDTO implements Cloneable {
 
     private Long uid;
     private String title;
-    private List<ScratchieAnswer> answers;
+    private List<QbOptionDTO> optionDtos;
     private boolean unraveledOnFirstAttempt;
     private int userMark;
     private int userAttempts;
-    //sequence of answers selected by user in the form of "X, Y, Z"
-    private String answersSequence;
+    //sequence of optionDtos selected by user in the form of "X, Y, Z"
+    private String optionsSequence;
 
     /**
      * Default contruction method.
      */
     public ScratchieItemDTO() {
-	answers = new LinkedList<>();
+	optionDtos = new LinkedList<>();
     }
 
     // **********************************************************
@@ -47,12 +45,12 @@ public class ScratchieItemDTO implements Cloneable {
 	this.title = title;
     }
 
-    public List<ScratchieAnswer> getAnswers() {
-	return answers;
+    public List<QbOptionDTO> getOptionDtos() {
+	return optionDtos;
     }
 
-    public void setAnswers(List<ScratchieAnswer> answers) {
-	this.answers = answers;
+    public void setOptionDtos(List<QbOptionDTO> optionDtos) {
+	this.optionDtos = optionDtos;
     }
 
     public boolean isUnraveledOnFirstAttempt() {
@@ -80,17 +78,17 @@ public class ScratchieItemDTO implements Cloneable {
     }
 
     /**
-     * @return sequence of answers selected by user in the form of "X, Y, Z"
+     * @return sequence of optionDtos selected by user in the form of "X, Y, Z"
      */
-    public String getAnswersSequence() {
-	return answersSequence;
+    public String getOptionsSequence() {
+	return optionsSequence;
     }
 
     /**
-     * @param answersSequence
-     *            sequence of answers selected by user in the form of "X, Y, Z"
+     * @param optionsSequence
+     *            sequence of optionDtos selected by user in the form of "X, Y, Z"
      */
-    public void setAnswersSequence(String answersSequence) {
-	this.answersSequence = answersSequence;
+    public void setOptionsSequence(String optionsSequence) {
+	this.optionsSequence = optionsSequence;
     }
 }

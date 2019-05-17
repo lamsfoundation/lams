@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
 public interface ScratchieAnswerVisitDAO extends DAO {
 
-    ScratchieAnswerVisitLog getLog(Long answerUid, Long itemUid, Long sessionId);
+    ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId);
 
     int getLogCountTotal(Long sessionId);
 

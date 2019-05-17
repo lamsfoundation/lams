@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
 
-    private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
+    private static final String FIND_BY_SESSION_AND_OPTION = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.qbToolQuestion.uid = ?";
 
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
@@ -46,8 +46,8 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=?";
 
     @Override
-    public ScratchieAnswerVisitLog getLog(Long answerUid, Long itemUid, Long sessionId) {
-	List list = doFind(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, itemUid, answerUid });
+    public ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId) {
+	List list = doFind(FIND_BY_SESSION_AND_OPTION, new Object[] { sessionId, itemUid, optionUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}

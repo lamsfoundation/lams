@@ -82,10 +82,10 @@
 			return;
 		}
 		
-		$.each(input, function(itemUid, answers) {
-			$.each(answers, function(answerUid, isCorrect){
+		$.each(input, function(itemUid, options) {
+			$.each(options, function(optionUid, isCorrect){
 				// only updates come via websockets
-				scratchImage(itemUid, answerUid, isCorrect);
+				scratchImage(itemUid, optionUid, isCorrect);
 			});
 		});
 	};
