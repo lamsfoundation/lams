@@ -85,4 +85,11 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	this.renameField(QuestionReference.class, "defaultGrade", "maxMark");
 	this.renameField(QuestionReference.class, "sequenceId", "displayOrder");
     }
+    
+    /**
+     * Import 20190110 version content to 20190517 version tool server.
+     */
+    public void up20190110To20190517() {
+	this.removeField(AssessmentQuestion.class, "questionHash");
+    }
 }

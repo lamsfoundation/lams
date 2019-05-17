@@ -415,12 +415,7 @@ public class AssessmentServiceImpl
 
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
-	for (AssessmentQuestion question : assessment.getQuestions()) {
-	    //update questions' hashes in case questions' titles or descriptions got changed
-	    String newHash = question.getQbQuestion().getDescription() == null ? null
-		    : HashUtil.sha1(question.getQbQuestion().getDescription());
-	    question.setQuestionHash(newHash);
-	    
+	for (AssessmentQuestion question : assessment.getQuestions()) {	    
 	    //update only in case QbQuestion was modified, to prevent updating the same QbQuestions received from SesssionMap
 	    if (question.getQbQuestionModified() != IQbService.QUESTION_MODIFIED_NONE) {
 		assessmentQuestionDao.saveObject(question.getQbQuestion());
@@ -434,12 +429,6 @@ public class AssessmentServiceImpl
 
     @Override
     public void updateAssessmentQuestion(AssessmentQuestion question) {
-	//update question's hash in case question's title or description got changed
-	String newHash = question.getQbQuestion().getDescription() == null ? null
-		: HashUtil.sha1(question.getQbQuestion().getDescription());
-	question.setQuestionHash(newHash);
-
-	//store object in DB
 	assessmentQuestionDao.update(question);
     }
 
@@ -2819,7 +2808,8 @@ public class AssessmentServiceImpl
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		QbQuestion qbQuestion = questionResult.getQbQuestion();
 
-		List<String> answers = new LinkedList<String>();
+		List<String> answers = new LinkedList<>();
+		List<Long> optionUids = new LinkedList<>();
 
 		if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 
@@ -2827,7 +2817,7 @@ public class AssessmentServiceImpl
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 			    if (optionAnswer.getAnswerBoolean()
 				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
-				answers.add(option.getName());
+				optionUids.add(option.getUid());
 			    }
 			}
 		    }
@@ -2854,15 +2844,25 @@ public class AssessmentServiceImpl
 
 		}
 
-		for (String answer : answers) {
+		for (Long optionUid : optionUids) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(userId.intValue());
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
-		    confidenceLevelDto.setQuestion(qbQuestion.getDescription());
-		    confidenceLevelDto.setAnswer(answer);
+		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+		    confidenceLevelDto.setQbOptionUid(optionUid);
 
 		    confidenceLevelDtos.add(confidenceLevelDto);
+		}
+		for (String answer : answers) {
+//		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+//		    confidenceLevelDto.setUserId(userId.intValue());
+//		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+//		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+//		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+//		    confidenceLevelDto.setQbOptionUid(optionUid);
+//
+//		    confidenceLevelDtos.add(confidenceLevelDto);
 		}
 	    }
 

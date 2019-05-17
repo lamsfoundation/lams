@@ -248,10 +248,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public void saveOrUpdateMcQueContent(McQueContent question) {
-	//update questions' hash
-	String newHash = question.getDescription() == null ? null : HashUtil.sha1(question.getDescription());
-	question.setQuestionHash(newHash);
-
 	mcQueContentDAO.insertOrUpdate(question.getQbQuestion());
 
 	for (QbOption option : question.getQbQuestion().getQbOptions()) {
@@ -327,7 +323,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    // in case questionDescription doesn't exist
 	    if (question == null) {
-		question = new McQueContent(qbQuestion, null, new Integer(displayOrder), content);
+		question = new McQueContent(qbQuestion, displayOrder, content);
 
 		// adding a new questionDescription to content
 		content.getMcQueContents().add(question);
@@ -335,7 +331,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 		// in case questionDescription exists already
 	    } else {
-		question.setDisplayOrder(new Integer(displayOrder));
+		question.setDisplayOrder(displayOrder);
 		// this is needed, if we took the clone as the new questionDescription
 		question.setQbQuestion(qbQuestion);
 	    }
@@ -1612,16 +1608,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
 	    Long userId = userAttempt.getMcQueUsr().getQueUsrId();
 
-	    //fill in questionDescription's and user answer's hashes
-	    McQueContent question = userAttempt.getMcQueContent();
-	    String answer = userAttempt.getQbOption().getName();
-
+	    //fill in question and option uids
 	    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 	    confidenceLevelDto.setUserId(userId.intValue());
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
-	    confidenceLevelDto.setQuestion(question.getDescription());
-	    confidenceLevelDto.setAnswer(answer);
+	    McQueContent question = userAttempt.getMcQueContent();
+	    confidenceLevelDto.setQbQuestionUid(question.getUid());
+	    confidenceLevelDto.setQbOptionUid(userAttempt.getQbOption().getUid());
 
 	    confidenceLevelDtos.add(confidenceLevelDto);
 	}
@@ -2020,8 +2014,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setMaxMark(1);
-	    McQueContent question = new McQueContent(qbQuestion, null,
-		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
+	    McQueContent question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
+		    mcq);
 
 	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 	    for (JsonNode optionData : optionsData) {

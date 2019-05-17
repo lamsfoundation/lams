@@ -8,9 +8,9 @@ public class ConfidenceLevelDTO {
 
     private int level;
     
-    private String question;
+    private Long qbQuestionUid;
     
-    private String answer;
+    private Long qbOptionUid;
     
     /**
      */
@@ -44,21 +44,21 @@ public class ConfidenceLevelDTO {
     
     /**
      */
-    public void setQuestion(String question) {
-	this.question = question;
+    public void setQbQuestionUid(Long qbQuestionUid) {
+	this.qbQuestionUid = qbQuestionUid;
     }
 
-    public String getQuestion() {
-	return this.question;
+    public Long getQbQuestionUid() {
+	return this.qbQuestionUid;
     }
     
     /**
      */
-    public void setAnswer(String answer) {
-	this.answer = answer;
+    public void setQbOptionUid(Long qbOptionUid) {
+	this.qbOptionUid = qbOptionUid;
     }
 
-    public String getAnswer() {
-	return this.answer;
+    public Long getQbOptionUid() {
+	return this.qbOptionUid;
     }
 }
