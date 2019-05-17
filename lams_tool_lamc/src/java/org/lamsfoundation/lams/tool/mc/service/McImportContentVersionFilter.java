@@ -57,4 +57,11 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
     public void up20170101To20181202() {
 	this.renameClass("org.lamsfoundation.lams.tool.mc.pojos.", "org.lamsfoundation.lams.tool.mc.model.");
     }
+    
+    /**
+     * Import 20190110 version content to 20190517 version tool server.
+     */
+    public void up20181202To20190517() {
+	this.removeField(McQueContent.class, "questionHash");
+    }
 }

@@ -415,12 +415,7 @@ public class AssessmentServiceImpl
 
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
-	for (AssessmentQuestion question : assessment.getQuestions()) {
-	    //update questions' hashes in case questions' titles or descriptions got changed
-	    String newHash = question.getQbQuestion().getDescription() == null ? null
-		    : HashUtil.sha1(question.getQbQuestion().getDescription());
-	    question.setQuestionHash(newHash);
-	    
+	for (AssessmentQuestion question : assessment.getQuestions()) {	    
 	    //update only in case QbQuestion was modified, to prevent updating the same QbQuestions received from SesssionMap
 	    if (question.getQbQuestionModified() != IQbService.QUESTION_MODIFIED_NONE) {
 		assessmentQuestionDao.saveObject(question.getQbQuestion());
@@ -434,12 +429,6 @@ public class AssessmentServiceImpl
 
     @Override
     public void updateAssessmentQuestion(AssessmentQuestion question) {
-	//update question's hash in case question's title or description got changed
-	String newHash = question.getQbQuestion().getDescription() == null ? null
-		: HashUtil.sha1(question.getQbQuestion().getDescription());
-	question.setQuestionHash(newHash);
-
-	//store object in DB
 	assessmentQuestionDao.update(question);
     }
 

@@ -53,12 +53,6 @@ public class AssessmentQuestion extends QbToolQuestion
     private static final long serialVersionUID = -7767327140430305575L;
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
 
-    /**
-     * It stores sha1(question) value that allows us to search for the AssessmentQuestions with the same question
-     */
-    @Column(name = "question_hash")
-    private String questionHash;
-
     @Column(name = "correct_answers_disclosed")
     private boolean correctAnswersDisclosed;
 
@@ -131,17 +125,6 @@ public class AssessmentQuestion extends QbToolQuestion
 
     public void setUid(Long userID) {
 	this.uid = userID;
-    }
-
-    /**
-     * Returns sha1(question) value that allows us to search for the AssessmentQuestions with the same question
-     */
-    public String getQuestionHash() {
-	return questionHash;
-    }
-
-    public void setQuestionHash(String questionHash) {
-	this.questionHash = questionHash;
     }
 
     public boolean isCorrectAnswersDisclosed() {

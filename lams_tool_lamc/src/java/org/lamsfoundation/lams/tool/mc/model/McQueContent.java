@@ -53,12 +53,6 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 public class McQueContent extends QbToolQuestion implements Serializable, Comparable<McQueContent> {
     private static final long serialVersionUID = 4022287106119453962L;
 
-    /**
-     * It stores sha1(questionDescription) value that allows us to search for the McQueContentc with the same questionDescription
-     */
-    @Column(name = "question_hash")
-    private String questionHash;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mc_content_id")
     private McContent mcContent;
@@ -67,9 +61,8 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
     @Transient
     private String escapedDescription;
 
-    public McQueContent(QbQuestion qbQuestion, String questionHash, Integer displayOrder, McContent mcContent) {
+    public McQueContent(QbQuestion qbQuestion, Integer displayOrder, McContent mcContent) {
 	this.qbQuestion = qbQuestion;
-	this.questionHash = questionHash;
 	this.displayOrder = displayOrder;
 	setMcContent(mcContent);
     }
@@ -87,8 +80,8 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      * @return the new qa questionDescription content object
      */
     public static McQueContent newInstance(McQueContent question, McContent newMcContent) {
-	McQueContent newQueContent = new McQueContent(question.getQbQuestion(), question.getQuestionHash(),
-		question.getDisplayOrder(), newMcContent);
+	McQueContent newQueContent = new McQueContent(question.getQbQuestion(), question.getDisplayOrder(),
+		newMcContent);
 	return newQueContent;
     }
     
@@ -106,17 +99,6 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 
     public void setDescription(String description) {
 	this.qbQuestion.setDescription(description);
-    }
-
-    /**
-     * Returns sha1(questionDescription) value that allows us to search for the McQueContent with the same questionDescription
-     */
-    public String getQuestionHash() {
-	return questionHash;
-    }
-
-    public void setQuestionHash(String questionHash) {
-	this.questionHash = questionHash;
     }
 
     public McContent getMcContent() {
