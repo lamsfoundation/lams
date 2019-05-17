@@ -293,18 +293,13 @@ public class ScratchieServiceImpl
 		optionDto.setConfidenceLevelDtos(confidenceLevelDtosTemp);
 	    }
 
-	    //Assessment (similar with Scratchie) adds '\n' at the end of question, MCQ - '\r\n'
-	    String question = item.getQbQuestion().getDescription() == null ? ""
-		    : item.getQbQuestion().getDescription().replaceAll("(\\r|\\n)", "");
-
-	    //find according confidenceLevelDto
+	    //find according QbQuestion
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
-		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
+		if (item.getQbQuestion().getUid().equals(confidenceLevelDto.getQbQuestionUid())) {
 
 		    //find according option
 		    for (QbOptionDTO option : item.getOptionDtos()) {
-			String optionText = option.getQbOption().getName().replaceAll("(\\r|\\n)", "");
-			if (optionText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
+			if (option.getQbOption().getUid().equals(confidenceLevelDto.getQbOptionUid())) {
 			    option.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }

@@ -2808,7 +2808,8 @@ public class AssessmentServiceImpl
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		QbQuestion qbQuestion = questionResult.getQbQuestion();
 
-		List<String> answers = new LinkedList<String>();
+		List<String> answers = new LinkedList<>();
+		List<Long> optionUids = new LinkedList<>();
 
 		if (qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
 
@@ -2816,7 +2817,7 @@ public class AssessmentServiceImpl
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 			    if (optionAnswer.getAnswerBoolean()
 				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
-				answers.add(option.getName());
+				optionUids.add(option.getUid());
 			    }
 			}
 		    }
@@ -2843,15 +2844,25 @@ public class AssessmentServiceImpl
 
 		}
 
-		for (String answer : answers) {
+		for (Long optionUid : optionUids) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(userId.intValue());
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
-		    confidenceLevelDto.setQuestion(qbQuestion.getDescription());
-		    confidenceLevelDto.setAnswer(answer);
+		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+		    confidenceLevelDto.setQbOptionUid(optionUid);
 
 		    confidenceLevelDtos.add(confidenceLevelDto);
+		}
+		for (String answer : answers) {
+//		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+//		    confidenceLevelDto.setUserId(userId.intValue());
+//		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+//		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+//		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
+//		    confidenceLevelDto.setQbOptionUid(optionUid);
+//
+//		    confidenceLevelDtos.add(confidenceLevelDto);
 		}
 	    }
 
