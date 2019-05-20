@@ -120,7 +120,7 @@ INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
 		'MCQ question', mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(question) AS question,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM question))) AS question,
 				 mark AS max_mark,
 				 IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback,
 				 mc_content_id
@@ -149,7 +149,7 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
 								  
 -- fill table with options matching unique QB questions inserted above
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
-	SELECT q.uid, o.displayOrder, TRIM(o.mc_que_option_text), o.correct_option
+	SELECT q.uid, o.displayOrder, TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.mc_que_option_text))), o.correct_option
 	FROM tl_lamc11_options_content AS o
 	JOIN lams_qb_question AS q
 		ON o.mc_que_content_id = q.tmp_question_id
@@ -194,7 +194,8 @@ UPDATE tl_lascrt11_scratchie_item SET uid = uid + @max_tool_question_id ORDER BY
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(q.title), TRIM(o.description) ORDER BY o.order_id)
+		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))),
+		   				TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.description))) ORDER BY o.order_id)
 	FROM tl_lascrt11_scratchie_item AS q
 	JOIN tl_lascrt11_scratchie_answer AS o
 		ON q.uid = o.scratchie_item_uid
@@ -204,7 +205,7 @@ INSERT INTO tmp_question
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 						      content TEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(TRIM(q.name), TRIM(o.name) ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
@@ -231,8 +232,8 @@ INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
 		sq.question, sq.description, NULL, NULL, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(title) AS question,
-				 TRIM(description) AS description,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM title))) AS question,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM description))) AS description,
 				 create_date
 		  FROM tl_lascrt11_scratchie_item) AS sq
 	JOIN (SELECT DISTINCT target_uid FROM tmp_question_match) AS q
@@ -286,7 +287,7 @@ DROP TABLE tmp_scratchie_answer;
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
-	SELECT q.uid, o.order_id, TRIM(o.description), o.correct
+	SELECT q.uid, o.order_id, TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.description))), o.correct
 	FROM tl_lascrt11_scratchie_answer AS o
 	JOIN lams_qb_question AS q
 		ON o.scratchie_item_uid = q.tmp_question_id
@@ -341,7 +342,8 @@ UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORD
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(q.title), TRIM(o.option_string) ORDER BY o.sequence_id)
+		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))), 
+		   				TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.option_string))) ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
@@ -351,7 +353,7 @@ INSERT INTO tmp_question
 -- create a similar mapping for existing questions in QB
 INSERT INTO tmp_qb_question
 	SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(TRIM(q.name), TRIM(o.name) ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
@@ -386,8 +388,9 @@ DELETE FROM tmp_question;
 
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(q.title), ''), q.correct_answer,
-						IFNULL(CONCAT(IFNULL(TRIM(o.question), ''), IFNULL(TRIM(o.option_string), ''), o.option_float, o.correct), '') 
+		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))), ''), q.correct_answer,
+						IFNULL(CONCAT(IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.question))), ''), 
+						IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.option_string))), ''), o.option_float, o.correct), '') 
 						ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	LEFT JOIN tl_laasse10_question_option AS o
@@ -412,18 +415,19 @@ INSERT INTO lams_qb_question SELECT NULL, 0, aq.question_type, @question_id:=@qu
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
 				aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(title) AS question,
-				 TRIM(question) AS description,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM title))) AS question,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM question))) AS description,
 				 default_grade AS max_mark,
 				 question_type,
-				 IF(TRIM(general_feedback) = '', NULL, TRIM(general_feedback)) AS feedback,
+				 IF(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM general_feedback)))= '', 
+				 	NULL, TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM general_feedback)))) AS feedback,
 				 penalty_factor,
 				 answer_required,
 				 multiple_answers_allowed,
 				 incorrect_answer_nullifies_mark,
-				 TRIM(feedback_on_correct) AS feedback_on_correct,
-				 TRIM(feedback_on_partially_correct) AS feedback_on_partially_correct,
-				 TRIM(feedback_on_incorrect) AS feedback_on_incorrect,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM feedback_on_correct))) AS feedback_on_correct,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM feedback_on_partially_correct))) AS feedback_on_partially_correct,
+				 TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM feedback_on_incorrect))) AS feedback_on_incorrect,
 				 shuffle,
 				 prefix_answers_with_letters,
 				 case_sensitive,
@@ -479,7 +483,8 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, IFNULL(TRIM(o.option_string), ''), o.correct, o.question, o.option_float, o.grade, o.accepted_error, o.feedback
+	SELECT q.uid, o.sequence_id, IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.option_string))), ''), o.correct, o.question, o.option_float,
+		   o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
 		ON o.question_uid = q.tmp_question_id
