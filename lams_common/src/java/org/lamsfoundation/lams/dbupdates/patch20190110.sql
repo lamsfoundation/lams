@@ -194,7 +194,7 @@ UPDATE tl_lascrt11_scratchie_item SET uid = uid + @max_tool_question_id ORDER BY
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))),
+		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.description))),
 		   				TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.description))) ORDER BY o.order_id)
 	FROM tl_lascrt11_scratchie_item AS q
 	JOIN tl_lascrt11_scratchie_answer AS o
@@ -205,11 +205,10 @@ INSERT INTO tmp_question
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 						      content TEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.description, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
-	WHERE q.type = 1
 	GROUP BY q.uid;
 	
 ALTER TABLE tmp_qb_question ADD INDEX (content(500));
@@ -342,7 +341,7 @@ UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORD
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))), 
+		   GROUP_CONCAT(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.question))), 
 		   				TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.option_string))) ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	JOIN tl_laasse10_question_option AS o
@@ -353,11 +352,10 @@ INSERT INTO tmp_question
 -- create a similar mapping for existing questions in QB
 INSERT INTO tmp_qb_question
 	SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.description, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
-	WHERE q.type = 1
 	GROUP BY q.uid;
 	
 -- set up references to QB question UIDs for existing questions
@@ -388,7 +386,7 @@ DELETE FROM tmp_question;
 
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.title))), ''), q.correct_answer,
+		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM q.question))), ''), q.correct_answer,
 						IFNULL(CONCAT(IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.question))), ''), 
 						IFNULL(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM o.option_string))), ''), o.option_float, o.correct), '') 
 						ORDER BY o.sequence_id)
