@@ -93,7 +93,7 @@ SET group_concat_max_len = 100000;
 -- create a mapping of MCQ question UID -> its question text + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
-						   content TEXT)
+						   content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
 			  GROUP_CONCAT(TRIM(question), TRIM(mc_que_option_text) ORDER BY displayOrder) AS content		  
 	FROM tl_lamc11_que_content AS q
@@ -203,7 +203,7 @@ INSERT INTO tmp_question
 	
 -- create a similar mapping for existing questions in QB
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
-						      content TEXT)
+						      content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
 			  GROUP_CONCAT(q.description, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
