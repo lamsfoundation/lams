@@ -89,13 +89,16 @@ SET group_concat_max_len = 100000;
 
 -- MULTIPLE CHOICE (MCQ)
 
+-- remove characters that prevent detecting identical questions
+UPDATE tl_lamc11_que_content SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_lamc11_options_content SET `mc_que_option_text` = TRIM(REPLACE(REPLACE(REPLACE(mc_que_option_text, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
 
 -- create a mapping of MCQ question UID -> its question text + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 						   content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(TRIM(REPLACE(REPLACE(question, '\r', ''), '\n', '')), TRIM(REPLACE(REPLACE(mc_que_option_text, '\r', ''), '\n', '')) ORDER BY displayOrder) AS content		  
+			  GROUP_CONCAT(question, mc_que_option_text ORDER BY displayOrder) AS content		  
 	FROM tl_lamc11_que_content AS q
 	JOIN tl_lamc11_options_content AS o ON q.uid = o.mc_que_content_id
 	GROUP BY q.uid;
@@ -120,7 +123,7 @@ INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
 		'MCQ question', mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(REPLACE(REPLACE(question, '\r', ''), '\n', '')) AS question,
+				 question AS question,
 				 mark AS max_mark,
 				 IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback,
 				 mc_content_id
@@ -149,7 +152,7 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
 								  
 -- fill table with options matching unique QB questions inserted above
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
-	SELECT q.uid, o.displayOrder, TRIM(REPLACE(REPLACE(o.mc_que_option_text, '\r', ''), '\n', '')), o.correct_option
+	SELECT q.uid, o.displayOrder, o.mc_que_option_text, o.correct_option
 	FROM tl_lamc11_options_content AS o
 	JOIN lams_qb_question AS q
 		ON o.mc_que_content_id = q.tmp_question_id
@@ -185,6 +188,11 @@ DELETE FROM tmp_question_match;
 -- SCRATCHIE
 
 
+-- remove characters that prevent detecting identical questions
+UPDATE tl_lascrt11_scratchie_item SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_lascrt11_scratchie_item SET `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_lascrt11_scratchie_answer SET `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+
 -- shift Scratchie question UIDs by offset equal to existing UIDs of MCQ in lams_qb_tool_question 
 SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
 UPDATE tl_lascrt11_scratchie_item SET uid = uid + @max_tool_question_id ORDER BY uid DESC;
@@ -194,8 +202,7 @@ UPDATE tl_lascrt11_scratchie_item SET uid = uid + @max_tool_question_id ORDER BY
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(REPLACE(REPLACE(q.description, '\r', ''), '\n', '')),
-		   				TRIM(REPLACE(REPLACE(o.description, '\r', ''), '\n', '')) ORDER BY o.order_id)
+		   GROUP_CONCAT(q.description, o.description ORDER BY o.order_id)
 	FROM tl_lascrt11_scratchie_item AS q
 	JOIN tl_lascrt11_scratchie_answer AS o
 		ON q.uid = o.scratchie_item_uid
@@ -231,8 +238,8 @@ INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
 		sq.question, sq.description, NULL, NULL, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(REPLACE(REPLACE(title, '\r', ''), '\n', '')) AS question,
-				 TRIM(REPLACE(REPLACE(description, '\r', ''), '\n', '')) AS description,
+				 title AS question,
+				 description AS description,
 				 create_date
 		  FROM tl_lascrt11_scratchie_item) AS sq
 	JOIN (SELECT DISTINCT target_uid FROM tmp_question_match) AS q
@@ -286,7 +293,7 @@ DROP TABLE tmp_scratchie_answer;
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
-	SELECT q.uid, o.order_id, TRIM(REPLACE(REPLACE(o.description, '\r', ''), '\n', '')), o.correct
+	SELECT q.uid, o.order_id, o.description, o.correct
 	FROM tl_lascrt11_scratchie_answer AS o
 	JOIN lams_qb_question AS q
 		ON o.scratchie_item_uid = q.tmp_question_id
@@ -331,6 +338,13 @@ DELETE FROM tmp_qb_question;
 -- ASSESSMENT
 
 
+-- remove characters that prevent detecting identical questions
+UPDATE tl_laasse10_assessment_question SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_laasse10_assessment_question SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_laasse10_question_option SET `option_string` = TRIM(REPLACE(REPLACE(REPLACE(option_string, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_laasse10_question_option SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_laasse10_question_result SET `answer_string` = TRIM(REPLACE(REPLACE(REPLACE(answer_string, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+
 -- shift Assessment question UIDs by offset equal to existing UIDs of MCQ adn Scratchie in lams_qb_tool_question 
 SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
 UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORDER BY uid DESC;
@@ -341,8 +355,7 @@ UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORD
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(TRIM(REPLACE(REPLACE(q.question, '\r', ''), '\n', '')), 
-		   				TRIM(REPLACE(REPLACE(o.option_string, '\r', ''), '\n', '')) ORDER BY o.sequence_id)
+		   GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
@@ -386,10 +399,8 @@ DELETE FROM tmp_question;
 
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question_type, IFNULL(TRIM(REPLACE(REPLACE(q.question, '\r', ''), '\n', '')), ''), q.correct_answer,
-						IFNULL(CONCAT(IFNULL(TRIM(REPLACE(REPLACE(o.question, '\r', ''), '\n', '')), ''), 
-						IFNULL(TRIM(REPLACE(REPLACE(o.option_string, '\r', ''), '\n', '')), ''), o.option_float, o.correct), '') 
-						ORDER BY o.sequence_id)
+		   GROUP_CONCAT(q.question_type, IFNULL(q.question, ''), q.correct_answer,
+						IFNULL(CONCAT(IFNULL(o.question, ''), IFNULL(o.option_string, ''), o.option_float, o.correct), '') ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	LEFT JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
@@ -413,8 +424,8 @@ INSERT INTO lams_qb_question SELECT NULL, 0, aq.question_type, @question_id:=@qu
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
 				aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(REPLACE(REPLACE(title, '\r', ''), '\n', '')) AS question,
-				 TRIM(REPLACE(REPLACE(question, '\r', ''), '\n', '')) AS description,
+				 title AS question,
+				 question AS description,
 				 default_grade AS max_mark,
 				 question_type,
 				 IF(TRIM(TRIM(BOTH '\r' FROM TRIM(BOTH '\n' FROM general_feedback)))= '', 
@@ -481,7 +492,7 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, IFNULL(TRIM(REPLACE(REPLACE(o.option_string, '\r', ''), '\n', '')), ''), o.correct, o.question, o.option_float,
+	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct, o.question, o.option_float,
 		   o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
