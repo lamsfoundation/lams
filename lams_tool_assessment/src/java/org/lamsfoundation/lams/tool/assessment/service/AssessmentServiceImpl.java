@@ -2823,7 +2823,7 @@ public class AssessmentServiceImpl
 	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
 	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
 		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
-	    Long userId = assessmentResult.getUser().getUserId();
+	    AssessmentUser user = assessmentResult.getUser();
 
 	    //fill in question's and user answer's hashes
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
@@ -2866,7 +2866,11 @@ public class AssessmentServiceImpl
 
 		for (String answer : answers) {
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-		    confidenceLevelDto.setUserId(userId.intValue());
+		    confidenceLevelDto.setUserId(user.getUserId().intValue());
+		    String userName = StringUtils.isBlank(user.getFirstName())
+			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+				    : user.getFirstName() + " " + user.getLastName();
+		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setQuestion(question.getQuestion());
