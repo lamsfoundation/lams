@@ -2145,7 +2145,6 @@ public class ScratchieServiceImpl
 	if ((session == null) || (session.getScratchie() == null)) {
 	    return;
 	}
-	Scratchie scratchie = session.getScratchie();
 
 	// as long as leader aware feature is always ON - copy answers from leader to non-leader user
 

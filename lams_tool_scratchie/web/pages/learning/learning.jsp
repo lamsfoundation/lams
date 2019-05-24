@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+<c:set var="tool"><lams:WebAppURL/></c:set>
+<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -18,51 +18,41 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+
+	<!-- ********************  CSS ********************** -->
+	<lams:css />
+	<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<style type="text/css">
-		.burning-question-container {
-			padding: 0 15px;
-		}
-		.answer-description {
-			margin-right: 20px;
-		}
-		.answer-with-confidence-level-portrait {
-			display: flex;
-			flex-wrap: wrap;
-   			align-items: center;
-		}
-		.c100.small {
-			font-size: 41px;
-			margin-right: 5px;
-			margin-bottom: 23px;
-		}
-		.confidence-level-percentage {
-			font-size: 13px;
-		    margin-top: 43px;
-		    text-align: center;
-		}
-		.lead {
-			margin-top: 30px;
-		}
-		[data-toggle="collapse"].collapsed .if-not-collapsed {
-		  display: none;
-		}
-		[data-toggle="collapse"]:not(.collapsed) .if-collapsed {
-		  display: none;
-		}
+
 	</style>
 
+	<!-- ********************  javascript ********************** -->
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script>
+		//Resolve name collision between jQuery UI and Twitter Bootstrap
+		$.widget.bridge('uitooltip', $.ui.tooltip);
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
+
+		$(document).ready(function(){
+			//initialize tooltips showing user names next to confidence levels
+			$('[data-toggle="tooltip"]').tooltip();
+		});
+	
 		function scratchImage(itemUid, answerUid, isCorrect) {
 			// first show animation, then put static image
 			var imageSuffix = isCorrect ? 'correct' : 'wrong';
