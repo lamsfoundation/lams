@@ -1,4 +1,4 @@
-<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
+<c:forEach var="item" items="${sessionMap.itemList}">
 	<div class="lead">
         <a name="${item.title}" style="text-decoration:none;color:black"><c:out value="${item.title}" escapeXml="true" /></a>
 	</div>
@@ -41,22 +41,20 @@
 					</c:if>
 				</td>
 
-				<td 
+				<td
 					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
 				>
 					<div class="answer-description">
 						<c:out value="${answer.description}" escapeXml="false" />
 					</div>
 					
-					<c:if test="${scratchie.confidenceLevelsActivityUiid != null}">
+					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">
+						<hr class="hr-confidence-level" />
+					
 						<div>
-							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}" varStatus="status">
-							
-								<div class="c100 p${confidenceLevelDto.level}0 small" style="">
-									<div class="confidence-level-username" style="">
-										${confidenceLevelDto.userName}
-									</div>
-								
+							<c:forEach var="confidenceLevelDto" items="${answer.confidenceLevelDtos}">
+
+								<div class="c100 p${confidenceLevelDto.level}0 small" data-toggle="tooltip" data-placement="top" title="${confidenceLevelDto.userName}">
 									<span>
 										<c:choose>
 											<c:when test="${confidenceLevelDto.portraitUuid == null}">
