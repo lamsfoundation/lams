@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.dao.hibernate;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,6 +27,20 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.qbToolQuestion.uid = :qbToolQuestionUid GROUP BY a.qbOption.uid";
     private static final String FIND_ANSWER_STATS_BY_ACTIVITY = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a, "
 	    + " ToolActivity AS act WHERE a.qbToolQuestion.toolContentId = act.toolContentId AND act.activityId = :activityId GROUP BY a.qbOption.uid";
+    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id), "
+	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
+	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
+	    + "JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
+	    + "LEFT JOIN tl_lamc11_usr_attempt AS mca ON a.answer_uid = mca.uid "
+	    + "LEFT JOIN tl_lamc11_que_usr AS mcu ON mca.que_usr_id = mcu.uid "
+	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
+	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id "
+	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "
+	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
+	    + "LEFT JOIN tl_laasse10_question_result AS aq ON a.answer_uid = aq.uid "
+	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid "
+	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid "
+	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid HAVING opt IS NOT NULL";
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
 	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
@@ -193,6 +208,18 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	Map<Long, Long> map = new HashMap<>(result.size());
 	for (Object[] answerStat : result) {
 	    map.put((Long) answerStat[0], (Long) answerStat[1]);
+	}
+	return map;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid) {
+	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWERS_BY_ACTIVITY)
+		.setParameter("activityId", activityId).setParameter("qbQuestionUid", qbQuestionUid).list();
+	Map<Integer, Long> map = new HashMap<>(result.size());
+	for (Object[] answerStat : result) {
+	    map.put(((BigInteger) answerStat[0]).intValue(), ((BigInteger) answerStat[1]).longValue());
 	}
 	return map;
     }

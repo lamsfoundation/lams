@@ -524,6 +524,13 @@ UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND o.question_uid = tq.tool_question_uid;
 		
+UPDATE tl_laasse10_option_answer AS sa, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
+	SET sa.question_option_uid = qo.uid
+	WHERE   o.sequence_id = qo.display_order
+		AND sa.question_option_uid = o.uid
+		AND qo.qb_question_uid = tq.qb_question_uid
+		AND o.question_uid = tq.tool_question_uid;
+		
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
 	SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;

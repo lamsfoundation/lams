@@ -1,10 +1,10 @@
 package org.lamsfoundation.lams.qb.service;
 
-import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import java.util.List;
 
+import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
-
 
 public interface IQbService {
 
@@ -18,13 +18,15 @@ public interface IQbService {
     static final int QUESTION_MODIFIED_VERSION_BUMP = 2;
     // it is a new question
     static final int QUESTION_MODIFIED_ID_BUMP = 3;
-    
+
+    static final double STATS_TOP_BOTTOM_GROUP_SIZE = 0.27;
+
     /**
      * @param qbQuestionUid
      * @return QbQuestion object with the specified uid
      */
     QbQuestion getQbQuestionByUid(Long qbQuestionUid);
-    
+
     /**
      * @param questionId
      * @return questions sharing the same questionId
@@ -37,10 +39,14 @@ public interface IQbService {
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);
 
-    QbStatsDTO getStats(long qbQuestionUid);
-    
-    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
-    
+    QbStatsDTO getQbQuestionStats(long qbQuestionUid);
+
+    QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);
+
+    QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Long correctOptionUid);
+
+    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
+
     int getCountQbQuestions(Integer questionType, String searchString);
 }

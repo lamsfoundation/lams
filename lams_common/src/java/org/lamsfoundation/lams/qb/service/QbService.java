@@ -1,14 +1,20 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
-import org.lamsfoundation.lams.qb.dto.QbStatsDTO.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -20,12 +26,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class QbService implements IQbService {
 
     private IQbDAO qbDAO;
-    
+
+    private IGradebookService gradebookService;
+
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
 	return qbDAO.getQbQuestionByUid(qbQuestionUid);
     }
-    
+
     @Override
     public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
 	return qbDAO.getQbQuestionsByQuestionId(questionId);
@@ -40,20 +48,20 @@ public class QbService implements IQbService {
     public int getMaxQuestionVersion(Integer qbQuestionId) {
 	return qbDAO.getMaxQuestionVersion(qbQuestionId);
     }
-    
+
     @Override
     public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	return qbDAO.getPagedQbQuestions(questionType, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
     public int getCountQbQuestions(Integer questionType, String searchString) {
 	return qbDAO.getCountQbQuestions(questionType, searchString);
     }
 
     @Override
-    public QbStatsDTO getStats(long qbQuestionUid) {
+    public QbStatsDTO getQbQuestionStats(long qbQuestionUid) {
 	QbStatsDTO stats = new QbStatsDTO();
 	QbQuestion qbQuestion = (QbQuestion) qbDAO.find(QbQuestion.class, qbQuestionUid);
 	List<QbOption> qbOptions = qbQuestion.getQbOptions();
@@ -63,24 +71,18 @@ public class QbService implements IQbService {
 
 	List<ToolActivity> activities = qbDAO.getQuestionActivities(qbQuestionUid);
 	List<QbStatsActivityDTO> activityDTOs = new LinkedList<>();
+
+	Long correctOptionUid = null;
+	for (QbOption option : qbOptions) {
+	    if (option.isCorrect()) {
+		correctOptionUid = option.getUid();
+		break;
+	    }
+	}
 	// calculate correct answer average for each activity
 	for (ToolActivity activity : activities) {
-	    QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
-	    activityDTO.setActivity(activity);
-	    Map<Long, Long> activityAnswersRaw = qbDAO.getAnswerStatsForActivity(activity.getActivityId());
-	    double total = 0;
-	    long correctCount = 0;
-	    for (QbOption option : qbOptions) {
-		Long answerCount = activityAnswersRaw.get(option.getUid());
-		if (answerCount == null) {
-		    answerCount = 0L;
-		}
-		total += answerCount;
-		if (option.isCorrect()) {
-		    correctCount = answerCount;
-		}
-	    }
-	    activityDTO.setAverage(total == 0 ? null : Long.valueOf(Math.round(correctCount / total * 100)).intValue());
+	    QbStatsActivityDTO activityDTO = getActivityStats(activity.getActivityId(), qbQuestionUid,
+		    correctOptionUid);
 	    activityDTOs.add(activityDTO);
 	}
 	stats.setActivities(activityDTOs);
@@ -114,7 +116,102 @@ public class QbService implements IQbService {
 	return stats;
     }
 
+    @Override
+    public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid) {
+	QbQuestion qbQuestion = (QbQuestion) qbDAO.find(QbQuestion.class, qbQuestionUid);
+	for (QbOption option : qbQuestion.getQbOptions()) {
+	    if (option.isCorrect()) {
+		return getActivityStats(activityId, qbQuestionUid, option.getUid());
+	    }
+	}
+	return null;
+    }
+
+    @Override
+    public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Long correctOptionUid) {
+	ToolActivity activity = (ToolActivity) qbDAO.find(ToolActivity.class, activityId);
+	Long lessonId = activity.getLearningDesign().getLessons().iterator().next().getLessonId();
+	List<GradebookUserLesson> userLessonGrades = gradebookService.getGradebookUserLesson(lessonId);
+	int participantCount = userLessonGrades.size();
+
+	QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
+	activityDTO.setActivity(activity);
+	activityDTO.setParticipantCount(participantCount);
+
+	// if there is only 1 participant, there is no point in calculating question indexes
+	if (participantCount > 1) {
+	    // mapping of user ID -> option UID
+	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivity(activity.getActivityId(), qbQuestionUid);
+	    // see who answered correctly
+	    Set<Integer> correctUserIds = new HashSet<>();
+	    for (Entry<Integer, Long> answer : activityAnswers.entrySet()) {
+		Integer userId = answer.getKey();
+		Long optionUid = answer.getValue();
+		if (correctOptionUid.equals(optionUid)) {
+		    correctUserIds.add(userId);
+		}
+	    }
+
+	    int correctUserCount = correctUserIds.size();
+	    int incorrectUserCount = participantCount - correctUserCount;
+	    int topUsersCorrect = 0;
+	    int bottomUsersCorrect = 0;
+	    double allUserMarkSum = 0;
+	    double correctUserMarkSum = 0;
+	    double incorrectUserMarkSum = 0;
+
+	    // sort grades by highest mark
+	    Collections.sort(userLessonGrades, (a, b) -> a.getMark().compareTo(b.getMark()));
+	    // see how many learners should be in top/bottom 27% of the group
+	    int groupCount = (int) Math.ceil(STATS_TOP_BOTTOM_GROUP_SIZE * participantCount);
+
+	    // go through each grade and gather data for indexes
+	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
+		GradebookUserLesson grade = userLessonGrades.get(userIndex);
+		double mark = grade.getMark();
+		allUserMarkSum += mark;
+		boolean isCorrect = correctUserIds.contains(grade.getLearner().getUserId());
+		if (isCorrect) {
+		    correctUserMarkSum += mark;
+		    if (userIndex < groupCount) {
+			topUsersCorrect++;
+		    } else if (userIndex >= participantCount - groupCount) {
+			bottomUsersCorrect++;
+		    }
+		} else {
+		    incorrectUserMarkSum += mark;
+		}
+	    }
+
+	    // calculate standard deviation needed for point biserial
+	    double deviation = 0;
+	    double markAverage = allUserMarkSum / participantCount;
+	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
+		GradebookUserLesson grade = userLessonGrades.get(userIndex);
+		double mark = grade.getMark();
+		deviation += Math.pow(mark - markAverage, 2);
+	    }
+	    deviation = Math.sqrt(deviation / participantCount);
+
+	    activityDTO.setDifficultyIndex(participantCount == 0 ? null : (double) correctUserCount / participantCount);
+	    activityDTO.setDiscriminationIndex((double) (topUsersCorrect - bottomUsersCorrect) / groupCount);
+	    if (correctUserCount == 0 || incorrectUserCount == 0) {
+		activityDTO.setPointBiserial(0d);
+	    } else {
+		activityDTO.setPointBiserial(
+			(correctUserMarkSum / correctUserCount - incorrectUserMarkSum / incorrectUserCount) / deviation
+				* Math.sqrt(correctUserCount * incorrectUserCount / Math.pow(participantCount, 2)));
+	    }
+	}
+
+	return activityDTO;
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
+    }
+
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
     }
 }

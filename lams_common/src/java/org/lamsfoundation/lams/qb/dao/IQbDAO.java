@@ -37,6 +37,8 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<Long, Long> getAnswerStatsForActivity(long activityId);
 
+    Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid);
+
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
     List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,

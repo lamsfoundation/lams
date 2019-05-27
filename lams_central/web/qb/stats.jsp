@@ -186,7 +186,16 @@
 							Tool type
 						</th>
 						<th>
-							Average correct selection<br>(as first choice)
+							Test participant count
+						</th>
+						<th>
+							Difficulty index
+						</th>
+						<th>
+							Discrimination index
+						</th>
+						<th>
+							Point biserial
 						</th>
 					</tr>
 					<c:forEach var="activityDTO" items="${stats.activities}">
@@ -205,15 +214,21 @@
 								<c:out value="${activityDTO.activity.tool.toolDisplayName}" />
 							</td>
 							<td>
-								<c:choose>
-									<c:when test="${empty activityDTO.average}">
-										-
-									</c:when>
-									<c:otherwise>
-										<c:out value="${activityDTO.average}" />%
-									</c:otherwise>
-								</c:choose>
+								<c:out value="${activityDTO.participantCount}" />
 							</td>
+							<c:choose>
+								<c:when test="${activityDTO.participantCount < 2}">
+									<td>-</td>
+									<td>-</td>
+									<td>-</td>
+								</c:when>
+								<c:otherwise>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+									
+								</c:otherwise>
+							</c:choose>
 						</tr>
 					</c:forEach>
 			</table>
