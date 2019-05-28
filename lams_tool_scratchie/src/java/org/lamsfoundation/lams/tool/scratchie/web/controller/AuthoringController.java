@@ -241,17 +241,14 @@ public class AuthoringController {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
 	Scratchie scratchie = authoringForm.getScratchie();
 
 	// **********************************Get Scratchie PO*********************
 	Scratchie scratchiePO = scratchieService.getScratchieByContentId(authoringForm.getScratchie().getContentId());
 
-	Set<ScratchieItem> oldItems = null;
-
 	//allow using old and modified questions and references altogether
+	Set<ScratchieItem> oldItems = null;
 	if (mode.isTeacher()) {
 	    oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
 	}
@@ -316,6 +313,11 @@ public class AuthoringController {
 	}
 	scratchiePO.setScratchieItems(items);
 
+	// **********************************************
+	// finally persist scratchiePO again
+	scratchieService.saveOrUpdateScratchie(scratchiePO);
+	authoringForm.setScratchie(scratchiePO);
+
 	//recalculate results in case content is edited from monitoring
 	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
 	if (mode.isTeacher()) {
@@ -331,12 +333,6 @@ public class AuthoringController {
 		scratchieService.deleteScratchieItem(item.getUid());
 	    }
 	}
-
-	// **********************************************
-	// finally persist scratchiePO again
-	scratchieService.saveOrUpdateScratchie(scratchiePO);
-
-	authoringForm.setScratchie(scratchiePO);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
