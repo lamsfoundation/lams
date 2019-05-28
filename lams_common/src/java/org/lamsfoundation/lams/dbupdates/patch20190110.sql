@@ -492,7 +492,7 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct, o.question, o.option_float,
+	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct OR o.grade > 0, o.question, o.option_float,
 		   o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
