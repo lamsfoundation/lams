@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,17 +73,16 @@ public class QbService implements IQbService {
 	List<ToolActivity> activities = qbDAO.getQuestionActivities(qbQuestionUid);
 	List<QbStatsActivityDTO> activityDTOs = new LinkedList<>();
 
-	Long correctOptionUid = null;
+	Set<Long> correctOptionUids = new HashSet<>();
 	for (QbOption option : qbOptions) {
 	    if (option.isCorrect()) {
-		correctOptionUid = option.getUid();
-		break;
+		correctOptionUids.add(option.getUid());
 	    }
 	}
 	// calculate correct answer average for each activity
 	for (ToolActivity activity : activities) {
 	    QbStatsActivityDTO activityDTO = getActivityStats(activity.getActivityId(), qbQuestionUid,
-		    correctOptionUid);
+		    correctOptionUids);
 	    activityDTOs.add(activityDTO);
 	}
 	stats.setActivities(activityDTOs);
@@ -119,16 +119,18 @@ public class QbService implements IQbService {
     @Override
     public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid) {
 	QbQuestion qbQuestion = (QbQuestion) qbDAO.find(QbQuestion.class, qbQuestionUid);
+	Set<Long> correctOptionUids = new HashSet<>();
 	for (QbOption option : qbQuestion.getQbOptions()) {
 	    if (option.isCorrect()) {
-		return getActivityStats(activityId, qbQuestionUid, option.getUid());
+		correctOptionUids.add(option.getUid());
 	    }
 	}
-	return null;
+	return getActivityStats(activityId, qbQuestionUid, correctOptionUids);
     }
 
     @Override
-    public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Long correctOptionUid) {
+    public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid,
+	    Collection<Long> correctOptionUids) {
 	ToolActivity activity = (ToolActivity) qbDAO.find(ToolActivity.class, activityId);
 	Long lessonId = activity.getLearningDesign().getLessons().iterator().next().getLessonId();
 	List<GradebookUserLesson> userLessonGrades = gradebookService.getGradebookUserLesson(lessonId);
@@ -147,7 +149,7 @@ public class QbService implements IQbService {
 	    for (Entry<Integer, Long> answer : activityAnswers.entrySet()) {
 		Integer userId = answer.getKey();
 		Long optionUid = answer.getValue();
-		if (correctOptionUid.equals(optionUid)) {
+		if (correctOptionUids.contains(optionUid)) {
 		    correctUserIds.add(userId);
 		}
 	    }

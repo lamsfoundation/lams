@@ -21,12 +21,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE a.toolContentId = q.toolContentId AND a.learningDesign.lessons IS NOT EMPTY AND q.qbQuestion.uid = :qbQuestionUid";
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
-    private static final String FIND_ANSWER_STATS_BY_QB_QUESTION = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a "
-	    + "WHERE a.qbOption.qbQuestion.uid = :qbQuestionUid GROUP BY a.qbOption.uid";
-    private static final String FIND_ANSWER_STATS_BY_TOOL_QUESTION = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a "
-	    + "WHERE a.qbToolQuestion.uid = :qbToolQuestionUid GROUP BY a.qbOption.uid";
-    private static final String FIND_ANSWER_STATS_BY_ACTIVITY = "SELECT a.qbOption.uid, COUNT(a.uid) FROM QbToolAnswer AS a, "
-	    + " ToolActivity AS act WHERE a.qbToolQuestion.toolContentId = act.toolContentId AND act.activityId = :activityId GROUP BY a.qbOption.uid";
+    private static final String FIND_ANSWER_STATS_BY_QB_QUESTION = "SELECT COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt, COUNT(a.answer_uid) "
+	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
+	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
+	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id "
+	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "
+	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
+	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
     private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id), "
 	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
@@ -92,11 +93,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     @SuppressWarnings("unchecked")
     public Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid) {
-	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_QB_QUESTION)
+	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWER_STATS_BY_QB_QUESTION)
 		.setParameter("qbQuestionUid", qbQuestionUid).list();
 	Map<Long, Long> map = new HashMap<>(result.size());
 	for (Object[] answerStat : result) {
-	    map.put((Long) answerStat[0], (Long) answerStat[1]);
+	    map.put(((BigInteger) answerStat[0]).longValue(), ((BigInteger) answerStat[1]).longValue());
 	}
 	return map;
     }
@@ -186,30 +187,6 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	query.setParameter("searchString", searchString);
 	int result = ((Number) query.uniqueResult()).intValue();
 	return result;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map<Long, Long> geAnswerStatsForQbToolQuestion(long qbToolQuestionUid) {
-	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_TOOL_QUESTION)
-		.setParameter("qbToolQuestionUid", qbToolQuestionUid).list();
-	Map<Long, Long> map = new HashMap<>(result.size());
-	for (Object[] answerStat : result) {
-	    map.put((Long) answerStat[0], (Long) answerStat[1]);
-	}
-	return map;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map<Long, Long> getAnswerStatsForActivity(long activityId) {
-	List<Object[]> result = this.getSession().createQuery(FIND_ANSWER_STATS_BY_ACTIVITY)
-		.setParameter("activityId", activityId).list();
-	Map<Long, Long> map = new HashMap<>(result.size());
-	for (Object[] answerStat : result) {
-	    map.put((Long) answerStat[0], (Long) answerStat[1]);
-	}
-	return map;
     }
 
     @Override

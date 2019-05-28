@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
@@ -43,7 +44,7 @@ public interface IQbService {
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);
 
-    QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Long correctOptionUid);
+    QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
 
     List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
