@@ -43,6 +43,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
@@ -71,7 +73,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -92,10 +93,10 @@ public class McMonitoringController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @Autowired
-    private WebApplicationContext applicationContext;
+    private IQbService qbService;
 
     @RequestMapping("/monitoring")
     public String execute(HttpServletRequest request) {
@@ -535,6 +536,15 @@ public class McMonitoringController {
 		request.setAttribute("sessionDtos", sessionDtos);
 	    }
 	    request.setAttribute("useSelectLeaderToolOutput", mcContent.isUseSelectLeaderToolOuput());
+
+	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
+	    for (McQueContent question : mcContent.getMcQueContents()) {
+		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(mcContent.getMcContentId(),
+			question.getQbQuestion().getUid());
+		questionStats.setQbQuestion(question.getQbQuestion());
+		qbStats.add(questionStats);
+	    }
+	    request.setAttribute("qbStats", qbStats);
 	}
 
 	// prepare toolOutputDefinitions and activityEvaluation

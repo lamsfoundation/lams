@@ -540,6 +540,8 @@
 
 	<bean id="qbServiceTarget" class="org.lamsfoundation.lams.qb.service.QbService">
 		<property name="qbDAO"><ref bean="qbDAO"/></property>
+		<property name="gradebookService"><ref bean="gradebookService"/></property>
+		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 	</bean>
 	
 	<bean id="qbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

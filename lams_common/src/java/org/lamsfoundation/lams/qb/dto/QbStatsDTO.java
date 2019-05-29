@@ -3,31 +3,9 @@ package org.lamsfoundation.lams.qb.dto;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public class QbStatsDTO {
-    public static class QbStatsActivityDTO {
-	public ToolActivity activity;
-	public Integer average;
-
-	public ToolActivity getActivity() {
-	    return activity;
-	}
-
-	public void setActivity(ToolActivity activity) {
-	    this.activity = activity;
-	}
-
-	public Integer getAverage() {
-	    return average;
-	}
-
-	public void setAverage(Integer average) {
-	    this.average = average;
-	}
-    }
-
     private QbQuestion question;
     private Map<Long, Long> answersRaw;
     private Map<Long, Integer> answersPercent;
