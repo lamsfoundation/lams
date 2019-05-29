@@ -10,15 +10,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.util.WebUtil;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,10 +30,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class QbService implements IQbService {
+    private static Logger log = Logger.getLogger(QbService.class);
 
     private IQbDAO qbDAO;
 
     private IGradebookService gradebookService;
+
+    private ILamsCoreToolService lamsCoreToolService;
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
@@ -141,13 +148,19 @@ public class QbService implements IQbService {
     public QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid,
 	    Collection<Long> correctOptionUids) {
 	ToolActivity activity = (ToolActivity) qbDAO.find(ToolActivity.class, activityId);
-	Long lessonId = activity.getLearningDesign().getLessons().iterator().next().getLessonId();
+	LearningDesign learningDesign = activity.getLearningDesign();
+	Lesson lesson = learningDesign.getLessons().iterator().next();
+	Long lessonId = lesson.getLessonId();
 	List<GradebookUserLesson> userLessonGrades = gradebookService.getGradebookUserLesson(lessonId);
 	int participantCount = userLessonGrades.size();
 
 	QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
 	activityDTO.setActivity(activity);
 	activityDTO.setParticipantCount(participantCount);
+
+	String monitorUrl = "/lams/" + lamsCoreToolService.getToolMonitoringURL(lessonId, activity)
+		+ "&contentFolderID=" + learningDesign.getContentFolderID();
+	activityDTO.setMonitorURL(monitorUrl);
 
 	// if there is only 1 participant, there is no point in calculating question indexes
 	if (participantCount > 1) {
@@ -224,5 +237,9 @@ public class QbService implements IQbService {
 
     public void setGradebookService(IGradebookService gradebookService) {
 	this.gradebookService = gradebookService;
+    }
+
+    public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
+	this.lamsCoreToolService = lamsCoreToolService;
     }
 }

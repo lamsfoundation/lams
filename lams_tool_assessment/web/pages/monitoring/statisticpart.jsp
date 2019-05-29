@@ -194,14 +194,13 @@
 						</th>
 					</tr>
 						
-					<c:forEach var="question" items="${qbStats}" varStatus="i">
-						<c:set var="activityDTO" value="${question.value}" />
+					<c:forEach var="activityDTO" items="${qbStats}" varStatus="i">
 						<tr>
 							<td>
 								${i.index + 1}
 							</td>
 							<td>
-								<c:out value="${question.key}" escapeXml="false"/>			
+								<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			
 							</td>
 							<td>
 								<c:out value="${activityDTO.participantCount}" />

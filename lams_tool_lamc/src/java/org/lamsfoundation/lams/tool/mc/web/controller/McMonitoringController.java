@@ -27,10 +27,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -539,11 +537,12 @@ public class McMonitoringController {
 	    }
 	    request.setAttribute("useSelectLeaderToolOutput", mcContent.isUseSelectLeaderToolOuput());
 
-	    Map<String, QbStatsActivityDTO> qbStats = new LinkedHashMap<>();
+	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
 	    for (McQueContent question : mcContent.getMcQueContents()) {
 		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(mcContent.getMcContentId(),
 			question.getQbQuestion().getUid());
-		qbStats.put(question.getName(), questionStats);
+		questionStats.setQbQuestion(question.getQbQuestion());
+		qbStats.add(questionStats);
 	    }
 	    request.setAttribute("qbStats", qbStats);
 	}

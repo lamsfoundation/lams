@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -297,14 +297,15 @@ public class MonitoringController {
 	    LeaderResultsDTO leaderDto = scratchieService.getLeaderResultsDTOForLeaders(scratchie.getContentId());
 	    sessionMap.put("leaderDto", leaderDto);
 
-	    Map<String, QbStatsActivityDTO> qbStats = new LinkedHashMap<>();
 	    Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	    items.addAll(scratchie.getScratchieItems());
+	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
 
 	    for (ScratchieItem item : items) {
 		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(scratchie.getContentId(),
 			item.getQbQuestion().getUid());
-		qbStats.put(item.getQbQuestion().getName(), questionStats);
+		questionStats.setQbQuestion(item.getQbQuestion());
+		qbStats.add(questionStats);
 	    }
 	    request.setAttribute("qbStats", qbStats);
 	}

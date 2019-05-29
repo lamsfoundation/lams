@@ -25,6 +25,10 @@
 		#chartDiv {
 			height: 220px;
 		}
+		
+		#usage a {
+			text-decoration: underline;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -171,7 +175,7 @@
 			Usage
 		</div>
 		<div class="panel-body">
-			<table class="table table-striped qb-stats-table">
+			<table id="usage" class="table table-striped qb-stats-table">
 					<tr>
 						<th>
 							Organisation
@@ -208,7 +212,16 @@
 								<c:out value="${lesson.lessonName}" />
 							</td>
 							<td title="${activityDTO.activity.activityId}">
-								<c:out value="${activityDTO.activity.title}" />
+								<c:choose>
+									<c:when test="${empty activityDTO.monitorURL}">
+										<c:out value="${activityDTO.activity.title}" />
+									</c:when>
+									<c:otherwise>
+										<a href="${activityDTO.monitorURL}">
+											<c:out value="${activityDTO.activity.title}" />
+										</a>
+									</c:otherwise>
+								</c:choose>
 							</td>
 							<td>
 								<c:out value="${activityDTO.activity.tool.toolDisplayName}" />

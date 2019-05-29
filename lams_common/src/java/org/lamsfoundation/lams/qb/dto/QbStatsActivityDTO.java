@@ -1,13 +1,16 @@
 package org.lamsfoundation.lams.qb.dto;
 
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public class QbStatsActivityDTO {
-    public ToolActivity activity;
-    public Integer participantCount;
-    public Double difficultyIndex;
-    public Double discriminationIndex;
-    public Double pointBiserial;
+    private ToolActivity activity;
+    private QbQuestion qbQuestion;
+    private String monitorURL;
+    private Integer participantCount;
+    private Double difficultyIndex;
+    private Double discriminationIndex;
+    private Double pointBiserial;
 
     public ToolActivity getActivity() {
 	return activity;
@@ -15,6 +18,22 @@ public class QbStatsActivityDTO {
 
     public void setActivity(ToolActivity activity) {
 	this.activity = activity;
+    }
+
+    public QbQuestion getQbQuestion() {
+	return qbQuestion;
+    }
+
+    public void setQbQuestion(QbQuestion qbQuestion) {
+	this.qbQuestion = qbQuestion;
+    }
+
+    public String getMonitorURL() {
+	return monitorURL;
+    }
+
+    public void setMonitorURL(String monitorURL) {
+	this.monitorURL = monitorURL;
     }
 
     public Integer getParticipantCount() {

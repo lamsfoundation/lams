@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -571,11 +571,12 @@ public class MonitoringController {
 		sessionMap.put("sessionDtos", sessionDtos);
 	    }
 
-	    Map<String, QbStatsActivityDTO> qbStats = new LinkedHashMap<>();
+	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
 	    for (AssessmentQuestion question : assessment.getQuestions()) {
 		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(assessment.getContentId(),
 			question.getQbQuestion().getUid());
-		qbStats.put(question.getQbQuestion().getName(), questionStats);
+		questionStats.setQbQuestion(question.getQbQuestion());
+		qbStats.add(questionStats);
 	    }
 	    request.setAttribute("qbStats", qbStats);
 	}
