@@ -161,6 +161,70 @@
 	</c:otherwise>
 	</c:choose>		
 	
+	<div id="accordion-qb-stats" class="panel-group voffset20" role="tablist" aria-multiselectable="true"> 
+	    <div class="panel panel-default">
+	        <div class="panel-heading collapsable-icon-left" id="heading-qb-stats">
+	        	<span class="panel-title">
+			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
+		          		<fmt:message key="label.qb.stats" />
+		          	</a>
+	      		</span>
+	        </div>
+	
+			<div aria-expanded="false" id="qb-stats" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="heading-qb-stats">
+				<table class="table table-condensed table-striped table-no-border">
+					<tr>		
+						<th scope="col">
+							#
+						</th>
+						<th scope="col">
+							<fmt:message key="label.monitoring.question.summary.question"/>
+						</th>
+						<th scope="col">
+							<fmt:message key="label.qb.participant.count"/>
+						</th>
+						<th scope="col">
+							<fmt:message key="label.qb.difficulty.index"/>
+						</th>
+						<th scope="col">
+							<fmt:message key="label.qb.discrimination.index"/>
+						</th>
+						<th scope="col">
+							<fmt:message key="label.qb.point.biserial"/>
+						</th>
+					</tr>
+						
+					<c:forEach var="question" items="${qbStats}" varStatus="i">
+						<c:set var="activityDTO" value="${question.value}" />
+						<tr>
+							<td>
+								${i.index + 1}
+							</td>
+							<td>
+								<c:out value="${question.key}" escapeXml="false"/>			
+							</td>
+							<td>
+								<c:out value="${activityDTO.participantCount}" />
+							</td>
+							<c:choose>
+								<c:when test="${activityDTO.participantCount < 2}">
+									<td>-</td>
+									<td>-</td>
+									<td>-</td>
+								</c:when>
+								<c:otherwise>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+								</c:otherwise>
+							</c:choose>
+						</tr>
+					</c:forEach>	
+				</table>
+			</div>
+		</div>
+	</div>
+
 </c:otherwise>
 </c:choose>
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -41,6 +42,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -88,6 +91,9 @@ public class MonitoringController {
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
 
+    @Autowired
+    private IQbService qbService;
+
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
 
@@ -129,7 +135,7 @@ public class MonitoringController {
 
 	    //show only questions from question list otherwise
 	} else {
-	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+	    for (QuestionReference reference : assessment.getQuestionReferences()) {
 		questionList.add(reference.getQuestion());
 	    }
 	}
@@ -564,6 +570,14 @@ public class MonitoringController {
 		List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
 		sessionMap.put("sessionDtos", sessionDtos);
 	    }
+
+	    Map<String, QbStatsActivityDTO> qbStats = new LinkedHashMap<>();
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(assessment.getContentId(),
+			question.getQbQuestion().getUid());
+		qbStats.put(question.getQbQuestion().getName(), questionStats);
+	    }
+	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/statisticpart";
     }
@@ -607,12 +621,12 @@ public class MonitoringController {
 		    + " and question ID " + questionUid);
 	}
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-    } 
+    }
 
 }
