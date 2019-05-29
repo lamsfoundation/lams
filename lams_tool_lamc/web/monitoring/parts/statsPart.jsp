@@ -161,4 +161,69 @@
 </c:choose>
 
 
+<div class="panel panel-default" >
+	<div class="panel-heading" id="heading-qb-stats">
+		<span class="panel-title collapsable-icon-left">
+			<a class=collapsed role="button" data-toggle="collapse" href="#qb-stats" 
+				aria-expanded="true" aria-controls="qb-stats" >
+			<fmt:message key="label.qb.stats" /></a>
+		</span>
+     </div>
+     
+     <div id="qb-stats" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-qb-stats">
+
+		<table class="table table-condensed table-striped">
+			<tr>		
+				<th scope="col">
+					#
+				</th>
+				<th scope="col">
+					<fmt:message key="label.question.only"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.participant.count"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.difficulty.index"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.discrimination.index"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.point.biserial"/>
+				</th>
+			</tr>
+				
+			<c:forEach var="question" items="${qbStats}" varStatus="i">
+				<c:set var="activityDTO" value="${question.value}" />
+				<tr>
+					<td>
+						${i.index + 1}
+					</td>
+					<td>
+						<c:out value="${question.key}" escapeXml="false"/>			
+					</td>
+					<td>
+						<c:out value="${activityDTO.participantCount}" />
+					</td>
+					<c:choose>
+						<c:when test="${activityDTO.participantCount < 2}">
+							<td>-</td>
+							<td>-</td>
+							<td>-</td>
+						</c:when>
+						<c:otherwise>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+							
+						</c:otherwise>
+					</c:choose>
+				</tr>
+			</c:forEach>		 
+		</table>
+
+	</div>
+</div>
+
 <%@ include file="toolOutput.jsp"%>

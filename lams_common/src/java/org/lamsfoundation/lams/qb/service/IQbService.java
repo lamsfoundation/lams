@@ -42,6 +42,8 @@ public interface IQbService {
 
     QbStatsDTO getQbQuestionStats(long qbQuestionUid);
 
+    QbStatsActivityDTO getActivityStatsByContentId(Long toolContentId, Long qbQuestionUid);
+
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);

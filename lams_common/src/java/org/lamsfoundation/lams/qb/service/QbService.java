@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
@@ -114,6 +115,14 @@ public class QbService implements IQbService {
 	stats.setAnswersPercent(answerPercent);
 	stats.setAnswersJSON(answersJSON.toString());
 	return stats;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public QbStatsActivityDTO getActivityStatsByContentId(Long toolContentId, Long qbQuestionUid) {
+	Activity activity = ((List<Activity>) qbDAO.findByProperty(ToolActivity.class, "toolContentId", toolContentId))
+		.get(0);
+	return getActivityStats(activity.getActivityId(), qbQuestionUid);
     }
 
     @Override
