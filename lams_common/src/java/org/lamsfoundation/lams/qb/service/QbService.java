@@ -23,6 +23,8 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -163,7 +165,7 @@ public class QbService implements IQbService {
 	activityDTO.setMonitorURL(monitorUrl);
 
 	// if there is only 1 participant, there is no point in calculating question indexes
-	if (participantCount > 1) {
+	if (participantCount >= Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS)) {
 	    // mapping of user ID -> option UID
 	    Map<Integer, Long> activityAnswers = qbDAO.getAnswersForActivity(activity.getActivityId(), qbQuestionUid);
 	    // see who answered correctly
@@ -187,7 +189,8 @@ public class QbService implements IQbService {
 	    // sort grades by highest mark
 	    Collections.sort(userLessonGrades, (a, b) -> a.getMark().compareTo(b.getMark()));
 	    // see how many learners should be in top/bottom 27% of the group
-	    int groupCount = (int) Math.ceil(STATS_TOP_BOTTOM_GROUP_SIZE * participantCount);
+	    int groupCount = (int) Math.ceil(
+		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS) / 100.0 * participantCount);
 
 	    // go through each grade and gather data for indexes
 	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {

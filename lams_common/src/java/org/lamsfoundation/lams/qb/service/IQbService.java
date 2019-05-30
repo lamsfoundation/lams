@@ -20,8 +20,6 @@ public interface IQbService {
     // it is a new question
     static final int QUESTION_MODIFIED_ID_BUMP = 3;
 
-    static final double STATS_TOP_BOTTOM_GROUP_SIZE = 0.27;
-
     /**
      * @param qbQuestionUid
      * @return QbQuestion object with the specified uid
