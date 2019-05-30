@@ -58,8 +58,6 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.questions.Question;
-import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -68,7 +66,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.util.QTIUtil;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
@@ -504,39 +501,6 @@ public class AuthoringController {
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
-    }
-
-    /**
-     * Parses questions extracted from IMS QTI file and adds them as new items.
-     */
-    @RequestMapping("/saveQTI")
-    public String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-
-	QTIUtil.saveQTI(request, questionList, contentFolderID);
-
-	reinitializeAvailableQuestions(sessionMap);
-	return "pages/authoring/parts/questionlist";
-    }
-
-    /**
-     * Prepares Assessment content for QTI packing
-     */
-    @RequestMapping("/exportQTI")
-    public String exportQTI(HttpServletRequest request, HttpServletResponse response)
-	    throws UnsupportedEncodingException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	
-	List<Question> questions = QTIUtil.exportQTI(questionList);
-
-	String title = request.getParameter("title");
-	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
-	exporter.exportQTIPackage(request, response);
-
-	return null;
     }
 
     /**

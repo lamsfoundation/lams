@@ -29,15 +29,6 @@
 	<div class="panel-heading panel-title">
 		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
 		
-		<div class="btn-group btn-group-xs pull-right">
-			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
-				<fmt:message key="label.authoring.import.qti" />
-			</a>
-			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
-				<fmt:message key="label.authoring.export.qti" />
-			</a>
-		</div>
-		
 		<div class="roffset5 pull-right">
 			<c:url var="tempUrl" value="">
 				<c:param name="output">
