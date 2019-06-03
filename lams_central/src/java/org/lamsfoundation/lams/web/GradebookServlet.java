@@ -128,7 +128,7 @@ public class GradebookServlet extends HttpServlet {
 		    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 		    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, extCourseId,
 			    courseName, userManagementService.getRootOrganisation().getOrganisationId().toString(),
-			    isTeacher, false);
+			    method, false);
 		    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 		    
 		    //when displaying GRADEBOOK_MONITOR_ORGANISATION_URL we need to make sure user has ROLE_GROUP_MANAGER role

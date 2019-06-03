@@ -147,10 +147,8 @@ public class IntegrationService implements IIntegrationService {
 	    courseName = extCourseId;
 	}
 
-	Boolean isTeacher = (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
-		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR));
 	return getExtCourseClassMap(extServer, userMap, extCourseId, courseName,
-		service.getRootOrganisation().getOrganisationId().toString(), isTeacher, prefix);
+		service.getRootOrganisation().getOrganisationId().toString(), method, prefix);
     }
 
     // wrapper method for compatibility with original integration modules
@@ -164,7 +162,7 @@ public class IntegrationService implements IIntegrationService {
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     @Override
     public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String extCourseName, String parentOrgId, Boolean isTeacher, Boolean prefix)
+	    String extCourseName, String parentOrgId, String method, Boolean prefix)
 	    throws UserInfoValidationException {
 	Organisation org;
 	User user = userMap.getUser();
@@ -194,7 +192,7 @@ public class IntegrationService implements IIntegrationService {
 	    }
 	}
 
-	updateUserRoles(user, org, isTeacher);
+	updateUserRoles(user, org, method);
 
 	return extCourseClassMap;
     }
@@ -212,7 +210,16 @@ public class IntegrationService implements IIntegrationService {
 	return extCourseClassMap;
     }
 
-    private void updateUserRoles(User user, Organisation org, Boolean isTeacher) {
+    /**
+     * Updates user roles based on the provided method parameter. It method is "author" - we assign Role.ROLE_AUTHOR,
+     * Role.ROLE_MONITOR, Role.ROLE_LEARNER; if method is "monitor" - we assign Role.ROLE_MONITOR; in all other cases
+     * assign Role.ROLE_LEARNER.
+     * 
+     * @param user
+     * @param org
+     * @param method
+     */
+    private void updateUserRoles(User user, Organisation org, String method) {
 
 	//create UserOrganisation if it doesn't exist
 	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), org.getOrganisationId());
@@ -222,10 +229,14 @@ public class IntegrationService implements IIntegrationService {
 	    user.addUserOrganisation(uo);
 	    service.saveUser(user);
 	}
-
+	
 	Integer[] roles;
-	if (isTeacher) {
+	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
+	    
+	} else if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+	    roles = new Integer[] { Role.ROLE_MONITOR };
+	    
 	} else {
 	    roles = new Integer[] { Role.ROLE_LEARNER };
 	}
@@ -816,7 +827,7 @@ public class IntegrationService implements IIntegrationService {
 		    Integer userId = extUserUseridMap.getUser().getUserId();
 
 		    //add user to organisation if it's not there
-		    updateUserRoles(user, organisation, false);
+		    updateUserRoles(user, organisation, LoginRequestDispatcher.METHOD_LEARNER);
 
 		    //check if user belong to the lesson. and if not - add it
 		    if (!lesson.getLessonClass().getLearnersGroup().hasLearner(user)) {
