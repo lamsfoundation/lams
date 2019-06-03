@@ -129,17 +129,13 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 
-	//Determine method based on role parameter. Monitor roles can be either LTI standard ones or tool consumer's custom ones set
+	//Determine method based on the "role" parameter. Author roles can be either LTI standard ones or tool consumer's custom ones set
 	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
-	String method;
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
-	if (LtiUtils.isStaff(roles) || LtiUtils.isAdmin(roles) || isCustomMonitorRole) {
-	    method = (lesson == null) ? LoginRequestDispatcher.METHOD_AUTHOR : LoginRequestDispatcher.METHOD_MONITOR;
-
-	} else {
-	    method = LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
-	}
+	String method = LtiUtils.isStaff(roles) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
+		? LoginRequestDispatcher.METHOD_AUTHOR
+		: LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
 
 	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
 	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
