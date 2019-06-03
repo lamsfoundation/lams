@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,11 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -232,6 +235,80 @@ public class QbService implements IQbService {
 	}
 
 	return activityDTO;
+    }
+
+    @Override
+    public QbCollection getPublicCollection() {
+	return (QbCollection) qbDAO.find(QbCollection.class, 1L);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public QbCollection getUserPrivateCollection(int userId) {
+	Map<String, Object> map = new HashMap<>();
+	map.put("userId", userId);
+	map.put("personal", true);
+	List<QbCollection> result = qbDAO.findByProperties(QbCollection.class, map);
+	if (!result.isEmpty()) {
+	    return result.get(0);
+	}
+
+	QbCollection collection = new QbCollection();
+	collection.setName("Private questions");
+	collection.setUserId(userId);
+	collection.setPersonal(true);
+	qbDAO.insert(collection);
+	return collection;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<QbCollection> getUserCollections(int userId) {
+	return qbDAO.findByProperty(QbCollection.class, "user.userId", userId);
+    }
+
+    @Override
+    public QbCollection addCollection(int userId, String name) {
+	QbCollection collection = new QbCollection();
+	collection.setName(name);
+	collection.setUserId(userId);
+	qbDAO.insert(collection);
+	return collection;
+    }
+
+    @Override
+    public void removeCollection(long collectionUid) {
+	qbDAO.deleteById(QbCollection.class, collectionUid);
+    }
+
+    @Override
+    public Organisation shareCollection(QbCollection collection, int organisationId) {
+	Organisation organisation = (Organisation) qbDAO.find(Organisation.class, organisationId);
+	collection.getOrganisations().add(organisation);
+	qbDAO.update(collection);
+	return organisation;
+    }
+
+    @Override
+    public void unshareCollection(QbCollection collection, int organisationId) {
+	Iterator<Organisation> orgIterator = collection.getOrganisations().iterator();
+	while (orgIterator.hasNext()) {
+	    if (orgIterator.next().getOrganisationId().equals(organisationId)) {
+		orgIterator.remove();
+		break;
+	    }
+	}
+	qbDAO.update(collection);
+    }
+
+    @Override
+    public void addQuestionToCollection(long collectionUid, long qbQuestionUid) {
+	qbDAO.addCollectionQuestion(collectionUid, qbQuestionUid);
+    }
+
+    @Override
+    public void removeQuestionFromCollection(long collectionUid, long qbQuestionUid) {
+	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUid);
     }
 
     public void setQbDAO(IQbDAO qbDAO) {

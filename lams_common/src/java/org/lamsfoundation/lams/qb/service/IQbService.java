@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 
 public interface IQbService {
 
@@ -50,4 +52,22 @@ public interface IQbService {
 	    String searchString);
 
     int getCountQbQuestions(Integer questionType, String searchString);
+
+    QbCollection getPublicCollection();
+
+    QbCollection getUserPrivateCollection(int userId);
+
+    List<QbCollection> getUserCollections(int userId);
+
+    QbCollection addCollection(int userId, String name);
+
+    void removeCollection(long collectionUid);
+
+    Organisation shareCollection(QbCollection collection, int organisationId);
+
+    void unshareCollection(QbCollection collection, int organisationId);
+
+    void addQuestionToCollection(long collectionUid, long qbQuestionUid);
+
+    void removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
 }

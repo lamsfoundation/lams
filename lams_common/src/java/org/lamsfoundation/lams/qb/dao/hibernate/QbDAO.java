@@ -46,6 +46,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
 	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
 
+    private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS c "
+	    + "JOIN lams_qb_question ON c.qb_question_uid = q.uid WHERE c.collection_uid = :collectionUid";
+
+    private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionUid)";
+
+    private static final String REMOVE_COLLECTION_QUESTION = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid AND qb_question_uid = :qbQuestionUid";
+
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
 	return (QbQuestion) this.find(QbQuestion.class, qbQuestionUid);
@@ -211,5 +218,30 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    map.put((String) burningQuestion[0], (Long) burningQuestion[1]);
 	}
 	return map;
+    }
+
+    @Override
+    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit) {
+	Query<QbQuestion> query = getSession().createNativeQuery(FIND_COLLECTION_QUESTIONS, QbQuestion.class);
+	query.setParameter("collectionUid", collectionUid);
+	if (offset != null) {
+	    query.setFirstResult(offset);
+	}
+	if (limit != null) {
+	    query.setMaxResults(limit);
+	}
+	return query.list();
+    }
+
+    @Override
+    public void addCollectionQuestion(long collectionUid, long qbQuestionUid) {
+	getSession().createNativeQuery(ADD_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
+		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+    }
+
+    @Override
+    public void removeCollectionQuestion(long collectionUid, long qbQuestionUid) {
+	getSession().createNativeQuery(REMOVE_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
+		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
     }
 }
