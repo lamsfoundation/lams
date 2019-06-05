@@ -170,6 +170,12 @@ public class QbCollectionController {
 	}
     }
 
+    @RequestMapping("/addCollection")
+    @ResponseBody
+    public void removeCollectionQuestions(@RequestParam String name) {
+	qbService.addCollection(getUserId(), name);
+    }
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);

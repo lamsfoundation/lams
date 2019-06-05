@@ -14,6 +14,22 @@
 		div.buttons {
 			margin-top: 5px;
 		}
+		
+		#addCollectionDiv {
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: black thin solid;
+		}
+		
+		#addCollectionDiv input {
+			display: inline;
+			width: 80%;
+			margin-right: 10px;
+		}
+		
+		#addCollectionDiv button {
+			float: right;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -161,6 +177,31 @@
 				grid.trigger('reloadGrid');
 			});
 		}
+		
+		function addCollection() {
+			var name = $('#addCollectionDiv input').val().trim(),
+				lower = name.toLowerCase();
+			$('.collection-grid').each(function(){
+				if ($(this).data('collectionName').trim().toLowerCase() == lower) {
+					alert('Collection with such name already exists');
+					name = null;
+					return false;
+				}
+			});
+			if (name) {
+				$.ajax({
+					'url'  : '<lams:LAMSURL />qb/collection/addCollection.do',
+					'type' : 'POST',
+					'dataType' : 'text',
+					'data' : {
+						'name' : name
+					},
+					'cache' : false
+				}).done(function(){
+					document.location.reload();
+				});
+			}
+		}
 	</script>
 </lams:head>
 <body class="stripes">
@@ -173,6 +214,10 @@
 			</div>
 		</div>
 	</c:forEach>
+	<div id="addCollectionDiv">
+		<input placeholder="Enter new collection name" class="form-control" />
+		<button class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
+	</div>
 </lams:Page>
 </body>
 </lams:html>
