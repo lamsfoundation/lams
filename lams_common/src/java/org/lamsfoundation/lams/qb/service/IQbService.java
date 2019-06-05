@@ -59,6 +59,8 @@ public interface IQbService {
 
     List<QbCollection> getUserCollections(int userId);
 
+    List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit);
+
     QbCollection addCollection(int userId, String name);
 
     void removeCollection(long collectionUid);

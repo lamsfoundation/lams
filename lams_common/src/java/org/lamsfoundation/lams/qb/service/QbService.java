@@ -264,7 +264,15 @@ public class QbService implements IQbService {
     @Override
     @SuppressWarnings("unchecked")
     public List<QbCollection> getUserCollections(int userId) {
-	return qbDAO.findByProperty(QbCollection.class, "user.userId", userId);
+	Map<String, Object> map = new HashMap<>();
+	map.put("userId", userId);
+	map.put("personal", false);
+	return qbDAO.findByProperties(QbCollection.class, map);
+    }
+
+    @Override
+    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit) {
+	return qbDAO.getCollectionQuestions(collectionUid, offset, limit);
     }
 
     @Override

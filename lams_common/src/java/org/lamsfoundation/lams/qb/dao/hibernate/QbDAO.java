@@ -47,7 +47,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
 
     private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS c "
-	    + "JOIN lams_qb_question ON c.qb_question_uid = q.uid WHERE c.collection_uid = :collectionUid";
+	    + "JOIN lams_qb_question AS q ON c.qb_question_uid = q.uid WHERE c.collection_uid = :collectionUid";
 
     private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionUid)";
 
