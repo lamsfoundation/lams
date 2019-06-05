@@ -3,9 +3,11 @@ package org.lamsfoundation.lams.qb.dao.hibernate;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Query;
 
@@ -54,10 +56,14 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionUid)";
 
-    private static final String REMOVE_COLLECTION_QUESTION = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid AND qb_question_uid = :qbQuestionUid";
+    private static final String EXISTS_COLLECTION_QUESTION = "SELECT 1 FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
+	    + "AND qb_question_uid = :qbQuestionUid";
 
-    private static final String REMOVE_COLLECTION_QUESTION_EXCLUDED = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
-	    + "AND qb_question_uid NOT IN :qbQuestionUids";
+    private static final String REMOVE_COLLECTION_QUESTION = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
+	    + "AND qb_question_uid = :qbQuestionUid";
+
+    private static final String FIND_COLLECTION_QUESTIONS_EXCLUDED = "SELECT qb_question_uid FROM lams_qb_collection_question "
+	    + "WHERE collection_uid = :collectionUid AND qb_question_uid NOT IN :qbQuestionUids";
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
@@ -254,8 +260,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public void addCollectionQuestion(long collectionUid, long qbQuestionUid) {
-	getSession().createNativeQuery(ADD_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
-		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+	if (!questionInCollectionExists(collectionUid, qbQuestionUid)) {
+	    getSession().createNativeQuery(ADD_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
+		    .setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+	}
     }
 
     @Override
@@ -264,10 +272,22 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids) {
-	getSession().createNativeQuery(REMOVE_COLLECTION_QUESTION_EXCLUDED).setParameter("collectionUid", collectionUid)
-		.setParameterList("qbQuestionUids", qbQuestionUids).executeUpdate();
+    public Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids) {
+	List<BigInteger> queryResult = getSession().createNativeQuery(FIND_COLLECTION_QUESTIONS_EXCLUDED)
+		.setParameter("collectionUid", collectionUid).setParameterList("qbQuestionUids", qbQuestionUids)
+		.getResultList();
+	Set<Long> result = new HashSet<>();
+	for (BigInteger uid : queryResult) {
+	    result.add(uid.longValue());
+	}
+	return result;
+    }
+
+    private boolean questionInCollectionExists(long collectionUid, long qbQuestionUid) {
+	return !getSession().createNativeQuery(EXISTS_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
+		.setParameter("qbQuestionUid", qbQuestionUid).getResultList().isEmpty();
     }
 
     private Query prepareCollectionQuestionsQuery(long collectionUid, String orderBy, String orderDirection,

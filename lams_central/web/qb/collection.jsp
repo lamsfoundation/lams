@@ -22,12 +22,23 @@
 		}
 		
 		#addCollectionDiv input {
-			display: inline;
 			width: 80%;
 			margin-right: 10px;
 		}
 		
 		#addCollectionDiv button {
+			float: right;
+		}
+		
+		.form-control {
+			display: inline;
+		}
+		
+		.targetCollectionSelect {
+			width: 300px;
+		}
+		
+		.targetCollectionDiv {
 			float: right;
 		}
 	</style>
@@ -202,6 +213,29 @@
 				});
 			}
 		}
+		
+		function addCollectionQuestions(button, copy) {
+			var grid = $(button).closest('.buttons').siblings(".ui-jqgrid").find('.collection-grid'),
+				sourceCollectionUid = grid.data('collectionUid'),
+				targetCollectionUid = $(button).closest('.panel-body').find('.targetCollectionSelect').val(),
+				included = grid.data('included'),
+				excluded = grid.data('excluded');
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'sourceCollectionUid' : sourceCollectionUid,
+					'targetCollectionUid' : targetCollectionUid,
+					'copy'			: copy,
+					'included'	    : included ? JSON.stringify(included) : null,
+					'excluded'	    : excluded ? JSON.stringify(excluded) : null
+				},
+				'cache' : false
+			}).done(function(){
+				$('.collection-grid[data-collection-uid="' + targetCollectionUid + '"]').trigger('reloadGrid');
+			});
+		}
 	</script>
 </lams:head>
 <body class="stripes">
@@ -210,7 +244,23 @@
 		<div class="panel-body">
 			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
 			<div class="buttons">
-				<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove</button>
+				<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
+				<div class="targetCollectionDiv">
+					<span>Transfer questions to </span>
+					<select class="form-control targetCollectionSelect">
+						<c:forEach var="target" items="${collections}">
+							<c:if test="${not (target.uid eq collection.uid)}">
+								<option value="${target.uid}"
+								<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
+									selected="selected"
+								</c:if>
+								><c:out value="${target.name}" /></option>
+							</c:if>
+						</c:forEach>
+					</select>
+					<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, false)" disabled="disabled">Add</button>
+					<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
+				</div>
 			</div>
 		</div>
 	</c:forEach>

@@ -325,13 +325,26 @@ public class QbService implements IQbService {
     }
 
     @Override
+    public void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
+	    Collection<Long> excludedQbQuestionUids) {
+	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(sourceCollectionUid,
+		excludedQbQuestionUids);
+	for (Long uid : includedUids) {
+	    addQuestionToCollection(targetCollectionUid, uid);
+	}
+    }
+
+    @Override
     public void removeQuestionFromCollection(long collectionUid, long qbQuestionUid) {
 	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUid);
     }
 
     @Override
-    public void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids) {
-	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUids);
+    public void removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids) {
+	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(collectionUid, excludedQbQuestionUids);
+	for (Long uid : includedUids) {
+	    qbDAO.removeCollectionQuestion(collectionUid, uid);
+	}
     }
 
     public void setQbDAO(IQbDAO qbDAO) {

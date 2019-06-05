@@ -166,7 +166,7 @@ public class QbCollectionController {
 	    for (int index = 0; index < excludedJSON.size(); index++) {
 		excludedSet.add(excludedJSON.get(index).asLong());
 	    }
-	    qbService.removeCollectionQuestion(collectionUid, excludedSet);
+	    qbService.removeQuestionFromCollection(collectionUid, excludedSet);
 	}
     }
 
@@ -174,6 +174,26 @@ public class QbCollectionController {
     @ResponseBody
     public void removeCollectionQuestions(@RequestParam String name) {
 	qbService.addCollection(getUserId(), name);
+    }
+
+    @RequestMapping("/addCollectionQuestions")
+    @ResponseBody
+    public void addllectionQuestions(@RequestParam long sourceCollectionUid, @RequestParam long targetCollectionUid,
+	    @RequestParam boolean copy, @RequestParam String included, @RequestParam String excluded)
+	    throws IOException {
+	if (StringUtils.isBlank(excluded)) {
+	    ArrayNode includedJSON = JsonUtil.readArray(included);
+	    for (int index = 0; index < includedJSON.size(); index++) {
+		qbService.addQuestionToCollection(targetCollectionUid, includedJSON.get(index).asLong());
+	    }
+	} else {
+	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
+	    Set<Long> excludedSet = new HashSet<>();
+	    for (int index = 0; index < excludedJSON.size(); index++) {
+		excludedSet.add(excludedJSON.get(index).asLong());
+	    }
+	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet);
+	}
     }
 
     private Integer getUserId() {

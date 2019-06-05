@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.qb.dao;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -53,6 +54,6 @@ public interface IQbDAO extends IBaseDAO {
     void addCollectionQuestion(long collectionUid, long qbQuestionUid);
 
     void removeCollectionQuestion(long collectionUid, long qbQuestionUid);
-    
-    void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids);
+
+    Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids);
 }
