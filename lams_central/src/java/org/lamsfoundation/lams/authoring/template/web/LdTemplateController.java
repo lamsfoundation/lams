@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.authoring.template.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
@@ -44,6 +45,9 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.questions.Answer;
+import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.Tool;
@@ -69,7 +73,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Base class for actions processing Learning Design templates.
  *
- * TODO stop hardcoding the icons!
+ * A little history: This code was written when we were still using Struts but we were phasing it out. So it was written with the
+ * minimal of Struts code, which was then swapped to being the minimal Spring MVC. Now we are using Spring MVC it would 
+ * be nice to convert to using more Spring MVC features rather than adding parts piecemeal as the template pages
+ * become more complicated. Rather than relying on the web page to keep all the data and doing ajax updates, it would be 
+ * nice to have a session form or the like backing the page. It would make it easier to have the templates load an existing
+ * design from the database for modification and make the processing when the template is saved so it doesn't do one huge
+ * parse in one go.
+ * 
+ * Would also be nice to stop hardcoding the icons!
  *
  * @author Marcin Cieslak, Fiona Malikoff
  */
@@ -182,6 +194,12 @@ public abstract class LdTemplateController {
 	String contentFolderID = FileUtil.generateUniqueContentFolderID();
 	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/template/tbl/tbl";
+    }
+
+    public String init(HttpServletRequest request, String forward ) throws Exception {
+	String contentFolderID = FileUtil.generateUniqueContentFolderID();
+	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
+	return forward;
     }
 
     protected abstract ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession)
@@ -360,7 +378,7 @@ public abstract class LdTemplateController {
     }
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
-    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords) {
+    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -376,10 +394,20 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, "Gate"); // I18N
+	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Gate"); 
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
+
+	return activityJSON;
+    }
+
+    protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
+	    String activityTitle, Long startOffset) {
+
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle);
+	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
+	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
 	return activityJSON;
     }
@@ -1306,6 +1334,60 @@ public abstract class LdTemplateController {
 
     }
 
+    @RequestMapping("/importQTI")
+    public String importAssessmentQTI(HttpServletRequest request) throws UnsupportedEncodingException {
+	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
+	String templatePage = WebUtil.readStrParam(request, "templatePage");
+	Question[] updatedQuestions = preprocessQuestions(QuestionParser.parseQuestionChoiceForm(request), contentFolderID);
+	request.setAttribute("questions", updatedQuestions);
+	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
+	return "/authoring/template/tool/" + templatePage;
+    }
+
+    private Question[] preprocessQuestions(Question[] questions, String contentFolderID) {
+
+	// Processing based on QTIUtil from the Assessment tool 
+	for ( Question question : questions ) {
+
+	    String correctAnswer = null;
+	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
+	    // int questionGrade = 1; Currently not supported by the templates.
+
+	    if (question.getAnswers() != null) {
+		for (Answer answer : question.getAnswers()) {
+
+		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+			    question.getResourcesFolderPath());
+		    answer.setText(answerText);
+
+		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
+			continue;
+		    }
+		    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			// for fill in blanks question all answers are correct and get full grade
+			if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
+			    // whatever the correct answer holds, it becomes the question score
+			    // questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    // 100% goes to the correct answer
+			    answer.setScore(1F);
+			    correctAnswer = answerText;
+			} else {
+			    log.warn("Choosing only first correct answer, despite another one was found: "
+				    + answerText);
+			    answer.setScore(0F);
+			}
+		    } else {
+			answer.setScore(0F);
+		    }
+
+		}
+	    }
+	}
+	return questions;
+    }
+	
     /**
      * Specialised call to create a new question & options for the surveys tab. Returns a fragment of HTML
      * which sets up a new CKEditor. Works with both mcquestion.jsp & surveyquestion.jsp. The template's

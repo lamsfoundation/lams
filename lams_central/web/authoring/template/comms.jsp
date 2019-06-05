@@ -2,17 +2,22 @@
 		var validator;
 		
 		// configure the wizard. Call after doing var validator = $("#templateForm").validate({ 
-		function initializeWizard(validatorIn) {
+		// screens need to specify the tabNumber for the save button if they are hiding tabs
+		function initializeWizard(validatorIn, startValidationOnTab, tblVersion) {
 			validator = validatorIn;
+			
+			if ( typeof startValidationOnTab === "undefined" )
+				startValidationOnTab = 0;
+
 	      	$('#rootwizard').bootstrapWizard({
 	      		'nextSelector': '.button-next', 
 	      		'previousSelector': '.button-previous',
 	      		'onTabShow': function(tab, navigation, index) {
-	      			var total = navigation.find('li').length;
+	      			var total = navigation.find('li[display = block]').length;
 	      			var current = index+1;
 	      			var percent = (current/total) * 100;
 	      			$('#rootwizard .progress-bar').css({width:percent+'%'})
- 	      			if ( current == total) {
+ 	      			if ( navigation.find('li:last').get(0) == tab.get(0) ) {
 	      				$('.button-save').show();
 	      				$('.button-next').hide();
 	      			} else {
@@ -22,7 +27,7 @@
  	      		},
  	      		'tabClass': 'nav nav-pills',
  		  		'onNext': function(tab, navigation, index) {
- 		  			if ( index > 1 ) {
+ 		  			if ( index >= (startValidationOnTab + 1) ) {
 	 		  			var valid = $("#templateForm").valid();
 	 		  			if(!valid) {
 	 		  				validator.focusInvalid();
@@ -378,3 +383,12 @@
 			} 
 			return true;
 		}
+
+
+		function importQTI(callerID, limit){
+		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?callerID='+callerID;
+		 	if ( limit ) {
+		 		url = url + '&limitType='+limit;
+		 	}
+	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes');
+	    }

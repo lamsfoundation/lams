@@ -11,6 +11,7 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 
+
 <lams:html>
 <lams:head>
  	<%@ include file="../header.jsp" %>
@@ -22,7 +23,8 @@
 		<%@ include file="../comms.jsp" %>
 
 		var minimumWordsSpinnerArray  = new Array(); // Peer Review Tab.
-
+		var showTime = 100; // how long should it take a field to show/hide.
+		
 		$(document).ready(function() {
 			groupingChanged();
 
@@ -71,6 +73,49 @@
 
 		});
 
+
+		<%-- matching importQTI(limit) function is in comms.jsp --%>
+	    function saveQTI(formHTML, formName, callerID) {
+	    	var form = $($.parseHTML(formHTML));
+
+	    	if ( callerID == 'assessment' ) {
+		    	var nextNum  = +$('#numAssessments').val()+1;
+				var url=getSubmissionURL()+"/importQTI.do?contentFolderID=${contentFolderID}&templatePage=assessmentQTI&questionNumber="+nextNum;
+				$.ajaxSetup({ cache: true });
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: form.serializeArray(),
+					success: function(response, status, xhr) {
+						if ( status == "error" ) {
+							console.log( xhr.status + " " + xhr.statusText );
+						} else {
+							$('#divassessments').append(response);
+							$('#divassess'+nextNum)[0].scrollIntoView();
+						}
+					}
+				});
+
+	    	} else {
+		    	var nextNum  = +$('#numQuestions').val()+1;
+				var url=getSubmissionURL()+"/importQTI.do?contentFolderID=${contentFolderID}&templatePage=mcquestionQTI&questionNumber="+nextNum;
+				$.ajaxSetup({ cache: true });
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: form.serializeArray(),
+					success: function(response, status, xhr) {
+						if ( status == "error" ) {
+							console.log( xhr.status + " " + xhr.statusText );
+						} else {
+							$('#divquestions').append(response);
+							$('#divq'+nextNum)[0].scrollIntoView();
+						}
+					}
+				});
+	    	}
+	    }
+
 	</script>
 	
 </lams:head>
@@ -105,6 +150,16 @@
 	<div class="tab-content">
 	    <div class="tab-pane" id="tab1">
 		    	<jsp:include page="../genericintro.jsp" ><jsp:param name="templateName" value="tbl"/></jsp:include>
+		    	<div style="display:none">
+<!-- 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" @template_tbl_show_introduction@ />
+ -->			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction"/>
+			<input type="checkbox" name="iratra" value="true" class="form-control-inline" id="iratra" checked />
+			<input type="checkbox" name="appex" value="true" class="form-control-inline" id="appex" checked />
+			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  @template_tbl_show_preview@  />
+<!-- 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="preview" @template_tbl_show_notebook@/>
+ -->
+			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="preview" />
+			</div>
 	    </div>
 	    <div class="tab-pane" id="tab2">
 	 		<div class="form-group">			
@@ -120,21 +175,23 @@
 
 			<div class="form-group voffset10">
 				<label for="confidenceLevelEnable">
-				<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable"/>&nbsp;
-				<fmt:message key="authoring.enable.confidence.levels"/>
-			</label>
+					<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable"/>&nbsp;
+					<fmt:message key="authoring.enable.confidence.levels"/>
+				</label>
 			</div>
 			
-		 	<input type="hidden" name="numQuestions" id="numQuestions" value="1"/>
+		 	<input type="hidden" name="numQuestions" id="numQuestions" value="0"/>
 			
 			<div id="divquestions">
-			<div id="divq1">
-			<c:set scope="request" var="questionNumber">1</c:set>
-			<%@ include file="../tool/mcquestion.jsp" %>
-			</div>
 			</div>
 		
+			<span class="voffset10">
 			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><fmt:message key="authoring.create.question"/></a>
+			<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">
+					<fmt:message key="authoring.template.basic.import.qti" /> 
+			</a>
+			</span>
+			
 	    </div>
 		<div class="tab-pane" id="tab4">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span>
@@ -144,8 +201,12 @@
 			<div id="divassessments">
 			</div>
 			
-			<a href="#" onclick="javascript:createAssessment('essay');" class="btn btn-default voffset10"><fmt:message key="authoring.create.essay.question"/></a>
-			<a href="#" onclick="javascript:createAssessment('mcq');" class="btn btn-default voffset10"><fmt:message key="authoring.create.mc.question"/></a>
+			<span class="voffset10">
+			<a href="#" onclick="javascript:createAssessment('essay');" class="btn btn-default"><fmt:message key="authoring.create.essay.question"/></a>
+			<a href="#" onclick="javascript:createAssessment('mcq');" class="btn btn-default"><fmt:message key="authoring.create.mc.question"/></a>
+			<a href="#" onClick="javascript:importQTI('assessment')" class="btn btn-default pull-right"><fmt:message key="authoring.template.basic.import.qti" /></a>
+			</span>
+			
 	    </div>
 	    	<div class="tab-pane" id="tab5">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.peer.review" /></span>
