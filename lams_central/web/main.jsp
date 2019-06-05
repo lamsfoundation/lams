@@ -217,7 +217,15 @@
 							<i class="fa fa-user"></i> <fmt:message key="index.myprofile"/>
 						</a>
 					</li>
-							
+					
+					<c:if test="${showQbCollectionsLink}">
+						<li>
+							<a href="#" onclick="javascript:openQbCollections(); return false;">
+								<i class="fa fa-question"></i> <fmt:message key="index.qb.collections"/>
+							</a>
+						</li>
+					</c:if>
+					
 					<c:forEach var="adminlink" items="${adminLinks}">
 						
 						<c:choose>
