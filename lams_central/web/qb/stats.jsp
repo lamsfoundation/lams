@@ -9,7 +9,7 @@
 	<title>Question statistics</title>
 	
 	<lams:css/>
-	<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/defaultHTML_chart.css" rel="stylesheet">
 	<style>
 		.question-table {
 			margin-bottom
