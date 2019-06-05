@@ -2,14 +2,22 @@ package org.lamsfoundation.lams.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -17,6 +25,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -451,7 +460,7 @@ public class WebUtil {
 	userJSON.put("firstName", user.getFirstName());
 	userJSON.put("lastName", user.getLastName());
 	userJSON.put("login", user.getLogin());
-	userJSON.put("portraitId",  user.getPortraitUuid());
+	userJSON.put("portraitId", user.getPortraitUuid());
 	return userJSON;
     }
 
@@ -509,5 +518,22 @@ public class WebUtil {
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
 
 	return decodedLessonId;
+    }
+
+    public static Document getDocument() throws ParserConfigurationException {
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	DocumentBuilder builder = factory.newDocumentBuilder();
+	Document document = builder.newDocument();
+	return document;
+    }
+
+    public static String getStringFromDocument(Document document) throws TransformerException {
+	DOMSource domSource = new DOMSource(document);
+	StringWriter writer = new StringWriter();
+	StreamResult result = new StreamResult(writer);
+	TransformerFactory tf = TransformerFactory.newInstance();
+	Transformer transformer = tf.newTransformer();
+	transformer.transform(domSource, result);
+	return writer.toString();
     }
 }

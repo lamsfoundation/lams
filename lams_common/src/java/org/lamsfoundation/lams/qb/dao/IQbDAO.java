@@ -42,7 +42,12 @@ public interface IQbDAO extends IBaseDAO {
 
     int getCountQbQuestions(Integer questionType, String searchString);
 
-    List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit);
+    List<QbQuestion> getCollectionQuestions(long collectionUid);
+
+    List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
+	    String orderDirection, String search);
+
+    int countCollectionQuestions(long collectionUid, String search);
 
     void addCollectionQuestion(long collectionUid, long qbQuestionUid);
 

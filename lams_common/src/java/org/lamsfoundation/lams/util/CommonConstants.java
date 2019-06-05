@@ -2,11 +2,16 @@ package org.lamsfoundation.lams.util;
 
 public class CommonConstants {
 
-    // params passed from the jqGrid 
+    // params passed from the jqGrid
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_ROWS = "rows";
     public static final String PARAM_SIDX = "sidx";
     public static final String PARAM_SORD = "sord";
+
+    public static final String PARAM_SEARCH = "_search";
+    public static final String PARAM_SEARCH_FIELD = "searchField";
+    public static final String PARAM_SEARCH_OPERATION = "searchOper";
+    public static final String PARAM_SEARCH_STRING = "searchString";
 
     // default coordinate used if the entry came from Flash is 0 or less.
     public static final Integer DEFAULT_COORD = new Integer(10);
@@ -37,7 +42,7 @@ public class CommonConstants {
     public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
     public static final String RESPONSE_CONTENT_TYPE_DOWNLOAD = "application/x-download";
     public static final String HEADER_CONTENT_ATTACHMENT = "attachment;filename=";
-    
+
     public static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
     public static final String TOOL_SIGNATURE_FORUM = "lafrum11";
     public static final String TOOL_SIGNATURE_LEADERSELECTION = "lalead11";

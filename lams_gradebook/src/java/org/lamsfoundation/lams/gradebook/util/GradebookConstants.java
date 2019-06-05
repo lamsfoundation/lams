@@ -38,10 +38,6 @@ public class GradebookConstants {
     public static final String PARAM_MARK = "mark";
     public static final String PARAM_FEEDBACK = "feedback";
     public static final String PARAM_USERID = "userID";
-    public static final String PARAM_SEARCH = "_search";
-    public static final String PARAM_SEARCH_FIELD = "searchField";
-    public static final String PARAM_SEARCH_OPERATION = "searchOper";
-    public static final String PARAM_SEARCH_STRING = "searchString";
     public static final String PARAM_ROW_NAME = "rowName";
     public static final String PARAM_TIME_TAKEN = "timeTaken";
     public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";

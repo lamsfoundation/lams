@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Query;
+
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
@@ -58,14 +60,15 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	return (QbQuestion) this.find(QbQuestion.class, qbQuestionUid);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
 	final String FIND_QUESTIONS_BY_QUESTION_ID = "FROM " + QbQuestion.class.getName()
 		+ " WHERE questionId = :questionId AND local = 0 ORDER BY version ASC";
 
-	Query<QbQuestion> q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
+	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
-	return q.list();
+	return q.getResultList();
     }
 
     @Override
@@ -187,12 +190,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query<?> query = getSession().createNativeQuery(SELECT_QUESTIONS);
+	Query query = getSession().createNativeQuery(SELECT_QUESTIONS, Integer.class);
 	query.setParameter("questionType", questionType);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setParameter("searchString", searchString);
-	int result = ((Number) query.uniqueResult()).intValue();
+	int result = (int) query.getSingleResult();
 	return result;
     }
 
@@ -221,16 +224,28 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit) {
-	Query<QbQuestion> query = getSession().createNativeQuery(FIND_COLLECTION_QUESTIONS, QbQuestion.class);
-	query.setParameter("collectionUid", collectionUid);
+    public List<QbQuestion> getCollectionQuestions(long collectionUid) {
+	return getCollectionQuestions(collectionUid, null, null, null, null, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
+	    String orderDirection, String search) {
+	Query query = prepareCollectionQuestionsQuery(collectionUid, orderBy, orderDirection, search, false);
 	if (offset != null) {
 	    query.setFirstResult(offset);
 	}
 	if (limit != null) {
 	    query.setMaxResults(limit);
 	}
-	return query.list();
+	return query.getResultList();
+    }
+
+    @Override
+    public int countCollectionQuestions(long collectionUid, String search) {
+	Query query = prepareCollectionQuestionsQuery(collectionUid, null, null, search, true);
+	return ((BigInteger) query.getSingleResult()).intValue();
     }
 
     @Override
@@ -243,5 +258,35 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public void removeCollectionQuestion(long collectionUid, long qbQuestionUid) {
 	getSession().createNativeQuery(REMOVE_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
 		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+    }
+
+    private Query prepareCollectionQuestionsQuery(long collectionUid, String orderBy, String orderDirection,
+	    String search, boolean isCount) {
+	StringBuilder queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS);
+
+	if (StringUtils.isNotBlank(search)) {
+	    queryBuilder.append(" AND (q.name LIKE :search OR q.description LIKE :search)");
+	}
+
+	if (!isCount && StringUtils.isNotBlank(orderBy)) {
+	    queryBuilder.append(" ORDER BY ").append(orderBy);
+	    if (StringUtils.isNotBlank(orderDirection)) {
+		queryBuilder.append(" ").append(orderDirection);
+	    }
+	}
+
+	String queryText = queryBuilder.toString();
+	if (isCount) {
+	    queryText = queryText.replace("q.*", "COUNT(*)");
+	}
+
+	Query query = isCount ? getSession().createNativeQuery(queryText)
+		: getSession().createNativeQuery(queryText, QbQuestion.class);
+	query.setParameter("collectionUid", collectionUid);
+	if (StringUtils.isNotBlank(search)) {
+	    query.setParameter("search", "%" + search.trim() + "%");
+	}
+
+	return query;
     }
 }

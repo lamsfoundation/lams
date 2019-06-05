@@ -271,8 +271,19 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit) {
-	return qbDAO.getCollectionQuestions(collectionUid, offset, limit);
+    public List<QbQuestion> getCollectionQuestions(long collectionUid) {
+	return qbDAO.getCollectionQuestions(collectionUid);
+    }
+
+    @Override
+    public List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
+	    String orderDirection, String search) {
+	return qbDAO.getCollectionQuestions(collectionUid, offset, limit, orderBy, orderDirection, search);
+    }
+
+    @Override
+    public int countCollectionQuestions(long collectionUid, String search) {
+	return qbDAO.countCollectionQuestions(collectionUid, search);
     }
 
     @Override

@@ -22,17 +22,11 @@
 
 package org.lamsfoundation.lams.web.qb;
 
-import java.io.StringWriter;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbCollection;
@@ -41,6 +35,7 @@ import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,39 +77,49 @@ public class QbCollectionController {
 
     @RequestMapping("/getCollectionGridData")
     @ResponseBody
-    public String getCollectionGridData(@RequestParam long collectionUid, HttpServletResponse response) {
+    public String getCollectionGridData(@RequestParam long collectionUid, HttpServletRequest request,
+	    HttpServletResponse response) {
 	response.setContentType("text/xml; charset=utf-8");
 
-	List<QbQuestion> questions = qbService.getCollectionQuestions(collectionUid, 0, 10);
-	return QbCollectionController.toGridXML(questions);
+	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
+	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
+	Boolean isSearch = WebUtil.readBooleanParam(request, CommonConstants.PARAM_SEARCH);
+	String searchString = isSearch ? WebUtil.readStrParam(request, "name", true) : null;
+
+	int offset = (page - 1) * rowLimit;
+	List<QbQuestion> questions = qbService.getCollectionQuestions(collectionUid, offset, rowLimit, sortBy,
+		sortOrder, searchString);
+	int total = qbService.countCollectionQuestions(collectionUid, searchString);
+	return QbCollectionController.toGridXML(questions, page, total);
     }
 
-    private static String toGridXML(List<QbQuestion> questions) {
+    private static String toGridXML(List<QbQuestion> questions, int page, int total) {
 	try {
-	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder builder = factory.newDocumentBuilder();
-	    Document document = builder.newDocument();
+	    Document document = WebUtil.getDocument();
 
 	    // root element
 	    Element rootElement = document.createElement(CommonConstants.ELEMENT_ROWS);
 
 	    Element pageElement = document.createElement(CommonConstants.ELEMENT_PAGE);
-	    pageElement.appendChild(document.createTextNode("" + 1));
+	    pageElement.appendChild(document.createTextNode(String.valueOf(page)));
 	    rootElement.appendChild(pageElement);
 
 	    Element totalPageElement = document.createElement(CommonConstants.ELEMENT_TOTAL);
-	    totalPageElement.appendChild(document.createTextNode("" + 1));
+	    totalPageElement.appendChild(document.createTextNode(String.valueOf(total)));
 	    rootElement.appendChild(totalPageElement);
 
 	    Element recordsElement = document.createElement(CommonConstants.ELEMENT_RECORDS);
-	    recordsElement.appendChild(document.createTextNode("" + questions.size()));
+	    recordsElement.appendChild(document.createTextNode(String.valueOf(questions.size())));
 	    rootElement.appendChild(recordsElement);
 
 	    for (QbQuestion question : questions) {
+		String uid = question.getUid().toString();
 		Element rowElement = document.createElement(CommonConstants.ELEMENT_ROW);
-		rowElement.setAttribute(CommonConstants.ELEMENT_ID, question.getUid().toString());
+		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
-		String[] data = { question.getUid().toString(), question.getName(), question.getUid().toString() };
+		String[] data = { uid, question.getName(), uid };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
@@ -128,13 +133,8 @@ public class QbCollectionController {
 	    }
 
 	    document.appendChild(rootElement);
-	    DOMSource domSource = new DOMSource(document);
-	    StringWriter writer = new StringWriter();
-	    StreamResult result = new StreamResult(writer);
-	    TransformerFactory tf = TransformerFactory.newInstance();
-	    Transformer transformer = tf.newTransformer();
-	    transformer.transform(domSource, result);
-	    return writer.toString();
+
+	    return WebUtil.getStringFromDocument(document);
 
 	} catch (Exception e) {
 	    log.error("Error while generating Question Bank collection jqGrid XML data", e);

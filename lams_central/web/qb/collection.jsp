@@ -34,7 +34,7 @@
 				    autowidth:true,
 					shrinkToFit: true,
 				    cellEdit: false,
-				    cmTemplate: { title: false },
+				    cmTemplate: { title: false, search: false },
 				    viewrecords: true,
 				    sortorder: "asc", 
 				    sortname: "name", 
@@ -47,9 +47,9 @@
 				    	"Stats"
 				    ],
 				    colModel:[
-				      {name:'id', index:'id', sortable:true, search:false, width: 10},
-				      {name:'name',index:'name', sortable:true,  autoencode:true},
-				      {name:'stats', index:'stats', sortable:false, search:false, width: 10, align: "center", formatter: statsLinkFormatter}
+				      {name:'id', index:'id', sortable:true,  width: 10},
+				      {name:'name',index:'name', sortable:true, search:true, autoencode:true},
+				      {name:'stats', index:'stats', sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
 				      ],
 				    loadError: function(xhr,st,err) {
 				    	collectionGrid.clearGridData();
