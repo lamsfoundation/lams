@@ -77,4 +77,6 @@ public interface IQbService {
     void addQuestionToCollection(long collectionUid, long qbQuestionUid);
 
     void removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
+
+    void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids);
 }

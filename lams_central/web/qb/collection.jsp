@@ -11,6 +11,9 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style>
+		div.buttons {
+			margin-top: 5px;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -20,7 +23,7 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
-			$('.collectionGrid').each(function(){
+			$('.collection-grid').each(function(){
 				var collectionGrid = $(this);
 				
 				collectionGrid.jqGrid({
@@ -53,6 +56,7 @@
 				      ],
 			        onSelectRow : function(id, status, event) {
 					    var grid = $(this),
+					    	buttons = grid.closest('.ui-jqgrid').siblings('.buttons').find('.btn'),
 					   		included = grid.data('included'),
 							excluded = grid.data('excluded'),
 							selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
@@ -72,18 +76,23 @@
 							if (index < 0) {
 								if (status) {
 									included.push(+id);
+									buttons.prop('disabled', false);
 								}
 							} else if (!status) {
 								included.splice(index, 1);
+								if (included.length === 0) {
+									buttons.prop('disabled', true);
+								}
 							}
 						}
 					},
 					gridComplete : function(){
 						var grid = $(this),
-							included = grid.data('included'),
+							buttons = grid.closest('.ui-jqgrid').siblings('.buttons').find('.btn'),
 							// cell containing "(de)select all" button
-							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
-						// remove the default button provided by jqGrid
+							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div'),
+							included = grid.data('included');
+						// remove the default button provided by jqGrid1
 						$('.cbox', selectAllCell).remove();
 						// create own button which follows own rules
 						var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
@@ -99,37 +108,15 @@
 														$('[role="row"]', grid).each(function(){
 															grid.jqGrid('setSelection', +$(this).attr('id'), false);
 														});
+														buttons.prop('disabled', false);
 													} else {
 														// on deselect all just change mode
 														grid.data('excluded', null);
 														grid.data('included', []);
+														buttons.prop('disabled', true);
 													}
 												});
 						grid.resetSelection();
-						if (selectAllCheckbox.prop('checked')) {
-							var excluded = grid.data('excluded');
-							// go through each loaded row
-							$('[role="row"]', grid).each(function(){
-								var id = +$(this).attr('id'),
-									selected = $(this).hasClass('success');
-								// if row is not selected and is not excluded, select it
-								if (!selected && (!excluded || !excluded.includes(id))) {
-									// select without triggering onSelectRow
-									grid.jqGrid('setSelection', id, false);
-								}
-							}); 
-						} else {
-							// go through each loaded row
-							$('[role="row"]', grid).each(function(){
-								var id = +$(this).attr('id'),
-									selected = $(this).hasClass('success');
-								// if row is not selected and is included, select it
-								if (!selected && included.includes(id)) {
-									// select without triggering onSelectRow
-									grid.jqGrid('setSelection', id, false);
-								}
-							});
-						}
 					},
 					loadComplete : function(){
 						var grid = $(this),
@@ -147,14 +134,32 @@
 					}).jqGrid('filterToolbar');
 				
 
-				collectionGrid.data('excluded', null)
-							  .data('included', []);
+				collectionGrid.data('included', []);
 			});
 		});
 		
 		function statsLinkFormatter(cellvalue){
-			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue + "\", \"_blank\")' title='Show stats'></i>";
-			// return "<a target='_blank' title='Show stats' href='javascript:document.location.href=\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue + "\"'><i class='fa fa-bar-chart'></i></a>";
+			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
+					+ "\", \"_blank\")' title='Show stats'></i>";
+		}
+		
+		function removeCollectionQuestions(button) {
+			var grid = $(button).parent().siblings(".ui-jqgrid").find('.collection-grid'),	
+				included = grid.data('included'),
+				excluded = grid.data('excluded');
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'collectionUid' : grid.data('collectionUid'),
+					'included'	    : included ? JSON.stringify(included) : null,
+					'excluded'	    : excluded ? JSON.stringify(excluded) : null
+				},
+				'cache' : false
+			}).done(function(){
+				grid.trigger('reloadGrid');
+			});
 		}
 	</script>
 </lams:head>
@@ -162,7 +167,10 @@
 <lams:Page title="Question collections" type="admin">
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
-			<table class="collectionGrid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
+			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
+			<div class="buttons">
+				<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove</button>
+			</div>
 		</div>
 	</c:forEach>
 </lams:Page>

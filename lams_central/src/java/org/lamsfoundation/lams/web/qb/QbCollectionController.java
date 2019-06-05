@@ -22,18 +22,23 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -47,6 +52,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -142,6 +149,25 @@ public class QbCollectionController {
 	}
 
 	return null;
+    }
+
+    @RequestMapping("/removeCollectionQuestions")
+    @ResponseBody
+    public void removeCollectionQuestions(@RequestParam long collectionUid, @RequestParam String included,
+	    @RequestParam String excluded) throws IOException {
+	if (StringUtils.isBlank(excluded)) {
+	    ArrayNode includedJSON = JsonUtil.readArray(included);
+	    for (int index = 0; index < includedJSON.size(); index++) {
+		qbService.removeQuestionFromCollection(collectionUid, includedJSON.get(index).asLong());
+	    }
+	} else {
+	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
+	    Set<Long> excludedSet = new HashSet<>();
+	    for (int index = 0; index < excludedJSON.size(); index++) {
+		excludedSet.add(excludedJSON.get(index).asLong());
+	    }
+	    qbService.removeCollectionQuestion(collectionUid, excludedSet);
+	}
     }
 
     private Integer getUserId() {

@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -52,4 +53,6 @@ public interface IQbDAO extends IBaseDAO {
     void addCollectionQuestion(long collectionUid, long qbQuestionUid);
 
     void removeCollectionQuestion(long collectionUid, long qbQuestionUid);
+    
+    void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids);
 }

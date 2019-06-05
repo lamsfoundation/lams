@@ -329,6 +329,11 @@ public class QbService implements IQbService {
 	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUid);
     }
 
+    @Override
+    public void removeCollectionQuestion(long collectionUid, Collection<Long> qbQuestionUids) {
+	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUids);
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }
