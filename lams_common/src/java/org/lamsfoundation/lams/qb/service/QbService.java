@@ -117,9 +117,8 @@ public class QbService implements IQbService {
 	    answerPercent.put(option.getUid(), value);
 
 	    ObjectNode answerJSON = JsonNodeFactory.instance.objectNode();
-	    String name = (answerIndex + 1) + ". "
-		    + (option.getName().length() > 30 ? option.getName().substring(0, 30) + "..." : option.getName());
-	    name = WebUtil.removeHTMLtags(name);
+	    String name = WebUtil.removeHTMLtags(option.getName());
+	    name = (answerIndex + 1) + ". " + (name.length() > 30 ? name.substring(0, 30) + "..." : name);
 	    answerJSON.put("name", name);
 	    answerJSON.put("value", value);
 	    answersJSON.add(answerJSON);
