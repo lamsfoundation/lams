@@ -81,6 +81,9 @@ public class IndexController {
 
 	IndexController.setHeaderLinks(request);
 	setAdminLinks(request);
+	if (request.isUserInRole(Role.AUTHOR)) {
+	    request.setAttribute("showQbCollectionsLink", true);
+	}
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
 	// taken based on that parameter; immediatelly, the value in DB is updated
@@ -198,6 +201,7 @@ public class IndexController {
 	if (request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager()) {
 	    adminLinks.add(new IndexLinkBean("index.sysadmin", "javascript:openSysadmin()"));
 	}
+
 	request.setAttribute("adminLinks", adminLinks);
     }
 
