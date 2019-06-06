@@ -34,11 +34,11 @@
 			display: inline;
 		}
 		
-		.targetCollectionSelect {
+		.targetCollectionSelect, .targetOrganisationSelect {
 			width: 300px;
 		}
 		
-		.targetCollectionDiv {
+		.targetCollectionDiv, .targetOrganisationDiv {
 			float: right;
 		}
 	</style>
@@ -255,6 +255,25 @@
 				});
 			}
 		}
+		
+		function shareCollection(button) {
+			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+				collectionUid = grid.data('collectionUid'),
+				organisationId = $(button).closest('.collectionButtons').find('.targetOrganisationSelect').val();
+			
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/shareCollection.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'collectionUid' : collectionUid,
+					'organisationId': organisationId
+				},
+				'cache' : false
+			}).done(function(){
+				document.location.reload();
+			});
+		}
 	</script>
 </lams:head>
 <body class="stripes">
@@ -275,7 +294,9 @@
 								<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
 									selected="selected"
 								</c:if>
-								><c:out value="${target.name}" /></option>
+								>
+									<c:out value="${target.name}" />
+								</option>
 							</c:if>
 						</c:forEach>
 					</select>
@@ -286,6 +307,27 @@
 			<c:if test="${not empty collection.userId and not collection.personal}">
 				<div class="collectionButtons">
 					<button class="btn btn-default" onClick="javascript:removeCollection(this)">Remove collection</button>
+					<div class="targetOrganisationDiv">
+						<span>Share collection with </span>
+						<select class="form-control targetOrganisationSelect">
+							<c:forEach var="target" items="${collection.shareableWithOrganisations}">
+									<option value="${target.organisationId}">
+										<c:out value="${target.name}" />
+									</option>
+							</c:forEach>
+						</select>
+						<button class="btn btn-default" onClick="javascript:shareCollection(this)">Share</button>
+					</div>
+					<c:if test="${not empty collection.organisations}">
+						<div>
+							<span>Shared with organisations</span>
+							<ul>
+								<c:forEach var="organisation" items="${collection.organisations}">
+									<li><c:out value="${organisation.name}" /></li>
+								</c:forEach>
+							</ul>
+						</div>
+					</c:if>
 				</div>
 			</c:if>
 		</div>

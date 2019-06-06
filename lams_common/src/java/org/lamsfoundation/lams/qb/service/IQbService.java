@@ -70,14 +70,16 @@ public interface IQbService {
 
     void removeCollection(long collectionUid);
 
-    Organisation shareCollection(QbCollection collection, int organisationId);
+    List<Organisation> getShareableWithOrganisations(long collectionUid, int userId);
 
-    void unshareCollection(QbCollection collection, int organisationId);
+    Organisation shareCollection(long collectionUid, int organisationId);
 
-    void addQuestionToCollection(long collectionUid, long qbQuestionUid);
+    void unshareCollection(long collectionUid, int organisationId);
+
+    void addQuestionToCollection(long collectionUid, long qbQuestionUid, boolean copy);
 
     void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
-	    Collection<Long> excludedQbQuestionUids);
+	    Collection<Long> excludedQbQuestionUids, boolean copy);
 
     void removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
 

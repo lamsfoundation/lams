@@ -71,6 +71,10 @@ public class QbCollectionController {
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
 	List<QbCollection> collections = qbService.getUserCollections(userId);
+	for (QbCollection collection : collections) {
+	    collection.setShareableWithOrganisations(
+		    qbService.getShareableWithOrganisations(collection.getUid(), userId));
+	}
 
 	QbCollection privateCollection = qbService.getUserPrivateCollection(userId);
 	collections.add(privateCollection);
@@ -178,7 +182,7 @@ public class QbCollectionController {
 	if (StringUtils.isBlank(excluded)) {
 	    ArrayNode includedJSON = JsonUtil.readArray(included);
 	    for (int index = 0; index < includedJSON.size(); index++) {
-		qbService.addQuestionToCollection(targetCollectionUid, includedJSON.get(index).asLong());
+		qbService.addQuestionToCollection(targetCollectionUid, includedJSON.get(index).asLong(), copy);
 	    }
 	} else {
 	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
@@ -186,7 +190,7 @@ public class QbCollectionController {
 	    for (int index = 0; index < excludedJSON.size(); index++) {
 		excludedSet.add(excludedJSON.get(index).asLong());
 	    }
-	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet);
+	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet, copy);
 	}
     }
 
@@ -200,6 +204,12 @@ public class QbCollectionController {
     @ResponseBody
     public void removeCollection(@RequestParam long collectionUid) {
 	qbService.removeCollection(collectionUid);
+    }
+
+    @RequestMapping("/shareCollection")
+    @ResponseBody
+    public void shareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
+	qbService.shareCollection(collectionUid, organisationId);
     }
 
     private Integer getUserId() {

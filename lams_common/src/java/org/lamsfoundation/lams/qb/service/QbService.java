@@ -1,8 +1,10 @@
 package org.lamsfoundation.lams.qb.service;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +29,8 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -43,6 +47,8 @@ public class QbService implements IQbService {
     private IGradebookService gradebookService;
 
     private ILamsCoreToolService lamsCoreToolService;
+
+    private IUserManagementService userManagementService;
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
@@ -305,7 +311,11 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public Organisation shareCollection(QbCollection collection, int organisationId) {
+    public Organisation shareCollection(long collectionUid, int organisationId) {
+	QbCollection collection = (QbCollection) qbDAO.find(QbCollection.class, collectionUid);
+	if (collection.getUserId() == null || collection.isPersonal()) {
+	    throw new InvalidParameterException("Attempt to share a private or the public question bank collection");
+	}
 	Organisation organisation = (Organisation) qbDAO.find(Organisation.class, organisationId);
 	collection.getOrganisations().add(organisation);
 	qbDAO.update(collection);
@@ -313,7 +323,11 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public void unshareCollection(QbCollection collection, int organisationId) {
+    public void unshareCollection(long collectionUid, int organisationId) {
+	QbCollection collection = (QbCollection) qbDAO.find(QbCollection.class, collectionUid);
+	if (collection.getUserId() == null || collection.isPersonal()) {
+	    throw new InvalidParameterException("Attempt to unshare a private or the public question bank collection");
+	}
 	Iterator<Organisation> orgIterator = collection.getOrganisations().iterator();
 	while (orgIterator.hasNext()) {
 	    if (orgIterator.next().getOrganisationId().equals(organisationId)) {
@@ -325,17 +339,27 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public void addQuestionToCollection(long collectionUid, long qbQuestionUid) {
-	qbDAO.addCollectionQuestion(collectionUid, qbQuestionUid);
+    public void addQuestionToCollection(long collectionUid, long qbQuestionUid, boolean copy) {
+	long addQbQuestionUid = qbQuestionUid;
+	if (copy) {
+	    QbQuestion question = getQbQuestionByUid(qbQuestionUid);
+	    QbQuestion newQuestion = question.clone();
+	    newQuestion.setQuestionId(getMaxQuestionId());
+	    newQuestion.setVersion(1);
+	    newQuestion.setCreateDate(new Date());
+	    qbDAO.insert(newQuestion);
+	    addQbQuestionUid = newQuestion.getUid();
+	}
+	qbDAO.addCollectionQuestion(collectionUid, addQbQuestionUid);
     }
 
     @Override
     public void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
-	    Collection<Long> excludedQbQuestionUids) {
+	    Collection<Long> excludedQbQuestionUids, boolean copy) {
 	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(sourceCollectionUid,
 		excludedQbQuestionUids);
 	for (Long uid : includedUids) {
-	    addQuestionToCollection(targetCollectionUid, uid);
+	    addQuestionToCollection(targetCollectionUid, uid, copy);
 	}
     }
 
@@ -352,6 +376,32 @@ public class QbService implements IQbService {
 	}
     }
 
+    @Override
+    public List<Organisation> getShareableWithOrganisations(long collectionUid, int userId) {
+	QbCollection collection = (QbCollection) qbDAO.find(QbCollection.class, collectionUid);
+	if (collection.getUserId() == null || collection.isPersonal()) {
+	    return null;
+	}
+
+	List<Organisation> result = new ArrayList<>();
+	Map<Integer, Set<Integer>> roles = userManagementService.getRolesForUser(userId);
+	for (Entry<Integer, Set<Integer>> roleEntry : roles.entrySet()) {
+	    Integer organisationId = roleEntry.getKey();
+	    for (Organisation organisation : collection.getOrganisations()) {
+		if (organisation.getOrganisationId().equals(organisationId)) {
+		    organisationId = null;
+		    break;
+		}
+	    }
+	    if (organisationId != null && roleEntry.getValue().contains(Role.ROLE_AUTHOR)) {
+		Organisation organisation = (Organisation) qbDAO.find(Organisation.class, organisationId);
+		result.add(organisation);
+	    }
+	}
+
+	return result;
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }
@@ -362,5 +412,9 @@ public class QbService implements IQbService {
 
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
     }
 }
