@@ -258,7 +258,8 @@ public class QbService implements IQbService {
 	if (!result.isEmpty()) {
 	    return result.get(0);
 	}
-
+	
+	// is an user does not have a private collection yet, create it
 	QbCollection collection = new QbCollection();
 	collection.setName("Private questions");
 	collection.setUserId(userId);
@@ -347,6 +348,7 @@ public class QbService implements IQbService {
 	    newQuestion.setQuestionId(getMaxQuestionId());
 	    newQuestion.setVersion(1);
 	    newQuestion.setCreateDate(new Date());
+	    newQuestion.clearID();
 	    qbDAO.insert(newQuestion);
 	    addQbQuestionUid = newQuestion.getUid();
 	}

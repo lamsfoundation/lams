@@ -7,14 +7,11 @@
 <lams:html>
 <lams:head>
 	<title>Question collections</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style>
-		div.questionButtons, div.collectionButtons {
-			margin-top: 5px;
-		}
-		
 		#addCollectionDiv {
 			margin-top: 10px;
 			padding-top: 10px;
@@ -24,22 +21,28 @@
 		#addCollectionDiv input {
 			width: 80%;
 			margin-right: 10px;
+			display: inline-block;
 		}
 		
 		#addCollectionDiv button {
 			float: right;
 		}
 		
-		.form-control {
-			display: inline;
+		.row {
+			margin-top: 10px;
 		}
 		
-		.targetCollectionSelect, .targetOrganisationSelect {
-			width: 300px;
+		.row > div:first-child, .row > div:last-child  {
+			text-align: left;
+			padding-left: 0;
 		}
 		
-		.targetCollectionDiv, .targetOrganisationDiv {
-			float: right;
+		.row > div {
+			text-align: right;
+		}
+		
+		.header-column {
+			font-weight: bold;
 		}
 	</style>
 	
@@ -50,12 +53,14 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
+			// create a grid for each collection
 			$('.collection-grid').each(function(){
 				var collectionGrid = $(this);
 				
 				collectionGrid.jqGrid({
 					guiStyle: "bootstrap",
 					iconSet: 'fontAwesome',
+					// data comes from data-collection-* attributes of <table> tag which is a base for the grid
 					caption: collectionGrid.data('collectionName'),
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?collectionUid=" + collectionGrid.data('collectionUid'),
@@ -79,11 +84,13 @@
 				    colModel:[
 				      {name:'id', index:'uid', sortable:true,  width: 10},
 				      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
+				      // formatter gets just question uid and creates a button
 				      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
 				      ],
 			        onSelectRow : function(id, status, event) {
 					    var grid = $(this),
-					    	buttons = grid.closest('.ui-jqgrid').siblings('.questionButtons').find('.btn'),
+					    	// if no questions are selected, buttons to manipulate them get disabled
+					    	buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
 					   		included = grid.data('included'),
 							excluded = grid.data('excluded'),
 							selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
@@ -115,11 +122,12 @@
 					},
 					gridComplete : function(){
 						var grid = $(this),
-							buttons = grid.closest('.ui-jqgrid').siblings('.questionButtons').find('.btn'),
+							// if no questions are selected, buttons to manipulate them get disabled
+							buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
 							// cell containing "(de)select all" button
 							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div'),
 							included = grid.data('included');
-						// remove the default button provided by jqGrid1
+						// remove the default button provided by jqGrid
 						$('.cbox', selectAllCell).remove();
 						// create own button which follows own rules
 						var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
@@ -148,8 +156,10 @@
 					loadComplete : function(){
 						var grid = $(this),
 							gridView = grid.closest('.ui-jqgrid-view');
+						// remove checkbox next to search bar
 						$('tr.ui-search-toolbar .cbox', gridView).remove();
 						
+						// do not select row when clicked on stats button
 						$('.stats-cell', gridView).click(function(event){
 							event.stopImmediatePropagation();
 						});
@@ -165,13 +175,15 @@
 			});
 		});
 		
+		// Creates a button to display question statistics
 		function statsLinkFormatter(cellvalue){
 			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
 		}
 		
+		// remove questions from a collection
 		function removeCollectionQuestions(button) {
-			var grid = $(button).parent().siblings(".ui-jqgrid").find('.collection-grid'),	
+			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),	
 				included = grid.data('included'),
 				excluded = grid.data('excluded');
 			$.ajax({
@@ -189,10 +201,11 @@
 			});
 		}
 		
+		// add or copy questions to a collection
 		function addCollectionQuestions(button, copy) {
-			var grid = $(button).closest('.questionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
 				sourceCollectionUid = grid.data('collectionUid'),
-				targetCollectionUid = $(button).closest('.panel-body').find('.targetCollectionSelect').val(),
+				targetCollectionUid = $(button).closest('.container-fluid').find('.targetCollectionSelect').val(),
 				included = grid.data('included'),
 				excluded = grid.data('excluded');
 			$.ajax({
@@ -212,9 +225,11 @@
 			});
 		}
 		
+		// add a new collection
 		function addCollection() {
 			var name = $('#addCollectionDiv input').val().trim(),
 				lower = name.toLowerCase();
+			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
 				if ($(this).data('collectionName').trim().toLowerCase() == lower) {
 					alert('Collection with such name already exists');
@@ -237,10 +252,12 @@
 			}
 		}
 		
+		// remove a collection
 		function removeCollection(button) {
-			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
 				collectionUid = grid.data('collectionUid'),
 				name = grid.data('collectionName');
+		
 			if (confirm('Are you sure you want to remove "' + name + '" collection?')) {
 				$.ajax({
 					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
@@ -256,10 +273,11 @@
 			}
 		}
 		
+		// share a collection with authors of an organisation
 		function shareCollection(button) {
-			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
 				collectionUid = grid.data('collectionUid'),
-				organisationId = $(button).closest('.collectionButtons').find('.targetOrganisationSelect').val();
+				organisationId = $(button).closest('.container-fluid').find('.targetOrganisationSelect').val();
 			
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/shareCollection.do',
@@ -275,8 +293,9 @@
 			});
 		}
 		
+		// stop sharing a collection with authors of an organisation
 		function unshareCollection(button, organisationId) {
-			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
 				collectionUid = grid.data('collectionUid');
 			
 			$.ajax({
@@ -298,61 +317,91 @@
 <lams:Page title="Question collections" type="admin">
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
+			<%-- jqGrid placeholder with some useful attributes --%>
 			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
-			<div class="questionButtons">
-				<c:if test="${not empty collection.userId}">
-					<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
-				</c:if>
-				<div class="targetCollectionDiv">
-					<span>Transfer questions to </span>
-					<select class="form-control targetCollectionSelect">
-						<c:forEach var="target" items="${collections}">
-							<c:if test="${not (target.uid eq collection.uid)}">
-								<option value="${target.uid}"
-								<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
-									selected="selected"
-								</c:if>
-								>
-									<c:out value="${target.name}" />
-								</option>
-							</c:if>
-						</c:forEach>
-					</select>
-					<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, false)" disabled="disabled">Add</button>
-					<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
-				</div>
-			</div>
-			<c:if test="${not empty collection.userId and not collection.personal}">
-				<div class="collectionButtons">
-					<button class="btn btn-default" onClick="javascript:removeCollection(this)">Remove collection</button>
-					<div class="targetOrganisationDiv">
-						<span>Share collection with </span>
-						<select class="form-control targetOrganisationSelect">
-							<c:forEach var="target" items="${collection.shareableWithOrganisations}">
-									<option value="${target.organisationId}">
+			
+			<div class="container-fluid">
+			
+				<div class="questionButtons row">
+					<div class="col-xs-12 col-md-2">
+						<%-- Do not allow removing questions from public collection --%>
+						<c:if test="${not empty collection.userId}">
+							<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
+						</c:if>
+					</div>
+					<div class="col-xs-12 col-md-2">
+						<span>Transfer questions to </span>
+					</div>
+					<div class="col-xs-12 col-md-6">
+						<select class="form-control targetCollectionSelect">
+							<c:forEach var="target" items="${collections}">
+								<c:if test="${not (target.uid eq collection.uid)}">
+									<option value="${target.uid}"
+									<%-- The default target collection for adding/copying questions is the public collection,
+										 unless it is the public collection itself: then it is the private collection --%>
+									<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
+										selected="selected"
+									</c:if>
+									>
 										<c:out value="${target.name}" />
 									</option>
+								</c:if>
 							</c:forEach>
 						</select>
-						<button class="btn btn-default" onClick="javascript:shareCollection(this)">Share</button>
 					</div>
-					<c:if test="${not empty collection.organisations}">
-						<div>
-							<span>Shared with organisations</span>
-							<ul>
-								<c:forEach var="organisation" items="${collection.organisations}">
-									<li>
-										<c:out value="${organisation.name}" />
-										<button class="btn btn-default" onClick="javascript:unshareCollection(this, ${organisation.organisationId})">
-											Unshare
-										</button>
-									</li>
-								</c:forEach>
-							</ul>
-						</div>
-					</c:if>
+					<div class="col-xs-12 col-md-2 button-group">
+						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, false)" disabled="disabled">Add</button>
+						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
+					</div>
 				</div>
-			</c:if>
+				
+				<%-- Do not display links for collection manipulation for public and private collections --%>
+				<c:if test="${not empty collection.userId and not collection.personal}">
+					<div class="row">
+						<div class="col-xs-12 col-md-2">
+							<button class="btn btn-default" onClick="javascript:removeCollection(this)">Remove collection</button>
+						</div>
+						<div class="col-xs-12 col-md-2">
+							<span>Share collection with </span>
+						</div>
+						<div class="col-xs-12 col-md-6">
+							<select class="form-control targetOrganisationSelect">
+								<c:forEach var="target" items="${collection.shareableWithOrganisations}">
+										<option value="${target.organisationId}">
+											<c:out value="${target.name}" />
+										</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="col-xs-12 col-md-2">
+							<button class="btn btn-default" onClick="javascript:shareCollection(this)">Share</button>
+						</div>
+					</div>
+					
+					<c:if test="${not empty collection.organisations}">
+						<div class="row">
+							<div class="col-xs-0 col-md-2"></div>
+							<div class="col-xs-12 col-md-8 header-column">
+								<span>Shared with organisations</span>
+							</div>
+							<div class="col-xs-0 col-md-2"></div>
+						</div>
+						<c:forEach var="organisation" items="${collection.organisations}">
+							<div class="row">
+								<div class="col-xs-0 col-md-2"></div>
+								<div class="col-xs-0 col-md-8">
+									<c:out value="${organisation.name}" />
+								</div>
+								<div class="col-xs-0 col-md-2">
+									<button class="btn btn-default" onClick="javascript:unshareCollection(this, ${organisation.organisationId})">
+										Unshare
+									</button>
+								</div>
+							</div>
+						</c:forEach>
+					</c:if>
+				</c:if>
+			</div>
 		</div>
 	</c:forEach>
 	<div id="addCollectionDiv">

@@ -131,6 +131,7 @@ public class QbCollectionController {
 		Element rowElement = document.createElement(CommonConstants.ELEMENT_ROW);
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
+		// the last cell is for creating stats button
 		String[] data = { uid, question.getName(), uid };
 
 		for (String cell : data) {
