@@ -11,7 +11,7 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style>
-		div.buttons {
+		div.questionButtons, div.collectionButtons {
 			margin-top: 5px;
 		}
 		
@@ -83,7 +83,7 @@
 				      ],
 			        onSelectRow : function(id, status, event) {
 					    var grid = $(this),
-					    	buttons = grid.closest('.ui-jqgrid').siblings('.buttons').find('.btn'),
+					    	buttons = grid.closest('.ui-jqgrid').siblings('.questionButtons').find('.btn'),
 					   		included = grid.data('included'),
 							excluded = grid.data('excluded'),
 							selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
@@ -115,7 +115,7 @@
 					},
 					gridComplete : function(){
 						var grid = $(this),
-							buttons = grid.closest('.ui-jqgrid').siblings('.buttons').find('.btn'),
+							buttons = grid.closest('.ui-jqgrid').siblings('.questionButtons').find('.btn'),
 							// cell containing "(de)select all" button
 							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div'),
 							included = grid.data('included');
@@ -189,6 +189,29 @@
 			});
 		}
 		
+		function addCollectionQuestions(button, copy) {
+			var grid = $(button).closest('.questionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+				sourceCollectionUid = grid.data('collectionUid'),
+				targetCollectionUid = $(button).closest('.panel-body').find('.targetCollectionSelect').val(),
+				included = grid.data('included'),
+				excluded = grid.data('excluded');
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'sourceCollectionUid' : sourceCollectionUid,
+					'targetCollectionUid' : targetCollectionUid,
+					'copy'			: copy,
+					'included'	    : included ? JSON.stringify(included) : null,
+					'excluded'	    : excluded ? JSON.stringify(excluded) : null
+				},
+				'cache' : false
+			}).done(function(){
+				$('.collection-grid[data-collection-uid="' + targetCollectionUid + '"]').trigger('reloadGrid');
+			});
+		}
+		
 		function addCollection() {
 			var name = $('#addCollectionDiv input').val().trim(),
 				lower = name.toLowerCase();
@@ -214,27 +237,23 @@
 			}
 		}
 		
-		function addCollectionQuestions(button, copy) {
-			var grid = $(button).closest('.buttons').siblings(".ui-jqgrid").find('.collection-grid'),
-				sourceCollectionUid = grid.data('collectionUid'),
-				targetCollectionUid = $(button).closest('.panel-body').find('.targetCollectionSelect').val(),
-				included = grid.data('included'),
-				excluded = grid.data('excluded');
-			$.ajax({
-				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
-				'type' : 'POST',
-				'dataType' : 'text',
-				'data' : {
-					'sourceCollectionUid' : sourceCollectionUid,
-					'targetCollectionUid' : targetCollectionUid,
-					'copy'			: copy,
-					'included'	    : included ? JSON.stringify(included) : null,
-					'excluded'	    : excluded ? JSON.stringify(excluded) : null
-				},
-				'cache' : false
-			}).done(function(){
-				$('.collection-grid[data-collection-uid="' + targetCollectionUid + '"]').trigger('reloadGrid');
-			});
+		function removeCollection(button) {
+			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+				collectionUid = grid.data('collectionUid'),
+				name = grid.data('collectionName');
+			if (confirm('Are you sure you want to remove "' + name + '" collection?')) {
+				$.ajax({
+					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
+					'type' : 'POST',
+					'dataType' : 'text',
+					'data' : {
+						'collectionUid' : collectionUid
+					},
+					'cache' : false
+				}).done(function(){
+					document.location.reload();
+				});
+			}
 		}
 	</script>
 </lams:head>
@@ -243,8 +262,10 @@
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
 			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
-			<div class="buttons">
-				<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
+			<div class="questionButtons">
+				<c:if test="${not empty collection.userId}">
+					<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
+				</c:if>
 				<div class="targetCollectionDiv">
 					<span>Transfer questions to </span>
 					<select class="form-control targetCollectionSelect">
@@ -262,6 +283,11 @@
 					<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
 				</div>
 			</div>
+			<c:if test="${not empty collection.userId and not collection.personal}">
+				<div class="collectionButtons">
+					<button class="btn btn-default" onClick="javascript:removeCollection(this)">Remove collection</button>
+				</div>
+			</c:if>
 		</div>
 	</c:forEach>
 	<div id="addCollectionDiv">

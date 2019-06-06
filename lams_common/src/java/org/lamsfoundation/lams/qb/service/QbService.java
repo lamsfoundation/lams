@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -296,7 +297,11 @@ public class QbService implements IQbService {
 
     @Override
     public void removeCollection(long collectionUid) {
-	qbDAO.deleteById(QbCollection.class, collectionUid);
+	QbCollection collection = (QbCollection) qbDAO.find(QbCollection.class, collectionUid);
+	if (collection.getUserId() == null || collection.isPersonal()) {
+	    throw new InvalidParameterException("Attempt to remove a private or the public question bank collection");
+	}
+	qbDAO.delete(collection);
     }
 
     @Override

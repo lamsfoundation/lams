@@ -170,15 +170,9 @@ public class QbCollectionController {
 	}
     }
 
-    @RequestMapping("/addCollection")
-    @ResponseBody
-    public void removeCollectionQuestions(@RequestParam String name) {
-	qbService.addCollection(getUserId(), name);
-    }
-
     @RequestMapping("/addCollectionQuestions")
     @ResponseBody
-    public void addllectionQuestions(@RequestParam long sourceCollectionUid, @RequestParam long targetCollectionUid,
+    public void addCollectionQuestions(@RequestParam long sourceCollectionUid, @RequestParam long targetCollectionUid,
 	    @RequestParam boolean copy, @RequestParam String included, @RequestParam String excluded)
 	    throws IOException {
 	if (StringUtils.isBlank(excluded)) {
@@ -194,6 +188,18 @@ public class QbCollectionController {
 	    }
 	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet);
 	}
+    }
+
+    @RequestMapping("/addCollection")
+    @ResponseBody
+    public void addCollection(@RequestParam String name) {
+	qbService.addCollection(getUserId(), name);
+    }
+
+    @RequestMapping("/removeCollection")
+    @ResponseBody
+    public void removeCollection(@RequestParam long collectionUid) {
+	qbService.removeCollection(collectionUid);
     }
 
     private Integer getUserId() {
