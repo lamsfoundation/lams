@@ -274,6 +274,24 @@
 				document.location.reload();
 			});
 		}
+		
+		function unshareCollection(button, organisationId) {
+			var grid = $(button).closest('.collectionButtons').siblings(".ui-jqgrid").find('.collection-grid'),
+				collectionUid = grid.data('collectionUid');
+			
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/unshareCollection.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'collectionUid' : collectionUid,
+					'organisationId': organisationId
+				},
+				'cache' : false
+			}).done(function(){
+				document.location.reload();
+			});
+		}
 	</script>
 </lams:head>
 <body class="stripes">
@@ -323,7 +341,12 @@
 							<span>Shared with organisations</span>
 							<ul>
 								<c:forEach var="organisation" items="${collection.organisations}">
-									<li><c:out value="${organisation.name}" /></li>
+									<li>
+										<c:out value="${organisation.name}" />
+										<button class="btn btn-default" onClick="javascript:unshareCollection(this, ${organisation.organisationId})">
+											Unshare
+										</button>
+									</li>
 								</c:forEach>
 							</ul>
 						</div>

@@ -212,6 +212,12 @@ public class QbCollectionController {
 	qbService.shareCollection(collectionUid, organisationId);
     }
 
+    @RequestMapping("/unshareCollection")
+    @ResponseBody
+    public void unshareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
+	qbService.unshareCollection(collectionUid, organisationId);
+    }
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
