@@ -17,7 +17,20 @@
  	<%@ include file="../header.jsp" %>
  
  	<title><fmt:message key="authoring.tbl.template.title"/></title>
-
+	
+	<style>
+		div.space-top {
+			padding-top: 15px;
+		}
+		div.space-sides {
+			padding-left: 15px;
+			padding-right: 15px;
+		}
+		div.space-bottom {
+			padding-bottom: 15px;
+		}
+	</style>
+	
 	<script type="text/javascript">
 
 		<%@ include file="../comms.jsp" %>
@@ -68,37 +81,46 @@
 			// Remove the display:none or the fields won't be validate as jquery validation is set to only valid non hidden fields. 
 			// If we allow validation of hidden fields then we cannot have validation on the Still should not be seen as visibility is hidden
 			// catch the editor update and redo validation otherwise error message won't go away when the user enters text.
+			debugger;
 			initializeWizard(validator);
 			reconfigureCKEditorInstance(CKEDITOR.instances.question1);
 
 		});
 
+		function createApplicationExercise(numAppexFieldname ) {
+			var numAppex = $('#numAppEx');
+			var currNum = numAppex.val();
+			var nextNum = +currNum + 1;
+			var newDiv = document.createElement("div");
+			newDiv.id = 'divappex'+nextNum;
+			newDiv.className = 'panel panel-default';
+			var url=getSubmissionURL()+"/createApplicationExercise.do?appexNumber="+nextNum;
+			$('#accordianAppEx').append(newDiv);
+			$.ajaxSetup({ cache: true });
+			$(newDiv).load(url, function( response, status, xhr ) {
+				if ( status == "error" ) {
+					console.log( xhr.status + " " + xhr.statusText );
+					newDiv.remove();
+				} else {
+					numAppex.val(nextNum);
+					newDiv.scrollIntoView();
+					// close all the others
+					var i;
+					for (i = 1; i <= currNum; i++) {
+						$('#collapseAppex'+i).removeClass('in');
+					}
+				}
+			});
+		}		
 
 		<%-- matching importQTI(limit) function is in comms.jsp --%>
 	    function saveQTI(formHTML, formName, callerID) {
 	    	var form = $($.parseHTML(formHTML));
 
-	    	if ( callerID == 'assessment' ) {
-		    	var nextNum  = +$('#numAssessments').val()+1;
-				var url=getSubmissionURL()+"/importQTI.do?contentFolderID=${contentFolderID}&templatePage=assessmentQTI&questionNumber="+nextNum;
-				$.ajaxSetup({ cache: true });
-				$.ajax({
-					type: "POST",
-					url: url,
-					data: form.serializeArray(),
-					success: function(response, status, xhr) {
-						if ( status == "error" ) {
-							console.log( xhr.status + " " + xhr.statusText );
-						} else {
-							$('#divassessments').append(response);
-							$('#divassess'+nextNum)[0].scrollIntoView();
-						}
-					}
-				});
-
-	    	} else {
-		    	var nextNum  = +$('#numQuestions').val()+1;
-				var url=getSubmissionURL()+"/importQTI.do?contentFolderID=${contentFolderID}&templatePage=mcquestionQTI&questionNumber="+nextNum;
+	    	if ( callerID == 'mcq' ) {
+		    	var nextNum  = +$('#numQuestions').val()+1,
+						url=getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=mcquestionQTI&questionNumber='
+								+nextNum+'&numQuestionsFieldname=numQuestions';
 				$.ajaxSetup({ cache: true });
 				$.ajax({
 					type: "POST",
@@ -110,6 +132,27 @@
 						} else {
 							$('#divquestions').append(response);
 							$('#divq'+nextNum)[0].scrollIntoView();
+						}
+					}
+				});
+	    	} else {
+	    		var	appexIndex = +(callerID.substring(5)),
+	    				numQuestionsFieldname = 'numAssessments'+appexIndex,
+	    				containingDivName = 'divass'+appexIndex,
+		    			nextNum  = +$('#'+numQuestionsFieldname).val()+1,
+		    			url=getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=assessmentQTI&questionNumber='
+		    					+nextNum+'&containingDivName='+containingDivName+'&numQuestionsFieldname='+numQuestionsFieldname;
+				$.ajaxSetup({ cache: true });
+				$.ajax({
+					type: "POST",
+					url: url,
+					data: form.serializeArray(),
+					success: function(response, status, xhr) {
+						if ( status == "error" ) {
+							console.log( xhr.status + " " + xhr.statusText );
+						} else {
+							$('#'+containingDivName).append(response);
+							$('#'+containingDivName+'divassess'+nextNum)[0].scrollIntoView();
 						}
 					}
 				});
@@ -196,19 +239,18 @@
 		<div class="tab-pane" id="tab4">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span>
 			
-		 	<input type="hidden" name="numAssessments" id="numAssessments" value="0"/>
+			<input type="hidden" name="numAppEx" id="numAppEx" value="1"/>
 	
-			<div id="divassessments">
-			</div>
-			
-			<span class="voffset10">
-			<a href="#" onclick="javascript:createAssessment('essay');" class="btn btn-default"><fmt:message key="authoring.create.essay.question"/></a>
-			<a href="#" onclick="javascript:createAssessment('mcq');" class="btn btn-default"><fmt:message key="authoring.create.mc.question"/></a>
-			<a href="#" onClick="javascript:importQTI('assessment')" class="btn btn-default pull-right"><fmt:message key="authoring.template.basic.import.qti" /></a>
-			</span>
+			<div class="panel-group" id="accordianAppEx" role="tablist" aria-multiselectable="true"> 
+			<c:set var="appexNumber" scope="page">1</c:set>
+			<%@ include file="appex.jsp" %>
+			</div> <!--  end panel group -->
+
+			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><fmt:message key="authoring.create.application.exercise"/></a>
 			
 	    </div>
-	    	<div class="tab-pane" id="tab5">
+
+    	<div class="tab-pane" id="tab5">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.peer.review" /></span>
 			
 		 	<input type="hidden" name="numRatingCriterias" id="numRatingCriterias" value="1"/>

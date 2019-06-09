@@ -127,23 +127,33 @@
 			$('#templateForm').submit();
 		}
 
+		// Triggers the import window. The saving is done in a method saveQTI(formHTML, formName, callerID) which should be defined in the main template jsp file.
+		// CallerID can be set to define which tab has triggered the QTI import, as TBL has import on both the RAT Questions and App Ex tabs.
+		function importQTI(callerID, limit){
+		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?callerID='+callerID;
+		 	if ( limit ) {
+		 		url = url + '&limitType='+limit;
+		 	}
+	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes');
+	    }
 
-		function createAssessment(questionType) {
+		function createAssessment(questionType, numAssessmentsFieldname, containingDivName ) {
+			var numAssessments = $('#'+numAssessmentsFieldname);
 			var type = questionType ? questionType : 'essay';
-			var currNum = $('#numAssessments').val();
+			var currNum = numAssessments.val();
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
-			newDiv.id = 'divassess'+nextNum;
-			newDiv.className = 'space-top';
-			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type;
-			$('#divassessments').append(newDiv);
+			newDiv.id = containingDivName+'divassess'+nextNum;
+			newDiv.className = 'space-top space-sides';
+			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type+"&containingDivName="+containingDivName;
+			$('#'+containingDivName).append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
 					newDiv.remove();
 				} else {
-					$('#numAssessments').val(nextNum);
+					numAssessments.val(nextNum);
 					newDiv.scrollIntoView();
 				}
 			});
@@ -234,9 +244,7 @@
 			});
 		}		
 
-		function getOptionData(questionNum, assessment) {
-			var paramPrefix  =  assessment ? "assmcq" : "question"; 
-			paramPrefix = paramPrefix + questionNum;
+		function getOptionData(questionNum, paramPrefix) {
 			var data = { };
 			var correctField = paramPrefix + "correct";
 			$('#templateForm').find('input, textarea, select').each(function() {
@@ -251,13 +259,18 @@
 		    return data;
 		}
 		
-		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, assessment) {
+		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, appexContainingDivName) {
 			refreshCKEditors() ;
-			var url=getSubmissionURL()+"/swapOption.do?questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
-			if ( assessment ) {
-				url += "&assess=true";
+
+			var paramPrefix  =  appexContainingDivName ? appexContainingDivName  + "assmcq" : "question"; 
+			paramPrefix = paramPrefix + questionNum;
+			var data = getOptionData(questionNum, paramPrefix);
+
+			var url=getSubmissionURL()+"/swapOption.do?questionNumber="+questionNum+"&optionNumber1="+optionNum1
+				+"&optionNumber2="+optionNum2;
+			if ( appexContainingDivName ) {
+				url += "&containingDivName="+appexContainingDivName+"&assess=true";
 			}
-			var data = getOptionData(questionNum, assessment);
 
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
@@ -269,12 +282,16 @@
 			});
 		}
 
-		function removeOption(questionNum, optionNum, divToLoad, assessment) {
+		function removeOption(questionNum, optionNum, divToLoad, appexContainingDivName) {
 			refreshCKEditors() ;
+
+			var paramPrefix  =  appexContainingDivName ? appexContainingDivName  + "assmcq" : "question"; 
+			paramPrefix = paramPrefix + questionNum;
+			var data = getOptionData(questionNum, paramPrefix);
+
 			var url=getSubmissionURL()+"/deleteOption.do?questionNumber="+questionNum+"&optionNumber="+optionNum;
-			if ( assessment ) 
-				url += "&assess=true";
-			var data = getOptionData(questionNum, assessment);
+			if ( appexContainingDivName ) 
+				url += "&containingDivName="+appexContainingDivName+"&assess=true";
 				
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
@@ -383,12 +400,3 @@
 			} 
 			return true;
 		}
-
-
-		function importQTI(callerID, limit){
-		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?callerID='+callerID;
-		 	if ( limit ) {
-		 		url = url + '&limitType='+limit;
-		 	}
-	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes');
-	    }

@@ -10,7 +10,7 @@ which are passed on to the individual question jsps to generate the form fields.
 <c:set scope="request" var="questionNumber">${currentNumber}</c:set>
 <c:set scope="request" var="question">${question}</c:set>
 
-<div id="divassess${currentNumber}" class="space-top">
+<div id="${containingDivName}divassess${currentNumber}" class="space-top space-sides">
 <c:choose>
 <c:when test="${not empty question.answers}">
 		<%@ include file="../tool/assessmcq.jsp" %>
@@ -25,5 +25,5 @@ which are passed on to the individual question jsps to generate the form fields.
 
 </c:forEach>
 <script>
-	$('#numAssessments').val("${currentNumber-1}");
+	$('#${numQuestionsFieldname}').val("${currentNumber-1}");
 </script>

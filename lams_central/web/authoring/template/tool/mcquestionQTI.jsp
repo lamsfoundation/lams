@@ -18,5 +18,5 @@ which are passed on to the individual question jsps to generate the form fields.
 
 </c:forEach>
 <script>
-	$('#numQuestions').val("${currentNumber-1}");
+	$('#${numQuestionsFieldname}').val("${currentNumber-1}");
 </script>

@@ -753,12 +753,12 @@ public abstract class LdTemplateController {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, ArrayNode questions) throws IOException {
+	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
-
+	toolContentJSON.put("numbered", enableNumbering);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
@@ -961,12 +961,13 @@ public abstract class LdTemplateController {
      * details of questions). Other fields are optional.
      */
     protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, ArrayNode questions) throws IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, boolean prefixAnswersWithLetters, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevel);
+	toolContentJSON.put("prefixAnswersWithLetters", prefixAnswersWithLetters);
 	return createToolContent(user, LdTemplateController.MCQ_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1324,6 +1325,7 @@ public abstract class LdTemplateController {
     @RequestMapping("/createAssessment")
     public String createAssessment(HttpServletRequest request) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 
 	String questionType = WebUtil.readStrParam(request, "questionType");
 	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
@@ -1334,13 +1336,15 @@ public abstract class LdTemplateController {
 
     }
 
-    @RequestMapping("/importQTI")
+  @RequestMapping("/importQTI")
     public String importAssessmentQTI(HttpServletRequest request) throws UnsupportedEncodingException {
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
 	String templatePage = WebUtil.readStrParam(request, "templatePage");
 	Question[] updatedQuestions = preprocessQuestions(QuestionParser.parseQuestionChoiceForm(request), contentFolderID);
 	request.setAttribute("questions", updatedQuestions);
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
+	request.setAttribute("numQuestionsFieldname", WebUtil.readStrParam(request, "numQuestionsFieldname"));
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return "/authoring/template/tool/" + templatePage;
     }
 
@@ -1468,9 +1472,11 @@ public abstract class LdTemplateController {
 
 	Integer questionNumber = WebUtil.readIntParam(request, "questionNumber", true);
 	Integer delete = WebUtil.readIntParam(request, "optionNumber");
+	
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
-
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
+	String containingDivName = WebUtil.readStrParam(request,  "containingDivName", true);
+	String prefixParam =  containingDivName != null ? containingDivName  + "assmcq" : "question";
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, prefixParam);
 	optionsMap.remove(delete);
 	// reorder the displayOrder and setup the return value
 	LinkedList<Option> options = new LinkedList<>();
@@ -1482,6 +1488,7 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
+	request.setAttribute("containingDivName", containingDivName);
 	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
@@ -1500,8 +1507,9 @@ public abstract class LdTemplateController {
 	}
 
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
-
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
+	String containingDivName = WebUtil.readStrParam(request,  "containingDivName", true);
+	String prefixParam =  containingDivName != null ? containingDivName  + "assmcq" : "question";
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, prefixParam);
 	// reorder the options and setup the return value
 	LinkedList<Option> options = new LinkedList<>();
 
@@ -1526,28 +1534,27 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
 
     // if mcq paramPrefix = "question". if assessment multiple choice paramPrefix = assmcq
     private TreeMap<Integer, Option> getOptions(HttpServletRequest request, Integer questionNumber,
-	    boolean useAssessmentVersion) {
-
-	String paramPrefix = useAssessmentVersion ? "assmcq" : "question";
+	    String prefixParam) {
 
 	// correctDisplayIdInteger is used for MCQ but not Survey - the value will be ignored by the
 	// survey jsp page.
-	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, paramPrefix + questionNumber + "correct", true);
+	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, prefixParam + questionNumber + "correct", true);
 	int correctDisplayId = correctDisplayIdInteger != null ? correctDisplayIdInteger.intValue() : 0;
 
 	TreeMap<Integer, Option> optionDtos = new TreeMap<>();
 
 	for (int i = 1; i <= MAX_OPTION_COUNT; i++) {
-	    String optionText = request.getParameter(paramPrefix + questionNumber + "option" + i);
+	    String optionText = request.getParameter(prefixParam + questionNumber  + "option" + i);
 	    if (optionText != null) {
 		// Grade is used for assessment
-		String grade = request.getParameter(paramPrefix + questionNumber + "option" + i + "grade");
+		String grade = request.getParameter(prefixParam + questionNumber + "option" + i + "grade");
 		Option option = new Option(i, i == correctDisplayId, optionText, grade);
 		optionDtos.put(new Integer(i), option);
 	    }

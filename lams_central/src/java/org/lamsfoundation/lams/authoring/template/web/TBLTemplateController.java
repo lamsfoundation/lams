@@ -90,7 +90,6 @@ public class TBLTemplateController extends LdTemplateController {
 
     @Override
     protected ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession) throws Exception {
-
 	TBLData data = new TBLData(request);
 	if (data.getErrorMessages() != null && data.getErrorMessages().size() > 0) {
 	    ObjectNode restRequestJSON = JsonNodeFactory.instance.objectNode();
@@ -126,8 +125,9 @@ public class TBLTemplateController extends LdTemplateController {
 	}
 
 	// Grouping
+	activityTitle = data.getText("boilerplate.grouping.title");
 	ObjectNode[] groupingJSONs = createGroupingActivity(maxUIID, order++, currentActivityPosition,
-		data.groupingType, data.numLearners, data.numGroups, null, null, data.getUIBundle(),
+		data.groupingType, data.numLearners, data.numGroups, activityTitle, null, data.getUIBundle(),
 		data.getFormatter());
 	activities.add(groupingJSONs[0]);
 	groupings.add(groupingJSONs[1]);
@@ -149,7 +149,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
 	    Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable,
+		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable, false,
 		    JsonUtil.readArray(data.testQuestions.values()));
 	    ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle);
@@ -189,51 +189,88 @@ public class TBLTemplateController extends LdTemplateController {
 
 	}
 
+	// Application Exercises - multiple exercises with gates between each exercise. There may also be a grouped 
+	// notebook after an exercise if indicated by the user. Each Application Exercise will have one or more questions.
+	// Start a new row so that they group nicely together
 	int displayOrder = 1;
+	String displayOrderAsString =  Integer.toString(displayOrder);
 	if (data.useApplicationExercises) {
-	    // Stop!
-	    firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
-	    currentActivityPosition = firstActivityInRowPosition;
-	    activityTitle = data.getText("boilerplate.before.app.ex");
-	    if (data.useScheduledGates && data.aeStartOffset != null) {
-		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, data.aeStartOffset));
-	    } else {
-		activities.add(
-			createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), activityTitle));
-	    }
+	    String gateTitleBeforeAppEx = data.getText("boilerplate.before.app.ex");
+	    String gateTitleBeforeNotebook = data.getText("boilerplate.before.app.ex.notebook");
 
-	    // Application Exercise - all the questions go into one exercise
-	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
-	    ArrayNode questionsJSONArray = JsonNodeFactory.instance.arrayNode();
-	    for (Assessment exerciseQuestion : data.applicationExercises.values()) {
-		if ( exerciseQuestion.getTitle() == null ) {
-		    // put in a dummy title if one is not supplied by the user
-		    String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
-				new String[] { Integer.toString(displayOrder) });
-		    exerciseQuestion.setTitle(applicationExerciseTitle);
+	    for (AppExData applicationExercise : data.applicationExercises.values()) {
+		
+		// Start a new row for each application exercise and potentially the notebook.
+		firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
+		currentActivityPosition = firstActivityInRowPosition;
+
+		//  Gate before Application Exercise 
+		if (data.useScheduledGates && data.aeStartOffset != null) {
+		    activities.add(createScheduledGateActivity(maxUIID, order++,
+			    calcGateOffset(currentActivityPosition), gateTitleBeforeAppEx, data.aeStartOffset));
+		} else {
+		    activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+			    gateTitleBeforeAppEx));
 		}
-		questionsJSONArray.add(exerciseQuestion.getAsObjectNode(displayOrder));
+
+		// Application Exercise
+		int assessmentNumber = 1;
+		String applicationExerciseTitle = data.getText("boilerplate.ae.application.exercise.num",
+			new String[] { displayOrderAsString });
+		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+		ArrayNode questionsJSONArray = JsonNodeFactory.instance.arrayNode();
+		for (Assessment exerciseQuestion : applicationExercise.assessments.values()) {
+		    if (exerciseQuestion.getTitle() == null) {
+			// put in a dummy title if one is not supplied by the user
+			exerciseQuestion.setTitle(data.getText("boilerplate.ae.question.num",
+				new String[] { Integer.toString(assessmentNumber) }));
+		    }
+			questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
+			assessmentNumber++;
+		}
+		Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
+			data.getText("boilerplate.ae.instructions"), null, true, false, questionsJSONArray);
+		activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
+			data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
+
+		// Optional Gate / Notebook. Don't add the extra gate in LAMS TBL or we will get too many scheduled gates to manage
+		if (applicationExercise.useNotebook) {
+		    if (!data.useScheduledGates) {
+			currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+			activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+				gateTitleBeforeNotebook));
+		    }
+		    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+		    String notebookTitle = data.getText("boilerplate.grouped.notebook.num",
+				new String[] { displayOrderAsString });
+		    Long reflectionToolContentId = createNotebookToolContent(userDTO, notebookTitle,
+			    applicationExercise.notebookInstructions, false, false);
+		    activities.add(createNotebookActivity(maxUIID, order++, currentActivityPosition,
+			    reflectionToolContentId, data.contentFolderID, groupingUIID, null, null, notebookTitle));
+		}
+
 		displayOrder++;
 	    }
-	    String overallAssessmentTitle = data.getText("boilerplate.ae.application.exercise.num",
-		    new String[] { "" });
-	    Long aetoolContentId = createAssessmentToolContent(userDTO, overallAssessmentTitle,
-		    data.getText("boilerplate.ae.instructions"), null, true, questionsJSONArray);
-	    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
-		    data.contentFolderID, groupingUIID, null, null, overallAssessmentTitle));
+
 	}
+
+	firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
+	currentActivityPosition = firstActivityInRowPosition;
 
 	if (data.usePeerReview) {
 	    // Peer Review - optional. Start by eliminating all criterias with no title. Then if any are left 
-	    // we create the tool data and activity
-	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
+	    // we create the gate before the Peer Review and the Peer Review tool data and activity
 	    ArrayNode criterias = JsonNodeFactory.instance.arrayNode();
 	    for (PeerReviewCriteria criteria : data.peerReviewCriteria.values()) {
 		if (criteria.getTitle() != null && criteria.getTitle().length() > 0)
 		    criterias.add(criteria.getAsObjectNode());
 	    }
 	    if (criterias.size() > 0) {
+		// Stop!
+		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+			data.getText("boilerplate.before.peer.review")));
+
+		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		String peerReviewTitle = data.getText("boilerplate.peerreview");
 		Long prtoolContentId = createPeerReviewToolContent(userDTO, peerReviewTitle,
 			data.getText("boilerplate.peerreview.instructions"), null, criterias);
@@ -266,6 +303,12 @@ public class TBLTemplateController extends LdTemplateController {
 
     }
 
+    class AppExData {
+	SortedMap<Integer, Assessment> assessments;
+	boolean useNotebook = false;
+	String notebookInstructions;
+    }
+    
     /**
      * TBLData contains all the data we need for the current instance. Created for each call to ensure that we have the
      * correct locale, messages, etc for this particular call.
@@ -306,7 +349,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 	SortedMap<Integer, ObjectNode> testQuestions;
 	boolean confidenceLevelEnable;
-	SortedMap<Integer, Assessment> applicationExercises;
+	SortedMap<Integer, AppExData> applicationExercises;
 	SortedMap<Integer, PeerReviewCriteria> peerReviewCriteria;
 
 	int questionOffset = 8;
@@ -324,7 +367,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
 
 	    testQuestions = new TreeMap<Integer, ObjectNode>();
-	    applicationExercises = new TreeMap<Integer, Assessment>();
+	    applicationExercises = new TreeMap<Integer, AppExData>();
 	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
 
 	    useIntroduction = WebUtil.readBooleanParam(request, "introduction", false);
@@ -389,7 +432,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    }
 
 	    if (useApplicationExercises) {
-		processAssessments(request);
+		processApplicationExercises(request);
 	    }
 
 	    validate();
@@ -415,13 +458,30 @@ public class TBLTemplateController extends LdTemplateController {
 	    return null;
 	}
 
-	// Assessment entries can't be deleted or rearranged so the count should always line up with numAssessments
-	private void processAssessments(HttpServletRequest request) {
-	    int numAssessments = WebUtil.readIntParam(request, "numAssessments");
+	// Assessment entries can't be deleted or rearranged so the count should always line up with numAppEx and numAssessments
+	private void processApplicationExercises(HttpServletRequest request) {
+	    int numAppEx = WebUtil.readIntParam(request, "numAppEx");
+	    for (int i = 1; i <= numAppEx; i++) {
+		String appexDiv = "divappex"+i;
+		AppExData newAppex = new AppExData();
+		newAppex.assessments = processAssessments(request, i);
+		newAppex.useNotebook = WebUtil.readBooleanParam(request,  appexDiv+"NB", false);
+		if ( newAppex.useNotebook ) {
+		    newAppex.notebookInstructions = WebUtil.readStrParam(request,  appexDiv+"NBIns", true);
+		}
+		applicationExercises.put(i,  newAppex);
+	    }
+	}
+
+	private SortedMap<Integer, Assessment> processAssessments(HttpServletRequest request, int appexNumber) {
+	    SortedMap<Integer, Assessment> applicationExercises = new TreeMap<Integer, Assessment>();
+	    int numAssessments = WebUtil.readIntParam(request, "numAssessments" + appexNumber);
+	    
 	    for (int i = 1; i <= numAssessments; i++) {
-		String assessmentPrefix = "assessment" + i;
+		String assessmentPrefix = new StringBuilder("divass").append(appexNumber).append("assessment")
+			.append(i).toString();
 		String questionText = getTrimmedString(request, assessmentPrefix, true);
-		String questionTitle = getTrimmedString(request, assessmentPrefix+"title", true);
+		String questionTitle = getTrimmedString(request, assessmentPrefix + "title", true);
 		Assessment assessment = new Assessment();
 		if (questionText != null) {
 		    assessment.setTitle(questionTitle);
@@ -429,8 +489,8 @@ public class TBLTemplateController extends LdTemplateController {
 		    assessment.setType(WebUtil.readStrParam(request, assessmentPrefix + "type"));
 		    assessment.setRequired(true);
 		    if (assessment.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
-			String optionPrefix = "assmcq" + i;
-			optionPrefix = optionPrefix + "option";
+			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq")
+				.append(i).append("option").toString();
 			for (int o = 1, order = 0; o <= MAX_OPTION_COUNT; o++) {
 			    String answer = getTrimmedString(request, optionPrefix + o, true);
 			    if (answer != null) {
@@ -441,7 +501,7 @@ public class TBLTemplateController extends LdTemplateController {
 				} catch (Exception e) {
 				    log.error("Error parsing " + grade + " for float", e);
 				    addValidationErrorMessage(
-					    "authoring.error.application.exercise.not.blank.and.grade", new Object[i]);
+					    "authoring.error.application.exercise.not.blank.and.grade", new Object[] {appexNumber, i});
 				}
 			    }
 			}
@@ -449,6 +509,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    applicationExercises.put(i, assessment);
 		}
 	    }
+	    return applicationExercises;
 	}
 
 	void processInputPeerReviewRequestField(String name, HttpServletRequest request) {
@@ -551,24 +612,45 @@ public class TBLTemplateController extends LdTemplateController {
 	    }
 	    if (sequenceTitle == null || !ValidationUtil.isOrgNameValid(sequenceTitle)) {
 		addValidationErrorMessage("authoring.fla.title.validation.error", null);
-	    } 
+	    }
 
 	    if (useApplicationExercises) {
-		if (applicationExercises.size() == 0) {
-		    addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });
-		} else {
-		    for (Map.Entry<Integer, Assessment> assessmentEntry : applicationExercises.entrySet()) {
-			List<String> errors = assessmentEntry.getValue().validate(appBundle, formatter,
-				assessmentEntry.getKey());
-			if (errors != null)
-			    errorMessages.addAll(errors);
-		    }
-		}
+		validateApplicationExercises();
 	    }
 	    // grouping is enforced on the front end by the layout & by requiring the groupingType
 	    // questions are validated in updateCorrectAnswers
 	}
 
+	private void validateApplicationExercises() {
+	    if (applicationExercises.size() == 0) {
+	        addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 });
+	    } else {
+	        for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
+	    	AppExData appEx = appExEntry.getValue();
+	    	if (appEx.assessments == null || appEx.assessments.size() == 0) {
+	    	    addValidationErrorMessage("authoring.error.application.exercise.num",
+	    		    new Integer[] { appExEntry.getKey() });
+	    	} else {
+	    	    for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
+	    		List<String> errors = assessmentEntry.getValue().validate(appBundle, formatter,
+	    			appExEntry.getKey(), assessmentEntry.getKey());
+	    		if (errors != null)
+	    		    errorMessages.addAll(errors);
+	    	    }
+	    	}
+	        }
+	    }
+	}
+
     }
+
+    // Create the application exercise form on the screen. Not in LdTemplateController as this is specific to TBL
+    // and hence the jsp is in the tbl template folder, not the tool template folder
+    @RequestMapping("/createApplicationExercise")
+    public String createApplicationExercise(HttpServletRequest request) {
+	request.setAttribute("appexNumber", WebUtil.readIntParam(request, "appexNumber"));
+	return "/authoring/template/tbl/appex";
+    }
+
 
 }
