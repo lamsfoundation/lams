@@ -99,22 +99,13 @@
    $('#${questionTitleDisplay}').editable({
    	mode: 'inline',
        type: 'text',
-    validate: function(value) {
-	    //close editing area on validation failure
-           if (!value.trim()) {
-               $('.editable-open').editableContainer('hide', 'cancel');
-               return 'Can not be empty!';
-           }
-       },
+       validate: validateXEditable,
        success: function(response, newValue) {
        	var trimmedValue = newValue.trim();
        	$('#${questionTitleDisplay}').val(trimmedValue);
        	$('#${questionTitleField}').val(trimmedValue);
        }
-   }).on('shown', function(e, editable) {
-	$(this).nextAll('i.fa-pencil').hide();
-}).on('hidden', function(e, reason) {
-	$(this).nextAll('i.fa-pencil').show();
-});;
+   }).on('shown', onShownForXEditable)
+	  .on('hidden', onHiddenForXEditable);
 </script>
 	

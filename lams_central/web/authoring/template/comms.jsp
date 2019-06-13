@@ -399,3 +399,23 @@
 			} 
 			return true;
 		}
+		
+		// Functions used of x-editable.
+		// Shown as a fudge the validator to keep x-editable compatible with jquery validator
+		function onShownForXEditable(e, editable) {
+			$(this).nextAll('i.fa-pencil').hide();
+		    var $innerForm = $(this).data('editable').input.$input.closest('form');
+	    	var $outerForm = $innerForm.parents('form').eq(0);
+	    	$innerForm.data('validator', $outerForm.data('validator'));
+		}		
+		function onHiddenForXEditable(e, reason) {
+			$(this).nextAll('i.fa-pencil').show();
+		}
+		function validateXEditable(value) {
+		    //close editing area on validation failure
+            if (!value.trim()) {
+                $('.editable-open').editableContainer('hide', 'cancel');
+                return 'Can not be empty!';
+            }
+        }
+		

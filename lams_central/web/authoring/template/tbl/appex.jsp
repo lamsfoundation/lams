@@ -59,23 +59,14 @@
     $('#${appexTitleDisplay}').editable({
     	mode: 'inline',
         type: 'text',
- 	    validate: function(value) {
-		    //close editing area on validation failure
-            if (!value.trim()) {
-                $('.editable-open').editableContainer('hide', 'cancel');
-                return 'Can not be empty!';
-            }
-        },
-       success: function(response, newValue) {
+ 	    validate: validateXEditable,
+        success: function(response, newValue) {
         	var trimmedValue = newValue.trim();
         	$('#${appexTitleDisplay}').val(trimmedValue);
         	$('#${appexTitleField}').val(trimmedValue);
-        }
-    }).on('shown', function(e, editable) {
-		$(this).nextAll('i.fa-pencil').hide();
-	}).on('hidden', function(e, reason) {
-		$(this).nextAll('i.fa-pencil').show();
-	});;
+       }
+    }).on('shown', onShownForXEditable)
+	  .on('hidden', onHiddenForXEditable);
     
 	</script>
 	
