@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-function" prefix="fn"%>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -11,25 +12,14 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 
-
 <lams:html>
 <lams:head>
  	<%@ include file="../header.jsp" %>
+ 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
+ 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
  
  	<title><fmt:message key="authoring.tbl.template.title"/></title>
-	
-	<style>
-		div.space-top {
-			padding-top: 15px;
-		}
-		div.space-sides {
-			padding-left: 15px;
-			padding-right: 15px;
-		}
-		div.space-bottom {
-			padding-bottom: 15px;
-		}
-	</style>
 	
 	<script type="text/javascript">
 
@@ -41,20 +31,13 @@
 		$(document).ready(function() {
 			groupingChanged();
 
-			// validate signup form on keyup and submit
+			// validate the main form
 			var validator = $("#templateForm").validate({
 			rules: {
 				sequenceTitle: {
 					required: true,
 					validateNoSpecialCharacters: true
 				},
-         		question1correct: "required",
- 				question1: {
- 					required: validateCK
-       			},
-       			assessment1: {
- 					required: validateCK
-       			},
 				<%@ include file="../groupingvalidation.jsp" %>
 			},
 			messages: {
@@ -62,10 +45,7 @@
 					required: '<fmt:message key="authoring.fla.title.validation.error" />',
 					validateNoSpecialCharacters: '<fmt:message key="authoring.fla.title.validation.error" />'
 				},
-				question1: '<fmt:message key="authoring.error.question.num"><fmt:param value="1"/></fmt:message>',
-				question1correct: '<fmt:message key="authoring.error.question.correct.num"><fmt:param value="1"/></fmt:message>',
-				assessment1: '<fmt:message key="authoring.error.application.exercise.num"><fmt:param value="1"/></fmt:message>',
-				<%@ include file="../groupingerrors.jsp" %>
+ 				<%@ include file="../groupingerrors.jsp" %>
 			},
 			invalidHandler: templateInvalidHandler,
 			errorClass: "text-danger",
@@ -77,14 +57,7 @@
 			});
 
 			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.fla.title.validation.error" />');
-
-			// Remove the display:none or the fields won't be validate as jquery validation is set to only valid non hidden fields. 
-			// If we allow validation of hidden fields then we cannot have validation on the Still should not be seen as visibility is hidden
-			// catch the editor update and redo validation otherwise error message won't go away when the user enters text.
-			debugger;
 			initializeWizard(validator);
-			reconfigureCKEditorInstance(CKEDITOR.instances.question1);
-
 		});
 
 		function createApplicationExercise(numAppexFieldname ) {
@@ -168,6 +141,8 @@
 <c:set var="title"><fmt:message key="authoring.tbl.template.title"/></c:set>
 <lams:Page title="${title}" type="wizard">
 
+<c:set var="usePreview">${fn:toLowerCase('@template_tbl_show_preview@') eq 'checked'}</c:set>
+
 	<div id="rootwizard">
 	<div class="navbar">
 	  <div class="navbar-inner">
@@ -177,7 +152,10 @@
 			<li><a href="#tab2" data-toggle="tab"><fmt:message key="authoring.section.lessondetails" /> </a></li>
 			<li><a href="#tab3" data-toggle="tab"><fmt:message key="authoring.section.questions" /></a></li>
 			<li><a href="#tab4" data-toggle="tab"><fmt:message key="authoring.section.applicationexercise" /></a></li>
+			<%--  Hide peer review page if not needed --%>
+			<c:if test="${usePreview}">
 			<li><a href="#tab5" data-toggle="tab"><fmt:message key="authoring.section.peerreview" /></a></li>
+			</c:if>
 		</ul>
 		</div>
 	  </div>
@@ -194,14 +172,11 @@
 	    <div class="tab-pane" id="tab1">
 		    	<jsp:include page="../genericintro.jsp" ><jsp:param name="templateName" value="tbl"/></jsp:include>
 		    	<div style="display:none">
-<!-- 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" @template_tbl_show_introduction@ />
- -->			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction"/>
+ 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" @template_tbl_show_introduction@ />
 			<input type="checkbox" name="iratra" value="true" class="form-control-inline" id="iratra" checked />
 			<input type="checkbox" name="appex" value="true" class="form-control-inline" id="appex" checked />
 			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  @template_tbl_show_preview@  />
-<!-- 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="preview" @template_tbl_show_notebook@/>
- -->
-			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="preview" />
+ 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="reflect" @template_tbl_show_notebook@/>
 			</div>
 	    </div>
 	    <div class="tab-pane" id="tab2">
@@ -218,7 +193,7 @@
 
 			<div class="form-group voffset10">
 				<label for="confidenceLevelEnable">
-					<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable"/>&nbsp;
+					<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
 					<fmt:message key="authoring.enable.confidence.levels"/>
 				</label>
 			</div>
@@ -250,6 +225,7 @@
 			
 	    </div>
 
+		<c:if test="${usePreview}">
     	<div class="tab-pane" id="tab5">
 			<span class="field-name"><fmt:message key="authoring.tbl.desc.peer.review" /></span>
 			
@@ -264,6 +240,7 @@
 			
 			<a href="#" onclick="javascript:createPeerReviewCriteria();" class="btn btn-default voffset10"><fmt:message key="authoring.create.criteria"/></a>
 	    </div>
+	    </c:if>
 	    
 	    <div id="navigation-buttons" class="voffset10">
 	    		<div style="float:right">

@@ -13,7 +13,7 @@
 	      		'nextSelector': '.button-next', 
 	      		'previousSelector': '.button-previous',
 	      		'onTabShow': function(tab, navigation, index) {
-	      			var total = navigation.find('li[display = block]').length;
+	      			var total = navigation.find('li:visible').length;
 	      			var current = index+1;
 	      			var percent = (current/total) * 100;
 	      			$('#rootwizard .progress-bar').css({width:percent+'%'})
@@ -214,29 +214,28 @@
 				}
 			});
 		}		
-				
-		function createAssessmentOption(questionNum, maxOptionCount) {
-			var currNum = $('#assmcq'+questionNum+'numOptions').val();
+		function createAssessmentOption(questionNum, maxOptionCount, containingDivName) {
+			var currNum = $('#'+containingDivName+'assmcq'+questionNum+'numOptions').val();
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
-			newDiv.id = 'divassmcq'+questionNum+'opt'+nextNum;
-			var optionsDiv=$('#divassmcq'+questionNum+'options');
+			newDiv.id = containingDivName+'divassmcq'+questionNum+'opt'+nextNum;
+			var optionsDiv=$('#'+containingDivName+'divassmcq'+questionNum+'options');
 			var lastChild=optionsDiv.children().filter(':last');
 			$(lastChild).after(newDiv);
 
-			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true";
+			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true&containingDivName="+containingDivName;
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
 					newDiv.remove();
 				} else {
-					$('#assmcq'+questionNum+'numOptions').val(nextNum);
+					$('#'+containingDivName+'assmcq'+questionNum+'numOptions').val(nextNum);
 					if ( nextNum >= maxOptionCount  ) {
-						$('#createAssessmentOptionButton'+questionNum).hide();
+						$('#'+containingDivName+'createAssessmentOptionButton'+questionNum).hide();
 					}
 					// need to add the down button to the previous last option!
-					var image = document.getElementById('assmcq'+questionNum+'option'+currNum+'DownButton')
+					var image = document.getElementById(containingDivName+'assmcq'+questionNum+'option'+currNum+'DownButton')
 					image.style.display="inline";
 					newDiv.scrollIntoView();
 					

@@ -1464,6 +1464,7 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	request.setAttribute("optionNumber", WebUtil.readIntParam(request, "optionNumber"));
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return (useAssessmentVersion ? "authoring/template/tool/assessoption" : "authoring/template/tool/mcoption");
     }
 

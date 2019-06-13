@@ -6,9 +6,22 @@
 <c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
 <%-- Generic Q&A question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options / as many as are need for a QTI import --%>
 
+<%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript. But that won't be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
+<c:choose>
+<c:when test="${not empty question.title}"><c:set var="questionTitle">${question.title}</c:set></c:when>
+<c:otherwise><c:set var="questionTitle"><fmt:message key="authoring.label.question.num"><fmt:param value="${questionNumber}"/></fmt:message></c:set></c:otherwise>
+</c:choose>
+<c:set var="questionTitleDisplay">question${questionNumber}titleDisplay</c:set>
+<c:set var="questionTitleField">question${questionNumber}title</c:set>
+
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<div class="panel-title"><label class="required"><fmt:message key="authoring.label.question.num"><fmt:param value="${questionNumber}"/></fmt:message></label></div>
+		<div class="panel-title">		
+		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
+			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+		${questionNumber eq 1 ? "</label>" : ""}
+			<input name="${questionTitleField}" id="${questionTitleField}" type="hidden" value="${questionTitle}"/>
+		</div>
 	</div>
 
 	<div class="panel-body">	
@@ -73,3 +86,26 @@
 		<div id="createOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createOption(${questionNumber},${maxOptionCount});" class="btn btn-default btn-sm"><fmt:message key="authoring.create.option"/></a></div>
 	</div>		
 </div>
+
+<script type="text/javascript">
+   $('#${questionTitleDisplay}').editable({
+   	mode: 'inline',
+       type: 'text',
+    validate: function(value) {
+	    //close editing area on validation failure
+           if (!value.trim()) {
+               $('.editable-open').editableContainer('hide', 'cancel');
+               return 'Can not be empty!';
+           }
+       },
+       success: function(response, newValue) {
+       	var trimmedValue = newValue.trim();
+       	$('#${questionTitleDisplay}').val(trimmedValue);
+       	$('#${questionTitleField}').val(trimmedValue);
+       }
+   }).on('shown', function(e, editable) {
+	$(this).nextAll('i.fa-pencil').hide();
+}).on('hidden', function(e, reason) {
+	$(this).nextAll('i.fa-pencil').show();
+});;
+</script>
