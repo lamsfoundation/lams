@@ -134,7 +134,9 @@
 		 	if ( limit ) {
 		 		url = url + '&limitType='+limit;
 		 	}
-	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes');
+			// open import pop up window, centered horizontally
+			var left = ((screen.width / 2) - (500 / 2));
+	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
 	    }
 
 		function createAssessment(questionType, numAssessmentsFieldname, containingDivName ) {
