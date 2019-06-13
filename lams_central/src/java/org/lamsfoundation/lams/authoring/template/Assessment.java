@@ -129,16 +129,16 @@ public class Assessment {
     }
 
     /** If no errors exist, returns null */
-    public List<String> validate(ResourceBundle appBundle, MessageFormat formatter, Integer questionNumber) {
+    public List<String> validate(ResourceBundle appBundle, MessageFormat formatter, Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
 	List<String> errorMessages = null;
 	if (questionText == null || questionText.length() == 0) {
 	    errorMessages = addError(errorMessages, TextUtil.getText(appBundle, formatter,
-		    "authoring.error.application.exercise.num", new Object[] { questionNumber }));
+		    "authoring.error.application.exercise.question.must.not.be.blank.num", new Object[] { applicationExerciseTitle, title }));
 	}
 	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    if (answers.size() == 0) {
 		errorMessages = addError(errorMessages, TextUtil.getText(appBundle, formatter,
-			"authoring.error.application.exercise.must.have.answer.num", new Object[] { questionNumber }));
+			"authoring.error.application.exercise.must.have.answer.num", new Object[] { applicationExerciseTitle, title }));
 	    } else {
 		boolean found100percent = false;
 		for (AssessMCAnswer answer : answers) {
@@ -151,7 +151,7 @@ public class Assessment {
 		    errorMessages = addError(errorMessages,
 			    TextUtil.getText(appBundle, formatter,
 				    "authoring.error.application.exercise.must.have.100.percent",
-				    new Object[] { questionNumber }));
+				    new Object[] { applicationExerciseTitle, title }));
 		}
 	    }
 	}
