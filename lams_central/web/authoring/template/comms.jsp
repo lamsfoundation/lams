@@ -2,17 +2,22 @@
 		var validator;
 		
 		// configure the wizard. Call after doing var validator = $("#templateForm").validate({ 
-		function initializeWizard(validatorIn) {
+		// screens need to specify the tabNumber for the save button if they are hiding tabs
+		function initializeWizard(validatorIn, startValidationOnTab, tblVersion) {
 			validator = validatorIn;
+			
+			if ( typeof startValidationOnTab === "undefined" )
+				startValidationOnTab = 0;
+
 	      	$('#rootwizard').bootstrapWizard({
 	      		'nextSelector': '.button-next', 
 	      		'previousSelector': '.button-previous',
 	      		'onTabShow': function(tab, navigation, index) {
-	      			var total = navigation.find('li').length;
+	      			var total = navigation.find('li:visible').length;
 	      			var current = index+1;
 	      			var percent = (current/total) * 100;
 	      			$('#rootwizard .progress-bar').css({width:percent+'%'})
- 	      			if ( current == total) {
+ 	      			if ( navigation.find('li:last').get(0) == tab.get(0) ) {
 	      				$('.button-save').show();
 	      				$('.button-next').hide();
 	      			} else {
@@ -22,7 +27,7 @@
  	      		},
  	      		'tabClass': 'nav nav-pills',
  		  		'onNext': function(tab, navigation, index) {
- 		  			if ( index > 1 ) {
+ 		  			if ( index >= (startValidationOnTab + 1) ) {
 	 		  			var valid = $("#templateForm").valid();
 	 		  			if(!valid) {
 	 		  				validator.focusInvalid();
@@ -122,23 +127,35 @@
 			$('#templateForm').submit();
 		}
 
+		// Triggers the import window. The saving is done in a method saveQTI(formHTML, formName, callerID) which should be defined in the main template jsp file.
+		// CallerID can be set to define which tab has triggered the QTI import, as TBL has import on both the RAT Questions and App Ex tabs.
+		function importQTI(callerID, limit){
+		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?callerID='+callerID;
+		 	if ( limit ) {
+		 		url = url + '&limitType='+limit;
+		 	}
+			// open import pop up window, centered horizontally
+			var left = ((screen.width / 2) - (500 / 2));
+	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
+	    }
 
-		function createAssessment(questionType) {
+		function createAssessment(questionType, numAssessmentsFieldname, containingDivName ) {
+			var numAssessments = $('#'+numAssessmentsFieldname);
 			var type = questionType ? questionType : 'essay';
-			var currNum = $('#numAssessments').val();
+			var currNum = numAssessments.val();
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
-			newDiv.id = 'divassess'+nextNum;
-			newDiv.className = 'space-top';
-			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type;
-			$('#divassessments').append(newDiv);
+			newDiv.id = containingDivName+'divassess'+nextNum;
+			newDiv.className = 'space-top space-sides';
+			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type+"&containingDivName="+containingDivName;
+			$('#'+containingDivName).append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
 					newDiv.remove();
 				} else {
-					$('#numAssessments').val(nextNum);
+					numAssessments.val(nextNum);
 					newDiv.scrollIntoView();
 				}
 			});
@@ -199,29 +216,28 @@
 				}
 			});
 		}		
-				
-		function createAssessmentOption(questionNum, maxOptionCount) {
-			var currNum = $('#assmcq'+questionNum+'numOptions').val();
+		function createAssessmentOption(questionNum, maxOptionCount, containingDivName) {
+			var currNum = $('#'+containingDivName+'assmcq'+questionNum+'numOptions').val();
 			var nextNum = +currNum + 1;
 			var newDiv = document.createElement("div");
-			newDiv.id = 'divassmcq'+questionNum+'opt'+nextNum;
-			var optionsDiv=$('#divassmcq'+questionNum+'options');
+			newDiv.id = containingDivName+'divassmcq'+questionNum+'opt'+nextNum;
+			var optionsDiv=$('#'+containingDivName+'divassmcq'+questionNum+'options');
 			var lastChild=optionsDiv.children().filter(':last');
 			$(lastChild).after(newDiv);
 
-			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true";
+			var url=getSubmissionURL()+"/createOption.do?questionNumber="+questionNum+"&optionNumber="+nextNum+"&assess=true&containingDivName="+containingDivName;
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
 				if ( status == "error" ) {
 					console.log( xhr.status + " " + xhr.statusText );
 					newDiv.remove();
 				} else {
-					$('#assmcq'+questionNum+'numOptions').val(nextNum);
+					$('#'+containingDivName+'assmcq'+questionNum+'numOptions').val(nextNum);
 					if ( nextNum >= maxOptionCount  ) {
-						$('#createAssessmentOptionButton'+questionNum).hide();
+						$('#'+containingDivName+'createAssessmentOptionButton'+questionNum).hide();
 					}
 					// need to add the down button to the previous last option!
-					var image = document.getElementById('assmcq'+questionNum+'option'+currNum+'DownButton')
+					var image = document.getElementById(containingDivName+'assmcq'+questionNum+'option'+currNum+'DownButton')
 					image.style.display="inline";
 					newDiv.scrollIntoView();
 					
@@ -229,9 +245,7 @@
 			});
 		}		
 
-		function getOptionData(questionNum, assessment) {
-			var paramPrefix  =  assessment ? "assmcq" : "question"; 
-			paramPrefix = paramPrefix + questionNum;
+		function getOptionData(questionNum, paramPrefix) {
 			var data = { };
 			var correctField = paramPrefix + "correct";
 			$('#templateForm').find('input, textarea, select').each(function() {
@@ -246,13 +260,18 @@
 		    return data;
 		}
 		
-		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, assessment) {
+		function swapOptions(questionNum, optionNum1, optionNum2, divToLoad, appexContainingDivName) {
 			refreshCKEditors() ;
-			var url=getSubmissionURL()+"/swapOption.do?questionNumber="+questionNum+"&optionNumber1="+optionNum1+"&optionNumber2="+optionNum2;
-			if ( assessment ) {
-				url += "&assess=true";
+
+			var paramPrefix  =  appexContainingDivName ? appexContainingDivName  + "assmcq" : "question"; 
+			paramPrefix = paramPrefix + questionNum;
+			var data = getOptionData(questionNum, paramPrefix);
+
+			var url=getSubmissionURL()+"/swapOption.do?questionNumber="+questionNum+"&optionNumber1="+optionNum1
+				+"&optionNumber2="+optionNum2;
+			if ( appexContainingDivName ) {
+				url += "&containingDivName="+appexContainingDivName+"&assess=true";
 			}
-			var data = getOptionData(questionNum, assessment);
 
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
@@ -264,12 +283,16 @@
 			});
 		}
 
-		function removeOption(questionNum, optionNum, divToLoad, assessment) {
+		function removeOption(questionNum, optionNum, divToLoad, appexContainingDivName) {
 			refreshCKEditors() ;
+
+			var paramPrefix  =  appexContainingDivName ? appexContainingDivName  + "assmcq" : "question"; 
+			paramPrefix = paramPrefix + questionNum;
+			var data = getOptionData(questionNum, paramPrefix);
+
 			var url=getSubmissionURL()+"/deleteOption.do?questionNumber="+questionNum+"&optionNumber="+optionNum;
-			if ( assessment ) 
-				url += "&assess=true";
-			var data = getOptionData(questionNum, assessment);
+			if ( appexContainingDivName ) 
+				url += "&containingDivName="+appexContainingDivName+"&assess=true";
 				
 			$.ajaxSetup({ cache: true });
 			jqueryDivToLoad = divToLoad ? $('#'+divToLoad) : $('#divq'+questionNum+'options');
@@ -378,3 +401,23 @@
 			} 
 			return true;
 		}
+		
+		// Functions used of x-editable.
+		// Shown as a fudge the validator to keep x-editable compatible with jquery validator
+		function onShownForXEditable(e, editable) {
+			$(this).nextAll('i.fa-pencil').hide();
+		    var $innerForm = $(this).data('editable').input.$input.closest('form');
+	    	var $outerForm = $innerForm.parents('form').eq(0);
+	    	$innerForm.data('validator', $outerForm.data('validator'));
+		}		
+		function onHiddenForXEditable(e, reason) {
+			$(this).nextAll('i.fa-pencil').show();
+		}
+		function validateXEditable(value) {
+		    //close editing area on validation failure
+            if (!value.trim()) {
+                $('.editable-open').editableContainer('hide', 'cancel');
+                return 'Can not be empty!';
+            }
+        }
+		

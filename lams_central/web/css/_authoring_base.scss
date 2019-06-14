@@ -559,12 +559,19 @@ td#canvasContainerCell {
 #rootwizard table.table-condensed {
   margin-bottom: 0px; }
 
-#rootwizard .required:after {
-  content: "*";
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  margin-left: 5px; }
+#rootwizard {
+	.required:after {
+	  content: "*";
+	  font-style: normal;
+	  font-weight: normal;
+	  text-decoration: inherit;
+	  margin-left: 5px; 
+  }
+  
+	.panel-title .required {
+		font-weight: 500;
+	}
+}
 
 #rootwizard .container {
     margin-right: 4px;
@@ -600,3 +607,24 @@ td#canvasContainerCell {
 #rootwizard .progress-bar {
      background-color: $brand-primary;
 }
+
+#rootwizard {
+	div.space-top {
+		padding-top: 15px;
+	}
+	div.space-sides {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+	div.space-bottom {
+		padding-bottom: 15px;
+	}
+	// Allow panel titles to be edited - show pencil only when hovering
+	span.hoverEdit:hover +span+ i { 
+		visibility: visible;
+	}
+	span.hoverEdit +span+ i { 
+		visibility: hidden;
+	}
+}
+	
