@@ -22,10 +22,18 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import java.util.Collection;
+
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -49,6 +57,18 @@ public class QbStatsController {
     public String showStats(@RequestParam long qbQuestionUid, Model model) throws Exception {
 	QbStatsDTO stats = qbService.getQbQuestionStats(qbQuestionUid);
 	model.addAttribute("stats", stats);
+
+	Integer userId = getUserId();
+	Collection<QbCollection> collections = qbService.getUserCollections(userId);
+	collections.removeAll(qbService.getQuestionCollections(qbQuestionUid));
+	model.addAttribute("collections", collections);
+
 	return "qb/stats";
+    }
+
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 }

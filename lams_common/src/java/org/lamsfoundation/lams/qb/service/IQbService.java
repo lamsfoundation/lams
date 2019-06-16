@@ -59,12 +59,16 @@ public interface IQbService {
 
     List<QbCollection> getUserCollections(int userId);
 
+    List<QbCollection> getUserOwnCollections(int userId);
+
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
     int countCollectionQuestions(long collectionUid, String search);
+
+    List<QbCollection> getQuestionCollections(long qbQuestionUid);
 
     QbCollection addCollection(int userId, String name);
 

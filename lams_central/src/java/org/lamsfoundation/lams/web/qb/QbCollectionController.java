@@ -34,7 +34,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -71,19 +70,7 @@ public class QbCollectionController {
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
-	List<QbCollection> collections = qbService.getUserCollections(userId);
-	for (QbCollection collection : collections) {
-	    collection.setShareableWithOrganisations(
-		    qbService.getShareableWithOrganisations(collection.getUid(), userId));
-	}
-
-	QbCollection privateCollection = qbService.getUserPrivateCollection(userId);
-	collections.add(privateCollection);
-
-	QbCollection publicCollection = qbService.getPublicCollection();
-	collections.add(publicCollection);
-
-	model.addAttribute("collections", collections);
+	model.addAttribute("collections", qbService.getUserCollections(userId));
 	return "qb/collection";
     }
 
@@ -187,8 +174,9 @@ public class QbCollectionController {
 
     @RequestMapping("/addCollectionQuestions")
     @ResponseBody
-    public void addCollectionQuestions(@RequestParam long sourceCollectionUid, @RequestParam long targetCollectionUid,
-	    @RequestParam boolean copy, @RequestParam String included, @RequestParam String excluded)
+    public void addCollectionQuestions(@RequestParam(required = false) Long sourceCollectionUid,
+	    @RequestParam long targetCollectionUid, @RequestParam boolean copy,
+	    @RequestParam(required = false) String included, @RequestParam(required = false) String excluded)
 	    throws IOException {
 	if (StringUtils.isBlank(excluded)) {
 	    ArrayNode includedJSON = JsonUtil.readArray(included);

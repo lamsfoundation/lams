@@ -3,6 +3,8 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
+<c:set var="question" value="${stats.question}" />
+
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
@@ -41,10 +43,27 @@
 			drawChart('bar', 'chartDiv', ${stats.answersJSON});
 			$("time.timeago").timeago();
 		});
+		
+		// add or copy questions to a collection
+		function addCollectionQuestions() {
+			var targetCollectionUid = $('#targetCollectionSelect').val();
+			$.ajax({
+				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
+				'type' : 'POST',
+				'dataType' : 'text',
+				'data' : {
+					'targetCollectionUid' : targetCollectionUid,
+					'copy'			: false,
+					'included'	    : JSON.stringify([${question.uid}])
+				},
+				'cache' : false
+			}).done(function(){
+				document.location.reload();
+			});
+		}
 	</script>
 </lams:head>
 <body class="stripes">
-<c:set var="question" value="${stats.question}" />
 
 <lams:Page title="Question statistics" type="admin">
 	<div class="panel panel-default">
@@ -95,6 +114,20 @@
 				</div>
 			</div>
 			
+			<c:if test="${not empty collections}">
+				<div>
+					<span>Transfer questions to </span>
+					<select class="form-control" id="targetCollectionSelect">
+						<c:forEach var="target" items="${collections}">
+							<option value="${target.uid}">
+								<c:out value="${target.name}" />
+							</option>
+						</c:forEach>
+					</select>
+					<button class="btn btn-default" onClick="javascript:addCollectionQuestions()">Add</button>
+				</div>
+			</c:if>
+				
 			<p class="question-section-header">Options</p>
 			<table class="table table-striped qb-stats-table">
 				<tr>

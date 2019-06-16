@@ -246,7 +246,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public List<QbCollection> getQuestionCollections(long qbQuestionUid) {
 	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS).setParameter("qbQuestionUid", qbQuestionUid)
-		.list();
+		.addEntity(QbCollection.class).list();
     }
 
     @SuppressWarnings("unchecked")
