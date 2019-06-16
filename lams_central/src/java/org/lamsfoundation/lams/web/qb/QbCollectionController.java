@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.web.qb;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -158,12 +159,19 @@ public class QbCollectionController {
 
     @RequestMapping("/removeCollectionQuestions")
     @ResponseBody
-    public void removeCollectionQuestions(@RequestParam long collectionUid, @RequestParam String included,
+    public String removeCollectionQuestions(@RequestParam long collectionUid, @RequestParam String included,
 	    @RequestParam String excluded) throws IOException {
+	// list of questions which could not be removed (they are in their last collection and are used in Learning Designs)
+	Collection<Long> retainedQuestions;
 	if (StringUtils.isBlank(excluded)) {
 	    ArrayNode includedJSON = JsonUtil.readArray(included);
+	    retainedQuestions = new HashSet<>();
 	    for (int index = 0; index < includedJSON.size(); index++) {
-		qbService.removeQuestionFromCollection(collectionUid, includedJSON.get(index).asLong());
+		long qbQuestionUid = includedJSON.get(index).asLong();
+		boolean deleted = qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
+		if (!deleted) {
+		    retainedQuestions.add(qbQuestionUid);
+		}
 	    }
 	} else {
 	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
@@ -171,8 +179,10 @@ public class QbCollectionController {
 	    for (int index = 0; index < excludedJSON.size(); index++) {
 		excludedSet.add(excludedJSON.get(index).asLong());
 	    }
-	    qbService.removeQuestionFromCollection(collectionUid, excludedSet);
+	    retainedQuestions = qbService.removeQuestionFromCollection(collectionUid, excludedSet);
 	}
+
+	return JsonUtil.toString(retainedQuestions);
     }
 
     @RequestMapping("/addCollectionQuestions")

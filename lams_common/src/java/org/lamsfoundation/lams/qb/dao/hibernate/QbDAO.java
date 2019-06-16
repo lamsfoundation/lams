@@ -16,6 +16,7 @@ import org.hibernate.query.NativeQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
@@ -51,8 +52,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
 	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
 
-    private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS c "
-	    + "JOIN lams_qb_question AS q ON c.qb_question_uid = q.uid WHERE c.collection_uid = :collectionUid";
+    private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_question AS q ON cq.qb_question_uid = q.uid WHERE cq.collection_uid = :collectionUid";
+
+    private static final String FIND_QUESTION_COLLECTIONS = "SELECT c.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid WHERE cq.qb_question_uid = :qbQuestionUid";
 
     private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionUid)";
 
@@ -236,6 +240,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public List<QbQuestion> getCollectionQuestions(long collectionUid) {
 	return getCollectionQuestions(collectionUid, null, null, null, null, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<QbCollection> getQuestionCollections(long qbQuestionUid) {
+	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS).setParameter("qbQuestionUid", qbQuestionUid)
+		.list();
     }
 
     @SuppressWarnings("unchecked")

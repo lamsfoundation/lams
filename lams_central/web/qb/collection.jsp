@@ -125,13 +125,11 @@
 							// if no questions are selected, buttons to manipulate them get disabled
 							buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
 							// cell containing "(de)select all" button
-							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div'),
-							included = grid.data('included');
+							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
 						// remove the default button provided by jqGrid
 						$('.cbox', selectAllCell).remove();
 						// create own button which follows own rules
 						var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
-												.prop('checked', included === null)
 												.prependTo(selectAllCell)
 												.change(function(){
 													// start with deselecting every question on current page
@@ -156,6 +154,8 @@
 					loadComplete : function(){
 						var grid = $(this),
 							gridView = grid.closest('.ui-jqgrid-view');
+						grid.data('excluded', null);
+						grid.data('included', []);
 						// remove checkbox next to search bar
 						$('tr.ui-search-toolbar .cbox', gridView).remove();
 						
@@ -169,9 +169,6 @@
 					   	alert("Error!");
 				    	}
 					}).jqGrid('filterToolbar');
-				
-
-				collectionGrid.data('included', []);
 			});
 		});
 		
@@ -189,14 +186,29 @@
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
 				'type' : 'POST',
-				'dataType' : 'text',
+				'dataType' : 'json',
 				'data' : {
 					'collectionUid' : grid.data('collectionUid'),
 					'included'	    : included ? JSON.stringify(included) : null,
 					'excluded'	    : excluded ? JSON.stringify(excluded) : null
 				},
 				'cache' : false
-			}).done(function(){
+			}).done(function(retainedQuestions){
+				if (retainedQuestions.length > 0) {
+					// if some questions have not been removed, inform the user
+					var message = "";
+					if (retainedQuestions.length > 10) {
+						message += "Multiple questions";
+					} else {
+						message += "Questions with IDs: "
+						for (var qbQuestionUid of retainedQuestions) {
+							message += qbQuestionUid + ", ";
+						}
+						message = message.substring(0, message.length - 2);
+					}
+					message += " have not been removed because they are in their last collection and are used in sequences";
+					alert(message);
+				}
 				grid.trigger('reloadGrid');
 			});
 		}
@@ -324,10 +336,7 @@
 			
 				<div class="questionButtons row">
 					<div class="col-xs-12 col-md-2">
-						<%-- Do not allow removing questions from public collection --%>
-						<c:if test="${not empty collection.userId}">
-							<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
-						</c:if>
+						<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
 					</div>
 					<div class="col-xs-12 col-md-2">
 						<span>Transfer questions to </span>

@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -258,7 +259,7 @@ public class QbService implements IQbService {
 	if (!result.isEmpty()) {
 	    return result.get(0);
 	}
-	
+
 	// is an user does not have a private collection yet, create it
 	QbCollection collection = new QbCollection();
 	collection.setName("Private questions");
@@ -309,6 +310,18 @@ public class QbService implements IQbService {
 	    throw new InvalidParameterException("Attempt to remove a private or the public question bank collection");
 	}
 	qbDAO.delete(collection);
+    }
+
+    public boolean removeQuestion(long qbQuestionUid) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("qbQuestion.uid", qbQuestionUid);
+	long activityCount = qbDAO.countByProperties(QbToolQuestion.class, properties);
+	if (activityCount > 0) {
+	    // if the question is used in a Learning Design, do not allow to remove it
+	    return false;
+	}
+	qbDAO.deleteById(QbQuestion.class, qbQuestionUid);
+	return true;
     }
 
     @Override
@@ -366,16 +379,28 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public void removeQuestionFromCollection(long collectionUid, long qbQuestionUid) {
+    public boolean removeQuestionFromCollection(long collectionUid, long qbQuestionUid) {
+	Collection<QbCollection> collections = qbDAO.getQuestionCollections(qbQuestionUid);
+	int size = collections.size();
+	if (size <= 1) {
+	    // if the question is in its last collection, try to remove it permanently
+	    return removeQuestion(qbQuestionUid);
+	}
 	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUid);
+	return true;
     }
 
     @Override
-    public void removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids) {
+    public Collection<Long> removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids) {
 	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(collectionUid, excludedQbQuestionUids);
+	Collection<Long> retainedQuestionUids = new HashSet<>();
 	for (Long uid : includedUids) {
-	    qbDAO.removeCollectionQuestion(collectionUid, uid);
+	    boolean deleted = removeQuestionFromCollection(collectionUid, uid);
+	    if (!deleted) {
+		retainedQuestionUids.add(uid);
+	    }
 	}
+	return retainedQuestionUids;
     }
 
     @Override
