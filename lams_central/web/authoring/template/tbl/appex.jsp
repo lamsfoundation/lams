@@ -34,7 +34,7 @@
 			</div>
 			<div class="space-top space-sides space-bottom">
 				<div class="checkbox"><label for="divappex${appexNumber}NB">
-					<input name="divappex${appexNumber}NB" id="divappex${appexNumber}NB" type="checkbox" value="true"/> <fmt:message key="authoring.tbl.use.noticeboard" />
+					<input name="divappex${appexNumber}NB" id="divappex${appexNumber}NB" type="checkbox" value="true"/> <fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.use.noticeboard.tooltip'/>"></i>
 				</label></div>
 				<div class="form-group" id="divappex${appexNumber}NBEntryDiv">
 					<lams:CKEditor id="divappex${appexNumber}NBEntry" value="" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
