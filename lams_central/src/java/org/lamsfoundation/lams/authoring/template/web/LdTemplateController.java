@@ -1358,6 +1358,9 @@ public abstract class LdTemplateController {
 	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
 	    // int questionGrade = 1; Currently not supported by the templates.
 
+	    question.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
+
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 
