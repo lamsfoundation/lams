@@ -133,6 +133,11 @@
 	    }
 
 	</script>
+    <script>
+        $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 	
 </lams:head>
 	
@@ -189,13 +194,14 @@
 			<%@ include file="../grouping.jsp" %>
 	    </div>
 		<div class="tab-pane" id="tab3">
-			<span class="field-name"><fmt:message key="authoring.tbl.desc.question" /></span>
+			<span class="field-name"><fmt:message key="authoring.tbl.desc.question"/></span>
 
 			<div class="form-group voffset10">
+					<input title="123" type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
 				<label for="confidenceLevelEnable">
-					<input type="checkbox" name="confidenceLevelEnable" value="true" class="form-control-inline" id="confidenceLevelEnable" checked/>&nbsp;
 					<fmt:message key="authoring.enable.confidence.levels"/>
 				</label>
+                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key='authoring.tbl.enable.confidence.tooltip'/>"></i>
 			</div>
 			
 		 	<input type="hidden" name="numQuestions" id="numQuestions" value="0"/>
@@ -212,7 +218,7 @@
 			
 	    </div>
 		<div class="tab-pane" id="tab4">
-			<span class="field-name"><fmt:message key="authoring.tbl.desc.ae" /></span>
+            <span class="field-name"><p><fmt:message key="authoring.tbl.desc.ae" /></p></span>
 			
 			<input type="hidden" name="numAppEx" id="numAppEx" value="1"/>
 	
@@ -243,6 +249,7 @@
 	    </c:if>
 	    
 	    <div id="navigation-buttons" class="voffset10">
+                <hr>
 	    		<div style="float:right">
 		  	<a href="#" class='btn btn-sm btn-primary button-next'><fmt:message key="button.next"/></a>
 	    		<a href="#" class='btn btn-sm btn-primary button-save' onclick="javascript:doSaveForm();" style="display:none"><fmt:message key="button.save"/></a>
