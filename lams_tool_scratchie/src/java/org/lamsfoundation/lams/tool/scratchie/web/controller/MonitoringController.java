@@ -26,9 +26,11 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -40,6 +42,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
@@ -50,6 +54,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
@@ -74,6 +79,9 @@ public class MonitoringController {
 
     @Autowired
     private IScratchieService scratchieService;
+
+    @Autowired
+    private IQbService qbService;
 
     @RequestMapping("/summary")
     private String summary(HttpServletRequest request) {
@@ -288,6 +296,18 @@ public class MonitoringController {
 	if (scratchie != null) {
 	    LeaderResultsDTO leaderDto = scratchieService.getLeaderResultsDTOForLeaders(scratchie.getContentId());
 	    sessionMap.put("leaderDto", leaderDto);
+
+	    Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
+	    items.addAll(scratchie.getScratchieItems());
+	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
+
+	    for (ScratchieItem item : items) {
+		QbStatsActivityDTO questionStats = qbService.getActivityStatsByContentId(scratchie.getContentId(),
+			item.getQbQuestion().getUid());
+		questionStats.setQbQuestion(item.getQbQuestion());
+		qbStats.add(questionStats);
+	    }
+	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/parts/statisticpart";
     }

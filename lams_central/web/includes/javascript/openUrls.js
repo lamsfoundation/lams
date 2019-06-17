@@ -214,6 +214,10 @@ function openCopyRight() {
 	}
 }
 
+function openQbCollections(){
+	window.open('qb/collection/show.do', '_blank');
+}
+
 function openCustom(url) {
 	var left = 0;
 	var top = 0;

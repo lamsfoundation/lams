@@ -69,7 +69,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Handles the general requests for content in gradebook
- * 
+ *
  * @author lfoxton
  */
 @Controller
@@ -111,10 +111,10 @@ public class GradebookController {
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
-	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
-	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
-	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
+	Boolean isSearch = WebUtil.readBooleanParam(request, CommonConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_FIELD, true);
+	String searchOper = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_OPERATION, true);
+	String searchString = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -183,7 +183,7 @@ public class GradebookController {
 	    }
 	}
 
-	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
@@ -295,9 +295,9 @@ public class GradebookController {
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
-	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
-	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
+	Boolean isSearch = WebUtil.readBooleanParam(request, CommonConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_FIELD, true);
+	String searchString = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
@@ -413,10 +413,10 @@ public class GradebookController {
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
-	Boolean isSearch = WebUtil.readBooleanParam(request, GradebookConstants.PARAM_SEARCH);
-	String searchField = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_FIELD, true);
-	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
-	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
+	Boolean isSearch = WebUtil.readBooleanParam(request, CommonConstants.PARAM_SEARCH);
+	String searchField = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_FIELD, true);
+	String searchOper = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_OPERATION, true);
+	String searchString = WebUtil.readStrParam(request, CommonConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
 	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, courseID);
@@ -459,8 +459,8 @@ public class GradebookController {
 	    }
 
 	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
-	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(),
-		    new String[] { Role.GROUP_MANAGER}, "get course gradebook", false)) {
+	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.GROUP_MANAGER },
+		    "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
 			"User is not a group manager or admin in the organisation");
 		return null;
@@ -567,7 +567,7 @@ public class GradebookController {
 	    return null;
 	}
 	Integer userID = getUser().getUserID();
-	for (Lesson lesson : (Set<Lesson>) activity.getLearningDesign().getLessons()) {
+	for (Lesson lesson : activity.getLearningDesign().getLessons()) {
 	    if (!securityService.isLessonMonitor(lesson.getLessonId(), userID, "get activity mark average", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 		return null;
@@ -578,7 +578,7 @@ public class GradebookController {
 	response.setContentType("text/plain, charset=utf-8");
 	if (averageMark != null) {
 	    return GradebookUtil.niceFormatting(averageMark);
-	    
+
 	} else {
 	    return GradebookConstants.CELL_EMPTY;
 	}
@@ -601,7 +601,7 @@ public class GradebookController {
 	response.setContentType("text/plain; charset=utf-8");
 	if (averageMark != null) {
 	    return GradebookUtil.niceFormatting(averageMark);
-	    
+
 	} else {
 	    return GradebookConstants.CELL_EMPTY;
 	}

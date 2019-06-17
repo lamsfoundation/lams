@@ -324,6 +324,18 @@ public class AuthoringController {
 		    newQuestions, oldReferences, newReferences);
 	}
 
+	// Handle question references
+	assessmentPO.setQuestionReferences(newReferences);
+
+	// ************************* Handle assessment overall feedbacks *******************
+	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
+	assessmentPO.setOverallFeedbacks(overallFeedbackList);
+
+	// **********************************************
+	// finally persist assessmentPO again
+	service.saveOrUpdateAssessment(assessmentPO);
+	assessmentForm.setAssessment(assessmentPO);
+
 	// delete References from database
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
 	Iterator<QuestionReference> iterRef = deletedReferences.iterator();
@@ -345,19 +357,6 @@ public class AuthoringController {
 		service.deleteAssessmentQuestion(question.getUid());
 	    }
 	}
-
-	// Handle question references
-	assessmentPO.setQuestionReferences(newReferences);
-
-	// ************************* Handle assessment overall feedbacks *******************
-	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
-	assessmentPO.setOverallFeedbacks(overallFeedbackList);
-
-	// **********************************************
-	// finally persist assessmentPO again
-	service.saveOrUpdateAssessment(assessmentPO);
-
-	assessmentForm.setAssessment(assessmentPO);
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());

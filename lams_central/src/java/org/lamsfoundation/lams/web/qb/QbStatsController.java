@@ -47,7 +47,7 @@ public class QbStatsController {
 
     @RequestMapping("/show")
     public String showStats(@RequestParam long qbQuestionUid, Model model) throws Exception {
-	QbStatsDTO stats = qbService.getStats(qbQuestionUid);
+	QbStatsDTO stats = qbService.getQbQuestionStats(qbQuestionUid);
 	model.addAttribute("stats", stats);
 	return "qb/stats";
     }

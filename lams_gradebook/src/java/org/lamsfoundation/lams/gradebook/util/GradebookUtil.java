@@ -20,10 +20,8 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.util;
 
-import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,14 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
@@ -114,7 +106,7 @@ public class GradebookUtil {
     public static String toGridXML(List gridRows, int page, int totalPages, GBGridView view) {
 	String xml = "";
 	try {
-	    Document document = GradebookUtil.getDocument();
+	    Document document = WebUtil.getDocument();
 
 	    // root element
 	    Element rootElement = document.createElement(CommonConstants.ELEMENT_ROWS);
@@ -138,7 +130,7 @@ public class GradebookUtil {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, gridRow.getId().toString());
 
 		// Work out which grid we want to put the data into
-		ArrayList<String> gridRowStringArray = new ArrayList<String>();
+		ArrayList<String> gridRowStringArray = new ArrayList<>();
 
 		gridRowStringArray = gridRow.toStringArray(view);
 
@@ -152,7 +144,7 @@ public class GradebookUtil {
 	    }
 
 	    document.appendChild(rootElement);
-	    xml = GradebookUtil.getStringFromDocument(document);
+	    xml = WebUtil.getStringFromDocument(document);
 
 	} catch (ParserConfigurationException e) {
 	    // TODO Auto-generated catch block
@@ -172,46 +164,31 @@ public class GradebookUtil {
 
     public static String niceFormatting(Double mark, boolean displayAsPercentage) {
 	String markStr = new DecimalFormat("##0.00").format(mark);
-	if ( displayAsPercentage )
+	if (displayAsPercentage) {
 	    markStr += "%";
+	}
 	return markStr;
     }
 
     public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
-	return createPercentageCell(mark, markConversionNeeded, false, 0);
+	return GradebookUtil.createPercentageCell(mark, markConversionNeeded, false, 0);
     }
 
 //    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold) {
 //	return createPercentageCell(mark, markConversionNeeded, isBold, 0);
 //    }
-    
+
     // if markConversionNeeded is true then mark is divided by 100. Otherwise assumes already a percentage.
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold, int borderStyle) {
+    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold,
+	    int borderStyle) {
 	Double convertedMark = null;
-	if ( mark != null )
+	if (mark != null) {
 	    convertedMark = markConversionNeeded ? mark / 100.0 : mark;
-	
+	}
+
 	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
 	userMarkCell.setIsPercentage(true);
 	return userMarkCell;
-    }
-    
-    private static Document getDocument() throws ParserConfigurationException {
-	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	DocumentBuilder builder = factory.newDocumentBuilder();
-	Document document = builder.newDocument();
-	return document;
-
-    }
-
-    private static String getStringFromDocument(Document document) throws TransformerException {
-	DOMSource domSource = new DOMSource(document);
-	StringWriter writer = new StringWriter();
-	StreamResult result = new StreamResult(writer);
-	TransformerFactory tf = TransformerFactory.newInstance();
-	Transformer transformer = tf.newTransformer();
-	transformer.transform(domSource, result);
-	return writer.toString();
     }
 
     /**
@@ -280,7 +257,7 @@ public class GradebookUtil {
      */
     private static List doRowNameSearch(List gradebookRows, String searchField, String searchOper,
 	    String searchString) {
-	List<GradebookGridRowDTO> ret = new ArrayList<GradebookGridRowDTO>();
+	List<GradebookGridRowDTO> ret = new ArrayList<>();
 
 	if (searchField.equals(GradebookConstants.PARAM_ROW_NAME)) {
 	    Iterator it = gradebookRows.iterator();

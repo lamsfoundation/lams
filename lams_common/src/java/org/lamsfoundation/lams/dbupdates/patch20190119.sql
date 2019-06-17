@@ -5,9 +5,9 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LDEV-4755 Add configuratio settings for ClamAV antivirus
 INSERT INTO lams_configuration VALUES
-('AntivirusEnable', 'false',     'config.av.enable', 'congfig.header.antivirus', 'BOOLEAN', 1),
-('AntivirusHost',   'localhost', 'config.av.host',   'congfig.header.antivirus', 'STRING',  0),
-('AntivirusPort',   '3310',      'config.av.port',   'congfig.header.antivirus', 'LONG',    0);
+('AntivirusEnable', 'false',     'config.av.enable', 'config.header.antivirus', 'BOOLEAN', 1),
+('AntivirusHost',   'localhost', 'config.av.host',   'config.header.antivirus', 'STRING',  0),
+('AntivirusPort',   '3310',      'config.av.port',   'config.header.antivirus', 'LONG',    0);
 
 ----------------------Put all sql statements above here-------------------------
 

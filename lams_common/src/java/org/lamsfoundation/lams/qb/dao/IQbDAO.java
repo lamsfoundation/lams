@@ -1,7 +1,9 @@
 package org.lamsfoundation.lams.qb.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -33,9 +35,7 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid);
 
-    Map<Long, Long> geAnswerStatsForQbToolQuestion(long qbToolQuestionUid);
-
-    Map<Long, Long> getAnswerStatsForActivity(long activityId);
+    Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid);
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
@@ -44,4 +44,16 @@ public interface IQbDAO extends IBaseDAO {
 
     int getCountQbQuestions(Integer questionType, String searchString);
 
+    List<QbQuestion> getCollectionQuestions(long collectionUid);
+
+    List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
+	    String orderDirection, String search);
+
+    int countCollectionQuestions(long collectionUid, String search);
+
+    void addCollectionQuestion(long collectionUid, long qbQuestionUid);
+
+    void removeCollectionQuestion(long collectionUid, long qbQuestionUid);
+
+    Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids);
 }

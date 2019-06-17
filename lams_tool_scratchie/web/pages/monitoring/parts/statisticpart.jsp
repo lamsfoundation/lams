@@ -64,6 +64,60 @@
 	</div>
 	</div>
 	
+	<div class="panel panel-default" >
+      	<div class="panel-body">
+      	<h4><fmt:message key="label.qb.stats" /></h4>
+      	
+		<table class="table table-condensed table-striped table-no-border">
+			<tr>		
+				<th scope="col">
+					#
+				</th>
+				<th scope="col">
+					<fmt:message key="label.question"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.participant.count"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.difficulty.index"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.discrimination.index"/>
+				</th>
+				<th scope="col">
+					<fmt:message key="label.qb.point.biserial"/>
+				</th>
+			</tr>
+				
+			<c:forEach var="activityDTO" items="${qbStats}" varStatus="i">
+				<tr>
+					<td>
+						${i.index + 1}
+					</td>
+					<td>
+						<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			
+					</td>
+					<td>
+						<c:out value="${activityDTO.participantCount}" />
+					</td>
+					<c:choose>
+						<c:when test="${activityDTO.participantCount < 2}">
+							<td>-</td>
+							<td>-</td>
+							<td>-</td>
+						</c:when>
+						<c:otherwise>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+							<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+							
+						</c:otherwise>
+					</c:choose>
+				</tr>
+			</c:forEach>	
+		</table>
+	</div>
+	
 </c:otherwise>
 </c:choose>	
-

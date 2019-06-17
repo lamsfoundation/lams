@@ -1,8 +1,6 @@
--- Turn off autocommit, so nothing is committed if there is an error
-SET AUTOCOMMIT = 0;
-----------------------Put all sql statements below here-------------------------
-
 -- LDEV-4746 Create Question Bank table structure and migrate existing data
+
+-- AUTO COMMIT stays ON because there is so many ALTER TABLE statements which are committed immediately anyway, that it does not make a difference
 
 -- Create QB question table
 CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT, 
@@ -121,7 +119,7 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
 							   
 INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
 	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-		'MCQ question', mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
+		mcq.question, NULL, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 question AS question,
 				 mark AS max_mark,
@@ -212,7 +210,7 @@ INSERT INTO tmp_question
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 						      content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.description, o.name ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
@@ -220,14 +218,23 @@ CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 	
 ALTER TABLE tmp_qb_question ADD INDEX (content(500));
 
+-- create a table which holds IDs of questions which are already in the question bank
+CREATE TABLE tmp_qb_question_match (question_uid BIGINT PRIMARY KEY, qb_question_uid BIGINT)
+	AS SELECT q.question_uid, qb.question_uid AS qb_question_uid
+	FROM tmp_question AS q
+	JOIN tmp_qb_question AS qb
+		USING (content);
+
+ALTER TABLE tmp_qb_question_match ADD INDEX (qb_question_uid);
+
 -- create a mapping of Scratchie question UID -> UID of one of Scratchie questions which holds the same content
 INSERT INTO tmp_question_match
 	SELECT q.question_uid, merged.question_uid
 	FROM (SELECT * FROM tmp_question GROUP BY content) AS merged
 	JOIN tmp_question AS q
 		USING (content)
-	LEFT JOIN tmp_qb_question AS qb
-		USING (content)
+	LEFT JOIN tmp_qb_question_match AS qb
+		ON q.question_uid = qb.question_uid
 	WHERE qb.question_uid IS NULL;
 
 -- reset column for matching QB questions with Scratchie questions
@@ -255,15 +262,19 @@ INSERT INTO lams_qb_tool_question
 		ON q.question_uid = sq.uid
 	JOIN tl_lascrt11_scratchie AS s
 		ON sq.scratchie_uid = s.uid;
+
+-- Since MCQ questions had only names and no descriptions, copy full information from matched Scratchie items
+UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_lascrt11_scratchie_item AS sq
+	SET q.name = sq.title, q.description = sq.description
+	WHERE q.uid = qb.qb_question_uid
+	AND   qb.question_uid = sq.uid;
 	
 -- set up references to QB question UIDs for existing questions
 INSERT INTO lams_qb_tool_question
-	SELECT q.question_uid, qb.question_uid, s.content_id, sq.order_id
-	FROM tmp_question AS q
-	JOIN tmp_qb_question qb
-		USING (content)
+	SELECT qb.question_uid, qb.qb_question_uid, s.content_id, sq.order_id
+	FROM tmp_qb_question_match AS qb
 	JOIN tl_lascrt11_scratchie_item AS sq
-		ON q.question_uid = sq.uid
+		ON qb.question_uid = sq.uid
 	JOIN tl_lascrt11_scratchie AS s
 		ON sq.scratchie_uid = s.uid;
 		
@@ -333,6 +344,7 @@ DROP TABLE tl_lascrt11_scratchie_answer;
 DELETE FROM tmp_question;
 DELETE FROM tmp_question_match;
 DELETE FROM tmp_qb_question;
+DELETE FROM tmp_qb_question_match;
 
 
 -- ASSESSMENT
@@ -353,32 +365,90 @@ UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORD
 
 -- create a mapping of Assessment question UID -> its question text + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
+
+-- in the first run we compare both name and description of questions
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id)
+		   GROUP_CONCAT(q.title, q.question, o.option_string ORDER BY o.sequence_id)
 	FROM tl_laasse10_assessment_question AS q
 	JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
 	WHERE q.question_type = 1
 	GROUP BY q.uid;
 	
--- create a similar mapping for existing questions in QB
+-- create a similar mapping for existing questions in QB (one which already have name and description)
 INSERT INTO tmp_qb_question
 	SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.description, o.name ORDER BY o.display_order) AS content
+			  GROUP_CONCAT(q.name, q.description, o.name ORDER BY o.display_order) AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
 	GROUP BY q.uid;
 	
+-- create a mapping which holds IDs of questions which are already in the question bank
+INSERT INTO tmp_qb_question_match
+	SELECT q.question_uid, qb.question_uid AS qb_question_uid
+	FROM tmp_question AS q
+	JOIN tmp_qb_question AS qb
+		USING (content);
+
+UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_laasse10_assessment_question AS aq
+	SET q.name = aq.title, q.description = aq.question
+	WHERE q.uid = qb.qb_question_uid
+	AND   qb.question_uid = aq.uid;
+		
 -- set up references to QB question UIDs for existing questions
 INSERT INTO lams_qb_tool_question
-	SELECT q.question_uid, qb.question_uid, assess.content_id, aq.sequence_id
-	FROM tmp_question AS q
-	JOIN tmp_qb_question qb
-		USING (content)
+	SELECT qb.question_uid, qb.qb_question_uid, assess.content_id, aq.sequence_id
+	FROM tmp_qb_question_match qb
 	JOIN tl_laasse10_assessment_question AS aq
-		ON q.question_uid = aq.uid
+		ON qb.question_uid = aq.uid
+	JOIN tl_laasse10_assessment AS assess
+		ON aq.assessment_uid = assess.uid;
+		
+-- prepare for second run: matching Assessment description with QB question name
+DELETE FROM tmp_question;
+DELETE FROM tmp_qb_question;
+DELETE FROM tmp_qb_question_match;
+
+INSERT INTO tmp_question
+	SELECT q.uid,
+		   GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id)
+	FROM tl_laasse10_assessment_question AS q
+	JOIN tl_laasse10_question_option AS o
+		ON q.uid = o.question_uid
+	LEFT JOIN lams_qb_tool_question AS tq
+		ON q.uid = tq.tool_question_uid
+	WHERE q.question_type = 1
+		AND tq.tool_question_uid IS NULL
+	GROUP BY q.uid;
+	
+-- create a similar mapping for existing questions in QB (one which already have name and description)
+INSERT INTO tmp_qb_question
+	SELECT q.uid AS question_uid,
+			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
+	FROM lams_qb_question AS q
+	JOIN lams_qb_option AS o
+		ON q.uid = o.qb_question_uid
+	GROUP BY q.uid;
+	
+INSERT INTO tmp_qb_question_match
+	SELECT q.question_uid, qb.question_uid
+	FROM tmp_question AS q
+	JOIN tmp_qb_question AS qb
+		USING (content);
+
+UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_laasse10_assessment_question AS aq
+	SET q.name = aq.title, q.description = aq.question
+	WHERE q.uid = qb.qb_question_uid
+	AND   qb.question_uid = aq.uid;
+
+-- set up references to QB question UIDs for existing questions
+INSERT INTO lams_qb_tool_question
+	SELECT qb.question_uid, qb.qb_question_uid, assess.content_id, aq.sequence_id
+	FROM tmp_qb_question_match qb
+	JOIN tl_laasse10_assessment_question AS aq
+		ON qb.question_uid = aq.uid
 	JOIN tl_laasse10_assessment AS assess
 		ON aq.assessment_uid = assess.uid;
 
@@ -388,13 +458,12 @@ INSERT INTO tmp_question_match
 	FROM (SELECT * FROM tmp_question GROUP BY content) AS merged
 	JOIN tmp_question AS q
 		USING (content)
-	LEFT JOIN tmp_qb_question AS qb
-		USING (content)
-	WHERE qb.question_uid IS NULL;	
+	LEFT JOIN lams_qb_tool_question AS qb
+		ON qb.tool_question_uid = q.question_uid
+	WHERE qb.tool_question_uid IS NULL;	
 	
 	
--- second, process questions with all other question_type
-
+-- third run, process questions with all other question_type
 DELETE FROM tmp_question;
 
 INSERT INTO tmp_question
@@ -492,7 +561,7 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct, o.question, o.option_float,
+	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct OR o.grade > 0, o.question, o.option_float,
 		   o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
@@ -524,6 +593,13 @@ UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND o.question_uid = tq.tool_question_uid;
 		
+UPDATE tl_laasse10_option_answer AS sa, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
+	SET sa.question_option_uid = qo.uid
+	WHERE   o.sequence_id = qo.display_order
+		AND sa.question_option_uid = o.uid
+		AND qo.qb_question_uid = tq.qb_question_uid
+		AND o.question_uid = tq.tool_question_uid;
+		
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
 	SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
@@ -538,11 +614,5 @@ DROP TABLE tl_laasse10_question_option,
 		   tl_laasse10_assessment_unit,
 		   tmp_question,
 		   tmp_question_match,
-		   tmp_qb_question;
-		   
-		   
-----------------------Put all sql statements above here-------------------------
-
--- If there were no errors, commit and restore autocommit to on
-COMMIT;
-SET AUTOCOMMIT = 1;
+		   tmp_qb_question,
+		   tmp_qb_question_match;
