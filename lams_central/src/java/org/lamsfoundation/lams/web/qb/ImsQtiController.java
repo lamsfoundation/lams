@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.web.controller;
+package org.lamsfoundation.lams.web.qb;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -21,20 +22,19 @@ import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Exports and imports IMS QTI questions.
  * 
- * @author Andrey
+ * @author Andrey Balan
  */
 @Controller
-@RequestMapping("/questions")
+@RequestMapping("/imsqti")
 public class ImsQtiController {
     private static Logger log = Logger.getLogger(ImsQtiController.class);
 
@@ -52,9 +52,8 @@ public class ImsQtiController {
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
     @RequestMapping("/saveQTI")
-    public String saveQTI(HttpServletRequest request) throws UnsupportedEncodingException {
-	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+    public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
+	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    QbQuestion qbQuestion = new QbQuestion();
@@ -291,6 +290,8 @@ public class ImsQtiController {
 	    qbQuestion.setMaxMark(questionMark);
 	    userManagementService.save(qbQuestion);
 	    
+	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+	    
 	    if (log.isDebugEnabled()) {
 		log.debug("Added question: " + qbQuestion.getName());
 	    }
@@ -298,16 +299,42 @@ public class ImsQtiController {
 
 	return "qb/qtiquestions";
     }
+    
+    /**
+     * Exports QB question as IMS QTI package.
+     */
+    @RequestMapping("/exportQuestionAsQTI")
+    public String exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam long qbQuestionUid) {
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	List<QbQuestion> qbQuestions = new LinkedList<>();
+	qbQuestions.add(qbQuestion);
+
+	String fileTitle = qbQuestion.getName();
+	exportQTI(request, response, qbQuestions, fileTitle);
+	return null;
+    }
 
     /**
-     * Prepares QB questions for QTI packing
+     * Exports all questions from QB Collection as IMS QTI package.
      */
-    @RequestMapping("/exportQTI")
-    public String exportQTI(HttpServletRequest request, HttpServletResponse response)
-	    throws UnsupportedEncodingException {
-	//TODO fill up qbQuestions
-	List<QbQuestion> qbQuestions = new ArrayList<>();
-	
+    @RequestMapping("/exportCollectionAsQTI")
+    public String exportCollectionAsQTI(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam long collectionUid) {
+	List<QbQuestion> qbQuestions = qbService.getCollectionQuestions(collectionUid);
+
+	QbCollection collection = qbService.getCollectionByUid(collectionUid);
+	String fileTitle = collection.getName();
+
+	exportQTI(request, response, qbQuestions, fileTitle);
+	return null;
+    }
+
+    /**
+     * Prepares QB questions for QTI packing.
+     */
+    private void exportQTI(HttpServletRequest request, HttpServletResponse response, List<QbQuestion> qbQuestions,
+	    String fileTitle) {
 	List<Question> questions = new LinkedList<>();
 	for (QbQuestion qbQuestion : qbQuestions) {
 	    Question question = new Question();
@@ -344,7 +371,7 @@ public class ImsQtiController {
 			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
 				    : qbQuestion.getFeedbackOnIncorrect());
 
-			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
+			    answers.add(answer);
 			}
 
 		    } else {
@@ -361,7 +388,7 @@ public class ImsQtiController {
 			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
 				    : qbQuestion.getFeedbackOnIncorrect());
 
-			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
+			    answers.add(answer);
 			}
 		    }
 		    break;
@@ -447,7 +474,7 @@ public class ImsQtiController {
 			answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
 				: qbQuestion.getFeedbackOnIncorrect());
 
-			answers.add(assessmentAnswer.getDisplayOrder(), answer);
+			answers.add(answer);
 		    }
 		    break;
 
@@ -463,14 +490,7 @@ public class ImsQtiController {
 	    questions.add(question);
 	}
 
-	//create package title for QuestionExporter 
-	//TODO
-	Long collectionUid = WebUtil.readLongParam(request, "collectionUid");
-	Object collection = null;
-	String title = "";//collection.getTitle();
-	QuestionExporter exporter = new QuestionExporter(title, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	QuestionExporter exporter = new QuestionExporter(fileTitle, questions.toArray(Question.QUESTION_ARRAY_TYPE));
 	exporter.exportQTIPackage(request, response);
-
-	return null;
     }
 }

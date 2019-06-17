@@ -10,7 +10,7 @@
     	var form = $($.parseHTML(formHTML));
 		$.ajax({
 			type: "POST",
-			url: '<c:url value="/questions/saveQTI.do" />?contentFolderID=${contentFolderID}',
+			url: '<c:url value="/imsqti/saveQTI.do" />?contentFolderID=${contentFolderID}&collectionUid={collectionUid}',
 			data: form.serializeArray(),
 			success: function(response) {
 				//$(questionListTargetDiv).html(response);
@@ -20,7 +20,7 @@
 
     function exportQTI(){
     	var frame = document.getElementById("downloadFileDummyIframe");
-    	frame.src = '<c:url value="/authoring/exportQTI.do" />?collectionUid=${collectionUid}';
+    	frame.src = '<c:url value="/imsqti/exportCollectionAsQTI.do" />?collectionUid=${collectionUid}';
     }
 </script>
 		

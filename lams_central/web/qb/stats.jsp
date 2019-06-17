@@ -2,6 +2,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<c:set var="question" value="${stats.question}" />
 
 <!DOCTYPE html>
 <lams:html>
@@ -41,16 +42,26 @@
 			drawChart('bar', 'chartDiv', ${stats.answersJSON});
 			$("time.timeago").timeago();
 		});
+
+	    function exportQTI(){
+	    	var frame = document.getElementById("downloadFileDummyIframe");
+	    	frame.src = '<c:url value="/imsqti/exportQuestionAsQTI.do" />?qbQuestionUid=${question.uid}';
+	    }
 	</script>
 </lams:head>
 <body class="stripes">
-<c:set var="question" value="${stats.question}" />
-
 <lams:Page title="Question statistics" type="admin">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			Question
+			
+			<div class="btn-group btn-group-xs pull-right">
+				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+					<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
+				</a>
+			</div>
 		</div>
+		
 		<div class="panel-body">
 			<div class="question-table">
 				<div class="row">
@@ -282,5 +293,8 @@
 		</div>
 	</div>
 </lams:Page>
+
+	<!-- For exporting QTI packages -->
+	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 </body>
 </lams:html>
