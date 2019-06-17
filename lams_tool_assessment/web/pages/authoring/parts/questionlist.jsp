@@ -140,15 +140,6 @@
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.question.bank.title" />
 		
-		<div class="btn-group btn-group-xs pull-right" role="group">
-			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
-				<fmt:message key="label.authoring.basic.import.qti" /> 
-			</a>
-			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
-				<fmt:message key="label.authoring.basic.export.qti" />
-			</a>
-		</div>
-		
 		<div class="btn-group btn-group-xs pull-right roffset5" role="group">		
 			<c:set var="importInitUrl" >
 				<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true

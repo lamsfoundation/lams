@@ -52,6 +52,8 @@ public interface IQbService {
 	    String searchString);
 
     int getCountQbQuestions(Integer questionType, String searchString);
+    
+    QbCollection getCollectionByUid(Long collectionUid);
 
     QbCollection getPublicCollection();
 

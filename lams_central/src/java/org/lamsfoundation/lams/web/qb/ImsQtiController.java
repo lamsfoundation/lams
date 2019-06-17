@@ -1,202 +1,62 @@
-package org.lamsfoundation.lams.tool.assessment.util;
+package org.lamsfoundation.lams.web.qb;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-public class QTIUtil {
-    private static Logger log = Logger.getLogger(QTIUtil.class);
+/**
+ * Exports and imports IMS QTI questions.
+ * 
+ * @author Andrey Balan
+ */
+@Controller
+@RequestMapping("/imsqti")
+public class ImsQtiController {
+    private static Logger log = Logger.getLogger(ImsQtiController.class);
 
-    public static List<Question> exportQTI(SortedSet<AssessmentQuestion> questionList) {
-	List<Question> questions = new LinkedList<>();
-	for (AssessmentQuestion assessmentQuestion : questionList) {
-	    QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	    Question question = new Question();
-	    List<Answer> answers = new ArrayList<>();
+    @Autowired
+    @Qualifier("centralMessageService")
+    private MessageService messageService;
 
-	    switch (assessmentQuestion.getType()) {
-
-		case QbQuestion.TYPE_MULTIPLE_CHOICE:
-
-		    if (qbQuestion.isMultipleAnswersAllowed()) {
-			question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
-			int correctAnswerCount = 0;
-
-			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			    if (assessmentAnswer.getMaxMark() > 0) {
-				correctAnswerCount++;
-			    }
-			}
-
-			Float correctAnswerScore = correctAnswerCount > 0
-				? Integer.valueOf(100 / correctAnswerCount).floatValue()
-				: null;
-			int incorrectAnswerCount = qbQuestion.getQbOptions().size() - correctAnswerCount;
-			Float incorrectAnswerScore = incorrectAnswerCount > 0
-				? Integer.valueOf(-100 / incorrectAnswerCount).floatValue()
-				: null;
-
-			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() > 0;
-
-			    answer.setText(assessmentAnswer.getName());
-			    answer.setScore(isCorrectAnswer ? correctAnswerScore : incorrectAnswerScore);
-			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
-				    : qbQuestion.getFeedbackOnIncorrect());
-
-			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
-			}
-
-		    } else {
-			question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-
-			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() == 1F;
-
-			    answer.setText(assessmentAnswer.getName());
-			    answer.setScore(
-				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue()
-					    : 0);
-			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
-				    : qbQuestion.getFeedbackOnIncorrect());
-
-			    answers.add(assessmentAnswer.getDisplayOrder(), answer);
-			}
-		    }
-		    break;
-
-		case QbQuestion.TYPE_SHORT_ANSWER:
-		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
-
-		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			// only answer which has more than 0% is considered a correct one
-			if (assessmentAnswer.getMaxMark() > 0) {
-			    Answer answer = new Answer();
-			    answer.setText(assessmentAnswer.getName());
-			    answer.setScore(Integer.valueOf(qbQuestion.getMaxMark()).floatValue());
-
-			    answers.add(answer);
-			}
-		    }
-		    break;
-
-		case QbQuestion.TYPE_TRUE_FALSE:
-		    question.setType(Question.QUESTION_TYPE_TRUE_FALSE);
-		    boolean isTrueCorrect = qbQuestion.getCorrectAnswer();
-
-		    // true/false question is basically the same for QTI, just with special answers
-		    Answer trueAnswer = new Answer();
-		    trueAnswer.setText("True");
-		    trueAnswer.setScore(
-			    isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
-		    trueAnswer.setFeedback(isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
-			    : qbQuestion.getFeedbackOnIncorrect());
-		    answers.add(trueAnswer);
-
-		    Answer falseAnswer = new Answer();
-		    falseAnswer.setText("False");
-		    falseAnswer.setScore(
-			    !isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
-		    falseAnswer.setFeedback(!isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
-			    : qbQuestion.getFeedbackOnIncorrect());
-		    answers.add(falseAnswer);
-		    break;
-
-		case QbQuestion.TYPE_MATCHING_PAIRS:
-		    question.setType(Question.QUESTION_TYPE_MATCHING);
-
-		    int answerIndex = 0;
-		    float score = qbQuestion.getMaxMark() / qbQuestion.getQbOptions().size();
-		    question.setMatchAnswers(new ArrayList<Answer>(qbQuestion.getQbOptions().size()));
-		    question.setMatchMap(new TreeMap<Integer, Integer>());
-		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			Answer answer = new Answer();
-
-			answer.setText(assessmentAnswer.getMatchingPair());
-			answer.setScore(score);
-			answer.setFeedback(assessmentAnswer.getFeedback());
-			answers.add(answer);
-
-			Answer matchingAnswer = new Answer();
-			matchingAnswer.setText(assessmentAnswer.getName());
-			question.getMatchAnswers().add(matchingAnswer);
-			question.getMatchMap().put(answerIndex, answerIndex);
-			answerIndex++;
-		    }
-
-		    break;
-
-		case QbQuestion.TYPE_ESSAY:
-		    // not much to do with essay
-		    question.setType(Question.QUESTION_TYPE_ESSAY);
-		    answers = null;
-		    break;
-
-		case QbQuestion.TYPE_MARK_HEDGING:
-
-		    question.setType(Question.QUESTION_TYPE_MARK_HEDGING);
-
-		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			Answer answer = new Answer();
-			boolean isCorrectAnswer = assessmentAnswer.isCorrect();
-
-			answer.setText(assessmentAnswer.getName());
-			answer.setScore(
-				isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
-			answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
-				: qbQuestion.getFeedbackOnIncorrect());
-
-			answers.add(assessmentAnswer.getDisplayOrder(), answer);
-		    }
-		    break;
-
-		default:
-		    continue;
-	    }
-
-	    question.setTitle(qbQuestion.getName());
-	    question.setText(qbQuestion.getDescription());
-	    question.setFeedback(qbQuestion.getFeedback());
-	    question.setAnswers(answers);
-
-	    questions.add(question);
-	}
-	
-	return questions;
-    }
-
-    public static void saveQTI(HttpServletRequest request, SortedSet<AssessmentQuestion> questionList,
-	    String contentFolderID) throws UnsupportedEncodingException {
+    @Autowired
+    private IQbService qbService;
+    
+    @Autowired
+    private IUserManagementService userManagementService;
+    
+    /**
+     * Parses questions extracted from IMS QTI file and adds them as new QB questions.
+     */
+    @RequestMapping("/saveQTI")
+    public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
+	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
-	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    assessmentQuestion.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
 	    QbQuestion qbQuestion = new QbQuestion();
-	    assessmentQuestion.setQbQuestion(qbQuestion);
-	    int maxDisplayOrder = 0;
-	    if ((questionList != null) && (questionList.size() > 0)) {
-		AssessmentQuestion last = questionList.last();
-		maxDisplayOrder = last.getDisplayOrder() + 1;
-	    }
-	    assessmentQuestion.setDisplayOrder(maxDisplayOrder);
 	    qbQuestion.setName(question.getTitle());
 	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
@@ -428,11 +288,209 @@ public class QTIUtil {
 	    }
 
 	    qbQuestion.setMaxMark(questionMark);
-
-	    questionList.add(assessmentQuestion);
+	    userManagementService.save(qbQuestion);
+	    
+	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+	    
 	    if (log.isDebugEnabled()) {
 		log.debug("Added question: " + qbQuestion.getName());
 	    }
 	}
+
+	return "qb/qtiquestions";
+    }
+    
+    /**
+     * Exports QB question as IMS QTI package.
+     */
+    @RequestMapping("/exportQuestionAsQTI")
+    public String exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam long qbQuestionUid) {
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	List<QbQuestion> qbQuestions = new LinkedList<>();
+	qbQuestions.add(qbQuestion);
+
+	String fileTitle = qbQuestion.getName();
+	exportQTI(request, response, qbQuestions, fileTitle);
+	return null;
+    }
+
+    /**
+     * Exports all questions from QB Collection as IMS QTI package.
+     */
+    @RequestMapping("/exportCollectionAsQTI")
+    public String exportCollectionAsQTI(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam long collectionUid) {
+	List<QbQuestion> qbQuestions = qbService.getCollectionQuestions(collectionUid);
+
+	QbCollection collection = qbService.getCollectionByUid(collectionUid);
+	String fileTitle = collection.getName();
+
+	exportQTI(request, response, qbQuestions, fileTitle);
+	return null;
+    }
+
+    /**
+     * Prepares QB questions for QTI packing.
+     */
+    private void exportQTI(HttpServletRequest request, HttpServletResponse response, List<QbQuestion> qbQuestions,
+	    String fileTitle) {
+	List<Question> questions = new LinkedList<>();
+	for (QbQuestion qbQuestion : qbQuestions) {
+	    Question question = new Question();
+	    List<Answer> answers = new ArrayList<>();
+
+	    switch (qbQuestion.getType()) {
+
+		case QbQuestion.TYPE_MULTIPLE_CHOICE:
+
+		    if (qbQuestion.isMultipleAnswersAllowed()) {
+			question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
+			int correctAnswerCount = 0;
+
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			    if (assessmentAnswer.getMaxMark() > 0) {
+				correctAnswerCount++;
+			    }
+			}
+
+			Float correctAnswerScore = correctAnswerCount > 0
+				? Integer.valueOf(100 / correctAnswerCount).floatValue()
+				: null;
+			int incorrectAnswerCount = qbQuestion.getQbOptions().size() - correctAnswerCount;
+			Float incorrectAnswerScore = incorrectAnswerCount > 0
+				? Integer.valueOf(-100 / incorrectAnswerCount).floatValue()
+				: null;
+
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			    Answer answer = new Answer();
+			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() > 0;
+
+			    answer.setText(assessmentAnswer.getName());
+			    answer.setScore(isCorrectAnswer ? correctAnswerScore : incorrectAnswerScore);
+			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				    : qbQuestion.getFeedbackOnIncorrect());
+
+			    answers.add(answer);
+			}
+
+		    } else {
+			question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+
+			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			    Answer answer = new Answer();
+			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() == 1F;
+
+			    answer.setText(assessmentAnswer.getName());
+			    answer.setScore(
+				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue()
+					    : 0);
+			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				    : qbQuestion.getFeedbackOnIncorrect());
+
+			    answers.add(answer);
+			}
+		    }
+		    break;
+
+		case QbQuestion.TYPE_SHORT_ANSWER:
+		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
+
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			// only answer which has more than 0% is considered a correct one
+			if (assessmentAnswer.getMaxMark() > 0) {
+			    Answer answer = new Answer();
+			    answer.setText(assessmentAnswer.getName());
+			    answer.setScore(Integer.valueOf(qbQuestion.getMaxMark()).floatValue());
+
+			    answers.add(answer);
+			}
+		    }
+		    break;
+
+		case QbQuestion.TYPE_TRUE_FALSE:
+		    question.setType(Question.QUESTION_TYPE_TRUE_FALSE);
+		    boolean isTrueCorrect = qbQuestion.getCorrectAnswer();
+
+		    // true/false question is basically the same for QTI, just with special answers
+		    Answer trueAnswer = new Answer();
+		    trueAnswer.setText("True");
+		    trueAnswer.setScore(
+			    isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    trueAnswer.setFeedback(isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
+			    : qbQuestion.getFeedbackOnIncorrect());
+		    answers.add(trueAnswer);
+
+		    Answer falseAnswer = new Answer();
+		    falseAnswer.setText("False");
+		    falseAnswer.setScore(
+			    !isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    falseAnswer.setFeedback(!isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
+			    : qbQuestion.getFeedbackOnIncorrect());
+		    answers.add(falseAnswer);
+		    break;
+
+		case QbQuestion.TYPE_MATCHING_PAIRS:
+		    question.setType(Question.QUESTION_TYPE_MATCHING);
+
+		    int answerIndex = 0;
+		    float score = qbQuestion.getMaxMark() / qbQuestion.getQbOptions().size();
+		    question.setMatchAnswers(new ArrayList<Answer>(qbQuestion.getQbOptions().size()));
+		    question.setMatchMap(new TreeMap<Integer, Integer>());
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			Answer answer = new Answer();
+
+			answer.setText(assessmentAnswer.getMatchingPair());
+			answer.setScore(score);
+			answer.setFeedback(assessmentAnswer.getFeedback());
+			answers.add(answer);
+
+			Answer matchingAnswer = new Answer();
+			matchingAnswer.setText(assessmentAnswer.getName());
+			question.getMatchAnswers().add(matchingAnswer);
+			question.getMatchMap().put(answerIndex, answerIndex);
+			answerIndex++;
+		    }
+
+		    break;
+
+		case QbQuestion.TYPE_ESSAY:
+		    // not much to do with essay
+		    question.setType(Question.QUESTION_TYPE_ESSAY);
+		    answers = null;
+		    break;
+
+		case QbQuestion.TYPE_MARK_HEDGING:
+
+		    question.setType(Question.QUESTION_TYPE_MARK_HEDGING);
+
+		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			Answer answer = new Answer();
+			boolean isCorrectAnswer = assessmentAnswer.isCorrect();
+
+			answer.setText(assessmentAnswer.getName());
+			answer.setScore(
+				isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+			answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
+				: qbQuestion.getFeedbackOnIncorrect());
+
+			answers.add(answer);
+		    }
+		    break;
+
+		default:
+		    continue;
+	    }
+
+	    question.setTitle(qbQuestion.getName());
+	    question.setText(qbQuestion.getDescription());
+	    question.setFeedback(qbQuestion.getFeedback());
+	    question.setAnswers(answers);
+
+	    questions.add(question);
+	}
+
+	QuestionExporter exporter = new QuestionExporter(fileTitle, questions.toArray(Question.QUESTION_ARRAY_TYPE));
+	exporter.exportQTIPackage(request, response);
     }
 }

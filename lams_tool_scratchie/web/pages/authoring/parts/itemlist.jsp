@@ -25,15 +25,6 @@
 <!-- Dropdown menu for choosing a question from question bank -->
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
-		<div id="importExport" class="btn-group pull-right">
-			<a href="#" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs">
-				<fmt:message key="label.authoring.import.qti" /> 
-			</a>
-			<a href="#" onClick="javascript:exportQTI();return false;" class="btn btn-default btn-xs">
-				<fmt:message key="label.authoring.export.qti" />
-			</a>
-		</div>
-
 		<div class="roffset5 pull-right">
 			<c:url var="tempUrl" value="">
 				<c:param name="output">
@@ -48,11 +39,10 @@
 		</div> 
 		
 		<fmt:message key="label.questions"/>
-		
 	</div>
-		<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
+	<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
 		
-		<table class="table table-condensed table-striped">
+	<table class="table table-condensed table-striped">
 			<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 				<tr>
 					<td style="padding-top:15px; padding-bottom:15px;">
@@ -75,14 +65,13 @@
 						</c:set>		
 						<a href="${editItemUrl}" class="thickbox"> 
 							<i class="fa fa-pencil"	title="<fmt:message key='label.edit' />"/></i>
-						</a>				
+						</a>
+					</td>			
 					
 					<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
-							onclick="removeItem(${status.index})"></i></td>
-							
+							onclick="removeItem(${status.index})"></i>
+					</td>
 				</tr>
 			</c:forEach>
-		</table>
+	</table>
 </div>
-	
-	

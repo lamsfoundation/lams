@@ -27,32 +27,6 @@
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
-        
-    function importQTI(){
-    	window.open('<lams:LAMSURL />questions/questionFile.jsp?limitType=mc',
-    			    'QuestionFile','width=500,height=240,scrollbars=yes');
-    }
-	
-    function saveQTI(formHTML, formName) {
-    	var form = $(formHTML);
-    	form.prop("action", '<lams:WebAppURL />authoring/saveQTI.do?sessionMapId=${sessionMapId}').appendTo(document.body);
-    	form.ajaxSubmit({ 
-    		target:  $('#itemArea'),
-    		iframe: true,
-    		success:    function() { 
-    			document.forms.mcAuthoringForm.action="submitAllContent.do";
-    			refreshThickbox();
-    	    	form.remove();
-    	    }
-	    });
-    }
-    
-    function exportQTI() {
-    	var frame = document.getElementById("downloadFileDummyIframe"),
-    		title = encodeURIComponent(document.getElementsByName("title")[0].value);
-    	frame.src = '<lams:WebAppURL />authoring/exportQTI.do?sessionMapId=${sessionMapId}'
-    			+ '&title=' + title;
-    }
 </script>
 
 <input type="hidden" name="questionIndex" />
@@ -77,6 +51,3 @@
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>
 </p>
-
-<!-- For exporting QTI packages -->
-<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

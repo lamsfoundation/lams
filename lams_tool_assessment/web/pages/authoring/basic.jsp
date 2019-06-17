@@ -130,32 +130,7 @@
 			var isSelected = (oldValue == i);
 		    $('#passingMark').append( new Option(i, i, isSelected, isSelected) );
 		}
-	};	
-	
-    function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
-			'QuestionFile','width=500,height=240,scrollbars=yes');
-    }
-	
-    function saveQTI(formHTML, formName) {
-    	var form = $($.parseHTML(formHTML));
-		$.ajax({
-			type: "POST",
-			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
-			data: form.serializeArray(),
-			success: function(response) {
-				$(questionListTargetDiv).html(response);
-				refreshThickbox();
-			}
-		});
-    }
-
-    function exportQTI(){
-    	var frame = document.getElementById("downloadFileDummyIframe"),
-    		title = encodeURIComponent(document.getElementsByName("assessment.title")[0].value);
-		
-    	frame.src = '<c:url value="/authoring/exportQTI.do?sessionMapID=${sessionMapID}" />&title=' + title;
-    }
+	};
 </script>
 
 <c:if test="${isAuthoringRestricted}">
@@ -212,8 +187,5 @@
 		</a>
 	</div>
 	<br><br>
-	
-	<!-- For exporting QTI packages -->
-	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 </c:if>
 

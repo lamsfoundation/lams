@@ -58,36 +58,11 @@
 		var questionType = questionTypeDropdown.selectedIndex + 1;
 		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
-	};
+	}
 	
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
-	};
-	
-    function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc',
-    			    'QuestionFile','width=500,height=240,scrollbars=yes');
-    }
-	
-    function saveQTI(formHTML, formName) {
-    	var form = $($.parseHTML(formHTML));
-		$.ajax({
-			type: "POST",
-			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
-			data: form.serializeArray(),
-			success: function(response) {
-				$(itemTargetDiv).html(response);
-				refreshThickbox();
-			}
-		});
-    }
-    
-    function exportQTI(){
-    	var frame = document.getElementById("downloadFileDummyIframe"),
-    		title = encodeURIComponent(document.getElementsByName("scratchie.title")[0].value);
-    	frame.src = '<lams:WebAppURL />/authoring/exportQTI.do?sessionMapID=${sessionMapID}'
-    			+ '&title=' + title;
-    }
+	}
 </script>
 
 <!-- Basic Tab Content -->
@@ -120,6 +95,3 @@
 		</a>
 	</div>
 </div>
-
-<!-- For exporting QTI packages -->
-<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

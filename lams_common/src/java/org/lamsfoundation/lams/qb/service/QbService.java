@@ -242,6 +242,11 @@ public class QbService implements IQbService {
 
 	return activityDTO;
     }
+    
+    @Override
+    public QbCollection getCollectionByUid(Long collectionUid) {
+	return (QbCollection) qbDAO.find(QbCollection.class, collectionUid);
+    }
 
     @Override
     public QbCollection getPublicCollection() {
