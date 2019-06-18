@@ -11,6 +11,7 @@
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/defaultHTML_chart.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet">
 	<style>
 		.question-table {
 			margin-bottom
@@ -37,6 +38,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			drawChart('bar', 'chartDiv', ${stats.answersJSON});
@@ -47,6 +49,12 @@
 	    	var frame = document.getElementById("downloadFileDummyIframe");
 	    	frame.src = '<c:url value="/imsqti/exportQuestionAsQTI.do" />?qbQuestionUid=${question.uid}';
 	    }
+
+	    //this method gets invoked after question has been edited and saved
+		function refreshThickbox(){
+			var newQuestionUid = $("#itemArea").html();
+			location.href = '<c:url value="/qb/stats/show.do" />?qbQuestionUid=' + newQuestionUid;
+		};
 	</script>
 </lams:head>
 <body class="stripes">
@@ -55,7 +63,11 @@
 		<div class="panel-heading">
 			Question
 			
-			<div class="btn-group btn-group-xs pull-right">
+			<div class="btn-group-xs pull-right">
+				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true" class="btn btn-default thickbox"> 
+					<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
+				</a>
+			
 				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
 					<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
 				</a>
@@ -296,5 +308,7 @@
 
 	<!-- For exporting QTI packages -->
 	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
+	<!-- For receiving question's uid after question has been saved -->
+	<div id="itemArea" class="hidden"></div>
 </body>
 </lams:html>

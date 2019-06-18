@@ -86,6 +86,7 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<form:hidden path="displayOrder" />
+				<form:hidden path="collectionUid" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">

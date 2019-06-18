@@ -1694,16 +1694,6 @@ public class ScratchieServiceImpl
 	return newDto;
     }
 
-    @Override
-    public int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion) {
-	if (baseLine.getUid() == null) {
-	    return IQbService.QUESTION_MODIFIED_ID_BUMP;
-	}
-
-	return baseLine.isModified(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
-		: IQbService.QUESTION_MODIFIED_NONE;
-    }
-
     // *****************************************************************************
     // private methods
     // *****************************************************************************

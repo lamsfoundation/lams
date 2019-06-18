@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.qb.service.QbUtils;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
@@ -495,7 +496,7 @@ public class AuthoringController {
 	}
 	item.getQbQuestion().setQbOptions(options);
 
-	item.setQbQuestionModified(scratchieService.isQbQuestionModified(baseLine, item.getQbQuestion()));
+	item.setQbQuestionModified(QbUtils.isQbQuestionModified(baseLine, item.getQbQuestion()));
 	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
 
 	// set session map ID so that itemlist.jsp can get sessionMAP

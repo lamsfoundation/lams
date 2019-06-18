@@ -76,6 +76,7 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<form:hidden path="displayOrder" />
+				<form:hidden path="collectionUid" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>				
 				<form:hidden path="feedbackOnCorrect" />
 				<form:hidden path="feedbackOnPartiallyCorrect" />

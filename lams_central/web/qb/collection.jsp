@@ -11,6 +11,7 @@
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet">
 	<style>
 		#addCollectionDiv {
 			margin-top: 10px;
@@ -50,6 +51,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -311,12 +313,54 @@
 				document.location.reload();
 			});
 		}
+
+		//create proper href for "Create question" button
+		function initLinkHref(collectionUid) {
+			var questionType = document.getElementById("question-type").selectedIndex + 1;
+			$("#create-question-href").attr("href", 
+					"<c:url value='/qb/edit/newQuestionInit.do'/>?questionType=" + questionType 
+					+ "&collectionUid=" + collectionUid 
+					+ "&KeepThis=true&TB_iframe=true&modal=true");
+		};
+		
+	    //this method gets invoked after question has been edited and saved
+		function refreshThickbox(){
+			location.reload();
+			//var newQuestionUid = $("#itemArea").html();
+			//location.href = '<c:url value="/qb/stats/show.do" />?qbQuestionUid=' + newQuestionUid;
+		};
 	</script>
 </lams:head>
 <body class="stripes">
 <lams:Page title="Question collections" type="admin">
-	<c:forEach var="collection" items="${collections}">
+	<c:forEach var="collection" items="${collections}" varStatus="status">
+	
+	<!-- TODO move to Collection jsp page -->
+	<c:if test="${status.first}">
+	<div class="btn-group-xs " style="height: 20px;">
+	<!-- Dropdown menu for choosing a question type -->
+	<div class="form-inline form-group pull-right">
+		<select id="question-type" class="form-control input-sm">
+			<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
+			<option><fmt:message key="label.question.type.matching.pairs" /></option>
+			<option><fmt:message key="label.question.type.short.answer" /></option>
+			<option><fmt:message key="label.question.type.numerical" /></option>
+			<option><fmt:message key="label.question.type.true.false" /></option>
+			<option><fmt:message key="label.question.type.essay" /></option>
+			<option><fmt:message key="label.question.type.ordering" /></option>
+			<option><fmt:message key="label.question.type.mark.hedging" /></option>
+		</select>
+		
+		<a onclick="initLinkHref(${collection.uid});return false;" href="" class="btn btn-default btn-sm button-add-item thickbox" id="create-question-href">  
+			<fmt:message key="label.create.question" />
+		</a>
+	</div>
+	</div>
+	</c:if>
+	
 		<div class="panel-body">
+
+		
 			<%-- jqGrid placeholder with some useful attributes --%>
 			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
 			
@@ -408,6 +452,10 @@
 		<input placeholder="Enter new collection name" class="form-control" />
 		<button class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
 	</div>
+	
+	<!-- TODO move to Collection jsp page -->
+	<!-- Dummy div for question save to work properly -->
+	<div id="itemArea" class="hidden"></div>
 </lams:Page>
 </body>
 </lams:html>

@@ -422,6 +422,4 @@ public interface IScratchieService extends ICommonToolService {
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
-
-    int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion);
 }
