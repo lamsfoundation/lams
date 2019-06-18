@@ -107,7 +107,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
@@ -158,6 +157,8 @@ public class AssessmentServiceImpl
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
+    
+    private IQbService qbService;
 
     // *******************************************************************************
     // Service method
@@ -774,7 +775,7 @@ public class AssessmentServiceImpl
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getMaxMark() * maxMark;
-		    QbOption qbOption = getQbOptionByUid(optionDto.getUid());
+		    QbOption qbOption = qbService.getQbOptionByUid(optionDto.getUid());
 		    questionResult.setQbOption(qbOption);
 		    break;
 		}
@@ -818,7 +819,7 @@ public class AssessmentServiceImpl
 		    }
 		    if (isAnswerMatchedCurrentOption) {
 			mark = optionDto.getMaxMark() * maxMark;
-			QbOption qbOption = getQbOptionByUid(optionDto.getUid());
+			QbOption qbOption = qbService.getQbOptionByUid(optionDto.getUid());
 			questionResult.setQbOption(qbOption);
 			break;
 		    }
@@ -2950,6 +2951,10 @@ public class AssessmentServiceImpl
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
     }
+    
+    public void setQbService(IQbService qbService) {
+	this.qbService = qbService;
+    }
 
     public AssessmentOutputFactory getAssessmentOutputFactory() {
 	return assessmentOutputFactory;
@@ -3210,29 +3215,5 @@ public class AssessmentServiceImpl
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
 	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
-    }
-    
-    @Override
-    public int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion) {
-	if (baseLine.getUid() == null) {
-	    return IQbService.QUESTION_MODIFIED_ID_BUMP;
-	}
-
-	return baseLine.isModified(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
-		: IQbService.QUESTION_MODIFIED_NONE;
-    }
-    
-    @Override
-    public QbOption getQbOptionByUid(Long optionUid) {
-	QbOption option = (QbOption) userManagementService.findById(QbOption.class, optionUid);
-	releaseFromCache(option);
-	return option;
-    }
-    
-    @Override
-    public QbQuestionUnit getQbQuestionUnitByUid(Long unitUid) {
-	QbQuestionUnit unit = (QbQuestionUnit) userManagementService.findById(QbQuestionUnit.class, unitUid);
-	releaseFromCache(unit);
-	return unit;
     }
 }

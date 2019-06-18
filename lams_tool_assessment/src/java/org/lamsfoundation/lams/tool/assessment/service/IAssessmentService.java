@@ -532,11 +532,5 @@ public interface IAssessmentService extends ICommonToolService {
      * to refresh page because new data is available
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
-    
-    int isQbQuestionModified(QbQuestion baseLine, QbQuestion modifiedQuestion);
-    
-    QbOption getQbOptionByUid(Long optionUid);
-    
-    QbQuestionUnit getQbQuestionUnitByUid(Long unitUid);
 
 }

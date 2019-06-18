@@ -79,6 +79,7 @@
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<form:hidden path="displayOrder" />
+				<form:hidden path="collectionUid" />
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />

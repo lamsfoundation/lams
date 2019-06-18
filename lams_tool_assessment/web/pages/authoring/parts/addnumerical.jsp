@@ -137,6 +137,7 @@
 				<input type="hidden" name="optionList" id="optionList" />
 				<input type="hidden" name="unitList" id="unitList" />
 				<form:hidden path="displayOrder" />
+				<form:hidden path="collectionUid" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">

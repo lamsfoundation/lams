@@ -27,6 +27,7 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -58,6 +59,22 @@ public class QbService implements IQbService {
     @Override
     public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
 	return qbDAO.getQbQuestionsByQuestionId(questionId);
+    }
+    
+    @Override
+    public QbOption getQbOptionByUid(Long optionUid) {
+	QbOption option = (QbOption) qbDAO.find(QbOption.class, optionUid);
+	qbDAO.releaseFromCache(option);
+	qbDAO.releaseFromCache(option.getQbQuestion());
+	return option;
+    }
+    
+    @Override
+    public QbQuestionUnit getQbQuestionUnitByUid(Long unitUid) {
+	QbQuestionUnit unit = (QbQuestionUnit) qbDAO.find(QbQuestionUnit.class, unitUid);
+	qbDAO.releaseFromCache(unit);
+	qbDAO.releaseFromCache(unit.getQbQuestion());
+	return unit;
     }
 
     @Override
@@ -407,6 +424,10 @@ public class QbService implements IQbService {
 	}
 
 	return result;
+    }
+
+    public void releaseFromCache(Object object) {
+	qbDAO.releaseFromCache(object);
     }
 
     public void setQbDAO(IQbDAO qbDAO) {

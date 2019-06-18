@@ -54,9 +54,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.qb.QbConstants;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.qb.service.QbUtils;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -68,8 +71,8 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
-import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -104,6 +107,9 @@ public class AuthoringController {
 
     @Autowired
     private IQbService qbService;
+    
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -367,7 +373,7 @@ public class AuthoringController {
      * Display empty page for new assessment question.
      */
     @RequestMapping("/newQuestionInit")
-    public String newQuestionInit(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+    public String newQuestionInit(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
 	    HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -381,19 +387,19 @@ public class AuthoringController {
 	questionForm.setAnswerRequired(true);
 
 	List<QbOption> optionList = new ArrayList<>();
-	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
+	for (int i = 0; i < QbConstants.INITIAL_OPTIONS_NUMBER; i++) {
 	    QbOption option = new QbOption();
 	    option.setDisplayOrder(i + 1);
 	    optionList.add(option);
 	}
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 
 	List<QbQuestionUnit> unitList = new ArrayList<>();
 	QbQuestionUnit unit = new QbQuestionUnit();
 	unit.setDisplayOrder(1);
 	unit.setMultiplier(1);
 	unitList.add(unit);
-	for (int i = 1; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
+	for (int i = 1; i < QbConstants.INITIAL_UNITS_NUMBER; i++) {
 	    unit = new QbQuestionUnit();
 	    unit.setDisplayOrder(i + 1);
 	    unit.setMultiplier(0);
@@ -411,7 +417,7 @@ public class AuthoringController {
      * Display edit page for existed assessment question.
      */
     @RequestMapping("/editQuestion")
-    public String editQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+    public String editQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
 	    HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesMaxMarks(request, sessionMap, false);
@@ -428,7 +434,8 @@ public class AuthoringController {
 	if (question == null) {
 	    throw new RuntimeException("Question with displayOrder:" + questionDisplayOrder + " was not found!");
 	}
-	populateQuestionToForm(question, questionForm, request);
+	QbUtils.fillFormWithQbQuestion(question.getQbQuestion(), questionForm, request);
+	questionForm.setDisplayOrder(question.getDisplayOrder());
 
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
 	
@@ -446,15 +453,48 @@ public class AuthoringController {
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/saveOrUpdateQuestion")
-    public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") AssessmentQuestionForm questionForm,
+    public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
 	    HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(questionForm.getSessionMapID());
 	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	
-	// check whether it is "edit(old Question)" or "add(new Question)"
-	extractFormToAssessmentQuestion(request, questionList, questionForm, isAuthoringRestricted);
+	//find according question
+	AssessmentQuestion question = null;
+	// add
+	if (questionForm.getDisplayOrder() == -1) { 
+	    question = new AssessmentQuestion();
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setType(questionForm.getQuestionType());
+	    question.setQbQuestion(qbQuestion);
+	    int maxSeq = 1;
+	    if ((questionList != null) && (questionList.size() > 0)) {
+		AssessmentQuestion last = questionList.last();
+		maxSeq = last.getDisplayOrder() + 1;
+	    }
+	    question.setDisplayOrder(maxSeq);
+	    questionList.add(question);
+	    
+	// edit
+	} else {
+	    for (AssessmentQuestion questionIter : questionList) {
+		if (questionIter.getDisplayOrder() == questionForm.getDisplayOrder()) {
+		    question = questionIter;
+		    break;
+		}
+	    }
+	}
+	QbQuestion qbQuestion = question.getQbQuestion();
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+	service.releaseFromCache(question);
+	service.releaseFromCache(qbQuestion);
+	
+	int isQbQuestionModified = QbUtils.extractFormToQbQuestion(qbQuestion, questionForm, request, qbService,
+		isAuthoringRestricted);
+	question.setQbQuestionModified(isQbQuestionModified);
+	request.setAttribute("qbQuestionModified", isQbQuestionModified);
 
 	reinitializeAvailableQuestions(sessionMap);
 
@@ -595,7 +635,8 @@ public class AuthoringController {
 	    }
 	    reference.setQuestion(question);
 
-	    reference.setMaxMark(question.getQbQuestion().getMaxMark());
+	    int maxMark = question.getQbQuestion().getMaxMark() == null ? 1 : question.getQbQuestion().getMaxMark(); 
+	    reference.setMaxMark(maxMark);
 	}
 	references.add(reference);
 
@@ -819,7 +860,7 @@ public class AuthoringController {
      */
     @RequestMapping("/addOption")
     public String addOption(HttpServletRequest request) {
-	TreeSet<QbOption> optionList = getOptionsFromRequest(request, false);
+	TreeSet<QbOption> optionList = QbUtils.getOptionsFromRequest(qbService, request, false);
 	QbOption option = new QbOption();
 	int maxSeq = 1;
 	if ((optionList != null) && (optionList.size() > 0)) {
@@ -833,7 +874,7 @@ public class AuthoringController {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
 		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	return "pages/authoring/parts/optionlist";
     }
 
@@ -842,7 +883,7 @@ public class AuthoringController {
      */
     @RequestMapping("/newUnit")
     public String newUnit(HttpServletRequest request) {
-	TreeSet<QbQuestionUnit> unitList = getUnitsFromRequest(request, false);
+	TreeSet<QbQuestionUnit> unitList = QbUtils.getUnitsFromRequest(qbService, request, false);
 	QbQuestionUnit unit = new QbQuestionUnit();
 	int maxSeq = 1;
 	if ((unitList != null) && (unitList.size() > 0)) {
@@ -1018,175 +1059,6 @@ public class AuthoringController {
 	return forward;
     }
 
-    /**
-     * This method will populate assessment question information to its form for edit use.
-     */
-    private void populateQuestionToForm(AssessmentQuestion question, AssessmentQuestionForm form,
-	    HttpServletRequest request) {
-	form.setTitle(question.getQbQuestion().getName());
-	form.setQuestion(question.getQbQuestion().getDescription());
-	form.setMaxMark(String.valueOf(question.getQbQuestion().getMaxMark()));
-	form.setPenaltyFactor(String.valueOf(question.getQbQuestion().getPenaltyFactor()));
-	form.setAnswerRequired(question.getQbQuestion().isAnswerRequired());
-	form.setFeedback(question.getQbQuestion().getFeedback());
-	form.setMultipleAnswersAllowed(question.getQbQuestion().isMultipleAnswersAllowed());
-	form.setIncorrectAnswerNullifiesMark(question.getQbQuestion().isIncorrectAnswerNullifiesMark());
-	form.setFeedbackOnCorrect(question.getQbQuestion().getFeedbackOnCorrect());
-	form.setFeedbackOnPartiallyCorrect(question.getQbQuestion().getFeedbackOnPartiallyCorrect());
-	form.setFeedbackOnIncorrect(question.getQbQuestion().getFeedbackOnIncorrect());
-	form.setShuffle(question.getQbQuestion().isShuffle());
-	form.setPrefixAnswersWithLetters(question.getQbQuestion().isPrefixAnswersWithLetters());
-	form.setCaseSensitive(question.getQbQuestion().isCaseSensitive());
-	form.setCorrectAnswer(question.getQbQuestion().getCorrectAnswer());
-	form.setAllowRichEditor(question.getQbQuestion().isAllowRichEditor());
-	form.setMaxWordsLimit(question.getQbQuestion().getMaxWordsLimit());
-	form.setMinWordsLimit(question.getQbQuestion().getMinWordsLimit());
-	form.setHedgingJustificationEnabled(question.getQbQuestion().isHedgingJustificationEnabled());
-	form.setDisplayOrder(question.getDisplayOrder());
-
-	Integer questionType = question.getType();
-	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		|| (questionType == QbQuestion.TYPE_ORDERING)
-		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS)
-		|| (questionType == QbQuestion.TYPE_SHORT_ANSWER)
-		|| (questionType == QbQuestion.TYPE_NUMERICAL)
-		|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
-	    List<QbOption> optionList = question.getQbQuestion().getQbOptions();
-	    request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	}
-	if (questionType == QbQuestion.TYPE_NUMERICAL) {
-	    List<QbQuestionUnit> unitList = question.getQbQuestion().getUnits();
-	    request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
-	}
-    }
-
-    /**
-     * Extract web form content to assessment question.
-     * 
-     * BE CAREFUL: This method will copy necessary info from request form to an old or new AssessmentQuestion
-     * instance. It gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
-     * persisting this assessment Question.
-     */
-    private void extractFormToAssessmentQuestion(HttpServletRequest request, SortedSet<AssessmentQuestion> questionList,
-	    AssessmentQuestionForm questionForm, boolean isAuthoringRestricted) {
-
-	//find according question
-	AssessmentQuestion question = null;
-	// add
-	if (questionForm.getDisplayOrder() == -1) { 
-	    question = new AssessmentQuestion();
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setType(questionForm.getQuestionType());
-	    question.setQbQuestion(qbQuestion);
-	    int maxSeq = 1;
-	    if ((questionList != null) && (questionList.size() > 0)) {
-		AssessmentQuestion last = questionList.last();
-		maxSeq = last.getDisplayOrder() + 1;
-	    }
-	    question.setDisplayOrder(maxSeq);
-	    questionList.add(question);
-	    
-	// edit
-	} else {
-	    for (AssessmentQuestion questionIter : questionList) {
-		if (questionIter.getDisplayOrder() == questionForm.getDisplayOrder()) {
-		    question = questionIter;
-		    break;
-		}
-	    }
-	}
-	
-	QbQuestion qbQuestion = question.getQbQuestion();
-	QbQuestion baseLine = qbQuestion.clone();
-	// evict everything manually as we do not use DTOs, just real entities
-	// without eviction changes would be saved immediately into DB
-	service.releaseFromCache(question);
-	service.releaseFromCache(baseLine);
-	service.releaseFromCache(qbQuestion);
-
-	qbQuestion.setName(questionForm.getTitle());
-	qbQuestion.setDescription(questionForm.getQuestion());
-
-	if (!isAuthoringRestricted) {
-	    qbQuestion.setMaxMark(Integer.parseInt(questionForm.getMaxMark()));
-	}
-	qbQuestion.setFeedback(questionForm.getFeedback());
-	qbQuestion.setAnswerRequired(questionForm.isAnswerRequired());
-
-	Integer type = questionForm.getQuestionType();
-	if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
-	    qbQuestion.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
-	    boolean incorrectAnswerNullifiesMark = questionForm.isMultipleAnswersAllowed()
-		    ? questionForm.isIncorrectAnswerNullifiesMark()
-		    : false;
-	    qbQuestion.setIncorrectAnswerNullifiesMark(incorrectAnswerNullifiesMark);
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    qbQuestion.setShuffle(questionForm.isShuffle());
-	    qbQuestion.setPrefixAnswersWithLetters(questionForm.isPrefixAnswersWithLetters());
-	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    qbQuestion.setShuffle(questionForm.isShuffle());
-	} else if ((type == QbQuestion.TYPE_SHORT_ANSWER)) {
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    qbQuestion.setCaseSensitive(questionForm.isCaseSensitive());
-	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    qbQuestion.setCorrectAnswer(questionForm.isCorrectAnswer());
-	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if ((type == QbQuestion.TYPE_ESSAY)) {
-	    qbQuestion.setAllowRichEditor(questionForm.isAllowRichEditor());
-	    qbQuestion.setMaxWordsLimit(questionForm.getMaxWordsLimit());
-	    qbQuestion.setMinWordsLimit(questionForm.getMinWordsLimit());
-	} else if (type == QbQuestion.TYPE_ORDERING) {
-	    qbQuestion.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
-	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
-	    qbQuestion.setShuffle(questionForm.isShuffle());
-	    qbQuestion.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    qbQuestion.setFeedbackOnPartiallyCorrect(questionForm.getFeedbackOnPartiallyCorrect());
-	    qbQuestion.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
-	    qbQuestion.setHedgingJustificationEnabled(questionForm.isHedgingJustificationEnabled());
-	}
-
-	// set options
-	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		|| (type == QbQuestion.TYPE_ORDERING)
-		|| (type == QbQuestion.TYPE_MATCHING_PAIRS)
-		|| (type == QbQuestion.TYPE_SHORT_ANSWER)
-		|| (type == QbQuestion.TYPE_NUMERICAL)
-		|| (type == QbQuestion.TYPE_MARK_HEDGING)) {
-	    Set<QbOption> optionList = getOptionsFromRequest(request, true);
-	    List<QbOption> options = new ArrayList<>();
-	    int displayOrder = 0;
-	    for (QbOption option : optionList) {
-		option.setDisplayOrder(displayOrder++);
-		options.add(option);
-	    }
-	    qbQuestion.setQbOptions(options);
-	}
-	// set units
-	if (type == QbQuestion.TYPE_NUMERICAL) {
-	    Set<QbQuestionUnit> unitList = getUnitsFromRequest(request, true);
-	    List<QbQuestionUnit> units = new ArrayList<>();
-	    int displayOrder = 0;
-	    for (QbQuestionUnit unit : unitList) {
-		unit.setDisplayOrder(displayOrder++);
-		units.add(unit);
-	    }
-	    qbQuestion.setUnits(units);
-	}
-	
-	question.setQbQuestionModified(service.isQbQuestionModified(baseLine, qbQuestion));
-	request.setAttribute("qbQuestionModified", question.getQbQuestionModified());
-    }
-
     private Set<QuestionReference> updateQuestionReferencesMaxMarks(HttpServletRequest request,
 	    SessionMap<String, Object> sessionMap, boolean isFormSubmit) {
 	Map<String, String> paramMap = splitRequestParameter(request,
@@ -1211,151 +1083,6 @@ public class AuthoringController {
 	}
 
 	return questionReferences;
-    }
-
-    /**
-     * Get answer options from <code>HttpRequest</code>
-     *
-     * @param request
-     * @param isForSaving
-     *            whether the blank options will be preserved or not
-     */
-    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
-	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
-
-	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
-	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
-	Integer correctOptionIndex = (paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT) == null) ? null
-		: NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_OPTION_CORRECT));
-	
-	TreeSet<QbOption> optionList = new TreeSet<>();
-	for (int i = 0; i < count; i++) {
-	    
-	    String displayOrder = paramMap.get(AssessmentConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i);
-	    //displayOrder is null, in case this item was removed using Remove button
-	    if (displayOrder == null) {
-		continue;
-	    }
-	    
-	    QbOption option = null;
-	    String uidStr = paramMap.get(AssessmentConstants.ATTR_OPTION_UID_PREFIX + i);
-	    if (uidStr != null) {
-		Long uid = NumberUtils.toLong(uidStr);
-		option = service.getQbOptionByUid(uid);
-		service.releaseFromCache(option.getQbQuestion());
-		
-	    } else {
-		option = new QbOption();
-	    }
-	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
-	    
-	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		    || (questionType == QbQuestion.TYPE_SHORT_ANSWER)) {
-		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
-		if ((name == null) && isForSaving) {
-		    continue;
-		}
-
-		option.setName(name);
-		float maxMark = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
-		option.setMaxMark(maxMark);
-		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-
-	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
-		String matchingPair = paramMap.get(AssessmentConstants.ATTR_MATCHING_PAIR_PREFIX + i);
-		if ((matchingPair == null) && isForSaving) {
-		    continue;
-		}
-
-		option.setName(paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i));
-		option.setMatchingPair(matchingPair);
-
-	    } else if (questionType == QbQuestion.TYPE_NUMERICAL) {
-		String numericalOptionStr = paramMap.get(AssessmentConstants.ATTR_NUMERICAL_OPTION_PREFIX + i);
-		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
-		String maxMarkStr = paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i);
-		if (numericalOptionStr.equals("0.0") && numericalOptionStr.equals("0.0") && maxMarkStr.equals("0.0")
-			&& isForSaving) {
-		    continue;
-		}
-
-		try {
-		    float numericalOption = Float.valueOf(numericalOptionStr);
-		    option.setNumericalOption(numericalOption);
-		} catch (Exception e) {
-		    option.setNumericalOption(0);
-		}
-		try {
-		    float acceptedError = Float.valueOf(acceptedErrorStr);
-		    option.setAcceptedError(acceptedError);
-		} catch (Exception e) {
-		    option.setAcceptedError(0);
-		}
-		float maxMark = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
-		option.setMaxMark(maxMark);
-		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-
-	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
-		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
-		if ((name == null) && isForSaving) {
-		    continue;
-		}
-
-		option.setName(name);
-		
-	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
-		String name = paramMap.get(AssessmentConstants.ATTR_OPTION_NAME_PREFIX + i);
-		if ((name == null) && isForSaving) {
-		    continue;
-		}
-
-		option.setName(name);
-		if ((correctOptionIndex != null) && correctOptionIndex.equals(Integer.valueOf(displayOrder))) {
-		    option.setCorrect(true);
-		}
-		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
-	    }
-	    
-	    optionList.add(option);
-	}
-	return optionList;
-    }
-
-    /**
-     * Get units from <code>HttpRequest</code>
-     *
-     * @param request
-     */
-    private TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving) {
-	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_UNIT_LIST);
-
-	int count = NumberUtils.toInt(paramMap.get(AssessmentConstants.ATTR_UNIT_COUNT));
-	TreeSet<QbQuestionUnit> unitList = new TreeSet<>();
-	for (int i = 0; i < count; i++) {
-	    String name = paramMap.get(AssessmentConstants.ATTR_UNIT_NAME_PREFIX + i);
-	    if (StringUtils.isBlank(name) && isForSaving) {
-		continue;
-	    }
-
-	    QbQuestionUnit unit = null;
-	    String uidStr = paramMap.get(AssessmentConstants.ATTR_UNIT_UID_PREFIX + i);
-	    if (uidStr != null) {
-		Long uid = NumberUtils.toLong(uidStr);
-		unit = service.getQbQuestionUnitByUid(uid);
-		service.releaseFromCache(unit.getQbQuestion());
-		
-	    } else {
-		unit = new QbQuestionUnit();
-	    }
-	    String displayOrder = paramMap.get(AssessmentConstants.ATTR_UNIT_DISPLAY_ORDER_PREFIX + i);
-	    unit.setDisplayOrder(NumberUtils.toInt(displayOrder));
-	    unit.setName(name);
-	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
-	    unit.setMultiplier(multiplier);
-	    unitList.add(unit);
-	}
-
-	return unitList;
     }
 
     /**
