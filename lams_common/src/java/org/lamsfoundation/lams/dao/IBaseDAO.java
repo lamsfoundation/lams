@@ -205,13 +205,13 @@ public interface IBaseDAO {
      * @param clazz
      * @param id
      */
-    public Object find(Class clazz, Serializable id);
+    public <T> T find(Class<T> clazz, Serializable id);
 
     /**
      * @param clazz
      * @return all of rows in the table for the Class as objects
      */
-    public List findAll(Class clazz);
+    public <T> List<T> findAll(Class<T> clazz);
 
     /**
      * @param clazz
@@ -219,14 +219,14 @@ public interface IBaseDAO {
      * @param value
      * @return a list of objects which have the same propery value
      */
-    public List findByProperty(Class clazz, String name, Object value);
+    public <T> List<T> findByProperty(Class<T> clazz, String name, Object value);
 
     /**
      * @param properties
      *            a map of property names and values
      * @return a list of objects which have the same property values
      */
-    public List findByProperties(Class clazz, Map<String, Object> properties);
+    public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties);
 
     public List find(String queryString);
 
@@ -248,7 +248,7 @@ public interface IBaseDAO {
      *            to match
      * @return a list of objects
      */
-    public List searchByStringProperty(Class clazz, String name, String pattern);
+    public <T> List<T> searchByStringProperty(Class<T> clazz, String name, String pattern);
 
     /**
      * @param clazz
@@ -258,7 +258,7 @@ public interface IBaseDAO {
      *            to match
      * @return a list of objects
      */
-    public List searchByStringProperties(Class clazz, Map<String, String> properties);
+    public <T> List<T> searchByStringProperties(Class<T> clazz, Map<String, String> properties);
 
     /**
      * @param clazz
@@ -270,7 +270,7 @@ public interface IBaseDAO {
      * @param maxIncluded
      * @return a list of objects
      */
-    public List searchByNumberSpan(Class clazz, String name, Integer min, Boolean minIncluded, Integer max,
+    public <T> List<T> searchByNumberSpan(Class<T> clazz, String name, Integer min, Boolean minIncluded, Integer max,
 	    Boolean maxIncluded);
 
     /**
