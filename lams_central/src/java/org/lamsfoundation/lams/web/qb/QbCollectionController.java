@@ -22,23 +22,17 @@
 
 package org.lamsfoundation.lams.web.qb;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -52,8 +46,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -71,7 +63,7 @@ public class QbCollectionController {
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
 	model.addAttribute("collections", qbService.getUserCollections(userId));
-	return "qb/collection";
+	return "qb/collectionList";
     }
 
     @RequestMapping("/getCollectionGridData")
@@ -144,53 +136,17 @@ public class QbCollectionController {
 	return null;
     }
 
-    @RequestMapping("/removeCollectionQuestions")
+    @RequestMapping("/removeCollectionQuestion")
     @ResponseBody
-    public String removeCollectionQuestions(@RequestParam long collectionUid, @RequestParam String included,
-	    @RequestParam String excluded) throws IOException {
-	// list of questions which could not be removed (they are in their last collection and are used in Learning Designs)
-	Collection<Long> retainedQuestions;
-	if (StringUtils.isBlank(excluded)) {
-	    ArrayNode includedJSON = JsonUtil.readArray(included);
-	    retainedQuestions = new HashSet<>();
-	    for (int index = 0; index < includedJSON.size(); index++) {
-		long qbQuestionUid = includedJSON.get(index).asLong();
-		boolean deleted = qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
-		if (!deleted) {
-		    retainedQuestions.add(qbQuestionUid);
-		}
-	    }
-	} else {
-	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
-	    Set<Long> excludedSet = new HashSet<>();
-	    for (int index = 0; index < excludedJSON.size(); index++) {
-		excludedSet.add(excludedJSON.get(index).asLong());
-	    }
-	    retainedQuestions = qbService.removeQuestionFromCollection(collectionUid, excludedSet);
-	}
-
-	return JsonUtil.toString(retainedQuestions);
+    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam long qbQuestionUid) {
+	qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
     }
 
-    @RequestMapping("/addCollectionQuestions")
+    @RequestMapping("/addCollectionQuestion")
     @ResponseBody
-    public void addCollectionQuestions(@RequestParam(required = false) Long sourceCollectionUid,
-	    @RequestParam long targetCollectionUid, @RequestParam boolean copy,
-	    @RequestParam(required = false) String included, @RequestParam(required = false) String excluded)
-	    throws IOException {
-	if (StringUtils.isBlank(excluded)) {
-	    ArrayNode includedJSON = JsonUtil.readArray(included);
-	    for (int index = 0; index < includedJSON.size(); index++) {
-		qbService.addQuestionToCollection(targetCollectionUid, includedJSON.get(index).asLong(), copy);
-	    }
-	} else {
-	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
-	    Set<Long> excludedSet = new HashSet<>();
-	    for (int index = 0; index < excludedJSON.size(); index++) {
-		excludedSet.add(excludedJSON.get(index).asLong());
-	    }
-	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet, copy);
-	}
+    public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
+	    @RequestParam long qbQuestionUid) {
+	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionUid, copy);
     }
 
     @RequestMapping("/addCollection")

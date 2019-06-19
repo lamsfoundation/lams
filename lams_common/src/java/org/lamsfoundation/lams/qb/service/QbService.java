@@ -317,16 +317,22 @@ public class QbService implements IQbService {
 	qbDAO.delete(collection);
     }
 
+    @Override
     public boolean removeQuestion(long qbQuestionUid) {
-	Map<String, Object> properties = new HashMap<>();
-	properties.put("qbQuestion.uid", qbQuestionUid);
-	long activityCount = qbDAO.countByProperties(QbToolQuestion.class, properties);
-	if (activityCount > 0) {
+	boolean removeQuestionPossible = removeQuestionPossible(qbQuestionUid);
+	if (!removeQuestionPossible) {
 	    // if the question is used in a Learning Design, do not allow to remove it
 	    return false;
 	}
 	qbDAO.deleteById(QbQuestion.class, qbQuestionUid);
 	return true;
+    }
+
+    @Override
+    public boolean removeQuestionPossible(long qbQuestionUid) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("qbQuestion.uid", qbQuestionUid);
+	return qbDAO.countByProperties(QbToolQuestion.class, properties) == 0;
     }
 
     @Override

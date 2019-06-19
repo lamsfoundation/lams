@@ -88,4 +88,8 @@ public interface IQbService {
     boolean removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
 
     Collection<Long> removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids);
+
+    boolean removeQuestion(long qbQuestionUid);
+
+    boolean removeQuestionPossible(long qbQuestionUid);
 }

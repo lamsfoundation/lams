@@ -71,8 +71,6 @@
 				    cmTemplate: { title: false, search: false },
 				    sortorder: "asc", 
 				    sortname: "name", 
-				    multiselect 	   : true,
-				    multiPageSelection : true,
 				    pager: true,
 				    rowList:[10,20,30,40,50,100],
 				    rowNum: 10,
@@ -87,82 +85,9 @@
 				      // formatter gets just question uid and creates a button
 				      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
 				      ],
-			        onSelectRow : function(id, status, event) {
-					    var grid = $(this),
-					    	// if no questions are selected, buttons to manipulate them get disabled
-					    	buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
-					   		included = grid.data('included'),
-							excluded = grid.data('excluded'),
-							selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
-						if (selectAllChecked) {
-							var index = excluded.indexOf(+id);
-							// if row is deselected, add it to excluded array
-							if (index < 0) {
-								if (!status) {
-									excluded.push(+id);
-								}
-							} else if (status) {
-								excluded.splice(index, 1);
-							}
-						} else {
-							var index = included.indexOf(+id);
-							// if row is selected, add it to included array
-							if (index < 0) {
-								if (status) {
-									included.push(+id);
-									buttons.prop('disabled', false);
-								}
-							} else if (!status) {
-								included.splice(index, 1);
-								if (included.length === 0) {
-									buttons.prop('disabled', true);
-								}
-							}
-						}
-					},
-					gridComplete : function(){
-						var grid = $(this),
-							// if no questions are selected, buttons to manipulate them get disabled
-							buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
-							// cell containing "(de)select all" button
-							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
-						// remove the default button provided by jqGrid
-						$('.cbox', selectAllCell).remove();
-						// create own button which follows own rules
-						var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
-												.prependTo(selectAllCell)
-												.change(function(){
-													// start with deselecting every question on current page
-													grid.resetSelection();
-													if ($(this).prop('checked')){
-														// on select all change mode and select all on current page
-														grid.data('included', null);
-														grid.data('excluded', []);
-														$('[role="row"]', grid).each(function(){
-															grid.jqGrid('setSelection', +$(this).attr('id'), false);
-														});
-														buttons.prop('disabled', false);
-													} else {
-														// on deselect all just change mode
-														grid.data('excluded', null);
-														grid.data('included', []);
-														buttons.prop('disabled', true);
-													}
-												});
-						grid.resetSelection();
-					},
-					loadComplete : function(){
-						var grid = $(this),
-							gridView = grid.closest('.ui-jqgrid-view');
-						grid.data('excluded', null);
-						grid.data('included', []);
-						// remove checkbox next to search bar
-						$('tr.ui-search-toolbar .cbox', gridView).remove();
-						
-						// do not select row when clicked on stats button
-						$('.stats-cell', gridView).click(function(event){
-							event.stopImmediatePropagation();
-						});
+					beforeSelectRow: function(rowid, e) {
+						// do not select rows at all
+					    return false;
 					},
 				    loadError: function(xhr,st,err) {
 				    	collectionGrid.clearGridData();
@@ -176,65 +101,6 @@
 		function statsLinkFormatter(cellvalue){
 			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
-		}
-		
-		// remove questions from a collection
-		function removeCollectionQuestions(button) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),	
-				included = grid.data('included'),
-				excluded = grid.data('excluded');
-			$.ajax({
-				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
-				'type' : 'POST',
-				'dataType' : 'json',
-				'data' : {
-					'collectionUid' : grid.data('collectionUid'),
-					'included'	    : included ? JSON.stringify(included) : null,
-					'excluded'	    : excluded ? JSON.stringify(excluded) : null
-				},
-				'cache' : false
-			}).done(function(retainedQuestions){
-				if (retainedQuestions.length > 0) {
-					// if some questions have not been removed, inform the user
-					var message = "";
-					if (retainedQuestions.length > 10) {
-						message += "Multiple questions";
-					} else {
-						message += "Questions with IDs: "
-						for (var qbQuestionUid of retainedQuestions) {
-							message += qbQuestionUid + ", ";
-						}
-						message = message.substring(0, message.length - 2);
-					}
-					message += " have not been removed because they are in their last collection and are used in sequences";
-					alert(message);
-				}
-				grid.trigger('reloadGrid');
-			});
-		}
-		
-		// add or copy questions to a collection
-		function addCollectionQuestions(button, copy) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
-				sourceCollectionUid = grid.data('collectionUid'),
-				targetCollectionUid = $(button).closest('.container-fluid').find('.targetCollectionSelect').val(),
-				included = grid.data('included'),
-				excluded = grid.data('excluded');
-			$.ajax({
-				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
-				'type' : 'POST',
-				'dataType' : 'text',
-				'data' : {
-					'sourceCollectionUid' : sourceCollectionUid,
-					'targetCollectionUid' : targetCollectionUid,
-					'copy'			: copy,
-					'included'	    : included ? JSON.stringify(included) : null,
-					'excluded'	    : excluded ? JSON.stringify(excluded) : null
-				},
-				'cache' : false
-			}).done(function(){
-				$('.collection-grid[data-collection-uid="' + targetCollectionUid + '"]').trigger('reloadGrid');
-			});
 		}
 		
 		// add a new collection
@@ -333,37 +199,6 @@
 			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
 			
 			<div class="container-fluid">
-			
-				<div class="questionButtons row">
-					<div class="col-xs-12 col-md-2">
-						<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
-					</div>
-					<div class="col-xs-12 col-md-2">
-						<span>Transfer questions to </span>
-					</div>
-					<div class="col-xs-12 col-md-6">
-						<select class="form-control targetCollectionSelect">
-							<c:forEach var="target" items="${collections}">
-								<c:if test="${not (target.uid eq collection.uid)}">
-									<option value="${target.uid}"
-									<%-- The default target collection for adding/copying questions is the public collection,
-										 unless it is the public collection itself: then it is the private collection --%>
-									<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
-										selected="selected"
-									</c:if>
-									>
-										<c:out value="${target.name}" />
-									</option>
-								</c:if>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="col-xs-12 col-md-2 button-group">
-						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, false)" disabled="disabled">Add</button>
-						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
-					</div>
-				</div>
-				
 				<%-- Do not display links for collection manipulation for public and private collections --%>
 				<c:if test="${not empty collection.userId and not collection.personal}">
 					<div class="row">

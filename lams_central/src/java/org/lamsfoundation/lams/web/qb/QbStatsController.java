@@ -58,10 +58,18 @@ public class QbStatsController {
 	QbStatsDTO stats = qbService.getQbQuestionStats(qbQuestionUid);
 	model.addAttribute("stats", stats);
 
+	Collection<QbCollection> existingCollections = qbService.getQuestionCollections(qbQuestionUid);
+	model.addAttribute("existingCollections", existingCollections);
+
 	Integer userId = getUserId();
-	Collection<QbCollection> collections = qbService.getUserCollections(userId);
-	collections.removeAll(qbService.getQuestionCollections(qbQuestionUid));
-	model.addAttribute("collections", collections);
+	Collection<QbCollection> availableCollections = qbService.getUserCollections(userId);
+	availableCollections.removeAll(existingCollections);
+	model.addAttribute("availableCollections", availableCollections);
+
+	boolean permanentRemove = existingCollections.size() <= 1;
+	model.addAttribute("permanentRemove", permanentRemove);
+	model.addAttribute("permanentRemovePossible",
+		permanentRemove ? qbService.removeQuestionPossible(qbQuestionUid) : false);
 
 	return "qb/stats";
     }
