@@ -295,6 +295,7 @@ public class ConfigurationKeys {
     public static String QB_QTI_ENABLE = "QbQtiEnable";
     public static String QB_WORD_ENABLE = "QbWordEnable";
     public static String QB_COLLECTIONS_CREATE_ALLOW = "QbCollectionsCreateEnable";
+    public static String QB_COLLECTIONS_TRANSFER_ALLOW = "QbCollectionsTransferEnable";
     public static String QB_MONITORS_READ_ONLY = "QbMonitorsReadOnly";
     public static String QB_STATS_MIN_PARTICIPANTS = "QbStatsMinParticipants";
     public static String QB_STATS_GROUP_SIZE = "QbStatsGroupSize";

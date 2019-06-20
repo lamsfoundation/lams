@@ -130,9 +130,12 @@
 </lams:head>
 <body class="stripes">
 <lams:Page title="Collection management" type="admin">
-	<div id="add-collection-div">
-		<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
-	</div>
+	<c:if test="${createCollectionAllowed}">
+		<div id="add-collection-div">
+			<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
+		</div>
+	</c:if>
+	
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
 			<c:set var="collectionTitle">

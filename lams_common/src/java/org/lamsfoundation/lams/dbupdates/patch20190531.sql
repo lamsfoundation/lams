@@ -34,6 +34,9 @@ INSERT INTO lams_qb_collection VALUES (1, 'Public questions', NULL, false);
 
 INSERT INTO lams_qb_collection_question
 	SELECT 1, uid FROM lams_qb_question;
+	
+INSERT INTO lams_configuration VALUES
+('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);
 									  		  
 ----------------------Put all sql statements above here-------------------------
 

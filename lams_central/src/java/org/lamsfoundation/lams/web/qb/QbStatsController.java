@@ -31,6 +31,8 @@ import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -70,6 +72,9 @@ public class QbStatsController {
 	model.addAttribute("permanentRemove", permanentRemove);
 	model.addAttribute("permanentRemovePossible",
 		permanentRemove ? qbService.removeQuestionPossible(qbQuestionUid) : false);
+
+	model.addAttribute("transferAllowed",
+		Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW));
 
 	return "qb/stats";
     }

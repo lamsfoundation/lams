@@ -13,6 +13,10 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style>
+		#edit-collection-button {
+			float: right;
+		}
+		
 		.row {
 			margin-top: 10px;
 		}
@@ -154,11 +158,39 @@
 				document.location.reload();
 			});
 		}
+		
+		// add a new collection
+		function changeCollectionName() {
+			var name = prompt("New collection name");
+			if (name) {
+				$.ajax({
+					'url'  : '<lams:LAMSURL />qb/collection/changeCollectionName.do',
+					'type' : 'POST',
+					'dataType' : 'text',
+					'data' : {
+						'collectionUid' : ${collection.uid},
+						'name' : name
+					},
+					'cache' : false
+				}).done(function(created){
+					if (created == 'true') {
+						document.location.reload();
+					} else {
+						alert('Collection with such name already exists');
+					}
+				});
+			}
+		}
 	</script>
 </lams:head>
 <body class="stripes">
 <lams:Page title="Collection" type="admin">
-	<button class="btn btn-default" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">Collection management</button>
+	<div>
+		<button class="btn btn-default" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
+			Collection management
+		</button>
+		<button id="edit-collection-button" class="btn btn-primary" onClick="javascript:changeCollectionName()">Change name</button>
+	</div>
 	<div class="panel-body">
 		<c:choose>
 			<c:when test="${hasQuestions}">

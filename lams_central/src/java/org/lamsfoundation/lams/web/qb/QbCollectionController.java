@@ -37,6 +37,8 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -73,6 +75,9 @@ public class QbCollectionController {
 	Map<Long, Integer> questionCount = collections.stream().collect(
 		Collectors.toMap(QbCollection::getUid, c -> qbService.getCountCollectionQuestions(c.getUid(), null)));
 	model.addAttribute("questionCount", questionCount);
+
+	model.addAttribute("createCollectionAllowed",
+		Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW));
 
 	return "qb/collectionList";
     }
@@ -169,12 +174,18 @@ public class QbCollectionController {
     @ResponseBody
     public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
 	    @RequestParam long qbQuestionUid) {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
+	    throw new SecurityException("Transfering questions between collections is disabled");
+	}
 	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionUid, copy);
     }
 
     @RequestMapping("/addCollection")
     @ResponseBody
     public void addCollection(@RequestParam String name) {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
+	    throw new SecurityException("New collections are disabled");
+	}
 	qbService.addCollection(getUserId(), name);
     }
 

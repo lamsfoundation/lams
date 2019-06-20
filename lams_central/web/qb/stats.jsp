@@ -146,7 +146,7 @@
 				</div>
 			</div>
 			
-			<c:if test="${not empty availableCollections}">
+			<c:if test="${not empty availableCollections and transferAllowed}">
 				<div>
 					<span>Transfer questions to </span>
 					<select class="form-control" id="targetCollectionSelect">
@@ -165,7 +165,9 @@
 				<span>Existing collections</span><br />
 				<c:forEach var="collection" items="${existingCollections}">
 					<c:out value="${collection.name}" />
-					<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button><br />
+					<c:if test="${transferAllowed}">
+						<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button><br />
+					</c:if>
 				</c:forEach>
 			</div>
 				
