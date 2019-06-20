@@ -259,7 +259,7 @@ public class QbService implements IQbService {
 
 	// is an user does not have a private collection yet, create it
 	QbCollection collection = new QbCollection();
-	collection.setName("Private questions");
+	collection.setName("My questions");
 	collection.setUserId(userId);
 	collection.setPersonal(true);
 	qbDAO.insert(collection);
