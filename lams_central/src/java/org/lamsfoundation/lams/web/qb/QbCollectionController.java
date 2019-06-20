@@ -145,7 +145,8 @@ public class QbCollectionController {
 		// the last cell is for creating stats button
 		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
 			: null;
-		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), usage, uid };
+		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
+			question.getVersion().toString(), usage, uid };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
@@ -198,32 +199,6 @@ public class QbCollectionController {
     @ResponseBody
     public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
 	    @RequestParam(name = "value") String name) {
-//	long lessonId = WebUtil.readLongParam(request, "pk");
-//
-//	HttpSession ss = SessionManager.getSession();
-//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "rename lesson", false)) {
-//	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-//	    return null;
-//	}
-//
-//	String newLessonName = request.getParameter("value");
-//	if (StringUtils.isBlank(newLessonName)) {
-//	    return null;
-//	}
-//
-//	Lesson lesson = lessonService.getLesson(lessonId);
-//	lesson.setLessonName(newLessonName);
-//	userManagementService.save(lesson);
-//
-//	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
-//	jsonObject.put("successful", true);
-//	response.setContentType("application/json;charset=utf-8");
-//	return jsonObject.toString();
-	
-	
-	
-	
 	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
 	name = name.trim();
 	for (QbCollection collection : collections) {

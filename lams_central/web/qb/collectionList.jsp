@@ -72,17 +72,21 @@
 				    colNames:[
 				    	"ID",
 				    	"Name",
+				    	"questionType",
+				    	"questionVersion",
 				    	// this column is hidden, so data coming from controller can be the same as for single collection view
 				    	"Used in # of lessons",
 				    	"Stats"
 				    ],
 				    colModel:[
-				      {name:'id', index:'uid', sortable:true,  width: 10},
-				      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
-				      {name: 'usage', index: 'usage', hidden: true},
-				      // formatter gets just question uid and creates a button
-				      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
-				      ],
+				    	{name:'id', index:'uid', sortable:true,  width: 10},
+				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true},
+				    	{name:'questionType', index:'questionType', width:0, hidden: true},
+				   		{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
+				    	{name: 'usage', index: 'usage', hidden: true},
+				    	// formatter gets just question uid and creates a button
+				    	{name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
+				    ],
 					beforeSelectRow: function(rowid, e) {
 						// do not select rows at all
 					    return false;

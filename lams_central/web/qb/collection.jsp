@@ -92,12 +92,16 @@
 			    colNames:[
 			    	"ID",
 			    	"Name",
+			    	"questionType",
+			    	"questionVersion",
 			    	"Used in<br>lessons",
 			    	"Actions"
 			    ],
 			    colModel:[
 			    	{name:'id', index:'uid', sortable:true, hidden:true, width: 10},
-			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true},
+			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: questionNameFormatter},
+			    	{name:'questionType', index:'questionType', width:0, hidden: true},
+			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
 			      	// formatter gets just question uid and creates a button
 			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter}
@@ -144,7 +148,7 @@
 			});
 		});
 		
-		// Creates a button to display question statistics
+		// auxiliary formatter for jqGrid's question statistics column
 		function actionsFormatter(cellvalue){
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
@@ -154,6 +158,49 @@
 			cellhtml += "</a>";
 
 			return cellhtml;
+		}
+		//auxiliary formatter for jqGrid's question column
+		function questionNameFormatter (cellvalue, options, rowObject) {
+	       	var questionTypeInt = rowObject[2].textContent;
+	       	var questionType;
+	       	switch (questionTypeInt) {
+	        case '1':
+	        	questionType = "<fmt:message key="label.question.type.multiple.choice" />";
+	          	break;
+	        case '2':
+	        	questionType = "<fmt:message key="label.question.type.matching.pairs" />";
+	          	break;
+	        case '3':
+	        	questionType = "<fmt:message key="label.question.type.short.answer" />";
+	          	break;
+	        case '4':
+	        	questionType = "<fmt:message key="label.question.type.numerical" />";
+	          	break;
+	        case '5':
+	        	questionType = "<fmt:message key="label.question.type.true.false" />";
+	          	break;
+	        case '6':
+	        	questionType = "<fmt:message key="label.question.type.essay" />";
+	          	break;
+	        case '7':
+	        	questionType = "<fmt:message key="label.question.type.ordering" />";
+	          	break;
+	        case '8':
+	        	questionType = "<fmt:message key="label.question.type.mark.hedging" />";
+	          	break;
+	      	}
+
+	       	var questionVersion = rowObject[3].textContent;
+
+	       	var text = cellvalue;
+	        text += "<span class='pull-right alert-info btn-xs loffset5'>";
+	       	text += "v. " + questionVersion;
+	        text += "</span>";
+	       	text += "<span class='pull-right alert-info btn-xs'>";
+	       	text += questionType;
+	        text += "</span>";
+	        	
+			return text;
 		}
 		
 		// remove a collection
