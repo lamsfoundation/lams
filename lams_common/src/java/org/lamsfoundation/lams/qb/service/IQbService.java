@@ -96,4 +96,6 @@ public interface IQbService {
     QbCollection getCollection(long collectionUid);
 
     int getCountQuestionActivities(long qbQuestionUid);
+
+    void changeCollectionName(long collectionUid, String name);
 }

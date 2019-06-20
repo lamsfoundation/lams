@@ -178,6 +178,20 @@ public class QbCollectionController {
 	qbService.addCollection(getUserId(), name);
     }
 
+    @RequestMapping("/changeCollectionName")
+    @ResponseBody
+    public String changeCollectionName(@RequestParam long collectionUid, @RequestParam String name) {
+	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
+	name = name.trim();
+	for (QbCollection collection : collections) {
+	    if (!collection.getUid().equals(collectionUid) && name.equalsIgnoreCase(collection.getName())) {
+		return "false";
+	    }
+	}
+	qbService.changeCollectionName(collectionUid, name);
+	return "true";
+    }
+
     @RequestMapping("/removeCollection")
     @ResponseBody
     public void removeCollection(@RequestParam long collectionUid) {
