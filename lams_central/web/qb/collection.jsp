@@ -13,6 +13,8 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<style>
 		#edit-collection-button {
 			float: right;
@@ -36,7 +38,6 @@
 		}
 		
 		.grid-collection-private {
-			margin-left: 10px;
 			color: red !important;
 		}
 		
@@ -45,6 +46,18 @@
 			float: right;
 			margin-right: 50px;
 		}
+		
+		#collection-name:hover+span+i {
+			visibility:visible
+		}
+		#collection-name+span+i {
+			visibility:hidden
+		}
+		
+		a.thickbox {
+			color: black;
+			padding-left: 8px;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -52,6 +65,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			var collectionGrid = $('#collection-grid');
@@ -79,30 +93,67 @@
 			    	"ID",
 			    	"Name",
 			    	"Used in<br>lessons",
-			    	"Stats"
+			    	"Actions"
 			    ],
 			    colModel:[
-			      {name:'id', index:'uid', sortable:true,  width: 10},
-			      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
-			      {name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
-			      // formatter gets just question uid and creates a button
-			      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
-			      ],
+			    	{name:'id', index:'uid', sortable:true, hidden:true, width: 10},
+			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true},
+			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
+			      	// formatter gets just question uid and creates a button
+			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter}
+			    ],
 				beforeSelectRow: function(rowid, e) {
 					// do not select rows at all
 				    return false;
 				},
+				loadComplete: function(data) {
+					//init thickbox
+					tb_init('a.thickbox');
+			    },
 			    loadError: function(xhr,st,err) {
 			    	collectionGrid.clearGridData();
 				   	alert("Error!");
-			    	}
+			    }
 			}).jqGrid('filterToolbar');
+
+			//turn to inline mode for x-editable.js
+			$.fn.editable.defaults.mode = 'inline';
+			//enable renaming of lesson title  
+			$('#collection-name').editable({
+			    type: 'text',
+			    pk: ${collection.uid},
+			    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
+			    validate: function(value) {
+				    //close editing area on validation failure
+		            if (!value.trim()) {
+		                $('.editable-open').editableContainer('hide', 'cancel');
+		                return 'Can not be empty!';
+		            }
+		        },
+			    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+			    success: function(response, newValue) {
+					if (response.created == 'false') {
+						alert('Collection with such name already exists');
+					}
+			    }
+		    //hide and show pencil on showing and hiding editing widget
+			}).on('shown', function(e, editable) {
+				$(this).nextAll('i.fa-pencil').hide();
+			}).on('hidden', function(e, reason) {
+				$(this).nextAll('i.fa-pencil').show();
+			});
 		});
 		
 		// Creates a button to display question statistics
-		function statsLinkFormatter(cellvalue){
-			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
+		function actionsFormatter(cellvalue){
+			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
+
+			cellhtml += "<a href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" + cellvalue + "&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
+			cellhtml += 	"<i class='fa fa-pencil' title='<fmt:message key='label.edit' />'></i>";
+			cellhtml += "</a>";
+
+			return cellhtml;
 		}
 		
 		// remove a collection
@@ -161,29 +212,6 @@
 			});
 		}
 		
-		// add a new collection
-		function changeCollectionName() {
-			var name = prompt("New collection name");
-			if (name) {
-				$.ajax({
-					'url'  : '<lams:LAMSURL />qb/collection/changeCollectionName.do',
-					'type' : 'POST',
-					'dataType' : 'text',
-					'data' : {
-						'collectionUid' : ${collection.uid},
-						'name' : name
-					},
-					'cache' : false
-				}).done(function(created){
-					if (created == 'true') {
-						document.location.reload();
-					} else {
-						alert('Collection with such name already exists');
-					}
-				});
-			}
-		}
-		
 		//create proper href for "Create question" button
 		function initLinkHref(collectionUid) {
 			var questionType = document.getElementById("question-type").selectedIndex + 1;
@@ -209,7 +237,11 @@
 	</div>
 	
 	<h4 class="voffset20">
-		<c:out value="${collection.name}" />
+		<span id="collection-name">
+			<c:out value="${collection.name}" />
+		</span>
+		<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+		
 		<c:if test="${collection.personal}">
 			<span class="grid-collection-private small">
 				<i class="fa fa-lock"></i> Private collection
@@ -217,26 +249,22 @@
 		</c:if>
 			
 		<div class="btn-group-xs pull-right">		
-			<button id="edit-collection-button" class="btn btn-default" onClick="javascript:changeCollectionName()">Change name</button>
-				
-				
 			<div class="btn-group-xs" style="display: flex;">
-
-					<select id="question-type" class="form-control btn-xs" style="height: auto;">
-						<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
-						<option><fmt:message key="label.question.type.matching.pairs" /></option>
-						<option><fmt:message key="label.question.type.short.answer" /></option>
-						<option><fmt:message key="label.question.type.numerical" /></option>
-						<option><fmt:message key="label.question.type.true.false" /></option>
-						<option><fmt:message key="label.question.type.essay" /></option>
-						<option><fmt:message key="label.question.type.ordering" /></option>
-						<option><fmt:message key="label.question.type.mark.hedging" /></option>
-					</select>&nbsp;
+				<select id="question-type" class="form-control btn-xs" style="height: auto;">
+					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
+					<option><fmt:message key="label.question.type.matching.pairs" /></option>
+					<option><fmt:message key="label.question.type.short.answer" /></option>
+					<option><fmt:message key="label.question.type.numerical" /></option>
+					<option><fmt:message key="label.question.type.true.false" /></option>
+					<option><fmt:message key="label.question.type.essay" /></option>
+					<option><fmt:message key="label.question.type.ordering" /></option>
+					<option><fmt:message key="label.question.type.mark.hedging" /></option>
+				</select>&nbsp;
 					
-					<a onclick="initLinkHref(${collection.uid});return false;" href=""
-						class="btn btn-default thickbox" id="create-question-href">  
-						<fmt:message key="label.create.question" />
-					</a>
+				<a onclick="initLinkHref(${collection.uid});return false;" href=""
+					class="btn btn-default thickbox" id="create-question-href">  
+					<fmt:message key="label.create.question" />
+				</a>
 			</div>
 		</div>
 	</h4>
@@ -245,8 +273,7 @@
 		<c:when test="${hasQuestions}">			
 			<%-- jqGrid placeholder with some useful attributes --%>
 			<div class="voffset20" >
-				<table id="collection-grid" data-collection-uid="${collection.uid}"
-				 	   data-collection-name="<c:out value='${collection.name}' />">
+				<table id="collection-grid" data-collection-uid="${collection.uid}">
 				</table>
 			</div>
 		</c:when>

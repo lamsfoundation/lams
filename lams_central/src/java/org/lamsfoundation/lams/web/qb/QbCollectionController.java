@@ -31,7 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -52,6 +54,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -191,7 +196,34 @@ public class QbCollectionController {
 
     @RequestMapping("/changeCollectionName")
     @ResponseBody
-    public String changeCollectionName(@RequestParam long collectionUid, @RequestParam String name) {
+    public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
+	    @RequestParam(name = "value") String name) {
+//	long lessonId = WebUtil.readLongParam(request, "pk");
+//
+//	HttpSession ss = SessionManager.getSession();
+//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+//	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "rename lesson", false)) {
+//	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+//	    return null;
+//	}
+//
+//	String newLessonName = request.getParameter("value");
+//	if (StringUtils.isBlank(newLessonName)) {
+//	    return null;
+//	}
+//
+//	Lesson lesson = lessonService.getLesson(lessonId);
+//	lesson.setLessonName(newLessonName);
+//	userManagementService.save(lesson);
+//
+//	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
+//	jsonObject.put("successful", true);
+//	response.setContentType("application/json;charset=utf-8");
+//	return jsonObject.toString();
+	
+	
+	
+	
 	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
 	name = name.trim();
 	for (QbCollection collection : collections) {
