@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Exports and imports IMS QTI questions.
@@ -52,8 +53,11 @@ public class ImsQtiController {
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
     @RequestMapping("/saveQTI")
-    public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
+    @ResponseBody
+    public void saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
 	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
+	int questionId = qbService.getMaxQuestionId();
+	
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    QbQuestion qbQuestion = new QbQuestion();
@@ -63,6 +67,7 @@ public class ImsQtiController {
 	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
 		    contentFolderID, question.getResourcesFolderPath()));
 	    qbQuestion.setPenaltyFactor(0);
+	    qbQuestion.setQuestionId(++questionId);
 
 	    int questionMark = 1;
 
@@ -103,6 +108,7 @@ public class ImsQtiController {
 			option.setName(answerText);
 			option.setDisplayOrder(orderId++);
 			option.setFeedback(answer.getFeedback());
+			option.setQbQuestion(qbQuestion);
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // for fill in blanks question all answers are correct and get full mark
@@ -156,6 +162,7 @@ public class ImsQtiController {
 			assessmentAnswer.setName(answerText);
 			assessmentAnswer.setDisplayOrder(orderId++);
 			assessmentAnswer.setFeedback(answer.getFeedback());
+			assessmentAnswer.setQbQuestion(qbQuestion);
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // set the factor of score for correct answers
@@ -222,6 +229,7 @@ public class ImsQtiController {
 			    assessmentAnswer.setName(matchAnswer.getText());
 			    assessmentAnswer.setDisplayOrder(orderId++);
 			    assessmentAnswer.setFeedback(answer.getFeedback());
+			    assessmentAnswer.setQbQuestion(qbQuestion);
 
 			    optionList.add(assessmentAnswer);
 			}
@@ -253,6 +261,7 @@ public class ImsQtiController {
 			option.setName(answerText);
 			option.setDisplayOrder(orderId++);
 			option.setFeedback(answer.getFeedback());
+			option.setQbQuestion(qbQuestion);
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // for fill in blanks question all answers are correct and get full mark
@@ -293,11 +302,9 @@ public class ImsQtiController {
 	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
 	    
 	    if (log.isDebugEnabled()) {
-		log.debug("Added question: " + qbQuestion.getName());
+		log.debug("Imported QTI question. Name: " + qbQuestion.getName() + ", uid: " + qbQuestion.getUid());
 	    }
 	}
-
-	return "qb/qtiquestions";
     }
     
     /**

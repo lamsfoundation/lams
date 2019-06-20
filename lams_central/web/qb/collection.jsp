@@ -47,6 +47,11 @@
 			margin-right: 50px;
 		}
 		
+		#collection-name-row {
+			min-height: 20px; 
+			margin-top: 20px;
+		}
+		
 		#collection-name:hover+span+i {
 			visibility:visible
 		}
@@ -75,8 +80,7 @@
 				iconSet: 'fontAwesome',
 				caption: "Questions",
 			    datatype: "xml",
-			 	// data comes from data-collection-* attributes of <table> tag which is a base for the grid
-			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?showUsage=true&collectionUid=" + collectionGrid.data('collectionUid'),
+			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?showUsage=true&collectionUid=${collection.uid}",
 			    height: "100%",
 			    autowidth:true,
 				shrinkToFit: true,
@@ -89,6 +93,7 @@
 			    rowNum: 10,
 			    viewrecords: true,
 			    recordpos: "left",
+			    hidegrid: false,
 			    colNames:[
 			    	"ID",
 			    	"Name",
@@ -223,7 +228,6 @@
 		// share a collection with authors of an organisation
 		function shareCollection() {
 			var grid =  $('#collection-grid'),
-				collectionUid = grid.data('collectionUid'),
 				organisationId = $('#targetOrganisationSelect').val();
 			
 			$.ajax({
@@ -231,7 +235,7 @@
 				'type' : 'POST',
 				'dataType' : 'text',
 				'data' : {
-					'collectionUid' : collectionUid,
+					'collectionUid' : ${collection.uid},
 					'organisationId': organisationId
 				},
 				'cache' : false
@@ -242,15 +246,14 @@
 		
 		// stop sharing a collection with authors of an organisation
 		function unshareCollection(organisationId) {
-			var grid =  $('#collection-grid'),
-				collectionUid = grid.data('collectionUid');
+			var grid =  $('#collection-grid');
 			
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/unshareCollection.do',
 				'type' : 'POST',
 				'dataType' : 'text',
 				'data' : {
-					'collectionUid' : collectionUid,
+					'collectionUid' : ${collection.uid},
 					'organisationId': organisationId
 				},
 				'cache' : false
@@ -258,13 +261,35 @@
 				document.location.reload();
 			});
 		}
+
+	    function importQTI(){
+	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
+				'QuestionFile','width=500,height=240,scrollbars=yes');
+	    }
+		
+	    function saveQTI(formHTML, formName) {
+	    	var form = $($.parseHTML(formHTML));
+			$.ajax({
+				type: "POST",
+				url: '<c:url value="/imsqti/saveQTI.do" />?contentFolderID=${contentFolderID}&collectionUid=${collection.uid}',
+				data: form.serializeArray(),
+				success: function() {
+					location.reload();
+				}
+			});
+	    }
+
+	    function exportQTI(){
+	    	var frame = document.getElementById("downloadFileDummyIframe");
+	    	frame.src = '<c:url value="/imsqti/exportCollectionAsQTI.do" />?collectionUid=${collection.uid}';
+	    }
 		
 		//create proper href for "Create question" button
-		function initLinkHref(collectionUid) {
+		function initLinkHref() {
 			var questionType = document.getElementById("question-type").selectedIndex + 1;
 			$("#create-question-href").attr("href", 
 					"<c:url value='/qb/edit/newQuestionInit.do'/>?questionType=" + questionType 
-					+ "&collectionUid=" + collectionUid 
+					+ "&collectionUid=${collection.uid}" 
 					+ "&KeepThis=true&TB_iframe=true&modal=true");
 		};
 		
@@ -283,20 +308,37 @@
 		</button>
 	</div>
 	
-	<h4 class="voffset20">
-		<span id="collection-name">
-			<c:out value="${collection.name}" />
-		</span>
-		<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+	<div id="collection-name-row" class="row h4">
 		
-		<c:if test="${collection.personal}">
-			<span class="grid-collection-private small">
-				<i class="fa fa-lock"></i> Private collection
+		<div class="col-xs-12 col-sm-8">
+			<span id="collection-name">
+				<strong>
+					<c:out value="${collection.name}" />
+				</strong>
 			</span>
-		</c:if>
+			<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
 			
-		<div class="btn-group-xs pull-right">		
-			<div class="btn-group-xs" style="display: flex;">
+			<c:if test="${collection.personal}">
+				<span class="grid-collection-private small">
+					<i class="fa fa-lock"></i> Private collection
+				</span>
+			</c:if>
+		</div>
+		
+		<div class=" col-xs-12 col-sm-4">
+			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
+				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
+					<i class="fa fa-upload" title="<fmt:message key='label.import.qti'/>"></i>
+				</a>
+				
+				<c:if test="${hasQuestions}">
+					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+						<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
+					</a>
+				</c:if>
+			</div>
+				
+			<div class="btn-group-xs pull-right" style="display: flex;">
 				<select id="question-type" class="form-control btn-xs" style="height: auto;">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
 					<option><fmt:message key="label.question.type.matching.pairs" /></option>
@@ -307,25 +349,23 @@
 					<option><fmt:message key="label.question.type.ordering" /></option>
 					<option><fmt:message key="label.question.type.mark.hedging" /></option>
 				</select>&nbsp;
-					
-				<a onclick="initLinkHref(${collection.uid});return false;" href=""
-					class="btn btn-default thickbox" id="create-question-href">  
-					<fmt:message key="label.create.question" />
+						
+				<a onclick="initLinkHref();return false;" href="" class="btn btn-default thickbox" id="create-question-href">  
+					<i class="fa fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.create.question" />"></i>
 				</a>
 			</div>
 		</div>
-	</h4>
+	</div>
 				
 	<c:choose>
 		<c:when test="${hasQuestions}">			
 			<%-- jqGrid placeholder with some useful attributes --%>
 			<div class="voffset20" >
-				<table id="collection-grid" data-collection-uid="${collection.uid}">
-				</table>
+				<table id="collection-grid"></table>
 			</div>
 		</c:when>
 		<c:otherwise>
-			<div class="header-column">
+			<div class="alert alert-warning">
 				There are no questions in this collection
 			</div>
 		</c:otherwise>
@@ -387,6 +427,8 @@
 	
 	<!-- Dummy div for question save to work properly -->
 	<div id="itemArea" class="hidden"></div>
+	<!-- Dummy iframe for exporting QTI packages -->
+	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 </lams:Page>
 </body>
 </lams:html>
