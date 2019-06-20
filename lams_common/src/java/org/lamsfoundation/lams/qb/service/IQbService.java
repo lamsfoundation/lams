@@ -66,7 +66,7 @@ public interface IQbService {
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
-    int countCollectionQuestions(long collectionUid, String search);
+    int getCountCollectionQuestions(long collectionUid, String search);
 
     List<QbCollection> getQuestionCollections(long qbQuestionUid);
 
@@ -92,4 +92,6 @@ public interface IQbService {
     boolean removeQuestion(long qbQuestionUid);
 
     boolean removeQuestionPossible(long qbQuestionUid);
+
+    QbCollection getCollection(long collectionUid);
 }

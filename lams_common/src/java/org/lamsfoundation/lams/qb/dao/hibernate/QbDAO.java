@@ -264,7 +264,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public int countCollectionQuestions(long collectionUid, String search) {
+    public int getCountCollectionQuestions(long collectionUid, String search) {
 	Query query = prepareCollectionQuestionsQuery(collectionUid, null, null, search, true);
 	return ((BigInteger) query.getSingleResult()).intValue();
     }

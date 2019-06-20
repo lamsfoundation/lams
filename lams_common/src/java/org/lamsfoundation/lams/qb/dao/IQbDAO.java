@@ -52,7 +52,7 @@ public interface IQbDAO extends IBaseDAO {
 
     List<QbCollection> getQuestionCollections(long qbQuestionUid);
 
-    int countCollectionQuestions(long collectionUid, String search);
+    int getCountCollectionQuestions(long collectionUid, String search);
 
     void addCollectionQuestion(long collectionUid, long qbQuestionUid);
 

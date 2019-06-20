@@ -22,13 +22,17 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -62,8 +66,24 @@ public class QbCollectionController {
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
-	model.addAttribute("collections", qbService.getUserCollections(userId));
+
+	Collection<QbCollection> collections = qbService.getUserCollections(userId);
+	model.addAttribute("collections", collections);
+
+	Map<Long, Integer> questionCount = collections.stream().collect(
+		Collectors.toMap(QbCollection::getUid, c -> qbService.getCountCollectionQuestions(c.getUid(), null)));
+	model.addAttribute("questionCount", questionCount);
+
 	return "qb/collectionList";
+    }
+
+    @RequestMapping("/showOne")
+    public String showOneCollection(@RequestParam long collectionUid, Model model) throws Exception {
+	model.addAttribute("collection", qbService.getCollection(collectionUid));
+	model.addAttribute("availableOrganisations",
+		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
+	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
+	return "qb/collection";
     }
 
     @RequestMapping("/getCollectionGridData")
@@ -82,7 +102,7 @@ public class QbCollectionController {
 	int offset = (page - 1) * rowLimit;
 	List<QbQuestion> questions = qbService.getCollectionQuestions(collectionUid, offset, rowLimit, sortBy,
 		sortOrder, searchString);
-	int total = qbService.countCollectionQuestions(collectionUid, searchString);
+	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
 	return QbCollectionController.toGridXML(questions, page, maxPages);
     }
