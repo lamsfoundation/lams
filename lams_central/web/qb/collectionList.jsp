@@ -72,6 +72,7 @@
 				    colNames:[
 				    	"ID",
 				    	"Name",
+				    	// this column is hidden, so data coming from controller can be the same as for single collection view
 				    	"Used in # of lessons",
 				    	"Stats"
 				    ],
@@ -102,6 +103,7 @@
 		
 		// add a new collection
 		function addCollection() {
+			// get collection name from a pop up
 			var name = prompt("New collection name"),
 				lower = name.toLowerCase();
 			// check if a collection with same name already exists
@@ -130,6 +132,7 @@
 </lams:head>
 <body class="stripes">
 <lams:Page title="Collection management" type="admin">
+	<%-- This option can be switched off in sysadmin --%>
 	<c:if test="${createCollectionAllowed}">
 		<div id="add-collection-div">
 			<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
@@ -138,6 +141,7 @@
 	
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
+			<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
 			<c:set var="collectionTitle">
 				<c:out value="${collection.name}" />
 				<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
@@ -154,7 +158,6 @@
 			<table class="collection-grid" data-collection-uid="${collection.uid}"
 			 	   data-collection-name='<c:out value="${collection.name}" />' data-collection-title='${collectionTitle}'>
 			</table>
-
 		</div>
 	</c:forEach>
 </lams:Page>

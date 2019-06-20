@@ -31,6 +31,19 @@
 		#usage a {
 			text-decoration: underline;
 		}
+				
+		.row {
+			margin-top: 10px;
+		}
+		
+		.middle-cell {
+			padding-top: 6px;
+			display: inline-block;
+		}
+
+		.header-column {
+			font-weight: bold;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -145,32 +158,7 @@
 					</div>
 				</div>
 			</div>
-			
-			<c:if test="${not empty availableCollections and transferAllowed}">
-				<div>
-					<span>Transfer questions to </span>
-					<select class="form-control" id="targetCollectionSelect">
-						<c:forEach var="target" items="${availableCollections}">
-							<option value="${target.uid}">
-								<c:out value="${target.name}" />
-							</option>
-						</c:forEach>
-					</select>
-					<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">Add</button>
-					<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">Copy</button>
-				</div>
-			</c:if>
-			
-			<div>
-				<span>Existing collections</span><br />
-				<c:forEach var="collection" items="${existingCollections}">
-					<c:out value="${collection.name}" />
-					<c:if test="${transferAllowed}">
-						<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button><br />
-					</c:if>
-				</c:forEach>
-			</div>
-				
+
 			<c:if test="${not empty question.qbOptions}">
 				<p class="question-section-header">Options</p>
 				<table class="table table-striped qb-stats-table">
@@ -210,6 +198,58 @@
 				</table>
 			</div>
 		</c:if>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			Management
+		</div>
+		<div class="panel-body">
+			<div class="container-fluid">
+				<c:if test="${not empty availableCollections and transferAllowed}">
+					<div class="row">
+						<div class="col-xs-12 col-md-2 middle-column">
+							Transfer questions to
+						</div>
+						<div class="col-xs-12 col-md-6">
+							<select class="form-control" id="targetCollectionSelect">
+								<c:forEach var="target" items="${availableCollections}">
+									<option value="${target.uid}">
+										<c:out value="${target.name}" />
+									</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="col-xs-12 col-md-4">
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">Add</button>
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">Copy</button>
+						</div>
+					</div>
+				</c:if>
+				
+				<div class="row">
+					<div class="col-xs-0 col-md-2"></div>
+					<div class="col-xs-12 col-md-8 header-column">
+						Existing collections
+					</div>
+					<div class="col-xs-0 col-md-2"></div>
+				</div>
+				
+				<c:forEach var="collection" items="${existingCollections}">
+					<div class="row">
+						<div class="col-xs-0 col-md-2"></div>
+						<div class="col-xs-12 col-md-6 middle-cell">
+							<c:out value="${collection.name}" />
+						</div>
+						<div class="col-xs-12 col-md-2">
+							<c:if test="${transferAllowed}">
+								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button>
+							</c:if>
+						</div>
+					</div>
+				</c:forEach>
+			</div>
+		</div>
 	</div>
 	
 	<c:if test="${not empty question.qbOptions}">

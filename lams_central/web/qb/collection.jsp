@@ -20,16 +20,12 @@
 		.row {
 			margin-top: 10px;
 		}
-		
-		.row > div:first-child, .row > div:last-child  {
-			text-align: left;
-			padding-left: 0;
+				
+		.middle-cell {
+			padding-top: 6px;
+			display: inline-block;
 		}
-		
-		.row > div {
-			text-align: right;
-		}
-		
+
 		.header-column {
 			font-weight: bold;
 		}
@@ -101,17 +97,13 @@
 		
 		// remove a collection
 		function removeCollection() {
-			var grid = $('#collection-grid'),
-				collectionUid = grid.data('collectionUid'),
-				name = grid.data('collectionName');
-		
-			if (confirm('Are you sure you want to remove "' + name + '" collection?')) {
+			if (confirm('Are you sure you want to remove "${collection.name}" collection?')) {
 				$.ajax({
 					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
 					'type' : 'POST',
 					'dataType' : 'text',
 					'data' : {
-						'collectionUid' : collectionUid
+						'collectionUid' : ${collection.uid}
 					},
 					'cache' : false
 				}).done(function(){
@@ -194,6 +186,7 @@
 	<div class="panel-body">
 		<c:choose>
 			<c:when test="${hasQuestions}">
+				<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
 				<c:set var="collectionTitle">
 					<c:out value="${collection.name}" />
 					<span class="grid-question-count">(${questionCount} questions)</span>
@@ -207,7 +200,9 @@
 				</table>
 			</c:when>
 			<c:otherwise>
-				There are no questions in this collection
+				<div class="header-column">
+					There are no questions in this collection
+				</div>
 			</c:otherwise>
 		</c:choose>
 
@@ -216,14 +211,14 @@
 		<c:if test="${not empty collection.userId and not collection.personal}">
 			<div class="container-fluid">
 				<div class="row">
-					<c:if test="${not hasQuestions}">
-						<div class="col-xs-12 col-md-2">
+					<div class="col-xs-12 col-md-2">
+						<c:if test="${not hasQuestions}">
 							<button class="btn btn-default" onClick="javascript:removeCollection()">Remove collection</button>
-						</div>
-					</c:if>
+						</c:if>
+					</div>
 					<c:if test="${not empty availableOrganisations}">
-						<div class="col-xs-12 col-md-2">
-							<span>Share collection with </span>
+						<div class="col-xs-12 col-md-2 middle-cell">
+							<span>Share collection with</span>
 						</div>
 						<div class="col-xs-12 col-md-6">
 							<select id="targetOrganisationSelect" class="form-control">
@@ -242,7 +237,7 @@
 				
 				<c:if test="${not empty collection.organisations}">
 					<div class="row">
-						<div class="col-xs-0 col-md-2"></div>
+						<div class="col-xs-0 col-md-4"></div>
 						<div class="col-xs-12 col-md-8 header-column">
 							<span>Shared with organisations</span>
 						</div>
@@ -250,8 +245,8 @@
 					</div>
 					<c:forEach var="organisation" items="${collection.organisations}">
 						<div class="row">
-							<div class="col-xs-0 col-md-2"></div>
-							<div class="col-xs-0 col-md-8">
+							<div class="col-xs-0 col-md-4"></div>
+							<div class="col-xs-0 col-md-6 middle-cell">
 								<c:out value="${organisation.name}" />
 							</div>
 							<div class="col-xs-0 col-md-2">
