@@ -2,48 +2,48 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<c:set var="hasQuestions" value="${questionCount > 0}" />
 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>Question collections</title>
+	<title>Collection</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet">
 	<style>
-		#addCollectionDiv {
-			margin-top: 10px;
-			padding-top: 10px;
-			border-top: black thin solid;
-		}
-		
-		#addCollectionDiv input {
-			width: 80%;
-			margin-right: 10px;
-			display: inline-block;
-		}
-		
-		#addCollectionDiv button {
+		#edit-collection-button {
 			float: right;
 		}
 		
 		.row {
 			margin-top: 10px;
 		}
-		
-		.row > div:first-child, .row > div:last-child  {
-			text-align: left;
-			padding-left: 0;
+				
+		.middle-cell {
+			padding-top: 6px;
+			display: inline-block;
 		}
-		
-		.row > div {
-			text-align: right;
-		}
-		
+
 		.header-column {
 			font-weight: bold;
+		}
+
+		.grid-question-count {
+			margin-left: 10px;
+		}
+		
+		.grid-collection-private {
+			margin-left: 10px;
+			color: red;
+		}
+		
+		#grid-question-create {
+			display: inline-block;
+			float: right;
+			margin-right: 50px;
 		}
 	</style>
 	
@@ -54,127 +54,47 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			var collectionGrid = $('#collection-grid');
 			
-			// create a grid for each collection
-			$('.collection-grid').each(function(){
-				var collectionGrid = $(this);
-				
-				collectionGrid.jqGrid({
-					guiStyle: "bootstrap",
-					iconSet: 'fontAwesome',
-					// data comes from data-collection-* attributes of <table> tag which is a base for the grid
-					caption: collectionGrid.data('collectionName'),
-				    datatype: "xml",
-				    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?collectionUid=" + collectionGrid.data('collectionUid'),
-				    height: "100%",
-				    autowidth:true,
-					shrinkToFit: true,
-				    cellEdit: false,
-				    cmTemplate: { title: false, search: false },
-				    sortorder: "asc", 
-				    sortname: "name", 
-				    multiselect 	   : true,
-				    multiPageSelection : true,
-				    pager: true,
-				    rowList:[10,20,30,40,50,100],
-				    rowNum: 10,
-				    colNames:[
-				    	"ID",
-				    	"Name",
-				    	"Stats"
-				    ],
-				    colModel:[
-				      {name:'id', index:'uid', sortable:true,  width: 10},
-				      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
-				      // formatter gets just question uid and creates a button
-				      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
-				      ],
-			        onSelectRow : function(id, status, event) {
-					    var grid = $(this),
-					    	// if no questions are selected, buttons to manipulate them get disabled
-					    	buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
-					   		included = grid.data('included'),
-							excluded = grid.data('excluded'),
-							selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
-						if (selectAllChecked) {
-							var index = excluded.indexOf(+id);
-							// if row is deselected, add it to excluded array
-							if (index < 0) {
-								if (!status) {
-									excluded.push(+id);
-								}
-							} else if (status) {
-								excluded.splice(index, 1);
-							}
-						} else {
-							var index = included.indexOf(+id);
-							// if row is selected, add it to included array
-							if (index < 0) {
-								if (status) {
-									included.push(+id);
-									buttons.prop('disabled', false);
-								}
-							} else if (!status) {
-								included.splice(index, 1);
-								if (included.length === 0) {
-									buttons.prop('disabled', true);
-								}
-							}
-						}
-					},
-					gridComplete : function(){
-						var grid = $(this),
-							// if no questions are selected, buttons to manipulate them get disabled
-							buttons = grid.closest('.ui-jqgrid').siblings('.container-fluid').find('.questionButtons .btn'),
-							// cell containing "(de)select all" button
-							selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div'),
-							included = grid.data('included');
-						// remove the default button provided by jqGrid
-						$('.cbox', selectAllCell).remove();
-						// create own button which follows own rules
-						var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
-												.prop('checked', included === null)
-												.prependTo(selectAllCell)
-												.change(function(){
-													// start with deselecting every question on current page
-													grid.resetSelection();
-													if ($(this).prop('checked')){
-														// on select all change mode and select all on current page
-														grid.data('included', null);
-														grid.data('excluded', []);
-														$('[role="row"]', grid).each(function(){
-															grid.jqGrid('setSelection', +$(this).attr('id'), false);
-														});
-														buttons.prop('disabled', false);
-													} else {
-														// on deselect all just change mode
-														grid.data('excluded', null);
-														grid.data('included', []);
-														buttons.prop('disabled', true);
-													}
-												});
-						grid.resetSelection();
-					},
-					loadComplete : function(){
-						var grid = $(this),
-							gridView = grid.closest('.ui-jqgrid-view');
-						// remove checkbox next to search bar
-						$('tr.ui-search-toolbar .cbox', gridView).remove();
-						
-						// do not select row when clicked on stats button
-						$('.stats-cell', gridView).click(function(event){
-							event.stopImmediatePropagation();
-						});
-					},
-				    loadError: function(xhr,st,err) {
-				    	collectionGrid.clearGridData();
-					   	alert("Error!");
-				    	}
-					}).jqGrid('filterToolbar');
-				
-
-				collectionGrid.data('included', []);
-			});
+			collectionGrid.jqGrid({
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
+				// data comes from data-collection-* attributes of <table> tag which is a base for the grid
+				caption: collectionGrid.data('collectionTitle'),
+			    datatype: "xml",
+			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?showUsage=true&collectionUid=" + collectionGrid.data('collectionUid'),
+			    height: "100%",
+			    autowidth:true,
+				shrinkToFit: true,
+			    cellEdit: false,
+			    cmTemplate: { title: false, search: false },
+			    sortorder: "asc", 
+			    sortname: "name", 
+			    pager: true,
+			    rowList:[10,20,30,40,50,100],
+			    rowNum: 10,
+			    colNames:[
+			    	"ID",
+			    	"Name",
+			    	"Used in<br>lessons",
+			    	"Stats"
+			    ],
+			    colModel:[
+			      {name:'id', index:'uid', sortable:true,  width: 10},
+			      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
+			      {name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
+			      // formatter gets just question uid and creates a button
+			      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
+			      ],
+				beforeSelectRow: function(rowid, e) {
+					// do not select rows at all
+				    return false;
+				},
+			    loadError: function(xhr,st,err) {
+			    	collectionGrid.clearGridData();
+				   	alert("Error!");
+			    	}
+			}).jqGrid('filterToolbar');
 		});
 		
 		// Creates a button to display question statistics
@@ -183,103 +103,28 @@
 					+ "\", \"_blank\")' title='Show stats'></i>";
 		}
 		
-		// remove questions from a collection
-		function removeCollectionQuestions(button) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),	
-				included = grid.data('included'),
-				excluded = grid.data('excluded');
-			$.ajax({
-				'url'  : '<lams:LAMSURL />qb/collection/removeCollectionQuestions.do',
-				'type' : 'POST',
-				'dataType' : 'text',
-				'data' : {
-					'collectionUid' : grid.data('collectionUid'),
-					'included'	    : included ? JSON.stringify(included) : null,
-					'excluded'	    : excluded ? JSON.stringify(excluded) : null
-				},
-				'cache' : false
-			}).done(function(){
-				grid.trigger('reloadGrid');
-			});
-		}
-		
-		// add or copy questions to a collection
-		function addCollectionQuestions(button, copy) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
-				sourceCollectionUid = grid.data('collectionUid'),
-				targetCollectionUid = $(button).closest('.container-fluid').find('.targetCollectionSelect').val(),
-				included = grid.data('included'),
-				excluded = grid.data('excluded');
-			$.ajax({
-				'url'  : '<lams:LAMSURL />qb/collection/addCollectionQuestions.do',
-				'type' : 'POST',
-				'dataType' : 'text',
-				'data' : {
-					'sourceCollectionUid' : sourceCollectionUid,
-					'targetCollectionUid' : targetCollectionUid,
-					'copy'			: copy,
-					'included'	    : included ? JSON.stringify(included) : null,
-					'excluded'	    : excluded ? JSON.stringify(excluded) : null
-				},
-				'cache' : false
-			}).done(function(){
-				$('.collection-grid[data-collection-uid="' + targetCollectionUid + '"]').trigger('reloadGrid');
-			});
-		}
-		
-		// add a new collection
-		function addCollection() {
-			var name = $('#addCollectionDiv input').val().trim(),
-				lower = name.toLowerCase();
-			// check if a collection with same name already exists
-			$('.collection-grid').each(function(){
-				if ($(this).data('collectionName').trim().toLowerCase() == lower) {
-					alert('Collection with such name already exists');
-					name = null;
-					return false;
-				}
-			});
-			if (name) {
-				$.ajax({
-					'url'  : '<lams:LAMSURL />qb/collection/addCollection.do',
-					'type' : 'POST',
-					'dataType' : 'text',
-					'data' : {
-						'name' : name
-					},
-					'cache' : false
-				}).done(function(){
-					document.location.reload();
-				});
-			}
-		}
-		
 		// remove a collection
-		function removeCollection(button) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
-				collectionUid = grid.data('collectionUid'),
-				name = grid.data('collectionName');
-		
-			if (confirm('Are you sure you want to remove "' + name + '" collection?')) {
+		function removeCollection() {
+			if (confirm('Are you sure you want to remove "${collection.name}" collection?')) {
 				$.ajax({
 					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
 					'type' : 'POST',
 					'dataType' : 'text',
 					'data' : {
-						'collectionUid' : collectionUid
+						'collectionUid' : ${collection.uid}
 					},
 					'cache' : false
 				}).done(function(){
-					document.location.reload();
+					document.location.href = '<lams:LAMSURL />qb/collection/show.do';
 				});
 			}
 		}
 		
 		// share a collection with authors of an organisation
-		function shareCollection(button) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
+		function shareCollection() {
+			var grid =  $('#collection-grid'),
 				collectionUid = grid.data('collectionUid'),
-				organisationId = $(button).closest('.container-fluid').find('.targetOrganisationSelect').val();
+				organisationId = $('#targetOrganisationSelect').val();
 			
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/shareCollection.do',
@@ -296,8 +141,8 @@
 		}
 		
 		// stop sharing a collection with authors of an organisation
-		function unshareCollection(button, organisationId) {
-			var grid = $(button).closest('.container-fluid').siblings(".ui-jqgrid").find('.collection-grid'),
+		function unshareCollection(organisationId) {
+			var grid =  $('#collection-grid'),
 				collectionUid = grid.data('collectionUid');
 			
 			$.ajax({
@@ -313,7 +158,30 @@
 				document.location.reload();
 			});
 		}
-
+		
+		// add a new collection
+		function changeCollectionName() {
+			var name = prompt("New collection name");
+			if (name) {
+				$.ajax({
+					'url'  : '<lams:LAMSURL />qb/collection/changeCollectionName.do',
+					'type' : 'POST',
+					'dataType' : 'text',
+					'data' : {
+						'collectionUid' : ${collection.uid},
+						'name' : name
+					},
+					'cache' : false
+				}).done(function(created){
+					if (created == 'true') {
+						document.location.reload();
+					} else {
+						alert('Collection with such name already exists');
+					}
+				});
+			}
+		}
+		
 		//create proper href for "Create question" button
 		function initLinkHref(collectionUid) {
 			var questionType = document.getElementById("question-type").selectedIndex + 1;
@@ -326,91 +194,82 @@
 	    //this method gets invoked after question has been edited and saved
 		function refreshThickbox(){
 			location.reload();
-			//var newQuestionUid = $("#itemArea").html();
-			//location.href = '<c:url value="/qb/stats/show.do" />?qbQuestionUid=' + newQuestionUid;
 		};
 	</script>
 </lams:head>
 <body class="stripes">
-<lams:Page title="Question collections" type="admin">
-	<c:forEach var="collection" items="${collections}" varStatus="status">
-	
-	<!-- TODO move to Collection jsp page -->
-	<c:if test="${status.first}">
-	<div class="btn-group-xs " style="height: 20px;">
-	<!-- Dropdown menu for choosing a question type -->
-	<div class="form-inline form-group pull-right">
-		<select id="question-type" class="form-control input-sm">
-			<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
-			<option><fmt:message key="label.question.type.matching.pairs" /></option>
-			<option><fmt:message key="label.question.type.short.answer" /></option>
-			<option><fmt:message key="label.question.type.numerical" /></option>
-			<option><fmt:message key="label.question.type.true.false" /></option>
-			<option><fmt:message key="label.question.type.essay" /></option>
-			<option><fmt:message key="label.question.type.ordering" /></option>
-			<option><fmt:message key="label.question.type.mark.hedging" /></option>
-		</select>
-		
-		<a onclick="initLinkHref(${collection.uid});return false;" href="" class="btn btn-default btn-sm button-add-item thickbox" id="create-question-href">  
-			<fmt:message key="label.create.question" />
-		</a>
+<lams:Page title="Collection" type="admin">
+	<div>
+		<button class="btn btn-default" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
+			Collection management
+		</button>
+		<button id="edit-collection-button" class="btn btn-primary" onClick="javascript:changeCollectionName()">Change name</button>
 	</div>
-	</div>
-	</c:if>
-	
-		<div class="panel-body">
+	<div class="panel-body">
+		<c:choose>
+			<c:when test="${hasQuestions}">
+				<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
+				<c:set var="collectionTitle">
+					<c:out value="${collection.name}" />
+					<span class="grid-question-count">(${questionCount} questions)</span>
+					<c:if test="${collection.personal}">
+						<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
+					</c:if>
+				</c:set>
+				<%-- jqGrid placeholder with some useful attributes --%>
+				<table id="collection-grid" data-collection-uid="${collection.uid}"
+				 	   data-collection-title='${collectionTitle}' data-collection-name="<c:out value='${collection.name}' />">
+				</table>
+			</c:when>
+			<c:otherwise>
+				<div class="header-column">
+					There are no questions in this collection
+				</div>
+			</c:otherwise>
+		</c:choose>
 
-		
-			<%-- jqGrid placeholder with some useful attributes --%>
-			<table class="collection-grid" data-collection-uid="${collection.uid}" data-collection-name='<c:out value="${collection.name}" />' ></table>
-			
-			<div class="container-fluid">
-			
-				<div class="questionButtons row">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-0 col-md-2"></div>
+				<div class="col-xs-12 col-md-2 middle-cell">
+					<span>Create question</span>
+				</div>
+				<div class="col-xs-12 col-md-6">
+					<select id="question-type" class="form-control">
+						<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
+						<option><fmt:message key="label.question.type.matching.pairs" /></option>
+						<option><fmt:message key="label.question.type.short.answer" /></option>
+						<option><fmt:message key="label.question.type.numerical" /></option>
+						<option><fmt:message key="label.question.type.true.false" /></option>
+						<option><fmt:message key="label.question.type.essay" /></option>
+						<option><fmt:message key="label.question.type.ordering" /></option>
+						<option><fmt:message key="label.question.type.mark.hedging" /></option>
+					</select>
+				</div>
+				<div class="col-xs-12 col-md-2">
+					<a onclick="initLinkHref(${collection.uid});return false;" 
+						href=""
+						class="btn btn-default thickbox" id="create-question-href">  
+						<fmt:message key="label.create.question" />
+					</a>
+				</div>
+			</div>
+
+		<%-- Do not display links for collection manipulation for public and private collections --%>
+			<c:if test="${not empty collection.userId and not collection.personal}">
+				<div class="row">
 					<div class="col-xs-12 col-md-2">
-						<%-- Do not allow removing questions from public collection --%>
-						<c:if test="${not empty collection.userId}">
-							<button class="btn btn-default" onClick="javascript:removeCollectionQuestions(this)" disabled="disabled">Remove questions</button>
+						<c:if test="${not hasQuestions}">
+							<button class="btn btn-default" onClick="javascript:removeCollection()">Remove collection</button>
 						</c:if>
 					</div>
-					<div class="col-xs-12 col-md-2">
-						<span>Transfer questions to </span>
-					</div>
-					<div class="col-xs-12 col-md-6">
-						<select class="form-control targetCollectionSelect">
-							<c:forEach var="target" items="${collections}">
-								<c:if test="${not (target.uid eq collection.uid)}">
-									<option value="${target.uid}"
-									<%-- The default target collection for adding/copying questions is the public collection,
-										 unless it is the public collection itself: then it is the private collection --%>
-									<c:if test="${empty collection.userId ? target.personal : empty target.userId }">
-										selected="selected"
-									</c:if>
-									>
-										<c:out value="${target.name}" />
-									</option>
-								</c:if>
-							</c:forEach>
-						</select>
-					</div>
-					<div class="col-xs-12 col-md-2 button-group">
-						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, false)" disabled="disabled">Add</button>
-						<button class="btn btn-default" onClick="javascript:addCollectionQuestions(this, true)" disabled="disabled">Copy</button>
-					</div>
-				</div>
-				
-				<%-- Do not display links for collection manipulation for public and private collections --%>
-				<c:if test="${not empty collection.userId and not collection.personal}">
-					<div class="row">
-						<div class="col-xs-12 col-md-2">
-							<button class="btn btn-default" onClick="javascript:removeCollection(this)">Remove collection</button>
-						</div>
-						<div class="col-xs-12 col-md-2">
-							<span>Share collection with </span>
+					<c:if test="${not empty availableOrganisations}">
+						<div class="col-xs-12 col-md-2 middle-cell">
+							<span>Share collection with</span>
 						</div>
 						<div class="col-xs-12 col-md-6">
-							<select class="form-control targetOrganisationSelect">
-								<c:forEach var="target" items="${collection.shareableWithOrganisations}">
+							<select id="targetOrganisationSelect" class="form-control">
+								<c:forEach var="target" items="${availableOrganisations}">
 										<option value="${target.organisationId}">
 											<c:out value="${target.name}" />
 										</option>
@@ -418,42 +277,37 @@
 							</select>
 						</div>
 						<div class="col-xs-12 col-md-2">
-							<button class="btn btn-default" onClick="javascript:shareCollection(this)">Share</button>
+							<button class="btn btn-default" onClick="javascript:shareCollection()">Share</button>
 						</div>
-					</div>
-					
-					<c:if test="${not empty collection.organisations}">
-						<div class="row">
-							<div class="col-xs-0 col-md-2"></div>
-							<div class="col-xs-12 col-md-8 header-column">
-								<span>Shared with organisations</span>
-							</div>
-							<div class="col-xs-0 col-md-2"></div>
-						</div>
-						<c:forEach var="organisation" items="${collection.organisations}">
-							<div class="row">
-								<div class="col-xs-0 col-md-2"></div>
-								<div class="col-xs-0 col-md-8">
-									<c:out value="${organisation.name}" />
-								</div>
-								<div class="col-xs-0 col-md-2">
-									<button class="btn btn-default" onClick="javascript:unshareCollection(this, ${organisation.organisationId})">
-										Unshare
-									</button>
-								</div>
-							</div>
-						</c:forEach>
 					</c:if>
+				</div>
+				
+				<c:if test="${not empty collection.organisations}">
+					<div class="row">
+						<div class="col-xs-0 col-md-4"></div>
+						<div class="col-xs-12 col-md-8 header-column">
+							<span>Shared with organisations</span>
+						</div>
+						<div class="col-xs-0 col-md-2"></div>
+					</div>
+					<c:forEach var="organisation" items="${collection.organisations}">
+						<div class="row">
+							<div class="col-xs-0 col-md-4"></div>
+							<div class="col-xs-0 col-md-6 middle-cell">
+								<c:out value="${organisation.name}" />
+							</div>
+							<div class="col-xs-0 col-md-2">
+								<button class="btn btn-default" onClick="javascript:unshareCollection(${organisation.organisationId})">
+									Unshare
+								</button>
+							</div>
+						</div>
+					</c:forEach>
 				</c:if>
-			</div>
+			</c:if>
 		</div>
-	</c:forEach>
-	<div id="addCollectionDiv">
-		<input placeholder="Enter new collection name" class="form-control" />
-		<button class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
 	</div>
 	
-	<!-- TODO move to Collection jsp page -->
 	<!-- Dummy div for question save to work properly -->
 	<div id="itemArea" class="hidden"></div>
 </lams:Page>

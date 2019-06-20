@@ -76,12 +76,16 @@ public interface IQbService {
 
     List<QbCollection> getUserCollections(int userId);
 
+    List<QbCollection> getUserOwnCollections(int userId);
+
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
-    int countCollectionQuestions(long collectionUid, String search);
+    int getCountCollectionQuestions(long collectionUid, String search);
+
+    List<QbCollection> getQuestionCollections(long qbQuestionUid);
 
     QbCollection addCollection(int userId, String name);
 
@@ -98,9 +102,19 @@ public interface IQbService {
     void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
 	    Collection<Long> excludedQbQuestionUids, boolean copy);
 
-    void removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
+    boolean removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
 
-    void removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids);
+    Collection<Long> removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids);
+
+    boolean removeQuestion(long qbQuestionUid);
+
+    boolean removeQuestionPossible(long qbQuestionUid);
+
+    QbCollection getCollection(long collectionUid);
+
+    int getCountQuestionActivities(long qbQuestionUid);
+
+    void changeCollectionName(long collectionUid, String name);
 
     void releaseFromCache(Object object);
 }
