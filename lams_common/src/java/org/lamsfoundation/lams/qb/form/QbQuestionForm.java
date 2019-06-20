@@ -21,19 +21,20 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.assessment.web.form;
+package org.lamsfoundation.lams.qb.form;
 
 /**
- * Assessment Question Form.
+ * QB Question Form.
  *
  *
  * @author Andrey Balan
  */
-public class AssessmentQuestionForm {
+public class QbQuestionForm {
 
     private int displayOrder;
     private String sessionMapID;
     private String contentFolderID;
+    private Long collectionUid;
 
     // tool access mode;
     private String mode;
@@ -74,6 +75,14 @@ public class AssessmentQuestionForm {
 
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
+    }
+    
+    public Long getCollectionUid() {
+	return collectionUid;
+    }
+
+    public void setCollectionUid(Long collectionUid) {
+	this.collectionUid = collectionUid;
     }
 
     public String getMode() {

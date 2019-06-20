@@ -240,7 +240,7 @@ public class LAMSBaseDAO implements IBaseDAO {
      * java.io.Serializable)
      */
     @Override
-    public Object find(Class clazz, Serializable id) {
+    public <T> T find(Class<T> clazz, Serializable id) {
 	return getSession().get(clazz, id);
     }
 
@@ -250,7 +250,7 @@ public class LAMSBaseDAO implements IBaseDAO {
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findAll(java.lang.Class)
      */
     @Override
-    public List findAll(Class clazz) {
+    public <T> List<T> findAll(Class<T> clazz) {
 	return loadAll(clazz);
     }
 
@@ -273,10 +273,11 @@ public class LAMSBaseDAO implements IBaseDAO {
      * org.lamsfoundation.lams.dao.IBaseDAO#findByProperties(java.lang.Class,
      * java.util.Map)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public List findByProperties(Class clazz, Map<String, Object> properties) {
+    public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties) {
 	Qv qv = buildQueryString(clazz, properties, SELECT, EQUAL_TO_WHAT);
-	return doFind(qv.queryString, qv.values);
+	return (List<T>) doFind(qv.queryString, qv.values);
     }
 
     private String buildQueryString(Class clazz, String operation) {
@@ -330,14 +331,15 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List searchByStringProperties(Class clazz, Map<String, String> properties) {
-	Map<String, Object> p = new HashMap<String, Object>();
+    public <T> List<T> searchByStringProperties(Class<T> clazz, Map<String, String> properties) {
+	Map<String, Object> p = new HashMap<>();
 	for (Map.Entry<String, String> entry : properties.entrySet()) {
 	    p.put(entry.getKey(), entry.getValue());
 	}
 	Qv qv = buildQueryString(clazz, p, SELECT, LIKE_WHAT);
-	return doFind(qv.queryString, qv.values);
+	return (List<T>) doFind(qv.queryString, qv.values);
     }
 
     @Override
@@ -372,7 +374,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	StringBuilder queryString = new StringBuilder(operation).append(clazzName).append(SPACE).append(objName)
 		.append(WHERE);
 	Field[] fields = obj.getClass().getDeclaredFields();
-	List<Object> values = new ArrayList<Object>();
+	List<Object> values = new ArrayList<>();
 	for (int i = 0; i < fields.length; i++) {
 	    String name = fields[i].getName();
 	    Method readMethod = getReadMethod(fields[i], name, obj.getClass());

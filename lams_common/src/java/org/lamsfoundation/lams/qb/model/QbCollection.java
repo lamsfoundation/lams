@@ -14,7 +14,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -51,9 +50,6 @@ public class QbCollection implements Serializable {
     @OrderBy("name")
     private List<Organisation> organisations = new ArrayList<>();
 
-    @Transient
-    private List<Organisation> shareableWithOrganisations = new ArrayList<>();
-
     public Long getUid() {
 	return uid;
     }
@@ -88,14 +84,6 @@ public class QbCollection implements Serializable {
 
     public void setOrganisations(List<Organisation> organisations) {
 	this.organisations = organisations;
-    }
-
-    public List<Organisation> getShareableWithOrganisations() {
-	return shareableWithOrganisations;
-    }
-
-    public void setShareableWithOrganisations(List<Organisation> shareableWithOrganisations) {
-	this.shareableWithOrganisations = shareableWithOrganisations;
     }
 
     @Override

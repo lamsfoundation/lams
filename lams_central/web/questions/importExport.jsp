@@ -33,24 +33,7 @@
 		</a>
 	</div>
 
-	<!-- Dropdown menu for choosing a question type -->
-	<div class="form-inline form-group">
-		<select id="questionType" class="form-control input-sm">
-			<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
-			<option><fmt:message key="label.question.type.matching.pairs" /></option>
-			<option><fmt:message key="label.question.type.short.answer" /></option>
-			<option><fmt:message key="label.question.type.numerical" /></option>
-			<option><fmt:message key="label.question.type.true.false" /></option>
-			<option><fmt:message key="label.question.type.essay" /></option>
-			<option><fmt:message key="label.question.type.ordering" /></option>
-			<option><fmt:message key="label.question.type.mark.hedging" /></option>
-		</select>
-		
-		<a onclick="createNewQuestionInitHref();return false;" href="" class="btn btn-default btn-sm button-add-item thickbox" id="newQuestionInitHref">  
-			<fmt:message key="label.add.question.to.pool" />
-		</a>
-	</div>
-	<br><br>
+
 	
 	<!-- For exporting QTI packages -->
 	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

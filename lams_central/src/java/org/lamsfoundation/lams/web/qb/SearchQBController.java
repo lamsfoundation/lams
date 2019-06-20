@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.web.controller;
+package org.lamsfoundation.lams.web.qb;
 
 import java.util.List;
 

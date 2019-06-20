@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public interface IQbDAO extends IBaseDAO {
@@ -31,6 +32,8 @@ public interface IQbDAO extends IBaseDAO {
 
     List<ToolActivity> getQuestionActivities(long qbQuestionUid);
 
+    int getCountQuestionActivities(long qbQuestionUid);
+
     List<QbQuestion> getQuestionVersions(long qbQuestionUid);
 
     Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid);
@@ -49,11 +52,14 @@ public interface IQbDAO extends IBaseDAO {
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
-    int countCollectionQuestions(long collectionUid, String search);
+    List<QbCollection> getQuestionCollections(long qbQuestionUid);
+
+    int getCountCollectionQuestions(long collectionUid, String search);
 
     void addCollectionQuestion(long collectionUid, long qbQuestionUid);
 
     void removeCollectionQuestion(long collectionUid, long qbQuestionUid);
 
     Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids);
+
 }

@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
+
 import org.lamsfoundation.lams.qb.model.QbCollection;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 
 public interface IQbService {
 
@@ -33,6 +36,18 @@ public interface IQbService {
      * @return questions sharing the same questionId
      */
     List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId);
+    
+    /**
+     * @param optionUid
+     * @return QbOption by its uid. Besides, it releases returned object and associated qbQuestion from the cache.
+     */
+    QbOption getQbOptionByUid(Long optionUid);
+    
+    /**
+     * @param unitUid
+     * @return QbQuestionUnit by its uid. Besides, it releases returned object and associated qbQuestion from the cache.
+     */
+    QbQuestionUnit getQbQuestionUnitByUid(Long unitUid);
 
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
@@ -52,7 +67,7 @@ public interface IQbService {
 	    String searchString);
 
     int getCountQbQuestions(Integer questionType, String searchString);
-    
+
     QbCollection getCollectionByUid(Long collectionUid);
 
     QbCollection getPublicCollection();
@@ -61,12 +76,16 @@ public interface IQbService {
 
     List<QbCollection> getUserCollections(int userId);
 
+    List<QbCollection> getUserOwnCollections(int userId);
+
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
-    int countCollectionQuestions(long collectionUid, String search);
+    int getCountCollectionQuestions(long collectionUid, String search);
+
+    List<QbCollection> getQuestionCollections(long qbQuestionUid);
 
     QbCollection addCollection(int userId, String name);
 
@@ -83,7 +102,19 @@ public interface IQbService {
     void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
 	    Collection<Long> excludedQbQuestionUids, boolean copy);
 
-    void removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
+    boolean removeQuestionFromCollection(long collectionUid, long qbQuestionUid);
 
-    void removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids);
+    Collection<Long> removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids);
+
+    boolean removeQuestion(long qbQuestionUid);
+
+    boolean removeQuestionPossible(long qbQuestionUid);
+
+    QbCollection getCollection(long collectionUid);
+
+    int getCountQuestionActivities(long qbQuestionUid);
+
+    void changeCollectionName(long collectionUid, String name);
+
+    void releaseFromCache(Object object);
 }

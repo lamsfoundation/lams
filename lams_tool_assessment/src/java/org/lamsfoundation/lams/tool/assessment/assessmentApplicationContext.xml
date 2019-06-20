@@ -110,6 +110,9 @@
    		<property name="assessmentOutputFactory">
    			<ref bean="assessmentOutputFactory"/>
    		</property>
+   		<property name="qbService">
+   			<ref bean="qbService"/>
+   		</property>
     </bean>
 
     <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

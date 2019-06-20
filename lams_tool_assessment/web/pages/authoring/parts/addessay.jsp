@@ -116,6 +116,7 @@
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="questionType" value="6"/>
 				<form:hidden path="displayOrder" />
+				<form:hidden path="collectionUid" />
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />

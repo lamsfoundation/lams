@@ -22,23 +22,23 @@
 
 package org.lamsfoundation.lams.web.qb;
 
-import java.io.IOException;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -52,8 +52,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -70,25 +68,33 @@ public class QbCollectionController {
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
-	List<QbCollection> collections = qbService.getUserCollections(userId);
-	for (QbCollection collection : collections) {
-	    collection.setShareableWithOrganisations(
-		    qbService.getShareableWithOrganisations(collection.getUid(), userId));
-	}
 
-	QbCollection privateCollection = qbService.getUserPrivateCollection(userId);
-	collections.add(privateCollection);
-
-	QbCollection publicCollection = qbService.getPublicCollection();
-	collections.add(publicCollection);
-
+	Collection<QbCollection> collections = qbService.getUserCollections(userId);
 	model.addAttribute("collections", collections);
+
+	Map<Long, Integer> questionCount = collections.stream().collect(
+		Collectors.toMap(QbCollection::getUid, c -> qbService.getCountCollectionQuestions(c.getUid(), null)));
+	model.addAttribute("questionCount", questionCount);
+
+	model.addAttribute("createCollectionAllowed",
+		Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW));
+
+	return "qb/collectionList";
+    }
+
+    @RequestMapping("/showOne")
+    public String showOneCollection(@RequestParam long collectionUid, Model model) throws Exception {
+	model.addAttribute("collection", qbService.getCollection(collectionUid));
+	model.addAttribute("availableOrganisations",
+		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
+	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
 	return "qb/collection";
     }
 
     @RequestMapping("/getCollectionGridData")
     @ResponseBody
-    public String getCollectionGridData(@RequestParam long collectionUid, HttpServletRequest request,
+    public String getCollectionGridData(@RequestParam long collectionUid,
+	    @RequestParam(defaultValue = "false") boolean showUsage, HttpServletRequest request,
 	    HttpServletResponse response) {
 	response.setContentType("text/xml; charset=utf-8");
 
@@ -102,12 +108,12 @@ public class QbCollectionController {
 	int offset = (page - 1) * rowLimit;
 	List<QbQuestion> questions = qbService.getCollectionQuestions(collectionUid, offset, rowLimit, sortBy,
 		sortOrder, searchString);
-	int total = qbService.countCollectionQuestions(collectionUid, searchString);
+	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return QbCollectionController.toGridXML(questions, page, maxPages);
+	return toGridXML(questions, page, maxPages, showUsage);
     }
 
-    private static String toGridXML(List<QbQuestion> questions, int page, int maxPages) {
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, boolean showUsage) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -132,7 +138,9 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String[] data = { uid, question.getName(), uid };
+		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
+			: null;
+		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), usage, uid };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
@@ -156,49 +164,43 @@ public class QbCollectionController {
 	return null;
     }
 
-    @RequestMapping("/removeCollectionQuestions")
+    @RequestMapping("/removeCollectionQuestion")
     @ResponseBody
-    public void removeCollectionQuestions(@RequestParam long collectionUid, @RequestParam String included,
-	    @RequestParam String excluded) throws IOException {
-	if (StringUtils.isBlank(excluded)) {
-	    ArrayNode includedJSON = JsonUtil.readArray(included);
-	    for (int index = 0; index < includedJSON.size(); index++) {
-		qbService.removeQuestionFromCollection(collectionUid, includedJSON.get(index).asLong());
-	    }
-	} else {
-	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
-	    Set<Long> excludedSet = new HashSet<>();
-	    for (int index = 0; index < excludedJSON.size(); index++) {
-		excludedSet.add(excludedJSON.get(index).asLong());
-	    }
-	    qbService.removeQuestionFromCollection(collectionUid, excludedSet);
-	}
+    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam long qbQuestionUid) {
+	qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
     }
 
-    @RequestMapping("/addCollectionQuestions")
+    @RequestMapping("/addCollectionQuestion")
     @ResponseBody
-    public void addCollectionQuestions(@RequestParam long sourceCollectionUid, @RequestParam long targetCollectionUid,
-	    @RequestParam boolean copy, @RequestParam String included, @RequestParam String excluded)
-	    throws IOException {
-	if (StringUtils.isBlank(excluded)) {
-	    ArrayNode includedJSON = JsonUtil.readArray(included);
-	    for (int index = 0; index < includedJSON.size(); index++) {
-		qbService.addQuestionToCollection(targetCollectionUid, includedJSON.get(index).asLong(), copy);
-	    }
-	} else {
-	    ArrayNode excludedJSON = JsonUtil.readArray(excluded);
-	    Set<Long> excludedSet = new HashSet<>();
-	    for (int index = 0; index < excludedJSON.size(); index++) {
-		excludedSet.add(excludedJSON.get(index).asLong());
-	    }
-	    qbService.addQuestionToCollection(sourceCollectionUid, targetCollectionUid, excludedSet, copy);
+    public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
+	    @RequestParam long qbQuestionUid) {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
+	    throw new SecurityException("Transfering questions between collections is disabled");
 	}
+	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionUid, copy);
     }
 
     @RequestMapping("/addCollection")
     @ResponseBody
     public void addCollection(@RequestParam String name) {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
+	    throw new SecurityException("New collections are disabled");
+	}
 	qbService.addCollection(getUserId(), name);
+    }
+
+    @RequestMapping("/changeCollectionName")
+    @ResponseBody
+    public String changeCollectionName(@RequestParam long collectionUid, @RequestParam String name) {
+	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
+	name = name.trim();
+	for (QbCollection collection : collections) {
+	    if (!collection.getUid().equals(collectionUid) && name.equalsIgnoreCase(collection.getName())) {
+		return "false";
+	    }
+	}
+	qbService.changeCollectionName(collectionUid, name);
+	return "true";
     }
 
     @RequestMapping("/removeCollection")
