@@ -71,7 +71,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
-	return (QbQuestion) this.find(QbQuestion.class, qbQuestionUid);
+	return this.find(QbQuestion.class, qbQuestionUid);
     }
 
     @SuppressWarnings("unchecked")
@@ -105,6 +105,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public List<ToolActivity> getQuestionActivities(long qbQuestionUid) {
 	return this.getSession().createQuery(FIND_QUESTION_ACTIVITIES).setParameter("qbQuestionUid", qbQuestionUid)
 		.list();
+    }
+
+    @Override
+    public int getCountQuestionActivities(long qbQuestionUid) {
+	return ((Long) getSession().createQuery(FIND_QUESTION_ACTIVITIES.replace("SELECT a", "SELECT COUNT(a)"))
+		.setParameter("qbQuestionUid", qbQuestionUid).getSingleResult()).intValue();
     }
 
     @Override

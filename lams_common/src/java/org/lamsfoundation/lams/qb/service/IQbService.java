@@ -94,4 +94,6 @@ public interface IQbService {
     boolean removeQuestionPossible(long qbQuestionUid);
 
     QbCollection getCollection(long collectionUid);
+
+    int getCountQuestionActivities(long qbQuestionUid);
 }

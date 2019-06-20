@@ -88,7 +88,8 @@ public class QbCollectionController {
 
     @RequestMapping("/getCollectionGridData")
     @ResponseBody
-    public String getCollectionGridData(@RequestParam long collectionUid, HttpServletRequest request,
+    public String getCollectionGridData(@RequestParam long collectionUid,
+	    @RequestParam(defaultValue = "false") boolean showUsage, HttpServletRequest request,
 	    HttpServletResponse response) {
 	response.setContentType("text/xml; charset=utf-8");
 
@@ -104,10 +105,10 @@ public class QbCollectionController {
 		sortOrder, searchString);
 	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return QbCollectionController.toGridXML(questions, page, maxPages);
+	return toGridXML(questions, page, maxPages, showUsage);
     }
 
-    private static String toGridXML(List<QbQuestion> questions, int page, int maxPages) {
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, boolean showUsage) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -132,7 +133,9 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), uid };
+		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
+			: null;
+		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), usage, uid };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);

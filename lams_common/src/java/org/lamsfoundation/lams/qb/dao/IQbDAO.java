@@ -32,6 +32,8 @@ public interface IQbDAO extends IBaseDAO {
 
     List<ToolActivity> getQuestionActivities(long qbQuestionUid);
 
+    int getCountQuestionActivities(long qbQuestionUid);
+
     List<QbQuestion> getQuestionVersions(long qbQuestionUid);
 
     Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid);

@@ -457,6 +457,10 @@ public class QbService implements IQbService {
 	return qbDAO.find(QbCollection.class, collectionUid);
     }
 
+    public int getCountQuestionActivities(long qbQuestionUid) {
+	return qbDAO.getCountQuestionActivities(qbQuestionUid);
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }

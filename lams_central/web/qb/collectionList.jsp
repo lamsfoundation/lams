@@ -56,7 +56,7 @@
 					guiStyle: "bootstrap",
 					iconSet: 'fontAwesome',
 					// data comes from data-collection-* attributes of <table> tag which is a base for the grid
-					caption: collectionGrid.data('collectionName'),
+					caption: collectionGrid.data('collectionTitle'),
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?collectionUid=" + collectionGrid.data('collectionUid'),
 				    height: "100%",
@@ -72,11 +72,13 @@
 				    colNames:[
 				    	"ID",
 				    	"Name",
+				    	"Used in # of lessons",
 				    	"Stats"
 				    ],
 				    colModel:[
 				      {name:'id', index:'uid', sortable:true,  width: 10},
 				      {name:'name', index:'name', sortable:true, search:true, autoencode:true},
+				      {name: 'usage', index: 'usage', hidden: true},
 				      // formatter gets just question uid and creates a button
 				      {name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}
 				      ],
