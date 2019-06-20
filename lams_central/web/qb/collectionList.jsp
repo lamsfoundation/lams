@@ -12,19 +12,11 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<style>
-		#addCollectionDiv {
-			margin-top: 10px;
-			padding-top: 10px;
-			border-top: black thin solid;
+		#add-collection-div {
+			height: 50px;
 		}
 		
-		#addCollectionDiv input {
-			width: 80%;
-			margin-right: 10px;
-			display: inline-block;
-		}
-		
-		#addCollectionDiv button {
+		#add-collection-button {
 			float: right;
 		}
 		
@@ -108,7 +100,7 @@
 		
 		// add a new collection
 		function addCollection() {
-			var name = $('#addCollectionDiv input').val().trim(),
+			var name = prompt("New collection name"),
 				lower = name.toLowerCase();
 			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
@@ -136,9 +128,12 @@
 </lams:head>
 <body class="stripes">
 <lams:Page title="Collection management" type="admin">
+	<div id="add-collection-div">
+		<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
+	</div>
 	<c:forEach var="collection" items="${collections}">
 		<div class="panel-body">
-			<c:set var="collectionName">
+			<c:set var="collectionTitle">
 				<c:out value="${collection.name}" />
 				<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
 				<c:if test="${collection.personal}">
@@ -152,15 +147,11 @@
 				
 			<%-- jqGrid placeholder with some useful attributes --%>
 			<table class="collection-grid" data-collection-uid="${collection.uid}"
-			 	   data-collection-name='${collectionName}' >
+			 	   data-collection-name='<c:out value="${collection.name}" />' data-collection-title='${collectionTitle}'>
 			</table>
 
 		</div>
 	</c:forEach>
-	<div id="addCollectionDiv">
-		<input placeholder="Enter new collection name" class="form-control" />
-		<button class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
-	</div>
 </lams:Page>
 </body>
 </lams:html>

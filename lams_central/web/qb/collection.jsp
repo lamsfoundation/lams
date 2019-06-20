@@ -52,7 +52,7 @@
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 				// data comes from data-collection-* attributes of <table> tag which is a base for the grid
-				caption: collectionGrid.data('collectionName'),
+				caption: collectionGrid.data('collectionTitle'),
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?collectionUid=" + collectionGrid.data('collectionUid'),
 			    height: "100%",
@@ -160,7 +160,7 @@
 	<div class="panel-body">
 		<c:choose>
 			<c:when test="${hasQuestions}">
-				<c:set var="collectionName">
+				<c:set var="collectionTitle">
 					<c:out value="${collection.name}" />
 					<span class="grid-question-count">(${questionCount} questions)</span>
 					<c:if test="${collection.personal}">
@@ -169,7 +169,7 @@
 				</c:set>
 				<%-- jqGrid placeholder with some useful attributes --%>
 				<table id="collection-grid" data-collection-uid="${collection.uid}"
-				 	   data-collection-name='${collectionName}' >
+				 	   data-collection-title='${collectionTitle}' data-collection-name="<c:out value='${collection.name}' />">
 				</table>
 			</c:when>
 			<c:otherwise>
