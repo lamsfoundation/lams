@@ -2,8 +2,10 @@ package org.lamsfoundation.lams.web.qb;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -107,13 +109,15 @@ public class EditQbQuestionController {
      * Display edit page for existed assessment question.
      */
     @RequestMapping("/editQuestion")
-    public String editQuestion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String editQuestion(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(defaultValue = "-1") Long collectionUid) throws ServletException, IOException {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
 	QbQuestionForm questionForm = new QbQuestionForm();
+	questionForm.setCollectionUid(collectionUid);
 	//we need to set form as a request attribute, as long as we use jsps from another context from the Assessment tool
 	request.setAttribute("assessmentQuestionForm", questionForm);
 	QbUtils.fillFormWithQbQuestion(qbQuestion, questionForm, request);
@@ -144,6 +148,8 @@ public class EditQbQuestionController {
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	//find according question
 	QbQuestion qbQuestion = null;
+	Long oldQuestionUid = null;
+	
 	// add
 	if (questionForm.getDisplayOrder() == -1) { 
 	    qbQuestion = new QbQuestion();
@@ -151,8 +157,8 @@ public class EditQbQuestionController {
 	    
 	// edit
 	} else {
-	    Long qbQuestionUid = Long.valueOf(questionForm.getDisplayOrder());
-	    qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	    oldQuestionUid = Long.valueOf(questionForm.getDisplayOrder());
+	    qbQuestion = qbService.getQbQuestionByUid(oldQuestionUid);
 	}
 	
 	boolean IS_AUTHORING_RESTRICTED = false;
@@ -178,12 +184,23 @@ public class EditQbQuestionController {
 	    }
 		break;
 	}
+	boolean belongsToNoCollection = qbQuestion.getUid() == null;
 	userManagementService.save(qbQuestion);
 	
 	//in case of new question - add it to specified collection
-	if (questionForm.getDisplayOrder() == -1) {
-	    Long collectionUid = WebUtil.readLongParam(request, "collectionUid");
-	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+	if (belongsToNoCollection) {
+
+	    Long collectionUid = questionForm.getCollectionUid();
+	    //try to get collection from the old question
+	    if (collectionUid != null && collectionUid.equals(-1L)) {
+		Collection<QbCollection> existingCollections = qbService.getQuestionCollections(oldQuestionUid);
+		collectionUid = existingCollections.stream().findFirst().map(collection -> collection.getUid())
+			.orElse(null);
+	    }
+
+	    if (collectionUid != null && !collectionUid.equals(-1L)) {
+		qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+	    }
 	}
 	
 	// add question case - return nothing

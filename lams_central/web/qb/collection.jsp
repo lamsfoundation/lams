@@ -163,7 +163,7 @@
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
 
-			cellhtml += "<a href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" + cellvalue + "&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
+			cellhtml += "<a href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" + cellvalue + "&collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
 			cellhtml += 	"<i class='fa fa-pencil' title='<fmt:message key='label.edit' />'></i>";
 			cellhtml += "</a>";
 
