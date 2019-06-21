@@ -115,10 +115,10 @@ public class QbCollectionController {
 		sortOrder, searchString);
 	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return toGridXML(questions, page, maxPages, showUsage);
+	return toGridXML(questions, page, maxPages, total, showUsage);
     }
 
-    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, boolean showUsage) {
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -134,7 +134,7 @@ public class QbCollectionController {
 	    rootElement.appendChild(totalPageElement);
 
 	    Element recordsElement = document.createElement(CommonConstants.ELEMENT_RECORDS);
-	    recordsElement.appendChild(document.createTextNode(String.valueOf(questions.size())));
+	    recordsElement.appendChild(document.createTextNode(String.valueOf(totalCount)));
 	    rootElement.appendChild(recordsElement);
 
 	    for (QbQuestion question : questions) {
