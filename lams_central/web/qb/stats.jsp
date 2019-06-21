@@ -131,6 +131,16 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			Question
+			
+			<div class="btn-group-xs pull-right">
+				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true" class="btn btn-default thickbox"> 
+					<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
+				</a>
+			
+				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+					<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
+				</a>
+			</div>
 		</div>
 		<div class="panel-body">
 			<div class="question-table">
@@ -212,9 +222,9 @@
 							</td>
 						</tr>
 					</c:forEach>
-				</table>
-			</div>
-		</c:if>
+				</table>		
+			</c:if>
+		</div>
 	</div>
 	
 	<div class="panel panel-default">
@@ -222,21 +232,7 @@
 			Management
 		</div>
 		<div class="panel-body">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-xs-0 col-md-2"></div>
-					<div class="col-xs-12 col-md-6 middle-buttons">
-						<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true"
-							class="btn btn-default thickbox"> 
-							<i class="fa fa-pencil"></i> <fmt:message key="label.edit" />
-						</a>
-						<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
-							<i class="fa fa-download"></i> <fmt:message key='label.export.qti'/>
-						</a>
-					</div>
-					<div class="col-xs-0 col-md-4"></div>
-				</div>
-			
+			<div class="container-fluid">			
 				<c:if test="${not empty availableCollections and transferAllowed}">
 					<div class="row">
 						<div class="col-xs-12 col-md-2 middle-cell">
@@ -438,7 +434,7 @@
 						<c:forEach var="version" items="${stats.versions}">
 							<tr>
 								<td>
-									<a href="/lams/qb/stats.do?qbQuestionUid=${version.uid}">v${version.version}</a>
+									<a href="/lams/qb/stats/show.do?qbQuestionUid=${version.uid}">v${version.version}</a>
 								</td>
 								<td>
 									<lams:Date value="${version.createDate}" />

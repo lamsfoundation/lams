@@ -31,7 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -52,6 +54,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -140,7 +145,8 @@ public class QbCollectionController {
 		// the last cell is for creating stats button
 		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
 			: null;
-		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), usage, uid };
+		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
+			question.getVersion().toString(), usage, uid };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
@@ -191,7 +197,8 @@ public class QbCollectionController {
 
     @RequestMapping("/changeCollectionName")
     @ResponseBody
-    public String changeCollectionName(@RequestParam long collectionUid, @RequestParam String name) {
+    public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
+	    @RequestParam(name = "value") String name) {
 	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
 	name = name.trim();
 	for (QbCollection collection : collections) {
