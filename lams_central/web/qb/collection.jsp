@@ -349,7 +349,7 @@
 					<i class="fa fa-upload" title="<fmt:message key='label.import.qti'/>"></i>
 				</a>
 				
-				<c:if test="${hasQuestions}">
+				<c:if test="${isQtiExportEnabled && hasQuestions}">
 					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
 						<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
 					</a>

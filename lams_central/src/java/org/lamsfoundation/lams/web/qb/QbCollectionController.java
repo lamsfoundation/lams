@@ -93,6 +93,8 @@ public class QbCollectionController {
 	model.addAttribute("availableOrganisations",
 		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
 	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
+	model.addAttribute("isQtiExportEnabled",
+		Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
 	return "qb/collection";
     }
 
