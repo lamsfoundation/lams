@@ -63,6 +63,11 @@
 			color: black;
 			padding-left: 8px;
 		}
+		
+		select {
+			height: auto !important;
+			width: auto !important;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -226,9 +231,8 @@
 		}
 		
 		// share a collection with authors of an organisation
-		function shareCollection() {
-			var grid =  $('#collection-grid'),
-				organisationId = $('#targetOrganisationSelect').val();
+		function shareCollection(organisationId) {
+			var grid =  $('#collection-grid');
 			
 			$.ajax({
 				'url'  : '<lams:LAMSURL />qb/collection/shareCollection.do',
@@ -304,6 +308,7 @@
 	
 	<div>
 		<button class="btn btn-default btn-sm" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
+			<i class="fa fa-angle-double-left"></i>
 			Collection management
 		</button>
 	</div>
@@ -326,6 +331,19 @@
 		</div>
 		
 		<div class=" col-xs-12 col-sm-4">
+
+			<%-- Do not display button for public and private collections --%>
+			<c:if test="${not empty collection.userId and not collection.personal}">
+				<div class="btn-group-xs pull-right loffset10">
+					<c:if test="${not hasQuestions}">
+						<button class="btn btn-default" onClick="javascript:removeCollection()">
+							<i class="fa fa-trash" title="Remove collection"></i>
+							Remove collection
+						</button>
+					</c:if>
+				</div>
+			</c:if>
+			
 			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
 				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
 					<i class="fa fa-upload" title="<fmt:message key='label.import.qti'/>"></i>
@@ -339,7 +357,7 @@
 			</div>
 				
 			<div class="btn-group-xs pull-right" style="display: flex;">
-				<select id="question-type" class="form-control btn-xs" style="height: auto;">
+				<select id="question-type" class="form-control btn-xs">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
 					<option><fmt:message key="label.question.type.matching.pairs" /></option>
 					<option><fmt:message key="label.question.type.short.answer" /></option>
@@ -354,6 +372,7 @@
 					<i class="fa fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.create.question" />"></i>
 				</a>
 			</div>
+			
 		</div>
 	</div>
 				
@@ -371,58 +390,51 @@
 		</c:otherwise>
 	</c:choose>
 
-		<div class="container-fluid">
-			<%-- Do not display links for collection manipulation for public and private collections --%>
-			<c:if test="${not empty collection.userId and not collection.personal}">
-				<div class="row">
-					<div class="col-xs-12 col-md-2">
-						<c:if test="${not hasQuestions}">
-							<button class="btn btn-default" onClick="javascript:removeCollection()">Remove collection</button>
-						</c:if>
-					</div>
-					<c:if test="${not empty availableOrganisations}">
-						<div class="col-xs-12 col-md-2 middle-cell">
-							<span>Share collection with</span>
-						</div>
-						<div class="col-xs-12 col-md-6">
-							<select id="targetOrganisationSelect" class="form-control">
-								<c:forEach var="target" items="${availableOrganisations}">
-										<option value="${target.organisationId}">
-											<c:out value="${target.name}" />
-										</option>
-								</c:forEach>
-							</select>
-						</div>
-						<div class="col-xs-12 col-md-2">
-							<button class="btn btn-default" onClick="javascript:shareCollection()">Share</button>
-						</div>
-					</c:if>
-				</div>
-				
-				<c:if test="${not empty collection.organisations}">
-					<div class="row">
-						<div class="col-xs-0 col-md-4"></div>
-						<div class="col-xs-12 col-md-8 header-column">
-							<span>Shared with organisations</span>
-						</div>
-						<div class="col-xs-0 col-md-2"></div>
-					</div>
-					<c:forEach var="organisation" items="${collection.organisations}">
-						<div class="row">
-							<div class="col-xs-0 col-md-4"></div>
-							<div class="col-xs-0 col-md-6 middle-cell">
-								<c:out value="${organisation.name}" />
-							</div>
-							<div class="col-xs-0 col-md-2">
-								<button class="btn btn-default" onClick="javascript:unshareCollection(${organisation.organisationId})">
-									Unshare
-								</button>
-							</div>
-						</div>
-					</c:forEach>
-				</c:if>
-			</c:if>
+	<%-- Do not display links for collection manipulation for public and private collections --%>
+	<c:if test="${not empty collection.userId and not collection.personal
+		and (not empty collection.organisations or not empty availableOrganisations)}">
+		<div class="panel panel-default voffset20">
+			<div class="panel-heading">
+				Share collection with organisations
+			</div>
+			<div class="panel-body">
+				<table class="table table-striped table-condensed table-responsive" style="max-width: 400px;">
+					<tbody>
+					
+						<%-- Already shared organisations--%>
+						<c:forEach var="organisation" items="${collection.organisations}">
+							<tr  class="info">
+								<td>
+									<c:out value="${organisation.name}" />&nbsp;
+									<span class="label label-primary">Shared</span>
+								</td>
+								<td width="30px;">
+									<button class="btn btn-default btn-xs" onClick="javascript:unshareCollection(${organisation.organisationId})">
+										Unshare
+									</button>
+								</td>
+							</tr>
+						</c:forEach>
+							
+						<%-- Not yet shared ones --%>
+						<c:forEach var="organisation" items="${availableOrganisations}">
+							<tr>
+								<td>
+									<c:out value="${organisation.name}" />
+								</td>
+								<td width="30px;" style="text-align: center;">
+									<button class="btn btn-default btn-xs" onClick="javascript:shareCollection(${organisation.organisationId})">
+										Share
+									</button>
+								</td>
+							</tr>						
+						</c:forEach>
+					</tbody>
+				</table>
+			
+			</div>
 		</div>
+	</c:if>
 
 	
 	<!-- Dummy div for question save to work properly -->

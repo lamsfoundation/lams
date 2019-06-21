@@ -434,7 +434,7 @@
 						<c:forEach var="version" items="${stats.versions}">
 							<tr>
 								<td>
-									<a href="/lams/qb/stats.do?qbQuestionUid=${version.uid}">v${version.version}</a>
+									<a href="/lams/qb/stats/show.do?qbQuestionUid=${version.uid}">v${version.version}</a>
 								</td>
 								<td>
 									<lams:Date value="${version.createDate}" />
