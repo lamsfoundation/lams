@@ -468,10 +468,12 @@ public class QbService implements IQbService {
 
     @Override
     public List<QbCollection> getUserCollections(int userId) {
-	List<QbCollection> collections = getUserOwnCollections(userId);
+	List<QbCollection> collections = new LinkedList<>();
 
 	QbCollection privateCollection = getUserPrivateCollection(userId);
 	collections.add(privateCollection);
+
+	collections.addAll(getUserOwnCollections(userId));
 
 	QbCollection publicCollection = getPublicCollection();
 	collections.add(publicCollection);
