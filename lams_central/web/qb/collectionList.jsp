@@ -23,12 +23,13 @@
 		.ui-jqgrid-title {
 			display: inline-block;
 			width: 100%;
-			height: 30px;
+			height: 25px;
 		}
 		
 		.edit-button {
 			position: absolute;
 			right: 50px;
+			font-size: 12px !important;
 		}
 				
 		.grid-question-count {
