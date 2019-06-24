@@ -4,6 +4,30 @@
 	body {
 	    -webkit-overflow-scrolling: touch;
 	}
+
+	/*----  fixed first column ----*/
+	table {
+	  position: relative;
+	}
+	
+	thead th {
+	  position: -webkit-sticky; /* for Safari */
+	  position: sticky;
+	  top: 0;
+	  background: #FFF;
+	}
+	
+	thead th:first-child {
+	  left: 0;
+	  z-index: 1;
+	}
+	
+	tbody th {
+	  position: -webkit-sticky; /* for Safari */
+	  position: sticky;
+	  left: 0;
+	  background: #FFF;
+	}
 </style>
 
 <script>
@@ -50,9 +74,9 @@
 <div class="row no-gutter">
 <div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
-<div class="panel-body table-responsive">
-          
-	<table id="questions-data" class="table table-responsive table-striped table-bordered table-hover table-condensed">
+<div class="panel-body">
+<div class="table-responsive">
+	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
 		<thead>
 			<tr role="row">
 			
@@ -76,11 +100,11 @@
 		<tbody>
 		
 			<tr>
-				<td>
+				<th>
 					<b>
 						<fmt:message key="label.correct.answer"/>
 					</b>
-				</td>
+				</th>
 				<c:forEach begin="1" end="${fn:length(correctAnswers) - 1}" var="i">
 					<td class="text-center">
 						${correctAnswers[i].cellValue}
@@ -91,16 +115,16 @@
 			</tr>
 			
 			<tr>
-				<td colspan="7" style="font-weight: bold;">
+				<th colspan="0" style="font-weight: bold;">
 					<fmt:message key="label.teams.notuppercase"/>
-				</td> 
+				</th> 
 			</tr>
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="i">
 				<tr>
-					<td class="text-center">
+					<th class="text-center">
 						${sessionDto.sessionName}
-					</td>
+					</th>
 					
 					<c:choose>
 						<c:when test="${empty sessionDto.itemDtos}">
@@ -136,6 +160,7 @@
 			</c:forEach>                                               
 		</tbody>
 	</table>
+	</div>
 </div>
 </div>
 </div>          

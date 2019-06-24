@@ -1,4 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
+<style>
+	.question-title {
+		white-space: nowrap;
+    	overflow: scroll;
+    	max-width: 30ch;
+	} 
+</style>
 <script>
 	function exportExcel(){
 		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
@@ -51,7 +58,9 @@
 				<th></th>
 				<c:forEach var="questionDto" items="${questionDtos}" varStatus="i">
 					<th class="text-center">
-						<fmt:message key="label.authoring.basic.list.header.question"/> ${i.index + 1}
+						<div class="question-title">
+							${questionDto.question.title}
+						</div>
 					</th>
 				</c:forEach>
 			</tr>
