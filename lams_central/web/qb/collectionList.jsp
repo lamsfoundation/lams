@@ -82,7 +82,8 @@
 				    ],
 				    colModel:[
 				    	{name:'id', index:'uid', sortable:true,  width: 10},
-				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true},
+				    	// formatter gets just question uid and creates a link
+				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: nameLinkFormatter},
 				    	{name:'questionType', index:'questionType', width:0, hidden: true},
 				   		{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 				    	{name: 'usage', index: 'usage', hidden: true},
@@ -105,6 +106,12 @@
 		function statsLinkFormatter(cellvalue){
 			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
+		}
+		
+		// Creates a link to display question statistics
+		function nameLinkFormatter(cellValue, options) {
+			return cellValue ? "<a target='_blank' title='Show stats' href='<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + options.rowId + "'>"
+					+ cellValue  + "</a>" : "";
 		}
 		
 		// add a new collection

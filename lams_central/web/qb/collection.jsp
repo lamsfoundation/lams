@@ -172,6 +172,7 @@
 
 			return cellhtml;
 		}
+		
 		//auxiliary formatter for jqGrid's question column
 		function questionNameFormatter (cellvalue, options, rowObject) {
 	       	var questionTypeInt = rowObject[2].textContent;
@@ -205,7 +206,8 @@
 
 	       	var questionVersion = rowObject[3].textContent;
 
-	       	var text = cellvalue;
+	       	var text = cellvalue ? "<a target='_blank' title='Show stats' href='<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" 
+	       						  + options.rowId + "'>" + cellvalue  + "</a>" : "";
 	        text += "<span class='pull-right alert-info btn-xs loffset5'>";
 	       	text += "v. " + questionVersion;
 	        text += "</span>";
