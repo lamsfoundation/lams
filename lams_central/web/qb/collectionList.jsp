@@ -156,11 +156,12 @@
 		<div class="panel-body">
 			<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
 			<c:set var="collectionTitle">
-				<c:out value="${collection.name}" />
-				<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
-				<c:if test="${collection.personal}">
-					<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
-				</c:if>
+				<a href="<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}"><c:out value="${collection.name}" />
+					<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
+					<c:if test="${collection.personal}">
+						<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
+					</c:if>
+				</a>
 				<button class="btn btn-primary btn-xs edit-button"
 						onClick="javascript:document.location.href=`<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}`">
 					Edit
