@@ -13,6 +13,7 @@ import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
+import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
@@ -193,7 +194,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public int getCountQbQuestions(Integer questionType, String searchString) {
-	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) " + " FROM lams_qb_question question  "
+	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count " + " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
 		+ " LEFT JOIN ("//help finding questions with the max available version
 		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
@@ -210,7 +211,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createNativeQuery(SELECT_QUESTIONS, Integer.class);
+	Query query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count", IntegerType.INSTANCE);;
 	query.setParameter("questionType", questionType);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
