@@ -23,12 +23,13 @@
 		.ui-jqgrid-title {
 			display: inline-block;
 			width: 100%;
-			height: 30px;
+			height: 25px;
 		}
 		
 		.edit-button {
 			position: absolute;
 			right: 50px;
+			font-size: 12px !important;
 		}
 				
 		.grid-question-count {
@@ -38,6 +39,7 @@
 		.grid-collection-private {
 			margin-left: 10px;
 			color: red;
+			font-size: smaller;
 		}
 	</style>
 	
@@ -62,6 +64,7 @@
 				    height: "100%",
 				    autowidth:true,
 					shrinkToFit: true,
+					viewrecords: true,
 				    cellEdit: false,
 				    cmTemplate: { title: false, search: false },
 				    sortorder: "asc", 
@@ -80,7 +83,8 @@
 				    ],
 				    colModel:[
 				    	{name:'id', index:'uid', sortable:true,  width: 10},
-				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true},
+				    	// formatter gets just question uid and creates a link
+				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: nameLinkFormatter},
 				    	{name:'questionType', index:'questionType', width:0, hidden: true},
 				   		{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 				    	{name: 'usage', index: 'usage', hidden: true},
@@ -103,6 +107,12 @@
 		function statsLinkFormatter(cellvalue){
 			return "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
+		}
+		
+		// Creates a link to display question statistics
+		function nameLinkFormatter(cellValue, options) {
+			return cellValue ? "<a target='_blank' title='Show stats' href='<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + options.rowId + "'>"
+					+ cellValue  + "</a>" : "";
 		}
 		
 		// add a new collection
@@ -147,11 +157,12 @@
 		<div class="panel-body">
 			<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
 			<c:set var="collectionTitle">
-				<c:out value="${collection.name}" />
-				<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
-				<c:if test="${collection.personal}">
-					<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
-				</c:if>
+				<a href="<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}"><c:out value="${collection.name}" />
+					<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
+					<c:if test="${collection.personal}">
+						<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
+					</c:if>
+				</a>
 				<button class="btn btn-primary btn-xs edit-button"
 						onClick="javascript:document.location.href=`<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}`">
 					Edit

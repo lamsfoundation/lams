@@ -39,6 +39,7 @@
 		
 		.grid-collection-private {
 			color: red !important;
+			font-size: smaller;
 		}
 		
 		#grid-question-create {
@@ -89,6 +90,7 @@
 			    height: "100%",
 			    autowidth:true,
 				shrinkToFit: true,
+				viewrecords: true,
 			    cellEdit: false,
 			    cmTemplate: { title: false, search: false },
 			    sortorder: "asc", 
@@ -163,12 +165,14 @@
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='Show stats'></i>";
 
-			cellhtml += "<a href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" + cellvalue + "&collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
-			cellhtml += 	"<i class='fa fa-pencil' title='<fmt:message key='label.edit' />'></i>";
+			cellhtml += "<a  title='<fmt:message key='label.edit' />' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
+						+ cellvalue + "&collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
+			cellhtml += 	"<i class='fa fa-pencil'></i>";
 			cellhtml += "</a>";
 
 			return cellhtml;
 		}
+		
 		//auxiliary formatter for jqGrid's question column
 		function questionNameFormatter (cellvalue, options, rowObject) {
 	       	var questionTypeInt = rowObject[2].textContent;
@@ -202,7 +206,8 @@
 
 	       	var questionVersion = rowObject[3].textContent;
 
-	       	var text = cellvalue;
+	       	var text = cellvalue ? "<a target='_blank' title='Show stats' href='<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" 
+	       						  + options.rowId + "'>" + cellvalue  + "</a>" : "";
 	        text += "<span class='pull-right alert-info btn-xs loffset5'>";
 	       	text += "v. " + questionVersion;
 	        text += "</span>";
@@ -336,8 +341,8 @@
 			<c:if test="${not empty collection.userId and not collection.personal}">
 				<div class="btn-group-xs pull-right loffset10">
 					<c:if test="${not hasQuestions}">
-						<button class="btn btn-default" onClick="javascript:removeCollection()">
-							<i class="fa fa-trash" title="Remove collection"></i>
+						<button class="btn btn-default" onClick="javascript:removeCollection()" title="Remove collection">
+							<i class="fa fa-trash"></i>
 							Remove collection
 						</button>
 					</c:if>
@@ -345,13 +350,13 @@
 			</c:if>
 			
 			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
-				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
-					<i class="fa fa-upload" title="<fmt:message key='label.import.qti'/>"></i>
+				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" title="<fmt:message key='label.import.qti'/>">
+					<i class="fa fa-upload"></i>
 				</a>
 				
 				<c:if test="${isQtiExportEnabled && hasQuestions}">
-					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
-						<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
+					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default" title="<fmt:message key='label.export.qti'/>">
+						<i class="fa fa-download"></i>
 					</a>
 				</c:if>
 			</div>
