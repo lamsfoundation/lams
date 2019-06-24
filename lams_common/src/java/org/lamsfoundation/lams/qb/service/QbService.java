@@ -4,6 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +52,10 @@ public class QbService implements IQbService {
     private ILamsCoreToolService lamsCoreToolService;
 
     private IUserManagementService userManagementService;
+
+    public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = (c1,
+	    c2) -> c1 == null || c1.getName() == null ? (c2 == null || c2.getName() == null ? 0 : -1)
+		    : c1.getName().compareTo(c2.getName());
 
     @Override
     public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
@@ -293,7 +298,9 @@ public class QbService implements IQbService {
 	Map<String, Object> map = new HashMap<>();
 	map.put("userId", userId);
 	map.put("personal", false);
-	return qbDAO.findByProperties(QbCollection.class, map);
+	List<QbCollection> result = qbDAO.findByProperties(QbCollection.class, map);
+	Collections.sort(result, COLLECTION_NAME_COMPARATOR);
+	return result;
     }
 
     @Override
