@@ -39,6 +39,7 @@
 		
 		.grid-collection-private {
 			color: red !important;
+			font-size: smaller;
 		}
 		
 		#grid-question-create {

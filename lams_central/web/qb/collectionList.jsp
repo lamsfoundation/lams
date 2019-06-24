@@ -38,6 +38,7 @@
 		.grid-collection-private {
 			margin-left: 10px;
 			color: red;
+			font-size: smaller;
 		}
 	</style>
 	
