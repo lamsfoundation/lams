@@ -90,6 +90,7 @@
 			    height: "100%",
 			    autowidth:true,
 				shrinkToFit: true,
+				viewrecords: true,
 			    cellEdit: false,
 			    cmTemplate: { title: false, search: false },
 			    sortorder: "asc", 
