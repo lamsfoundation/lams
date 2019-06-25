@@ -139,18 +139,6 @@
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.question.bank.title" />
-		
-		<div class="btn-group btn-group-xs pull-right roffset5" role="group">		
-			<c:set var="importInitUrl" >
-				<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true
-			</c:set>
-			<a href="${importInitUrl}" class="btn btn-default btn-xs loffset5 thickbox" id="importButton">  
-				<fmt:message key="label.authoring.basic.import.questions" />
-			</a>
-			<a onclick="javascript:exportQuestions();" class="btn btn-default btn-xs " id="exportButton">  
-				<fmt:message key="label.authoring.basic.export.questions" />
-			</a>
-		</div>
 
 		<div class="pull-right roffset5">
 			<c:url var="tempUrl" value="">

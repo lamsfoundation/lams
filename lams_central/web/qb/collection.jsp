@@ -293,6 +293,11 @@
 	    	frame.src = '<c:url value="/imsqti/exportCollectionAsQTI.do" />?collectionUid=${collection.uid}';
 	    }
 		
+		function exportQuestionsXml(){   
+		    var reqIDVar = new Date();
+			location.href="<c:url value='/xmlQuestions/exportQuestionsXml.do'/>?collectionUid=${collection.uid}&reqID="+reqIDVar.getTime();
+		}
+		
 		//create proper href for "Create question" button
 		function initLinkHref() {
 			var questionType = document.getElementById("question-type").selectedIndex + 1;
@@ -348,8 +353,25 @@
 					</c:if>
 				</div>
 			</c:if>
+		
+			<div class="btn-group btn-group-xs pull-right loffset10" role="group">
+				<a class="btn btn-default btn-xs disabled" aria-disabled="true">XML</a>
+			
+				<a class="btn btn-default btn-xs loffset5 thickbox" title="<fmt:message key="label.import.xml" />"
+					href="<c:url value='/xmlQuestions/initImportQuestionsXml.do'/>?collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true" >  
+					<i class="fa fa-upload"></i>
+				</a>
+				
+				<c:if test="${isQtiExportEnabled && hasQuestions}">
+					<a onclick="javascript:exportQuestionsXml();" class="btn btn-default btn-xs" title="<fmt:message key="label.export.xml" />">  
+						<i class="fa fa-download"></i>
+					</a>
+				</c:if>
+			</div>
 			
 			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
+				<a class="btn btn-default btn-xs disabled" aria-disabled="true">QTI</a>
+			
 				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" title="<fmt:message key='label.import.qti'/>">
 					<i class="fa fa-upload"></i>
 				</a>

@@ -100,12 +100,6 @@
 		});
 		return serializedMaxMarks;
 	}
-	
-	function exportQuestions(){   
-	    var reqIDVar = new Date();
-		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
-		location.href="<c:url value='/authoring/exportQuestions.do'/>" + param;
-	};
 
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");

@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<%@ include file="/common/taglibs.jsp"%>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
@@ -9,9 +13,11 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="authoring.title.import" /></title>
-	<%@ include file="/common/header.jsp"%>
+	<title>x</title>
+	<lams:css/>
 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
 	<script type="text/javascript">
@@ -50,18 +56,13 @@
 
 			document.getElementById('itemAttachment_Busy').style.display = '';
 			var options = { 
-		    	   	target:  parent.jQuery('#itemArea'), 
-		    	   	success: afterRatingSubmit  // post-submit callback
+				target:  parent.jQuery('#itemArea'), 
+				success: function (responseText, statusText) {  // post-submit callback 
+		   			self.parent.location.reload();;
+		   		}
 	    	}; 							
 	    	$('#importForm').ajaxSubmit(options);
-
 		}
-
-		// post-submit callback 
-   		function afterRatingSubmit(responseText, statusText) { 
-   			self.parent.refreshThickbox();
-   			self.parent.tb_remove();
-   		}  
 			
 	</script>
 </lams:head>
@@ -71,20 +72,24 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
-				<fmt:message key="authoring.title.import" />
+				<fmt:message key="label.import.xml" />
 			</div>
 		</div>
 			
 		<div class="panel-body">
 				
-			<form action="<c:url value="/authoring/importQuestions.do"/>?sessionMapID=${sessionMapID}" method="post" enctype="multipart/form-data" id="importForm">	
+			<form action="<c:url value="/xmlQuestions/importQuestionsXml.do"/>?collectionUid=${param.collectionUid}" method="post" 
+				enctype="multipart/form-data" id="importForm">	
+				
 				<lams:FileUpload fileFieldname="UPLOAD_FILE" fileInputMessageKey="label.file" 
 					uploadInfoMessageKey="msg.import.file.format" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+
 				<lams:WaitingSpinner id="itemAttachment_Busy"/>
 			
 				<div class="pull-right voffset10" id="buttonsDiv">
-					<input class="btn btn-sm btn-default" value='<fmt:message key="label.authoring.cancel.button"/>' type="button"
+					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:self.parent.tb_remove();" />
+
 					<a href="#nogo" class="btn btn-sm btn-primary" onclick="javascript:verifyAndSubmit();">
 						<i class="fa fa-sm fa-upload"></i>&nbsp;<fmt:message key="button.import" />
 					</a>
