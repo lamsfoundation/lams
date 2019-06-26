@@ -3,8 +3,7 @@
 -- AUTO COMMIT stays ON because there is so many ALTER TABLE statements which are committed immediately anyway, that it does not make a difference
 
 -- Create QB question table
-CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT, 
-							   `local` TINYINT(1) NOT NULL DEFAULT 0,
+CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
 							   `type` TINYINT NOT NULL,
 							   `question_id` INT NOT NULL,
 							   `version` SMALLINT NOT NULL DEFAULT 1,
@@ -31,8 +30,7 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
 							   `tmp_question_id` BIGINT,
 							   PRIMARY KEY (uid),
 							   INDEX (tmp_question_id),
-							   CONSTRAINT UQ_question_version UNIQUE INDEX (question_id, version),
-							   INDEX (`local`));
+							   CONSTRAINT UQ_question_version UNIQUE INDEX (question_id, version));
 							   
 -- Create a question table from which tools' questions will inherit						   
 CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
@@ -117,8 +115,8 @@ ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FROM lams_qb_question);
 							   
-INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
-	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
+INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
+	SELECT NULL, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
 		mcq.question, NULL, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 question AS question,
@@ -241,8 +239,8 @@ INSERT INTO tmp_question_match
 UPDATE lams_qb_question SET tmp_question_id = -1;
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
-INSERT INTO lams_qb_question (uid, `local`, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id)
-	SELECT NULL, 0, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
+INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id)
+	SELECT NULL, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
 		sq.question, sq.description, NULL, NULL, q.target_uid
 	FROM (SELECT uid,
 				 title AS question,

@@ -79,7 +79,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
 	final String FIND_QUESTIONS_BY_QUESTION_ID = "FROM " + QbQuestion.class.getName()
-		+ " WHERE questionId = :questionId AND local = 0 ORDER BY version ASC";
+		+ " WHERE questionId = :questionId ORDER BY version ASC";
 
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
@@ -144,13 +144,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
 		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
 		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
-		+ "	WHERE biggerQuestion.type = :questionType " + " 	AND biggerQuestion.local = 0 "
+		+ "	WHERE biggerQuestion.type = :questionType "
 		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
 		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
 		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
 		+ " WHERE biggerQuestion.version is NULL " + " AND question.type = :questionType "
-		+ " AND question.local = 0 "
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
@@ -200,13 +199,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
 		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
 		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
-		+ "	WHERE biggerQuestion.type = :questionType " + " 	AND biggerQuestion.local = 0 "
+		+ "	WHERE biggerQuestion.type = :questionType "
 		+ "	AND (REGEXP_REPLACE(biggerQuestion.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
 		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
 		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
 		+ " WHERE biggerQuestion.version is NULL " + " AND question.type = :questionType "
-		+ " AND question.local = 0 "
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";

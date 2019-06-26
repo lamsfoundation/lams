@@ -49,11 +49,6 @@ public class QbQuestion implements Serializable, Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    // is the question searchable in Question Bank
-    // or rathe it is a tool's private data
-    @Column
-    private Boolean local = true;
-
     // one of question types
     @Column
     private Integer type;
@@ -202,14 +197,6 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public Long getUid() {
 	return uid;
-    }
-
-    public Boolean getLocal() {
-	return local;
-    }
-
-    public void setLocal(Boolean local) {
-	this.local = local;
     }
 
     public Integer getType() {
