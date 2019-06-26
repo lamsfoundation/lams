@@ -120,13 +120,30 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    return;
 	}
 
-	//provide default values for user names, as we can't fetch them from LTI Tool consumer
-	if (StringUtils.isBlank(firstName)) {
-	    firstName = DEFAULT_FIRST_NAME;
+	//in case both first and last names are missing, try to get them using other ways
+	if (StringUtils.isBlank(firstName) && StringUtils.isBlank(lastName)) {
+	    
+	    //check LIS_PERSON_NAME_FULL parameter
+	    String fullName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FULL);
+	    if (StringUtils.isNotBlank(fullName)) {
+		firstName = fullName;
+		lastName = " ";
+		
+	    } else {
+		//provide default values for user names, as we can't fetch them from LTI Tool consumer
+		firstName = DEFAULT_FIRST_NAME;
+		lastName = DEFAULT_LAST_NAME;
+	    }
+	
+	//only firstName is missing
+	} else if (StringUtils.isBlank(firstName)) {
+	    firstName = " ";
+	    
+	//only lastName is missing
+	} else if (StringUtils.isBlank(lastName)) {
+	    lastName = " ";
 	}
-	if (StringUtils.isBlank(lastName)) {
-	    lastName = DEFAULT_LAST_NAME;
-	}
+	
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 
 	//Determine method based on the "role" parameter. Author roles can be either LTI standard ones or tool consumer's custom ones set
