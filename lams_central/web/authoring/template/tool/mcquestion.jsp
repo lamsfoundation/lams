@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
 <c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
-<%-- Generic Q&A question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options / as many as are need for a QTI import --%>
+<%-- Generic MC question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options / as many as are need for a QTI import --%>
 
 <%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript. But that won't be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
 <c:choose>

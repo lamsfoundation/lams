@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.authoring.template.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -91,6 +93,9 @@ public abstract class LdTemplateController {
     @Autowired
     WebApplicationContext applictionContext;
 
+    // Used to append the number to the group label - format as 2 digits so it sorts better.
+    NumberFormat groupNumberFormatter = new DecimalFormat("00");  
+    
     private static Logger log = Logger.getLogger(LdTemplateController.class);
     public static final int MAX_OPTION_COUNT = 6;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
@@ -378,7 +383,7 @@ public abstract class LdTemplateController {
     }
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
-    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle) {
+    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle, String activityDescription) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -395,6 +400,8 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Gate"); 
+	if ( activityDescription != null )
+	    activityJSON.put(AuthoringJsonTags.DESCRIPTION, activityDescription); 
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
@@ -403,9 +410,9 @@ public abstract class LdTemplateController {
     }
 
     protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
-	    String activityTitle, Long startOffset) {
+	    String activityTitle, String activityDescription, Long startOffset) {
 
-	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle);
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
@@ -446,8 +453,8 @@ public abstract class LdTemplateController {
 	    Integer useNumGroups = (numGroups != null && numGroups > 0) ? numGroups : 2;
 	    for (int orderId = 0, groupNum = 1; orderId < useNumGroups; orderId++, groupNum++) {
 		ObjectNode group = JsonNodeFactory.instance.objectNode();
-		group.put(AuthoringJsonTags.GROUP_NAME,
-			TextUtil.getText(appBundle, formatter, "label.course.groups.prefix", null) + groupNum);
+		group.put(AuthoringJsonTags.GROUP_NAME, TextUtil.getText(appBundle, formatter,
+			"authoring.label.group.name", new String[] { groupNumberFormatter.format(groupNum) }));
 		group.put(AuthoringJsonTags.ORDER_ID, orderId);
 		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
 		groups.add(group);
@@ -759,13 +766,17 @@ public abstract class LdTemplateController {
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put("numbered", enableNumbering);
+	toolContentJSON.put("displaySummary", Boolean.TRUE);
+	toolContentJSON.put("allowDiscloseAnswers", Boolean.TRUE);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
 	for (int i = 0; i < questions.size(); i++) {
-	    Integer questionDisplayOrder = ((ObjectNode) questions.get(i)).get(RestTags.DISPLAY_ORDER).asInt();
+	    ObjectNode question = (ObjectNode) questions.get(i);
+	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
+	    Integer defaultGrade = question.get("defaultGrade").asInt();
 	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
-		    .put("questionDisplayOrder", questionDisplayOrder));
+		    .put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
 	}
 	toolContentJSON.set("references", references);
 

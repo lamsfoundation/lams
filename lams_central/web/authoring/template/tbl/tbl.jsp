@@ -42,8 +42,8 @@
 			},
 			messages: {
 				sequenceTitle: {
-					required: '<fmt:message key="authoring.fla.title.validation.error" />',
-					validateNoSpecialCharacters: '<fmt:message key="authoring.fla.title.validation.error" />'
+					required: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />',
+					validateNoSpecialCharacters: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />'
 				},
  				<%@ include file="../groupingerrors.jsp" %>
 			},
@@ -56,7 +56,7 @@
  				},
 			});
 
-			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.fla.title.validation.error" />');
+			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />');
 			initializeWizard(validator);
 		});
 

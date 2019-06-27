@@ -34,6 +34,9 @@
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}type" id="${containingDivName}assessment${questionNumber}type" value="mcq"/>
 	<lams:CKEditor id="${containingDivName}assessment${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 	
+	<label for="${containingDivName}assessment${questionNumber}mark" class="voffset5"><fmt:message key="label.marks"/></label>
+	<input type="number" step="1" min="1" value="1" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="voffset5"/>
+	
 	<table class="table table-condensed table-no-border">
 	<tr><td></td><td></td>
 	<td width="100px" class="align-center">
