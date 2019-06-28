@@ -415,6 +415,7 @@ public class TBLTemplateController extends LdTemplateController {
 		aeStartOffset = getOffsetFromRequest(request, "aeLogistic", "aeScheduled", "aeStartDatetime");
 	    }
 	    
+	    // Process the Multiple Choice Questions that go to IRA and TRA & Peer Review fields
 	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
 	    Enumeration parameterNames = request.getParameterNames();
 	    while (parameterNames.hasMoreElements()) {
@@ -456,6 +457,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    addValidationErrorMessage("authoring.error.rat.not.blank", null, ratErrors);
 		}
 		updateCorrectAnswers(correctAnswers);
+		redoDisplayOrder();
 	    }
 
 	    if (useApplicationExercises) {
@@ -468,6 +470,20 @@ public class TBLTemplateController extends LdTemplateController {
 	    errorMessages.addAll(ratErrors);
 	    errorMessages.addAll(applicationExerciseErrors);
 	    errorMessages.addAll(peerReviewErrors);
+	}
+
+	// Reset the display order or it confuses matters in the MCQ tool. Display order may skip numbers if the user 
+	// deletes questions on the screen before saving.
+	private void redoDisplayOrder() {
+	    SortedMap<Integer, ObjectNode> oldTestQuestions = testQuestions;
+	    testQuestions = new TreeMap<Integer, ObjectNode>();
+	    int newDisplayOrder = 1;
+	    for (Map.Entry<Integer, ObjectNode> oldQuestionEntry : oldTestQuestions.entrySet()) {
+		ObjectNode question = oldQuestionEntry.getValue();
+		question.put(RestTags.DISPLAY_ORDER, newDisplayOrder);
+		testQuestions.put(newDisplayOrder, question);
+		newDisplayOrder++;
+	    }
 	}
 
 	private Long getOffsetFromRequest(HttpServletRequest request, String radioButtonField,
@@ -495,22 +511,29 @@ public class TBLTemplateController extends LdTemplateController {
 	    for (int i = 1; i <= numAppEx; i++) {
 		String appexDiv = "divappex"+i;
 		AppExData newAppex = new AppExData();
-		newAppex.title = WebUtil.readStrParam(request,  appexDiv+"Title");
+		newAppex.title = WebUtil.readStrParam(request,  appexDiv+"Title", true);
 		newAppex.assessments = processAssessments(request, i, newAppex.title);
-		newAppex.useNoticeboard = WebUtil.readBooleanParam(request,  appexDiv+"NB", false);
-		if ( newAppex.useNoticeboard ) {
-		    newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv+"NBEntry", true);
-		    if ( newAppex.noticeboardInstructions == null )
-			addValidationErrorMessage(
-				    "authoring.error.application.exercise.needs.noticeboard.text", new Object[] {"\"" + newAppex.title + "\""}, applicationExerciseErrors);
-		}
-		applicationExercises.put(i,  newAppex);
+		// null indicates appex was deleted
+		if ( newAppex.assessments != null ) {
+        		newAppex.useNoticeboard = WebUtil.readBooleanParam(request,  appexDiv+"NB", false);
+        		if ( newAppex.useNoticeboard ) {
+        		    newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv+"NBEntry", true);
+        		    if ( newAppex.noticeboardInstructions == null )
+        			addValidationErrorMessage(
+        				    "authoring.error.application.exercise.needs.noticeboard.text", new Object[] {"\"" + newAppex.title + "\""}, applicationExerciseErrors);
+        		}
+        		applicationExercises.put(i,  newAppex);
+		} 
 	    }
 	}
 
 	private SortedMap<Integer, Assessment> processAssessments(HttpServletRequest request, int appexNumber, String appexTitle) {
 	    SortedMap<Integer, Assessment> applicationExercises = new TreeMap<Integer, Assessment>();
-	    int numAssessments = WebUtil.readIntParam(request, "numAssessments" + appexNumber);
+	    Integer numAssessments = WebUtil.readIntParam(request, "numAssessments" + appexNumber, true);
+	    if ( numAssessments == null ) {
+		// Application Exercise has been deleted
+		return null;
+	    }
 	    
 	    for (int i = 1; i <= numAssessments; i++) {
 		String assessmentPrefix = new StringBuilder("divass").append(appexNumber).append("assessment")

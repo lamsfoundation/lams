@@ -11,6 +11,7 @@
 <!--  Start of panel Appex${appexNumber} -->
  <div class="panel panel-default" id="divappex${appexNumber}" >
      <div class="panel-heading" id="headingAppex${appexNumber}">
+		<c:if test="${appexNumber > 1}"><a href="#" onclick="javascript:deleteAppexDiv('divappex${appexNumber}', '${appexTitleField}');" class="btn btn-default btn-sm pull-right" style="margin-top: -5px" id="deleteAssessmentButton${questionNumber}"><fmt:message key="authoring.fla.delete.button"/></a></c:if>
      	<span class="panel-title collapsable-icon-left">
      		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapseAppex${appexNumber}" 
 			aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapseAppex${appexNumber}" >&nbsp;

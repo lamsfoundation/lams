@@ -29,7 +29,7 @@
 	
 	<lams:CKEditor id="${containingDivName}assessment${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 
-	<label for="${containingDivName}assessment${questionNumber}mark" class="voffset5"><fmt:message key="label.marks"/></label>
+	<label for="${containingDivName}assessment${questionNumber}mark" class="form-control form-control-inline voffset5"><fmt:message key="label.marks"/></label>
 	<input type="number" step="1" min="1" value="1" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="voffset5"/>
 	
 	</div>
