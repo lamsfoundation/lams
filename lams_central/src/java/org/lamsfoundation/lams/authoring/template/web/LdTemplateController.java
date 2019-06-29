@@ -116,6 +116,7 @@ public abstract class LdTemplateController {
     // icon strings found in the lams_learningdesign_activity table
     protected static final String ASSESSMENT_TOOL_SIGNATURE = "laasse10";
     protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.swf";
+    protected static final String ASSESSMENT_TOOL_OUTPUT_DEFINITION = "learner.total.score"; 
     protected static final String CHAT_TOOL_SIGNATURE = "lachat11";
     protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.swf";
     protected static final String FORUM_TOOL_SIGNATURE = "lafrum11";
@@ -124,6 +125,7 @@ public abstract class LdTemplateController {
     protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
     protected static final String MCQ_TOOL_SIGNATURE = "lamc11";
     protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.swf";
+    protected static final String MCQ_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
     protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
@@ -134,6 +136,7 @@ public abstract class LdTemplateController {
     protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.swf";
     protected static final String SCRATCHIE_TOOL_SIGNATURE = "lascrt11";
     protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.swf";
+    protected static final String SCRATCHIE_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String SCRIBE_TOOL_SIGNATURE = "lascrb11";
     protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.swf";
     protected static final String SUBMIT_TOOL_SIGNATURE = "lasbmt11";
@@ -679,6 +682,13 @@ public abstract class LdTemplateController {
     protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
 	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle, int activityCategory) {
+	return createToolActivity(uiid, order, layoutCoords, toolSignature, toolIcon, toolContentID, contentFolderID,
+		groupingUIID, parentUIID, parentActivityType, activityTitle, activityCategory, null);
+    }
+    
+    protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
+	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle, int activityCategory, String toolOutputDefinition) {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Tool tool = getTool(toolSignature);
 
@@ -706,6 +716,9 @@ public abstract class LdTemplateController {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, true);
 	} else {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
+	}
+	if ( toolOutputDefinition != null ) {
+	    activityJSON.put(AuthoringJsonTags.TOOL_OUTPUT_DEFINITION, toolOutputDefinition);
 	}
 	return activityJSON;
     }
@@ -792,7 +805,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE,
 		LdTemplateController.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT,
+		LdTemplateController.ASSESSMENT_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -992,7 +1006,7 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
 		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
-		Activity.CATEGORY_ASSESSMENT);
+		Activity.CATEGORY_ASSESSMENT, LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -1142,7 +1156,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE,
 		LdTemplateController.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT,
+		LdTemplateController.SCRATCHIE_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
