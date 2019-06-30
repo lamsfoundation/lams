@@ -31,9 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -54,9 +52,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -93,8 +88,7 @@ public class QbCollectionController {
 	model.addAttribute("availableOrganisations",
 		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
 	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
-	model.addAttribute("isQtiExportEnabled",
-		Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
+	model.addAttribute("isQtiExportEnabled", Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
 	return "qb/collection";
     }
 
@@ -204,7 +198,13 @@ public class QbCollectionController {
 	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
 	name = name.trim();
 	for (QbCollection collection : collections) {
-	    if (!collection.getUid().equals(collectionUid) && name.equalsIgnoreCase(collection.getName())) {
+	    if (collection.getUid().equals(collectionUid)) {
+		if (collection.getUserId() == null) {
+		    // can not change public collection name
+		    return "false";
+		}
+	    } else if (name.equalsIgnoreCase(collection.getName())) {
+		// a collection with the same name already exists
 		return "false";
 	    }
 	}

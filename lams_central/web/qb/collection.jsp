@@ -79,7 +79,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			var collectionGrid = $('#collection-grid');
+			var collectionGrid = $('#collection-grid'),	
+				isPublicCollection = ${empty collection.userId};
 			
 			collectionGrid.jqGrid({
 				guiStyle: "bootstrap",
@@ -132,32 +133,34 @@
 			    }
 			}).jqGrid('filterToolbar');
 
-			//turn to inline mode for x-editable.js
-			$.fn.editable.defaults.mode = 'inline';
-			//enable renaming of lesson title  
-			$('#collection-name').editable({
-			    type: 'text',
-			    pk: ${collection.uid},
-			    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
-			    validate: function(value) {
-				    //close editing area on validation failure
-		            if (!value.trim()) {
-		                $('.editable-open').editableContainer('hide', 'cancel');
-		                return 'Can not be empty!';
-		            }
-		        },
-			    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
-			    success: function(response, newValue) {
-					if (response.created == 'false') {
-						alert('Collection with such name already exists');
-					}
-			    }
-		    //hide and show pencil on showing and hiding editing widget
-			}).on('shown', function(e, editable) {
-				$(this).nextAll('i.fa-pencil').hide();
-			}).on('hidden', function(e, reason) {
-				$(this).nextAll('i.fa-pencil').show();
-			});
+			if (!isPublicCollection) {
+				//turn to inline mode for x-editable.js
+				$.fn.editable.defaults.mode = 'inline';
+				//enable renaming of lesson title  
+				$('#collection-name').editable({
+				    type: 'text',
+				    pk: ${collection.uid},
+				    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
+				    validate: function(value) {
+					    //close editing area on validation failure
+			            if (!value.trim()) {
+			                $('.editable-open').editableContainer('hide', 'cancel');
+			                return 'Can not be empty!';
+			            }
+			        },
+				    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+				    success: function(response, newValue) {
+						if (response.created == 'false') {
+							alert('Collection with such name already exists');
+						}
+				    }
+			    //hide and show pencil on showing and hiding editing widget
+				}).on('shown', function(e, editable) {
+					$(this).nextAll('i.fa-pencil').hide();
+				}).on('hidden', function(e, reason) {
+					$(this).nextAll('i.fa-pencil').show();
+				});
+			}
 		});
 		
 		// auxiliary formatter for jqGrid's question statistics column
@@ -331,7 +334,9 @@
 					<c:out value="${collection.name}" />
 				</strong>
 			</span>
-			<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			<c:if test="${not empty collection.userId}">
+				<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			</c:if>
 			
 			<c:if test="${collection.personal}">
 				<span class="grid-collection-private small">
