@@ -556,15 +556,25 @@ td#canvasContainerCell {
 
 #rootwizard {
 	.required:after {
-	  content: "*";
-	  font-style: normal;
-	  font-weight: normal;
-	  text-decoration: inherit;
-	  margin-left: 5px; 
+		content: "\f069";
+		font-family: FontAwesome;
+	    font-size: smaller;
+		font-style: normal;
+		font-weight: normal;
+		text-decoration: inherit;
+		margin-left: 5px; 
+		color: $brand-primary;
   }
   
 	.panel-title .required {
 		font-weight: 500;
+	}
+
+	.panel-title-button {
+		margin-top: -5px;
+		margin-right: 4px;
+		width: 100px; // Make a similar size to the Add Option question above on the AppEx screen
+		float: right;
 	}
 }
 

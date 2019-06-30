@@ -16,7 +16,8 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm pull-right" style="margin-top: -5px" id="deleteAssessmentButton${questionNumber}"><fmt:message key="authoring.fla.delete.button"/></a></c:if>
+		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
 		<div class="panel-title">		
 		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
 			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
@@ -84,7 +85,7 @@
 		</c:choose>
 		</div>
 		
-		<div id="createOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createOption(${questionNumber},${maxOptionCount});" class="btn btn-default btn-sm"><fmt:message key="authoring.create.option"/></a></div>
+		<div id="createOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createOption(${questionNumber},${maxOptionCount});" class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.option"/></a></div>
 	</div>		
 </div>
 

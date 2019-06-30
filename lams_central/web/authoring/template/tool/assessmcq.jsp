@@ -34,8 +34,8 @@
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}type" id="${containingDivName}assessment${questionNumber}type" value="mcq"/>
 	<lams:CKEditor id="${containingDivName}assessment${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 	
-	<label for="${containingDivName}assessment${questionNumber}mark" class="form-control form-control-inline voffset5"><fmt:message key="label.marks"/></label>
-	<input type="number" step="1" min="1" value="1" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="voffset5"/>
+	<label for="${containingDivName}assessment${questionNumber}mark" class="voffset5"><fmt:message key="label.marks"/></label>
+	<input type="number" step="1" min="1" value="1" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="form-control form-control-inline voffset5"/>
 	
 	<table class="table table-condensed table-no-border">
 	<tr><td></td><td></td>
@@ -93,7 +93,7 @@
 	</c:choose>
 	</div>
 	
-	<div id="${containingDivName}createAssessmentOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createAssessmentOption(${questionNumber},${maxOptionCount}, '${containingDivName}');" class="btn btn-default btn-sm"><fmt:message key="authoring.create.option"/></a></div>
+	<div id="${containingDivName}createAssessmentOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createAssessmentOption(${questionNumber},${maxOptionCount}, '${containingDivName}');" class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.option"/></a></div>
 	
 	</div>
 </div>
