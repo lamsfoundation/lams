@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.authoring.template.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -91,6 +93,9 @@ public abstract class LdTemplateController {
     @Autowired
     WebApplicationContext applictionContext;
 
+    // Used to append the number to the group label - format as 2 digits so it sorts better.
+    NumberFormat groupNumberFormatter = new DecimalFormat("00");  
+    
     private static Logger log = Logger.getLogger(LdTemplateController.class);
     public static final int MAX_OPTION_COUNT = 6;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
@@ -111,6 +116,7 @@ public abstract class LdTemplateController {
     // icon strings found in the lams_learningdesign_activity table
     protected static final String ASSESSMENT_TOOL_SIGNATURE = "laasse10";
     protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.swf";
+    protected static final String ASSESSMENT_TOOL_OUTPUT_DEFINITION = "learner.total.score"; 
     protected static final String CHAT_TOOL_SIGNATURE = "lachat11";
     protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.swf";
     protected static final String FORUM_TOOL_SIGNATURE = "lafrum11";
@@ -119,6 +125,7 @@ public abstract class LdTemplateController {
     protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
     protected static final String MCQ_TOOL_SIGNATURE = "lamc11";
     protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.swf";
+    protected static final String MCQ_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
     protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
@@ -129,6 +136,7 @@ public abstract class LdTemplateController {
     protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.swf";
     protected static final String SCRATCHIE_TOOL_SIGNATURE = "lascrt11";
     protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.swf";
+    protected static final String SCRATCHIE_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String SCRIBE_TOOL_SIGNATURE = "lascrb11";
     protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.swf";
     protected static final String SUBMIT_TOOL_SIGNATURE = "lasbmt11";
@@ -378,7 +386,7 @@ public abstract class LdTemplateController {
     }
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
-    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle) {
+    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle, String activityDescription) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -395,6 +403,8 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Gate"); 
+	if ( activityDescription != null )
+	    activityJSON.put(AuthoringJsonTags.DESCRIPTION, activityDescription); 
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
@@ -403,9 +413,9 @@ public abstract class LdTemplateController {
     }
 
     protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
-	    String activityTitle, Long startOffset) {
+	    String activityTitle, String activityDescription, Long startOffset) {
 
-	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle);
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
@@ -446,8 +456,8 @@ public abstract class LdTemplateController {
 	    Integer useNumGroups = (numGroups != null && numGroups > 0) ? numGroups : 2;
 	    for (int orderId = 0, groupNum = 1; orderId < useNumGroups; orderId++, groupNum++) {
 		ObjectNode group = JsonNodeFactory.instance.objectNode();
-		group.put(AuthoringJsonTags.GROUP_NAME,
-			TextUtil.getText(appBundle, formatter, "label.course.groups.prefix", null) + groupNum);
+		group.put(AuthoringJsonTags.GROUP_NAME, TextUtil.getText(appBundle, formatter,
+			"authoring.label.group.name", new String[] { groupNumberFormatter.format(groupNum) }));
 		group.put(AuthoringJsonTags.ORDER_ID, orderId);
 		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
 		groups.add(group);
@@ -672,6 +682,13 @@ public abstract class LdTemplateController {
     protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
 	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle, int activityCategory) {
+	return createToolActivity(uiid, order, layoutCoords, toolSignature, toolIcon, toolContentID, contentFolderID,
+		groupingUIID, parentUIID, parentActivityType, activityTitle, activityCategory, null);
+    }
+    
+    protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
+	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle, int activityCategory, String toolOutputDefinition) {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Tool tool = getTool(toolSignature);
 
@@ -699,6 +716,9 @@ public abstract class LdTemplateController {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, true);
 	} else {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
+	}
+	if ( toolOutputDefinition != null ) {
+	    activityJSON.put(AuthoringJsonTags.TOOL_OUTPUT_DEFINITION, toolOutputDefinition);
 	}
 	return activityJSON;
     }
@@ -759,13 +779,17 @@ public abstract class LdTemplateController {
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put("numbered", enableNumbering);
+	toolContentJSON.put("displaySummary", Boolean.TRUE);
+	toolContentJSON.put("allowDiscloseAnswers", Boolean.TRUE);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
 	for (int i = 0; i < questions.size(); i++) {
-	    Integer questionDisplayOrder = ((ObjectNode) questions.get(i)).get(RestTags.DISPLAY_ORDER).asInt();
+	    ObjectNode question = (ObjectNode) questions.get(i);
+	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
+	    Integer defaultGrade = question.get("defaultGrade").asInt();
 	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
-		    .put("questionDisplayOrder", questionDisplayOrder));
+		    .put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
 	}
 	toolContentJSON.set("references", references);
 
@@ -781,7 +805,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE,
 		LdTemplateController.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT,
+		LdTemplateController.ASSESSMENT_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -981,7 +1006,7 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
 		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
-		Activity.CATEGORY_ASSESSMENT);
+		Activity.CATEGORY_ASSESSMENT, LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -1131,7 +1156,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE,
 		LdTemplateController.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT,
+		LdTemplateController.SCRATCHIE_TOOL_OUTPUT_DEFINITION);
     }
 
     /**

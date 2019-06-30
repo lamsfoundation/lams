@@ -60,8 +60,6 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
-import org.lamsfoundation.lams.questions.Answer;
-import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -3050,6 +3048,7 @@ public class AssessmentServiceImpl
 		JsonUtil.optBoolean(toolContentJSON, "allowOverallFeedbackAfterQuestion", Boolean.FALSE));
 	assessment
 		.setAllowQuestionFeedback(JsonUtil.optBoolean(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
+	assessment.setAllowDiscloseAnswers(JsonUtil.optBoolean(toolContentJSON, "allowDiscloseAnswers", Boolean.FALSE));
 	assessment.setAllowRightAnswersAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAllowWrongAnswersAfterQuestion(

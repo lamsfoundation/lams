@@ -42,8 +42,8 @@
 			},
 			messages: {
 				sequenceTitle: {
-					required: '<fmt:message key="authoring.fla.title.validation.error" />',
-					validateNoSpecialCharacters: '<fmt:message key="authoring.fla.title.validation.error" />'
+					required: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />',
+					validateNoSpecialCharacters: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />'
 				},
  				<%@ include file="../groupingerrors.jsp" %>
 			},
@@ -56,7 +56,7 @@
  				},
 			});
 
-			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.fla.title.validation.error" />');
+			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />');
 			initializeWizard(validator);
 		});
 
@@ -210,10 +210,8 @@
 			</div>
 		
 			<span class="voffset10">
-			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><fmt:message key="authoring.create.question"/></a>
-			<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">
-					<fmt:message key="authoring.template.basic.import.qti" /> 
-			</a>
+			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/></a>
+			<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
 			
 	    </div>
@@ -227,7 +225,7 @@
 			<%@ include file="appex.jsp" %>
 			</div> <!--  end panel group -->
 
-			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><fmt:message key="authoring.create.application.exercise"/></a>
+			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/></a>
 			
 	    </div>
 

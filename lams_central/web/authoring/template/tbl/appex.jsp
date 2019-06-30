@@ -11,6 +11,8 @@
 <!--  Start of panel Appex${appexNumber} -->
  <div class="panel panel-default" id="divappex${appexNumber}" >
      <div class="panel-heading" id="headingAppex${appexNumber}">
+		<c:if test="${appexNumber > 1}"><a href="#" onclick="javascript:deleteAppexDiv('divappex${appexNumber}', '${appexTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
      	<span class="panel-title collapsable-icon-left">
      		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapseAppex${appexNumber}" 
 			aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapseAppex${appexNumber}" >&nbsp;
@@ -28,9 +30,9 @@
 		 	<input type="hidden" name="numAssessments${appexNumber}" id="numAssessments${appexNumber}" value="0"/>
 			<div id="divass${appexNumber}"></div>
 			<div class="space-top space-sides">
-				<a href="#" onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><fmt:message key="authoring.create.essay.question"/></a>
-				<a href="#" onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><fmt:message key="authoring.create.mc.question"/></a>
-				<a href="#" onClick="javascript:importQTI('appex${appexNumber}')" class="btn btn-default pull-right"><fmt:message key="authoring.template.basic.import.qti" /></a>
+				<a href="#" onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.essay.question"/></a>
+				<a href="#" onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.mc.question"/></a>
+				<a href="#" onClick="javascript:importQTI('appex${appexNumber}')" class="btn btn-default pull-right"><i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</div>
 			<div class="space-top space-sides space-bottom">
 				<div class="checkbox"><label for="divappex${appexNumber}NB">

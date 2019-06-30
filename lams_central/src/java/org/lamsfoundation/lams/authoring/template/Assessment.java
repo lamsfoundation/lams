@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.authoring.template;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -52,6 +51,7 @@ public class Assessment {
     String title = null;
     String questionText = null;
     Boolean required = false;
+    int defaultGrade = 1;
     List<AssessMCAnswer> answers = null; // only used if type == 1
 
     public void setType(short type) {
@@ -97,6 +97,14 @@ public class Assessment {
 	this.title = title;
     }
 
+    public int getDefaultGrade() {
+	return defaultGrade;
+    }
+
+    public void setDefaultGrade(int defaultGrade) {
+	this.defaultGrade = defaultGrade;
+    }
+
     public List<AssessMCAnswer> getAnswers() {
 	return answers;
     }
@@ -107,6 +115,7 @@ public class Assessment {
 	json.put(RestTags.QUESTION_TEXT, questionText != null ? questionText : "");
 	json.put(RestTags.DISPLAY_ORDER, displayOrder);
 	json.put("answerRequired", required);
+	json.put("defaultGrade", defaultGrade);
 	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    json.put("type", ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
 	    ArrayNode answersJSON = JsonNodeFactory.instance.arrayNode();
@@ -120,25 +129,22 @@ public class Assessment {
 	return json;
     }
 
-    private List<String> addError(List<String> errorMessages, String errorMessage) {
-	if (errorMessages == null) {
-	    errorMessages = new ArrayList<String>();
-	}
-	errorMessages.add(errorMessage);
-	return errorMessages;
-    }
-
-    /** If no errors exist, returns null */
-    public List<String> validate(ResourceBundle appBundle, MessageFormat formatter, Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
-	List<String> errorMessages = null;
+    
+    public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter,
+	    Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
+	boolean errorsExist = false;
 	if (questionText == null || questionText.length() == 0) {
-	    errorMessages = addError(errorMessages, TextUtil.getText(appBundle, formatter,
-		    "authoring.error.application.exercise.question.must.not.be.blank.num", new Object[] { applicationExerciseTitle, title }));
+	    errorMessages.add(TextUtil.getText(appBundle, formatter,
+		    "authoring.error.application.exercise.question.must.not.be.blank.num",
+		    new Object[] { applicationExerciseTitle, title }));
+	    errorsExist = true;
 	}
 	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    if (answers.size() == 0) {
-		errorMessages = addError(errorMessages, TextUtil.getText(appBundle, formatter,
-			"authoring.error.application.exercise.must.have.answer.num", new Object[] { applicationExerciseTitle, title }));
+		errorMessages.add(TextUtil.getText(appBundle, formatter,
+			"authoring.error.application.exercise.must.have.answer.num",
+			new Object[] { applicationExerciseTitle, "\""+ title +"\"" }));
+		errorsExist = true;
 	    } else {
 		boolean found100percent = false;
 		for (AssessMCAnswer answer : answers) {
@@ -148,13 +154,13 @@ public class Assessment {
 		    }
 		}
 		if (!found100percent) {
-		    errorMessages = addError(errorMessages,
-			    TextUtil.getText(appBundle, formatter,
-				    "authoring.error.application.exercise.must.have.100.percent",
-				    new Object[] { applicationExerciseTitle, title }));
+		    errorMessages.add(TextUtil.getText(appBundle, formatter,
+			    "authoring.error.application.exercise.must.have.100.percent",
+			    new Object[] { applicationExerciseTitle, "\""+ title +"\""}));
+		    errorsExist = true;
 		}
 	    }
 	}
-	return errorMessages;
+	return errorsExist;
     }
 }

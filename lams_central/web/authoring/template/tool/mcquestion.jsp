@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
 <c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
-<%-- Generic Q&A question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options / as many as are need for a QTI import --%>
+<%-- Generic MC question page. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options / as many as are need for a QTI import --%>
 
 <%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript. But that won't be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
 <c:choose>
@@ -16,6 +16,8 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading">
+		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
 		<div class="panel-title">		
 		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
 			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
@@ -83,7 +85,7 @@
 		</c:choose>
 		</div>
 		
-		<div id="createOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createOption(${questionNumber},${maxOptionCount});" class="btn btn-default btn-sm"><fmt:message key="authoring.create.option"/></a></div>
+		<div id="createOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createOption(${questionNumber},${maxOptionCount});" class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.option"/></a></div>
 	</div>		
 </div>
 

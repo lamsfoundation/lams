@@ -1,5 +1,7 @@
 
 		var validator;
+		var appexDeleteMsg =  "<fmt:message key='authoring.tbl.delete.appex.prompt'/>";
+		var mcqDeleteMsg = "<fmt:message key='authoring.tbl.delete.mcq.prompt'/>";
 		
 		// configure the wizard. Call after doing var validator = $("#templateForm").validate({ 
 		// screens need to specify the tabNumber for the save button if they are hiding tabs
@@ -388,6 +390,18 @@
 				}
 			});
 		}		
+		
+		function deleteAppexDiv(idOfDivToDelete, idOfTitleField) {
+			if ( confirm(appexDeleteMsg.replace("{0}", "\""+$("#"+idOfTitleField).val()+"\"")) ) {
+				$("#"+idOfDivToDelete).remove();
+			}		
+		}
+
+		function deleteMCQDiv(idOfDivToDelete, idOfTitleField) {
+			if ( confirm(mcqDeleteMsg.replace("{0}", "\""+$("#"+idOfTitleField).val()+"\"")) ) {
+				$("#"+idOfDivToDelete).remove();
+			}		
+		}
 		
 		function testURL(urlField) {
 			launchPopup($('#'+urlField).val(),'popupUrl');
