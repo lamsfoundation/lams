@@ -193,8 +193,7 @@ public class LearnerController {
 	    redirectToURL(response, url);
 
 	} catch (Exception e) {
-	    log
-		    .error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
+	    log.error("An error occurred while learner " + learner + " attempting to join the lesson.", e);
 	    return "error";
 	}
 
@@ -209,6 +208,10 @@ public class LearnerController {
 	    throws IOException, ServletException {
 	// fetch necessary parameters
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+	if (!lesson.getAllowLearnerRestart()) {
+	    throw new ServletException("Lesson with ID " + lessonID + " does not allow learners to restart it.");
+	}
 	User user = LearningWebUtil.getUser(learnerService);
 	Integer userID = user.getUserId();
 
@@ -222,8 +225,8 @@ public class LearnerController {
 	// make a copy of attempted and completed activities
 	Date archiveDate = new Date();
 	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
-	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
-	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
+	Map<Activity, Date> attemptedActivities = new HashMap<>(learnerProgress.getAttemptedActivities());
+	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<>();
 	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
 	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(
 		    entry.getValue().getStartDate(), entry.getValue().getFinishDate());
