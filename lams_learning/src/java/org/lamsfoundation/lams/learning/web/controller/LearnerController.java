@@ -205,6 +205,10 @@ public class LearnerController {
 	    throws IOException, ServletException {
 	// fetch necessary parameters
 	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+	if (!lesson.getAllowLearnerRestart()) {
+	    throw new ServletException("Lesson with ID " + lessonID + " does not allow learners to restart it.");
+	}
 	Integer userID = LearningWebUtil.getUserId();
 	User user = userManagementService.getUserById(userID);
 
