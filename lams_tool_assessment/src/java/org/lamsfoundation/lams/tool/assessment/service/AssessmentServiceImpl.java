@@ -775,7 +775,7 @@ public class AssessmentServiceImpl
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getMaxMark() * maxMark;
-		    QbOption qbOption = qbService.getQbOptionByUid(optionDto.getUid());
+		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 		    questionResult.setQbOption(qbOption);
 		    break;
 		}
@@ -819,7 +819,7 @@ public class AssessmentServiceImpl
 		    }
 		    if (isAnswerMatchedCurrentOption) {
 			mark = optionDto.getMaxMark() * maxMark;
-			QbOption qbOption = qbService.getQbOptionByUid(optionDto.getUid());
+			QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
 			questionResult.setQbOption(qbOption);
 			break;
 		    }

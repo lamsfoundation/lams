@@ -57,17 +57,17 @@ public class QbService implements IQbService {
 	    .comparing(QbCollection::getName);
 
     @Override
-    public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
-	return qbDAO.getQbQuestionByUid(qbQuestionUid);
+    public QbQuestion getQuestionByUid(Long qbQuestionUid) {
+	return qbDAO.getQuestionByUid(qbQuestionUid);
     }
 
     @Override
-    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
-	return qbDAO.getQbQuestionsByQuestionId(questionId);
+    public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
+	return qbDAO.getQuestionsByQuestionId(questionId);
     }
 
     @Override
-    public QbOption getQbOptionByUid(Long optionUid) {
+    public QbOption getOptionByUid(Long optionUid) {
 	QbOption option = qbDAO.find(QbOption.class, optionUid);
 	qbDAO.releaseFromCache(option);
 	qbDAO.releaseFromCache(option.getQbQuestion());
@@ -75,7 +75,7 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public QbQuestionUnit getQbQuestionUnitByUid(Long unitUid) {
+    public QbQuestionUnit getQuestionUnitByUid(Long unitUid) {
 	QbQuestionUnit unit = qbDAO.find(QbQuestionUnit.class, unitUid);
 	qbDAO.releaseFromCache(unit);
 	qbDAO.releaseFromCache(unit.getQbQuestion());
@@ -93,18 +93,18 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-	return qbDAO.getPagedQbQuestions(questionType, page, size, sortBy, sortOrder, searchString);
+    public List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
+	return qbDAO.getPagedQuestions(questionType, page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
-    public int getCountQbQuestions(Integer questionType, String searchString) {
-	return qbDAO.getCountQbQuestions(questionType, searchString);
+    public int getCountQuestions(Integer questionType, String searchString) {
+	return qbDAO.getCountQuestions(questionType, searchString);
     }
 
     @Override
-    public QbStatsDTO getQbQuestionStats(long qbQuestionUid) {
+    public QbStatsDTO getQuestionStats(long qbQuestionUid) {
 	QbStatsDTO stats = new QbStatsDTO();
 	QbQuestion qbQuestion = qbDAO.find(QbQuestion.class, qbQuestionUid);
 	List<QbOption> qbOptions = qbQuestion.getQbOptions();
@@ -130,7 +130,7 @@ public class QbService implements IQbService {
 	stats.setActivities(activityDTOs);
 
 	stats.setVersions(qbDAO.getQuestionVersions(qbQuestionUid));
-	Map<Long, Long> answersRaw = qbDAO.getAnswerStatsForQbQuestion(qbQuestionUid);
+	Map<Long, Long> answersRaw = qbDAO.getAnswerStatsForQuestion(qbQuestionUid);
 	stats.setAnswersRaw(answersRaw);
 
 	ArrayNode answersJSON = JsonNodeFactory.instance.arrayNode();
@@ -426,7 +426,7 @@ public class QbService implements IQbService {
     public void addQuestionToCollection(long collectionUid, int qbQuestionId, boolean copy) {
 	int addQbQuestionId = qbQuestionId;
 	if (copy) {
-	    List<QbQuestion> questions = getQbQuestionsByQuestionId(qbQuestionId);
+	    List<QbQuestion> questions = getQuestionsByQuestionId(qbQuestionId);
 	    QbQuestion question = questions.get(0);
 	    QbQuestion newQuestion = question.clone();
 	    addQbQuestionId = getMaxQuestionId();
@@ -451,7 +451,7 @@ public class QbService implements IQbService {
 
     @Override
     public boolean removeQuestionFromCollectionByUid(long collectionUid, long qbQuestionUid) {
-	QbQuestion question = getQbQuestionByUid(qbQuestionUid);
+	QbQuestion question = getQuestionByUid(qbQuestionUid);
 	return removeQuestionFromCollectionByQuestionId(collectionUid, question.getQuestionId());
     }
 

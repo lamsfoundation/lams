@@ -521,7 +521,7 @@ public class AuthoringController {
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
 	AssessmentQuestion question = new AssessmentQuestion();

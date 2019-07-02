@@ -151,9 +151,9 @@ public class SearchQBController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = qbService.getPagedQbQuestions(questionType, page - 1, rowLimit, sortBy, sortOrder,
+	List<QbQuestion> questions = qbService.getPagedQuestions(questionType, page - 1, rowLimit, sortBy, sortOrder,
 		searchString);
-	int countQuestions = qbService.getCountQbQuestions(questionType, searchString);
+	int countQuestions = qbService.getCountQuestions(questionType, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
 
@@ -191,7 +191,7 @@ public class SearchQBController {
 	QbQuestion qbQuestion = (QbQuestion) userManagementService.findById(QbQuestion.class, questionUid);
 	request.setAttribute("question", qbQuestion);
 	
-	List<QbQuestion> otherVersions = qbService.getQbQuestionsByQuestionId(qbQuestion.getQuestionId());
+	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
 	request.setAttribute("otherVersions", otherVersions);
 	
 	return "qb/qbQuestionDetails";

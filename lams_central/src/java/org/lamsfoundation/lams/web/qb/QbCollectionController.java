@@ -120,7 +120,7 @@ public class QbCollectionController {
 	    HttpServletResponse response) {
 	response.setContentType("text/xml; charset=utf-8");
 
-	List<QbQuestion> questions = qbService.getQbQuestionsByQuestionId(qbQuestionId);
+	List<QbQuestion> questions = qbService.getQuestionsByQuestionId(qbQuestionId);
 	questions = questions.subList(1, questions.size());
 	return toGridXML(questions, 1, 1, questions.size(), true, true);
     }

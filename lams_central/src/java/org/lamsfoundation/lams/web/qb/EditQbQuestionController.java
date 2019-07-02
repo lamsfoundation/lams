@@ -110,7 +110,7 @@ public class EditQbQuestionController {
     public String editQuestion(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam(defaultValue = "-1") Long collectionUid) throws ServletException, IOException {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
@@ -157,7 +157,7 @@ public class EditQbQuestionController {
 	    // edit
 	} else {
 	    oldQuestionUid = Long.valueOf(questionForm.getDisplayOrder());
-	    qbQuestion = qbService.getQbQuestionByUid(oldQuestionUid);
+	    qbQuestion = qbService.getQuestionByUid(oldQuestionUid);
 	}
 
 	boolean IS_AUTHORING_RESTRICTED = false;

@@ -16,13 +16,13 @@ public interface IQbDAO extends IBaseDAO {
      * @param qbQuestionUid
      * @return QbQuestion object with the specified uid
      */
-    QbQuestion getQbQuestionByUid(Long qbQuestionUid);
+    QbQuestion getQuestionByUid(Long qbQuestionUid);
 
     /**
      * @param questionId
      * @return questions sharing the same questionId
      */
-    List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId);
+    List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
@@ -38,16 +38,16 @@ public interface IQbDAO extends IBaseDAO {
 
     List<QbQuestion> getQuestionVersions(long qbQuestionUid);
 
-    Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid);
+    Map<Long, Long> getAnswerStatsForQuestion(long qbQuestionUid);
 
     Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid);
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
-    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+    List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
-    int getCountQbQuestions(Integer questionType, String searchString);
+    int getCountQuestions(Integer questionType, String searchString);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 

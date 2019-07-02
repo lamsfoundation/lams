@@ -313,7 +313,7 @@ public class ImsQtiController {
     @RequestMapping("/exportQuestionAsQTI")
     public String exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam long qbQuestionUid) {
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	List<QbQuestion> qbQuestions = new LinkedList<>();
 	qbQuestions.add(qbQuestion);
 

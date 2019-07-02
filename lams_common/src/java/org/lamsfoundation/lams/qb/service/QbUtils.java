@@ -194,7 +194,7 @@ public class QbUtils {
 	    String uidStr = paramMap.get(QbConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		option = qbService.getQbOptionByUid(uid);
+		option = qbService.getOptionByUid(uid);
 		
 	    } else {
 		option = new QbOption();
@@ -294,7 +294,7 @@ public class QbUtils {
 	    String uidStr = paramMap.get(QbConstants.ATTR_UNIT_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		unit = qbService.getQbQuestionUnitByUid(uid);
+		unit = qbService.getQuestionUnitByUid(uid);
 		
 	    } else {
 		unit = new QbQuestionUnit();

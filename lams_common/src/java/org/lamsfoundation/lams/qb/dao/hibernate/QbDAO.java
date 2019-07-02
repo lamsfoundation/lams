@@ -83,13 +83,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "WHERE collection_uid = :collectionUid AND qb_question_id NOT IN :qbQuestionIds";
 
     @Override
-    public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
+    public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
+    public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
 	final String FIND_QUESTIONS_BY_QUESTION_ID = "FROM " + QbQuestion.class.getName()
 		+ " WHERE questionId = :questionId ORDER BY version DESC";
 
@@ -143,7 +143,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid) {
+    public Map<Long, Long> getAnswerStatsForQuestion(long qbQuestionUid) {
 	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWER_STATS_BY_QB_QUESTION)
 		.setParameter("qbQuestionUid", qbQuestionUid).list();
 	Map<Long, Long> map = new HashMap<>(result.size());
@@ -155,8 +155,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+    public List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
 	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
 	final String SELECT_QUESTIONS = "SELECT DISTINCT question.* " + " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
@@ -212,7 +212,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public int getCountQbQuestions(Integer questionType, String searchString) {
+    public int getCountQuestions(Integer questionType, String searchString) {
 	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count "
 		+ " FROM lams_qb_question question  " + " LEFT OUTER JOIN lams_qb_option qboption "
 		+ "	ON qboption.qb_question_uid = question.uid " + " LEFT JOIN ("//help finding questions with the max available version

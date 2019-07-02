@@ -610,7 +610,7 @@ public class QaAuthoringController implements QaAppConstants {
 	
 	//get QbQuestion from DB
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 	boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, qbQuestion.getName());
