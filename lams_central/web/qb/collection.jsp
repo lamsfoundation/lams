@@ -108,7 +108,8 @@
 			    	"questionType",
 			    	"questionVersion",
 			    	"Used in<br>lessons",
-			    	"Actions"
+			    	"Actions",
+			    	"hasVersions"
 			    ],
 			    colModel:[
 			    	{name:'id', index:'uid', sortable:true, hidden:false, width: 10},
@@ -117,7 +118,8 @@
 			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
 			      	// formatter gets just question uid and creates a button
-			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter}
+			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter},
+					{name:'hasVersions', index:'hasVersions', width:0, hidden: true}
 			    ],
 				beforeSelectRow: function(rowid, e) {
 					// do not select rows at all
@@ -130,7 +132,52 @@
 			    loadError: function(xhr,st,err) {
 			    	collectionGrid.clearGridData();
 				   	alert("Error!");
-			    }
+			    },
+				subGrid : true,
+				subGridOptions: {
+				    hasSubgrid: function (options) {
+				        return options.data.hasVersions == 'true';
+				    }
+				 },
+				subGridRowExpanded: function(subgrid_id, row_id) {
+				    var subgrid_table_id = subgrid_id + "_t",
+				   	    rowData = jQuery("#" + subgrid_id.substring(0, subgrid_id.lastIndexOf('_'))).getRowData(row_id),
+				   	    questionId = rowData["id"].split("_")[0];
+					jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					jQuery("#"+subgrid_table_id).jqGrid({
+							 guiStyle: "bootstrap",
+							 iconSet: 'fontAwesome',
+							 autoencode:false,
+							 autowidth: true,
+						     datatype: "xml",
+						     url: "<lams:LAMSURL />qb/collection/getQuestionVersionGridData.do?qbQuestionId=" + questionId,
+						     height: "100%",
+						     cmTemplate: { title: false },
+						     cellEdit:false,
+						     pager: false,
+						     colNames: [
+						    	"ID",
+						    	"Name",
+						    	"questionType",
+						    	"questionVersion",
+						    	"Used in<br>lessons",
+						    	"Actions"
+						     ],
+						     colModel: [
+						    	{name:'id', index:'uid', sortable:false, hidden:true, width: 10},
+						    	{name:'name', index:'name', sortable:false, search:false, autoencode:true, formatter: questionNameFormatter},
+						    	{name:'questionType', index:'questionType', width:0, hidden: true},
+						    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
+						    	{name: 'usage', index: 'usage', sortable:false, width: 9, align: "center"},
+						      	// formatter gets just question uid and creates a button
+						    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 12, align: "center", formatter: actionsFormatter}
+						     ],
+						     loadError: function(xhr,st,err) {
+						    	jQuery("#"+subgrid_table_id).clearGridData();
+						    	alert("Error!");
+						     }
+					  	});
+					}
 			}).jqGrid('filterToolbar');
 
 			if (!isPublicCollection) {
@@ -214,9 +261,11 @@
 	        text += "<span class='pull-right alert-info btn-xs loffset5'>";
 	       	text += "v. " + questionVersion;
 	        text += "</span>";
-	       	text += "<span class='pull-right alert-info btn-xs'>";
-	       	text += questionType;
-	        text += "</span>";
+	        if (questionType) {
+		       	text += "<span class='pull-right alert-info btn-xs'>";
+		       	text += questionType;
+		        text += "</span>";
+	        }
 	        	
 			return text;
 		}

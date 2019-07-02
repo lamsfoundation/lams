@@ -158,6 +158,13 @@ public class QbService implements IQbService {
     }
 
     @Override
+    public int countQuestionVersions(int qbQuestionId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("questionId", qbQuestionId);
+	return Long.valueOf(qbDAO.countByProperties(QbQuestion.class, properties)).intValue();
+    }
+
+    @Override
     public QbStatsActivityDTO getActivityStatsByContentId(Long toolContentId, Long qbQuestionUid) {
 	Activity activity = qbDAO.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
 	return getActivityStats(activity.getActivityId(), qbQuestionUid);
@@ -529,7 +536,7 @@ public class QbService implements IQbService {
     public int getCountQuestionActivitiesByUid(long qbQuestionUid) {
 	return qbDAO.getCountQuestionActivitiesByUid(qbQuestionUid);
     }
-    
+
     @Override
     public int getCountQuestionActivitiesByQuestionId(int qbQuestionId) {
 	return qbDAO.getCountQuestionActivitiesByQuestionId(qbQuestionId);

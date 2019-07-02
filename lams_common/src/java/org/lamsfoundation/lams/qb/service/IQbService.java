@@ -56,6 +56,8 @@ public interface IQbService {
 
     QbStatsDTO getQbQuestionStats(long qbQuestionUid);
 
+    int countQuestionVersions(int qbQuestionId);
+
     QbStatsActivityDTO getActivityStatsByContentId(Long toolContentId, Long qbQuestionUid);
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid);

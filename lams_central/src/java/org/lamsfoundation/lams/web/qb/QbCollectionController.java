@@ -111,10 +111,22 @@ public class QbCollectionController {
 		sortOrder, searchString);
 	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return toGridXML(questions, page, maxPages, total, showUsage);
+	return toGridXML(questions, page, maxPages, total, showUsage, false);
     }
 
-    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage) {
+    @RequestMapping("/getQuestionVersionGridData")
+    @ResponseBody
+    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, HttpServletRequest request,
+	    HttpServletResponse response) {
+	response.setContentType("text/xml; charset=utf-8");
+
+	List<QbQuestion> questions = qbService.getQbQuestionsByQuestionId(qbQuestionId);
+	questions = questions.subList(1, questions.size());
+	return toGridXML(questions, 1, 1, questions.size(), true, true);
+    }
+
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage,
+	    boolean isVersionGrid) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -140,11 +152,14 @@ public class QbCollectionController {
 
 		// the last cell is for creating stats button
 		String usage = showUsage
-			? String.valueOf(qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
+			? String.valueOf(isVersionGrid ? qbService.getCountQuestionActivitiesByUid(question.getUid())
+				: qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
 			: null;
+		boolean hasVersions = qbService.countQuestionVersions(question.getQuestionId()) > 1;
 		String[] data = { question.getQuestionId().toString(),
-			WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
-			question.getVersion().toString(), usage, uid };
+			WebUtil.removeHTMLtags(question.getName()).trim(),
+			isVersionGrid ? null : question.getType().toString(), question.getVersion().toString(), usage,
+			uid, String.valueOf(hasVersions) };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
