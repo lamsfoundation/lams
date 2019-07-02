@@ -111,7 +111,7 @@
 			    	"Actions"
 			    ],
 			    colModel:[
-			    	{name:'id', index:'uid', sortable:true, hidden:true, width: 10},
+			    	{name:'id', index:'uid', sortable:true, hidden:false, width: 10},
 			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: questionNameFormatter},
 			    	{name:'questionType', index:'questionType', width:0, hidden: true},
 			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},

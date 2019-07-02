@@ -60,7 +60,7 @@ public class QbStatsController {
 	QbStatsDTO stats = qbService.getQbQuestionStats(qbQuestionUid);
 	model.addAttribute("stats", stats);
 
-	Collection<QbCollection> existingCollections = qbService.getQuestionCollections(qbQuestionUid);
+	Collection<QbCollection> existingCollections = qbService.getQuestionCollectionsByUid(qbQuestionUid);
 	model.addAttribute("existingCollections", existingCollections);
 
 	Integer userId = getUserId();
@@ -71,7 +71,7 @@ public class QbStatsController {
 	boolean permanentRemove = existingCollections.size() <= 1;
 	model.addAttribute("permanentRemove", permanentRemove);
 	model.addAttribute("permanentRemovePossible",
-		permanentRemove ? qbService.removeQuestionPossible(qbQuestionUid) : false);
+		permanentRemove ? qbService.removeQuestionPossibleByUid(qbQuestionUid) : false);
 
 	model.addAttribute("transferAllowed",
 		Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW));

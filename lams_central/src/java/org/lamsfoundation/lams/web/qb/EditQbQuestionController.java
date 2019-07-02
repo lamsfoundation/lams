@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -64,7 +62,7 @@ public class EditQbQuestionController {
 
 	//TODO think about where do we need to get ContentFolderID, and whether it's a good idea to generate a new one each time
 	String contentFolderID = FileUtil.generateUniqueContentFolderID();
-	
+
 	QbQuestionForm questionForm = new QbQuestionForm();
 	//we need to set form as a request attribute, as long as we use jsps from another context from the Assessment tool
 	request.setAttribute("assessmentQuestionForm", questionForm);
@@ -99,12 +97,12 @@ public class EditQbQuestionController {
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 //	sessionMap.put(QbConstants.ATTR_QUESTION_TYPE, type);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	
-	String jspPageName = getAuthoringJspByQuestionType(type);
+
+	String jspPageName = EditQbQuestionController.getAuthoringJspByQuestionType(type);
 	forwardToAssessmentJsp(jspPageName, request, response);
 	return null;
     }
-    
+
     /**
      * Display edit page for existed assessment question.
      */
@@ -121,17 +119,17 @@ public class EditQbQuestionController {
 	//we need to set form as a request attribute, as long as we use jsps from another context from the Assessment tool
 	request.setAttribute("assessmentQuestionForm", questionForm);
 	QbUtils.fillFormWithQbQuestion(qbQuestion, questionForm, request);
-	
+
 	//store uid as displayOrder in order to use it later during question saving
 	questionForm.setDisplayOrder(qbQuestionUid.intValue());
-	
+
 	//TODO think about where do we need to get ContentFolderID, and whether it's a good idea to generate a new one each time
 	String contentFolderID = FileUtil.generateUniqueContentFolderID();
 	questionForm.setContentFolderID(contentFolderID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	
-	String jspPageName = getAuthoringJspByQuestionType(qbQuestion.getType());
-	forwardToAssessmentJsp(jspPageName, request, response);	
+
+	String jspPageName = EditQbQuestionController.getAuthoringJspByQuestionType(qbQuestion.getType());
+	forwardToAssessmentJsp(jspPageName, request, response);
 	return null;
     }
 
@@ -140,7 +138,8 @@ public class EditQbQuestionController {
      * <code>HttpSession</code> AssessmentQuestionList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     @RequestMapping("/saveOrUpdateQuestion")
     @ResponseBody
@@ -149,18 +148,18 @@ public class EditQbQuestionController {
 	//find according question
 	QbQuestion qbQuestion = null;
 	Long oldQuestionUid = null;
-	
+
 	// add
-	if (questionForm.getDisplayOrder() == -1) { 
+	if (questionForm.getDisplayOrder() == -1) {
 	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(questionForm.getQuestionType());
-	    
-	// edit
+
+	    // edit
 	} else {
 	    oldQuestionUid = Long.valueOf(questionForm.getDisplayOrder());
 	    qbQuestion = qbService.getQbQuestionByUid(oldQuestionUid);
 	}
-	
+
 	boolean IS_AUTHORING_RESTRICTED = false;
 	int isQbQuestionModified = QbUtils.extractFormToQbQuestion(qbQuestion, questionForm, request, qbService,
 		IS_AUTHORING_RESTRICTED);
@@ -178,48 +177,49 @@ public class EditQbQuestionController {
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
 		qbQuestion.setVersion(1);
-		qbQuestion.setQuestionId(qbService.getMaxQuestionId()+1);
+		qbQuestion.setQuestionId(qbService.getMaxQuestionId() + 1);
 		qbQuestion.setCreateDate(new Date());
-		
+
 	    }
 		break;
 	}
 	boolean belongsToNoCollection = qbQuestion.getUid() == null;
 	userManagementService.save(qbQuestion);
-	
+
 	//in case of new question - add it to specified collection
 	if (belongsToNoCollection) {
 
 	    Long collectionUid = questionForm.getCollectionUid();
 	    //try to get collection from the old question
 	    if (collectionUid != null && collectionUid.equals(-1L)) {
-		Collection<QbCollection> existingCollections = qbService.getQuestionCollections(oldQuestionUid);
+		Collection<QbCollection> existingCollections = qbService.getQuestionCollectionsByUid(oldQuestionUid);
 		collectionUid = existingCollections.stream().findFirst().map(collection -> collection.getUid())
 			.orElse(null);
 	    }
 
 	    if (collectionUid != null && !collectionUid.equals(-1L)) {
-		qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+		qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 	    }
 	}
-	
+
 	// add question case - return nothing
 	if (questionForm.getDisplayOrder() == -1) {
 	    return null;
-	    
-	// edit question case - return question's uid
+
+	    // edit question case - return question's uid
 	} else {
 	    response.setContentType("text/plain");
 	    response.setCharacterEncoding("UTF-8");
 	    return qbQuestion.getUid().toString();
 	}
     }
-    
+
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/addOption")
-    public String addOption(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String addOption(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	TreeSet<QbOption> optionList = QbUtils.getOptionsFromRequest(qbService, request, false);
 	QbOption option = new QbOption();
 	int maxSeq = 1;
@@ -243,7 +243,8 @@ public class EditQbQuestionController {
      * Ajax call, will add one more input line for new Unit.
      */
     @RequestMapping("/newUnit")
-    public String newUnit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public String newUnit(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	TreeSet<QbQuestionUnit> unitList = QbUtils.getUnitsFromRequest(qbService, request, false);
 	QbQuestionUnit unit = new QbQuestionUnit();
 	int maxSeq = 1;
@@ -258,7 +259,7 @@ public class EditQbQuestionController {
 	forwardToAssessmentJsp("unitlist.jsp", request, response);
 	return null;
     }
-    
+
     /**
      * Get back jsp name.
      */
@@ -297,14 +298,16 @@ public class EditQbQuestionController {
     }
 
     /**
-     *  Forwards to the specified jsp page from Assessment tool.
+     * Forwards to the specified jsp page from Assessment tool.
      */
     private void forwardToAssessmentJsp(String jspPageName, HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
 	serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/" + serverURLContextPath;
 	serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	applicationcontext.getServletContext().getContext(serverURLContextPath + "tool/" + CommonConstants.TOOL_SIGNATURE_ASSESSMENT)
-		.getRequestDispatcher("/pages/authoring/parts/" + jspPageName +"?lessonID=1").forward(request, response);
+	applicationcontext.getServletContext()
+		.getContext(serverURLContextPath + "tool/" + CommonConstants.TOOL_SIGNATURE_ASSESSMENT)
+		.getRequestDispatcher("/pages/authoring/parts/" + jspPageName + "?lessonID=1")
+		.forward(request, response);
     }
 }

@@ -14,10 +14,10 @@ CREATE TABLE lams_qb_collection (`uid` BIGINT AUTO_INCREMENT,
 							    );
 							    
 CREATE TABLE lams_qb_collection_question (`collection_uid`  BIGINT NOT NULL,
-									      `qb_question_uid` BIGINT NOT NULL,
+									      `qb_question_id` INT NOT NULL,
 									   	  CONSTRAINT FK_lams_qb_collection_question_1 FOREIGN KEY (collection_uid) REFERENCES lams_qb_collection (uid)
 											ON DELETE CASCADE ON UPDATE CASCADE,
-									   	  CONSTRAINT FK_lams_qb_collection_question_2 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid)
+									   	  CONSTRAINT FK_lams_qb_collection_question_2 FOREIGN KEY (qb_question_id) REFERENCES lams_qb_question (question_id)
 											ON DELETE CASCADE ON UPDATE CASCADE
 									  );
 							   				    
@@ -33,7 +33,7 @@ CREATE TABLE lams_qb_collection_organisation (`collection_uid`  BIGINT NOT NULL,
 INSERT INTO lams_qb_collection VALUES (1, 'Public questions', NULL, false);
 
 INSERT INTO lams_qb_collection_question
-	SELECT 1, uid FROM lams_qb_question;
+	SELECT 1, question_id FROM lams_qb_question;
 	
 INSERT INTO lams_configuration VALUES
 ('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);

@@ -139,9 +139,11 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
+		String usage = showUsage
+			? String.valueOf(qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
 			: null;
-		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
+		String[] data = { question.getQuestionId().toString(),
+			WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
 			question.getVersion().toString(), usage, uid };
 
 		for (String cell : data) {
@@ -168,18 +170,18 @@ public class QbCollectionController {
 
     @RequestMapping("/removeCollectionQuestion")
     @ResponseBody
-    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam long qbQuestionUid) {
-	qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
+    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId) {
+	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId);
     }
 
     @RequestMapping("/addCollectionQuestion")
     @ResponseBody
     public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
-	    @RequestParam long qbQuestionUid) {
+	    @RequestParam int qbQuestionId) {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
 	    throw new SecurityException("Transfering questions between collections is disabled");
 	}
-	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionUid, copy);
+	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
     }
 
     @RequestMapping("/addCollection")

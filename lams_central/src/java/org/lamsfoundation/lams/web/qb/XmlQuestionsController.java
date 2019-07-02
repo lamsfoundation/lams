@@ -4,37 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.qb.model.QbCollection;
-import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.questions.Answer;
-import org.lamsfoundation.lams.questions.Question;
-import org.lamsfoundation.lams.questions.QuestionExporter;
-import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +32,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * Exports and imports questions from the given collection in XML format.
- * 
+ *
  * @author Andrey Balan
  */
 @Controller
@@ -57,7 +42,7 @@ public class XmlQuestionsController {
 
     @Autowired
     private IQbService qbService;
-    
+
     @Autowired
     private IUserManagementService userManagementService;
 
@@ -78,7 +63,7 @@ public class XmlQuestionsController {
     public void importQuestionsXml(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request,
 	    @RequestParam long collectionUid) throws ServletException {
 	int questionId = qbService.getMaxQuestionId();
-	
+
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
@@ -96,7 +81,7 @@ public class XmlQuestionsController {
 
 	    // import learning design
 	    String fullFilePath = destinationFile.getAbsolutePath();// FileUtil.getFullPath(learningDesignPath,
-							       // ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
+	    // ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    List<QbQuestion> questions = (List<QbQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
 	    if (questions != null) {
 		for (QbQuestion qbQuestion : questions) {
@@ -104,7 +89,7 @@ public class XmlQuestionsController {
 		    qbQuestion.setCreateDate(new Date());
 		    userManagementService.save(qbQuestion);
 
-		    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
+		    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 
 		    if (log.isDebugEnabled()) {
 			log.debug("Imported XML question. Name: " + qbQuestion.getName() + ", uid: "
@@ -127,13 +112,14 @@ public class XmlQuestionsController {
      * Exports xml format questions from question collection.
      */
     @RequestMapping("/exportQuestionsXml")
-    public void exportQuestionsXml(HttpServletRequest request, HttpServletResponse response, @RequestParam long collectionUid) {
+    public void exportQuestionsXml(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam long collectionUid) {
 	List<QbQuestion> qbQuestions = qbService.getCollectionQuestions(collectionUid);
 	String errors = null;
 	try {
 	    ArrayList<QbQuestion> questionsToExport = new ArrayList<>();
 	    for (QbQuestion qbQuestion : qbQuestions) {
-		QbQuestion clonedQuestion = (QbQuestion) qbQuestion.clone();
+		QbQuestion clonedQuestion = qbQuestion.clone();
 		clonedQuestion.clearID();
 		clonedQuestion.setVersion(1);
 		questionsToExport.add(clonedQuestion);

@@ -59,10 +59,13 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
 		var permanentRemove = ${permanentRemove},
-			permanentRemovePossible = ${permanentRemovePossible};
+			permanentRemovePossible = ${permanentRemovePossible},
+			optionsExist = ${not empty question.qbOptions};
 		
 		$(document).ready(function(){
-			drawChart('bar', 'chartDiv', ${stats.answersJSON});
+			if (optionsExist) {
+				drawChart('bar', 'chartDiv', ${stats.answersJSON});
+			}
 			$("time.timeago").timeago();
 		});
 		
@@ -76,7 +79,7 @@
 				'data' : {
 					'targetCollectionUid' : targetCollectionUid,
 					'copy'				  : copy,
-					'qbQuestionUid'	      : ${question.uid}
+					'qbQuestionId'	      : ${question.questionId}
 				},
 				'cache' : false
 			}).done(function(){
@@ -101,7 +104,7 @@
 				'dataType' : 'text',
 				'data' : {
 					'collectionUid' : collectionUid,
-					'qbQuestionUid'	: ${question.uid}
+					'qbQuestionId'	: ${question.questionId}
 				},
 				'cache' : false
 			}).done(function(){
