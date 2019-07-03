@@ -153,8 +153,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_PAGED_QUESTION_DTOS = "pagedQuestions";
 
-    public static final String ATTR_QUESTION_FOR_ORDERING = "questionForOrdering";
-
     public static final String ATTR_ASSESSMENT_RESULT = "assessmentResult";
 
     public static final String ATTR_IS_RESUBMIT_ALLOWED = "isResubmitAllowed";
@@ -202,6 +200,9 @@ public class AssessmentConstants {
     public static final String OUTPUT_NAME_FIRST_SCORE = "first.score";
     public static final String OUTPUT_NAME_AVERAGE_SCORE = "average.score";
 
+    public static final String OUTPUT_NAME_ORDERED_ANSWERS = "ordered.answers";
+    public static final String OUTPUT_NAME_CONDITION_ORDERED_ANSWER = "ordered.answer";
+   
     public static final String ATTR_USER_UID = "userUid";
 
     public static final String DEFUALT_PROTOCOL_REFIX = "http://";

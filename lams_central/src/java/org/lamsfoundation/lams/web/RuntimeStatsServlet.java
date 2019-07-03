@@ -53,12 +53,12 @@ public class RuntimeStatsServlet extends HttpServlet {
 	    if (log.isDebugEnabled()) {
 		log.debug("Getting long runtime stats");
 	    }
-	    stats = getLongStats();
+	    stats = RuntimeStatsServlet.getLongStats();
 	} else {
 	    if (log.isDebugEnabled()) {
 		log.debug("Getting short runtime stats");
 	    }
-	    stats = getShortStats();
+	    stats = RuntimeStatsServlet.getShortStats();
 	}
 
 	if (stats != null) {
@@ -78,36 +78,18 @@ public class RuntimeStatsServlet extends HttpServlet {
 	Date date = new Date();
 	MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 	try {
-	    /*
-	     * ObjectName serviceRef = new ObjectName("*.*:*");
-	     * Set<ObjectName> mbeans = server.queryNames(serviceRef, null);
-	     * for (ObjectName on : mbeans) {
-	     * System.out.println("\nObjectName : " + on);
-	     * MBeanInfo info = server.getMBeanInfo(on);
-	     * MBeanAttributeInfo[] attrInfo = info.getAttributes();
-	     * MBeanOperationInfo[] operInfo = info.getOperations();
-	     * System.out.println(">Attributes:");
-	     * for (MBeanAttributeInfo attr : attrInfo) {
-	     * System.out.println("  " + attr.getName() + "\n");
-	     * }
-	     * System.out.println(">Operations:");
-	     * for (MBeanOperationInfo attr : operInfo) {
-	     * System.out.println("  " + attr.getName() + "\n");
-	     * }
-	     * }
-	     */
-
 	    ObjectName dataSourceName = new ObjectName(
 		    "jboss.as.expr:subsystem=datasources,data-source=lams-ds,statistics=pool");
 	    Integer activeCount = Integer.valueOf((String) server.getAttribute(dataSourceName, "ActiveCount"));
 
-	    resp.append("Overall Status : ok");
+	    resp.append("Overall Status : OK");
 	    if (activeCount > 0) {
 		resp.append(" - DB connection established");
 	    }
-	    resp.append("\nServer : ").append(SessionManager.getJvmRoute()).append("\n");
-	    resp.append("Current Sessions : ").append(SessionManager.getSessionCount()).append("\n");
-	    resp.append("Time of Request : ").append(date);
+	    resp.append("\njvmRoute: ").append(SessionManager.getJvmRoute()).append("\n");
+	    resp.append("Active sessions [user/total]: ").append(SessionManager.getSessionUserCount()).append("/")
+		    .append(SessionManager.getSessionTotalCount()).append("\n");
+	    resp.append("Time of request: ").append(date);
 	} catch (Exception e) {
 	    log.error("Error while getting short runtime stats", e);
 	}
@@ -142,25 +124,24 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    .append(threadBean.getThreadCount()).append("/").append(threadBean.getPeakThreadCount())
 		    .append("\n");
 
-	    /*
-	     * Connector statistics do not seem to be present for WF 8.
-	     * They should be available in WF 9+ (WFLY-4420).
-	     * ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
-	     * Integer busyThreads = (Integer) server.getAttribute(connectorName, "ioThreads");
-	     * Integer maxThreads = (Integer) server.getAttribute(connectorName, "taskMaxThreads");
-	     * resp.append("IO threads [io/task max]: "
-	     * ).append(busyThreads).append("/").append(maxThreads).append("\n");
-	     */
+	    ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
+	    String busyThreads = (String) server.getAttribute(connectorName, "ioThreads");
+	    String maxThreads = (String) server.getAttribute(connectorName, "taskMaxThreads");
+	    resp.append("IO threads [io/task max]: ").append(busyThreads).append("/").append(maxThreads).append("\n");
 
-	    resp.append("Active sessions : ").append(SessionManager.getSessionCount()).append("\n");
+	    resp.append("Active sessions [user/total]: ").append(SessionManager.getSessionUserCount()).append("/")
+		    .append(SessionManager.getSessionTotalCount()).append("\n");
 
 	    ObjectName dataSourceName = new ObjectName(
 		    "jboss.as.expr:subsystem=datasources,data-source=lams-ds,statistics=pool");
-	    String inUseConnections = (String) server.getAttribute(dataSourceName, "InUseCount");
-	    String activeConnections = (String) server.getAttribute(dataSourceName, "ActiveCount");
-	    String availConnections = (String) server.getAttribute(dataSourceName, "AvailableCount");
-	    resp.append("Connections [in use/active/total]: ").append(inUseConnections).append("/")
-		    .append(activeConnections).append("/").append(availConnections).append("\n");
+	    Integer inUseConnections = Integer.parseInt((String) server.getAttribute(dataSourceName, "InUseCount"));
+	    Integer activeConnections = Integer.parseInt((String) server.getAttribute(dataSourceName, "ActiveCount"));
+	    Integer availConnections = Integer.parseInt((String) server.getAttribute(dataSourceName, "AvailableCount"));
+	    String maxUsageTime = (String) server.getAttribute(dataSourceName, "MaxUsageTime");
+	    resp.append("Connection count [in use/idle/left]: ").append(inUseConnections).append("/")
+		    .append(activeConnections - inUseConnections).append("/")
+		    .append(availConnections - activeConnections).append("\n");
+	    resp.append("Connection max usage time ms: ").append(maxUsageTime);
 	} catch (Exception e) {
 	    log.error("Error while getting long runtime stats", e);
 	}

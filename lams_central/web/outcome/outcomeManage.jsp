@@ -18,8 +18,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
-		var organisationId = '${param.organisationID}',
-			LAMS_URL = '<lams:LAMSURL/>',
+		var LAMS_URL = '<lams:LAMSURL/>',
 			
 			decoderDiv = $('<div />'),
 			LABELS = {
@@ -44,9 +43,6 @@
 			<div class="col-xs-3">
 				<fmt:message key='outcome.manage.add.code' />
 			</div>
-			<div class="col-xs-2">
-				<fmt:message key='outcome.manage.scope' />
-			</div>
 			<div class="col-xs-1">
 			</div>
 			<div class="col-xs-1">
@@ -60,57 +56,34 @@
 				<div class="col-xs-3">
 					<c:out value="${outcome.code}" />
 				</div>
-				<div class="col-xs-2">
-					<c:choose>
-						<c:when test="${empty outcome.organisation}">
-							<fmt:message key='outcome.manage.scope.global' />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key='outcome.manage.scope.course' />
-						</c:otherwise>
-					</c:choose>
+				<div class="col-xs-1">
+					<i class="manageButton fa fa-pencil" title="<fmt:message key='outcome.manage.edit' />"
+				   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
+					</i>
 				</div>
 				<div class="col-xs-1">
-					<c:choose>
-						<c:when test="${not empty outcome.organisation or canManageGlobal}">
-							<i class="manageButton fa fa-pencil" title="<fmt:message key='outcome.manage.edit' />"
-						   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
-							</i>
-						</c:when>
-						<c:otherwise>
-							<i class="manageButton fa fa-eye" title="<fmt:message key='outcome.manage.view' />"
-						   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
-							</i>
-						</c:otherwise>
-					</c:choose>
-				</div>
-				<div class="col-xs-1">
-					<c:if test="${not empty outcome.organisation or canManageGlobal}">
-						<i class="manageButton fa fa-remove" title="<fmt:message key='outcome.manage.remove' />"
-					   	   onClick="javascript:removeOutcome(${outcome.outcomeId})" >
-						</i>
-					</c:if>
+					<i class="manageButton fa fa-remove" title="<fmt:message key='outcome.manage.remove' />"
+				   	   onClick="javascript:removeOutcome(${outcome.outcomeId})" >
+					</i>
 				</div>
 			</div>
 		</c:forEach>
-		<c:if test="${canManageGlobal}">
-			<c:if test="${not empty outcomes}">
-				<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
-					 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
-					<i class="fa fa-download"></i>
-					<span class="hidden-xs">
-						<fmt:message key="outcome.export" />
-					</span>
-				</div>
-			</c:if>
-			
-			<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
-				<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
+		<c:if test="${not empty outcomes}">
+			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
+				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
+				<i class="fa fa-download"></i>
+				<span class="hidden-xs">
+					<fmt:message key="outcome.export" />
+				</span>
 			</div>
-			<form id="importForm" action="outcomeImport.do" method="post" enctype="multipart/form-data">
-				<input type="file" id="importInput" name="file"/>
-			</form>
 		</c:if>
+		
+		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
+		</div>
+		<form id="importForm" action="outcomeImport.do" method="post" enctype="multipart/form-data">
+			<input type="file" id="importInput" name="file"/>
+		</form>
 		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditOutcomeDialog()">
 			<i class="fa fa-plus"></i>
 			<span><fmt:message key='outcome.manage.add' /></span>

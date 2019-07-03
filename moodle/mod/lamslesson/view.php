@@ -56,7 +56,7 @@ add_to_log($course->id, 'lamslesson', 'view', "view.php?id=$cm->id", $lamslesson
 $PAGE->set_url('/mod/lamslesson/view.php', array('id' => $cm->id));
 $PAGE->set_title($lamslesson->name);
 $PAGE->set_heading($course->shortname);
-$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'lamslesson')));
+// $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'lamslesson')));
 
 // Main page
 $options_html = '';

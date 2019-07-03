@@ -175,7 +175,12 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">
-							<span class="float-left space-right">Q${i.index+1})</span> <c:out value="${question.qbQuestion.name}" escapeXml="false"/>
+							<c:if test="${assessmentDto.assessment.numbered}">
+								<span class="float-left space-right">Q${i.index+1})</span>
+							</c:if> 
+							
+							<c:out value="${question.qbQuestion.name}" escapeXml="false"/>
+							
 							<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
 								<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
 									<%-- Allow disclosing correct answers only for multiple choice questions --%>

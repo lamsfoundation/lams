@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.outcome.service;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
@@ -15,15 +14,20 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IOutcomeService {
     static final long DEFAULT_SCALE_ID = 1;
 
-    String getContentFolderId(Integer organisationId);
+    // just a hardcoded, random number
+    static final String OUTCOME_CONTENT_FOLDER_ID = "outcomeo-utco-meou-tcom-eoutcomeoutc";
 
-    List<Outcome> getOutcomes(Integer organisationId);
+    List<Outcome> getOutcomes();
 
-    List<Outcome> getOutcomes(String search, Set<Integer> organisationIds);
+    List<Outcome> getOutcomes(String search);
 
     List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId);
 
-    List<OutcomeScale> getScales(Integer organisationId);
+    long countOutcomeMappings(Long outcomeId);
+
+    long countScaleUse(Long scaleId);
+
+    List<OutcomeScale> getScales();
 
     List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId);
 

@@ -48,6 +48,7 @@
 		window.resizeTo(1152, 648);
 	
 		var returnURL = '${returnURL}';
+		var callerID = '${callerID}';
 		
 		function submitForm() {
 			var anyQuestionsSelected = false;
@@ -62,7 +63,7 @@
 				var form = $("#questionForm");
 				if (returnURL == '') {
 					form.css('visibility', 'hidden');
-					window.opener.saveQTI(form[0].outerHTML, 'questionForm');
+					window.opener.saveQTI(form[0].outerHTML, 'questionForm', callerID);
 					window.close();
 				} else {
 					// this code is not really used at the moment, but it's available

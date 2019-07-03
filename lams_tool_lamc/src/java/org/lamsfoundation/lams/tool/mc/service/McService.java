@@ -103,7 +103,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelUtil;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
@@ -490,7 +489,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    McQueContent question = this.getQuestionByUid(questionUid);
 	    if (question == null) {
 		throw new McApplicationException(
-			"Can't find questionDescription with specified questionDescription uid: " + answerDto.getQuestionUid());
+			"Can't find questionDescription with specified questionDescription uid: "
+				+ answerDto.getQuestionUid());
 	    }
 
 	    QbOption answerOption = answerDto.getAnswerOption();
@@ -535,6 +535,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @Override
     public int getAttemptsCountPerOption(Long optionUid) {
 	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
+    }
+
+    @Override
+    public boolean isMcContentAttempted(Long mcContentUid) {
+	return mcUsrAttemptDAO.isMcContentAttempted(mcContentUid);
     }
 
     @Override
@@ -844,25 +849,24 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 	    logEventService.logMarkChange(user.getQueUsrId(), user.getUsername(), toolContentId, "" + oldMark,
 		    "" + totalMark);
-
 	}
     }
 
     @Override
     public void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions,
-	    List<McQuestionDTO> questionDTOs, List<McQuestionDTO> deletedQuestions) {
-
+	    List<McQuestionDTO> questionDTOs) {
 	// create list of modified questions
 	List<McQuestionDTO> modifiedQuestions = new ArrayList<>();
 	// create list of modified questionDescription marks
 	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<>();
+
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
 
 		    boolean isQuestionModified = false;
 		    boolean isQuestionMarkModified = false;
-		    
+
 		    // question name is different
 		    if (!oldQuestion.getName().equals(questionDTO.getName())) {
 			isQuestionModified = true;
@@ -874,7 +878,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    }
 
 		    // mark is different
-		    if (oldQuestion.getMark().intValue() != (new Integer(questionDTO.getMark())).intValue()) {
+		    if (!oldQuestion.getMark().equals(Integer.valueOf(questionDTO.getMark()))) {
 			isQuestionMarkModified = true;
 		    }
 
@@ -888,9 +892,15 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 				if (!StringUtils.equals(oldOption.getName(), optionDTO.getCandidateAnswer())
 					|| (oldOption.isCorrect() != "Correct".equals(optionDTO.getCorrect()))) {
 				    isQuestionModified = true;
+				    break;
 				}
 			    }
 			}
+		    }
+
+		    // a new option is added
+		    if (oldOptions.size() != optionDTOs.size()) {
+			isQuestionModified = true;
 		    }
 
 		    if (isQuestionModified) {
@@ -918,65 +928,59 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		Iterator<McUsrAttempt> iter = userAttempts.iterator();
 		while (iter.hasNext()) {
 		    McUsrAttempt userAttempt = iter.next();
-
 		    McQueContent question = userAttempt.getMcQueContent();
-
-		    boolean isRemoveQuestionResult = false;
+		    Integer oldUserMark = userAttempt.getMark();
 
 		    // [+] if the questionDescription mark is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestionsMarksOnly) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    Integer newQuestionMark = new Integer(modifiedQuestion.getMark());
+			    Integer newQuestionMark = Integer.valueOf(modifiedQuestion.getMark());
 			    Integer oldQuestionMark = question.getMark();
 			    Integer newActualMark = (userAttempt.getMark() * newQuestionMark) / oldQuestionMark;
-
-			    newTotalMark += newActualMark - userAttempt.getMark();
 
 			    // update questionDescription answer's mark
 			    userAttempt.setMark(newActualMark);
 			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
 
+			    newTotalMark += newActualMark - oldUserMark;
+
 			    break;
 			}
-
 		    }
 
 		    // [+] if the questionDescription is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestions) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
+
+			    //check whether user has selected correct answer, taking into account changes done to modifiedQuestion
+			    boolean isAnswerCorrect = false;
+			    McOptsContent selectedOption = userAttempt.getMcOptionsContent();
+			    for (McOptionDTO modifiedOption : modifiedQuestion.getOptionDtos()) {
+				if (selectedOption.getQbOption().getUid().equals(modifiedOption.getQbOptionUid())) {
+				    isAnswerCorrect = "Correct".equals(modifiedOption.getCorrect());
+				}
+			    }
+
+			    //recalculate mark
+			    Integer newActualMark = isAnswerCorrect ? Integer.valueOf(modifiedQuestion.getMark()) : 0;
+			    boolean passed = user.isMarkPassed(newActualMark);
+			    userAttempt.setMark(newActualMark);
+			    userAttempt.setPassed(passed);
+			    userAttempt.setAttemptCorrect(isAnswerCorrect);
+			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+
+			    newTotalMark += newActualMark - oldUserMark;
+
 			    break;
 			}
 		    }
-
-		    // [+] if the questionDescription was removed
-		    for (McQuestionDTO deletedQuestion : deletedQuestions) {
-			if (question.getUid().equals(deletedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
-			    break;
-			}
-		    }
-
-		    if (isRemoveQuestionResult) {
-
-			Integer oldMark = userAttempt.getMark();
-			if (oldMark != null) {
-			    newTotalMark -= oldMark;
-			}
-
-			iter.remove();
-			mcUsrAttemptDAO.removeAttempt(userAttempt);
-		    }
-
-		    // [+] doing nothing if the new questionDescription was added
-
 		}
 
 		// if the mark is changed, update user's lastAttemptTotalMark and also propagade it to the Gradebook
 		if (newTotalMark != oldTotalMark) {
 		    user.setLastAttemptTotalMark(newTotalMark);
 		    updateMcQueUsr(user);
-		    toolService.updateActivityMark(new Double(newTotalMark), null, user.getQueUsrId().intValue(),
+		    toolService.updateActivityMark(Double.valueOf(newTotalMark), null, user.getQueUsrId().intValue(),
 			    toolSessionId, false);
 		}
 
@@ -1606,11 +1610,13 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
 	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
 		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
-	    Long userId = userAttempt.getMcQueUsr().getQueUsrId();
+	    McQueUsr user = userAttempt.getMcQueUsr();
 
 	    //fill in question and option uids
 	    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
-	    confidenceLevelDto.setUserId(userId.intValue());
+	    confidenceLevelDto.setUserId(user.getQueUsrId().intValue());
+	    String userName = StringUtils.isBlank(user.getFullname()) ? user.getUsername() : user.getFullname();
+	    confidenceLevelDto.setUserName(userName);
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
 	    QbQuestion qbQuestion = userAttempt.getMcQueContent().getQbQuestion();

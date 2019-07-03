@@ -41,13 +41,12 @@
 }
 
 #page-content-wrapper {
-    width:100%;
-    position:absolute;
+    min-width: 100%;
+    width: 1px;
     padding: 10px 20px;
 }
 
 #wrapper.toggled #page-content-wrapper {
-    position: absolute;
     margin-right:-154px;
 }
 
@@ -173,19 +172,13 @@ table.tablesorter {
         width: 0;
     }
 
-    #page-content-wrapper {
-        position: relative;
-    }
-
     #wrapper.toggled #page-content-wrapper {
-        position: relative;
         margin-right: 0;
     }
    
    .top-nav div {
 	    padding-top: 20px;
 	}
-
 }
 
 @media (max-width: 500px) {

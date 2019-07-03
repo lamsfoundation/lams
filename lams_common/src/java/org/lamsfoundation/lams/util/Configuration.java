@@ -91,7 +91,7 @@ public class Configuration implements InitializingBean {
     public static boolean getAsBoolean(String key) {
 	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
 	    if (Configuration.getItemValue(Configuration.items.get(key)) != null) {
-		return new Boolean(Configuration.getItemValue(Configuration.items.get(key))).booleanValue();
+		return Boolean.valueOf(Configuration.getItemValue(Configuration.items.get(key)));
 	    }
 	}
 	return false;
@@ -101,7 +101,7 @@ public class Configuration implements InitializingBean {
 	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
 	    // could throw NumberFormatException which is a RuntimeException
 	    if (Configuration.getItemValue(Configuration.items.get(key)) != null) {
-		return new Integer(Configuration.getItemValue(Configuration.items.get(key))).intValue();
+		return Integer.valueOf(Configuration.getItemValue(Configuration.items.get(key)));
 	    }
 	}
 	return -1;
@@ -201,6 +201,8 @@ public class Configuration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
+	// it should be wrapped in HibernateSessionManager.openSession() and closeSession(),
+	// but ConfigurationDAO.getAllItems() does session closing anyway - see LDEV-4801
 	Configuration.refreshCache();
 
 	new Thread("LAMSConfigurationServerStateCheckThread") {
@@ -262,7 +264,7 @@ public class Configuration implements InitializingBean {
      */
     public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems(int filter) {
 	List<ConfigurationItem> originalList = Configuration.getAllItems();
-	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<String, ArrayList<ConfigurationItem>>();
+	HashMap<String, ArrayList<ConfigurationItem>> groupedList = new HashMap<>();
 
 	for (int i = 0; i < originalList.size(); i++) {
 	    ConfigurationItem item = originalList.get(i);
@@ -300,10 +302,8 @@ public class Configuration implements InitializingBean {
     }
 
     public ConfigurationItem getConfigItemByKey(String key) {
-	if ((Configuration.items != null) && (Configuration.items.get(key) != null)) {
-	    if (Configuration.items.get(key) != null) {
-		return Configuration.items.get(key);
-	    }
+	if (Configuration.items != null) {
+	    return Configuration.items.get(key);
 	}
 	return null;
     }

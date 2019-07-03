@@ -39,7 +39,7 @@ type:"text",label:b.alt,setup:function(a){this.setValue(a.data.alt)},commit:func
         
     	//remove obsolete classes
         for (var oldClass in oldClasses) {
-            if (oldClasses.hasOwnProperty(oldClass) && !userEnteredClasses.includes(oldClass)) {
+            if (oldClasses.hasOwnProperty(oldClass) && (userEnteredClasses.indexOf(oldClass) == -1)) {
             	widget.removeClass(oldClass);
             }
         }

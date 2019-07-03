@@ -1,4 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
+<style>
+	#barChart {
+		width: 515px !important; 
+		height: 240px !important;
+	}
+</style>
 
 <!-- ChartJS. Colour used is brand-primary for purple skin. -->
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs.js"></script>
@@ -115,7 +121,7 @@
 			</div>
 			
 			<div class="panel-body">
-				<canvas id="barChart" height="240" width="515" style="width: 515px; height: 240px;"></canvas>
+				<canvas id="barChart" height="240" width="515"></canvas>
 			</div>
 		</div>  
 	</div>

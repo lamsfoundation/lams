@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.scilab.forge.jlatexmath">
   <resources>
-    <resource-root path="jlatexmath-1.0.6.jar"/>
+    <resource-root path="jlatexmath-1.0.8.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api" />

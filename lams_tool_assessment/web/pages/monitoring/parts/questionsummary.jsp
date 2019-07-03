@@ -11,12 +11,10 @@
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<link type="text/css" href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet">	
 		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
   	    <script>
@@ -28,6 +26,7 @@
 	  				jQuery("#session${sessionDto.sessionId}").jqGrid({
 	  					datatype: "json",
 	  					url: "<c:url value="/monitoring/getUsersByQuestion.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}&questionUid=${questionDto.uid}",
+	  					autoencode:false,
 	  					height: 'auto',
 	  					autowidth: true,
 	  					shrinkToFit: false,
@@ -35,9 +34,11 @@
 	  				  	rowList:[10,20,30,40,50,100],
 	  				    rowNum:10,
 	  				    viewrecords:true,
+	  					guiStyle: "bootstrap",
+	  					iconSet: 'fontAwesome',
 	  				   	colNames:[
 		  				   	'questionResultUid',
-	  				   	    	'maxMark',
+	  				   	    'maxMark',
 	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
 	  		  			    "<fmt:message key="label.monitoring.user.summary.grade" />",
 		  			   		<c:if test="${assessment.enableConfidenceLevels}">
@@ -94,17 +95,7 @@
 	  					},
   						loadComplete: function () {
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
-  					    	}
-  						/*  resetSelection() doesn't work in this version
-						    hope it'll be fixed in the next one
-						    
-	  					,
-	  					onSelectRow: function (rowid){
-	  						$("[id^='user']").resetSelection();
-	  					},
-	  					onCellSelect: function (rowid, iCol, cellcontent){
-	  						jQuery("#session${sessionDto.sessionId}}").resetSelection();
-	  					}*/ 	  				  	
+  					    }	  				  	
 	  				})
 	  				<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
 		  				.jqGrid('filterToolbar', { 
@@ -206,8 +197,8 @@
 				</div>	
 			</c:forEach>
 			
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-primary btn-sm voffset10 pull-right">
-				<fmt:message key="label.monitoring.question.summary.ok" /> 
+			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
+				<fmt:message key="label.close" /> 
 			</a>
 
 		</div>

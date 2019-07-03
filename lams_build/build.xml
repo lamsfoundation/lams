@@ -410,7 +410,21 @@
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
 			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
+			<fileset dir="lib/batik">
+				<include name="batik-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
+			file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/compress/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="commons-compress-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/compress/main/module.xml"
+			  file="lib/apache-poi/compress.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/imsglobal/main" overwrite="true" verbose="true">
 			<fileset dir="lib/basiclti-util">

@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
+
 <style>
 	#itemList .panel-heading.panel-title {
 		overflow:hidden;
@@ -44,10 +46,11 @@
 <div id="itemArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
-  
-<p>
-	<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
-		class="btn btn-default btn-sm thickbox"> 
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
-	</a>
-</p>
+<c:if test="${!isAuthoringRestricted}">
+	<p>
+		<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
+			class="btn btn-default btn-sm thickbox"> 
+			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
+		</a>
+	</p>
+</c:if>

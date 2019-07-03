@@ -29,22 +29,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html xhtml="true">
 
 <lams:head>
-
-	<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
-	
-	<title><c:out value="${title}" /></title>
-	<lams:css />
 	<META HTTP-EQUIV="Refresh"
 		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
+
+	<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
+	<title><c:out value="${title}" /></title>
+	
+	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
-		
-		
 </lams:head>
 
 <body class="stripes">
-
-
 	<lams:Page type="learner" title="${title}">
 
 		<%@ include file="gateDescription.jsp"%>
@@ -56,10 +52,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</fmt:message>
 		</lams:Alert>
 
-
-<div class="voffset5">
-	<fmt:message key="label.synch.gate.message" />
-</div>
+		<div class="voffset5">
+			<fmt:message key="label.synch.gate.message" />
+		</div>
 
 		<%@ include file="../gate/gateNext.jsp"%>
 

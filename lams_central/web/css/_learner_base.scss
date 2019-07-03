@@ -118,6 +118,10 @@ a:focus {
 	background-color: $brand-primary-light;
 }
 
+// override the bootstrap 3.3.7 setting
+label {
+    font-weight: initial;
+}
 
 /* Spacer classes */
 
@@ -577,6 +581,10 @@ a.button-add-item:before {
 	font-size: $font-size-small;
 	line-height:1.42857143;
 	padding: 2px;
+}
+
+.rating-criteria-tag .ui-button-icon-only .ui-icon {
+    margin-left: 0px;
 }
 
 #criterias-table {
@@ -1238,4 +1246,16 @@ $portrait-size-image-xl: 400px;
 
 #fullPageContentDiv:fullscreen #mainDiv {
   @include mainDivDefn;
+}
+    
+/* jqGrid text wrapping */
+.ui-jqgrid tr.jqgrow td, .ui-jqgrid tr.ui-subgrid td {
+	white-space:normal !important;
+   	height:auto;
+}
+/* jqGrid text wrapping, that has no blanks or other white-space (https://stackoverflow.com/a/6915486) */
+.ui-jqgrid tr.jqgrow td, .ui-jqgrid tr.ui-subgrid td {
+	word-wrap: break-word; /* IE 5.5+ and CSS3 */
+    overflow: hidden;
+    vertical-align: middle;
 }

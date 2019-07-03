@@ -96,7 +96,7 @@ table.table-row-spacing {
 	margin-top: -10px;
 }
 
-// countdown growl
+/*----------countdown growl----------------*/
 .jGrowl {
   	font-size: 22px;
   	font-family: $font-family-base;
@@ -113,3 +113,11 @@ table.table-row-spacing {
 	padding-left: 10px;
 	padding-top: 5px;
 }
+
+/*----------SORTABLE----------------*/
+.sortable-chosen {
+  background-color: #fff; 
+}
+.sortable-placeholder {
+  background-color: rgba(241, 241, 241, 0.7); 
+ }

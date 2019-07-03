@@ -16,8 +16,8 @@
         <FIELD NAME="lesson_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="sequence_id" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="lesson_id" NEXT="completionfinish"/>
         <FIELD NAME="completionfinish" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then the activity will be automatically marked as 'complete' once the user finishes a lesson." PREVIOUS="timemodified" NEXT="displaydesign"/>
-        <FIELD NAME="displaydesign" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then display the design image as PNG/SVG" PREVIOUS="completionfinish" NEXT="allowLearnerRestart"/>
-        <FIELD NAME="allowLearnerRestart" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then learner can restart the lesson" PREVIOUS="displaydesign"/>
+        <FIELD NAME="displaydesign" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then display the design image as PNG/SVG" PREVIOUS="completionfinish" NEXT="allowlearnerrestart"/>
+        <FIELD NAME="allowlearnerrestart" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="If this field is set to 1, then learner can restart the lesson" PREVIOUS="displaydesign"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary_lamslesson" TYPE="primary" FIELDS="id" COMMENT="Primary key for lamslesson"/>

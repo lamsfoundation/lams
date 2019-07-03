@@ -71,7 +71,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -91,9 +90,6 @@ public class McLearningController {
     @Autowired
     @Qualifier("lamcMessageService")
     private static MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("/displayMc")
     public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,

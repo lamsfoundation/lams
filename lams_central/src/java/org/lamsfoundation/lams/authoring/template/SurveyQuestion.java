@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.authoring.template;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -83,21 +82,17 @@ public class SurveyQuestion {
 		.put("required", required).set(RestTags.ANSWERS, JsonUtil.readArray(answers.values()));
     }
 
-    /** If no errors exist, returns null */
-    public List<String> validate(ResourceBundle appBundle, MessageFormat formatter, Integer questionNumber) {
-	List<String> errorMessages = null;
+    public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter, Integer questionNumber) {
+	boolean errorsExist = false;
 	if (questionText == null || questionText.length() == 0) {
-	    errorMessages = new ArrayList<String>();
-	    errorMessages
-		    .add(TextUtil.getText(appBundle, formatter, "error.question.num", new Object[] { questionNumber }));
+	    errorMessages.add(TextUtil.getText(appBundle, formatter, "error.question.num", new Object[] { questionNumber }));
+	    errorsExist = true;
 	}
 	if (answers.size() == 0) {
-	    if (errorMessages == null) {
-		errorMessages = new ArrayList<String>();
-	    }
 	    errorMessages.add(TextUtil.getText(appBundle, formatter, "error.question.must.have.answer.num",
 		    new Object[] { questionNumber }));
+	    errorsExist = true;
 	}
-	return errorMessages;
+	return errorsExist;
     }
 }

@@ -38,8 +38,10 @@
   	    	<span class="panel-title  collapsable-icon-left">
   	    	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionUid}" 
 				aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionUid}" >
-		<c:out value="${sessionDto.sessionName}"/></a>
-		</span>  ${buttonbar}
+				<c:out value="${sessionDto.sessionName}"/>
+			</a>
+			</span>  
+			${buttonbar}
        </div>
        
        <div id="collapse${sessionUid}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionUid}">
@@ -61,9 +63,9 @@
 						
 				<td  valign=top class="align-left">				  	 		
 					<c:set var="viewVotesURL">
-					<lams:WebAppURL/>monitoring.do?dispatch=getVoteNomination&questionUid=${questionUid}&sessionUid=${sessionUid}
+						<lams:WebAppURL/>monitoring/getVoteNomination.do?questionUid=${questionUid}&sessionUid=${sessionUid}
 					</c:set>
-					<a href="javascript:launchInstructionsPopup('<c:out value='${viewVotesURL}' escapeXml='false'/>')">
+					<a href="javascript:launchInstructionsPopup('${viewVotesURL}')">
 						<c:out value="${currentNomination.numberOfVotes}"/>  
 					</a>
 					&nbsp;(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentNomination.percentageOfVotes}" /><fmt:message key="label.percent"/>) 
@@ -79,9 +81,9 @@
 						
 				<td  valign=top class="align-left">				  	 		
 					<c:set var="viewVotesURL">
-					<lams:WebAppURL/>monitoring/OtherTextNominationViewer.jsp?&toolContentUID=${toolContentID}&sessionUid=${sessionUid}
+						<lams:WebAppURL/>monitoring/OtherTextNominationViewer.jsp?&toolContentUID=${toolContentID}&sessionUid=${sessionUid}
 					</c:set>
-					<a href="javascript:launchInstructionsPopup('<c:out value='${viewVotesURL}' escapeXml='false'/>')">
+					<a href="javascript:launchInstructionsPopup('${viewVotesURL}')">
 						<c:out value="${sessionDto.openTextNumberOfVotes}"/>  
 					</a>
 					&nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${sessionDto.openTextPercentageOfVotes}" />  <fmt:message key="label.percent"/>) 

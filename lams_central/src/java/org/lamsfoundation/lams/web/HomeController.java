@@ -48,6 +48,8 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonDTOComparator;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -94,7 +96,9 @@ public class HomeController {
     @Autowired
     private ISecurityService securityService;
     @Autowired
-    WebApplicationContext applicationcontext;
+    private WebApplicationContext applicationcontext;
+    @Autowired
+    private ILogEventService logEventService;
 
     /**
      * request for sysadmin environment
@@ -191,8 +195,7 @@ public class HomeController {
 	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	    applicationcontext.getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/welcome.jsp?lessonID=" + lessonId).forward(req, res);
+	    res.sendRedirect(serverURLContextPath + "learning/welcome.jsp?lessonID=" + lessonId);
 	    return null;
 
 	} catch (Exception e) {
@@ -293,7 +296,7 @@ public class HomeController {
 	// find lessons which can be set as preceding ones for newly created lesson
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
 	Set<LessonDTO> availableLessons = new TreeSet<>(new LessonDTOComparator());
-	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
+	for (Lesson availableLesson : organisation.getLessons()) {
 	    Integer availableLessonState = availableLesson.getLessonStateId();
 	    if (!Lesson.REMOVED_STATE.equals(availableLessonState)
 		    && !Lesson.FINISHED_STATE.equals(availableLessonState)) {
@@ -355,8 +358,17 @@ public class HomeController {
 
     @RequestMapping("/logout")
     public String logout(HttpServletRequest req) throws IOException, ServletException {
+	UserDTO userDTO = getUser();
 
 	req.getSession().invalidate();
+
+	if (userDTO != null) {
+	    String message = new StringBuilder("User ").append(userDTO.getLogin()).append(" (")
+		    .append(userDTO.getUserID()).append(") logged out manually").toString();
+	    logEventService.logEvent(LogEvent.TYPE_LOGOUT, userDTO.getUserID(), userDTO.getUserID(), null, null,
+		    message);
+	}
+
 	return "redirect:/index.do";
     }
 
@@ -372,5 +384,5 @@ public class HomeController {
 
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
-    } 
+    }
 }

@@ -10,10 +10,14 @@
 		<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/thickbox.css" rel="stylesheet" rel="stylesheet" type="text/css">
-		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css">		
+		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css" >
  		<lams:css suffix="chart"/>
  		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
- 		<link href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet" type="text/css">	
+ 		<style>
+ 		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
+			background-color: #f5f5f5;
+ 		}
+ 		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		<script>
@@ -34,8 +38,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
- 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>

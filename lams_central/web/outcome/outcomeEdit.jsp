@@ -21,16 +21,14 @@
 		<c:if test="${saved}">
 			var outcomesFrame = $('#dialogOutcome iframe', window.parent.document);
 			if (outcomesFrame.length == 0) {
-				window.parent.document.location.href = 
-					'<lams:LAMSURL/>outcome/outcomeManage.do${empty param.organisationID ? "" : "?organisationID=param.organisationID"}';
+				window.parent.document.location.href = '<lams:LAMSURL/>outcome/outcomeManage.do';
 			} else {
 				outcomesFrame.attr('src', outcomesFrame.attr('src'));
 				$('#dialogOutcomeEdit', window.parent.document).remove();
 			}
 		</c:if>
 		
-		var organisationId = '${param.organisationID}',
-			LAMS_URL = '<lams:LAMSURL/>',
+		var LAMS_URL = '<lams:LAMSURL/>',
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="outcome.manage.add" var="ADD_OUTCOME_TITLE_VAR"/>
@@ -40,20 +38,14 @@
 				<fmt:message key="outcome.manage.remove.confirm" var="REMOVE_OUTCOME_CONFIRM_LABEL_VAR"/>
 				REMOVE_OUTCOME_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_OUTCOME_CONFIRM_LABEL_VAR}" />').text(),
 				<fmt:message key="scale.title" var="OUTCOME_MANAGE_SCALE_TITLE_VAR"/>
-				OUTCOME_SCALE_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_SCALE_TITLE_VAR}" />',
-				<fmt:message key="scale.manage.title" var="OUTCOME_SCALE_COURSE_MANAGE_TITLE_VAR"/>
-				OUTCOME_SCALE_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_SCALE_COURSE_MANAGE_TITLE_VAR}" />'
+				OUTCOME_SCALE_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_SCALE_TITLE_VAR}" />'
 			};
 	</script>
 </lams:head>
 <body>
 
 <form:form action="outcomeSave.do" method="post" modelAttribute="outcomeForm">
-	<c:set var="formDisabled" value="${not empty outcomeForm.outcomeId and empty outcomeForm.organisationId and not canManageGlobal}" />
-
 	<form:hidden path="outcomeId" />
-	<form:hidden path="organisationId" />
-	<form:hidden path="contentFolderId" />
 	
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -66,28 +58,17 @@
 						
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.name" />:
-								<form:input path="name" size="50" maxlength="255" cssClass="form-control" disabled="${formDisabled}" />
+								<form:input path="name" size="50" maxlength="255" cssClass="form-control" />
 							</label>
 						</div>
 						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.code" />:
-								<form:input path="code" size="50" maxlength="50" cssClass="form-control" disabled="${formDisabled}" />
+								<form:input path="code" size="50" maxlength="50" cssClass="form-control" />
 							</label>
 						</div>
 						<div class="form-group">
-							<fmt:message key="outcome.manage.scope" />:
-							<c:choose>
-								<c:when test="${empty outcomeForm.organisationId}">
-									<fmt:message key="outcome.manage.scope.global" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="outcome.manage.scope.course" />
-								</c:otherwise>
-							</c:choose>
-						</div>
-						<div class="form-group">
 							<label><fmt:message key="outcome.manage.add.scale" />:
-								<form:select path="scaleId"  cssClass="form-control" disabled="${formDisabled}">
+								<form:select path="scaleId"  cssClass="form-control">
 									<c:forEach items="${scales}" var="scale">
 										<form:option value="${scale.scaleId}">
 											<c:out value="${scale.name}" /> (<c:out value="${scale.code}" />)
@@ -101,25 +82,15 @@
 						</div>
 						<div class="form-group">
 							<fmt:message key="outcome.manage.add.description" />:
-							<c:choose>
-								<c:when test="${formDisabled}">
-									<br />
-									<c:out value="${outcomeForm.description}" />
-								</c:when>
-								<c:otherwise>
-									 <lams:CKEditor id="description" value="${outcomeForm.description}" contentFolderID="${outcomeForm.contentFolderId}"></lams:CKEditor>
-								</c:otherwise>
-							</c:choose>
+							<lams:CKEditor id="description" value="${outcomeForm.description}" contentFolderID="${outcomeForm.contentFolderId}"></lams:CKEditor>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<c:if test="${not formDisabled}">
-			<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
-				<fmt:message key="outcome.manage.add.save" />
-			</button>
-		</c:if>
+		<button id="addButton" type="submit" class="btn btn-primary" onClick="javascript:submitOutcome()">
+			<fmt:message key="outcome.manage.add.save" />
+		</button>
 	</div>
 </form:form>
 </body>

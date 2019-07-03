@@ -47,9 +47,12 @@
 		},
 		// keep mapped outcome IDs for search result filtering
 		outcomeMappingIds${outcomeTagId} = [],
+		outcomeAddEnabled = true,
 		
 		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
-		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>';
+		outcomeCreateNewLabel = '<fmt:message key="outcome.authoring.create.new" />',
+		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>',
+		outcomeMappingRemoveConfirm = '<fmt:message key="outcome.authoring.remove.confirm" />';
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
@@ -58,11 +61,30 @@
 			'minLength' : 2,
 			'response' : function(event, ui) {
 				// filter out already mapped outcomes
-				var index = ui.content.length;
+				var index = ui.content.length - 1,
+					// if result is empty, term and outcome add enabled come as objects (label, value)
+					// if there are results, they come as simple values
+					outcomeAddEnabled = ui.content[index] instanceof Object ? ui.content[index].label : ui.content[index],
+					// convert to boolean
+					outcomeAddEnabled = outcomeAddEnabled == 'true',
+					term = ui.content[index - 1] instanceof Object ? ui.content[index - 1].label : ui.content[index - 1],
+					sameNameFound = false;
+				index--;
+				ui.content.splice(index, 2);
 				while(index--) {
+					var label = ui.content[index].label;
+					if (label.split('(')[0].trim() == term) {
+						// do not offer to create an output which perfectly matches an existing one
+						sameNameFound = true;
+					}
 					if (outcomeMappingIds${outcomeTagId}.includes(ui.content[index].value)){
 						ui.content.splice(index, 1);
 					}
+				}
+				if (outcomeAddEnabled && !sameNameFound) {
+					ui.content.push({
+						'label' : term + ' ' + outcomeCreateNewLabel
+					});
 				}
 			},
 			'select' : function(event, ui){
@@ -70,7 +92,9 @@
 				$.ajax({
 					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do',
 					'data': $.extend({
-						'outcomeId' : ui.item.value
+						'outcomeId' : ui.item.value,
+						// if value is null, then it is a new outcome to create; remove ' [create new]' part before sending
+						'name'		: ui.item.value ? null : ui.item.label.replace(outcomeCreateNewLabel, '')
 					}, outcomeData${outcomeTagId}),
 					'method' : 'post',
 					'cache' : false,
@@ -110,10 +134,12 @@
 						// cache already mapped outcomes
 						outcomeMappingIds${outcomeTagId}.push(this.outcomeId);
 						// add a label with outcome information
-						var outcomeButton = $('<button type="button" class="roffset10 btn btn-primary outcomeButton" />').attr('mappingId', this.mappingId)
+						var outcomeButton = $('<button type="button" class="roffset10 btn btn-xs btn-info outcomeButton" />').attr('mappingId', this.mappingId)
 												.html(this.label + outcomeMappingRemoveButton).appendTo(mappingDiv);
 						outcomeButton.click(function(){
-							removeOutcomeMapping(this);
+							if (confirm(outcomeMappingRemoveConfirm)) {
+								removeOutcomeMapping(this);
+							}
 						});
 					});
 				}

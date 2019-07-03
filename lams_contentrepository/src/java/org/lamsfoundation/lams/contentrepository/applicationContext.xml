@@ -27,7 +27,7 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="login">PROPAGATION_SUPPORTS,readOnly</prop>
+				<prop key="login">PROPAGATION_REQUIRED</prop>
 				<prop key="addWorkspace">PROPAGATION_REQUIRED</prop>
 				<prop key="createCredentials">PROPAGATION_REQUIRED</prop>
 				<prop key="assignCredentials">PROPAGATION_REQUIRED</prop>
@@ -42,10 +42,10 @@
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="logout">PROPAGATION_SUPPORTS</prop>
 				<prop key="setProperty">PROPAGATION_SUPPORTS</prop>
-				<!--  Read only methods -->
-				<prop key="getFileItem">PROPAGATION_REQUIRED,readOnly</prop>
-				<prop key="getVersionHistory">PROPAGATION_REQUIRED,readOnly</prop>
-				<prop key="getNodeList">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="getFileItem">PROPAGATION_REQUIRED</prop>
+				<prop key="getVersionHistory">PROPAGATION_REQUIRED</prop>
+				<prop key="getNodeList">PROPAGATION_REQUIRED</prop>
+				<prop key="workspaceExists">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 		<property name="preInterceptors">

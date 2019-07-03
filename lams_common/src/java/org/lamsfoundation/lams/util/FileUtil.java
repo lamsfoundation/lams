@@ -874,6 +874,7 @@ public class FileUtil {
 	    client.ping();
 	    // try scanning
 	    ScanResult result = client.scan(inputStream);
+	    inputStream.close();
 	    if (result instanceof ScanResult.OK) {
 		if (log.isDebugEnabled()) {
 		    log.debug("File scan completed successfully");

@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
 @Entity
@@ -28,10 +27,6 @@ public class Outcome implements Serializable {
     private Long outcomeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organisation_id")
-    private Organisation organisation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scale_id")
     private OutcomeScale scale;
 
@@ -43,9 +38,6 @@ public class Outcome implements Serializable {
 
     @Column
     private String description;
-
-    @Column(name = "content_folder_id")
-    private String contentFolderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
@@ -60,14 +52,6 @@ public class Outcome implements Serializable {
 
     public void setOutcomeId(Long outcomeId) {
 	this.outcomeId = outcomeId;
-    }
-
-    public Organisation getOrganisation() {
-	return organisation;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-	this.organisation = organisation;
     }
 
     public OutcomeScale getScale() {
@@ -116,13 +100,5 @@ public class Outcome implements Serializable {
 
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
-    }
-
-    public String getContentFolderId() {
-	return contentFolderId;
-    }
-
-    public void setContentFolderId(String contentFolderId) {
-	this.contentFolderId = contentFolderId;
     }
 }

@@ -8,12 +8,10 @@
 		<%@ include file="/common/header.jsp"%>		
 		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<link type="text/css" href="<lams:WebAppURL/>includes/css/monitoring.css" rel="stylesheet">	
 
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
   	    <script>
 	    	var isEdited = false;
@@ -24,11 +22,13 @@
 	  			
 	  				jQuery("#user${question.uid}").jqGrid({
 	  					datatype: "local",
+	  					autoencode:false,
 	  					rowNum: 10000,
 	  					height: 'auto',
 	  					autowidth: true,
 	  					shrinkToFit: false,
-	  					
+	  					guiStyle: "bootstrap",
+	  					iconSet: 'fontAwesome',
 	  				   	colNames:[
 		  				   	"<fmt:message key="label.monitoring.user.summary.attempt" />",
 	  						'questionResultUid',
@@ -38,8 +38,7 @@
 	  							"<fmt:message key="label.confidence" />",
 	  						</c:if>
 	  						"<fmt:message key="label.monitoring.user.summary.grade" />"
-	  					],
-	  						    
+	  					],  
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:52, sorttype:"int"},
 	  				   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
@@ -50,7 +49,6 @@
 			  			  	</c:if>
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],
-	  				   	
 	  				   	multiselect: false,
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
@@ -85,17 +83,7 @@
 	  							var questionResultUid = jQuery("#user${question.uid}").getCell(rowid, 'questionResultUid');
 	  							return {questionResultUid:questionResultUid};		  				  		
 	  				  		}
-	  					}
-  						/*  resetSelection() doesn't work in this version
-						    hope it'll be fixed in the next one
-						    
-	  					,
-	  					onSelectRow: function (rowid){
-	  						$("[id^='user']").resetSelection();
-	  					},
-	  					onCellSelect: function (rowid, iCol, cellcontent){
-	  						jQuery("#user${question.uid+1}").resetSelection();
-	  					}*/ 	  				  	
+	  					}  				  	
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
@@ -228,7 +216,7 @@
 			</c:forEach>
 
 			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset20 pull-right">
-				<fmt:message key="label.monitoring.user.summary.ok" /> 
+				<fmt:message key="label.close" /> 
 			</a>
 
 		</div>

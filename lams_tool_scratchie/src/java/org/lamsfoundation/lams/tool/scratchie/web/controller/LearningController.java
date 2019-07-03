@@ -555,7 +555,7 @@ public class LearningController {
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
-
+ 
 	scratchieService.removeLike(burningQuestionUid, sessionId);
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();

@@ -239,7 +239,7 @@ public class GradebookService implements IGradebookFullService {
 		.debug("Getting archive gradebook user data for activity: " + activityId + ". For user: " + userId);
 
 	Activity activity = getActivityById(activityId);
-	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	Lesson lesson = activity.getLearningDesign().getLessons().iterator().next();
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<>();
 	List<GradebookUserLessonArchive> lessonArchives = gradebookDAO.getArchivedLessonMarks(lesson.getLessonId(),
@@ -450,7 +450,7 @@ public class GradebookService implements IGradebookFullService {
 	    Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap;
 	    //size will be 0 in case of excel export
 	    if (size == 0) {
-		learners = new LinkedList<User>(lesson.getAllLearners());
+		learners = new LinkedList<>(lesson.getAllLearners());
 		Collections.sort(learners, new LastNameAlphabeticComparator());
 
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
@@ -933,17 +933,20 @@ public class GradebookService implements IGradebookFullService {
     }
 
     @Override
-    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
-	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone) {
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer,
+	    boolean isGroupManager, GBGridView view, int page, int size, String sortBy, String sortOrder,
+	    String searchString, TimeZone userTimeZone) {
 	List<GBLessonGridRowDTO> lessonRows = new ArrayList<>();
 	Integer userId = user.getUserId();
 	Integer orgId = organisation.getOrganisationId();
 
 	if (organisation != null) {
 
-	    List<Lesson> lessons = (view == GBGridView.MON_COURSE || view == GBGridView.LIST)
-		    ? gradebookDAO.getLessonsByGroupAndUser(userId, orgId, page, size, sortBy, sortOrder, searchString)
-		    : lessonService.getLessonsByGroupAndUser(userId, orgId);
+	    List<Lesson> lessons = (view == GBGridView.MON_COURSE || view == GBGridView.LIST
+		    || view == GBGridView.MON_USER)
+			    ? gradebookDAO.getLessonsByGroupAndUser(isGroupManager ? null : viewer.getUserId(), true,
+				    orgId, page, size, sortBy, sortOrder, searchString)
+			    : lessonService.getLessonsByGroupAndUser(userId, orgId);
 
 	    if (lessons != null) {
 
@@ -1440,8 +1443,8 @@ public class GradebookService implements IGradebookFullService {
 			Date finishDate = getActivityFinishDate(learnerProgress, activity, null);
 			activityDataRow[2] = new ExcelCell(finishDate == null ? ""
 				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate), false);
-			activityDataRow[3] = new ExcelCell(getActivityDuration(learnerProgress, activity) / 1000,
-				false);
+			Long duration = getActivityDuration(learnerProgress, activity);
+			activityDataRow[3] = new ExcelCell(duration == null ? "" : duration / 1000, false);
 			activityDataRow[4] = new ExcelCell(activityArchive == null ? "" : activityArchive.getMark(),
 				false);
 
@@ -1999,7 +2002,7 @@ public class GradebookService implements IGradebookFullService {
 	// set mark to null so lesson mark recalculates correctly
 	Double oldActivityMark = gradebookUserActivity.getMark();
 	gradebookUserActivity.setMark(null);
-	Lesson lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+	Lesson lesson = activity.getLearningDesign().getLessons().iterator().next();
 	boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
 	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lesson.getLessonId(),
 		gradebookUserActivity.getLearner().getUserId());
@@ -2132,7 +2135,7 @@ public class GradebookService implements IGradebookFullService {
 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
 		processLearnerActivity(childUrl, toolActivities, false);
 	    }
-	} else if (activity instanceof OptionsActivity) {
+	} else if (activity instanceof OptionsActivity || activity instanceof SequenceActivity) {
 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
 		processLearnerActivity(childUrl, toolActivities, true);
 	    }

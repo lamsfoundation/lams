@@ -21,9 +21,12 @@
 		jQuery("#group${toolSessionId}").jqGrid({
 		   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}",
 			datatype: "json",
+			autoencode: false,
 			height: 'auto',
 			autowidth: true,
 			shrinkToFit: false,
+			guiStyle: "bootstrap",
+			iconSet: 'fontAwesome',
 		   	colNames:[
 				'itemId',
 				'<fmt:message key="label.user.name" />',
@@ -69,13 +72,8 @@
 							groupField : ['criteriaId'],
 							groupColumnShow : [false]
 						},
-						loadComplete: function(){
-							//remove empty subgrids
-					        var table_value = $('#'+subgridTableId).getGridParam('records');
-					        if(table_value === 0){
-					            $('#'+subgrid_id).parent().unbind('click').html('<fmt:message key="label.no.ratings.left" />');
-					        }
-						},
+						guiStyle: "bootstrap",
+						iconSet: 'fontAwesome',
 						colNames:[
 							'id',
 							'<fmt:message key="label.user.name" />',
@@ -88,6 +86,13 @@
 						   {name:'rating', index:'rating', width:200, align:"center",  title:false},
 						   {name:'criteriaId', width:0, hidden:true}
 						],
+						loadComplete: function(){
+							//remove empty subgrids
+					        var table_value = $('#'+subgridTableId).getGridParam('records');
+					        if(table_value === 0){
+					            $('#'+subgrid_id).parent().unbind('click').html('<fmt:message key="label.no.ratings.left" />');
+					        }
+						},
 						loadError: function(xhr,st,err) {
 					    	jQuery("#"+subgridTableId).clearGridData();
 					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");

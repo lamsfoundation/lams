@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.outcome.dao.hibernate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
@@ -35,61 +34,35 @@ import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 
-    private static final String FIND_CONTENT_FOLDER_ID_BY_ORGANISATION = "SELECT * FROM (SELECT content_folder_id FROM lams_outcome WHERE organisation_id ? "
-	    + "UNION SELECT content_folder_id FROM lams_outcome_scale WHERE organisation_id ?) AS a WHERE content_folder_id IS NOT NULL LIMIT 1";
+    private static final String FIND_OUTCOMES_SORTED_BY_NAME = "FROM Outcome o ? ORDER BY o.name, o.code";
 
-    private static final String FIND_OUTCOMES_SORTED_BY_NAME = "FROM Outcome o WHERE (o.organisation IS NULL ?) ORDER BY o.name, o.code";
-
-    private static final String FIND_AUTHOR_ORGANISATIONS = "SELECT uor.userOrganisation.organisation.organisationId FROM UserOrganisationRole uor "
-	    + "WHERE uor.userOrganisation.user.userId = ? AND uor.role.roleId = " + Role.ROLE_AUTHOR;
-
-    private static final String FIND_SCALES_SORTED_BY_NAME = "FROM OutcomeScale o WHERE (o.organisation IS NULL ?) ORDER BY o.name, o.code";
-
-    /**
-     * Finds an existing content folder ID for the given organisation outcomes or scales, or for global ones
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public String getContentFolderID(Integer organisationId) {
-	String queryString = FIND_CONTENT_FOLDER_ID_BY_ORGANISATION.replace("?",
-		organisationId == null ? "IS NULL" : "=" + organisationId);
-	Query<String> query = getSession().createSQLQuery(queryString);
-	return query.uniqueResult();
-    }
+    private static final String FIND_SCALES_SORTED_BY_NAME = "FROM OutcomeScale o ORDER BY o.name, o.code";
 
     /**
      * Finds all global outcomes and ones for the given organisation
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<Outcome> getOutcomesSortedByName(Integer organisationId) {
-	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replace("?",
-		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId);
+    public List<Outcome> getOutcomesSortedByName() {
+	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replace("?", "");
 	return find(queryString);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Outcome> getOutcomesSortedByName(String search, Set<Integer> organisationIds) {
+    public List<Outcome> getOutcomesSortedByName(String search) {
 	String queryString = FIND_OUTCOMES_SORTED_BY_NAME;
-	if (organisationIds != null && !organisationIds.isEmpty()) {
-	    queryString = queryString.replace("?", "OR o.organisation.organisationId IN (:organisationIds) ? ");
-	}
 	if (StringUtils.isNotBlank(search)) {
-	    queryString = queryString.replace("?", "AND (o.name LIKE :search OR o.code LIKE :search)");
+	    queryString = queryString.replace("?", "WHERE o.name LIKE :search OR o.code LIKE :search");
 	}
 	queryString = queryString.replace("?", "");
 
 	Query<Outcome> query = getSession().createQuery(queryString);
-	if (organisationIds != null && !organisationIds.isEmpty()) {
-	    query.setParameterList("organisationIds", organisationIds);
-	}
 	if (StringUtils.isNotBlank(search)) {
 	    query.setParameter("search", "%" + search + "%");
 	}
@@ -100,7 +73,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("lessonId", lessonId);
 	}
@@ -118,22 +91,14 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<OutcomeScale> getScalesSortedByName(Integer organisationId) {
-	String queryString = FIND_SCALES_SORTED_BY_NAME.replace("?",
-		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId);
-	return find(queryString);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Integer> getAuthorOrganisations(Integer userId) {
-	return find(FIND_AUTHOR_ORGANISATIONS, new Object[] { userId });
+    public List<OutcomeScale> getScalesSortedByName() {
+	return find(FIND_SCALES_SORTED_BY_NAME);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("mapping.outcome.lessonId", lessonId);
 	}
@@ -152,7 +117,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.userId", userId);
 	properties.put("mapping.mappingId", mappingId);
 	List<OutcomeResult> result = findByProperties(OutcomeResult.class, properties);

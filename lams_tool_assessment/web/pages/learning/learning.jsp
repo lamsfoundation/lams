@@ -36,9 +36,9 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			
 			//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
 			if (${isLeadershipEnabled}) {
 				$(".mark-hedging-select").on('change keydown keypress keyup paste', function() {
@@ -67,6 +67,28 @@
 
 			//initialize bootstrap-sliders if "Enable confidence level" option is ON
 			$('.bootstrap-slider').bootstrapSlider();
+
+			//init options sorting feature
+			if (${hasEditRight}) {
+				$("table.ordering-table tbody").each(function () {
+					new Sortable($(this)[0], {
+					    animation: 150,
+					    ghostClass: 'sortable-placeholder',
+					    direction: 'vertical',
+						store: {
+							set: function (sortable) {
+								//update all sequenceIds in order to later save it as options' order
+								for (var i = 0; i < sortable.el.rows.length; i++) {
+									var tr = sortable.el.rows[i];
+									var input = $("input", $(tr));
+								    input.val(i);
+								}
+							}
+						}			            
+			        });
+			    });
+			}
+			
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
@@ -243,31 +265,6 @@
                 }
 			});
 		}
-
-		function upOption(questionUid, idx){
-			var orderingArea = "#orderingArea" + questionUid;
-			var url = "<c:url value="/learning/upOption.do"/>";
-			$(orderingArea).load(
-					url,
-					{
-						questionUid: questionUid,
-						optionIndex: idx, 
-						sessionMapID: "${sessionMapID}"
-					}
-			);
-		}
-		function downOption(questionUid, idx){
-			var orderingArea = "#orderingArea" + questionUid;
-			var url = "<c:url value="/learning/downOption.do"/>";
-			$(orderingArea).load(
-				url,
-				{
-					questionUid: questionUid,
-					optionIndex: idx, 
-					sessionMapID: "${sessionMapID}"
-				}
-			);		    
-		}		
 		
 		if (${!hasEditRight && mode != "teacher"}) {
 			setInterval("checkLeaderProgress();", 15000);// Auto-Refresh every 15 seconds for non-leaders

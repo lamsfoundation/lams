@@ -54,26 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					shown = true;
 				}
 			}
-	/* 		
-			function applyDate() {
-				var date = $('#scheduleDatetimeField').val();
-				if (date) {
-					$.ajax({
-						url : LAMS_URL + 'monitoring/gate.do',
-						cache : false,
-						data : {
-							'method'        : ??,
-							'openDate' : date
-						},
-						success : function() {
-							refreshMonitor('lesson');
-						}
-					});
-				} else {
-					alert('<fmt:message key="error.lesson.schedule.date"/>');
-				}
-			}
-	 */	</script>
+		</script>
     </lams:head>
     
     <body class="stripes">
@@ -99,7 +80,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</a>
 							<%-- padding keeps the inputs the same height as the buttons. No flicking when shown/hidden --%>
 							<form:input cssClass="input input-sm" path="scheduleDate" id="scheduleDate" style="vertical-align:bottom"/> 
-							<input type="id" id="scheduleDatetimeApply" class="btn btn-primary btn-sm loffset2" value="<fmt:message key="button.apply"/>" />
+							<input type="submit" id="scheduleDatetimeApply" class="btn btn-primary btn-sm loffset2" value="<fmt:message key="button.apply"/>" />
 						</div>
 						</form:form>
 					</c:if>

@@ -361,6 +361,11 @@ div.branchMappingDialog td.branchMappingListCell div {
 	cursor: pointer;
 }
 
+div.branchMappingDialog #branchMappingOrderedRow td {
+	text-align: left;
+	padding-top: 5px;
+}
+
 div#outputConditionsDialogContents div#complexConditions > div {
 	font-weight: bold;
 	margin: 10px 0 0 2px;
@@ -554,12 +559,29 @@ td#canvasContainerCell {
 #rootwizard table.table-condensed {
   margin-bottom: 0px; }
 
-#rootwizard .required:after {
-  content: "*";
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  margin-left: 5px; }
+#rootwizard {
+	.required:after {
+		content: "\f069";
+		font-family: FontAwesome;
+	    font-size: smaller;
+		font-style: normal;
+		font-weight: normal;
+		text-decoration: inherit;
+		margin-left: 5px; 
+		color: $brand-primary;
+  }
+  
+	.panel-title .required {
+		font-weight: 500;
+	}
+
+	.panel-title-button {
+		margin-top: -5px;
+		margin-right: 4px;
+		width: 100px; // Make a similar size to the Add Option question above on the AppEx screen
+		float: right;
+	}
+}
 
 #rootwizard .container {
     margin-right: 4px;
@@ -595,3 +617,24 @@ td#canvasContainerCell {
 #rootwizard .progress-bar {
      background-color: $brand-primary;
 }
+
+#rootwizard {
+	div.space-top {
+		padding-top: 15px;
+	}
+	div.space-sides {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+	div.space-bottom {
+		padding-bottom: 15px;
+	}
+	// Allow panel titles to be edited - show pencil only when hovering
+	span.hoverEdit:hover +span+ i { 
+		visibility: visible;
+	}
+	span.hoverEdit +span+ i { 
+		visibility: hidden;
+	}
+}
+	

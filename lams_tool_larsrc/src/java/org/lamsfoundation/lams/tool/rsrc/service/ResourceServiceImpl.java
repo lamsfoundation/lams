@@ -804,6 +804,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
+
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndContentID(newUserUid.longValue(), toolContentId);
 	    if (user == null) {
 		user = new ResourceUser();

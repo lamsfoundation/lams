@@ -25,10 +25,14 @@ package org.lamsfoundation.lams.admin.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.web.session.SessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Marcin Cieslak
@@ -36,6 +40,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/sessionmaintain")
 public class SessionMaintainController {
+    @Autowired
+    private ILogEventService logEventService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     @RequestMapping(path = "/list")
     public String list(HttpServletRequest request) {
@@ -47,7 +55,13 @@ public class SessionMaintainController {
     public String delete(HttpServletRequest request) {
 	String login = request.getParameter("login");
 	if (StringUtils.isNotBlank(login)) {
+	    User user = userManagementService.getUserByLogin(login);
+
 	    SessionManager.removeSessionByLogin(login, true);
+
+	    String message = new StringBuilder("User ").append(login).append(" (").append(user.getUserId())
+		    .append(") got logged out by sysadmin").toString();
+	    logEventService.logEvent(LogEvent.TYPE_LOGOUT, user.getUserId(), user.getUserId(), null, null, message);
 	}
 	return list(request);
     }

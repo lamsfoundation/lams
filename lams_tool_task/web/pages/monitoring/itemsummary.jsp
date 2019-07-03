@@ -9,22 +9,6 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/monitorheader.jsp"%>
-
-	<style media="screen,projection" type="text/css">
-		 .ui-jqgrid {
-			border-left-style: none !important;
-			border-right-style: none !important;
-			border-bottom-style: none !important;
-		}
-		
-		.ui-jqgrid tr {
-			border-left-style: none !important;
-		}
-		
-		.ui-jqgrid td {
-			border-style: none !important;
-		}
-	</style>
 		
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -33,6 +17,7 @@
 				jQuery("#group${sessionDto.sessionId}").jqGrid({
 					datatype: "json",
 					url: "<c:url value='/monitoring/getPagedUsersByItem.do'/>?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}&itemUid=${item.uid}",
+					autoencode:false,
 					height: 'auto',
 					autowidth: true,
 					shrinkToFit: true,
@@ -41,7 +26,8 @@
 					rowList:[10,20,30,40,50,100],
 					rowNum:10,
 					viewrecords:true,
-				   	caption: "${sessionDto.sessionName}",
+				   	guiStyle: "bootstrap",
+					iconSet: 'fontAwesome',
 				   	colNames:[
 							"<fmt:message key="label.monitoring.tasksummary.user" />",
 							"<fmt:message key="label.monitoring.tasksummary.completed" />",
@@ -95,10 +81,8 @@
 	
 <body class="stripes">
 
-	<c:set var="title"><fmt:message key="label.monitoring.tasksummary.task.summary" /></c:set>
+	<c:set var="title"><c:out value="${item.title}" escapeXml="true"/></c:set>
 	<lams:Page type="admin" title="${title}">
-
-		<h4><c:out value="${item.title}" escapeXml="true"/></h4>
 				
 		<c:if test="${item.required}">
 		<div><em><fmt:message key="label.monitoring.tasksummary.task.required.to.finish" /></em></div>

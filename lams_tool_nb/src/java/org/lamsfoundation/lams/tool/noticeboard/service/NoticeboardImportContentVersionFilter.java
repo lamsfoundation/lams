@@ -40,7 +40,7 @@ public class NoticeboardImportContentVersionFilter extends ToolContentVersionFil
 	this.removeField(NoticeboardContent.class, "nbAttachments");
     }
 
-    public void up20170101To20181202() {
+    public void up20180716To20181202() {
 	this.renameClass("org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent",
 		"org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent");
 	this.renameClass("org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession",

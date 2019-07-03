@@ -50,6 +50,7 @@
       <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
       <module name="io.jsonwebtoken" export="true" />
       <module name="xyz.capybara.clamav-client" export="true" />
+      <module name="org.apache.batik" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,7 +37,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
@@ -46,11 +44,12 @@ import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -90,55 +89,24 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeManage")
     public String outcomeManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
-	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
 
-	if (organisationId == null) {
-	    // check if user is allowed to view and edit global outcomes
-	    if (!securityService.isSysadmin(userId, "manage global outcomes", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    // check if user is allowed to view and edit course outcomes
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "manage course outcomes", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
-	}
-	List<Outcome> outcomes = outcomeService.getOutcomes(organisationId);
+	List<Outcome> outcomes = outcomeService.getOutcomes();
 	request.setAttribute("outcomes", outcomes);
-
-	request.setAttribute("canManageGlobal", userManagementService.isUserSysAdmin());
 	return "outcome/outcomeManage";
     }
 
     @RequestMapping("/outcomeEdit")
     public String outcomeEdit(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
-	Outcome outcome = null;
-	Integer organisationId = null;
-	if (outcomeId == null) {
-	    organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
-	} else {
-	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
-	    if (outcome.getOrganisation() != null) {
-		// get organisation ID from the outcome - the safest way
-		organisationId = outcome.getOrganisation().getOrganisationId();
-	    }
-	}
+	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 
-	if (organisationId != null && !securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		"add/edit course outcome", false)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-	    return null;
-	}
-
-	outcomeForm.setOrganisationId(organisationId);
-	outcomeForm.setContentFolderId(outcomeService.getContentFolderId(organisationId));
+	outcomeForm.setContentFolderId(IOutcomeService.OUTCOME_CONTENT_FOLDER_ID);
 	if (outcome == null) {
 	    outcomeForm.setScaleId(IOutcomeService.DEFAULT_SCALE_ID);
 	} else {
@@ -149,10 +117,9 @@ public class OutcomeController {
 	    outcomeForm.setScaleId(outcome.getScale().getScaleId());
 	}
 
-	List<OutcomeScale> scales = outcomeService.getScales(organisationId);
+	List<OutcomeScale> scales = outcomeService.getScales();
 	request.setAttribute("scales", scales);
 
-	request.setAttribute("canManageGlobal", userManagementService.isUserSysAdmin());
 	return "outcome/outcomeEdit";
     }
 
@@ -162,30 +129,7 @@ public class OutcomeController {
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Long outcomeId = outcomeForm.getOutcomeId();
-	Outcome outcome = null;
-	Integer organisationId = null;
-	if (outcomeId == null) {
-	    organisationId = outcomeForm.getOrganisationId();
-	} else {
-	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
-	    if (outcome.getOrganisation() != null) {
-		// get organisation ID from the outcome - the safest way
-		organisationId = outcome.getOrganisation().getOrganisationId();
-	    }
-	}
-
-	if (organisationId == null) {
-	    if (!securityService.isSysadmin(userId, "persist global outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "persist course outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
-	}
+	Outcome outcome = outcomeId == null ? null : (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	validateOutcomeForm(outcomeForm, errorMap);
@@ -193,11 +137,8 @@ public class OutcomeController {
 	    request.setAttribute("errorMap", errorMap);
 	} else {
 	    try {
-		Organisation organisation = (Organisation) (organisationId == null ? null
-			: userManagementService.findById(Organisation.class, organisationId));
 		if (outcome == null) {
 		    outcome = new Outcome();
-		    outcome.setOrganisation(organisation);
 		    User user = (User) userManagementService.findById(User.class, userId);
 		    outcome.setCreateBy(user);
 		    outcome.setCreateDateTime(new Date());
@@ -206,12 +147,11 @@ public class OutcomeController {
 		outcome.setName(outcomeForm.getName());
 		outcome.setCode(outcomeForm.getCode());
 		outcome.setDescription(outcomeForm.getDescription());
-		outcome.setContentFolderId(outcomeForm.getContentFolderId());
-		if (outcomeForm.getScaleId() != null) {
-		    OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class,
-			    outcomeForm.getScaleId());
-		    outcome.setScale(scale);
-		}
+		long scaleId = outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0
+			? IOutcomeService.DEFAULT_SCALE_ID
+			: outcomeForm.getScaleId();
+		OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
+		outcome.setScale(scale);
 		userManagementService.save(outcome);
 
 		if (log.isDebugEnabled()) {
@@ -232,31 +172,27 @@ public class OutcomeController {
 
     @RequestMapping("/outcomeRemove")
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	UserDTO user = getUserDTO();
+	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
+
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 	if (outcome == null) {
 	    throw new IllegalArgumentException("Can not find an outcome with ID " + outcomeId);
 	}
-	Integer organisationId = outcome.getOrganisation() == null ? null
-		: outcome.getOrganisation().getOrganisationId();
-	Integer userId = getUserDTO().getUserID();
 
-	if (organisationId == null) {
-	    if (!securityService.isSysadmin(userId, "remove global outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
+	long mappingCount = outcomeService.countOutcomeMappings(outcomeId);
+	if (mappingCount == 0) {
+	    userManagementService.delete(outcome);
+	    if (log.isDebugEnabled()) {
+		log.debug("Deleted outcome " + outcomeId);
 	    }
 	} else {
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "remove course outcome", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
+	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
+	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.remove.error.in.use"));
+	    request.setAttribute("errorMap", errorMap);
 	}
-	userManagementService.delete(outcome);
-	if (log.isDebugEnabled()) {
-	    log.debug("Deleted outcome " + outcomeId);
-	}
+
 	return outcomeManage(request, response);
     }
 
@@ -264,37 +200,19 @@ public class OutcomeController {
     @ResponseBody
     public String outcomeSearch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	String search = WebUtil.readStrParam(request, "term", true);
-	String organisationIdString = WebUtil.readStrParam(request, "organisationIds", true);
-	Set<Integer> organisationIds = null;
-	Integer userId = getUserDTO().getUserID();
-	if (StringUtils.isNotBlank(organisationIdString)) {
-	    String[] split = organisationIdString.split(",");
-	    organisationIds = new HashSet<Integer>(split.length);
-	    for (String organisationId : split) {
-		organisationIds.add(Integer.valueOf(organisationId));
-	    }
-	}
-	if (organisationIds == null) {
-	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
-		String error = "User " + userId + " is not sysadmin nor an author and can not search outcome";
-		log.error(error);
-		throw new SecurityException(error);
-	    }
-	} else {
-	    for (Integer organisationId : organisationIds) {
-		securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "search outcome",
-			true);
-	    }
-	}
+	boolean addEnabled = Configuration.getAsBoolean(ConfigurationKeys.LEARNING_OUTCOME_QUICK_ADD_ENABLE);
 
-	List<Outcome> outcomes = outcomeService.getOutcomes(search, organisationIds);
+	List<Outcome> outcomes = outcomeService.getOutcomes(search);
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (Outcome outcome : outcomes) {
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("value", outcome.getOutcomeId());
-	    outcomeJSON.put("label", outcome.getName() + " (" + outcome.getCode() + ")");
+	    outcomeJSON.put("label",
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
+	responseJSON.add(search);
+	responseJSON.add(String.valueOf(addEnabled));
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -302,7 +220,7 @@ public class OutcomeController {
     @RequestMapping("/outcomeMap")
     @ResponseBody
     public String outcomeMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Long outcomeId = WebUtil.readLongParam(request, "outcomeId");
+	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
 	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
 	if (lessonId == null && toolContentId == null) {
@@ -310,20 +228,41 @@ public class OutcomeController {
 		    "Either lesson ID or tool content ID must not be null when creating an outcome mapping");
 	}
 	Long itemId = WebUtil.readLongParam(request, "itemId", true);
-
-	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
-	Integer organisationId = outcome.getOrganisation() == null ? null
-		: outcome.getOrganisation().getOrganisationId();
-	Integer userId = getUserDTO().getUserID();
-
-	if (organisationId == null) {
-	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
-		String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
-		log.error(error);
-		throw new SecurityException(error);
+	Outcome outcome = null;
+	if (outcomeId == null) {
+	    boolean addEnabled = Configuration.getAsBoolean(ConfigurationKeys.LEARNING_OUTCOME_QUICK_ADD_ENABLE);
+	    if (!addEnabled) {
+		throw new SecurityException("Adding Learning Outcomes on the fly is disabled");
 	    }
+	    // create a new outcome on the fly
+	    String name = WebUtil.readStrParam(request, "name");
+	    String code = null;
+	    // check if name contains code part
+	    String[] nameParts = name.split("\\(");
+	    if (nameParts.length > 1) {
+		name = nameParts[0].trim();
+		code = nameParts[1].replaceFirst("\\)", "").trim();
+	    }
+	    outcome = new Outcome();
+
+	    Integer userId = getUserDTO().getUserID();
+	    User user = (User) userManagementService.findById(User.class, userId);
+	    outcome.setCreateBy(user);
+	    outcome.setCreateDateTime(new Date());
+
+	    outcome.setName(name);
+	    outcome.setCode(code);
+	    OutcomeScale scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class,
+		    IOutcomeService.DEFAULT_SCALE_ID);
+	    outcome.setScale(scale);
+	    userManagementService.save(outcome);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Saved outcome " + outcome.getOutcomeId());
+	    }
+
 	} else {
-	    securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "map outcome", true);
+	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 	}
 
 	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId);
@@ -370,11 +309,12 @@ public class OutcomeController {
 	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId);
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (OutcomeMapping outcomeMapping : outcomeMappings) {
+	    Outcome outcome = outcomeMapping.getOutcome();
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("mappingId", outcomeMapping.getMappingId());
-	    outcomeJSON.put("outcomeId", outcomeMapping.getOutcome().getOutcomeId());
+	    outcomeJSON.put("outcomeId", outcome.getOutcomeId());
 	    outcomeJSON.put("label",
-		    outcomeMapping.getOutcome().getName() + " (" + outcomeMapping.getOutcome().getCode() + ")");
+		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
 	response.setContentType("application/json;charset=utf-8");
@@ -386,23 +326,10 @@ public class OutcomeController {
 	Long mappingId = WebUtil.readLongParam(request, "mappingId");
 	OutcomeMapping outcomeMapping = (OutcomeMapping) userManagementService.findById(OutcomeMapping.class,
 		mappingId);
-	Organisation organisation = outcomeMapping.getOutcome().getOrganisation();
-	Integer organisationId = organisation == null ? null : organisation.getOrganisationId();
-	Integer userId = getUserDTO().getUserID();
-	if (organisationId == null) {
-	    if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
-		String error = "User " + userId
-			+ " is not sysadmin nor an author and can not remove an outcome mapping";
-		log.error(error);
-		throw new SecurityException(error);
-	    }
-	} else {
-	    securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "remove outcome mapping",
-		    true);
-	}
 	userManagementService.delete(outcomeMapping);
+
 	if (log.isDebugEnabled()) {
-	    log.debug("Deleted outcome mapping " + outcomeMapping);
+	    log.debug("Deleted outcome mapping " + mappingId);
 	}
     }
 
@@ -419,7 +346,7 @@ public class OutcomeController {
 	if (lessonId == null) {
 	    ToolActivity toolActivity = ((List<ToolActivity>) userManagementService.findByProperty(ToolActivity.class,
 		    "toolContentId", outcomeMapping.getToolContentId())).get(0);
-	    lessonId = ((Lesson) toolActivity.getLearningDesign().getLessons().iterator().next()).getLessonId();
+	    lessonId = toolActivity.getLearningDesign().getLessons().iterator().next().getLessonId();
 	}
 	Integer userId = getUserDTO().getUserID();
 	securityService.isLessonMonitor(lessonId, userId, "set outcome result", true);
@@ -514,27 +441,9 @@ public class OutcomeController {
 
     @RequestMapping("/scaleManage")
     public String scaleManage(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
-	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
-
-	if (organisationId == null) {
-	    // check if user is allowed to view and edit global outcomes
-	    if (!securityService.isSysadmin(userId, "manage global scales", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    // check if user is allowed to view and edit course outcomes
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "manage course scales", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
-	}
-	List<OutcomeScale> scales = outcomeService.getScales(organisationId);
+	List<OutcomeScale> scales = outcomeService.getScales();
 	request.setAttribute("scales", scales);
 
-	request.setAttribute("canManageGlobal", userManagementService.isUserSysAdmin());
 	return "outcome/scaleManage";
     }
 
@@ -545,30 +454,16 @@ public class OutcomeController {
 	if (scale == null) {
 	    throw new IllegalArgumentException("Can not find an outcome scale with ID " + scaleId);
 	}
-	Integer organisationId = scale.getOrganisation() == null ? null : scale.getOrganisation().getOrganisationId();
-	Integer userId = getUserDTO().getUserID();
 
-	if (organisationId == null) {
-	    if (!securityService.isSysadmin(userId, "remove global scale", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR }, "remove course scale",
-		    false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
-	}
-	try {
+	long scaleUseCount = outcomeService.countScaleUse(scaleId);
+	if (scaleUseCount == 0) {
 	    userManagementService.delete(scale);
 	    if (log.isDebugEnabled()) {
 		log.debug("Deleted outcome scale " + scaleId);
 	    }
-	} catch (Exception e) {
-	    log.error("Error while removing an outcome scale", e);
+	} else {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
-	    errorMap.add("GLOBAL", messageService.getMessage("scale.manage.remove.scale"));
+	    errorMap.add("GLOBAL", messageService.getMessage("scale.manage.remove.error.in.use"));
 	    request.setAttribute("errorMap", errorMap);
 	}
 
@@ -578,28 +473,11 @@ public class OutcomeController {
     @RequestMapping("/scaleEdit")
     public String scaleEdit(@ModelAttribute("scaleForm") OutcomeScaleForm scaleForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Integer userId = getUserDTO().getUserID();
 	Long scaleId = WebUtil.readLongParam(request, "scaleId", true);
-	OutcomeScale scale = null;
-	Integer organisationId = null;
-	if (scaleId == null) {
-	    organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
-	} else {
-	    scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
-	    if (scale.getOrganisation() != null) {
-		// get organisation ID from the outcome - the safest way
-		organisationId = scale.getOrganisation().getOrganisationId();
-	    }
-	}
+	OutcomeScale scale = scaleId == null ? null
+		: (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
 
-	if (organisationId != null && !securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		"add/edit course outcome", false)) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-	    return null;
-	}
-
-	scaleForm.setOrganisationId(organisationId);
-	scaleForm.setContentFolderId(outcomeService.getContentFolderId(organisationId));
+	scaleForm.setContentFolderId(IOutcomeService.OUTCOME_CONTENT_FOLDER_ID);
 	if (scale != null) {
 	    scaleForm.setScaleId(scale.getScaleId());
 	    scaleForm.setName(scale.getName());
@@ -608,7 +486,6 @@ public class OutcomeController {
 	    scaleForm.setItems(scale.getItemString());
 	}
 
-	request.setAttribute("canManageGlobal", userManagementService.isUserSysAdmin());
 	request.setAttribute("isDefaultScale", outcomeService.isDefaultScale(scaleForm.getScaleId()));
 	return "outcome/scaleEdit";
     }
@@ -618,33 +495,11 @@ public class OutcomeController {
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
 	Long scaleId = scaleForm.getScaleId();
-	OutcomeScale scale = null;
-	Integer organisationId = null;
-	if (scaleId == null) {
-	    organisationId = scaleForm.getOrganisationId();
-	} else {
-	    scale = (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
-	    if (outcomeService.isDefaultScale(scale.getScaleId())) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The default scale can not be altered");
-		return null;
-	    }
-	    if (scale.getOrganisation() != null) {
-		// get organisation ID from the outcome - the safest way
-		organisationId = scale.getOrganisation().getOrganisationId();
-	    }
-	}
-
-	if (organisationId == null) {
-	    if (!securityService.isSysadmin(userId, "persist global scale", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a sysadmin");
-		return null;
-	    }
-	} else {
-	    if (!securityService.hasOrgRole(organisationId, userId, new String[] { Role.AUTHOR },
-		    "persist course scale", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
-		return null;
-	    }
+	OutcomeScale scale = scaleId == null ? null
+		: (OutcomeScale) userManagementService.findById(OutcomeScale.class, scaleId);
+	if (scale != null && outcomeService.isDefaultScale(scaleId)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The default scale can not be altered");
+	    return null;
 	}
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>(1);
@@ -655,11 +510,8 @@ public class OutcomeController {
 	}
 	if (errorMap.isEmpty()) {
 	    try {
-		Organisation organisation = (Organisation) (organisationId == null ? null
-			: userManagementService.findById(Organisation.class, organisationId));
 		if (scale == null) {
 		    scale = new OutcomeScale();
-		    scale.setOrganisation(organisation);
 		    User user = (User) userManagementService.findById(User.class, userId);
 		    scale.setCreateBy(user);
 		    scale.setCreateDateTime(new Date());
@@ -668,7 +520,6 @@ public class OutcomeController {
 		scale.setName(scaleForm.getName());
 		scale.setCode(scaleForm.getCode());
 		scale.setDescription(scaleForm.getDescription());
-		scale.setContentFolderId(scaleForm.getContentFolderId());
 		userManagementService.save(scale);
 
 		// find existing scales and add new ones
@@ -770,12 +621,16 @@ public class OutcomeController {
 	if (StringUtils.isBlank(outcomeForm.getName())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.name.blank"));
 	}
-	if (StringUtils.isBlank(outcomeForm.getCode())) {
-	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
-	}
-	if (outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0) {
-	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.scale.choose"));
-	}
+	/**
+	 * LDEV-4786 We allow blank code when creating an outcome straight from outcome select field
+	 * if (StringUtils.isBlank(outcomeForm.getCode())) {
+	 * errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
+	 * }
+	 * If no outcome is chosen, the default scale gets chosen
+	 * if (outcomeForm.getScaleId() == null || outcomeForm.getScaleId() == 0) {
+	 * errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.scale.choose"));
+	 * }
+	 **/
     }
 
     private void validateScaleForm(OutcomeScaleForm scaleForm, MultiValueMap<String, String> errorMap) {

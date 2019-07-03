@@ -27,3 +27,8 @@
 .cke_reset_all {
 	width: 70% !important;
 }
+
+/** Overwrite CKEditor's default CSS, so that content in an editor is displayed the same way as in real life */
+.cke_widget_inline {
+    display: block !important;
+}
