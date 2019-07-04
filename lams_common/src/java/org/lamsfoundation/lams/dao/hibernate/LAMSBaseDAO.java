@@ -261,7 +261,7 @@ public class LAMSBaseDAO implements IBaseDAO {
      * java.lang.String, java.lang.Object)
      */
     @Override
-    public List findByProperty(Class clazz, String name, Object value) {
+    public <T> List<T> findByProperty(Class<T> clazz, String name, Object value) {
 	String queryString = buildQueryString(clazz, name, SELECT);
 	return doFind(queryString, value);
     }
@@ -277,7 +277,7 @@ public class LAMSBaseDAO implements IBaseDAO {
     @Override
     public <T> List<T> findByProperties(Class<T> clazz, Map<String, Object> properties) {
 	Qv qv = buildQueryString(clazz, properties, SELECT, EQUAL_TO_WHAT);
-	return (List<T>) doFind(qv.queryString, qv.values);
+	return doFind(qv.queryString, qv.values);
     }
 
     private String buildQueryString(Class clazz, String operation) {
@@ -339,7 +339,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	    p.put(entry.getKey(), entry.getValue());
 	}
 	Qv qv = buildQueryString(clazz, p, SELECT, LIKE_WHAT);
-	return (List<T>) doFind(qv.queryString, qv.values);
+	return doFind(qv.queryString, qv.values);
     }
 
     @Override
@@ -461,7 +461,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return sessionFactory;
     }
 
-    public List<?> doFind(final String queryString, final Object... values) {
+    public List doFind(final String queryString, final Object... values) {
 	Query queryObject = convertLegacyStyleParameters(queryString, values);
 	return queryObject.list();
     }

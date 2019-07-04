@@ -21,7 +21,7 @@ public interface IOutcomeService {
 
     List<Outcome> getOutcomes(String search);
 
-    List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId);
+    List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId, Integer qbQuestionId);
 
     long countOutcomeMappings(Long outcomeId);
 
@@ -37,8 +37,9 @@ public interface IOutcomeService {
 
     boolean isDefaultScale(Long scaleId);
 
-    void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId, Long targetLessonId,
-	    Long targetToolContentId, Long targetItemId);
+    void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId,
+	    Integer sourceQbQuestionId, Long targetLessonId, Long targetToolContentId, Long targetItemId,
+	    Integer targetQbQuestionId);
 
     LinkedHashMap<String, ExcelCell[][]> exportScales();
 

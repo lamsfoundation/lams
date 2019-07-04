@@ -23,7 +23,9 @@ public interface IQbDAO extends IBaseDAO {
      * @return questions sharing the same questionId
      */
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
-
+    
+    List<QbQuestion> getQuestionsByToolContentId(long toolContentId);
+    
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
 
@@ -31,7 +33,7 @@ public interface IQbDAO extends IBaseDAO {
     int getMaxQuestionVersion(Integer qbQuestionId);
 
     List<ToolActivity> getQuestionActivities(long qbQuestionUid);
-
+    
     int getCountQuestionActivitiesByUid(long qbQuestionUid);
 
     int getCountQuestionActivitiesByQuestionId(int qbQuestionId);

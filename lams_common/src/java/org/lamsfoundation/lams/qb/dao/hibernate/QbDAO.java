@@ -82,6 +82,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_COLLECTION_QUESTIONS_EXCLUDED = "SELECT qb_question_id FROM lams_qb_collection_question "
 	    + "WHERE collection_uid = :collectionUid AND qb_question_id NOT IN :qbQuestionIds";
 
+    private static final String FIND_QUESTIONS_BY_TOOL_CONTENT_ID = "SELECT tq.qbQuestion FROM QbToolQuestion AS tq "
+	    + "WHERE tq.toolContentId = :toolContentId";
+
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
@@ -96,6 +99,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
 	return q.getResultList();
+    }
+
+    @Override
+    public List<QbQuestion> getQuestionsByToolContentId(long toolContentId) {
+	return getSession().createQuery(FIND_QUESTIONS_BY_TOOL_CONTENT_ID, QbQuestion.class)
+		.setParameter("toolContentId", toolContentId).getResultList();
     }
 
     @Override

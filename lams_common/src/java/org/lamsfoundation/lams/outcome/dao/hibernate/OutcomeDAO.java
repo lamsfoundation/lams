@@ -22,9 +22,14 @@
 
 package org.lamsfoundation.lams.outcome.dao.hibernate;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
@@ -34,14 +39,20 @@ import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.dao.IOutcomeDAO;
+import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 
+    private IQbDAO qbDAO;
+
     private static final String FIND_OUTCOMES_SORTED_BY_NAME = "FROM Outcome o ? ORDER BY o.name, o.code";
 
     private static final String FIND_SCALES_SORTED_BY_NAME = "FROM OutcomeScale o ORDER BY o.name, o.code";
+
+    private static final String FIND_OUTCOME_MAPPINGS_BY_QUESTION_ID = "FROM OutcomeMapping m WHERE m.qbQuestionId IN :qbQuestionIds";
 
     /**
      * Finds all global outcomes and ones for the given organisation
@@ -71,19 +82,41 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
+    public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId,
+	    Integer qbQuestionId) {
+	List<OutcomeMapping> result = new ArrayList<>();
 	Map<String, Object> properties = new HashMap<>();
+
+	Set<Integer> qbQuestionIds = new HashSet<>();
 	if (lessonId != null) {
 	    properties.put("lessonId", lessonId);
 	}
 	if (toolContentId != null) {
 	    properties.put("toolContentId", toolContentId);
+
+	    Collection<QbQuestion> questions = qbDAO.getQuestionsByToolContentId(toolContentId);
+	    qbQuestionIds.addAll(
+		    questions.stream().collect(Collectors.mapping(QbQuestion::getQuestionId, Collectors.toSet())));
 	}
 	if (itemId != null) {
 	    properties.put("itemId", itemId);
 	}
-	return findByProperties(OutcomeMapping.class, properties);
+	// find mappings bound to the given lesson/activity/item
+	if (!properties.isEmpty()) {
+	    result.addAll(findByProperties(OutcomeMapping.class, properties));
+	}
+
+	// find mappings bound to an activity via its QB questions
+	if (qbQuestionId != null) {
+	    qbQuestionIds.add(qbQuestionId);
+	}
+	if (!qbQuestionIds.isEmpty()) {
+	    Query<OutcomeMapping> query = getSession()
+		    .createQuery(FIND_OUTCOME_MAPPINGS_BY_QUESTION_ID, OutcomeMapping.class)
+		    .setParameter("qbQuestionIds", qbQuestionIds);
+	    result.addAll(query.getResultList());
+	}
+	return result;
     }
 
     /**
@@ -96,7 +129,6 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
 	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
@@ -115,12 +147,15 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.userId", userId);
 	properties.put("mapping.mappingId", mappingId);
 	List<OutcomeResult> result = findByProperties(OutcomeResult.class, properties);
 	return result.isEmpty() ? null : result.get(0);
+    }
+
+    public void setQbDAO(IQbDAO qbDAO) {
+	this.qbDAO = qbDAO;
     }
 }

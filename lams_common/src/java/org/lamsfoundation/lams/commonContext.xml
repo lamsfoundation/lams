@@ -707,8 +707,10 @@
 	<!-- Outcome related beans -->
 	<bean id="outcomeDAO" class="org.lamsfoundation.lams.outcome.dao.hibernate.OutcomeDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+		<property name="qbDAO"><ref bean="qbDAO"/></property>
 	</bean>
 	
+	<!-- Question Bank related beans -->
 	<bean id="qbDAO" class="org.lamsfoundation.lams.qb.dao.hibernate.QbDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>

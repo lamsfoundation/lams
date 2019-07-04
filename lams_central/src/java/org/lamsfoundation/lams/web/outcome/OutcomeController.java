@@ -22,7 +22,10 @@
 
 package org.lamsfoundation.lams.web.outcome;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -217,17 +220,16 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("/outcomeMap")
+    @RequestMapping(path = "/outcomeMap", produces = "text/plain;charset=utf-8")
     @ResponseBody
-    public String outcomeMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", true);
-	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
-	if (lessonId == null && toolContentId == null) {
+    public String outcomeMap(@RequestParam(required = false) Long outcomeId,
+	    @RequestParam(required = false) Long lessonId, @RequestParam(required = false) Long toolContentId,
+	    @RequestParam(required = false) Long itemId, @RequestParam(required = false) Integer qbQuestionId,
+	    @RequestParam(required = false) String name) throws Exception {
+	if (lessonId == null && toolContentId == null && qbQuestionId == null) {
 	    throw new IllegalArgumentException(
-		    "Either lesson ID or tool content ID must not be null when creating an outcome mapping");
+		    "Either lesson ID or tool content ID or QB question ID must not be null when creating an outcome mapping");
 	}
-	Long itemId = WebUtil.readLongParam(request, "itemId", true);
 	Outcome outcome = null;
 	if (outcomeId == null) {
 	    boolean addEnabled = Configuration.getAsBoolean(ConfigurationKeys.LEARNING_OUTCOME_QUICK_ADD_ENABLE);
@@ -235,7 +237,6 @@ public class OutcomeController {
 		throw new SecurityException("Adding Learning Outcomes on the fly is disabled");
 	    }
 	    // create a new outcome on the fly
-	    String name = WebUtil.readStrParam(request, "name");
 	    String code = null;
 	    // check if name contains code part
 	    String[] nameParts = name.split("\\(");
@@ -265,7 +266,8 @@ public class OutcomeController {
 	    outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
 	}
 
-	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId);
+	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId,
+		qbQuestionId);
 	for (OutcomeMapping existingMapping : outcomeMappings) {
 	    if (existingMapping.getOutcome().getOutcomeId().equals(outcome.getOutcomeId())) {
 		throw new IllegalArgumentException(
@@ -278,27 +280,26 @@ public class OutcomeController {
 	outcomeMapping.setLessonId(lessonId);
 	outcomeMapping.setToolContentId(toolContentId);
 	outcomeMapping.setItemId(itemId);
+	outcomeMapping.setQbQuestionId(qbQuestionId);
 	userManagementService.save(outcomeMapping);
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Mapped outcome " + outcome.getOutcomeId() + " to lesson ID " + lessonId + " and tool content ID "
-		    + toolContentId + " and item ID " + itemId);
+		    + toolContentId + " and item ID " + itemId + " and QB question ID " + qbQuestionId);
 	}
 
-	response.setContentType("text/plain;charset=utf-8");
 	return String.valueOf(outcomeMapping.getMappingId());
     }
 
-    @RequestMapping("/outcomeGetMappings")
+    @RequestMapping(path = "/outcomeGetMappings", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String outcomeGetMappings(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	Long lessonId = WebUtil.readLongParam(request, "lessonId", true);
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
-	if (lessonId == null && toolContentId == null) {
+    public String outcomeGetMappings(@RequestParam(required = false) Long lessonId,
+	    @RequestParam(required = false) Long toolContentId, @RequestParam(required = false) Long itemId,
+	    @RequestParam(required = false) Integer qbQuestionId, HttpServletRequest request) throws Exception {
+	if (lessonId == null && toolContentId == null && qbQuestionId == null) {
 	    throw new IllegalArgumentException(
-		    "Either lesson ID or tool content ID must not be null when fetching outcome mappings");
+		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
 	}
-	Long itemId = WebUtil.readLongParam(request, "itemId", true);
 	Integer userId = getUserDTO().getUserID();
 	if (!request.isUserInRole(Role.SYSADMIN) && !request.isUserInRole(Role.AUTHOR)) {
 	    String error = "User " + userId + " is not sysadmin nor an author and can not map outcome";
@@ -306,18 +307,21 @@ public class OutcomeController {
 	    throw new SecurityException(error);
 	}
 
-	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId);
+	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId,
+		qbQuestionId);
+	OutcomeController.filterQuestionMappings(outcomeMappings);
+
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (OutcomeMapping outcomeMapping : outcomeMappings) {
 	    Outcome outcome = outcomeMapping.getOutcome();
 	    ObjectNode outcomeJSON = JsonNodeFactory.instance.objectNode();
 	    outcomeJSON.put("mappingId", outcomeMapping.getMappingId());
 	    outcomeJSON.put("outcomeId", outcome.getOutcomeId());
+	    outcomeJSON.put("qbMapping", outcomeMapping.getQbQuestionId() != null);
 	    outcomeJSON.put("label",
 		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
-	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
 
@@ -640,6 +644,33 @@ public class OutcomeController {
 	if (StringUtils.isBlank(scaleForm.getCode())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
 	}
+    }
+
+    /**
+     * There can be duplicates in mappings, if one comes from activity and the other comes from a QB question that the
+     * activity imported.
+     * We need to get rid of duplicates and sort the remaining mappings.
+     */
+    private static void filterQuestionMappings(List<OutcomeMapping> mappings) {
+	Iterator<OutcomeMapping> iterator = mappings.iterator();
+	while (iterator.hasNext()) {
+	    OutcomeMapping mapping = iterator.next();
+	    boolean duplicateFound = false;
+	    for (OutcomeMapping otherMapping : mappings) {
+		if (!mapping.getMappingId().equals(otherMapping.getMappingId())
+			&& mapping.getOutcome().getOutcomeId().equals(otherMapping.getOutcome().getOutcomeId())) {
+		    duplicateFound = true;
+		    break;
+		}
+	    }
+	    // remove the one coming from activity, not one coming from question
+	    if (duplicateFound && mapping.getQbQuestionId() == null) {
+		iterator.remove();
+	    }
+	}
+
+	Collections.sort(mappings,
+		Comparator.comparing(OutcomeMapping::getOutcome, Comparator.comparing(Outcome::getName)));
     }
 
 }

@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 @Entity
 @Table(name = "lams_outcome_mapping")
 public class OutcomeMapping implements Serializable {
@@ -34,6 +37,9 @@ public class OutcomeMapping implements Serializable {
 
     @Column(name = "item_id")
     private Long itemId;
+
+    @Column(name = "qb_question_id")
+    private Integer qbQuestionId;
 
     public Long getMappingId() {
 	return mappingId;
@@ -73,5 +79,24 @@ public class OutcomeMapping implements Serializable {
 
     public void setItemId(Long itemId) {
 	this.itemId = itemId;
+    }
+
+    public Integer getQbQuestionId() {
+	return qbQuestionId;
+    }
+
+    public void setQbQuestionId(Integer qbQuestionId) {
+	this.qbQuestionId = qbQuestionId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+	OutcomeMapping other = (OutcomeMapping) o;
+	return new EqualsBuilder().append(mappingId, other.mappingId).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(mappingId).toHashCode();
     }
 }

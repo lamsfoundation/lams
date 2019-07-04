@@ -35,7 +35,7 @@ public interface IOutcomeDAO extends IBaseDAO {
 
     List<Outcome> getOutcomesSortedByName(String search);
 
-    List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId);
+    List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId, Integer qbQuestionId);
 
     List<OutcomeScale> getScalesSortedByName();
 

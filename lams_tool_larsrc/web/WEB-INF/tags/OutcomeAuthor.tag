@@ -16,6 +16,7 @@
 <%@ attribute name="lessonId" required="false" rtexprvalue="true" %>
 <%@ attribute name="toolContentId" required="false" rtexprvalue="true" %>
 <%@ attribute name="itemId" required="false" rtexprvalue="true" %>
+<%@ attribute name="qbQuestionId" required="false" rtexprvalue="true" %>
 
 <%-- Support for multiple tags on one page --%>
 <c:set var="outcomeTagId" value="${empty outcomeTagId ? 1 : outcomeTagId + 1}" />
@@ -43,7 +44,8 @@
 	var outcomeData${outcomeTagId} = {
 			lessonId : '${lessonId}',
 			toolContentId : '${toolContentId}',
-			itemId : '${itemId}'
+			itemId : '${itemId}',
+			qbQuestionId : '${qbQuestionId}'
 		},
 		// keep mapped outcome IDs for search result filtering
 		outcomeMappingIds${outcomeTagId} = [],
@@ -56,7 +58,7 @@
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({
-			'source' : "<lams:LAMSURL/>outcome/outcomeSearch.do?organisationIds=${organisations}",
+			'source' : "<lams:LAMSURL/>outcome/outcomeSearch.do",
 			'delay'  : 700,
 			'minLength' : 2,
 			'response' : function(event, ui) {
@@ -91,6 +93,7 @@
 				var input = $(this);
 				$.ajax({
 					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do',
+					'dataType' : 'text',
 					'data': $.extend({
 						'outcomeId' : ui.item.value,
 						// if value is null, then it is a new outcome to create; remove ' [create new]' part before sending
@@ -116,9 +119,11 @@
 	 * Loads existing mappings
 	 */
 	function refreshOutcomeMappings(outcomeTagId) {
+		var outcomeData = outcomeData${outcomeTagId};
+		
 		$.ajax({
 			'url' 	   : '<lams:LAMSURL/>outcome/outcomeGetMappings.do',
-			'data'	   : outcomeData${outcomeTagId},
+			'data'	   : outcomeData,
 			'cache'    : false,
 			'dataType' : 'json',
 			'success'  : function(outcomeMappings) {
@@ -134,13 +139,17 @@
 						// cache already mapped outcomes
 						outcomeMappingIds${outcomeTagId}.push(this.outcomeId);
 						// add a label with outcome information
-						var outcomeButton = $('<button type="button" class="roffset10 btn btn-xs btn-info outcomeButton" />').attr('mappingId', this.mappingId)
-												.html(this.label + outcomeMappingRemoveButton).appendTo(mappingDiv);
-						outcomeButton.click(function(){
-							if (confirm(outcomeMappingRemoveConfirm)) {
-								removeOutcomeMapping(this);
-							}
-						});
+						var qbMapping = !outcomeData.qbQuestionId && outcomeData.toolContentId && this.qbMapping;
+						$('<button type="button" class="roffset10 btn btn-xs btn-info outcomeButton" />')
+							.attr('mappingId', this.mappingId)
+							.html(this.label + (qbMapping ? '' : outcomeMappingRemoveButton))
+							.prop('disabled', qbMapping)
+							.appendTo(mappingDiv)
+							.click(function(){
+								if (confirm(outcomeMappingRemoveConfirm)) {
+									removeOutcomeMapping(this);
+								}
+							});
 					});
 				}
 			}

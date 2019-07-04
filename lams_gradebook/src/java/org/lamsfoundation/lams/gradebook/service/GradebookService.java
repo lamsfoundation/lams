@@ -203,7 +203,7 @@ public class GradebookService implements IGradebookFullService {
 	    }
 
 	    List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(null, activity.getToolContentId(),
-		    null);
+		    null, null);
 	    if (!outcomeMappings.isEmpty()) {
 		ArrayNode outcomeMappingsJSON = JsonNodeFactory.instance.arrayNode();
 		for (OutcomeMapping outcomeMapping : outcomeMappings) {

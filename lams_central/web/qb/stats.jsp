@@ -232,7 +232,7 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Management
+			Collections
 		</div>
 		<div class="panel-body">
 			<div class="container-fluid">			
@@ -281,6 +281,8 @@
 			</div>
 		</div>
 	</div>
+	
+	<lams:OutcomeAuthor qbQuestionId="${question.questionId}" />
 	
 	<c:if test="${not empty question.qbOptions}">
 		<div class="panel panel-default">

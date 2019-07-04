@@ -52,8 +52,9 @@ public class OutcomeService implements IOutcomeService {
     }
 
     @Override
-    public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
-	return outcomeDAO.getOutcomeMappings(lessonId, toolContentId, itemId);
+    public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId,
+	    Integer qbQuestionId) {
+	return outcomeDAO.getOutcomeMappings(lessonId, toolContentId, itemId, qbQuestionId);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class OutcomeService implements IOutcomeService {
 
     @Override
     public OutcomeScale getDefaultScale() {
-	return (OutcomeScale) outcomeDAO.find(OutcomeScale.class, DEFAULT_SCALE_ID);
+	return outcomeDAO.find(OutcomeScale.class, DEFAULT_SCALE_ID);
     }
 
     @Override
@@ -92,14 +93,17 @@ public class OutcomeService implements IOutcomeService {
 
     @Override
     public void copyOutcomeMappings(Long sourceLessonId, Long sourceToolContentId, Long sourceItemId,
-	    Long targetLessonId, Long targetToolContentId, Long targetItemId) {
-	List<OutcomeMapping> sourceMappings = getOutcomeMappings(sourceLessonId, sourceToolContentId, sourceItemId);
+	    Integer sourceQbQuestionId, Long targetLessonId, Long targetToolContentId, Long targetItemId,
+	    Integer targetQbQuestionId) {
+	List<OutcomeMapping> sourceMappings = getOutcomeMappings(sourceLessonId, sourceToolContentId, sourceItemId,
+		sourceQbQuestionId);
 	for (OutcomeMapping sourceMapping : sourceMappings) {
 	    OutcomeMapping targetMapping = new OutcomeMapping();
 	    targetMapping.setOutcome(sourceMapping.getOutcome());
 	    targetMapping.setLessonId(targetLessonId);
 	    targetMapping.setToolContentId(targetToolContentId);
 	    targetMapping.setItemId(targetItemId);
+	    targetMapping.setQbQuestionId(targetQbQuestionId);
 	    outcomeDAO.insert(targetMapping);
 	}
     }
@@ -161,7 +165,6 @@ public class OutcomeService implements IOutcomeService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public int importScales(MultipartFile fileItem) throws IOException {
 	int counter = 0;
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
@@ -204,7 +207,7 @@ public class OutcomeService implements IOutcomeService {
 		scale.setDescription(description);
 		if (user == null) {
 		    UserDTO userDTO = OutcomeService.getUserDTO();
-		    user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+		    user = outcomeDAO.find(User.class, userDTO.getUserID());
 		}
 		scale.setCreateBy(user);
 		scale.setCreateDateTime(new Date());
@@ -227,7 +230,6 @@ public class OutcomeService implements IOutcomeService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public int importOutcomes(MultipartFile fileItem) throws IOException {
 	int counter = 0;
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
@@ -278,7 +280,7 @@ public class OutcomeService implements IOutcomeService {
 		outcome.setScale(scale);
 		if (user == null) {
 		    UserDTO userDTO = OutcomeService.getUserDTO();
-		    user = (User) outcomeDAO.find(User.class, userDTO.getUserID());
+		    user = outcomeDAO.find(User.class, userDTO.getUserID());
 		}
 		outcome.setCreateBy(user);
 		outcome.setCreateDateTime(new Date());
