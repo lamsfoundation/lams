@@ -51,8 +51,8 @@
 			<input type="hidden" name="numOptionsQuestion${questionNumber}" id="numOptionsQuestion${questionNumber}" value="${numAnswers}"/>
 			<c:set scope="request" var="optionCount">${numAnswers}</c:set>
 			<c:forEach items="${question.answers}" var="answer" varStatus="loopStatus">
-				<c:set scope="request" var="optionText">${answer.text}</c:set>
-				<c:set scope="request" var="optionCorrect">${answer.score > 0}</c:set>
+				<c:set scope="request" var="optionText">${answer.answerText}</c:set>
+				<c:set scope="request" var="optionCorrect">${answer.grade > 0}</c:set>
 				<c:set scope="request" var="optionNumber">${loopStatus.count}</c:set>
 				<div id="divq${questionNumber}opt${optionNumber}">
 					<%@ include file="mcoption.jsp" %>

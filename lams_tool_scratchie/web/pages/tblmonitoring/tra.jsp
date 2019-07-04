@@ -31,7 +31,7 @@
 			barStrokeWidth: 2,
 			barValueSpacing: 5,
 			barDatasetSpacing: 1,
-			responsive: true,
+	<%--	responsive: true,  When responsive the font becomes too small on larger screen --%>
 		};
 
 		var ctx = document.getElementById("barChart").getContext("2d");
