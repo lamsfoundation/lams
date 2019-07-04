@@ -140,7 +140,7 @@ public class QbQuestion implements Serializable, Cloneable {
     private List<QbQuestionUnit> units = new ArrayList<>();
 
     // read-only collection of learning outcomes
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     @JoinTable(name = "lams_outcome_mapping", joinColumns = @JoinColumn(name = "qb_question_id", referencedColumnName = "question_id", updatable = false, insertable = false), inverseJoinColumns = @JoinColumn(name = "outcome_id"))
     private List<Outcome> outcomes = new ArrayList<>();
@@ -421,5 +421,13 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
+    }
+
+    public List<Outcome> getOutcomes() {
+	return outcomes;
+    }
+
+    public void setOutcomes(List<Outcome> outcomes) {
+	this.outcomes = outcomes;
     }
 }
