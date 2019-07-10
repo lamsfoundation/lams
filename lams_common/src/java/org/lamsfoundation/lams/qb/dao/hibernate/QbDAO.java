@@ -85,6 +85,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_QUESTIONS_BY_TOOL_CONTENT_ID = "SELECT tq.qbQuestion FROM QbToolQuestion AS tq "
 	    + "WHERE tq.toolContentId = :toolContentId";
 
+    private static final String IS_QUESTION_IN_USER_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
+	    + "(c.user_id = :userId OR c.user_id IS NULL) AND cq.qb_question_id = :qbQuestionId";
+
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
@@ -336,6 +340,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    result.add(questionId.intValue());
 	}
 	return result;
+    }
+
+    @Override
+    public boolean isQuestionInUserCollection(int userId, int qbQuestionId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_USER_COLLECTION).setParameter("userId", userId)
+		.setParameter("qbQuestionId", qbQuestionId).getSingleResult() != null;
     }
 
     private boolean questionInCollectionExists(long collectionUid, int qbQuestionId) {

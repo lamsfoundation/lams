@@ -549,6 +549,11 @@ public class QbService implements IQbService {
 	qbDAO.update(collection);
     }
 
+    @Override
+    public boolean isQuestionInUserCollection(int qbQuestionId, int userId) {
+	return qbDAO.isQuestionInUserCollection(userId, qbQuestionId);
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }

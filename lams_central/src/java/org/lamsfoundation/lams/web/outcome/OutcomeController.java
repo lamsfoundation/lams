@@ -22,10 +22,7 @@
 
 package org.lamsfoundation.lams.web.outcome;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +43,7 @@ import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
 import org.lamsfoundation.lams.outcome.OutcomeScaleItem;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
+import org.lamsfoundation.lams.outcome.service.OutcomeService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -309,7 +307,7 @@ public class OutcomeController {
 
 	List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(lessonId, toolContentId, itemId,
 		qbQuestionId);
-	OutcomeController.filterQuestionMappings(outcomeMappings);
+	OutcomeService.filterQuestionMappings(outcomeMappings);
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (OutcomeMapping outcomeMapping : outcomeMappings) {
@@ -645,32 +643,4 @@ public class OutcomeController {
 	    errorMap.add("GLOBAL", messageService.getMessage("outcome.manage.add.error.code.blank"));
 	}
     }
-
-    /**
-     * There can be duplicates in mappings, if one comes from activity and the other comes from a QB question that the
-     * activity imported.
-     * We need to get rid of duplicates and sort the remaining mappings.
-     */
-    private static void filterQuestionMappings(List<OutcomeMapping> mappings) {
-	Iterator<OutcomeMapping> iterator = mappings.iterator();
-	while (iterator.hasNext()) {
-	    OutcomeMapping mapping = iterator.next();
-	    boolean duplicateFound = false;
-	    for (OutcomeMapping otherMapping : mappings) {
-		if (!mapping.getMappingId().equals(otherMapping.getMappingId())
-			&& mapping.getOutcome().getOutcomeId().equals(otherMapping.getOutcome().getOutcomeId())) {
-		    duplicateFound = true;
-		    break;
-		}
-	    }
-	    // remove the one coming from activity, not one coming from question
-	    if (duplicateFound && mapping.getQbQuestionId() == null) {
-		iterator.remove();
-	    }
-	}
-
-	Collections.sort(mappings,
-		Comparator.comparing(OutcomeMapping::getOutcome, Comparator.comparing(Outcome::getName)));
-    }
-
 }

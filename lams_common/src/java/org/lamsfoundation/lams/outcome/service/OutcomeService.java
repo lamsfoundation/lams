@@ -1,8 +1,11 @@
 package org.lamsfoundation.lams.outcome.service;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -290,6 +293,33 @@ public class OutcomeService implements IOutcomeService {
 	    }
 	}
 	return counter;
+    }
+
+    /**
+     * There can be duplicates in mappings, if one comes from activity and the other comes from a QB question that the
+     * activity imported.
+     * We need to get rid of duplicates and sort the remaining mappings.
+     */
+    public static void filterQuestionMappings(List<OutcomeMapping> mappings) {
+	Iterator<OutcomeMapping> iterator = mappings.iterator();
+	while (iterator.hasNext()) {
+	    OutcomeMapping mapping = iterator.next();
+	    boolean duplicateFound = false;
+	    for (OutcomeMapping otherMapping : mappings) {
+		if (!mapping.getMappingId().equals(otherMapping.getMappingId())
+			&& mapping.getOutcome().getOutcomeId().equals(otherMapping.getOutcome().getOutcomeId())) {
+		    duplicateFound = true;
+		    break;
+		}
+	    }
+	    // remove the one coming from activity, not one coming from question
+	    if (duplicateFound && mapping.getQbQuestionId() == null) {
+		iterator.remove();
+	    }
+	}
+
+	Collections.sort(mappings,
+		Comparator.comparing(OutcomeMapping::getOutcome, Comparator.comparing(Outcome::getName)));
     }
 
     private static UserDTO getUserDTO() {

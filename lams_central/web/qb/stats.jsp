@@ -58,8 +58,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
-		var permanentRemove = ${permanentRemove},
-			permanentRemovePossible = ${permanentRemovePossible},
+		var permanentRemove = '${permanentRemove}' == 'true',
+			permanentRemovePossible = '${permanentRemovePossible}' == 'true',
 			optionsExist = ${not empty question.qbOptions};
 		
 		$(document).ready(function(){
@@ -453,8 +453,47 @@
 		</div>
 	</div>
 	
-	<lams:OutcomeAuthor qbQuestionId="${question.questionId}" />
-	
+	<c:choose>
+		<c:when test="${managementAllowed}">
+			<lams:OutcomeAuthor qbQuestionId="${question.questionId}" />
+		</c:when>
+		<c:otherwise>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Learning outcomes
+				</div>
+				<div class="panel-body">
+					<c:choose>
+						<c:when test="${empty outcomes}">
+							This question does not have any learning outcomes
+						</c:when>
+						<c:otherwise>
+							<div class="container-fluid">			
+								<div class="row">
+									<div class="col-xs-0 col-md-2"></div>
+									<div class="col-xs-12 col-md-8 header-column">
+										Existing outcomes
+									</div>
+									<div class="col-xs-0 col-md-2"></div>
+								</div>
+								
+								<c:forEach var="outcome" items="${outcomes}">
+									<div class="row">
+										<div class="col-xs-0 col-md-2"></div>
+										<div class="col-xs-12 col-md-8 middle-cell">
+											<c:out value="${outcome}" />
+										</div>
+										<div class="col-xs-0 col-md-2">
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</div>
+		</c:otherwise>
+	</c:choose>
 </lams:Page>
 
 <!-- For exporting QTI packages -->
