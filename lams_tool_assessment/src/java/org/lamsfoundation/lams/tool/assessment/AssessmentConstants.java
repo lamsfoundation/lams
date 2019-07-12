@@ -89,15 +89,13 @@ public class AssessmentConstants {
     
     public static final String ATTR_CONFIDENCE_LEVEL_PREFIX = "confidenceLevel";
 
-    public static final String ATTR_QUESTION_TYPE = "questionType";
-
     public static final String ATTR_QUESTION_LIST = "questionList";
+    
+    public static final String ATTR_RANDOM_POOL_QUESTIONS = "randomPoolQuestions";
+    
+    public static final String ATTR_DELETED_RANDOM_POOL_QUESTIONS = "deletedRandomPoolQuestions";
 
     public static final String ATTR_QUESTION_REFERENCES = "questionReferences";
-
-    public static final String ATTR_AVAILABLE_QUESTIONS = "availableQuestions";
-
-    public static final String ATTR_DELETED_QUESTION_LIST = "deleteAssessmentList";
 
     public static final String ATTR_DELETED_QUESTION_REFERENCES = "deleteQuestionReferences";
 

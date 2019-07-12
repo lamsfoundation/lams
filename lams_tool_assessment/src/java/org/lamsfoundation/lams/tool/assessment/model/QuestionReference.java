@@ -49,12 +49,6 @@ public class QuestionReference implements Cloneable, Sequencable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column(name = "question_type")
-    private short type;
-
-    @Column
-    private String title;
-
     @Column(name = "sequence_id")
     private int sequenceId;
 
@@ -105,22 +99,6 @@ public class QuestionReference implements Cloneable, Sequencable {
 
     public void setQuestion(AssessmentQuestion question) {
 	this.question = question;
-    }
-
-    public short getType() {
-	return type;
-    }
-
-    public void setType(short type) {
-	this.type = type;
-    }
-
-    public String getTitle() {
-	return title;
-    }
-
-    public void setTitle(String title) {
-	this.title = title;
     }
 
     /**

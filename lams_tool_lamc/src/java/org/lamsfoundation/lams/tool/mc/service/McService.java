@@ -2062,7 +2062,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	modifiedQuestion.setFeedback(questionDTO.getFeedback());
 
 	List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
-	boolean isModified = baseLine.isModified(modifiedQuestion)
+	boolean isModified = !baseLine.equals(modifiedQuestion)
 		|| optionDTOs.size() != modifiedQuestion.getQbOptions().size();
 	if (isModified) {
 	    return IQbService.QUESTION_MODIFIED_VERSION_BUMP;
@@ -2084,7 +2084,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 	}
 	// run check again, this time with modified options
-	return baseLine.isModified(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
+	return !baseLine.equals(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
 		: IQbService.QUESTION_MODIFIED_NONE;
     }
 

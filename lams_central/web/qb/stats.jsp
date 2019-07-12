@@ -133,7 +133,7 @@
 			Question
 			
 			<div class="btn-group-xs pull-right">
-				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true" class="btn btn-default thickbox"> 
+				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default thickbox"> 
 					<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
 				</a>
 			

@@ -23,10 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -34,9 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,17 +44,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
-import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
-import org.lamsfoundation.lams.qb.service.QbUtils;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -72,9 +63,9 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -86,11 +77,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -104,12 +95,10 @@ public class AuthoringController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
-
     @Autowired
     private IQbService qbService;
-    
     @Autowired
-    private IUserManagementService userManagementService;
+    WebApplicationContext applicationcontext;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -172,27 +161,25 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	List<AssessmentQuestion> questions = null;
-	if (assessment.getQuestions() != null) {
-	    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
-	} else {
-	    questions = new ArrayList<>();
+	// init RandomPoolQuestions
+	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	randomPoolQuestions.clear();
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.isRandomQuestion()) {
+		randomPoolQuestions.add(question);
+	    }
 	}
-
-	// init assessment question list
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	questionList.clear();
-	questionList.addAll(questions);
 
 	// init question references
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	references.clear();
-	if (assessment.getQuestionReferences() != null) {
-	    references.addAll(assessment.getQuestionReferences());
+	references.addAll(assessment.getQuestionReferences());
+	//init references' qbQuestions to avoid no session exception 
+	for (QuestionReference reference : references) {
+	    if (!reference.isRandomQuestion()) {
+		reference.getQuestion().getQbQuestion();
+	    }
 	}
-
-	// init available questions
-	reinitializeAvailableQuestions(sessionMap);
 
 	boolean isAssessmentAttempted = assessment.getUid() == null ? false
 		: service.isAssessmentAttempted(assessment.getUid());
@@ -235,9 +222,10 @@ public class AuthoringController {
 	Assessment assessment = assessmentForm.getAssessment();
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
-	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
-	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
-		: assessmentPO.getQuestionReferences();
+	//TODO **part of markrecalculation**
+//	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
+//	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
+//		: assessmentPO.getQuestionReferences();
 	
 	AssessmentUser assessmentUser = null;
 
@@ -247,15 +235,16 @@ public class AuthoringController {
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
 
 	} else {
-	    // copyProperties() below sets assessmentPO items to empty collection
-	    // but the items still exist in Hibernate cache, so we need to evict them now
-	    for (AssessmentQuestion question : oldQuestions) {
-		service.releaseFromCache(question);
-//		service.releaseFromCache(question.getQbQuestion());
-	    }
-	    for (QuestionReference reference : oldReferences) {
-		service.releaseFromCache(reference);
-	    }
+	    //TODO **part of markrecalculation**
+//	    // copyProperties() below sets assessmentPO items to empty collection
+//	    // but the items still exist in Hibernate cache, so we need to evict them now
+//	    for (AssessmentQuestion question : oldQuestions) {
+//		service.releaseFromCache(question);
+////		service.releaseFromCache(question.getQbQuestion());
+//	    }
+//	    for (QuestionReference reference : oldReferences) {
+//		service.releaseFromCache(reference);
+//	    }
 	    assessmentPO.getQuestions().clear();
 	    
 	    Long uid = assessmentPO.getUid();
@@ -291,44 +280,36 @@ public class AuthoringController {
 	assessmentPO.setCreatedBy(assessmentUser);
 
 	// ************************* Handle assessment questions *******************
-	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
-	int maxQuestionId = qbService.getMaxQuestionId();
-	for (AssessmentQuestion question : newQuestions) {
-	    question.setToolContentId(assessmentPO.getContentId());
-	    removeNewLineCharacters(question);
-	    // modification status was already set in AuthoringController#saveItem()
-	    switch (question.getQbQuestionModified()) {
-		case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
-		    // new version of the old question gets created
-		    QbQuestion qbQuestion = question.getQbQuestion().clone();
-		    question.setQbQuestion(qbQuestion);
-		    qbQuestion.clearID();
-		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
-		    qbQuestion.setCreateDate(new Date());
-		}
-		    break;
-		case IQbService.QUESTION_MODIFIED_ID_BUMP: {
-		    // new question gets created
-		    QbQuestion qbQuestion = question.getQbQuestion().clone();
-		    question.setQbQuestion(qbQuestion);
-		    qbQuestion.clearID();
-		    qbQuestion.setVersion(1);
-		    qbQuestion.setQuestionId(maxQuestionId++);
-		    qbQuestion.setCreateDate(new Date());
-		}
-		    break;
-	    }
-	}
-	assessmentPO.setQuestions(newQuestions);
-
-	Set<QuestionReference> newReferences = updateQuestionReferencesMaxMarks(request, sessionMap, true);	
+	List<AssessmentQuestion> newRandomQuestions = getRandomPoolQuestions(sessionMap);
+	TreeSet<AssessmentQuestion> newQuestions = new TreeSet<>(newRandomQuestions);
 	
-	//recalculate results in case content is edited from monitoring and it's been already attempted by a student
-	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
-	if (isAuthoringRestricted) {
-	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
-		    newQuestions, oldReferences, newReferences);
+	for (AssessmentQuestion question : newRandomQuestions) {
+	    question.setToolContentId(assessmentPO.getContentId());
+	    //TODO check
+//	    removeNewLineCharacters(question);
 	}
+	
+	Set<QuestionReference> newReferences = updateQuestionReferencesMaxMarks(request, sessionMap, true);
+	for (QuestionReference reference : newReferences) {
+	    if (!reference.isRandomQuestion()) {
+		AssessmentQuestion question = reference.getQuestion();
+		question.setToolContentId(assessmentPO.getContentId());
+		newQuestions.add(question);
+	    }	   
+	    //TODO check
+//	    removeNewLineCharacters(question);
+	}
+
+	
+	assessmentPO.setQuestions(newQuestions);
+	
+	//TODO **part of markrecalculation**
+//	// recalculate results in case content is edited from monitoring and it's been already attempted by a student
+//	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+//	if (isAuthoringRestricted) {
+//	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
+//		    newQuestions, oldReferences, newReferences);
+//	}
 
 	// Handle question references
 	assessmentPO.setQuestionReferences(newReferences);
@@ -350,17 +331,20 @@ public class AuthoringController {
 	    iterRef.remove();
 	    if (reference.getUid() != null) {
 		service.deleteQuestionReference(reference.getUid());
+		
+		//TODO maybe check and delete orphaned AssessmentQuestion
+		//service.deleteAssessmentQuestion(question.getUid());
 	    }
 	}
-
-	// delete Questions from database
-	List<AssessmentQuestion> deletedQuestions = getDeletedQuestionList(sessionMap);
-	Iterator<AssessmentQuestion> iter = deletedQuestions.iterator();
-	while (iter.hasNext()) {
-	    AssessmentQuestion question = iter.next();
-	    iter.remove();
-	    if (question.getUid() != null) {
-		service.deleteAssessmentQuestion(question.getUid());
+	
+	// delete References from database
+	List<AssessmentQuestion> deletedRandomPoolQuestions = getDeletedRandomPoolQuestions(sessionMap);
+	Iterator<AssessmentQuestion> iterDeletedQuestions = deletedRandomPoolQuestions.iterator();
+	while (iterDeletedQuestions.hasNext()) {
+	    AssessmentQuestion delQuestion = iterDeletedQuestions.next();
+	    iterDeletedQuestions.remove();
+	    if (delQuestion.getUid() != null) {
+		service.deleteAssessmentQuestion(delQuestion.getUid());
 	    }
 	}
 
@@ -372,77 +356,97 @@ public class AuthoringController {
     /**
      * Display empty page for new assessment question.
      */
-    @RequestMapping("/newQuestionInit")
-    public String newQuestionInit(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
-	    HttpServletRequest request) {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+    @RequestMapping("/initNewQuestion")
+    public String initNewQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
+	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesMaxMarks(request, sessionMap, false);
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	questionForm.setSessionMapID(sessionMapID);
-	questionForm.setDisplayOrder(-1);//which signifies it's a new question
-	questionForm.setContentFolderID(contentFolderID);
-	questionForm.setMaxMark("1");
-	questionForm.setPenaltyFactor("0");
-	questionForm.setAnswerRequired(true);
+	
+	
+//	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+//	questionForm.setContentFolderID(contentFolderID);
+	
 
-	List<QbOption> optionList = new ArrayList<>();
-	for (int i = 0; i < QbConstants.INITIAL_OPTIONS_NUMBER; i++) {
-	    QbOption option = new QbOption();
-	    option.setDisplayOrder(i + 1);
-	    optionList.add(option);
+//	request.setAttribute("isRequestedByTool", true);
+//	request.setAttribute("contentFolderID", contentFolderID);
+	
+	
+//	questionForm.setDisplayOrder(-1);//which signifies it's a new question
+//	
+//	questionForm.setMaxMark("1");
+//	questionForm.setPenaltyFactor("0");
+//	questionForm.setAnswerRequired(true);
+	
+
+	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
+	if (type.equals(-1)) {//randomQuestion case
+	    questionForm.setUid(-1L);//which signifies it's a new question
+	    questionForm.setMaxMark(1);
+	    questionForm.setPenaltyFactor("0");
+	    questionForm.setAnswerRequired(false);
+	    return "pages/authoring/randomQuestion";
+	    
+	} else {
+	    //let QB controller know request comes from the tool
+//		boolean REQUEST_CAME_FROM_ASSESSMENT_TOOL = true;
+//		questionForm.setRequestCameFromAssessmentTool(REQUEST_CAME_FROM_ASSESSMENT_TOOL);
+	    boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+
+	    String params = "?" + AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED + "=" + isAuthoringRestricted;
+	    // sessionMapID and questionType is already supplied as parameters
+
+	    forwardToEditQbQuestionController(request, response, "/qb/edit/initNewQuestion.do", params);
+	    return null;
 	}
-	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
-
-	List<QbQuestionUnit> unitList = new ArrayList<>();
-	QbQuestionUnit unit = new QbQuestionUnit();
-	unit.setDisplayOrder(1);
-	unit.setMultiplier(1);
-	unitList.add(unit);
-	for (int i = 1; i < QbConstants.INITIAL_UNITS_NUMBER; i++) {
-	    unit = new QbQuestionUnit();
-	    unit.setDisplayOrder(i + 1);
-	    unit.setMultiplier(0);
-	    unitList.add(unit);
-	}
-	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
-
-	Integer type = NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
-	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return findForward(type);
     }
 
     /**
      * Display edit page for existed assessment question.
      */
-    @RequestMapping("/editQuestion")
-    public String editQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
-	    HttpServletRequest request) {
+    @RequestMapping("/editQuestionReference")
+    public String editQuestionReference(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam int questionReferenceIndex) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesMaxMarks(request, sessionMap, false);
-
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	int questionDisplayOrder = WebUtil.readIntParam(request, AssessmentConstants.PARAM_QUESTION_DISPLAY_ORDER);
-	AssessmentQuestion question = null;
-	for (AssessmentQuestion questionIter : questionList) {
-	    if (questionIter.getDisplayOrder() == questionDisplayOrder) {
-		question = questionIter;
-		break;
-	    }
-	}
-	if (question == null) {
-	    throw new RuntimeException("Question with displayOrder:" + questionDisplayOrder + " was not found!");
-	}
-	QbUtils.fillFormWithQbQuestion(question.getQbQuestion(), questionForm, request);
-	questionForm.setDisplayOrder(question.getDisplayOrder());
-
-	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, question.getType());
 	
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	questionForm.setContentFolderID(contentFolderID);
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return findForward(question.getType());
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.get(questionReferenceIndex);
+	
+	if (questionReference.isRandomQuestion()) {
+	    return "pages/authoring/randomQuestion";
+	    
+	} else {
+//	    QbUtils.fillFormWithQbQuestion(question.getQbQuestion(), questionForm, request);
+//	    questionForm.setDisplayOrder(question.getDisplayOrder());
+
+	    //let QB controller know request comes from the tool
+//	    boolean REQUEST_CAME_FROM_ASSESSMENT_TOOL = true;
+//	    questionForm.setRequestCameFromAssessmentTool(REQUEST_CAME_FROM_ASSESSMENT_TOOL);
+//	    questionForm.setContentFolderID(contentFolderID);
+	    boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+//	    questionForm.setAuthoringRestricted(isAuthoringRestricted);
+	    AssessmentQuestion question = questionReference.getQuestion();
+	    
+	    String params = "?" + AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED + "=" + isAuthoringRestricted;
+	    params += "&qbQuestionUid=" + question.getQbQuestion().getUid();
+	    // sessionMapID and questionType is already supplied as parameters
+	    
+	    forwardToEditQbQuestionController(request, response, "/qb/edit/editQuestion.do", params);
+	    return null;
+	}
+    }
+    
+    /**
+     * Forwards to the specified jsp page from Assessment tool.
+     */
+    private void forwardToEditQbQuestionController(HttpServletRequest request, HttpServletResponse response, String url,
+	    String params) throws ServletException, IOException {
+	String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
+	serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/" + serverURLContextPath;
+	serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
+	applicationcontext.getServletContext().getContext(serverURLContextPath).getRequestDispatcher(url + params)
+		.forward(request, response);
     }
 
     /**
@@ -454,54 +458,73 @@ public class AuthoringController {
     @SuppressWarnings("unchecked")
     @RequestMapping("/saveOrUpdateQuestion")
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
-	    HttpServletRequest request) {
+	    HttpServletRequest request, @RequestParam Long qbQuestionUid, @RequestParam int questionModificationStatus) {
+	String sessionMapId = questionForm.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(questionForm.getSessionMapID());
-	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+		.getAttribute(sessionMapId);
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
 	
-	//find according question
-	AssessmentQuestion question = null;
 	// add
-	if (questionForm.getDisplayOrder() == -1) { 
-	    question = new AssessmentQuestion();
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setType(questionForm.getQuestionType());
-	    question.setQbQuestion(qbQuestion);
-	    int maxSeq = 1;
-	    if ((questionList != null) && (questionList.size() > 0)) {
-		AssessmentQuestion last = questionList.last();
-		maxSeq = last.getDisplayOrder() + 1;
+	Long oldQbQuestionUid = questionForm.getUid();
+	if (oldQbQuestionUid == -1) {
+	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	    assessmentQuestion.setQbQuestion(qbQuestion);
+	    assessmentQuestion.setRandomQuestion(false);
+	    assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+	    
+	    //create new QuestionReference
+	    QuestionReference reference = new QuestionReference();
+	    reference.setQuestion(assessmentQuestion);
+	    reference.setRandomQuestion(false);
+	    // set SequenceId
+	    int maxSeq2 = 1;
+	    if ((references != null) && (references.size() > 0)) {
+		QuestionReference last = references.last();
+		maxSeq2 = last.getSequenceId() + 1;
 	    }
-	    question.setDisplayOrder(maxSeq);
-	    questionList.add(question);
+	    reference.setSequenceId(maxSeq2);
+	    //set maxMark
+	    int maxMark = qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark();
+	    reference.setMaxMark(maxMark);
+	    references.add(reference);
 	    
 	// edit
 	} else {
-	    for (AssessmentQuestion questionIter : questionList) {
-		if (questionIter.getDisplayOrder() == questionForm.getDisplayOrder()) {
-		    question = questionIter;
-		    break;
+	    //QbQuestion's uid is kept the same - means it's a minor change, do nothing
+	    if (oldQbQuestionUid.equals(qbQuestion.getUid())) {
+
+	    //replace QbQuestion with the new version of it
+	    } else {
+		for (QuestionReference reference : references) {
+		    if (!reference.isRandomQuestion()
+			    && oldQbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
+			AssessmentQuestion assessmentQuestion = reference.getQuestion();
+			assessmentQuestion.setQbQuestion(qbQuestion);
+			assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+			break;
+		    }
 		}
 	    }
 	}
-	QbQuestion qbQuestion = question.getQbQuestion();
-	// evict everything manually as we do not use DTOs, just real entities
-	// without eviction changes would be saved immediately into DB
-	service.releaseFromCache(question);
-	service.releaseFromCache(qbQuestion);
+//	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+//	// evict everything manually as we do not use DTOs, just real entities
+//	// without eviction changes would be saved immediately into DB
+//	service.releaseFromCache(assessmentQuestion);
+//	service.releaseFromCache(qbQuestion);
 	
-	int isQbQuestionModified = QbUtils.extractFormToQbQuestion(qbQuestion, questionForm, request, qbService,
-		isAuthoringRestricted);
-	question.setQbQuestionModified(isQbQuestionModified);
-	request.setAttribute("qbQuestionModified", isQbQuestionModified);
 
-	reinitializeAvailableQuestions(sessionMap);
+	
+//	int isQbQuestionModified = QbUtils.extractFormToQbQuestion(qbQuestion, questionForm, request, qbService,
+//		isAuthoringRestricted);
+//	assessmentQuestion.setQbQuestionModified(isQbQuestionModified);
+	request.setAttribute("qbQuestionModified", questionModificationStatus);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	
 	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options 
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	if (isAuthoringRestricted) {
 	    return "pages/authoring/parts/questionlistRestricted";    
 	} else {
@@ -514,136 +537,88 @@ public class AuthoringController {
      */
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
-    private String importQbQuestion(HttpServletRequest request) {
+    private String importQbQuestion(HttpServletRequest request, @RequestParam Long qbQuestionUid) {
+	//TODO perform updateQuestionReferencesMaxMarks prior to runnning this method
+	
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	
-	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
-	AssessmentQuestion question = new AssessmentQuestion();
-	question.setQbQuestion(qbQuestion);
-	int maxSeq = 1;
-	if (questionList != null && questionList.size() > 0) {
-	    AssessmentQuestion last = questionList.last();
-	    maxSeq = last.getDisplayOrder() + 1;
-	}
-	question.setDisplayOrder(maxSeq);
-	question.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
-	questionList.add(question);
+	AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	assessmentQuestion.setQbQuestion(qbQuestion);
+	assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+		
+	QuestionReference reference = new QuestionReference();
+	reference.setQuestion(assessmentQuestion);
+	reference.setRandomQuestion(false);
 	
-	reinitializeAvailableQuestions(sessionMap);
+	// set SequenceId
+	int maxSeq = 1;
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	if ((references != null) && (references.size() > 0)) {
+	    QuestionReference last = references.last();
+	    maxSeq = last.getSequenceId() + 1;
+	}
+	reference.setSequenceId(maxSeq);
+	
+	//set maxMark
+	int maxMark = qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark();
+	reference.setMaxMark(maxMark);
+	
+	references.add(reference);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
     }
 
-    /**
-     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
-     * happen when user submit whole page. So this remove is just impact HttpSession values.
-     */
-    @RequestMapping("/removeQuestion")
-    public String removeQuestion(HttpServletRequest request) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
-
-	int deletedQuestionDisplayOrder = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_DISPLAY_ORDER), -1);
-	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	Iterator<AssessmentQuestion> iterator = questionList.iterator();
-	AssessmentQuestion deletedQuestion = null;
-	while (iterator.hasNext()) {
-	    AssessmentQuestion questionIter = iterator.next();
-	    if (questionIter.getDisplayOrder() == deletedQuestionDisplayOrder) {
-		deletedQuestion = questionIter;
-		iterator.remove();
-	    }
-	}
-	
-	// add to delList
-	List<AssessmentQuestion> delList = getDeletedQuestionList(sessionMap);
-	delList.add(deletedQuestion);
-
-	// remove according questionReference, if exists
-	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
-	QuestionReference questionReferenceToDelete = null;
-	for (QuestionReference questionReference : questionReferences) {
-	    if ((questionReference.getQuestion() != null)
-		    && (questionReference.getQuestion().getDisplayOrder() == deletedQuestionDisplayOrder)) {
-		questionReferenceToDelete = questionReference;
-	    }
-	}
-	// check if we need to delete random question reference
-	if ((questionReferenceToDelete == null) && (questionReferences.size() > questionList.size())) {
-	    // find the first random question
-	    for (QuestionReference questionReference : questionReferences) {
-		if (questionReference.isRandomQuestion()) {
-		    questionReferenceToDelete = questionReference;
-		    break;
-		}
-	    }
-	}
-	if (questionReferenceToDelete != null) {
-	    questionReferences.remove(questionReferenceToDelete);
-	    // add to delList
-	    List<QuestionReference> delReferencesList = getDeletedQuestionReferences(sessionMap);
-	    delReferencesList.add(questionReferenceToDelete);
-	}
-
-	reinitializeAvailableQuestions(sessionMap);
-	return "pages/authoring/parts/questionlist";
-    }
-
-    /**
-     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
-     * happen when user submit whole page. So this remove is just impact HttpSession values.
-     */
-    @RequestMapping("/addQuestionReference")
-    public String addQuestionReference(HttpServletRequest request) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
-
-	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	int questionIdx = NumberUtils.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
-
-	// set SequenceId
-	QuestionReference reference = new QuestionReference();
-	int maxSeq = 1;
-	if ((references != null) && (references.size() > 0)) {
-	    QuestionReference last = references.last();
-	    maxSeq = last.getSequenceId() + 1;
-	}
-	reference.setSequenceId(maxSeq);
-
-	// set isRandomQuestion
-	boolean isRandomQuestion = (questionIdx == -1);
-	reference.setRandomQuestion(isRandomQuestion);
-
-	if (isRandomQuestion) {
-	    reference.setMaxMark(1);
-	} else {
-	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	    AssessmentQuestion question = null;
-	    for (AssessmentQuestion questionFromList : questionList) {
-		if (questionFromList.getDisplayOrder() == questionIdx) {
-		    question = questionFromList;
-		    break;
-		}
-	    }
-	    reference.setQuestion(question);
-
-	    int maxMark = question.getQbQuestion().getMaxMark() == null ? 1 : question.getQbQuestion().getMaxMark(); 
-	    reference.setMaxMark(maxMark);
-	}
-	references.add(reference);
-
-	reinitializeAvailableQuestions(sessionMap);
-
-	return "pages/authoring/parts/questionlist";
-    }
+//    /**
+//     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
+//     * happen when user submit whole page. So this remove is just impact HttpSession values.
+//     */
+//    @RequestMapping("/addQuestionReference")
+//    public String addQuestionReference(HttpServletRequest request, @RequestParam int questionIndex) {
+//	SessionMap<String, Object> sessionMap = getSessionMap(request);
+//	updateQuestionReferencesMaxMarks(request, sessionMap, false);
+//
+//	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+//
+//	// set SequenceId
+//	QuestionReference reference = new QuestionReference();
+//	int maxSeq = 1;
+//	if ((references != null) && (references.size() > 0)) {
+//	    QuestionReference last = references.last();
+//	    maxSeq = last.getSequenceId() + 1;
+//	}
+//	reference.setSequenceId(maxSeq);
+//
+//	// set isRandomQuestion
+//	boolean isRandomQuestion = (questionIndex == -1);
+//	reference.setRandomQuestion(isRandomQuestion);
+//
+//	if (isRandomQuestion) {
+//	    reference.setMaxMark(1);
+//	    
+//	} else {
+//	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+//	    AssessmentQuestion question = null;
+//	    for (AssessmentQuestion questionFromList : questionList) {
+//		if (questionFromList.getDisplayOrder() == questionIndex) {
+//		    question = questionFromList;
+//		    break;
+//		}
+//	    }
+//	    reference.setQuestion(question);
+//
+//	    int maxMark = question.getQbQuestion().getMaxMark() == null ? 1 : question.getQbQuestion().getMaxMark(); 
+//	    reference.setMaxMark(maxMark);
+//	}
+//	references.add(reference);
+//
+//	return "pages/authoring/parts/questionlist";
+//    }
 
     /**
      * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
@@ -666,8 +641,6 @@ public class AuthoringController {
 	    List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
 	    delList.add(questionReference);
 	}
-
-	reinitializeAvailableQuestions(sessionMap);
 
 	return "pages/authoring/parts/questionlist";
     }
@@ -722,51 +695,48 @@ public class AuthoringController {
 	    return "pages/authoring/parts/questionlist";
 	}
     }
+    
+    @RequestMapping("/addToRandomPool")
+    @ResponseBody
+    public String addToRandomPool(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam Long qbQuestionUid) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	
+	AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	assessmentQuestion.setQbQuestion(qbQuestion);
+	assessmentQuestion.setRandomQuestion(true);
+	assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+	
+	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	randomPoolQuestions.add(assessmentQuestion);
 
-    /**
-     * Ajax call, will add one more input line for new resource item instruction.
-     */
-    @RequestMapping("/addOption")
-    public String addOption(HttpServletRequest request) {
-	TreeSet<QbOption> optionList = QbUtils.getOptionsFromRequest(qbService, request, false);
-	QbOption option = new QbOption();
-	int maxSeq = 1;
-	if ((optionList != null) && (optionList.size() > 0)) {
-	    QbOption last = optionList.last();
-	    maxSeq = last.getDisplayOrder() + 1;
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDone", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
+    }
+    
+    @RequestMapping("/removeFromRandomPool")
+    @ResponseBody
+    public void removeFromRandomPool(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam Long qbQuestionUid) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	
+	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
+	    if (qbQuestionUid.equals(randomPoolQuestion.getQbQuestion().getUid())) {
+		randomPoolQuestions.remove(randomPoolQuestion);
+		
+		// add to delList
+		List<AssessmentQuestion> deletedRandomPoolQuestions = getDeletedRandomPoolQuestions(sessionMap);
+		deletedRandomPoolQuestions.add(randomPoolQuestion);
+	    }
 	}
-	option.setDisplayOrder(maxSeq);
-	optionList.add(option);
-
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
-		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
-	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
-	return "pages/authoring/parts/optionlist";
     }
 
     /**
-     * Ajax call, will add one more input line for new Unit.
-     */
-    @RequestMapping("/newUnit")
-    public String newUnit(HttpServletRequest request) {
-	TreeSet<QbQuestionUnit> unitList = QbUtils.getUnitsFromRequest(qbService, request, false);
-	QbQuestionUnit unit = new QbQuestionUnit();
-	int maxSeq = 1;
-	if ((unitList != null) && (unitList.size() > 0)) {
-	    QbQuestionUnit last = unitList.last();
-	    maxSeq = last.getDisplayOrder() + 1;
-	}
-	unit.setDisplayOrder(maxSeq);
-	unitList.add(unit);
-
-	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
-	return "pages/authoring/parts/unitlist";
-    }
-
-    /**
-     * Ajax call, will add one more input line for new resource item instruction.
+     * Ajax call, will add one more input line for a new OverallFeedback.
      */
     @RequestMapping("/initOverallFeedback")
     public String initOverallFeedback(HttpServletRequest request) {
@@ -817,38 +787,6 @@ public class AuthoringController {
     // *************************************************************************************
 
     /**
-     * refreshes set of all available questions for adding to question list
-     */
-    @SuppressWarnings("unchecked")
-    private void reinitializeAvailableQuestions(SessionMap<String, Object> sessionMap) {
-	SortedSet<AssessmentQuestion> bankQuestions = getQuestionList(sessionMap);
-	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	Set<AssessmentQuestion> questionsFromList = new LinkedHashSet<>();
-	for (QuestionReference reference : references) {
-	    questionsFromList.add(reference.getQuestion());
-	}
-
-	Set<AssessmentQuestion> availableQuestions = new TreeSet<>();
-	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
-
-	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
-    }
-
-    /**
-     * List save current assessment questions.
-     */
-    @SuppressWarnings("unchecked")
-    private SortedSet<AssessmentQuestion> getQuestionList(SessionMap<String, Object> sessionMap) {
-	SortedSet<AssessmentQuestion> list = (SortedSet<AssessmentQuestion>) sessionMap
-		.get(AssessmentConstants.ATTR_QUESTION_LIST);
-	if (list == null) {
-	    list = new TreeSet<>();
-	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_LIST, list);
-	}
-	return list;
-    }
-
-    /**
      * List save current question references.
      */
     @SuppressWarnings("unchecked")
@@ -866,16 +804,24 @@ public class AuthoringController {
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
      */
     @SuppressWarnings("unchecked")
-    private List<AssessmentQuestion> getDeletedQuestionList(SessionMap<String, Object> sessionMap) {
-	return (List<AssessmentQuestion>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
+    private List<QuestionReference> getDeletedQuestionReferences(SessionMap<String, Object> sessionMap) {
+	return (List<QuestionReference>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
+    }
+    
+    /**
+     * List current assessment questions.
+     */
+    @SuppressWarnings("unchecked")
+    private List<AssessmentQuestion> getRandomPoolQuestions(SessionMap<String, Object> sessionMap) {
+	return (List<AssessmentQuestion>) getListFromSession(sessionMap, AssessmentConstants.ATTR_RANDOM_POOL_QUESTIONS);
     }
 
     /**
-     * List save deleted assessment questions, which could be persisted or non-persisted questions.
+     * List current assessment questions.
      */
     @SuppressWarnings("unchecked")
-    private List<QuestionReference> getDeletedQuestionReferences(SessionMap<String, Object> sessionMap) {
-	return (List<QuestionReference>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
+    private List<AssessmentQuestion> getDeletedRandomPoolQuestions(SessionMap<String, Object> sessionMap) {
+	return (List<AssessmentQuestion>) getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_RANDOM_POOL_QUESTIONS);
     }
 
     /**
@@ -888,43 +834,6 @@ public class AuthoringController {
 	    sessionMap.put(name, list);
 	}
 	return list;
-    }
-
-    /**
-     * Get back jsp name.
-     */
-    private String findForward(Integer type) {
-	String forward;
-	switch (type) {
-	    case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		forward = "pages/authoring/parts/addmultiplechoice";
-		break;
-	    case QbQuestion.TYPE_MATCHING_PAIRS:
-		forward = "pages/authoring/parts/addmatchingpairs";
-		break;
-	    case QbQuestion.TYPE_SHORT_ANSWER:
-		forward = "pages/authoring/parts/addshortanswer";
-		break;
-	    case QbQuestion.TYPE_NUMERICAL:
-		forward = "pages/authoring/parts/addnumerical";
-		break;
-	    case QbQuestion.TYPE_TRUE_FALSE:
-		forward = "pages/authoring/parts/addtruefalse";
-		break;
-	    case QbQuestion.TYPE_ESSAY:
-		forward = "pages/authoring/parts/addessay";
-		break;
-	    case QbQuestion.TYPE_ORDERING:
-		forward = "pages/authoring/parts/addordering";
-		break;
-	    case QbQuestion.TYPE_MARK_HEDGING:
-		forward = "pages/authoring/parts/addmarkhedging";
-		break;
-	    default:
-		forward = null;
-		break;
-	}
-	return forward;
     }
 
     private Set<QuestionReference> updateQuestionReferencesMaxMarks(HttpServletRequest request,
@@ -1075,4 +984,25 @@ public class AuthoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     } 
+    
+    private int getNextDisplayOrder(SessionMap<String, Object> sessionMap) {
+	int maxDisplayOrder = 1;
+	
+	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
+	    if (randomPoolQuestion.getDisplayOrder() > maxDisplayOrder) {
+		maxDisplayOrder = randomPoolQuestion.getDisplayOrder();
+	    }
+	}
+	
+	Set<QuestionReference> references = getQuestionReferences(sessionMap);
+	for (QuestionReference reference : references) {
+	    AssessmentQuestion question = reference.getQuestion();
+	    if (question != null && question.getDisplayOrder() > maxDisplayOrder) {
+		maxDisplayOrder = question.getDisplayOrder();
+	    }
+	}	
+
+	return maxDisplayOrder+1;
+    }
 }

@@ -20,6 +20,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.lamsfoundation.lams.qb.service.IQbService;
 
 /**
  * A question in Question Bank.
@@ -64,6 +65,9 @@ public class QbQuestion implements Serializable, Cloneable {
 
     @Column(name = "create_date")
     private Date createDate = new Date();
+    
+    @Column(name = "content_folder_id")
+    private String contentFolderId;
 
     // text of the question
     @Column
@@ -135,13 +139,57 @@ public class QbQuestion implements Serializable, Cloneable {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
-    // compares if current question data and the other one (probably modified with new data) are the same
-    // it detects if question is the same or should another question/version be created
-    public boolean isModified(QbQuestion modifiedQuestion) {
-	return !equals(modifiedQuestion);
+    // checks if important parts of another question are the same as current question's.
+    // And if not, determines whether another question/version be created.
+    public int isQbQuestionModified(QbQuestion oldQuestion) {
+	if (oldQuestion.getUid() == null) {
+	    return IQbService.QUESTION_MODIFIED_ID_BUMP;
+	}
+	if (QbQuestion.TYPE_ESSAY == oldQuestion.getType() || QbQuestion.TYPE_MATCHING_PAIRS == oldQuestion.getType()) {
+	    return IQbService.QUESTION_MODIFIED_NONE;
+	}
+
+	boolean isModificationRequiresNewVersion = false;
+	// title or question is different - do nothing. Also question grade can't be changed
+
+	//QbQuestion.TYPE_TRUE_FALSE
+	if (oldQuestion.getCorrectAnswer() != getCorrectAnswer()) {
+	    isModificationRequiresNewVersion = true;
+	}
+
+	// options are different
+	List<QbOption> oldOptions = oldQuestion.getQbOptions();
+	List<QbOption> newOptions = getQbOptions();
+	for (QbOption oldOption : oldOptions) {
+	    for (QbOption newOption : newOptions) {
+		if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+
+		    //ordering
+		    if (((oldQuestion.getType() == QbQuestion.TYPE_ORDERING)
+			    && (oldOption.getDisplayOrder() != newOption.getDisplayOrder()))
+			    //short answer
+			    || ((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
+				    && !StringUtils.equals(oldOption.getName(), newOption.getName()))
+			    //numbering
+			    || (oldOption.getNumericalOption() != newOption.getNumericalOption())
+			    || (oldOption.getAcceptedError() != newOption.getAcceptedError())
+			    //option grade
+			    || (oldOption.getMaxMark() != newOption.getMaxMark())
+			    //changed correct option
+			    || (oldOption.isCorrect() != newOption.isCorrect())) {
+			isModificationRequiresNewVersion = true;
+		    }
+		}
+	    }
+	}
+	if (oldOptions.size() != newOptions.size()) {
+	    isModificationRequiresNewVersion = true;
+	}
+
+	return isModificationRequiresNewVersion ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
+		: IQbService.QUESTION_MODIFIED_NONE;
     }
 
-    // checks if important parts of another question are the same as current question's
     @Override
     public boolean equals(Object o) {
 	QbQuestion other = (QbQuestion) o;
@@ -229,6 +277,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
+    }
+    
+    public String getContentFolderId() {
+	return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+	this.contentFolderId = contentFolderId;
     }
 
     public String getName() {

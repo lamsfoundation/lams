@@ -4,18 +4,23 @@
 		
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<link href="<lams:WebAppURL/>includes/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
-		<link href="<lams:WebAppURL/>includes/css/addQuestion.css" rel="stylesheet" type="text/css">
+		<lams:css />
+		<link href="<lams:LAMSURL/>/tool/laasse10/includes/css/assessment.css" rel="stylesheet" type="text/css">
+		<link href="<lams:LAMSURL/>/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
+		<link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 		<script type="text/javascript">
 			const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 			const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
 		</script>
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/authoring-question.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-		<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/bootstrap-toggle.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-toggle.js"></script>
   	    <script>
 			$(document).ready(function(){
 		    	$("#assessmentQuestionForm").validate({
@@ -47,6 +52,7 @@
 		    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
+		    			$("#collection-uid-hidden").val($("#collection-uid-select option:selected").val());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#itemArea'), 
@@ -72,14 +78,13 @@
 		</div>
 			
 		<div class="panel-body">
-			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+			<form:form action="/lams/qb/edit/saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
 				method="post" autocomplete="off">
-				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
-				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
+				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
+				<form:hidden path="uid" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
-				<form:hidden path="displayOrder" />
-				<form:hidden path="collectionUid" />
+				<form:hidden path="collectionUid" id="collection-uid-hidden"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />
@@ -134,7 +139,7 @@
 						</label>
 					</div>			
 					
-					<c:if test="${!isAuthoringRestricted}">
+					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row form-inline">
 						    <label for="maxMark" class="col-sm-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -180,17 +185,6 @@
 		</div>	
 	</div>
 	
-	<footer class="footer fixed-bottom">
-		<div class="panel-heading">
-        	<div class="pull-right">
-			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
-					<fmt:message key="label.cancel" />
-				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.save.button" />
-				</a>
-			</div>	
-      	</div>
-    </footer>
+	<%@ include file="addQuestionFooter.jsp"%>
 </body>
 </lams:html>

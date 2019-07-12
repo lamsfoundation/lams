@@ -416,11 +416,14 @@ public class AssessmentServiceImpl
 
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
-	for (AssessmentQuestion question : assessment.getQuestions()) {	    
-	    //update only in case QbQuestion was modified, to prevent updating the same QbQuestions received from SesssionMap
-	    if (question.getQbQuestionModified() != IQbService.QUESTION_MODIFIED_NONE) {
-		assessmentQuestionDao.saveObject(question.getQbQuestion());
+	for (QuestionReference reference : assessment.getQuestionReferences()) {
+	    if (!reference.isRandomQuestion()) {
+		assessmentQuestionDao.saveObject(reference.getQuestion());
 	    }
+	    assessmentQuestionDao.saveObject(reference);
+	}
+	
+	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    assessmentQuestionDao.saveObject(question);
 	}
 
@@ -3151,7 +3154,6 @@ public class AssessmentServiceImpl
 	;// collection
 	for (JsonNode referenceJSONData : references) {
 	    QuestionReference reference = new QuestionReference();
-	    reference.setType((short) 0);
 	    reference.setMaxMark(JsonUtil.optInt(referenceJSONData, "maxMark", 1));
 	    reference.setSequenceId(JsonUtil.optInt(referenceJSONData, RestTags.DISPLAY_ORDER));
 	    AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
@@ -3162,7 +3164,6 @@ public class AssessmentServiceImpl
 	    }
 	    reference.setQuestion(matchingQuestion);
 	    reference.setRandomQuestion(JsonUtil.optBoolean(referenceJSONData, "randomQuestion", Boolean.FALSE));
-	    reference.setTitle(null);
 	    newReferenceSet.add(reference);
 	}
 

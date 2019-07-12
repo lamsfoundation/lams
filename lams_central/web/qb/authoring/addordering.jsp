@@ -1,86 +1,86 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="questionType" value="2"	scope="request" />
+<c:set var="questionType" value="7"	scope="request" />
 
 <lams:html>
-<lams:head>
-	<%@ include file="/common/authoringQuestionHeader.jsp"%>
-    <script>
-		$(document).ready(function(){
-		    $("#assessmentQuestionForm").validate({
-		    	ignore: 'hidden',
-		    	rules: {
-		    		title: "required",
-		    		maxMark: {
-		    	    	required: true,
-		    		    digits: true
+	<lams:head>
+		<%@ include file="addQuestionHeader.jsp"%>
+  	    <script>
+			$(document).ready(function(){
+		    	$("#assessmentQuestionForm").validate({
+		    		ignore: 'hidden',
+		    		rules: {
+		    			title: "required",
+		    			maxMark: {
+		    			      required: true,
+		    			      digits: true
+		    			},
+		    			penaltyFactor: {
+		    			      required: true,
+		    			      number: true
+		    			},
+		    			hasOptionFilled: {
+		    				required: function(element) {
+		    					prepareOptionEditorsForAjaxSubmit();	    				
+		    		        	return $("textarea[name^=optionName]:filled").length < 1;
+			    		    }			    		    
+	    			    }
 		    		},
-		    		penaltyFactor: {
-		    		    required: true,
-		    		    number: true
+		    		messages: {
+		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    			maxMark: {
+		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+		    			},
+		    			penaltyFactor: {
+		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+		    			},
+		    			hasOptionFilled:  "<fmt:message key='label.authoring.numerical.error.answer'/>"
 		    		},
-		    		hasOptionFilled: {
-		    			required: function(element) {
-		    				prepareOptionEditorsForAjaxSubmit();	    				
-		    		       	return $("textarea[name^=matchingPair]:filled").length < 1;
-			    	    }
-	    			   }
-		    	},
-	    		messages: {
-	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			maxMark: {
-	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-	    			},
-	    			penaltyFactor: {
-	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-	    			},
-	    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
-	    		},
-   			    submitHandler: function(form) {
-	    			$("#optionList").val($("#optionForm").serialize(true));
-	    			$("#question").val(CKEDITOR.instances.question.getData());
-	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
+     			    submitHandler: function(form) {
+     			    	prepareOptionEditorsForAjaxSubmit();
+		    			$("#optionList").val($("#optionForm").serialize(true));
+		    			$("#question").val(CKEDITOR.instances.question.getData());
+		    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
+		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
+		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
+     			    	$("#collection-uid-hidden").val($("#collection-uid-select option:selected").val());
 		    			
-	    	    	var options = { 
-	    	    		target:  parent.jQuery('#itemArea'), 
-	    		   		success: afterRatingSubmit  // post-submit callback
-	    		    }; 				
+		    	    	var options = { 
+		    	    		target:  parent.jQuery('#itemArea'), 
+		    		   		success: afterRatingSubmit  // post-submit callback
+		    		    }; 				
 		    		    				
-	    			$('#assessmentQuestionForm').ajaxSubmit(options);
-	    		},
-	    		invalidHandler: formValidationInvalidHandler,
-				errorElement: "em",
-				errorPlacement: formValidationErrorPlacement,
-				success: formValidationSuccess,
-				highlight: formValidationHighlight,
-				unhighlight: formValidationUnhighlight
-	  		});
-		}); 
-	</script>
+		    			$('#assessmentQuestionForm').ajaxSubmit(options);
+		    		},
+		    		invalidHandler: formValidationInvalidHandler,
+					errorElement: "em",
+					errorPlacement: formValidationErrorPlacement,
+					success: formValidationSuccess,
+					highlight: formValidationHighlight,
+					unhighlight: formValidationUnhighlight
+		  		});
+			});
+  		</script>
 </lams:head>
 <body>
 	<div class="panel-default add-file">
 		<div class="panel-heading panel-title">
-			<fmt:message key="label.authoring.basic.type.matching.pairs" />
+			<fmt:message key="label.authoring.basic.type.ordering" />
 		</div>
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+			<form:form action="/lams/qb/edit/saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
 				method="post" autocomplete="off">
-				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
-				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
+				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
+				<form:hidden path="uid" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="displayOrder" />
-				<form:hidden path="collectionUid" />
-				<form:hidden path="contentFolderID" id="contentFolderID"/>				
-				<form:hidden path="feedbackOnCorrect" />
-				<form:hidden path="feedbackOnPartiallyCorrect" />
-				<form:hidden path="feedbackOnIncorrect" />
+				<form:hidden path="collectionUid" id="collection-uid-hidden"/>
+				<form:hidden path="contentFolderID" id="contentFolderID"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />
@@ -93,7 +93,7 @@
 							<span></span>
 						</lams:Alert>	
 				    </div>
-	
+					
 					<div id="title-container" class="form-group">
 						<c:set var="TITLE_LABEL"><fmt:message key="label.enter.question.title"/> </c:set>
 					    <form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
@@ -108,10 +108,9 @@
 					
 					<div>
 						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
-						<label for="hasOptionFilled" class="error" style="display: none;"></label>
 					</div>
 				</div>
-				
+
 				<div class="settings-tab">
 					 <div class="error">
 				    	<lams:Alert id="errorMessages" type="danger" close="false" >
@@ -128,8 +127,8 @@
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
 					</div>
-	
-					<c:if test="${!isAuthoringRestricted}">
+					
+					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row form-inline">
 						    <label for="maxMark" class="col-sm-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -152,33 +151,36 @@
 					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
 					    </div>
 					</div>
-	
-					<div>
-						<label class="switch">
-							<form:checkbox path="shuffle" id="shuffle"/>
-							<span class="switch-slider round"></span>
-						</label>
-						<label for="shuffle">		
-							<fmt:message key="label.authoring.basic.shuffle.the.choices" />
-						</label>
-					</div>
-	
+									
 					<div class="voffset5 form-group">
 						<c:set var="GENERAL_FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.general.feedback"/></c:set>
 						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
-				</div>
+						
+					<!-- Overall feedback -->
 				
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_CORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.correct"/></c:set>
+						<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
+							placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>
+					
+					<div class="form-group">
+						<c:set var="FEEDBACK_ON_INCORRECT_LABEL"><fmt:message key="label.authoring.choice.feedback.on.incorrect"/></c:set>
+						<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
+							placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
+					</div>	
+				</div>
 			</form:form>
 			
 			<!-- Options -->
 			<div class="question-tab">
-				<form id="optionForm" name="optionForm">
+				<form id="optionForm" name="optionForm" class="form-group">
 					<%@ include file="optionlist.jsp"%>
 					
 					<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-default button-add-item pull-right">
-						<fmt:message key="label.authoring.matching.pairs.add.matching.pair" /> 
+						<fmt:message key="label.authoring.choice.add.option" />  
 					</a>
 				</form>
 			</div>
@@ -186,17 +188,6 @@
 		</div>		
 	</div>	
 	
-	<footer class="footer fixed-bottom">
-		<div class="panel-heading">
-        	<div class="pull-right">
-			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
-					<fmt:message key="label.cancel" />
-				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.save.button" />
-				</a>
-			</div>	
-      	</div>
-    </footer>
+	<%@ include file="addQuestionFooter.jsp"%>
 </body>
 </lams:html>
