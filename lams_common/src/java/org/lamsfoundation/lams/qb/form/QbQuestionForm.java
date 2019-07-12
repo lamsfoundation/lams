@@ -34,7 +34,8 @@ public class QbQuestionForm {
     private Long uid;
     private String sessionMapID;
     private String contentFolderID;
-    private Long collectionUid;
+    private Long oldCollectionUid;
+    private Long newCollectionUid;
 
     // tool access mode;
     private String mode;
@@ -87,14 +88,21 @@ public class QbQuestionForm {
 	this.contentFolderID = contentFolderID;
     }
     
-    public Long getCollectionUid() {
-	return collectionUid;
+    public Long getOldCollectionUid() {
+	return oldCollectionUid;
     }
 
-    public void setCollectionUid(Long collectionUid) {
-	this.collectionUid = collectionUid;
+    public void setOldCollectionUid(Long oldCollectionUid) {
+	this.oldCollectionUid = oldCollectionUid;
+    }
+    
+    public Long getNewCollectionUid() {
+	return newCollectionUid;
     }
 
+    public void setNewCollectionUid(Long newCollectionUid) {
+	this.newCollectionUid = newCollectionUid;
+    }
     public String getMode() {
 	return mode;
     }

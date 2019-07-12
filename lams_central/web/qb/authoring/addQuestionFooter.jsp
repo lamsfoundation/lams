@@ -9,7 +9,7 @@
 				<select class="form-controlx btn btn-md btn-default" id="collection-uid-select">
 					<c:forEach var="collection" items="${userCollections}">
 						<option value="${collection.uid}"
-							<c:if test="${collection.uid == assessmentQuestionForm.collectionUid}">selected="selected"</c:if>>
+							<c:if test="${collection.uid == assessmentQuestionForm.oldCollectionUid}">selected="selected"</c:if>>
 							<c:out value="${collection.name}" />
 						</option>
 					</c:forEach>

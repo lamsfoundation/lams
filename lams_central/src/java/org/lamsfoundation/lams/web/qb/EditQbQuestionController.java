@@ -63,7 +63,7 @@ public class EditQbQuestionController {
     WebApplicationContext applicationcontext;
 
     /**
-     * Display empty page for new assessment question.
+     * Display empty page for new question.
      */
     @RequestMapping("/initNewQuestion")
     public String initNewQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
@@ -110,10 +110,13 @@ public class EditQbQuestionController {
 	if (isRequestCameFromAssessmentTool) {
 	    for (QbCollection collection : userCollections) {
 		if (collection.isPersonal()) {
-		    form.setCollectionUid(collection.getUid());
+		    form.setOldCollectionUid(collection.getUid());
 		    break;
 		}
 	    }
+	    
+	} else {
+	    form.setOldCollectionUid(collectionUid);
 	}
 
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
@@ -191,7 +194,7 @@ public class EditQbQuestionController {
 	    } else {
 		collectionUid = questionCollections.iterator().next().getUid();
 	    }
-	    form.setCollectionUid(collectionUid);
+	    form.setOldCollectionUid(collectionUid);
 	}
 
 	return findForwardByQuestionType(qbQuestion.getType());
@@ -247,23 +250,21 @@ public class EditQbQuestionController {
 	userManagementService.save(qbQuestion);
 	
 	final boolean IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL = StringUtils.isNotBlank(form.getSessionMapID());
-	if (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL) {
-	    
-	    //take care about question's collections
-	    Long collectionUid = form.getCollectionUid();
-	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
-	    //remove from the old collection, if needed
-	    if (!isAddingQuestion) {
-		Collection<QbCollection> oldQuestionCollections = qbService.getQuestionCollectionsByUid(oldQuestionUid);
-		Collection<QbCollection> newQuestionCollections = qbService
-			.getQuestionCollectionsByUid(qbQuestion.getUid());
-		oldQuestionCollections.removeAll(newQuestionCollections);
-		for (QbCollection obsoleteOldQuestionCollection : oldQuestionCollections) {
-		    qbService.removeQuestionFromCollectionByQuestionId(obsoleteOldQuestionCollection.getUid(),
-			    qbQuestion.getQuestionId());
-		}
-	    }
+
+	//take care about question's collections. add to collection first
+	Long oldCollectionUid = form.getOldCollectionUid();
+	Long newCollectionUid = form.getNewCollectionUid();
+	if (isAddingQuestion || (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL && !newCollectionUid.equals(oldCollectionUid))) {
+	    qbService.addQuestionToCollection(newCollectionUid, qbQuestion.getQuestionId(), false);
+	}
 	
+	//remove from the old collection first, if needed
+	if (!isAddingQuestion && IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL && !newCollectionUid.equals(oldCollectionUid)) {
+	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, qbQuestion.getQuestionId(),
+		    false);
+	}
+	
+	if (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL) {
 	    //forward to Assessment controller
 	    String params = "?qbQuestionUid=" + qbQuestion.getUid();
 	    params += "&questionModificationStatus=" + questionModificationStatus;

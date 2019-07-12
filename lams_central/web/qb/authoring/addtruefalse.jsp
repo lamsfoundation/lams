@@ -52,7 +52,7 @@
 		    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
-		    			$("#collection-uid-hidden").val($("#collection-uid-select option:selected").val());
+		    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#itemArea'), 
@@ -84,7 +84,8 @@
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="uid" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
-				<form:hidden path="collectionUid" id="collection-uid-hidden"/>
+				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
+				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />

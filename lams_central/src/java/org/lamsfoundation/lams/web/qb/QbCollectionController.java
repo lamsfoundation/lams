@@ -186,7 +186,7 @@ public class QbCollectionController {
     @RequestMapping("/removeCollectionQuestion")
     @ResponseBody
     public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId) {
-	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId);
+	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId, true);
     }
 
     @RequestMapping("/addCollectionQuestion")

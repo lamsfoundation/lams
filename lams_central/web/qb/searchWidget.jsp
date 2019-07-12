@@ -181,6 +181,8 @@
 						//invoke refreshThickbox() only in case parent page has this method 
 						if (typeof self.parent.refreshThickbox === "function") {
 							self.parent.refreshThickbox();
+						} else if (typeof refreshThickbox === "function") {
+							refreshThickbox();
 						}
 
 						//show successfull notification

@@ -107,7 +107,7 @@ public interface IQbService {
 
     boolean removeQuestionFromCollectionByUid(long collectionUid, long qbQuestionUid);
 
-    boolean removeQuestionFromCollectionByQuestionId(long collectionUid, int qbQuestionId);
+    boolean removeQuestionFromCollectionByQuestionId(long collectionUid, int qbQuestionId, boolean tryRemovingQuestion);
 
     Collection<Integer> removeQuestionFromCollection(long collectionUid, Collection<Integer> excludedQbQuestionIds);
 
