@@ -67,8 +67,9 @@ public class EditQbQuestionController {
      */
     @RequestMapping("/initNewQuestion")
     public String initNewQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
+	    HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(required = false) Long collectionUid) throws ServletException, IOException {
+
 	form.setUid(-1L);//which signifies it's a new question
 	form.setMaxMark(1);
 	form.setPenaltyFactor("0");
@@ -118,7 +119,7 @@ public class EditQbQuestionController {
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 	return findForwardByQuestionType(type);
     }
-    
+
     /**
      * Display edit page for existing question.
      */
@@ -126,7 +127,7 @@ public class EditQbQuestionController {
     public String editQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
@@ -177,7 +178,7 @@ public class EditQbQuestionController {
 	//in case request came from assessment tool - set private collection as default, otherwise collectioUid is already supplied as parameter from collections.jsp
 	final boolean isRequestCameFromAssessmentTool = StringUtils.isNotBlank(form.getSessionMapID());
 	if (isRequestCameFromAssessmentTool) {
-	    Collection<QbCollection> questionCollections = qbService.getQuestionCollections(qbQuestionUid);
+	    Collection<QbCollection> questionCollections = qbService.getQuestionCollectionsByUid(qbQuestionUid);
 
 	    Long collectionUid = null;
 	    if (questionCollections.isEmpty()) {
@@ -201,8 +202,6 @@ public class EditQbQuestionController {
      * <code>HttpSession</code> AssessmentQuestionList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * @throws IOException 
-     * @throws ServletException 
      */
     @RequestMapping("/saveOrUpdateQuestion")
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
@@ -212,16 +211,16 @@ public class EditQbQuestionController {
 	QbQuestion qbQuestion = null;
 	Long oldQuestionUid = null;
 	
-	boolean isQuestionNew = form.getUid() == -1;
+	boolean isAddingQuestion = form.getUid() == -1;
 	// add
-	if (isQuestionNew) { 
+	if (isAddingQuestion) { 
 	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(form.getQuestionType());
 	    
 	// edit
 	} else {
-	    oldQuestionUid = Long.valueOf(form.getUid());
-	    qbQuestion = qbService.getQbQuestionByUid(oldQuestionUid);
+	    oldQuestionUid = form.getUid();
+	    qbQuestion = qbService.getQuestionByUid(oldQuestionUid);
 	    qbService.releaseFromCache(qbQuestion);
 	}
 	
@@ -240,48 +239,32 @@ public class EditQbQuestionController {
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
 		qbQuestion.setVersion(1);
-		qbQuestion.setQuestionId(qbService.getMaxQuestionId()+1);
+		qbQuestion.setQuestionId(qbService.getMaxQuestionId() + 1);
 		qbQuestion.setCreateDate(new Date());
 	    }
 		break;
 	}
 	userManagementService.save(qbQuestion);
 	
-	//take care about question's collections
-	Long collectionUid = form.getCollectionUid();
-	qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
-	//remove from the old collection, if needed
-	//TODO after merging Marcin's collection changes
-	if (!isQuestionNew) {
-	    Collection<QbCollection> oldQuestionCollections = qbService.getQuestionCollections(oldQuestionUid);
-	    Collection<QbCollection> newQuestionCollections = qbService.getQuestionCollections(qbQuestion.getUid());
-	    oldQuestionCollections.removeAll(newQuestionCollections);
-	    for (QbCollection obsoleteOldQuestionCollection : oldQuestionCollections) {
-		qbService.removeQuestionFromCollection(obsoleteOldQuestionCollection.getUid(), qbQuestion.getUid());
-	    }
-	}
-	
-	
-	
-//	boolean belongsToNoCollection = qbQuestion.getUid() == null;
-	//in case of new question - add it to specified collection
-//	if (belongsToNoCollection) {
-//
-//	    Long collectionUid = questionForm.getCollectionUid();
-//	    //try to get collection from the old question
-//	    if (collectionUid != null && collectionUid.equals(-1L)) {
-//		Collection<QbCollection> existingCollections = qbService.getQuestionCollections(oldQuestionUid);
-//		collectionUid = existingCollections.stream().findFirst().map(collection -> collection.getUid())
-//			.orElse(null);
-//	    }
-//
-//	    if (collectionUid != null && !collectionUid.equals(-1L)) {
-//		qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
-//	    }
-//	}
-	
 	final boolean IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL = StringUtils.isNotBlank(form.getSessionMapID());
 	if (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL) {
+	    
+	    //take care about question's collections
+	    Long collectionUid = form.getCollectionUid();
+	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
+	    //remove from the old collection, if needed
+	    if (!isAddingQuestion) {
+		Collection<QbCollection> oldQuestionCollections = qbService.getQuestionCollectionsByUid(oldQuestionUid);
+		Collection<QbCollection> newQuestionCollections = qbService
+			.getQuestionCollectionsByUid(qbQuestion.getUid());
+		oldQuestionCollections.removeAll(newQuestionCollections);
+		for (QbCollection obsoleteOldQuestionCollection : oldQuestionCollections) {
+		    qbService.removeQuestionFromCollectionByQuestionId(obsoleteOldQuestionCollection.getUid(),
+			    qbQuestion.getQuestionId());
+		}
+	    }
+	
+	    //forward to Assessment controller
 	    String params = "?qbQuestionUid=" + qbQuestion.getUid();
 	    params += "&questionModificationStatus=" + questionModificationStatus;
 
@@ -297,15 +280,12 @@ public class EditQbQuestionController {
 	} else {
 	    
 	    // in case adding new question - return nothing
-	    if (isQuestionNew) {
+	    if (isAddingQuestion) {
 		return null;
 
-		// edit question case - return question's uid
+	    // edit question case - return question's uid
 	    } else {
 		return "forward:returnQuestionUid.do?qbQuestionUid=" + qbQuestion.getUid();
-//		response.setContentType("text/plain");
-//		response.setCharacterEncoding("UTF-8");
-//		return qbQuestion.getUid().toString();
 	    }
 	}
     }
@@ -415,13 +395,14 @@ public class EditQbQuestionController {
 	
 	return qbQuestion.isQbQuestionModified(oldQuestion);
     }
-    
+
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/addOption")
     public String addOption(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	TreeSet<QbOption> optionList = getOptionsFromRequest(request, false);
+
 	QbOption option = new QbOption();
 	int maxSeq = 1;
 	if ((optionList != null) && (optionList.size() > 0)) {
@@ -487,7 +468,7 @@ public class EditQbQuestionController {
 	    String uidStr = paramMap.get(QbConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		option = qbService.getQbOptionByUid(uid);
+		option = qbService.getOptionByUid(uid);
 		
 	    } else {
 		option = new QbOption();
@@ -586,7 +567,7 @@ public class EditQbQuestionController {
 	    String uidStr = paramMap.get(QbConstants.ATTR_UNIT_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
-		unit = qbService.getQbQuestionUnitByUid(uid);
+		unit = qbService.getQuestionUnitByUid(uid);
 		
 	    } else {
 		unit = new QbQuestionUnit();
@@ -631,7 +612,7 @@ public class EditQbQuestionController {
 	}
 	return paramMap;
     }
-    
+
     /**
      * Get back jsp name.
      */

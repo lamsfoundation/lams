@@ -407,7 +407,7 @@ public class AuthoringController {
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
 	ScratchieItem item = new ScratchieItem();

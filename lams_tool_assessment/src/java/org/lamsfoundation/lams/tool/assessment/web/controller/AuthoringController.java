@@ -463,7 +463,7 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	// add
 	Long oldQbQuestionUid = questionForm.getUid();
@@ -543,7 +543,7 @@ public class AuthoringController {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
 	AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
@@ -701,7 +701,7 @@ public class AuthoringController {
     public String addToRandomPool(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
 	assessmentQuestion.setQbQuestion(qbQuestion);

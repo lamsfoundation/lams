@@ -31,9 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -54,9 +52,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/qb/collection")
@@ -93,8 +88,7 @@ public class QbCollectionController {
 	model.addAttribute("availableOrganisations",
 		qbService.getShareableWithOrganisations(collectionUid, getUserId()));
 	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
-	model.addAttribute("isQtiExportEnabled",
-		Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
+	model.addAttribute("isQtiExportEnabled", Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
 	return "qb/collection";
     }
 
@@ -117,10 +111,22 @@ public class QbCollectionController {
 		sortOrder, searchString);
 	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return toGridXML(questions, page, maxPages, total, showUsage);
+	return toGridXML(questions, page, maxPages, total, showUsage, false);
     }
 
-    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage) {
+    @RequestMapping("/getQuestionVersionGridData")
+    @ResponseBody
+    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, HttpServletRequest request,
+	    HttpServletResponse response) {
+	response.setContentType("text/xml; charset=utf-8");
+
+	List<QbQuestion> questions = qbService.getQuestionsByQuestionId(qbQuestionId);
+	questions = questions.subList(1, questions.size());
+	return toGridXML(questions, 1, 1, questions.size(), true, true);
+    }
+
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage,
+	    boolean isVersionGrid) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -145,10 +151,15 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String usage = showUsage ? String.valueOf(qbService.getCountQuestionActivities(question.getUid()))
+		String usage = showUsage
+			? String.valueOf(isVersionGrid ? qbService.getCountQuestionActivitiesByUid(question.getUid())
+				: qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
 			: null;
-		String[] data = { uid, WebUtil.removeHTMLtags(question.getName()).trim(), question.getType().toString(),
-			question.getVersion().toString(), usage, uid };
+		boolean hasVersions = qbService.countQuestionVersions(question.getQuestionId()) > 1;
+		String[] data = { question.getQuestionId().toString(),
+			WebUtil.removeHTMLtags(question.getName()).trim(),
+			isVersionGrid ? null : question.getType().toString(), question.getVersion().toString(), usage,
+			uid, String.valueOf(hasVersions) };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);
@@ -174,18 +185,18 @@ public class QbCollectionController {
 
     @RequestMapping("/removeCollectionQuestion")
     @ResponseBody
-    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam long qbQuestionUid) {
-	qbService.removeQuestionFromCollection(collectionUid, qbQuestionUid);
+    public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId) {
+	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId);
     }
 
     @RequestMapping("/addCollectionQuestion")
     @ResponseBody
     public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
-	    @RequestParam long qbQuestionUid) {
+	    @RequestParam int qbQuestionId) {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
 	    throw new SecurityException("Transfering questions between collections is disabled");
 	}
-	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionUid, copy);
+	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
     }
 
     @RequestMapping("/addCollection")
@@ -204,7 +215,13 @@ public class QbCollectionController {
 	Collection<QbCollection> collections = qbService.getUserCollections(getUserId());
 	name = name.trim();
 	for (QbCollection collection : collections) {
-	    if (!collection.getUid().equals(collectionUid) && name.equalsIgnoreCase(collection.getName())) {
+	    if (collection.getUid().equals(collectionUid)) {
+		if (collection.getUserId() == null) {
+		    // can not change public collection name
+		    return "false";
+		}
+	    } else if (name.equalsIgnoreCase(collection.getName())) {
+		// a collection with the same name already exists
 		return "false";
 	    }
 	}

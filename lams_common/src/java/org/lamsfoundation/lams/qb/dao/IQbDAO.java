@@ -16,13 +16,13 @@ public interface IQbDAO extends IBaseDAO {
      * @param qbQuestionUid
      * @return QbQuestion object with the specified uid
      */
-    QbQuestion getQbQuestionByUid(Long qbQuestionUid);
+    QbQuestion getQuestionByUid(Long qbQuestionUid);
 
     /**
      * @param questionId
      * @return questions sharing the same questionId
      */
-    List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId);
+    List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
@@ -32,34 +32,38 @@ public interface IQbDAO extends IBaseDAO {
 
     List<ToolActivity> getQuestionActivities(long qbQuestionUid);
 
-    int getCountQuestionActivities(long qbQuestionUid);
+    int getCountQuestionActivitiesByUid(long qbQuestionUid);
+
+    int getCountQuestionActivitiesByQuestionId(int qbQuestionId);
 
     List<QbQuestion> getQuestionVersions(long qbQuestionUid);
 
-    Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid);
+    Map<Long, Long> getAnswerStatsForQuestion(long qbQuestionUid);
 
     Map<Integer, Long> getAnswersForActivity(long activityId, long qbQuestionUid);
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
-    List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+    List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
-    int getCountQbQuestions(Integer questionType, String searchString);
+    int getCountQuestions(Integer questionType, String searchString);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid, Integer offset, Integer limit, String orderBy,
 	    String orderDirection, String search);
 
-    List<QbCollection> getQuestionCollections(long qbQuestionUid);
+    List<QbCollection> getQuestionCollectionsByUid(long qbQuestionUid);
+
+    List<QbCollection> getQuestionCollectionsByQuestionId(int qbQuestionId);
 
     int getCountCollectionQuestions(long collectionUid, String search);
 
-    void addCollectionQuestion(long collectionUid, long qbQuestionUid);
+    void addCollectionQuestion(long collectionUid, int qbQuestionId);
 
-    void removeCollectionQuestion(long collectionUid, long qbQuestionUid);
+    void removeCollectionQuestion(long collectionUid, int qbQuestionId);
 
-    Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids);
+    Set<Integer> getCollectionQuestionIdsExcluded(long collectionUid, Collection<Integer> qbQuestionIds);
 
 }

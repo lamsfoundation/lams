@@ -79,7 +79,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			var collectionGrid = $('#collection-grid');
+			var collectionGrid = $('#collection-grid'),	
+				isPublicCollection = ${empty collection.userId};
 			
 			collectionGrid.jqGrid({
 				guiStyle: "bootstrap",
@@ -107,16 +108,18 @@
 			    	"questionType",
 			    	"questionVersion",
 			    	"Used in<br>lessons",
-			    	"Actions"
+			    	"Actions",
+			    	"hasVersions"
 			    ],
 			    colModel:[
-			    	{name:'id', index:'uid', sortable:true, hidden:true, width: 10},
+			    	{name:'id', index:'uid', sortable:true, hidden:false, width: 10},
 			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: questionNameFormatter},
 			    	{name:'questionType', index:'questionType', width:0, hidden: true},
 			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
 			      	// formatter gets just question uid and creates a button
-			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter}
+			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter},
+					{name:'hasVersions', index:'hasVersions', width:0, hidden: true}
 			    ],
 				beforeSelectRow: function(rowid, e) {
 					// do not select rows at all
@@ -129,35 +132,82 @@
 			    loadError: function(xhr,st,err) {
 			    	collectionGrid.clearGridData();
 				   	alert("Error!");
-			    }
+			    },
+				subGrid : true,
+				subGridOptions: {
+				    hasSubgrid: function (options) {
+				        return options.data.hasVersions == 'true';
+				    }
+				 },
+				subGridRowExpanded: function(subgrid_id, row_id) {
+				    var subgrid_table_id = subgrid_id + "_t",
+				   	    rowData = jQuery("#" + subgrid_id.substring(0, subgrid_id.lastIndexOf('_'))).getRowData(row_id),
+				   	    questionId = rowData["id"].split("_")[0];
+					jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll archive'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					jQuery("#"+subgrid_table_id).jqGrid({
+							 guiStyle: "bootstrap",
+							 iconSet: 'fontAwesome',
+							 autoencode:false,
+							 autowidth: true,
+						     datatype: "xml",
+						     url: "<lams:LAMSURL />qb/collection/getQuestionVersionGridData.do?qbQuestionId=" + questionId,
+						     height: "100%",
+						     cmTemplate: { title: false },
+						     cellEdit:false,
+						     pager: false,
+						     colNames: [
+						    	"ID",
+						    	"Name",
+						    	"questionType",
+						    	"questionVersion",
+						    	"Used in<br>lessons",
+						    	"Actions"
+						     ],
+						     colModel: [
+						    	{name:'id', index:'uid', sortable:false, hidden:true, width: 10},
+						    	{name:'name', index:'name', sortable:false, search:false, autoencode:true, formatter: questionNameFormatter},
+						    	{name:'questionType', index:'questionType', width:0, hidden: true},
+						    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
+						    	{name: 'usage', index: 'usage', sortable:false, width: 9, align: "center"},
+						      	// formatter gets just question uid and creates a button
+						    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 12, align: "center", formatter: actionsFormatter}
+						     ],
+						     loadError: function(xhr,st,err) {
+						    	jQuery("#"+subgrid_table_id).clearGridData();
+						    	alert("Error!");
+						     }
+					  	});
+					}
 			}).jqGrid('filterToolbar');
 
-			//turn to inline mode for x-editable.js
-			$.fn.editable.defaults.mode = 'inline';
-			//enable renaming of lesson title  
-			$('#collection-name').editable({
-			    type: 'text',
-			    pk: ${collection.uid},
-			    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
-			    validate: function(value) {
-				    //close editing area on validation failure
-		            if (!value.trim()) {
-		                $('.editable-open').editableContainer('hide', 'cancel');
-		                return 'Can not be empty!';
-		            }
-		        },
-			    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
-			    success: function(response, newValue) {
-					if (response.created == 'false') {
-						alert('Collection with such name already exists');
-					}
-			    }
-		    //hide and show pencil on showing and hiding editing widget
-			}).on('shown', function(e, editable) {
-				$(this).nextAll('i.fa-pencil').hide();
-			}).on('hidden', function(e, reason) {
-				$(this).nextAll('i.fa-pencil').show();
-			});
+			if (!isPublicCollection) {
+				//turn to inline mode for x-editable.js
+				$.fn.editable.defaults.mode = 'inline';
+				//enable renaming of lesson title  
+				$('#collection-name').editable({
+				    type: 'text',
+				    pk: ${collection.uid},
+				    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
+				    validate: function(value) {
+					    //close editing area on validation failure
+			            if (!value.trim()) {
+			                $('.editable-open').editableContainer('hide', 'cancel');
+			                return 'Can not be empty!';
+			            }
+			        },
+				    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+				    success: function(response, newValue) {
+						if (response.created == 'false') {
+							alert('Collection with such name already exists');
+						}
+				    }
+			    //hide and show pencil on showing and hiding editing widget
+				}).on('shown', function(e, editable) {
+					$(this).nextAll('i.fa-pencil').hide();
+				}).on('hidden', function(e, reason) {
+					$(this).nextAll('i.fa-pencil').show();
+				});
+			}
 		});
 		
 		// auxiliary formatter for jqGrid's question statistics column
@@ -211,9 +261,11 @@
 	        text += "<span class='pull-right alert-info btn-xs loffset5'>";
 	       	text += "v. " + questionVersion;
 	        text += "</span>";
-	       	text += "<span class='pull-right alert-info btn-xs'>";
-	       	text += questionType;
-	        text += "</span>";
+	        if (questionType) {
+		       	text += "<span class='pull-right alert-info btn-xs'>";
+		       	text += questionType;
+		        text += "</span>";
+	        }
 	        	
 			return text;
 		}
@@ -331,7 +383,9 @@
 					<c:out value="${collection.name}" />
 				</strong>
 			</span>
-			<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			<c:if test="${not empty collection.userId}">
+				<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			</c:if>
 			
 			<c:if test="${collection.personal}">
 				<span class="grid-collection-private small">

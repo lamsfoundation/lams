@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Exports and imports IMS QTI questions.
- * 
+ *
  * @author Andrey Balan
  */
 @Controller
@@ -45,10 +45,10 @@ public class ImsQtiController {
 
     @Autowired
     private IQbService qbService;
-    
+
     @Autowired
     private IUserManagementService userManagementService;
-    
+
     /**
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
@@ -57,15 +57,15 @@ public class ImsQtiController {
     public void saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
 	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
 	int questionId = qbService.getMaxQuestionId();
-	
+
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    QbQuestion qbQuestion = new QbQuestion();
 	    qbQuestion.setName(question.getTitle());
 	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
-	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
-		    contentFolderID, question.getResourcesFolderPath()));
+	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
 	    qbQuestion.setPenaltyFactor(0);
 	    qbQuestion.setQuestionId(++questionId);
 
@@ -298,22 +298,22 @@ public class ImsQtiController {
 
 	    qbQuestion.setMaxMark(questionMark);
 	    userManagementService.save(qbQuestion);
-	    
-	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getUid(), false);
-	    
+
+	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
+
 	    if (log.isDebugEnabled()) {
 		log.debug("Imported QTI question. Name: " + qbQuestion.getName() + ", uid: " + qbQuestion.getUid());
 	    }
 	}
     }
-    
+
     /**
      * Exports QB question as IMS QTI package.
      */
     @RequestMapping("/exportQuestionAsQTI")
     public String exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam long qbQuestionUid) {
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	List<QbQuestion> qbQuestions = new LinkedList<>();
 	qbQuestions.add(qbQuestion);
 
@@ -390,8 +390,7 @@ public class ImsQtiController {
 
 			    answer.setText(assessmentAnswer.getName());
 			    answer.setScore(
-				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue()
-					    : 0);
+				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
 			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
 				    : qbQuestion.getFeedbackOnIncorrect());
 
@@ -422,18 +421,16 @@ public class ImsQtiController {
 		    // true/false question is basically the same for QTI, just with special answers
 		    Answer trueAnswer = new Answer();
 		    trueAnswer.setText("True");
-		    trueAnswer.setScore(
-			    isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
-		    trueAnswer.setFeedback(isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
-			    : qbQuestion.getFeedbackOnIncorrect());
+		    trueAnswer.setScore(isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    trueAnswer.setFeedback(
+			    isTrueCorrect ? qbQuestion.getFeedbackOnCorrect() : qbQuestion.getFeedbackOnIncorrect());
 		    answers.add(trueAnswer);
 
 		    Answer falseAnswer = new Answer();
 		    falseAnswer.setText("False");
-		    falseAnswer.setScore(
-			    !isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
-		    falseAnswer.setFeedback(!isTrueCorrect ? qbQuestion.getFeedbackOnCorrect()
-			    : qbQuestion.getFeedbackOnIncorrect());
+		    falseAnswer.setScore(!isTrueCorrect ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+		    falseAnswer.setFeedback(
+			    !isTrueCorrect ? qbQuestion.getFeedbackOnCorrect() : qbQuestion.getFeedbackOnIncorrect());
 		    answers.add(falseAnswer);
 		    break;
 
@@ -476,8 +473,7 @@ public class ImsQtiController {
 			boolean isCorrectAnswer = assessmentAnswer.isCorrect();
 
 			answer.setText(assessmentAnswer.getName());
-			answer.setScore(
-				isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
+			answer.setScore(isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
 			answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
 				: qbQuestion.getFeedbackOnIncorrect());
 

@@ -445,7 +445,7 @@ public class McController {
 
 	//get QbQuestion from DB
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
-	QbQuestion qbQuestion = qbService.getQbQuestionByUid(qbQuestionUid);	
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);	
 	
 	//finding max displayOrder
 	int maxDisplayOrder = 0;

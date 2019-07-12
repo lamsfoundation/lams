@@ -23,11 +23,15 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String FIND_MAX_QUESTION_ID = "SELECT MAX(questionId) FROM QbQuestion";
+
     private static final String FIND_MAX_VERSION = "SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId";
+
     private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM ToolActivity AS a, QbToolQuestion AS q "
 	    + "WHERE a.toolContentId = q.toolContentId AND a.learningDesign.lessons IS NOT EMPTY AND q.qbQuestion.uid = :qbQuestionUid";
+
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
+
     private static final String FIND_ANSWER_STATS_BY_QB_QUESTION = "SELECT COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt, COUNT(a.answer_uid) "
 	    + "FROM lams_qb_tool_question AS tq JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
 	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
@@ -35,6 +39,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
 	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
+
     private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id), "
 	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
@@ -49,37 +54,44 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_laasse10_assessment_result AS ar ON aq.result_uid = ar.uid "
 	    + "LEFT JOIN tl_laasse10_user AS au ON ar.user_uid = au.uid "
 	    + "WHERE act.activity_id = :activityId AND tq.qb_question_uid = :qbQuestionUid HAVING opt IS NOT NULL";
+
     private static final String FIND_BURNING_QUESTIONS = "SELECT b.question, COUNT(bl.uid) FROM ScratchieBurningQuestion b LEFT OUTER JOIN "
 	    + "BurningQuestionLike AS bl ON bl.burningQuestion = b WHERE b.scratchieItem.qbQuestion.uid = :qbQuestionUid "
 	    + "GROUP BY b.question ORDER BY COUNT(bl.uid) DESC";
 
     private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS cq "
-	    + "JOIN lams_qb_question AS q ON cq.qb_question_uid = q.uid WHERE cq.collection_uid = :collectionUid";
+	    + "JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id WHERE "
+	    + "q.version = (SELECT MAX(version) FROM lams_qb_question WHERE question_id = q.question_id) "
+	    + "AND cq.collection_uid = :collectionUid";
 
-    private static final String FIND_QUESTION_COLLECTIONS = "SELECT c.* FROM lams_qb_collection_question AS cq "
-	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid WHERE cq.qb_question_uid = :qbQuestionUid";
+    private static final String FIND_QUESTION_COLLECTIONS_BY_UID = "SELECT c.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id "
+	    + "WHERE q.uid = :qbQuestionUid";
 
-    private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionUid)";
+    private static final String FIND_QUESTION_COLLECTIONS_BY_QUESTION_ID = "SELECT c.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid WHERE cq.qb_question_id = :qbQuestionId";
+
+    private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionId)";
 
     private static final String EXISTS_COLLECTION_QUESTION = "SELECT 1 FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
-	    + "AND qb_question_uid = :qbQuestionUid";
+	    + "AND qb_question_id = :qbQuestionId";
 
     private static final String REMOVE_COLLECTION_QUESTION = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
-	    + "AND qb_question_uid = :qbQuestionUid";
+	    + "AND qb_question_id = :qbQuestionId";
 
-    private static final String FIND_COLLECTION_QUESTIONS_EXCLUDED = "SELECT qb_question_uid FROM lams_qb_collection_question "
-	    + "WHERE collection_uid = :collectionUid AND qb_question_uid NOT IN :qbQuestionUids";
+    private static final String FIND_COLLECTION_QUESTIONS_EXCLUDED = "SELECT qb_question_id FROM lams_qb_collection_question "
+	    + "WHERE collection_uid = :collectionUid AND qb_question_id NOT IN :qbQuestionIds";
 
     @Override
-    public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
+    public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
+    public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
 	final String FIND_QUESTIONS_BY_QUESTION_ID = "FROM " + QbQuestion.class.getName()
-		+ " WHERE questionId = :questionId ORDER BY version ASC";
+		+ " WHERE questionId = :questionId ORDER BY version DESC";
 
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
@@ -109,9 +121,17 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public int getCountQuestionActivities(long qbQuestionUid) {
+    public int getCountQuestionActivitiesByUid(long qbQuestionUid) {
 	return ((Long) getSession().createQuery(FIND_QUESTION_ACTIVITIES.replace("SELECT a", "SELECT COUNT(a)"))
 		.setParameter("qbQuestionUid", qbQuestionUid).getSingleResult()).intValue();
+    }
+
+    @Override
+    public int getCountQuestionActivitiesByQuestionId(int qbQuestionId) {
+	return ((Long) getSession()
+		.createQuery(FIND_QUESTION_ACTIVITIES.replace("SELECT a", "SELECT COUNT(a)")
+			.replace("uid = :qbQuestionUid", "questionId = :qbQuestionId"))
+		.setParameter("qbQuestionId", qbQuestionId).getSingleResult()).intValue();
     }
 
     @Override
@@ -123,7 +143,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Long, Long> getAnswerStatsForQbQuestion(long qbQuestionUid) {
+    public Map<Long, Long> getAnswerStatsForQuestion(long qbQuestionUid) {
 	List<Object[]> result = this.getSession().createSQLQuery(FIND_ANSWER_STATS_BY_QB_QUESTION)
 		.setParameter("qbQuestionUid", qbQuestionUid).list();
 	Map<Long, Long> map = new HashMap<>(result.size());
@@ -135,8 +155,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+    public List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
 	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
 	final String SELECT_QUESTIONS = "SELECT DISTINCT question.* " + " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
@@ -192,10 +212,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public int getCountQbQuestions(Integer questionType, String searchString) {
-	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count " + " FROM lams_qb_question question  "
-		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
-		+ " LEFT JOIN ("//help finding questions with the max available version
+    public int getCountQuestions(Integer questionType, String searchString) {
+	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count "
+		+ " FROM lams_qb_question question  " + " LEFT OUTER JOIN lams_qb_option qboption "
+		+ "	ON qboption.qb_question_uid = question.uid " + " LEFT JOIN ("//help finding questions with the max available version
 		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
 		+ " 		LEFT OUTER JOIN lams_qb_option qboption1 "
 		+ "		ON qboption1.qb_question_uid = biggerQuestion.uid "
@@ -209,7 +229,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 
-	Query query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count", IntegerType.INSTANCE);;
+	Query query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count", IntegerType.INSTANCE);
+	;
 	query.setParameter("questionType", questionType);
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
@@ -249,9 +270,16 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<QbCollection> getQuestionCollections(long qbQuestionUid) {
-	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS).setParameter("qbQuestionUid", qbQuestionUid)
-		.addEntity(QbCollection.class).list();
+    public List<QbCollection> getQuestionCollectionsByUid(long qbQuestionUid) {
+	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS_BY_UID)
+		.setParameter("qbQuestionUid", qbQuestionUid).addEntity(QbCollection.class).list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<QbCollection> getQuestionCollectionsByQuestionId(int qbQuestionId) {
+	return getSession().createNativeQuery(FIND_QUESTION_COLLECTIONS_BY_QUESTION_ID)
+		.setParameter("qbQuestionId", qbQuestionId).addEntity(QbCollection.class).list();
     }
 
     @SuppressWarnings("unchecked")
@@ -275,35 +303,35 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     }
 
     @Override
-    public void addCollectionQuestion(long collectionUid, long qbQuestionUid) {
-	if (!questionInCollectionExists(collectionUid, qbQuestionUid)) {
+    public void addCollectionQuestion(long collectionUid, int qbQuestionId) {
+	if (!questionInCollectionExists(collectionUid, qbQuestionId)) {
 	    getSession().createNativeQuery(ADD_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
-		    .setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+		    .setParameter("qbQuestionId", qbQuestionId).executeUpdate();
 	}
     }
 
     @Override
-    public void removeCollectionQuestion(long collectionUid, long qbQuestionUid) {
+    public void removeCollectionQuestion(long collectionUid, int qbQuestionId) {
 	getSession().createNativeQuery(REMOVE_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
-		.setParameter("qbQuestionUid", qbQuestionUid).executeUpdate();
+		.setParameter("qbQuestionId", qbQuestionId).executeUpdate();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Set<Long> getCollectionQuestionUidsExcluded(long collectionUid, Collection<Long> qbQuestionUids) {
+    public Set<Integer> getCollectionQuestionIdsExcluded(long collectionUid, Collection<Integer> qbQuestionIds) {
 	List<BigInteger> queryResult = getSession().createNativeQuery(FIND_COLLECTION_QUESTIONS_EXCLUDED)
-		.setParameter("collectionUid", collectionUid).setParameterList("qbQuestionUids", qbQuestionUids)
+		.setParameter("collectionUid", collectionUid).setParameterList("qbQuestionIds", qbQuestionIds)
 		.getResultList();
-	Set<Long> result = new HashSet<>();
-	for (BigInteger uid : queryResult) {
-	    result.add(uid.longValue());
+	Set<Integer> result = new HashSet<>();
+	for (BigInteger questionId : queryResult) {
+	    result.add(questionId.intValue());
 	}
 	return result;
     }
 
-    private boolean questionInCollectionExists(long collectionUid, long qbQuestionUid) {
+    private boolean questionInCollectionExists(long collectionUid, int qbQuestionId) {
 	return !getSession().createNativeQuery(EXISTS_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
-		.setParameter("qbQuestionUid", qbQuestionUid).getResultList().isEmpty();
+		.setParameter("qbQuestionId", qbQuestionId).getResultList().isEmpty();
     }
 
     private Query prepareCollectionQuestionsQuery(long collectionUid, String orderBy, String orderDirection,

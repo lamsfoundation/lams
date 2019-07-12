@@ -53,22 +53,21 @@ public class QbService implements IQbService {
 
     private IUserManagementService userManagementService;
 
-    public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = (c1,
-	    c2) -> c1 == null || c1.getName() == null ? (c2 == null || c2.getName() == null ? 0 : -1)
-		    : c1.getName().compareTo(c2.getName());
+    public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = Comparator
+	    .comparing(QbCollection::getName);
 
     @Override
-    public QbQuestion getQbQuestionByUid(Long qbQuestionUid) {
-	return qbDAO.getQbQuestionByUid(qbQuestionUid);
+    public QbQuestion getQuestionByUid(Long qbQuestionUid) {
+	return qbDAO.getQuestionByUid(qbQuestionUid);
     }
 
     @Override
-    public List<QbQuestion> getQbQuestionsByQuestionId(Integer questionId) {
-	return qbDAO.getQbQuestionsByQuestionId(questionId);
+    public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
+	return qbDAO.getQuestionsByQuestionId(questionId);
     }
 
     @Override
-    public QbOption getQbOptionByUid(Long optionUid) {
+    public QbOption getOptionByUid(Long optionUid) {
 	QbOption option = qbDAO.find(QbOption.class, optionUid);
 	qbDAO.releaseFromCache(option);
 	qbDAO.releaseFromCache(option.getQbQuestion());
@@ -76,7 +75,7 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public QbQuestionUnit getQbQuestionUnitByUid(Long unitUid) {
+    public QbQuestionUnit getQuestionUnitByUid(Long unitUid) {
 	QbQuestionUnit unit = qbDAO.find(QbQuestionUnit.class, unitUid);
 	qbDAO.releaseFromCache(unit);
 	qbDAO.releaseFromCache(unit.getQbQuestion());
@@ -94,18 +93,18 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public List<QbQuestion> getPagedQbQuestions(Integer questionType, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-	return qbDAO.getPagedQbQuestions(questionType, page, size, sortBy, sortOrder, searchString);
+    public List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+	    String searchString) {
+	return qbDAO.getPagedQuestions(questionType, page, size, sortBy, sortOrder, searchString);
     }
 
     @Override
-    public int getCountQbQuestions(Integer questionType, String searchString) {
-	return qbDAO.getCountQbQuestions(questionType, searchString);
+    public int getCountQuestions(Integer questionType, String searchString) {
+	return qbDAO.getCountQuestions(questionType, searchString);
     }
 
     @Override
-    public QbStatsDTO getQbQuestionStats(long qbQuestionUid) {
+    public QbStatsDTO getQuestionStats(long qbQuestionUid) {
 	QbStatsDTO stats = new QbStatsDTO();
 	QbQuestion qbQuestion = qbDAO.find(QbQuestion.class, qbQuestionUid);
 	List<QbOption> qbOptions = qbQuestion.getQbOptions();
@@ -131,7 +130,7 @@ public class QbService implements IQbService {
 	stats.setActivities(activityDTOs);
 
 	stats.setVersions(qbDAO.getQuestionVersions(qbQuestionUid));
-	Map<Long, Long> answersRaw = qbDAO.getAnswerStatsForQbQuestion(qbQuestionUid);
+	Map<Long, Long> answersRaw = qbDAO.getAnswerStatsForQuestion(qbQuestionUid);
 	stats.setAnswersRaw(answersRaw);
 
 	ArrayNode answersJSON = JsonNodeFactory.instance.arrayNode();
@@ -156,6 +155,13 @@ public class QbService implements IQbService {
 	stats.setAnswersPercent(answerPercent);
 	stats.setAnswersJSON(answersJSON.toString());
 	return stats;
+    }
+
+    @Override
+    public int countQuestionVersions(int qbQuestionId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("questionId", qbQuestionId);
+	return Long.valueOf(qbDAO.countByProperties(QbQuestion.class, properties)).intValue();
     }
 
     @Override
@@ -320,8 +326,13 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public List<QbCollection> getQuestionCollections(long qbQuestionUid) {
-	return qbDAO.getQuestionCollections(qbQuestionUid);
+    public List<QbCollection> getQuestionCollectionsByUid(long qbQuestionUid) {
+	return qbDAO.getQuestionCollectionsByUid(qbQuestionUid);
+    }
+
+    @Override
+    public List<QbCollection> getQuestionCollectionsByQuestionId(int qbQuestionId) {
+	return qbDAO.getQuestionCollectionsByQuestionId(qbQuestionId);
     }
 
     @Override
@@ -346,8 +357,8 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public boolean removeQuestion(long qbQuestionUid) {
-	boolean removeQuestionPossible = removeQuestionPossible(qbQuestionUid);
+    public boolean removeQuestionByUid(long qbQuestionUid) {
+	boolean removeQuestionPossible = removeQuestionPossibleByUid(qbQuestionUid);
 	if (!removeQuestionPossible) {
 	    // if the question is used in a Learning Design, do not allow to remove it
 	    return false;
@@ -357,9 +368,29 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public boolean removeQuestionPossible(long qbQuestionUid) {
+    public boolean removeQuestionByQuestionId(int qbQuestionId) {
+	boolean removeQuestionPossible = removeQuestionPossibleByQuestionId(qbQuestionId);
+	if (!removeQuestionPossible) {
+	    // if the question is used in a Learning Design, do not allow to remove it
+	    return false;
+	}
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("questionId", qbQuestionId);
+	qbDAO.deleteByProperties(QbQuestion.class, properties);
+	return true;
+    }
+
+    @Override
+    public boolean removeQuestionPossibleByUid(long qbQuestionUid) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("qbQuestion.uid", qbQuestionUid);
+	return qbDAO.countByProperties(QbToolQuestion.class, properties) == 0;
+    }
+
+    @Override
+    public boolean removeQuestionPossibleByQuestionId(int qbQuestionId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("qbQuestion.questionId", qbQuestionId);
 	return qbDAO.countByProperties(QbToolQuestion.class, properties) == 0;
     }
 
@@ -392,54 +423,62 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public void addQuestionToCollection(long collectionUid, long qbQuestionUid, boolean copy) {
-	long addQbQuestionUid = qbQuestionUid;
+    public void addQuestionToCollection(long collectionUid, int qbQuestionId, boolean copy) {
+	int addQbQuestionId = qbQuestionId;
 	if (copy) {
-	    QbQuestion question = getQbQuestionByUid(qbQuestionUid);
+	    List<QbQuestion> questions = getQuestionsByQuestionId(qbQuestionId);
+	    QbQuestion question = questions.get(0);
 	    QbQuestion newQuestion = question.clone();
-	    newQuestion.setQuestionId(getMaxQuestionId());
+	    addQbQuestionId = getMaxQuestionId();
+	    newQuestion.setQuestionId(addQbQuestionId);
 	    newQuestion.setVersion(1);
 	    newQuestion.setCreateDate(new Date());
 	    newQuestion.clearID();
 	    qbDAO.insert(newQuestion);
-	    addQbQuestionUid = newQuestion.getUid();
 	}
-	qbDAO.addCollectionQuestion(collectionUid, addQbQuestionUid);
+	qbDAO.addCollectionQuestion(collectionUid, addQbQuestionId);
     }
 
     @Override
     public void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
-	    Collection<Long> excludedQbQuestionUids, boolean copy) {
-	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(sourceCollectionUid,
-		excludedQbQuestionUids);
-	for (Long uid : includedUids) {
-	    addQuestionToCollection(targetCollectionUid, uid, copy);
+	    Collection<Integer> excludedQbQuestionIds, boolean copy) {
+	Collection<Integer> includedIds = qbDAO.getCollectionQuestionIdsExcluded(sourceCollectionUid,
+		excludedQbQuestionIds);
+	for (Integer questionId : includedIds) {
+	    addQuestionToCollection(targetCollectionUid, questionId, copy);
 	}
     }
 
     @Override
-    public boolean removeQuestionFromCollection(long collectionUid, long qbQuestionUid) {
-	Collection<QbCollection> collections = getQuestionCollections(qbQuestionUid);
+    public boolean removeQuestionFromCollectionByUid(long collectionUid, long qbQuestionUid) {
+	QbQuestion question = getQuestionByUid(qbQuestionUid);
+	return removeQuestionFromCollectionByQuestionId(collectionUid, question.getQuestionId());
+    }
+
+    @Override
+    public boolean removeQuestionFromCollectionByQuestionId(long collectionUid, int qbQuestionId) {
+	Collection<QbCollection> collections = getQuestionCollectionsByQuestionId(qbQuestionId);
 	int size = collections.size();
 	if (size <= 1) {
 	    // if the question is in its last collection, try to remove it permanently
-	    return removeQuestion(qbQuestionUid);
+	    return removeQuestionByQuestionId(qbQuestionId);
 	}
-	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionUid);
+	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionId);
 	return true;
     }
 
     @Override
-    public Collection<Long> removeQuestionFromCollection(long collectionUid, Collection<Long> excludedQbQuestionUids) {
-	Collection<Long> includedUids = qbDAO.getCollectionQuestionUidsExcluded(collectionUid, excludedQbQuestionUids);
-	Collection<Long> retainedQuestionUids = new HashSet<>();
-	for (Long uid : includedUids) {
-	    boolean deleted = removeQuestionFromCollection(collectionUid, uid);
+    public Collection<Integer> removeQuestionFromCollection(long collectionUid,
+	    Collection<Integer> excludedQbQuestionIds) {
+	Collection<Integer> includedIds = qbDAO.getCollectionQuestionIdsExcluded(collectionUid, excludedQbQuestionIds);
+	Collection<Integer> retainedQuestionIds = new HashSet<>();
+	for (Integer questionId : includedIds) {
+	    boolean deleted = removeQuestionFromCollectionByQuestionId(collectionUid, questionId);
 	    if (!deleted) {
-		retainedQuestionUids.add(uid);
+		retainedQuestionIds.add(questionId);
 	    }
 	}
-	return retainedQuestionUids;
+	return retainedQuestionIds;
     }
 
     @Override
@@ -494,8 +533,13 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public int getCountQuestionActivities(long qbQuestionUid) {
-	return qbDAO.getCountQuestionActivities(qbQuestionUid);
+    public int getCountQuestionActivitiesByUid(long qbQuestionUid) {
+	return qbDAO.getCountQuestionActivitiesByUid(qbQuestionUid);
+    }
+
+    @Override
+    public int getCountQuestionActivitiesByQuestionId(int qbQuestionId) {
+	return qbDAO.getCountQuestionActivitiesByQuestionId(qbQuestionId);
     }
 
     @Override
