@@ -63,7 +63,7 @@
 		    }
 		});
 
-		//init all toogles (required in case of adding/removing options)
+		//init all toggles (required in case of adding/removing options)
 		if (${questionType == 8}) {
 			$("input[type='checkbox'][name='optionCorrect']").bootstrapToggle();
 		}
@@ -82,7 +82,9 @@
 	<input type="hidden" name="optionCount" id="optionCount" value="${fn:length(optionList)}">
 	<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 	
-	<div id="option-table">
+	<div id="option-table" 
+		<c:if test="${!assessmentQuestionForm.authoringRestricted}">class="sortable-on"</c:if>>
+		
 		<c:forEach var="option" items="${optionList}" varStatus="status">
 			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
 				<tr>
@@ -113,7 +115,7 @@
 						</c:choose>	
 					</td>
 	
-					<c:if test="${!isAuthoringRestricted}">
+					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<td width="30px">
 							<i class="fa fa-trash delete-button option-settings-hidden" title="<fmt:message key="label.authoring.basic.delete" />"
 								onclick="javascript:removeOption(${status.index})" style="display: none;"></i>

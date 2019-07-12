@@ -4,7 +4,7 @@
 
 <lams:html>
 <lams:head>
-	<%@ include file="/common/authoringQuestionHeader.jsp"%>
+	<%@ include file="addQuestionHeader.jsp"%>
     <script>
 		$(document).ready(function(){
 		    $("#assessmentQuestionForm").validate({
@@ -60,6 +60,7 @@
 	    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
 	    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrect.getData());
 	    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
+	    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 		    			
 	    	    	var options = { 
 	    	    		target:  parent.jQuery('#itemArea'), 
@@ -117,15 +118,15 @@
 			
 		<div class="panel-body">
 			
-			<form:form action="saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
+			<form:form action="/lams/qb/edit/saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
 				method="post" autocomplete="off">
-				<c:set var="sessionMap" value="${sessionScope[assessmentQuestionForm.sessionMapID]}" />
-				<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
+				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
+				<form:hidden path="uid" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
-				<form:hidden path="displayOrder" />
-				<form:hidden path="collectionUid" />
+				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
+				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
@@ -177,7 +178,7 @@
 						</label>
 					</div>
 					
-					<c:if test="${!isAuthoringRestricted}">
+					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row">
 						    <label for="maxMark" class="col-sm-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -287,17 +288,6 @@
 		</div>	
 	</div>	
 	
-	<footer class="footer fixed-bottom">
-		<div class="panel-heading">
-        	<div class="pull-right">
-			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
-					<fmt:message key="label.cancel" />
-				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.save.button" />
-				</a>
-			</div>	
-      	</div>
-    </footer>	
+	<%@ include file="addQuestionFooter.jsp"%>	
 </body>
 </lams:html>

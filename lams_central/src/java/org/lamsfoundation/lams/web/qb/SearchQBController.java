@@ -121,7 +121,12 @@ public class SearchQBController {
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	
-	return "qb/search";
+	boolean isFullJspRequested = WebUtil.readBooleanParam(request, "isFullJspRequested", true);
+	if (isFullJspRequested) {
+	    return "qb/search";    
+	} else {
+	    return "qb/searchWidget";
+	}
     }
     
     /**

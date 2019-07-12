@@ -216,7 +216,7 @@
 					+ "\", \"_blank\")' title='Show stats'></i>";
 
 			cellhtml += "<a  title='<fmt:message key='label.edit' />' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
-						+ cellvalue + "&collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true' class='thickbox'>"; 
+						+ cellvalue + "&collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true' class='thickbox'>"; 
 			cellhtml += 	"<i class='fa fa-pencil'></i>";
 			cellhtml += "</a>";
 
@@ -354,7 +354,7 @@
 		function initLinkHref() {
 			var questionType = document.getElementById("question-type").selectedIndex + 1;
 			$("#create-question-href").attr("href", 
-					"<c:url value='/qb/edit/newQuestionInit.do'/>?questionType=" + questionType 
+					"<c:url value='/qb/edit/initNewQuestion.do'/>?questionType=" + questionType 
 					+ "&collectionUid=${collection.uid}" 
 					+ "&KeepThis=true&TB_iframe=true&modal=true");
 		};

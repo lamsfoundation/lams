@@ -92,4 +92,9 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
     public void up20190110To20190517() {
 	this.removeField(AssessmentQuestion.class, "questionHash");
     }
+    
+    public void up20190517To20190704() {
+	this.removeField(QuestionReference.class, "title");
+	this.removeField(QuestionReference.class, "type");
+    }
 }

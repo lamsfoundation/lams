@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +42,6 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -52,11 +50,6 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.qb.service.QbUtils;
-import org.lamsfoundation.lams.questions.Answer;
-import org.lamsfoundation.lams.questions.Question;
-import org.lamsfoundation.lams.questions.QuestionExporter;
-import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
@@ -496,8 +489,9 @@ public class AuthoringController {
 	}
 	item.getQbQuestion().setQbOptions(options);
 
-	item.setQbQuestionModified(QbUtils.isQbQuestionModified(baseLine, item.getQbQuestion()));
-	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
+	int isQbQuestionModified = item.getQbQuestion().isQbQuestionModified(baseLine);
+	item.setQbQuestionModified(isQbQuestionModified);
+	request.setAttribute("qbQuestionModified", isQbQuestionModified);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, scratchieItemForm.getSessionMapID());

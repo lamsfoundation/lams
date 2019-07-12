@@ -452,11 +452,12 @@ public class QbService implements IQbService {
     @Override
     public boolean removeQuestionFromCollectionByUid(long collectionUid, long qbQuestionUid) {
 	QbQuestion question = getQuestionByUid(qbQuestionUid);
-	return removeQuestionFromCollectionByQuestionId(collectionUid, question.getQuestionId());
+	return removeQuestionFromCollectionByQuestionId(collectionUid, question.getQuestionId(), true);
     }
 
     @Override
-    public boolean removeQuestionFromCollectionByQuestionId(long collectionUid, int qbQuestionId) {
+    public boolean removeQuestionFromCollectionByQuestionId(long collectionUid, int qbQuestionId,
+	    boolean tryRemovingQuestion) {
 	Collection<QbCollection> collections = getQuestionCollectionsByQuestionId(qbQuestionId);
 	int size = collections.size();
 	if (size <= 1) {
@@ -473,7 +474,7 @@ public class QbService implements IQbService {
 	Collection<Integer> includedIds = qbDAO.getCollectionQuestionIdsExcluded(collectionUid, excludedQbQuestionIds);
 	Collection<Integer> retainedQuestionIds = new HashSet<>();
 	for (Integer questionId : includedIds) {
-	    boolean deleted = removeQuestionFromCollectionByQuestionId(collectionUid, questionId);
+	    boolean deleted = removeQuestionFromCollectionByQuestionId(collectionUid, questionId, true);
 	    if (!deleted) {
 		retainedQuestionIds.add(questionId);
 	    }

@@ -52,16 +52,15 @@ public class AssessmentQuestion extends QbToolQuestion
 	implements Serializable, Cloneable, Comparable<AssessmentQuestion> {
     private static final long serialVersionUID = -7767327140430305575L;
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
+    
+    @Column(name = "random_question")
+    private boolean randomQuestion;
 
     @Column(name = "correct_answers_disclosed")
     private boolean correctAnswersDisclosed;
 
     @Column(name = "groups_answers_disclosed")
     private boolean groupsAnswersDisclosed;
-
-    // *************** NON Persistent Fields ********************
-    @Transient
-    private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
 
     @Override
     public Object clone() {
@@ -126,6 +125,14 @@ public class AssessmentQuestion extends QbToolQuestion
     public void setUid(Long userID) {
 	this.uid = userID;
     }
+    
+    public boolean isRandomQuestion() {
+	return randomQuestion;
+    }
+
+    public void setRandomQuestion(boolean randomQuestion) {
+	this.randomQuestion = randomQuestion;
+    }
 
     public boolean isCorrectAnswersDisclosed() {
 	return correctAnswersDisclosed;
@@ -141,15 +148,5 @@ public class AssessmentQuestion extends QbToolQuestion
 
     public void setGroupsAnswersDisclosed(boolean groupsAnswersDisclosed) {
 	this.groupsAnswersDisclosed = groupsAnswersDisclosed;
-    }
-
-    // *************** NON Persist Fields used in monitoring ********************
-    
-    public int getQbQuestionModified() {
-	return qbQuestionModified;
-    }
-
-    public void setQbQuestionModified(int qbQuestionModified) {
-	this.qbQuestionModified = qbQuestionModified;
     }
 }

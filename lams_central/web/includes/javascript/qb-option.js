@@ -105,7 +105,7 @@ function initializeAnswers() {
 	}
     
     //init options sorting feature
-    new Sortable(document.getElementById('option-table'), {
+    new Sortable($('#option-table.sortable-on')[0], {
 	    animation: 150,
 	    ghostClass: 'sortable-placeholder',
 	    direction: 'vertical',

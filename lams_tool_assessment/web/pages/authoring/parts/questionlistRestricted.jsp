@@ -1,18 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="availableQuestions" value="${sessionMap.availableQuestions}" />
 
 <div class="panel panel-default voffset5">
-	<div class="panel-heading panel-title">
-		<fmt:message key="label.authoring.basic.question.list.title" />
-	</div>
-
 	<table class="table table-condensed" id="referencesTable">
 		<tr>
-			<th width="20%">
-				<fmt:message key="label.authoring.basic.list.header.type" />
-			</th>
-			<th width="40%">
+			<th>
 				<fmt:message key="label.authoring.basic.list.header.question" />
 			</th>
 			<th colspan="3">
@@ -26,49 +18,53 @@
 				<td>
 					<c:choose>
 						<c:when test="${questionReference.randomQuestion}">
-							<fmt:message key="label.authoring.basic.type.random.question" />
-						</c:when>
-						<c:when test="${question.type == 1}">
-							<fmt:message key="label.authoring.basic.type.multiple.choice" />
-						</c:when>
-						<c:when test="${question.type == 2}">
-							<fmt:message key="label.authoring.basic.type.matching.pairs" />
-						</c:when>
-						<c:when test="${question.type == 3}">
-							<fmt:message key="label.authoring.basic.type.short.answer" />
-						</c:when>
-						<c:when test="${question.type == 4}">
-							<fmt:message key="label.authoring.basic.type.numerical" />
-						</c:when>
-						<c:when test="${question.type == 5}">
-							<fmt:message key="label.authoring.basic.type.true.false" />
-						</c:when>
-						<c:when test="${question.type == 6}">
-							<fmt:message key="label.authoring.basic.type.essay" />
-						</c:when>
-						<c:when test="${question.type == 7}">
-							<fmt:message key="label.authoring.basic.type.ordering" />
-						</c:when>
-						<c:when test="${question.type == 8}">
-							<fmt:message key="label.authoring.basic.type.mark.hedging" />
-						</c:when>
-					</c:choose>
-				</td>
-
-				<td>
-					<c:choose>
-						<c:when test="${questionReference.randomQuestion}">
 							<fmt:message key="label.authoring.basic.random.question" />
 						</c:when>
 						<c:otherwise>
 							<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
+					
+			        <span class='pull-right alert-info btn-xs loffset5 roffset5'>
+			       		v.&nbsp;${question.qbQuestion.version}
+			        </span>
+			        
+			       	<span class='pull-right alert-info btn-xs'>
+						<c:choose>
+							<c:when test="${questionReference.randomQuestion}">
+								<fmt:message key="label.authoring.basic.type.random.question" />
+							</c:when>
+							<c:when test="${question.type == 1}">
+								<fmt:message key="label.authoring.basic.type.multiple.choice" />
+							</c:when>
+							<c:when test="${question.type == 2}">
+								<fmt:message key="label.authoring.basic.type.matching.pairs" />
+							</c:when>
+							<c:when test="${question.type == 3}">
+								<fmt:message key="label.authoring.basic.type.short.answer" />
+							</c:when>
+							<c:when test="${question.type == 4}">
+								<fmt:message key="label.authoring.basic.type.numerical" />
+							</c:when>
+							<c:when test="${question.type == 5}">
+								<fmt:message key="label.authoring.basic.type.true.false" />
+							</c:when>
+							<c:when test="${question.type == 6}">
+								<fmt:message key="label.authoring.basic.type.essay" />
+							</c:when>
+							<c:when test="${question.type == 7}">
+								<fmt:message key="label.authoring.basic.type.ordering" />
+							</c:when>
+							<c:when test="${question.type == 8}">
+								<fmt:message key="label.authoring.basic.type.mark.hedging" />
+							</c:when>
+						</c:choose>
+	       			</span>
 				</td>
 				
-				<td>
+				<td width="70px" style="padding-right: 10px;">
 					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
-						id="maxMark${questionReference.sequenceId}" class="form-control input-sm" style="width: 50%;">
+						id="maxMark${questionReference.sequenceId}" class="form-control input-sm">
 				</td>
 				
 				<td class="arrows">
@@ -84,10 +80,10 @@
 
 				<td width="30px">
 					<c:if test="${!questionReference.randomQuestion}">
-						<c:set var="editQuestionUrl" >
-							<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionDisplayOrder=${questionReference.question.displayOrder}&KeepThis=true&TB_iframe=true&modal=true
+						<c:set var="editQuestionReferenceUrl" >
+							<c:url value='/authoring/editQuestionReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>
-						<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
+						<a href="${editQuestionReferenceUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
 							<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 						</a>			
 					</c:if>
