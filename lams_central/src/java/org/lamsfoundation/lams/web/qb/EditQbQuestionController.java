@@ -141,7 +141,7 @@ public class EditQbQuestionController {
 	form.setContentFolderID(qbQuestion.getContentFolderId() == null ? "temp" : qbQuestion.getContentFolderId());
 	form.setTitle(qbQuestion.getName());
 	form.setQuestion(qbQuestion.getDescription());
-	form.setMaxMark(qbQuestion.getMaxMark());
+	form.setMaxMark(qbQuestion.getMaxMark()== null ? 1 : qbQuestion.getMaxMark());
 	form.setPenaltyFactor(String.valueOf(qbQuestion.getPenaltyFactor()));
 	form.setAnswerRequired(qbQuestion.isAnswerRequired());
 	form.setFeedback(qbQuestion.getFeedback());
