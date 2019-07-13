@@ -1,10 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${not empty questionForOrdering}">
-	<c:set var="question" value="${questionForOrdering}" />
-	<c:set var="assessment" value="${sessionMap.assessment}" />	
-</c:if>
-
 <div class="question-type">
 	<fmt:message key="label.learning.ordering.sort.answers" />
 </div>
@@ -13,7 +8,6 @@
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">
 			<tr>
-
 				<td class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.displayOrder == ordStatus.index)}">
 						<i class="fa fa-check text-success"></i>	

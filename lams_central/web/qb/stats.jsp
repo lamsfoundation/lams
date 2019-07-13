@@ -58,8 +58,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript">
-		var permanentRemove = ${permanentRemove},
-			permanentRemovePossible = ${permanentRemovePossible},
+		var permanentRemove = '${permanentRemove}' == 'true',
+			permanentRemovePossible = '${permanentRemovePossible}' == 'true',
 			optionsExist = ${not empty question.qbOptions};
 		
 		$(document).ready(function(){
@@ -227,58 +227,6 @@
 					</c:forEach>
 				</table>		
 			</c:if>
-		</div>
-	</div>
-	
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			Management
-		</div>
-		<div class="panel-body">
-			<div class="container-fluid">			
-				<c:if test="${not empty availableCollections and transferAllowed}">
-					<div class="row">
-						<div class="col-xs-12 col-md-2 middle-cell">
-							Transfer questions to
-						</div>
-						<div class="col-xs-12 col-md-6">
-							<select class="form-control" id="targetCollectionSelect">
-								<c:forEach var="target" items="${availableCollections}">
-									<option value="${target.uid}">
-										<c:out value="${target.name}" />
-									</option>
-								</c:forEach>
-							</select>
-						</div>
-						<div class="col-xs-12 col-md-4">
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">Add</button>
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">Copy</button>
-						</div>
-					</div>
-				</c:if>
-				
-				<div class="row">
-					<div class="col-xs-0 col-md-2"></div>
-					<div class="col-xs-12 col-md-8 header-column">
-						Existing collections
-					</div>
-					<div class="col-xs-0 col-md-2"></div>
-				</div>
-				
-				<c:forEach var="collection" items="${existingCollections}">
-					<div class="row">
-						<div class="col-xs-0 col-md-2"></div>
-						<div class="col-xs-12 col-md-6 middle-cell">
-							<c:out value="${collection.name}" />
-						</div>
-						<div class="col-xs-12 col-md-2">
-							<c:if test="${transferAllowed}">
-								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button>
-							</c:if>
-						</div>
-					</div>
-				</c:forEach>
-			</div>
 		</div>
 	</div>
 	
@@ -452,6 +400,100 @@
 			</c:choose>
 		</div>
 	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			Collections
+		</div>
+		<div class="panel-body">
+			<div class="container-fluid">			
+				<c:if test="${not empty availableCollections and transferAllowed}">
+					<div class="row">
+						<div class="col-xs-12 col-md-2 middle-cell">
+							Transfer questions to
+						</div>
+						<div class="col-xs-12 col-md-6">
+							<select class="form-control" id="targetCollectionSelect">
+								<c:forEach var="target" items="${availableCollections}">
+									<option value="${target.uid}">
+										<c:out value="${target.name}" />
+									</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="col-xs-12 col-md-4">
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">Add</button>
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">Copy</button>
+						</div>
+					</div>
+				</c:if>
+				
+				<div class="row">
+					<div class="col-xs-0 col-md-2"></div>
+					<div class="col-xs-12 col-md-8 header-column">
+						Existing collections
+					</div>
+					<div class="col-xs-0 col-md-2"></div>
+				</div>
+				
+				<c:forEach var="collection" items="${existingCollections}">
+					<div class="row">
+						<div class="col-xs-0 col-md-2"></div>
+						<div class="col-xs-12 col-md-6 middle-cell">
+							<c:out value="${collection.name}" />
+						</div>
+						<div class="col-xs-12 col-md-2">
+							<c:if test="${transferAllowed}">
+								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button>
+							</c:if>
+						</div>
+					</div>
+				</c:forEach>
+			</div>
+		</div>
+	</div>
+	
+	<c:choose>
+		<c:when test="${managementAllowed}">
+			<lams:OutcomeAuthor qbQuestionId="${question.questionId}" />
+		</c:when>
+		<c:otherwise>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Learning outcomes
+				</div>
+				<div class="panel-body">
+					<c:choose>
+						<c:when test="${empty outcomes}">
+							This question does not have any learning outcomes
+						</c:when>
+						<c:otherwise>
+							<div class="container-fluid">			
+								<div class="row">
+									<div class="col-xs-0 col-md-2"></div>
+									<div class="col-xs-12 col-md-8 header-column">
+										Existing outcomes
+									</div>
+									<div class="col-xs-0 col-md-2"></div>
+								</div>
+								
+								<c:forEach var="outcome" items="${outcomes}">
+									<div class="row">
+										<div class="col-xs-0 col-md-2"></div>
+										<div class="col-xs-12 col-md-8 middle-cell">
+											<c:out value="${outcome}" />
+										</div>
+										<div class="col-xs-0 col-md-2">
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</div>
+		</c:otherwise>
+	</c:choose>
 </lams:Page>
 
 <!-- For exporting QTI packages -->

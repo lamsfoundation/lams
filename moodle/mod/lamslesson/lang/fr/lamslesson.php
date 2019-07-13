@@ -41,7 +41,7 @@
          $string['pluginname'] = 'Leçon LAMS';
          $string['selectsequence'] = 'Sélection d´une séquence';
          $string['displaydesign'] = 'Afficher image du design?';
-         $string['allowLearnerRestart'] = 'Learners can restart the lesson?';
+         $string['allowlearnerrestart'] = 'Learners can restart the lesson?';
          $string['availablesequences'] = 'Séquences';
          $string['openauthor'] = 'Créer nouvelle leçon LAMS';
 

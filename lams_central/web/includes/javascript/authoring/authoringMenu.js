@@ -594,7 +594,7 @@ var MenuLib = {
 		
 		// find an unqiue title for the new activity
 		var copyCount = 1, 
-			title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', ' ') + ' ' + activity.title;
+			title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', '') + ' ' + activity.title;
 		while (true) {
 			var sameTitleFound = false;
 			$.each(layout.activities, function(){
@@ -606,7 +606,7 @@ var MenuLib = {
 			
 			if (sameTitleFound) {
 				copyCount++;
-				title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', ' (' + copyCount + ') ') + ' ' + activity.title;
+				title = LABELS.ACTIVITY_COPY_TITLE_PREFIX.replace('[0]', '(' + copyCount + ') ') + ' ' + activity.title;
 			} else {
 				break;
 			}

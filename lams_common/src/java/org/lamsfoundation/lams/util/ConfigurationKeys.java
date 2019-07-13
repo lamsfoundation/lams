@@ -290,6 +290,9 @@ public class ConfigurationKeys {
     public static String ANTIVIRUS_ENABLE = "AntivirusEnable";
     public static String ANTIVIRUS_HOST = "AntivirusHost";
     public static String ANTIVIRUS_PORT = "AntivirusPort";
+    
+    // LDEV-4819
+    public static String LEARNING_OUTCOME_QUICK_ADD_ENABLE = "LearningOutcomeQuickAddEnable";
 
     // LDEV-4827 Question Bank
     public static String QB_QTI_ENABLE = "QbQtiEnable";

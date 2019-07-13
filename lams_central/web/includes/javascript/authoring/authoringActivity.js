@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿﻿/**
  * This file contains methods for Activity definition and manipulation on canvas.
  */
 
@@ -78,11 +78,12 @@ ActivityDefs = {
 	/**
 	 * Represents a set of branches. It is not displayed on canvas, but holds all the vital data.
 	 */
-	BranchingActivity : function(id, uiid, branchingEdgeStart, readOnly) {
+	BranchingActivity : function(id, uiid, branchingEdgeStart, readOnly, orderedAsc) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.start = branchingEdgeStart;
 		this.readOnly = readOnly;
+		this.orderedAsc = orderedAsc;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
 		this.groupsToBranches = [];
@@ -1139,6 +1140,16 @@ ActivityLib = {
 		return transition;
 	},
 	
+	/**
+	 * It is run from authoringConfirm.jsp
+	 * It closes the dialog with activity authoring 
+	 */
+	closeActivityAuthoring : function(){
+		$("#dialogActivity").off('hide.bs.modal').on('hide.bs.modal', function(){
+			$('iframe', this).attr('src', null);
+		}).modal('hide');
+	},
+	
 	
 	/**
 	 * Drop the dragged activity on the canvas.
@@ -1376,7 +1387,7 @@ ActivityLib = {
 		}
 		
 		if (activity.authorURL) {
-			showDialog("dialogActivity" + activity.toolContentID, {
+			showDialog("dialogActivity", {
 				'height' : Math.max(300, $(window).height() - 30),
 				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
 				'draggable' : true,
@@ -1397,16 +1408,10 @@ ActivityLib = {
 					PropertyLib.validateConditionMappings(activity);
 				},
 				'open' : function() {
-					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', dialog).attr('src', activity.authorURL).load(function(){
+					$('iframe', this).attr('src', activity.authorURL).load(function(){
 						// override the close function so it works with the dialog, not window
-						this.contentWindow.closeWindow = function(){
-							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
-							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
-								$('iframe', this).attr('src', null);
-							}).modal('hide');
-						}
+						this.contentWindow.closeWindow = ActivityLib.closeActivityAuthoring;
 					});
 				}
 			}, true);

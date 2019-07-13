@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.integration.security;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -113,7 +114,7 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
 		    return;
 		}
-		user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
+		user = SsoHandler.getUserManagementService(session.getServletContext()).getUserByLogin(login);
 		if (user == null) {
 		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
 		    return;
@@ -179,6 +180,7 @@ public class SsoHandler implements ServletExtension {
 		    // if user is already logged in on another browser, log him out
 		    if (existingSession != null) {
 			SessionManager.removeSessionByID(existingSession.getId(), true, false);
+			SsoHandler.logLogout(userDTO);
 		    }
 
 		    Integer failedAttempts = user.getFailedAttempts();
@@ -186,9 +188,10 @@ public class SsoHandler implements ServletExtension {
 			    && !password.startsWith("#LAMS")) {
 			user.setFailedAttempts(null);
 			user.setLockOutTime(null);
-			getUserManagementService(session.getServletContext()).save(user);
+			SsoHandler.getUserManagementService(session.getServletContext()).save(user);
 		    }
 
+		    SsoHandler.logLogin(userDTO, request);
 		} else {
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts == null) {
@@ -205,14 +208,14 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
-			String message = new StringBuilder("User ").append(user.getLogin()).append("(")
+			String message = new StringBuilder("User ").append(user.getLogin()).append(" (")
 				.append(user.getUserId()).append(") is locked out for ")
 				.append(Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)).append(" mins after ")
 				.append(failedAttempts).append(" failed attempts.").toString();
-			getLogEventService(session.getServletContext()).logEvent(LogEvent.TYPE_ACCOUNT_LOCKED,
-				user.getUserId(), user.getUserId(), null, null, message);
+			SsoHandler.getLogEventService(session.getServletContext()).logEvent(
+				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null, message);
 		    }
-		    getUserManagementService(session.getServletContext()).save(user);
+		    SsoHandler.getUserManagementService(session.getServletContext()).save(user);
 		}
 
 		SessionManager.endSession();
@@ -288,7 +291,32 @@ public class SsoHandler implements ServletExtension {
 	}
     }
 
-    private IUserManagementService getUserManagementService(ServletContext context) {
+    private static void logLogin(UserDTO user, HttpServletRequest request) {
+	String clientIP = null;
+	String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+	if (xForwardedForHeader == null) {
+	    clientIP = request.getRemoteAddr();
+	} else {
+	    // As of https://en.wikipedia.org/wiki/X-Forwarded-For
+	    // The general format of the field is: X-Forwarded-For: client, proxy1, proxy2 ...
+	    // we only want the client
+	    clientIP = new StringTokenizer(xForwardedForHeader, ",").nextToken().trim();
+	}
+
+	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
+		.append(") logged in from IP ").append(clientIP).toString();
+	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGIN,
+		user.getUserID(), user.getUserID(), null, null, message);
+    }
+
+    private static void logLogout(UserDTO user) {
+	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
+		.append(") got logged out from another browser").toString();
+	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGOUT,
+		user.getUserID(), user.getUserID(), null, null, message);
+    }
+
+    private static IUserManagementService getUserManagementService(ServletContext context) {
 	if (SsoHandler.userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 	    SsoHandler.userManagementService = (UserManagementService) ctx.getBean("userManagementService");
@@ -296,7 +324,7 @@ public class SsoHandler implements ServletExtension {
 	return SsoHandler.userManagementService;
     }
 
-    protected ILogEventService getLogEventService(ServletContext context) {
+    private static ILogEventService getLogEventService(ServletContext context) {
 	if (SsoHandler.logEventService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
 	    SsoHandler.logEventService = (ILogEventService) ctx.getBean("logEventService");

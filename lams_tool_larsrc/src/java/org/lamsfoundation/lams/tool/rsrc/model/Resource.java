@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,7 +56,9 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
  */
 @Entity
 @Table(name = "tl_larsrc11_resource")
-public class Resource implements Cloneable {
+public class Resource implements Cloneable, Serializable {
+    private static final long serialVersionUID = 6742325835257953475L;
+
     private static final Logger log = Logger.getLogger(Resource.class);
 
     @Id
@@ -127,7 +130,7 @@ public class Resource implements Cloneable {
 
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
-    @JoinColumn(name = "tool_content_id")
+    @JoinColumn(name = "tool_content_id", referencedColumnName = "content_id")
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
     // *************** NON Persist Fields ********************

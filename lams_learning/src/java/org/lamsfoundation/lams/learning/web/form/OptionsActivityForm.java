@@ -25,9 +25,6 @@ package org.lamsfoundation.lams.learning.web.form;
 
 /**
  * @author daveg
- *
- *         XDoclet definition:
- *
  */
 public class OptionsActivityForm extends ActivityForm {
 
@@ -35,7 +32,8 @@ public class OptionsActivityForm extends ActivityForm {
     private String description;
     private int minimum;
     private int maximum;
-    private boolean finished;
+    private boolean minimumLimitReached;
+    private boolean hasCompletedActivities;
     private Long progressID;
     private boolean maxActivitiesReached;
 
@@ -71,12 +69,20 @@ public class OptionsActivityForm extends ActivityForm {
 	this.maximum = maximum;
     }
 
-    public boolean isFinished() {
-	return finished;
+    public boolean isMinimumLimitReached() {
+	return minimumLimitReached;
     }
 
-    public void setFinished(boolean finished) {
-	this.finished = finished;
+    public void setMinimumLimitReached(boolean minimumLimitReached) {
+	this.minimumLimitReached = minimumLimitReached;
+    }
+    
+    public boolean isHasCompletedActivities() {
+	return hasCompletedActivities;
+    }
+
+    public void setHasCompletedActivities(boolean hasCompletedActivities) {
+	this.hasCompletedActivities = hasCompletedActivities;
     }
 
     public Long getProgressID() {

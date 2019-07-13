@@ -602,9 +602,11 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void disableUser(Integer userId) {
-
 	User user = (User) findById(User.class, userId);
 	user.setDisabledFlag(true);
+	log.debug("disabling user " + user.getLogin());
+	saveUser(user);
+
 	Set uos = user.getUserOrganisations();
 	Iterator iter = uos.iterator();
 	while (iter.hasNext()) {
@@ -613,8 +615,6 @@ public class UserManagementService implements IUserManagementService {
 	    delete(uo);
 	    iter.remove();
 	}
-	log.debug("disabling user " + user.getLogin());
-	saveUser(user);
     }
 
     @Override
@@ -645,14 +645,13 @@ public class UserManagementService implements IUserManagementService {
 
 	UserOrganisation uo = getUserOrganisation(user.getUserId(), org.getOrganisationId());
 	if (uo == null) {
+	    if (rolesList.isEmpty()) {
+		// user has no roles and shoud have none, so nothing to do
+		return;
+	    }
 	    uo = new UserOrganisation(user, org);
 	    save(uo);
 	    log.debug("added " + user.getLogin() + " to " + org.getName());
-	    Set uos;
-	    if ((uos = org.getUserOrganisations()) == null) {
-		uos = new HashSet();
-	    }
-	    uos.add(uo);
 	}
 
 	// if user is to be added to a class, make user a member of parent
@@ -701,8 +700,12 @@ public class UserManagementService implements IUserManagementService {
 		}
 	    }
 	}
-	uo.setUserOrganisationRoles(uors);
-	saveUser(user);
+	if (uors.isEmpty()) {
+	    delete(uo);
+	} else {
+	    uo.setUserOrganisationRoles(uors);
+	    save(uo);
+	}
 	// make sure group managers have monitor and learner in each subgroup
 	checkGroupManager(user, org);
     }
@@ -1072,7 +1075,7 @@ public class UserManagementService implements IUserManagementService {
 	    throw new IOException("/tmp/portraits is not readable");
 	}
 
-	List<String> uploadedPortraits = new LinkedList<String>();
+	List<String> uploadedPortraits = new LinkedList<>();
 	Integer prefixLength = StringUtils.isBlank(prefix) ? null : prefix.length() + 1;
 
 	for (int userId = minUserId; userId <= maxUserId; userId++) {

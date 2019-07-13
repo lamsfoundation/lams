@@ -34,6 +34,32 @@
 		</copy>
 	</target>
 	
+	<target name="_copy-jsp" depends="sass.compile, _js-minify">
+			<!-- Internal target: Copies JSP files. -->
+			<echo>${ant.project.name}: Copying JSP files</echo>
+
+			<!-- No processing is needed for most of the files so copy files straight to assembly dir to create WAR -->
+			<echo>Copying web resources</echo>
+		 	<copy todir="${basedir}/build/war">
+				<fileset dir="${conf.web.dir}">
+					<exclude name="**/*.scss"/>
+					<exclude name="authoring/template/tbl/tbl.jsp"/>
+				</fileset>
+		 	</copy>
+		
+			<!-- Now handle the tweaks to the authoring template files -->
+			<echo>Configuring template files to generate desired activities</echo>
+		 	<copy todir="${basedir}/build/war/authoring/template/tbl/" overwrite="true" verbose="true">
+				<fileset dir="${conf.web.dir}/authoring/template/tbl/">
+					<include name="tbl.jsp" />
+				</fileset>
+				<filterset>
+					<filter token="template_tbl_show_introduction" value="${template.tbl.show.introduction}" />
+					<filter token="template_tbl_show_preview" value="${template.tbl.show.preview}" />
+					<filter token="template_tbl_show_notebook" value="${template.tbl.show.notebook}" />
+				</filterset>
+		 	</copy>
+	</target>
 	
 	<target name="_build-war" depends="_build-manifest, _copy-war-resources, _copy-jsp">
 		<!-- Internal target: Builds WAR without archivisation -->

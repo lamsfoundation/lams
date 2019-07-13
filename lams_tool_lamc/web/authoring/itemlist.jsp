@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 <c:set var="questionDtos" value="${sessionMap.questionDtos}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" />
 <%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
 
 <script>
@@ -27,20 +28,23 @@
 	<div class="panel panel-default add-file">
 	
 	<div class="panel-heading panel-title">
+		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
 		
-		<div class="roffset5 pull-right">
-			<c:url var="tempUrl" value="">
-				<c:param name="output">
-					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapId=${sessionMapId}
-				</c:param>
-			</c:url>
-			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
+		<c:if test="${!isAuthoringRestricted}">
+			<div class="roffset5 pull-right">
+				<c:url var="tempUrl" value="">
+					<c:param name="output">
+						<c:url value='/authoring/importQbQuestion.do'/>?sessionMapId=${sessionMapId}
+					</c:param>
+				</c:url>
+				<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
 		
-			<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
-				<fmt:message key="label.import.from.question.bank"/>
-			</a>
-		</div> 
+				<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
+					<fmt:message key="label.import.from.question.bank"/>
+				</a>
+			</div>
+		</c:if>
 	</div>
 
 	<table id="itemTable" class="table table-striped table-condensed">
@@ -106,9 +110,11 @@
 					</a>
 				</td>
 
-				<td  align="center" style="width:5%">
-					<i class="fa fa-times" title="<fmt:message key="label.tip.deleteQuestion" />" 	onclick="removeQuestion(${queIndex});"></i>
-				</td>
+				<c:if test="${!isAuthoringRestricted}">
+					<td  align="center" style="width:5%">
+						<i class="fa fa-times" title="<fmt:message key="label.tip.deleteQuestion" />" onclick="removeQuestion(${queIndex});"></i>
+					</td>
+				</c:if>
 
 			</tr>
 		</c:forEach>

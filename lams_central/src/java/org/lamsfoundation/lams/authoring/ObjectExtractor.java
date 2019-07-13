@@ -66,6 +66,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
@@ -1137,6 +1138,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.GROUP_BASED_BRANCHING));
 	} else if (branchingActivity.isToolBranchingActivity()) {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.TOOL_BASED_BRANCHING));
+	    ((ToolBranchingActivity) branchingActivity).setBranchingOrderedAsc(
+		    JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.BRANCHING_ORDERED_ASC));
 	}
 
 	branchingActivity.setStartXcoord(getCoord(activityDetails, AuthoringJsonTags.START_XCOORD));
@@ -1233,10 +1236,9 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildScheduleGateActivity(ScheduleGateActivity activity, ObjectNode activityDetails) {
 	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
 	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
-	activity.setGateActivityCompletionBased(
-		JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED));
-	SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
-	activity.setSystemTool(systemTool);
+	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
+	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
+	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
     }
 
     private void createLessonClass(LessonClass lessonClass, ObjectNode groupingDetails) {

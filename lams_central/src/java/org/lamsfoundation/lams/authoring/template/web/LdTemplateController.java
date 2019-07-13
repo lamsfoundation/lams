@@ -24,7 +24,10 @@ package org.lamsfoundation.lams.authoring.template.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -44,6 +47,9 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.questions.Answer;
+import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.Tool;
@@ -69,7 +75,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * Base class for actions processing Learning Design templates.
  *
- * TODO stop hardcoding the icons!
+ * A little history: This code was written when we were still using Struts but we were phasing it out. So it was written with the
+ * minimal of Struts code, which was then swapped to being the minimal Spring MVC. Now we are using Spring MVC it would 
+ * be nice to convert to using more Spring MVC features rather than adding parts piecemeal as the template pages
+ * become more complicated. Rather than relying on the web page to keep all the data and doing ajax updates, it would be 
+ * nice to have a session form or the like backing the page. It would make it easier to have the templates load an existing
+ * design from the database for modification and make the processing when the template is saved so it doesn't do one huge
+ * parse in one go.
+ * 
+ * Would also be nice to stop hardcoding the icons!
  *
  * @author Marcin Cieslak, Fiona Malikoff
  */
@@ -79,6 +93,9 @@ public abstract class LdTemplateController {
     @Autowired
     WebApplicationContext applictionContext;
 
+    // Used to append the number to the group label - format as 2 digits so it sorts better.
+    NumberFormat groupNumberFormatter = new DecimalFormat("00");  
+    
     private static Logger log = Logger.getLogger(LdTemplateController.class);
     public static final int MAX_OPTION_COUNT = 6;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
@@ -99,6 +116,7 @@ public abstract class LdTemplateController {
     // icon strings found in the lams_learningdesign_activity table
     protected static final String ASSESSMENT_TOOL_SIGNATURE = "laasse10";
     protected static final String ASSESSMENT_ICON = "tool/laasse10/images/icon_assessment.swf";
+    protected static final String ASSESSMENT_TOOL_OUTPUT_DEFINITION = "learner.total.score"; 
     protected static final String CHAT_TOOL_SIGNATURE = "lachat11";
     protected static final String CHAT_ICON = "tool/lachat11/images/icon_chat.swf";
     protected static final String FORUM_TOOL_SIGNATURE = "lafrum11";
@@ -107,6 +125,7 @@ public abstract class LdTemplateController {
     protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
     protected static final String MCQ_TOOL_SIGNATURE = "lamc11";
     protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.swf";
+    protected static final String MCQ_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
     protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
@@ -117,6 +136,7 @@ public abstract class LdTemplateController {
     protected static final String SHARE_RESOURCES_ICON = "tool/larsrc11/images/icon_rsrc.swf";
     protected static final String SCRATCHIE_TOOL_SIGNATURE = "lascrt11";
     protected static final String SCRATCHIE_ICON = "tool/lascrt11/images/icon_scratchie.swf";
+    protected static final String SCRATCHIE_TOOL_OUTPUT_DEFINITION = "learner.mark"; 
     protected static final String SCRIBE_TOOL_SIGNATURE = "lascrb11";
     protected static final String SCRIBE_ICON = "tool/lascrb11/images/icon_scribe.swf";
     protected static final String SUBMIT_TOOL_SIGNATURE = "lasbmt11";
@@ -182,6 +202,12 @@ public abstract class LdTemplateController {
 	String contentFolderID = FileUtil.generateUniqueContentFolderID();
 	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/template/tbl/tbl";
+    }
+
+    public String init(HttpServletRequest request, String forward ) throws Exception {
+	String contentFolderID = FileUtil.generateUniqueContentFolderID();
+	request.setAttribute(RestTags.CONTENT_FOLDER_ID, contentFolderID);
+	return forward;
     }
 
     protected abstract ObjectNode createLearningDesign(HttpServletRequest request, HttpSession httpSession)
@@ -360,7 +386,7 @@ public abstract class LdTemplateController {
     }
 
     /* ************************************** Non-Tool Activity methods ******************************************** */
-    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords) {
+    protected ObjectNode createGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String activityTitle, String activityDescription) {
 
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Integer[] pos = layoutCoords;
@@ -376,10 +402,22 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, "Gate"); // I18N
+	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Gate"); 
+	if ( activityDescription != null )
+	    activityJSON.put(AuthoringJsonTags.DESCRIPTION, activityDescription); 
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
+
+	return activityJSON;
+    }
+
+    protected ObjectNode createScheduledGateActivity(AtomicInteger uiid, int order, Integer[] layoutCoords,
+	    String activityTitle, String activityDescription, Long startOffset) {
+
+	ObjectNode activityJSON = createGateActivity(uiid, order, layoutCoords, activityTitle, activityDescription);
+	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SCHEDULE_GATE_ACTIVITY_TYPE);
+	activityJSON.put(AuthoringJsonTags.GATE_START_OFFSET, startOffset);
 
 	return activityJSON;
     }
@@ -418,8 +456,8 @@ public abstract class LdTemplateController {
 	    Integer useNumGroups = (numGroups != null && numGroups > 0) ? numGroups : 2;
 	    for (int orderId = 0, groupNum = 1; orderId < useNumGroups; orderId++, groupNum++) {
 		ObjectNode group = JsonNodeFactory.instance.objectNode();
-		group.put(AuthoringJsonTags.GROUP_NAME,
-			TextUtil.getText(appBundle, formatter, "label.course.groups.prefix", null) + groupNum);
+		group.put(AuthoringJsonTags.GROUP_NAME, TextUtil.getText(appBundle, formatter,
+			"authoring.label.group.name", new String[] { groupNumberFormatter.format(groupNum) }));
 		group.put(AuthoringJsonTags.ORDER_ID, orderId);
 		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
 		groups.add(group);
@@ -644,6 +682,13 @@ public abstract class LdTemplateController {
     protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
 	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
 	    Integer parentActivityType, String activityTitle, int activityCategory) {
+	return createToolActivity(uiid, order, layoutCoords, toolSignature, toolIcon, toolContentID, contentFolderID,
+		groupingUIID, parentUIID, parentActivityType, activityTitle, activityCategory, null);
+    }
+    
+    protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
+	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
+	    Integer parentActivityType, String activityTitle, int activityCategory, String toolOutputDefinition) {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Tool tool = getTool(toolSignature);
 
@@ -671,6 +716,9 @@ public abstract class LdTemplateController {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, true);
 	} else {
 	    activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
+	}
+	if ( toolOutputDefinition != null ) {
+	    activityJSON.put(AuthoringJsonTags.TOOL_OUTPUT_DEFINITION, toolOutputDefinition);
 	}
 	return activityJSON;
     }
@@ -725,19 +773,23 @@ public abstract class LdTemplateController {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, ArrayNode questions) throws IOException {
+	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
-
+	toolContentJSON.put("numbered", enableNumbering);
+	toolContentJSON.put("displaySummary", Boolean.TRUE);
+	toolContentJSON.put("allowDiscloseAnswers", Boolean.TRUE);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
 	for (int i = 0; i < questions.size(); i++) {
-	    Integer questionDisplayOrder = ((ObjectNode) questions.get(i)).get(RestTags.DISPLAY_ORDER).asInt();
+	    ObjectNode question = (ObjectNode) questions.get(i);
+	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
+	    Integer defaultGrade = question.get("defaultGrade").asInt();
 	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
-		    .put("questionDisplayOrder", questionDisplayOrder));
+		    .put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
 	}
 	toolContentJSON.set("references", references);
 
@@ -753,7 +805,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE,
 		LdTemplateController.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT,
+		LdTemplateController.ASSESSMENT_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -933,12 +986,13 @@ public abstract class LdTemplateController {
      * details of questions). Other fields are optional.
      */
     protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, ArrayNode questions) throws IOException {
+	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, boolean prefixAnswersWithLetters, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevel);
+	toolContentJSON.put("prefixAnswersWithLetters", prefixAnswersWithLetters);
 	return createToolContent(user, LdTemplateController.MCQ_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -952,7 +1006,7 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
 		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
-		Activity.CATEGORY_ASSESSMENT);
+		Activity.CATEGORY_ASSESSMENT, LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -1102,7 +1156,8 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE,
 		LdTemplateController.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT,
+		LdTemplateController.SCRATCHIE_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -1296,6 +1351,7 @@ public abstract class LdTemplateController {
     @RequestMapping("/createAssessment")
     public String createAssessment(HttpServletRequest request) {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 
 	String questionType = WebUtil.readStrParam(request, "questionType");
 	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
@@ -1306,6 +1362,65 @@ public abstract class LdTemplateController {
 
     }
 
+  @RequestMapping("/importQTI")
+    public String importAssessmentQTI(HttpServletRequest request) throws UnsupportedEncodingException {
+	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
+	String templatePage = WebUtil.readStrParam(request, "templatePage");
+	Question[] updatedQuestions = preprocessQuestions(QuestionParser.parseQuestionChoiceForm(request), contentFolderID);
+	request.setAttribute("questions", updatedQuestions);
+	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
+	request.setAttribute("numQuestionsFieldname", WebUtil.readStrParam(request, "numQuestionsFieldname"));
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
+	return "/authoring/template/tool/" + templatePage;
+    }
+
+    private Question[] preprocessQuestions(Question[] questions, String contentFolderID) {
+
+	// Processing based on QTIUtil from the Assessment tool 
+	for ( Question question : questions ) {
+
+	    String correctAnswer = null;
+	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
+	    // int questionGrade = 1; Currently not supported by the templates.
+
+	    question.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
+
+	    if (question.getAnswers() != null) {
+		for (Answer answer : question.getAnswers()) {
+
+		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+			    question.getResourcesFolderPath());
+		    answer.setText(answerText);
+
+		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
+			continue;
+		    }
+		    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			// for fill in blanks question all answers are correct and get full grade
+			if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
+			    // whatever the correct answer holds, it becomes the question score
+			    // questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    // 100% goes to the correct answer
+			    answer.setScore(1F);
+			    correctAnswer = answerText;
+			} else {
+			    log.warn("Choosing only first correct answer, despite another one was found: "
+				    + answerText);
+			    answer.setScore(0F);
+			}
+		    } else {
+			answer.setScore(0F);
+		    }
+
+		}
+	    }
+	}
+	return questions;
+    }
+	
     /**
      * Specialised call to create a new question & options for the surveys tab. Returns a fragment of HTML
      * which sets up a new CKEditor. Works with both mcquestion.jsp & surveyquestion.jsp. The template's
@@ -1378,6 +1493,7 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	request.setAttribute("optionNumber", WebUtil.readIntParam(request, "optionNumber"));
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return (useAssessmentVersion ? "authoring/template/tool/assessoption" : "authoring/template/tool/mcoption");
     }
 
@@ -1386,9 +1502,11 @@ public abstract class LdTemplateController {
 
 	Integer questionNumber = WebUtil.readIntParam(request, "questionNumber", true);
 	Integer delete = WebUtil.readIntParam(request, "optionNumber");
+	
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
-
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
+	String containingDivName = WebUtil.readStrParam(request,  "containingDivName", true);
+	String prefixParam =  containingDivName != null ? containingDivName  + "assmcq" : "question";
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, prefixParam);
 	optionsMap.remove(delete);
 	// reorder the displayOrder and setup the return value
 	LinkedList<Option> options = new LinkedList<>();
@@ -1400,6 +1518,7 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
+	request.setAttribute("containingDivName", containingDivName);
 	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
@@ -1418,8 +1537,9 @@ public abstract class LdTemplateController {
 	}
 
 	boolean useAssessmentVersion = WebUtil.readBooleanParam(request, "assess", false);
-
-	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, useAssessmentVersion);
+	String containingDivName = WebUtil.readStrParam(request,  "containingDivName", true);
+	String prefixParam =  containingDivName != null ? containingDivName  + "assmcq" : "question";
+	TreeMap<Integer, Option> optionsMap = getOptions(request, questionNumber, prefixParam);
 	// reorder the options and setup the return value
 	LinkedList<Option> options = new LinkedList<>();
 
@@ -1444,28 +1564,27 @@ public abstract class LdTemplateController {
 	request.setAttribute("questionNumber", questionNumber);
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
+	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
 
     // if mcq paramPrefix = "question". if assessment multiple choice paramPrefix = assmcq
     private TreeMap<Integer, Option> getOptions(HttpServletRequest request, Integer questionNumber,
-	    boolean useAssessmentVersion) {
-
-	String paramPrefix = useAssessmentVersion ? "assmcq" : "question";
+	    String prefixParam) {
 
 	// correctDisplayIdInteger is used for MCQ but not Survey - the value will be ignored by the
 	// survey jsp page.
-	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, paramPrefix + questionNumber + "correct", true);
+	Integer correctDisplayIdInteger = WebUtil.readIntParam(request, prefixParam + questionNumber + "correct", true);
 	int correctDisplayId = correctDisplayIdInteger != null ? correctDisplayIdInteger.intValue() : 0;
 
 	TreeMap<Integer, Option> optionDtos = new TreeMap<>();
 
 	for (int i = 1; i <= MAX_OPTION_COUNT; i++) {
-	    String optionText = request.getParameter(paramPrefix + questionNumber + "option" + i);
+	    String optionText = request.getParameter(prefixParam + questionNumber  + "option" + i);
 	    if (optionText != null) {
 		// Grade is used for assessment
-		String grade = request.getParameter(paramPrefix + questionNumber + "option" + i + "grade");
+		String grade = request.getParameter(prefixParam + questionNumber + "option" + i + "grade");
 		Option option = new Option(i, i == correctDisplayId, optionText, grade);
 		optionDtos.put(new Integer(i), option);
 	    }

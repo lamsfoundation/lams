@@ -314,7 +314,8 @@
 		<fmt:message key="authoring.fla.page.menu.preview" />
 	</button>
 	<div class="pull-right">
-		<button id="addButton" class="btn btn-primary" href="#" onClick="javascript:addLesson()">
+		<button id="addButton" class="btn btn-primary" href="#" onClick="javascript:addLesson()"
+				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="button.add.now" /></span>">
 			<i class="fa fa-plus"></i> 
 			<fmt:message key="button.add.now" />
 		</button>

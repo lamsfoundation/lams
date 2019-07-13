@@ -50,7 +50,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
- * The LoginRequestLtiServlet handles login request by LTI tool consumers. This servlet checks for the correctly signed by OAuth parameters,
+ * The LoginRequestLtiServlet handles login request by LTI tool consumers. This servlet checks for the correctly signed
+ * by OAuth parameters,
  * and if it's valid it redirects it to LoginRequestServlet for actual authentication.
  *
  * @author Andrey Balan
@@ -58,13 +59,13 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @SuppressWarnings("serial")
 public class LoginRequestLtiServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LoginRequestLtiServlet.class);
-    
+
     @Autowired
     private IntegrationService integrationService = null;
 
     private final String DEFAULT_FIRST_NAME = "John";
     private final String DEFAULT_LAST_NAME = "Doe";
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -119,27 +120,40 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    return;
 	}
 
-	//provide default values for user names, as we can't fetch them from LTI Tool consumer
-	if (StringUtils.isBlank(firstName)) {
-	    firstName = DEFAULT_FIRST_NAME;
-	}
-	if (StringUtils.isBlank(firstName)) {
-	    lastName = DEFAULT_LAST_NAME;
-	}
-	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
-
-	//Determine method based on role parameter. Monitor roles can be either LTI standard ones or tool consumer's custom ones set
-	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
-	String method;
-	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
-		extServer.getLtiToolConsumerMonitorRoles());
-	if (LtiUtils.isStaff(roles) || LtiUtils.isAdmin(roles) || isCustomMonitorRole) {
-	    method = (lesson == null) ? LoginRequestDispatcher.METHOD_AUTHOR : LoginRequestDispatcher.METHOD_MONITOR;
-
-	} else {
-	    method = LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
+	//in case both first and last names are missing, try to get them using other ways
+	if (StringUtils.isBlank(firstName) && StringUtils.isBlank(lastName)) {
+	    
+	    //check LIS_PERSON_NAME_FULL parameter
+	    String fullName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FULL);
+	    if (StringUtils.isNotBlank(fullName)) {
+		firstName = fullName;
+		lastName = " ";
+		
+	    } else {
+		//provide default values for user names, as we can't fetch them from LTI Tool consumer
+		firstName = DEFAULT_FIRST_NAME;
+		lastName = DEFAULT_LAST_NAME;
+	    }
+	
+	//only firstName is missing
+	} else if (StringUtils.isBlank(firstName)) {
+	    firstName = " ";
+	    
+	//only lastName is missing
+	} else if (StringUtils.isBlank(lastName)) {
+	    lastName = " ";
 	}
 	
+	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
+
+	//Determine method based on the "role" parameter. Author roles can be either LTI standard ones or tool consumer's custom ones set
+	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
+	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
+		extServer.getLtiToolConsumerMonitorRoles());
+	String method = LtiUtils.isStaff(roles) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
+		? LoginRequestDispatcher.METHOD_AUTHOR
+		: LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
+
 	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
 	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
 
@@ -149,12 +163,11 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	// regular case: [ts + uid + method + serverID + serverKey]
 	String plaintext = timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim()
 		+ method.toLowerCase().trim()
-		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId
-			: "")
+		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha1(plaintext);
 
-	// constructing redirectUrl by getting request.getQueryString() for POST requests 
+	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
 	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + LoginRequestDispatcher.PARAM_METHOD, method);
 	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
@@ -164,7 +177,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
 		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
 		String paramValue = request.getParameter(paramName);
-		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName, URLEncoder.encode(paramValue, "UTF-8"));
+		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName,
+			URLEncoder.encode(paramValue, "UTF-8"));
 	    }
 	}
 
@@ -195,27 +209,29 @@ public class LoginRequestLtiServlet extends HttpServlet {
     }
 
     /**
-     * 
+     *
      * @param localeStr
      *            the full balckboard locale string
      * @return the language
      */
     private static String getLanguage(String localeStr) {
-	if (localeStr == null)
+	if (localeStr == null) {
 	    return "xx";
+	}
 	String[] split = localeStr.split("_");
 	return split[0];
     }
 
     /**
-     * 
+     *
      * @param localeStr
      *            the full balckboard locale string
      * @return the country
      */
     private static String getCountry(String localeStr) {
-	if (localeStr == null)
+	if (localeStr == null) {
 	    return "XX";
+	}
 	String[] split = localeStr.split("_");
 
 	//default country set to AU

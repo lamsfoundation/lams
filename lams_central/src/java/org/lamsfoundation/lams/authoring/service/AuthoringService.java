@@ -379,7 +379,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID)
 	    throws LearningDesignException, UserException, IOException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
 	}
@@ -431,7 +431,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     @Override
     public void setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException, IOException {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
 	}
@@ -457,7 +457,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @SuppressWarnings("unchecked")
     @Override
     public void finishEditOnFly(Long learningDesignID, Integer userID, boolean cancelled) throws Exception {
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new IOException("User not found, ID: " + userID);
 	}
@@ -778,12 +778,12 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		    messageService.getMessage("no.such.learningdesign.exist", new Object[] { originalDesignID }));
 	}
 
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 	if (user == null) {
 	    throw new UserException(messageService.getMessage("no.such.user.exist", new Object[] { userID }));
 	}
 
-	WorkspaceFolder workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
+	WorkspaceFolder workspaceFolder = baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
 	if (workspaceFolder == null) {
 	    throw new WorkspaceFolderException(
 		    messageService.getMessage("no.such.workspace.exist", new Object[] { workspaceFolderID }));
@@ -879,7 +879,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    ToolActivity toolActivity = (ToolActivity) activity;
 	    // copy the content
 	    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, customCSV);
-	    outcomeService.copyOutcomeMappings(null, toolActivity.getToolContentId(), null, null, newContentId, null);
+	    outcomeService.copyOutcomeMappings(null, toolActivity.getToolContentId(), null, null, null, newContentId,
+		    null, null);
 	    toolActivity.setToolContentId(newContentId);
 
 	    // clear read only field
@@ -1309,7 +1310,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	User user = null;
 	Integer userID = AuthoringService.getUserId();
 	if (userID != null) {
-	    user = (User) baseDAO.find(User.class, userID);
+	    user = baseDAO.find(User.class, userID);
 	}
 	if (user == null) {
 	    throw new UserException("UserID missing or user not found.");
@@ -1319,7 +1320,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	WorkspaceFolder workspaceFolder = null;
 	boolean authorised = false;
 	if (workspaceFolderID != null) {
-	    workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
+	    workspaceFolder = baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
 	    authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID);
 	}
 
@@ -1403,7 +1404,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public Long copyToolContent(Long toolContentID, String customCSV) throws IOException {
 	Long newToolContentID = lamsCoreToolService.notifyToolToCopyContent(toolContentID, customCSV);
-	outcomeService.copyOutcomeMappings(null, toolContentID, null, null, newToolContentID, null);
+	outcomeService.copyOutcomeMappings(null, toolContentID, null, null, null, newToolContentID, null, null);
 	return newToolContentID;
     }
 
@@ -1414,7 +1415,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     public Vector<LicenseDTO> getAvailableLicenses() {
 	List<License> licenses = licenseDAO.getLicensesByOrderId();
 	Vector<LicenseDTO> licenseDTOList = new Vector(licenses.size());
-	for ( License element : licenses ) {
+	for (License element : licenses) {
 	    licenseDTOList.add(element.getLicenseDTO(Configuration.get(ConfigurationKeys.SERVER_URL)));
 	}
 	return licenseDTOList;
@@ -1428,7 +1429,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    Long learningLibraryID, String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
-	User user = (User) baseDAO.find(User.class, userID);
+	User user = baseDAO.find(User.class, userID);
 
 	LearningDesign learningDesign = new LearningDesign(null, null, null, learningDesignTitle, null, null, 1, false,
 		false, null, null, null, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
@@ -1443,7 +1444,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    learningDesign.setCopyTypeID(LearningDesign.COPY_TYPE_LESSON);
 	    // taken from MonitoringService#initializeLesson()
 	    int MAX_DEEP_LEVEL_FOLDER = 50;
-	    Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationID);
+	    Organisation organisation = baseDAO.find(Organisation.class, organisationID);
 	    for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
 		if ((organisation == null) || (folder != null)) {
 		    break;

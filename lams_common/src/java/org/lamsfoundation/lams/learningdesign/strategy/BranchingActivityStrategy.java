@@ -30,6 +30,8 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -54,7 +56,7 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy {
      * activity itself so as to select a branch either determined by the server or to display
      * the wait screen (for the normal learner) or for the author to select a particular
      * branch (in preview).
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy#getNextActivityByParent(Activity,
      *      Activity)
      */
@@ -81,26 +83,35 @@ public class BranchingActivityStrategy extends ComplexActivityStrategy {
      */
     @Override
     public boolean areChildrenCompleted(LearnerProgress learnerProgress) {
-	ComplexActivity complexActivity = getComplexActivity();
+	BranchingActivity branchingActivity = (BranchingActivity) getComplexActivity();
 	boolean isPreview = learnerProgress.getLesson().isPreviewLesson();
+	Boolean isOrderedAsc = branchingActivity.isToolBranchingActivity()
+		? ((ToolBranchingActivity) branchingActivity).getBranchingOrderedAsc()
+		: null;
 
-	if (complexActivity != null && complexActivity.getActivities().size() > 0) {
-	    for (Iterator i = complexActivity.getActivities().iterator(); i.hasNext();) {
-		Activity currentActivity = (Activity) i.next();
-		boolean actComplete = learnerProgress.getCompletedActivities().containsKey(currentActivity);
-		if (isPreview && !actComplete) {
-		    // found one not complete, so can try more branches
+	if (branchingActivity != null && branchingActivity.getActivities().size() > 0) {
+	    for (Iterator i = branchingActivity.getActivities().iterator(); i.hasNext();) {
+		// we need the real activity, not proxy
+		SequenceActivity sequenceActivity = (SequenceActivity) activityDAO
+			.getActivityByActivityId(((Activity) i.next()).getActivityId());
+		boolean actComplete = learnerProgress.getCompletedActivities().containsKey(sequenceActivity);
+		if (actComplete) {
+		    // if activity is complete and it is not preview nor ordered branching where all branches need to get passed,
+		    // then branching activity is complete
+		    if (!isPreview && isOrderedAsc == null) {
+			return true;
+		    }
+		    // if it is preview or there are not completed branches with conditions in ordered branching,
+		    // then this branching activity is not finished yet
+		} else if (isPreview || (isOrderedAsc != null && !sequenceActivity.getBranchEntries().isEmpty())) {
 		    return false;
-		} else if (!isPreview && actComplete) {
-		    // found one complete, so branching is finished
-		    return true;
 		}
 	    }
-	    // We've checked all the activities. If we are in preview, then they are all
+	    // We've checked all the activities. If we are in preview or ordered branching, then they are all
 	    // completed so return true. If we are not in preview (ie normal learner) then
-	    // we haven't found any that were completed so we return false. So we can just 
+	    // we haven't found any that were completed so we return false. So we can just
 	    // return isPreview as that is the correct boolean state.
-	    return (isPreview);
+	    return isPreview || isOrderedAsc != null;
 	}
 
 	// didn't find any child activities so we are complete

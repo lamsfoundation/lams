@@ -85,8 +85,9 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
     @Override
     public List<GradebookUserLesson> getGradebookUserDataForLesson(Long lessonID) {
-	List<GradebookUserLesson> result = getSession().createQuery(GET_GRADEBOOK_USER_LESSONS, GradebookUserLesson.class)
-		.setParameter("lessonID", lessonID).list();
+	List<GradebookUserLesson> result = getSession()
+		.createQuery(GET_GRADEBOOK_USER_LESSONS, GradebookUserLesson.class).setParameter("lessonID", lessonID)
+		.list();
 
 	return result;
     }
@@ -174,7 +175,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
 		+ " ) AS t2" + " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
 
-	 Object result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY)
+	Object result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY)
 		.setParameter("activityID", activityID).uniqueResult();
 
 	//converting into milliseconds
@@ -256,8 +257,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
 		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)" + " ) AS t1";
-	
-	 Object result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
+
+	Object result = getSession().createSQLQuery(GET_MIN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setParameter("activityID", activityID).setParameter("groupID", groupID).uniqueResult();
 
 	//converting into milliseconds
@@ -272,8 +273,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
 		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
 		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)" + " ) AS t1";
-	
-	 Object result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
+
+	Object result = getSession().createSQLQuery(GET_MAX_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setParameter("activityID", activityID).setParameter("groupID", groupID).uniqueResult();
 
 	//converting into milliseconds
@@ -281,40 +282,39 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     }
 
     @Override
-    public List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size,
-	    String sortBy, String sortOrder, String searchString) {
+    public List<Lesson> getLessonsByGroupAndUser(final Integer userId, boolean staffOnly, final Integer orgId, int page,
+	    int size, String sortBy, String sortOrder, String searchString) {
 	final String LOAD_LESSONS_ORDERED_BY_FIELDS = "SELECT DISTINCT lesson "
-		+ "FROM Lesson lesson, LearningDesign ld, Group g, GroupUser ug, Organisation lo "
-		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId " + "AND ld.copyTypeID != 3 "
+		+ "FROM Lesson lesson, LearningDesign ld, {0} Organisation lo "
+		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonClass.groupingId = g.grouping.groupingId " + "AND lesson.lessonStateId != 7 "
-		+ "AND ug.group.groupId = g.groupId " + "AND ug.user.userId = :userId "
-		+ "AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') " + "ORDER BY " + "CASE "
-		+ "WHEN :sortBy='rowName' THEN lesson.lessonName "
-		+ "WHEN :sortBy='startDate' THEN lesson.startDateTime " + "END " + sortOrder;
+		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
+		+ "ORDER BY CASE WHEN :sortBy='rowName' THEN lesson.lessonName "
+		+ "WHEN :sortBy='startDate' THEN lesson.startDateTime END " + sortOrder;
 
 	//when :sortBy='avgTimeTaken'
 	final String LOAD_LESSONS_ORDERED_BY_AVERAGE_TIME_TAKEN = "SELECT DISTINCT lesson "
-		+ "FROM LearnerProgress progress right outer join progress.lesson lesson, LearningDesign ld, Group g, GroupUser ug, Organisation lo "
-		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId " + "AND ld.copyTypeID != 3 "
+		+ "FROM LearnerProgress progress right outer join progress.lesson lesson, LearningDesign ld, {0} Organisation lo "
+		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonClass.groupingId = g.grouping.groupingId " + "AND lesson.lessonStateId != 7 "
-		+ "AND ug.group.groupId = g.groupId " + "AND ug.user.userId = :userId "
-		+ "AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') " + "GROUP BY lesson "
-		+ "ORDER BY AVG(TIMEDIFF(progress.finishDate,progress.startDate)) " + sortOrder;
+		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
+		+ "GROUP BY lesson ORDER BY AVG(TIMEDIFF(progress.finishDate,progress.startDate)) " + sortOrder;
 
 	//when :sortBy='avgMark'
 	final String LOAD_LESSONS_ORDERED_BY_AVERAGE_MARK = "SELECT DISTINCT lesson "
-		+ "FROM GradebookUserLesson gles right outer join gles.lesson lesson, LearningDesign ld, Group g, GroupUser ug, Organisation lo "
-		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId " + "AND ld.copyTypeID != 3 "
+		+ "FROM GradebookUserLesson gles right outer join gles.lesson lesson, LearningDesign ld, {0} Organisation lo "
+		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonClass.groupingId = g.grouping.groupingId " + "AND lesson.lessonStateId != 7 "
-		+ "AND ug.group.groupId = g.groupId " + "AND ug.user.userId = :userId "
-		+ "AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') " + "GROUP BY lesson "
-		+ "ORDER BY AVG(IFNULL(gles.mark, -1)) " + sortOrder;
+		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
+		+ "GROUP BY lesson ORDER BY AVG(IFNULL(gles.mark, -1)) " + sortOrder;
+
+	final String CONDITION_IF_ANY_USER_PROVIDED = "AND lesson.lessonClass.groupingId = g.grouping.groupingId "
+		+ "AND ug.group.groupId = g.groupId AND ug.user.userId = :userId";
+
+	final String CONDITION_IF_STAFF_PROVIDED = "AND ug.group.groupId = lesson.lessonClass.staffGroup.groupId AND ug.user.userId = :userId";
 
 	String queryString;
 	if (sortBy.equals("avgTimeTaken")) {
@@ -325,8 +325,15 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LESSONS_ORDERED_BY_FIELDS;
 	}
 
+	queryString = queryString.replace("{0}",
+		userId == null ? "" : staffOnly ? "Group g," : "Group g, GroupUser ug,");
+	queryString = queryString.replace("{1}",
+		userId == null ? "" : staffOnly ? CONDITION_IF_STAFF_PROVIDED : CONDITION_IF_ANY_USER_PROVIDED);
+
 	Query<Lesson> query = getSession().createQuery(queryString, Lesson.class);
-	query.setParameter("userId", userId);
+	if (userId != null) {
+	    query.setParameter("userId", userId);
+	}
 	query.setParameter("orgId", orgId);
 	if (!sortBy.equals("avgTimeTaken") && !sortBy.equals("avgMark")) {
 	    query.setParameter("sortBy", sortBy);
@@ -601,6 +608,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	return count > 0;
     }
 
+    @Override
     public List<GradebookUserLessonArchive> getArchivedLessonMarks(Long lessonId, Integer userId) {
 	final String GET_ARCHIVED_LESSON_MARKS = "FROM GradebookUserLessonArchive a WHERE "
 		+ " a.lesson.lessonId = :lessonId AND a.learner.userId = :userId ORDER BY a.archiveDate DESC";
@@ -608,6 +616,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		.setParameter("lessonId", lessonId).setParameter("userId", userId).list();
     }
 
+    @Override
     public List<GradebookUserActivityArchive> getArchivedActivityMarks(Long activityId, Integer userId) {
 	final String GET_ARCHIVED_ACTIVITY_MARKS = "FROM GradebookUserActivityArchive a WHERE "
 		+ " a.activity.activityId = :activityId AND a.learner.userId = :userId ORDER BY a.archiveDate DESC";

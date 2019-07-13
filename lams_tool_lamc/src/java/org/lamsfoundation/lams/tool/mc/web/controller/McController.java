@@ -142,9 +142,12 @@ public class McController {
 
 	List<McQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
+	
+	boolean isMcContentAttempted = mcContent.getUid() == null ? false
+		: mcService.isMcContentAttempted(mcContent.getUid());
+	sessionMap.put(McAppConstants.ATTR_IS_AUTHORING_RESTRICTED, isMcContentAttempted && mode.isTeacher());
 
 	return "authoring/AuthoringTabsHolder";
-
     }
 
     /**
@@ -158,11 +161,11 @@ public class McController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
-
-	String strToolContentID = (String) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+
+	Long toolContentID = Long.parseLong((String) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID));
+	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
+	McContent mcContent = mcService.getMcContent(toolContentID);
 	List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
 		.get(McAppConstants.LIST_DELETED_QUESTION_DTOS);
 
@@ -174,17 +177,17 @@ public class McController {
 	    return "authoring/AuthoringTabsHolder";
 	}
 
-	// in case request is from monitoring module - prepare for recalculate User Answers
-	if (mode.isTeacher()) {
+	//recalculate results in case content is edited from monitoring and it's been already attempted by a student
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(McAppConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	if (isAuthoringRestricted) {
 	    Set<McQueContent> oldQuestions = mcContent.getMcQueContents();
 	    mcService.releaseQuestionsFromCache(mcContent);
-	    mcService.setDefineLater(strToolContentID, false);
 
 	    // audit log the teacher has started editing activity in monitor
-	    mcService.auditLogStartEditingActivityInMonitor(new Long(strToolContentID));
+	    mcService.auditLogStartEditingActivityInMonitor(toolContentID);
 
 	    // recalculate User Answers
-	    mcService.recalculateUserAnswers(mcContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
+	    mcService.recalculateUserAnswers(mcContent, oldQuestions, questionDTOs);
 	}
 
 	// remove deleted questions
@@ -202,9 +205,9 @@ public class McController {
 		mcService.removeMcQueContent(removeableQuestion);
 	    }
 	}
-
+	
 	// store content
-	mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mcContent, strToolContentID, questionDTOs);
+	mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mode, mcContent, toolContentID, questionDTOs);
 
 	// store questions
 	mcContent = mcService.createQuestions(questionDTOs, mcContent);

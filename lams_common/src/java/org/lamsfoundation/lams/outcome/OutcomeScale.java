@@ -21,7 +21,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 
 @Entity
@@ -33,11 +32,6 @@ public class OutcomeScale implements Serializable {
     @Column(name = "scale_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scaleId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organisation_id")
-    private Organisation organisation;
-
     @Column
     private String name;
 
@@ -46,9 +40,6 @@ public class OutcomeScale implements Serializable {
 
     @Column
     private String description;
-
-    @Column(name = "content_folder_id")
-    private String contentFolderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by")
@@ -59,7 +50,7 @@ public class OutcomeScale implements Serializable {
 
     @OneToMany(mappedBy = "scale", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("value")
-    private Set<OutcomeScaleItem> items = new LinkedHashSet<OutcomeScaleItem>();
+    private Set<OutcomeScaleItem> items = new LinkedHashSet<>();
 
     /**
      * Split comma separated values into a list
@@ -85,14 +76,6 @@ public class OutcomeScale implements Serializable {
 
     public void setScaleId(Long scaleId) {
 	this.scaleId = scaleId;
-    }
-
-    public Organisation getOrganisation() {
-	return organisation;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-	this.organisation = organisation;
     }
 
     public String getName() {
@@ -141,13 +124,5 @@ public class OutcomeScale implements Serializable {
 
     public void setItems(Set<OutcomeScaleItem> items) {
 	this.items = items;
-    }
-
-    public String getContentFolderId() {
-	return contentFolderId;
-    }
-
-    public void setContentFolderId(String contentFolderId) {
-	this.contentFolderId = contentFolderId;
     }
 }

@@ -15,7 +15,7 @@
 				</td>
 				
 				<td style="width: 100px;">
-					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
+					<select name="question${questionIndex}_${option.uid}" class="mark-hedging-select" data-question-index="${questionIndex}"
 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>				
 					>
 						

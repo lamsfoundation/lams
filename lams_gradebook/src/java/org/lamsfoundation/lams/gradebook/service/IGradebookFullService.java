@@ -207,8 +207,9 @@ public interface IGradebookFullService extends IGradebookService {
      * @param view
      * @return
      */
-    List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
-	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone);
+    List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, boolean isGroupManager,
+	    GBGridView view, int page, int size, String sortBy, String sortOrder, String searchString,
+	    TimeZone userTimeZone);
 
     /**
      * Gets a gradebook activity mark/feedback for a given activity and user

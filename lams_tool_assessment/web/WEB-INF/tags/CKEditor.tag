@@ -3,10 +3,8 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
-<%@ attribute name="placeholder" required="false" rtexprvalue="true"%>
 <%@ attribute name="value" required="true" rtexprvalue="true"%>
 <%@ attribute name="toolbarSet" required="false" rtexprvalue="true"%>
-<%@ attribute name="classes" required="false" rtexprvalue="true"%>
 <%@ attribute name="height" required="false" rtexprvalue="true"%>
 <%@ attribute name="width" required="false" rtexprvalue="true"%>
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
@@ -41,17 +39,7 @@
 <c:set var="fixedValue" value="${fn:replace(value,'&lt','&amp;lt')}"/>
 <c:set var="fixedValue" value="${fn:replace(fixedValue,'&gt','&amp;gt')}"/>
 
-<c:if test="${not empty placeholder}">
-	<c:set var="classes" value="placeholder-shown ${classes}" />
-	<div class="cke-div">
-</c:if>
-
-<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${fixedValue}</textarea>
-
-<c:if test="${not empty placeholder}">
-		<label for="${id}" class="cke-label-floating">${placeholder}</label>
-	</div>
-</c:if>
+<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;" placeholder="${placeholder}">${fixedValue}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">
 	<c:set scope="request" var="ckEditorBasePath">/lams/ckeditor/</c:set>
@@ -81,7 +69,6 @@
 				width                         : "${width}",
 				height                        : "${height}",
 				toolbar                       : "${toolbarSet}",
-				classes                       : "${classes}",
 				language                      : "${language}",
 				defaultLangugage              : "en",
 				toolbarStartupExpanded        : ${displayExpanded},

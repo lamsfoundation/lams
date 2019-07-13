@@ -8,6 +8,7 @@
 		<div id="divq${questionNumber}opt${option.displayOrder}">
 		<c:set scope="request" var="optionNumber">${option.displayOrder}</c:set>
 		<c:set scope="request" var="optionText">${option.text}</c:set>
+		<c:set scope="request" var="optionCorrect">${option.correct}</c:set>
 		<%@ include file="mcoption.jsp" %>
 		</div>
 	</c:forEach>

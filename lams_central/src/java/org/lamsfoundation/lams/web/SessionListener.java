@@ -99,7 +99,9 @@ public class SessionListener implements HttpSessionListener {
 
 		// remove obsolete mappings to session
 		// the session is either already invalidated or will be very soon by another module
-		SessionManager.removeSessionByLogin(login, false);
+
+		// it seems obsolete as removeSessionByID() above already clears login mapping
+		// SessionManager.removeSessionByLogin(login, false);
 	    }
 	}
     }

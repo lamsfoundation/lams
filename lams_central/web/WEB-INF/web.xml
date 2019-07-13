@@ -360,6 +360,13 @@
 		</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>SPEnrolmentServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.SPEnrolmentServlet
+		</servlet-class>
+	</servlet>
+	
 	
 	<servlet-mapping>
 		<servlet-name>LearningDesignRestServlet</servlet-name>
@@ -485,7 +492,10 @@
 		<servlet-name>OrganisationGroupServlet</servlet-name>
 		<url-pattern>/services/xml/CourseGroupManager</url-pattern>
 	</servlet-mapping>
-	
+	<servlet-mapping>
+		<servlet-name>SPEnrolmentServlet</servlet-name>
+		<url-pattern>/services/SPEnrolment</url-pattern>
+	</servlet-mapping>
 	
 	<mime-mapping>
 		<extension>csv</extension>
@@ -588,6 +598,7 @@
 			<url-pattern>/services/xml/NotificationManager</url-pattern>
 			<url-pattern>/services/UserRoleManager</url-pattern>
 			<url-pattern>/services/xml/CourseGroupManager</url-pattern>
+			<url-pattern>/services/SPEnrolment</url-pattern>
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
 			<url-pattern>/forgotPasswordProc.jsp</url-pattern>
@@ -612,6 +623,7 @@
 		<web-resource-collection>
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
+			<url-pattern>/outcome/*</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>

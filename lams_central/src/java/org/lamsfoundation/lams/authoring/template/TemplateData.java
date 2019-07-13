@@ -47,7 +47,7 @@ public class TemplateData {
     protected ResourceBundle msgBundle;
     protected ResourceBundle appBundle;
     protected MessageFormat formatter;
-    protected List<String> errorMessages;
+    protected List<String> errorMessages; // Errors to be returned. Other error lists may be used temporarily for sorting purposes
 
     public TemplateData(HttpServletRequest request, String templateCode) {
 	// get a new message source & formatter each time we process a template so
@@ -103,10 +103,24 @@ public class TemplateData {
 	return null;
     }
 
+    /** Create an error message from the ApplicationResources file into a particular set of errors  */
+    protected void addValidationErrorMessage(String key, Object[] params, List<String> errorList) {
+	errorList.add(params != null ? TextUtil.getText(appBundle, formatter, key, params)
+		: TextUtil.getText(appBundle, key));
+    }
+
+    /**
+     * Add all the errors in newErrors to the errorList 
+     */
+    protected void addValidationErrorMessages(List<String> newErrors, List<String> errorList) {
+	if (newErrors != null) {
+		errorList.addAll(newErrors);
+	}
+    }
+
     /** Create an error message from the ApplicationResources file */
     protected void addValidationErrorMessage(String key, Object[] params) {
-	errorMessages.add(params != null ? TextUtil.getText(appBundle, formatter, key, params)
-		: TextUtil.getText(appBundle, key));
+	addValidationErrorMessage(key, params, errorMessages);
     }
 
     /**
@@ -116,13 +130,7 @@ public class TemplateData {
      *            may be null if there are no errors
      */
     protected void addValidationErrorMessages(List<String> newErrors) {
-	if (newErrors != null) {
-	    if (errorMessages == null) {
-		errorMessages = newErrors;
-	    } else {
-		errorMessages.addAll(newErrors);
-	    }
-	}
+	addValidationErrorMessages(newErrors, errorMessages);
     }
 
     protected ArrayNode getForumTopics(HttpServletRequest request, Integer numTopics) {

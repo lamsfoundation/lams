@@ -142,6 +142,7 @@ public interface AuthoringJsonTags {
     public static final String USER_ID = "userID";
     public static final String ORIGINAL_USER_ID = "originalUserID";
     public static final String EDIT_OVERRIDE_USER_ID = "editOverrideUserID";
+    public static final String BRANCHING_ORDERED_ASC = "branchingOrderedAsc";
 
     public static final String COPY_TYPE = "copyTypeID";
     public static final String CREATION_DATE = "createDateTime";

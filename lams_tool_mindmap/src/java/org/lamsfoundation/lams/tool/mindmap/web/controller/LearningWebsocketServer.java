@@ -56,6 +56,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
+		    
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -71,16 +72,18 @@ public class LearningWebsocketServer {
 			}
 			SendWorker.send(toolSessionId, null, null);
 		    }
+		} catch (IllegalStateException e) {
+		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Mindmap worker thread", e);
 		} finally {
-		    HibernateSessionManager.closeSession();
 		    try {
+			HibernateSessionManager.closeSession();
 			Thread.sleep(SendWorker.CHECK_INTERVAL);
-		    } catch (InterruptedException e) {
-			LearningWebsocketServer.log.warn("Stopping Mindmap worker thread");
+		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
+			LearningWebsocketServer.log.warn("Stopping Mindmap worker thread");
 		    }
 		}
 	    }

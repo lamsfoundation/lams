@@ -12,6 +12,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -21,6 +24,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.outcome.Outcome;
 
 /**
  * A question in Question Bank.
@@ -106,7 +110,7 @@ public class QbQuestion implements Serializable, Cloneable {
     // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     @Column
     private boolean shuffle;
-    
+
     @Column(name = "prefix_answers_with_letters")
     private boolean prefixAnswersWithLetters;
 
@@ -122,7 +126,7 @@ public class QbQuestion implements Serializable, Cloneable {
     // only for essay type of question
     @Column(name = "max_words_limit")
     private int maxWordsLimit;
-    
+
     // only for essay type of question
     @Column(name = "min_words_limit")
     private int minWordsLimit;
@@ -132,12 +136,18 @@ public class QbQuestion implements Serializable, Cloneable {
     private boolean hedgingJustificationEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<QbOption> qbOptions = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
+
+    // read-only collection of learning outcomes
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JoinTable(name = "lams_outcome_mapping", joinColumns = @JoinColumn(name = "qb_question_id", referencedColumnName = "question_id", updatable = false, insertable = false), inverseJoinColumns = @JoinColumn(name = "outcome_id"))
+    private List<Outcome> outcomes = new ArrayList<>();
 
     // checks if important parts of another question are the same as current question's.
     // And if not, determines whether another question/version be created.
@@ -318,7 +328,6 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setFeedback(String feedback) {
 	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
     }
-    
 
     public float getPenaltyFactor() {
 	return penaltyFactor;
@@ -447,11 +456,11 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public boolean isPrefixAnswersWithLetters() {
-        return prefixAnswersWithLetters;
+	return prefixAnswersWithLetters;
     }
 
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
-        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     public List<QbOption> getQbOptions() {
@@ -461,12 +470,20 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setQbOptions(List<QbOption> options) {
 	this.qbOptions = options;
     }
-    
+
     public List<QbQuestionUnit> getUnits() {
 	return units;
     }
 
     public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
+    }
+
+    public List<Outcome> getOutcomes() {
+	return outcomes;
+    }
+
+    public void setOutcomes(List<Outcome> outcomes) {
+	this.outcomes = outcomes;
     }
 }

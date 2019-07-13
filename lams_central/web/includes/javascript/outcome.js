@@ -8,13 +8,13 @@
 
 function removeOutcome(outcomeId) {
 	if (confirm(LABELS.REMOVE_OUTCOME_CONFIRM_LABEL)) {
-		document.location.href = 'outcomeRemove.do?organisationID=' + organisationId + '&outcomeId=' + outcomeId;
+		document.location.href = 'outcomeRemove.do?outcomeId=' + outcomeId;
 	}
 }
 
 function removeScale(scaleId) {
 	if (confirm(LABELS.REMOVE_SCALE_CONFIRM_LABEL)) {
-		document.location.href = 'scaleRemove.do?organisationID=' + organisationId + '&scaleId=' + scaleId;
+		document.location.href = 'scaleRemove.do?scaleId=' + scaleId;
 	}
 }
 
@@ -28,8 +28,8 @@ function openEditOutcomeDialog(outcomeId) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome/outcomeEdit.do?organisationID=' + organisationId
-						+ (outcomeId ? "&outcomeId=" + outcomeId : ""));
+						+ 'outcome/outcomeEdit.do'
+						+ (outcomeId ? "?outcomeId=" + outcomeId : ""));
 		}
 	});
 }
@@ -44,8 +44,8 @@ function openEditScaleDialog(scaleId) {
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome/scaleEdit.do?organisationID=' + organisationId
-						+ (scaleId ? "&scaleId=" + scaleId : ""));
+						+ 'outcome/scaleEdit.do'
+						+ (scaleId ? "?scaleId=" + scaleId : ""));
 		}
 	});
 }
@@ -54,14 +54,13 @@ function openOutcomeScaleDialog() {
 	window.parent.showDialog("dialogOutcomeScale", {
 		'height': Math.max(380, Math.min(700, $(window.parent).height() - 30)),
 		'width' : Math.max(380, Math.min(850, $(window.parent).width() - 60)),
-		'title' : organisationId ? LABELS.OUTCOME_SCALE_COURSE_MANAGE_TITLE : LABELS.OUTCOME_SCALE_MANAGE_TITLE,
+		'title' : LABELS.OUTCOME_SCALE_MANAGE_TITLE,
 		'open'  : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome/scaleManage.do?organisationID='
-						+ organisationId);
+						+ 'outcome/scaleManage.do');
 		}
 	});
 }

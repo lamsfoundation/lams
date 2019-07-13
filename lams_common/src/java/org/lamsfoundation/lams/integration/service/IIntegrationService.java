@@ -53,7 +53,7 @@ public interface IIntegrationService {
 	    String prettyCourseName, String method) throws UserInfoValidationException;
 
     ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
-	    String extCourseName, String parentOrgId, Boolean isTeacher, Boolean prefix)
+	    String extCourseName, String parentOrgId, String method, Boolean prefix)
 	    throws UserInfoValidationException;
 
     ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)

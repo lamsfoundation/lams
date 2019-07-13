@@ -187,15 +187,11 @@ public class DisplayGroupController {
 			moreLinks.add(new IndexLinkBean("label.enable.lesson.sorting", "javascript:makeOrgSortable()",
 				"fa fa-fw fa-sort sorting tour-sorting", "label.enable.lesson.sorting"));
 		    }
-		}
 
-		// Adding gradebook course monitor links if enabled
-		if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
 			    "index.coursegradebook.tooltip"));
 		}
-
 	    } else {// CLASS_TYPE
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getParentOrganisation().getEnableSingleActivityLessons()
@@ -203,10 +199,7 @@ public class DisplayGroupController {
 			    : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + organisationId + ")",
 			    "fa fa-fw fa-plus", null));
-		}
 
-		// Adding gradebook course monitor links if enabled
-		if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 		    String link = "javascript:showGradebookCourseDialog(" + organisationId + ")";
 		    moreLinks.add(
 			    new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));

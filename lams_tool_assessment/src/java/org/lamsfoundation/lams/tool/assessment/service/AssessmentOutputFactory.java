@@ -23,22 +23,30 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.lamsfoundation.lams.learningdesign.BranchCondition;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 
 public class AssessmentOutputFactory extends OutputFactory {
 
@@ -49,7 +57,7 @@ public class AssessmentOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) {
 
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 
 	ToolOutputDefinition definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS,
 		0L, null);
@@ -60,7 +68,7 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	if (toolContentObject != null) {
 	    Assessment assessment = (Assessment) toolContentObject;
-	    Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
 
 	    Long totalMarksPossible = 0L;
@@ -94,9 +102,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 		    markAvailable = Long.valueOf(questionReference.getMaxMark());
 		}
 
-		String description = getI18NText("output.user.score.for.question", false);
+		String description = getI18NText("output.user.score.for.question", false) + " ";
 		if (questionReference.isRandomQuestion()) {
-		    description += getI18NText("label.authoring.basic.type.random.question", false) + " "
+		    description += getI18NText("label.authoring.basic.type.random.question", false)
 			    + randomQuestionsCount++;
 		} else {
 		    description += questionReference.getQuestion().getQbQuestion().getName();
@@ -106,7 +114,28 @@ public class AssessmentOutputFactory extends OutputFactory {
 		definition.setDescription(description);
 		definitionMap.put(String.valueOf(questionReference.getSequenceId()), definition);
 	    }
-	    ;
+
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		if (question.getType() == QbQuestion.TYPE_ORDERING) {
+		    String outputName = AssessmentConstants.OUTPUT_NAME_ORDERED_ANSWERS + "#"
+			    + question.getDisplayOrder();
+		    ToolOutputDefinition orderedAnswersDefinition = buildLongOutputDefinition(outputName);
+		    orderedAnswersDefinition.setShowConditionNameOnly(true);
+		    orderedAnswersDefinition.setDescription(getI18NText("output.ordered.answers.for.question", false)
+			    + " " + question.getQbQuestion().getName());
+		    List<BranchCondition> conditions = new LinkedList<>();
+		    orderedAnswersDefinition.setConditions(conditions);
+		    int orderId = 1;
+		    for (QbOption option : question.getQbQuestion().getQbOptions()) {
+			conditions.add(new BranchCondition(null, null, orderId++,
+				AssessmentConstants.OUTPUT_NAME_CONDITION_ORDERED_ANSWER + "#"
+					+ question.getDisplayOrder() + "#" + option.getDisplayOrder(),
+				WebUtil.removeHTMLtags(option.getName()), BranchCondition.OUTPUT_TYPE_LONG, null, null,
+				null));
+		    }
+		    definitionMap.put(outputName, orderedAnswersDefinition);
+		}
+	    }
 	}
 
 	return definitionMap;
@@ -115,7 +144,7 @@ public class AssessmentOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IAssessmentService assessmentService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> output = new TreeMap<>();
 
 	AssessmentSession session = assessmentService.getSessionBySessionId(toolSessionId);
 	if ((session != null) && (session.getAssessment() != null)) {
@@ -144,6 +173,14 @@ public class AssessmentOutputFactory extends OutputFactory {
 	    if (names == null || names.contains(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		output.put(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS,
 			getNumberAttempts(assessmentService, learnerId, assessment));
+	    }
+	    if (names != null) {
+		for (String name : names) {
+		    if (name.startsWith(AssessmentConstants.OUTPUT_NAME_CONDITION_ORDERED_ANSWER)) {
+			output.put(AssessmentConstants.OUTPUT_NAME_CONDITION_ORDERED_ANSWER,
+				getAnswerOrder(assessmentService, assessment, learnerId, name));
+		    }
+		}
 	    }
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
 	    for (AssessmentQuestion question : questions) {
@@ -183,11 +220,14 @@ public class AssessmentOutputFactory extends OutputFactory {
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		    return getNumberAttempts(assessmentService, learnerId, assessment);
 
+		} else if (name.startsWith(AssessmentConstants.OUTPUT_NAME_CONDITION_ORDERED_ANSWER)) {
+		    return getAnswerOrder(assessmentService, assessment, learnerId, name);
 		} else {
 		    Set<AssessmentQuestion> questions = assessment.getQuestions();
 		    for (AssessmentQuestion question : questions) {
 			if (name.equals(String.valueOf(question.getDisplayOrder()))) {
-			    return getQuestionScore(assessmentService, learnerId, assessment, question.getDisplayOrder());
+			    return getQuestionScore(assessmentService, learnerId, assessment,
+				    question.getDisplayOrder());
 			}
 		    }
 		}
@@ -198,50 +238,51 @@ public class AssessmentOutputFactory extends OutputFactory {
 
     public List<ToolOutput> getToolOutputs(String name, IAssessmentService assessmentService, Long toolContentId) {
 	if ((name != null) && (toolContentId != null)) {
-
 	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getLastTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-
-	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_BEST_SCORE)) {
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_BEST_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getBestTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-
-	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE)) {
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_FIRST_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getFirstTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-
-	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE)) {
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_AVERAGE_SCORE)) {
 		List<AssessmentUserDTO> results = assessmentService.getAverageTotalScoresByContentId(toolContentId);
 		return convertToToolOutputs(results);
-
-	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
 		return null;
-
-	    } else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		return null;
-
-	    } else {
-		Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
-		Set<AssessmentQuestion> questions = assessment.getQuestions();
-		for (AssessmentQuestion question : questions) {
-		    if (name.equals(String.valueOf(question.getDisplayOrder()))) {
-			return null;
-		    }
+	    }
+	    if (name.startsWith(AssessmentConstants.OUTPUT_NAME_ORDERED_ANSWERS)) {
+		return null;
+	    }
+	    Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	    Set<AssessmentQuestion> questions = assessment.getQuestions();
+	    for (AssessmentQuestion question : questions) {
+		if (name.equals(String.valueOf(question.getDisplayOrder()))) {
+		    return null;
 		}
 	    }
 	}
+
 	return null;
     }
 
     /**
      * Simply converts List<AssessmentUserDTO> to List<ToolOutput>.
-     * 
+     *
      * @param results
      * @return
      */
     private List<ToolOutput> convertToToolOutputs(List<AssessmentUserDTO> results) {
-	List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
+	List<ToolOutput> toolOutputs = new ArrayList<>();
 	for (AssessmentUserDTO result : results) {
 	    float totalScore = result.getGrade();
 
@@ -332,6 +373,45 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	float questionResultMark = (questionResultMarkDB == null) ? 0 : questionResultMarkDB;
 	return new ToolOutput(String.valueOf(questionDisplayOrder), "description", questionResultMark);
+    }
+
+    /**
+     * Get order ID selected by the learner for the given option
+     */
+    private ToolOutput getAnswerOrder(IAssessmentService assessmentService, Assessment assessment, Long learnerId,
+	    String conditionName) {
+	// condition name is prefix#questionSequenceId#optionSequenceId
+	String[] conditionNameSplit = conditionName.split("#");
+	Integer questionSequenceId = Integer.valueOf(conditionNameSplit[1]);
+	Integer optionSequenceId = Integer.valueOf(conditionNameSplit[2]);
+	AssessmentQuestion question = null;
+	// find question
+	for (AssessmentQuestion questionCandidate : assessment.getQuestions()) {
+	    if (questionSequenceId.equals(questionCandidate.getDisplayOrder())) {
+		question = questionCandidate;
+		break;
+	    }
+	}
+	// find option
+	Long optionUid = null;
+	for (QbOption optionCandidate : question.getQbQuestion().getQbOptions()) {
+	    if (optionSequenceId.equals(optionCandidate.getDisplayOrder())) {
+		optionUid = optionCandidate.getUid();
+		break;
+	    }
+	}
+	// find order in which the given learner put the option
+	AssessmentResult result = assessmentService.getLastAssessmentResult(assessment.getUid(), learnerId);
+	for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+	    if (questionResult.getQbToolQuestion().getUid().equals(question.getUid())) {
+		for (AssessmentOptionAnswer answer : questionResult.getOptionAnswers()) {
+		    if (answer.getOptionUid().equals(optionUid)) {
+			return new ToolOutput(conditionName, null, answer.getAnswerInt());
+		    }
+		}
+	    }
+	}
+	return null;
     }
 
 }
