@@ -12,9 +12,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -24,7 +21,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.outcome.Outcome;
 
 /**
  * A question in Question Bank.
@@ -69,7 +65,7 @@ public class QbQuestion implements Serializable, Cloneable {
 
     @Column(name = "create_date")
     private Date createDate = new Date();
-    
+
     @Column(name = "content_folder_id")
     private String contentFolderId;
 
@@ -142,12 +138,6 @@ public class QbQuestion implements Serializable, Cloneable {
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
-
-    // read-only collection of learning outcomes
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JoinTable(name = "lams_outcome_mapping", joinColumns = @JoinColumn(name = "qb_question_id", referencedColumnName = "question_id", updatable = false, insertable = false), inverseJoinColumns = @JoinColumn(name = "outcome_id"))
-    private List<Outcome> outcomes = new ArrayList<>();
 
     // checks if important parts of another question are the same as current question's.
     // And if not, determines whether another question/version be created.
@@ -288,7 +278,7 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-    
+
     public String getContentFolderId() {
 	return contentFolderId;
     }
@@ -477,13 +467,5 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
-    }
-
-    public List<Outcome> getOutcomes() {
-	return outcomes;
-    }
-
-    public void setOutcomes(List<Outcome> outcomes) {
-	this.outcomes = outcomes;
     }
 }

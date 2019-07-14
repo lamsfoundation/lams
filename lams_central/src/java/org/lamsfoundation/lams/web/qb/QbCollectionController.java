@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -64,6 +64,9 @@ public class QbCollectionController {
 
     @Autowired
     private IQbService qbService;
+
+    @Autowired
+    private IOutcomeService outcomeService;
 
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
@@ -152,7 +155,8 @@ public class QbCollectionController {
 			: null;
 		boolean hasVersions = qbService.countQuestionVersions(question.getQuestionId()) > 1;
 		String learningOutcomes = view.equalsIgnoreCase("single")
-			? question.getOutcomes().stream().map(Outcome::getName).collect(Collectors.joining("<br>"))
+			? outcomeService.getOutcomeMappings(null, null, null, question.getQuestionId()).stream()
+				.map(m -> m.getOutcome().getName()).collect(Collectors.joining("<br>"))
 			: null;
 
 		String[] data = { question.getQuestionId().toString(),
