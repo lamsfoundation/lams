@@ -544,7 +544,7 @@ public class TBLTemplateController extends LdTemplateController {
 		Assessment assessment = new Assessment();
 		if (questionText != null) {
 		    assessment.setTitle(questionTitle);
-		    assessment.setQuestionText(questionText);
+		    assessment.setText(questionText);
 		    assessment.setType(WebUtil.readStrParam(request, assessmentPrefix + "type"));
 		    assessment.setRequired(true);
 
@@ -562,6 +562,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    }
 
 		    if (assessment.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+			assessment.setMultipleAnswersAllowed(WebUtil.readBooleanParam(request,  assessmentPrefix + "multiAllowed", false));
 			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq")
 				.append(i).append("option").toString();
 			for (int o = 1, order = 0; o <= MAX_OPTION_COUNT; o++) {

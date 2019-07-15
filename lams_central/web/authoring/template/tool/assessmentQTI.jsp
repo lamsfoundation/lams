@@ -12,7 +12,7 @@ which are passed on to the individual question jsps to generate the form fields.
 
 <div id="${containingDivName}divassess${currentNumber}" class="space-top space-sides">
 <c:choose>
-<c:when test="${not empty question.answers}">
+<c:when test="${question.type eq 1}">
 		<%@ include file="../tool/assessmcq.jsp" %>
 </c:when>
 <c:otherwise> 
