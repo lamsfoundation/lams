@@ -284,7 +284,7 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Usage in lessons
+			Usage in active lessons
 		</div>
 		<div class="panel-body">
 			<c:choose>

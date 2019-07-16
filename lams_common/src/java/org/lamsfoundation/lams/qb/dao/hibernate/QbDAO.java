@@ -26,8 +26,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String FIND_MAX_VERSION = "SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId";
 
-    private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM ToolActivity AS a, QbToolQuestion AS q "
-	    + "WHERE a.toolContentId = q.toolContentId AND a.learningDesign.lessons IS NOT EMPTY AND q.qbQuestion.uid = :qbQuestionUid";
+    private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM QbToolQuestion AS q, ToolActivity AS a JOIN a.learningDesign.lessons AS l "
+	    + "WHERE a.toolContentId = q.toolContentId AND l IS NOT EMPTY AND l.lessonStateId IN (3,4,5,6) AND q.qbQuestion.uid = :qbQuestionUid "
+	    + "ORDER BY l.organisation.name, l.lessonName";
 
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
