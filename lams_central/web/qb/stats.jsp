@@ -49,6 +49,10 @@
 		.header-column {
 			font-weight: bold;
 		}
+		
+		a {
+			cursor: pointer;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -57,6 +61,9 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
 	<script type="text/javascript">
 		var permanentRemove = '${permanentRemove}' == 'true',
 			permanentRemovePossible = '${permanentRemovePossible}' == 'true',
@@ -318,8 +325,10 @@
 								<td>
 									<c:out value="${lesson.organisation.name}" />
 								</td>
-								<td title="${lesson.lessonId}">
-									<c:out value="${lesson.lessonName}" />
+								<td>
+									<a onClick="javascript:openMonitorLesson(${lesson.lessonId})">
+										<c:out value="${lesson.lessonName}" />
+									</a>
 								</td>
 								<td title="${activityDTO.activity.activityId}">
 									<c:choose>
