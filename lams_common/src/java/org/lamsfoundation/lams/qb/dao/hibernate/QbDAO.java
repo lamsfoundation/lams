@@ -63,7 +63,15 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id WHERE "
 	    + "q.version = (SELECT MAX(version) FROM lams_qb_question WHERE question_id = q.question_id) "
-	    + "AND cq.collection_uid = :collectionUid";
+	    + "AND cq.collection_uid = :collectionUid ?";
+
+    private static final String FIND_COLLECTION_QUESTIONS_BY_USAGE = "SELECT q.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id "
+	    + "JOIN lams_qb_tool_question AS tq ON q.uid = tq.qb_question_uid "
+	    + "JOIN lams_learning_activity AS a USING (tool_content_id) "
+	    + "JOIN lams_lesson AS l USING (learning_design_id) WHERE l.lesson_state_id IN (3,4,5,6) "
+	    + "AND q.version = (SELECT MAX(version) FROM lams_qb_question WHERE question_id = q.question_id) "
+	    + "AND cq.collection_uid = :collectionUid ? GROUP BY q.question_id ORDER BY COUNT(l.lesson_id)";
 
     private static final String FIND_QUESTION_COLLECTIONS_BY_UID = "SELECT c.* FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id "
@@ -358,12 +366,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    String search, boolean isCount) {
 	StringBuilder queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS);
 
-	if (StringUtils.isNotBlank(search)) {
-	    queryBuilder.append(" AND (q.name LIKE :search OR q.description LIKE :search)");
-	}
-
 	if (!isCount && StringUtils.isNotBlank(orderBy)) {
-	    queryBuilder.append(" ORDER BY ").append(orderBy);
+	    if (orderBy.equalsIgnoreCase("usage")) {
+		queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS_BY_USAGE);
+	    } else {
+		queryBuilder.append(" ORDER BY ").append(orderBy);
+	    }
 	    if (StringUtils.isNotBlank(orderDirection)) {
 		queryBuilder.append(" ").append(orderDirection);
 	    }
@@ -373,6 +381,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	if (isCount) {
 	    queryText = queryText.replace("q.*", "COUNT(*)");
 	}
+
+	queryText = queryText.replace("?",
+		(StringUtils.isBlank(search) ? "" : " AND (q.name LIKE :search OR q.description LIKE :search)"));
 
 	Query query = isCount ? getSession().createNativeQuery(queryText)
 		: getSession().createNativeQuery(queryText, QbQuestion.class);

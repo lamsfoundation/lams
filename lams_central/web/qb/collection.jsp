@@ -126,7 +126,7 @@
 			    	{name:'questionType', index:'questionType', width:0, hidden: true},
 			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 			    	{name: 'learningOutcomes', index: 'learningOutcomes', sortable:true, search:true, autoencode: true, width: 25, formatter: learningOutcomeFormatter},
-			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
+			    	{name: 'usage', index: 'usage', sortable:true, width: 15, align: "center"},
 			      	// formatter gets just question uid and creates a button
 			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter},
 					{name:'hasVersions', index:'hasVersions', width:0, hidden: true}
@@ -176,7 +176,7 @@
 						     ],
 						     colModel: [
 						    	{name:'id', index:'question_id', sortable:false, hidden:true, width: 10},
-						    	{name:'name', index:'name', sortable:false, search:false, autoencode:true, formatter: questionNameFormatter},
+						    	{name:'name', index:'name', sortable:false, search:false, autoencode:false, formatter: questionNameFormatter},
 						    	{name:'questionType', index:'questionType', width:0, hidden: true},
 						    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
 						    	{name: 'learningOutcomes', index: 'learningOutcomes', width:0, hidden: true},
