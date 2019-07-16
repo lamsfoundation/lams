@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -95,10 +96,11 @@ public class QbCollectionController {
 	return "qb/collection";
     }
 
-    @RequestMapping(path = "/getCollectionGridData", produces = "text/xml; charset=utf-8")
+    @RequestMapping(path = "/getCollectionGridData")
     @ResponseBody
     public String getCollectionGridData(@RequestParam long collectionUid, @RequestParam String view,
-	    HttpServletRequest request) {
+	    HttpServletRequest request, HttpServletResponse response) {
+	response.setContentType("application/xml;charset=UTF-8");
 
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
@@ -115,9 +117,11 @@ public class QbCollectionController {
 	return toGridXML(questions, page, maxPages, total, view);
     }
 
-    @RequestMapping(path = "/getQuestionVersionGridData", produces = "text/xml; charset=utf-8")
+    @RequestMapping(path = "/getQuestionVersionGridData", produces = "application/xml;charset=utf-8")
     @ResponseBody
-    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, @RequestParam String view) {
+    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, @RequestParam String view,
+	    HttpServletResponse response) {
+	response.setContentType("application/xml;charset=UTF-8");
 
 	List<QbQuestion> questions = qbService.getQuestionsByQuestionId(qbQuestionId);
 	questions = questions.subList(1, questions.size());
