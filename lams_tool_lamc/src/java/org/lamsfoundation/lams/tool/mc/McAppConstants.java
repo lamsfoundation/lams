@@ -63,6 +63,10 @@ public interface McAppConstants {
     public static final String PASSMARK = "passMark";
     public static final String VIEW_ANSWERS = "viewAnswers";
     public static final String ATTR_SESSION_MAP_ID = "sessionMapId";
+    /**
+     * It's used to signify edit in monitor when assessment has been attempted already
+     */
+    public static final String ATTR_IS_AUTHORING_RESTRICTED = "isAuthoringRestricted";
 
     /* Date time restriction */
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";

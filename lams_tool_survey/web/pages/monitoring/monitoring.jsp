@@ -41,7 +41,7 @@
 
 	<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
-	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
+	<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet" />
 		
 	 <script>
 			var initialTabId = "${initialTabId}";

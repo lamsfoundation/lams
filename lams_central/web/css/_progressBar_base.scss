@@ -10,6 +10,7 @@ div.optionalActivity {
 
 div.optionalActivity table {
 	border: $border-thin-black;
+	border-collapse: separate;
 	background-color: $optional-activity-background;
 	width: 145px;
 }

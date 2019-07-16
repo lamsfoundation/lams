@@ -275,6 +275,7 @@ function showMonitorLessonDialog(lessonID) {
 	var id = "dialogMonitorLesson" + lessonID,
 		dialog = showDialog(id, {
 			'data' : {
+				'isMonitorDialog' : true,
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
@@ -565,18 +566,17 @@ function showKumaliveReportDialog(orgID){
 	}, false);
 }
 
-function showOutcomeDialog(organisationID) {
+function showOutcomeDialog() {
 	showDialog("dialogOutcome", {
 		'height': Math.max(380, Math.min(700, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
-		'title' : organisationID ? LABELS.OUTCOME_COURSE_MANAGE_TITLE : LABELS.OUTCOME_MANAGE_TITLE,
+		'title' : LABELS.OUTCOME_MANAGE_TITLE,
 		'open'  : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog)
 					.attr('src', LAMS_URL
-						+ 'outcome.do?method=outcomeManage&organisationID='
-						+ organisationID);
+						+ 'outcome.do?method=outcomeManage');
 		}
 	});
 }

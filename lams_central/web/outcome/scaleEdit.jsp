@@ -21,25 +21,20 @@
 		<c:if test="${saved}">
 			var scalesFrame = $('#dialogOutcomeScale iframe', window.parent.document);
 			if (scalesFrame.length == 0) {
-				window.parent.document.location.href = 
-					'<lams:LAMSURL/>outcome/scaleManage.do${empty param.organisationID ? "" : "?organisationID=param.organisationID"}';
+				window.parent.document.location.href = '<lams:LAMSURL/>outcome/scaleManage.do';
 			} else {
 				scalesFrame.attr('src', scalesFrame.attr('src'));
 				$('#dialogOutcomeScaleEdit', window.parent.document).remove();
 			}
 		</c:if>
-		
-		var organisationId = '${param.organisationID}';
 	</script>
 </lams:head>
 <body>
 
 <form:form action="scaleSave.do" method="post" modelAttribute="scaleForm">
-	<c:set var="formDisabled" value="${isDefaultScale or (not empty scaleForm.scaleId and empty scaleForm.organisationId and not canManageGlobal)}" />
+	<c:set var="formDisabled" value="${isDefaultScale}" />
 
 	<form:hidden path="scaleId" />
-	<form:hidden path="organisationId" />
-	<form:hidden path="contentFolderId" />
 	
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -61,22 +56,13 @@
 							</label>
 						</div>
 						<div class="form-group">
-							<fmt:message key="outcome.manage.scope" />:
-							<c:choose>
-								<c:when test="${empty scaleForm.organisationId}">
-									<fmt:message key="outcome.manage.scope.global" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="outcome.manage.scope.course" />
-								</c:otherwise>
-							</c:choose>
-						</div>
-						<div class="form-group">
 							<label><fmt:message key="scale.manage.add.value" />:<br />
 								<form:textarea path="items" disabled="${formDisabled}" />
-								<lams:Alert type="info" close="false">
-							        <fmt:message key="scale.manage.add.value.info" />
-								</lams:Alert>
+								<c:if test="${not formDisabled}">
+									<lams:Alert type="info" close="false">
+							        	<fmt:message key="scale.manage.add.value.info" />
+									</lams:Alert>
+								</c:if>
 							</label>
 						</div>
 						<div class="form-group">

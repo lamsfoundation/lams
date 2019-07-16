@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas
  */
 public class AuthoringUtil {
-    private static Logger logger = Logger.getLogger(AuthoringUtil.class.getName());
 
     /**
      * extractCandidateAtOrder
@@ -72,8 +71,8 @@ public class AuthoringUtil {
     /**
      * persisting content.
      */
-    public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
-	    String strToolContentID, List<McQuestionDTO> questionDTOs) {
+    public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, ToolAccessMode mode,
+	    McContent mcContent, Long toolContentID, List<McQuestionDTO> questionDTOs) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
@@ -161,9 +160,15 @@ public class AuthoringUtil {
 	if (mcContent == null) {
 	    mcContent = new McContent();
 	    newContent = true;
+
+	} else {
+	    // if it is a Teacher mode (i.e. request comes from monitor) - change define later status
+	    if (mode.isTeacher()) {
+		mcContent.setDefineLater(false);
+	    }
 	}
 
-	mcContent.setMcContentId(new Long(strToolContentID));
+	mcContent.setMcContentId(toolContentID);
 	mcContent.setTitle(richTextTitle);
 	mcContent.setInstructions(richTextInstructions);
 	mcContent.setUpdateDate(new Date(System.currentTimeMillis()));
@@ -213,7 +218,7 @@ public class AuthoringUtil {
 	    mcService.updateMc(mcContent);
 	}
 
-	mcContent = mcService.getMcContent(new Long(strToolContentID));
+	mcContent = mcService.getMcContent(new Long(toolContentID));
 
 	return mcContent;
     }

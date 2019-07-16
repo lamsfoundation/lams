@@ -633,6 +633,12 @@
 				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
 				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
 			</tr>
+			<tr id="branchMappingOrderedRow">
+				<td colspan="5">
+					<input id="branchMappingOrderedAscCheckbox" type="checkbox" checked="checked"></input>
+					<fmt:message key="authoring.fla.branch.mapping.ordered.asc" />
+				</td>
+			</tr>
 			<tr>
 				<td colspan="5">
 					<div class="container-fluid">
@@ -731,7 +737,7 @@
 				<td>
 					 <input class="propertiesContentFieldGroupCountEnable" type="radio"
 					 		name="propertiesContentFieldGroupDivide">
-					 <input class="propertiesContentFieldGroupCount spinner" type="text">
+					 <input class="propertiesContentFieldGroupCount spinner" type="number">
 				</td>
 			</tr>
 			<tr>
@@ -741,7 +747,7 @@
 				<td>
 					<input class="propertiesContentFieldLearnerCountEnable" type="radio"
 					 		name="propertiesContentFieldGroupDivide">
-					 <input class="propertiesContentFieldLearnerCount spinner" type="text">
+					 <input class="propertiesContentFieldLearnerCount spinner" type="number">
 				</td>
 			</tr>
 			<tr>
@@ -813,15 +819,15 @@
 					<fmt:message key="authoring.fla.page.prop.gate.delay" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetDay spinner" type="text"> 
+					<input class="propertiesContentFieldOffsetDay spinner" type="number"> 
 					<fmt:message key="authoring.fla.page.prop.days" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetHour spinner" type="text"> 
+					<input class="propertiesContentFieldOffsetHour spinner" type="number"> 
 					<fmt:message key="authoring.fla.page.prop.hours" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOffsetMinute spinner" type="text"> 
+					<input class="propertiesContentFieldOffsetMinute spinner" type="number"> 
 					<fmt:message key="authoring.fla.page.prop.minutes" />
 				</td>
 			</tr>
@@ -906,7 +912,7 @@
 					<fmt:message key="authoring.fla.page.prop.branching.sequences.min" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="text">
+					<input class="propertiesContentFieldOptionalSequenceMin spinner" type="number">
 				</td>
 			</tr>
 			<tr>
@@ -914,7 +920,7 @@
 					<fmt:message key="authoring.fla.page.prop.branching.sequences.max" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="text">
+					<input class="propertiesContentFieldOptionalSequenceMax spinner" type="number">
 				</td>
 			</tr>
 		</table>
@@ -958,7 +964,7 @@
 					<fmt:message key="authoring.fla.page.prop.optional.activities.min" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalActivityMin spinner" type="text">
+					<input class="propertiesContentFieldOptionalActivityMin spinner" type="number">
 				</td>
 			</tr>
 			<tr>
@@ -966,7 +972,7 @@
 					<fmt:message key="authoring.fla.page.prop.optional.activities.max" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldOptionalActivityMax spinner" type="text">
+					<input class="propertiesContentFieldOptionalActivityMax spinner" type="number">
 				</td>
 			</tr>
 		</table>
@@ -1055,10 +1061,10 @@
 		 	<option value="range"><fmt:message key="authoring.fla.page.dialog.cond.range" /></option>
 		 </select>
 		 <div id="rangeAddDiv" class="outputSelectDependent">
-			 <input id="singleRangeSpinner" class="outputSelectDependent spinner"/>
+			 <input id="singleRangeSpinner" class="outputSelectDependent spinner" type="number" />
 			 <div id="multiRangeDiv" class="outputSelectDependent">
-			 	<fmt:message key="authoring.fla.page.dialog.cond.range.from" /> <input id="multiRangeFromSpinner" class="spinner" />
-			 	<fmt:message key="authoring.fla.page.dialog.cond.range.to" /> <input id="multiRangeToSpinner" class="spinner" />
+			 	<fmt:message key="authoring.fla.page.dialog.cond.range.from" /> <input id="multiRangeFromSpinner" class="spinner" type="number" />
+			 	<fmt:message key="authoring.fla.page.dialog.cond.range.to" /> <input id="multiRangeToSpinner" class="spinner" type="number" />
 			 </div>
 			 <button id="rangeAddButton" class="btn btn-default">
 			 	<i class="fa fa-plus"></i>

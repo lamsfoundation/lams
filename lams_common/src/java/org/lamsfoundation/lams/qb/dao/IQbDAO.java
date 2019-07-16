@@ -24,6 +24,8 @@ public interface IQbDAO extends IBaseDAO {
      */
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
+    List<QbQuestion> getQuestionsByToolContentId(long toolContentId);
+
     // finds next question ID for Question Bank question
     int getMaxQuestionId();
 
@@ -66,4 +68,5 @@ public interface IQbDAO extends IBaseDAO {
 
     Set<Integer> getCollectionQuestionIdsExcluded(long collectionUid, Collection<Integer> qbQuestionIds);
 
+    boolean isQuestionInUserCollection(int userId, int qbQuestionId);
 }

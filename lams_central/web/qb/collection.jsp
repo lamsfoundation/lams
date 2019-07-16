@@ -69,6 +69,14 @@
 			height: auto !important;
 			width: auto !important;
 		}
+		
+		.all-learning-outcomes {
+			display: none;
+		}
+		
+		.all-learning-outcomes-show {
+			cursor: pointer;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -87,7 +95,7 @@
 				iconSet: 'fontAwesome',
 				caption: "Questions",
 			    datatype: "xml",
-			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?showUsage=true&collectionUid=${collection.uid}",
+			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?view=single&collectionUid=${collection.uid}",
 			    height: "100%",
 			    autowidth:true,
 				shrinkToFit: true,
@@ -107,6 +115,7 @@
 			    	"Name",
 			    	"questionType",
 			    	"questionVersion",
+			    	"Learning Outcomes",
 			    	"Used in<br>lessons",
 			    	"Actions",
 			    	"hasVersions"
@@ -116,7 +125,8 @@
 			    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: questionNameFormatter},
 			    	{name:'questionType', index:'questionType', width:0, hidden: true},
 			    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
-			    	{name: 'usage', index: 'usage', sortable:false, width: 10, align: "center"},
+			    	{name: 'learningOutcomes', index: 'learningOutcomes', sortable:true, search:true, autoencode: true, width: 25, formatter: learningOutcomeFormatter},
+			    	{name: 'usage', index: 'usage', sortable:true, width: 15, align: "center"},
 			      	// formatter gets just question uid and creates a button
 			    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter},
 					{name:'hasVersions', index:'hasVersions', width:0, hidden: true}
@@ -150,7 +160,7 @@
 							 autoencode:false,
 							 autowidth: true,
 						     datatype: "xml",
-						     url: "<lams:LAMSURL />qb/collection/getQuestionVersionGridData.do?qbQuestionId=" + questionId,
+						     url: "<lams:LAMSURL />qb/collection/getQuestionVersionGridData.do?view=version&qbQuestionId=" + questionId,
 						     height: "100%",
 						     cmTemplate: { title: false },
 						     cellEdit:false,
@@ -160,14 +170,16 @@
 						    	"Name",
 						    	"questionType",
 						    	"questionVersion",
+						    	"Learning Outcomes",
 						    	"Used in<br>lessons",
 						    	"Actions"
 						     ],
 						     colModel: [
-						    	{name:'id', index:'uid', sortable:false, hidden:true, width: 10},
-						    	{name:'name', index:'name', sortable:false, search:false, autoencode:true, formatter: questionNameFormatter},
+						    	{name:'id', index:'question_id', sortable:false, hidden:true, width: 10},
+						    	{name:'name', index:'name', sortable:false, search:false, autoencode:false, formatter: questionNameFormatter},
 						    	{name:'questionType', index:'questionType', width:0, hidden: true},
 						    	{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
+						    	{name: 'learningOutcomes', index: 'learningOutcomes', width:0, hidden: true},
 						    	{name: 'usage', index: 'usage', sortable:false, width: 9, align: "center"},
 						      	// formatter gets just question uid and creates a button
 						    	{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 12, align: "center", formatter: actionsFormatter}
@@ -209,6 +221,34 @@
 				});
 			}
 		});
+		
+		function learningOutcomeFormatter(cellvalue) {
+			if (!cellvalue) {
+				return '';
+			}
+			
+			var outcomes = cellvalue.split('<br>'),
+				cellhtml = '',
+				firstOutcome = null;
+			outcomes.forEach(function(outcome){
+				cellhtml += '<span class="alert-info btn-xs">' + outcome + '</span><br>';
+				if (!firstOutcome) {
+					firstOutcome = cellhtml;
+				}
+			});
+			
+			// if there is only one outcome, just show it
+			// if there is more, show the first one and a button to show all
+			return outcomes.length === 1 ? cellhtml :
+				   	firstOutcome + '<a class="all-learning-outcomes-show" onClick="javascript:showLearningOutcomes(this)">'
+					+ '(show all)</a><div class="all-learning-outcomes">' + cellhtml + '</div>';
+		}
+		
+		function showLearningOutcomes(button) {
+			var cell = $(button).closest('td'),
+				fullText = $('.all-learning-outcomes', cell).html();
+			cell.html(fullText);
+		}
 		
 		// auxiliary formatter for jqGrid's question statistics column
 		function actionsFormatter(cellvalue){

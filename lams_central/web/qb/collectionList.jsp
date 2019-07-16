@@ -60,7 +60,7 @@
 					// data comes from data-collection-* attributes of <table> tag which is a base for the grid
 					caption: collectionGrid.data('collectionTitle'),
 				    datatype: "xml",
-				    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?collectionUid=" + collectionGrid.data('collectionUid'),
+				    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?view=list&collectionUid=" + collectionGrid.data('collectionUid'),
 				    height: "100%",
 				    autowidth:true,
 					shrinkToFit: true,
@@ -77,16 +77,18 @@
 				    	"Name",
 				    	"questionType",
 				    	"questionVersion",
+				    	"Learning Outcomes",
 				    	// this column is hidden, so data coming from controller can be the same as for single collection view
 				    	"Used in # of lessons",
 				    	"Stats"
 				    ],
 				    colModel:[
-				    	{name:'id', index:'uid', sortable:true,  width: 10},
+				    	{name:'id', index:'question_id', sortable:true,  width: 10},
 				    	// formatter gets just question uid and creates a link
 				    	{name:'name', index:'name', sortable:true, search:true, autoencode:true, formatter: nameLinkFormatter},
 				    	{name:'questionType', index:'questionType', width:0, hidden: true},
 				   		{name:'questionVersion', index:'questionVersion', width:0, hidden: true},
+				    	{name: 'learningOutcomes', index: 'learningOutcomes', width:0, hidden: true},
 				    	{name: 'usage', index: 'usage', hidden: true},
 				    	// formatter gets just question uid and creates a button
 				    	{name:'stats', index:'stats', classes: "stats-cell", sortable:false, width: 10, align: "center", formatter: statsLinkFormatter}

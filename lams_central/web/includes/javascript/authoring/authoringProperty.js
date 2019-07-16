@@ -21,13 +21,13 @@ var PropertyDefs = {
 				PropertyLib.fillGroupingDropdown(activity, activity.branchingActivity.grouping);
 				PropertyLib.fillToolInputDropdown(activity, activity.branchingActivity.input);
 				
-				$('.propertiesContentFieldOptionalSequenceMin', content).spinner('value',
+				$('.propertiesContentFieldOptionalSequenceMin', content).attr('value',
 																				 activity.branchingActivity.minOptions)
-																		.spinner('option', 'max',
+																		.attr('max',
 																				 activity.branchingActivity.branches.length);
-				$('.propertiesContentFieldOptionalSequenceMax', content).spinner('value',
+				$('.propertiesContentFieldOptionalSequenceMax', content).attr('value',
 																				 activity.branchingActivity.maxOptions)
-																		.spinner('option', {
+																		.attr({
 																			'min' : activity.branchingActivity.minOptions,
 																			'max' : activity.branchingActivity.branches.length
 																		});
@@ -37,7 +37,7 @@ var PropertyDefs = {
 						.add($('.propertiesContentFieldMatchGroups', content).closest('tr'))
 						.hide();
 				}
-			}
+			};
 		
 		if (!content) {
 			// first run, create the content
@@ -104,6 +104,7 @@ var PropertyDefs = {
 						inputDefinitionRows.hide();
 					}
 				} else {
+					branchingActivity.orderedAsc = null;
 					inputRow.hide();
 					inputDefinitionRows.hide();
 				}
@@ -127,26 +128,26 @@ var PropertyDefs = {
 			}
 			
 			// min can not be higher than max; neither of them can be higher than number of branches
-			$('.propertiesContentFieldOptionalSequenceMin', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
+			$('.propertiesContentFieldOptionalSequenceMin', content).attr('min', 0)
+			  .on('input', function(){
 				  var value = +$(this).val();
 				  activity.branchingActivity.minOptions = Math.min(value, activity.branchingActivity.branches.length);
 				  if (value != activity.branchingActivity.minOptions) {
-					  $(this, content).spinner('value', activity.branchingActivity.minOptions);
+					  $(this, content).attr('value', activity.branchingActivity.minOptions);
 				  }
 				  if (activity.branchingActivity.minOptions > activity.branchingActivity.maxOptions) {
-					  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('value', value);
+					  $('.propertiesContentFieldOptionalSequenceMax', content).attr('value', value);
 				  }
-				  $('.propertiesContentFieldOptionalSequenceMax', content).spinner('option', 'min', value);
+				  $('.propertiesContentFieldOptionalSequenceMax', content).attr('min', value);
 			  });
 			
 			
-			$('.propertiesContentFieldOptionalSequenceMax', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
+			$('.propertiesContentFieldOptionalSequenceMax', content).attr('min', 0)
+			  .on('input', function(){
 				  var value = +$(this).val();
 				  activity.branchingActivity.maxOptions = Math.min(value, activity.branchingActivity.branches.length);
 				  if (value != activity.branchingActivity.maxOptions) {
-					  $(this, content).spinner('value', activity.branchingActivity.maxOptions);
+					  $(this, content).attr('value', activity.branchingActivity.maxOptions);
 				  }
 			  });
 			
@@ -249,23 +250,23 @@ var PropertyDefs = {
 			};
 			
 			// create groups/learners spinners
-			$('.propertiesContentFieldOffsetDay', content).spinner({
+			$('.propertiesContentFieldOffsetDay', content).attr({
 				'min' : 0,
 				'max' : 364
-			}).spinner('value', activity.offsetDay || 0)
-			  .on('spinchange', changeFunction);
+			}).attr('value', activity.offsetDay || 0)
+			  .on('input', changeFunction);
 			
-			$('.propertiesContentFieldOffsetHour', content).spinner({
+			$('.propertiesContentFieldOffsetHour', content).attr({
 				'min' : 0,
 				'max' : 23
-			}).spinner('value', activity.offsetHour || 0)
-			  .on('spinchange', changeFunction);
+			}).attr('value', activity.offsetHour || 0)
+			  .on('input', changeFunction);
 			
-			$('.propertiesContentFieldOffsetMinute', content).spinner({
+			$('.propertiesContentFieldOffsetMinute', content).attr({
 				'min' : 0,
 				'max' : 59
-			}).spinner('value', activity.offsetMinute || 0)
-			  .on('spinchange', changeFunction);
+			}).attr('value', activity.offsetMinute || 0)
+			  .on('input', changeFunction);
 			
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
@@ -278,7 +279,9 @@ var PropertyDefs = {
 		if (activity.transitions.to.length == 0){
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('checked', null)
+				.prop('checked', false)
 				.attr('disabled', 'disabled');
+
 		} else {
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('disabled', null);
@@ -322,7 +325,7 @@ var PropertyDefs = {
 				
 				$('input[name="propertiesContentFieldGroupDivide"]', content).each(function(){
 						// enable/disable division types, depending on radio buttons next to them
-						$(this).next().find('.spinner').spinner('option', 'disabled', !$(this).is(':checked'));
+						$(this).next().find('.spinner').prop('disabled', !$(this).is(':checked'));
 					})
 					// hide group/learner division with some grouping types
 					.add($('.propertiesContentFieldLearnerCount', content).closest('tr'))
@@ -375,15 +378,15 @@ var PropertyDefs = {
 			}	
 			
 			// create groups/learners spinners
-			$('.propertiesContentFieldGroupCount', content).spinner({
+			$('.propertiesContentFieldGroupCount', content).attr({
 				'min' : 2
-			}).spinner('value', activity.groupCount)
-			  .on('spinchange', changeFunction);
+			}).attr('value', activity.groupCount)
+			  .on('input', changeFunction);
 			
-			$('.propertiesContentFieldLearnerCount', content).spinner({
+			$('.propertiesContentFieldLearnerCount', content).attr({
 				'min' 	   : 1
-			}).spinner('value', activity.learnerCount)
-			  .on('spinchange', changeFunction);
+			}).attr('value', activity.learnerCount)
+			  .on('input', changeFunction);
 			
 			$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
 			$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
@@ -511,34 +514,34 @@ var PropertyDefs = {
 			});
 			
 			// min can not be higher than max; neither of them can be higher than children count
-			$('.propertiesContentFieldOptionalActivityMin', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
+			$('.propertiesContentFieldOptionalActivityMin', content).attr({'min' : 0})
+			  .on('input', function(){
 				  var value = +$(this).val();
 				  activity.minOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.minOptions) {
-					  $(this, content).spinner('value', activity.minOptions);
+					  $(this, content).attr('value', activity.minOptions);
 				  }
 				  if (activity.minOptions > activity.maxOptions) {
-					  $('.propertiesContentFieldOptionalActivityMax', content).spinner('value', value);
+					  $('.propertiesContentFieldOptionalActivityMax', content).attr('value', value);
 				  }
-				  $('.propertiesContentFieldOptionalActivityMax', content).spinner('option', 'min', value);
+				  $('.propertiesContentFieldOptionalActivityMax', content).attr('min', value);
 			  });
 			
 			
-			$('.propertiesContentFieldOptionalActivityMax', content).spinner({'min' : 0})
-			  .on('spinchange', function(){
+			$('.propertiesContentFieldOptionalActivityMax', content).attr('min', 0)
+			  .on('input', function(){
 				  var value = +$(this).val();
 				  activity.maxOptions = Math.min(value, activity.childActivities.length);
 				  if (value != activity.maxOptions) {
-					  $(this, content).spinner('value', activity.maxOptions);
+					  $(this, content).attr('value', activity.maxOptions);
 				  }
 			  });
 		}
 		
-		$('.propertiesContentFieldOptionalActivityMin', content).spinner('value', activity.minOptions)
-																.spinner('option', 'max', activity.childActivities.length);
-		$('.propertiesContentFieldOptionalActivityMax', content).spinner('value', activity.maxOptions)
-																.spinner('option', {
+		$('.propertiesContentFieldOptionalActivityMin', content).attr('value', activity.minOptions)
+																.attr('max', activity.childActivities.length);
+		$('.propertiesContentFieldOptionalActivityMax', content).attr('value', activity.maxOptions)
+																.attr({
 																	'min' : activity.minOptions,
 																	'max' : activity.childActivities.length
 																});
@@ -835,6 +838,9 @@ PropertyLib = {
 								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 		 						  .mousemove(HandlerPropertyLib.approachPropertiesDialogHandler)
 		                          .find('.modal-header button').remove();
+		propertiesDialog.on('drag', function(event, ui){
+			$(this).data('dragged', true);
+		});
 		layout.dialogs.push(propertiesDialog);
 		
 		var groupNamingContent = $('#propertiesContentGroupNaming');
@@ -1078,19 +1084,21 @@ PropertyLib = {
 						// build output dropdown and bind data to each option
 						$.each(activity.input.outputDefinitions,function(){
 							var suffix = '';
-							switch(this.type) {
-								case 'OUTPUT_COMPLEX' :
-									suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
-									break;
-														
-								case 'OUTPUT_LONG' :
-									suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-									break;
-									
-								case 'OUTPUT_BOOLEAN' :
-									suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
-									break;
-							};
+							if (!this.showConditionNameOnly) {
+								switch(this.type) {
+									case 'OUTPUT_COMPLEX' :
+										suffix = LABELS.COMPLEX_OUTPUT_SUFFIX;
+										break;
+															
+									case 'OUTPUT_LONG' :
+										suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+										break;
+										
+									case 'OUTPUT_BOOLEAN' :
+										suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+										break;
+								};
+							}
 			
 							this.toolActivityUIID = activity.input.uiid;
 							var option = $('<option />')
@@ -1148,19 +1156,19 @@ PropertyLib = {
 							// build list using conditions from Tool activity output definitions
 							$.each(output.conditions, function(){
 								// use an existing mapping or build a new one
-								var mappingEntry = mappingEntries[this.conditionId] || {};
+								var mappingEntry = this.conditionId ? (mappingEntries[this.conditionId] || {}) : {};
 								
 								mappingEntry.condition = {
 									'name' 			  : this.name,
 								    'displayName' 	  : this.displayName,
-								    'type' 			  : 'OUTPUT_COMPLEX',
+								    'type' 			  : this.type,
 								    'conditionID'	  : this.conditionId,
 								    'toolActivityUIID' : output.toolActivityUIID
 								};
 								
 								$('<li />').text(this.displayName)
-								   		   .data('mappingEntry', mappingEntry)			   
-								   		   .appendTo(list);
+										   .appendTo(list)
+								   		   .data('mappingEntry', mappingEntry);			   
 							});
 						}
 					} else {
@@ -1317,9 +1325,9 @@ PropertyLib = {
 		});
 		
 		// initialise spinner widgets
-		$('#singleRangeSpinner, #multiRangeFromSpinner, #multiRangeToSpinner', outputConditionsDialogContents).spinner({
-			'min' : 0,
-		}).spinner('value', 0);
+		$('#singleRangeSpinner, #multiRangeFromSpinner, #multiRangeToSpinner', outputConditionsDialogContents).attr({
+			'min' : 0
+		}).attr('value', 0);
 		
 		$('.modal-body', layout.outputConditionsDialog).empty().append(outputConditionsDialogContents.show());
 		layout.dialogs.push(layout.outputConditionsDialog);
@@ -1355,7 +1363,7 @@ PropertyLib = {
 	        			assignedToDefault = false,
 	        			defaultBranch = isGate ? 'closed' : null,
 	        			close = true;
-	        		
+            		
             		// see what was mapped
 	    			$.each(mappingCopy, function(){
 	    				var mappingEntry = this;
@@ -1410,6 +1418,8 @@ PropertyLib = {
 	    			
 	    			if (close) {
 	    				activity.conditionsToBranches = mappingCopy;
+	    				activity.orderedAsc = $('#branchMappingOrderedRow', dialog).is(':visible') ? 
+     						   				  $('#branchMappingOrderedAscCheckbox', dialog).prop('checked') : null;
 	            		GeneralLib.setModified(true);
 	    			}
 	    			
@@ -1509,7 +1519,7 @@ PropertyLib = {
 			// generate a name and an UIID if they do not exist
 			var item = itemIndex > existingList.length ? {} : existingList[itemIndex - 1];
 			if (!item[nameAttr]) {
-				item[nameAttr] = prefix + itemIndex;
+				item[nameAttr] = prefix + ' ' + itemIndex;
 			}
 			if (!item.uiid) {
 				item.uiid = ++layout.ld.maxUIID;
@@ -1638,12 +1648,17 @@ PropertyLib = {
 					activity.branches, 'title', LABELS.DEFAULT_BRANCH_PREFIX);
 		}
 		
+		var orderedAsc = null;
 		$.each(activity.conditionsToBranches, function(){
 			// see what conditions are already mapped to branches/gate states and which are free
 			var entry = this,
 				condition = entry.condition,
 				conditionElem = $('<div />').click(PropertyLib.selectBranchMappingListItem)
 										.text(condition.displayName).attr('uiid', entry.uiid);
+			// there are special conditions that tell that this is an ordered branching
+			if (orderedAsc === null && condition.name.startsWith('ordered.answer')){
+				orderedAsc = activity.orderedAsc === null ? true : activity.orderedAsc;
+			}
 			
 			// is it mapped already?
 			if (entry.branch && (isGate || activity.branches.indexOf(entry.branch) != -1)) {
@@ -1661,6 +1676,12 @@ PropertyLib = {
 				conditionElem.appendTo(conditionsCell);
 			}
 		});
+		
+		if (orderedAsc === null) {
+			$('#branchMappingOrderedRow', dialog).hide();
+		} else {
+			$('#branchMappingOrderedRow', dialog).show().prop('checked', orderedAsc);
+		}
 		
 		// find the default branch
 		var defaultBranch = isGate ? 'closed' : null;
@@ -1716,6 +1737,11 @@ PropertyLib = {
 			return;
 		}
 
+		var conditionsLength = activity.input.outputDefinitions.length;
+		ActivityLib.getOutputDefinitions(activity.input);
+		if (conditionsLength != activity.input.outputDefinitions.length) {
+			PropertyLib.fillOutputDefinitionsDropdown(activity.input);
+		}
 		layout.outputConditionsDialog.data('parentObject', activity)
 			  						 .modal('show');
 	},
@@ -1739,10 +1765,14 @@ PropertyLib = {
 		if (object.readOnly) {
 			// make all widgets read-only
 			modalBody.find('input, select, textarea').prop('disabled', true);
-			modalBody.find('.spinner').spinner('option', 'disabled', true);
+			modalBody.find('.spinner').prop('disabled', true);
 		}
 		modalBody.find('input').blur();
 		dialog.on('shown.bs.modal', function(){
+			if (dialog.data('dragged')){
+				// if user dragged the dialog at least once, it does not automatically change its position anymore
+				return;
+			}
 			var box = object.items.getBBox(),
 				canvasOffset = canvas.offset(),
 				canvasWidth = canvas.width(),

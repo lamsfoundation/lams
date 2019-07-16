@@ -128,4 +128,6 @@ public interface IQbService {
     void changeCollectionName(long collectionUid, String name);
 
     void releaseFromCache(Object object);
+
+    boolean isQuestionInUserCollection(int qbQuestionId, int userId);
 }

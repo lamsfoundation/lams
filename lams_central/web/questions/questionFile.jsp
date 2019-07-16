@@ -62,6 +62,7 @@ div#errorArea {
 
 			<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post" onsubmit="return verifyAndSubmit();">
 				<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 
+				<input type="hidden" name="callerID" value="${empty param.callerID ? callerID : param.callerID}" /> 
 				<input type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" /> 
 				<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 				<lams:WaitingSpinner id="itemAttachment_Busy"/>

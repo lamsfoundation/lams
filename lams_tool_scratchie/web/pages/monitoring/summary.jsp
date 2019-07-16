@@ -4,8 +4,9 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
-<style media="screen,projection" type="text/css">
-	 .ui-jqgrid {
+<style type="text/css">
+	/* remove jqGrid borders */
+	.ui-jqgrid {
 		border-left-style: none !important;
 		border-right-style: none !important;
 		border-bottom-style: none !important;
@@ -16,14 +17,20 @@
 	.ui-jqgrid td {
 		border-style: none !important;
 	}
+	
 	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
 	    padding-top:2px;
 	}
 	.ui-jqgrid tr.jqgrow td {
 		vertical-align:middle !important
+	}
+	
+	/* remove jqGrid border radius */
+	.ui-jqgrid.ui-jqgrid-bootstrap {
+	    border-radius:0;
+	    -moz-border-radius:0;
+	    -webkit-border-radius:0;
+	    -khtml-border-radius:0;
 	}
 </style>
 
@@ -39,13 +46,8 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
-			   	ondblClickRow: function(rowid) {
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
-
-			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
-					launchPopup(userSummaryUrl, "MonitoringReview");		
-			  	},
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'#',
 					'userId',
@@ -64,6 +66,13 @@
 			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}},
 			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   	],
+			   	ondblClickRow: function(rowid) {
+			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+
+			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
+					launchPopup(userSummaryUrl, "MonitoringReview");		
+			  	},
 			   	// caption: "${summary.sessionName}",
 				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
   				cellEdit: true,
@@ -114,6 +123,8 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:['#',
 						"<fmt:message key='label.monitoring.summary.user.name' />",
 					    "<fmt:message key='label.burning.questions' />",

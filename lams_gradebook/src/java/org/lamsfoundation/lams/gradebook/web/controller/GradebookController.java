@@ -444,11 +444,12 @@ public class GradebookController {
 
 	User user;
 	User viewer = getRealUser();
+	boolean isGroupManager = false;
 	if (view == GBGridView.MON_USER) {
 	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	    user = (User) userManagementService.findById(User.class, userID);
 	} else {
-	    user = getRealUser();
+	    user = viewer;
 	}
 
 	//permission check
@@ -459,10 +460,11 @@ public class GradebookController {
 	    }
 
 	} else if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {
-	    if (!securityService.hasOrgRole(courseID, viewer.getUserId(), new String[] { Role.GROUP_MANAGER },
-		    "get course gradebook", false)) {
+	    isGroupManager = userManagementService.hasRoleInOrganisation(viewer, Role.ROLE_GROUP_MANAGER, organisation);
+	    if (!isGroupManager && !securityService.hasOrgRole(courseID, viewer.getUserId(),
+		    new String[] { Role.MONITOR }, "get course gradebook", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN,
-			"User is not a group manager or admin in the organisation");
+			"User is not a group manager or monitor in the organisation");
 		return null;
 	    }
 
@@ -483,7 +485,7 @@ public class GradebookController {
 	    return null;
 	}
 	List<GBLessonGridRowDTO> gradebookLessonDTOs = gradebookService.getGBLessonRows(organisation, user, viewer,
-		view, page - 1, rowLimit, sortBy, sortOrder, searchString, getUser().getTimeZone());
+		isGroupManager, view, page - 1, rowLimit, sortBy, sortOrder, searchString, getUser().getTimeZone());
 
 	String ret;
 	if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {

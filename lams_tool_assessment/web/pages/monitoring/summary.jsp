@@ -22,6 +22,8 @@
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
 			    viewrecords:true,
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'userId',
 					'sessionId',
@@ -46,28 +48,28 @@
 			  	},
 			  	onSelectRow: function(rowid) { 
 			  	    if(rowid == null) { 
-			  	    		rowid=0; 
+			  	    	rowid=0; 
 			  	    } 
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
 					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
 		  	        jQuery("#userSummary${sessionDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
 		  	        $("#masterDetailArea").load(
-		  	        		userMasterDetailUrl,
-		  	        		{
-		  	        			userID: userId,
-		  	        			sessionId: sessionId,
-		  	        			sessionMapID: '${sessionMapID}'
+		  	        	userMasterDetailUrl,
+		  	        	{
+		  	        		userID: userId,
+		  	        		sessionId: sessionId,
+		  	        		sessionMapID: '${sessionMapID}'
 		  	       		}
 		  	       	);    
 	  	  		},
 			    loadError: function(xhr,st,err) {
-			    		jQuery("#list${sessionDto.sessionId}").clearGridData();
-			    		$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    	jQuery("#list${sessionDto.sessionId}").clearGridData();
+			    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			    },
 			    loadComplete: function () {
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');
-			    	},
+			    },
 
 			})
 			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
@@ -80,13 +82,14 @@
 	        var oldValue = 0;
 			jQuery("#userSummary${sessionDto.sessionId}").jqGrid({
 				datatype: "local",
+				autoencode:false,
 				rowNum: 10000,
 				gridstate:"hidden",
-				//hiddengrid:true,
 				height: 180,
 				autowidth: true,
 				shrinkToFit: false,
-				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
+				guiStyle: "bootstrap",
+				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'#',
 					'questionResultUid',
@@ -105,7 +108,7 @@
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			  	{name:'response', index:'response', width:443, sortable:false}
+	  			  	{name:'response', index:'response', datatype:'html', width:443, sortable:false}
 			   	],
 			   	multiselect: false,
 
@@ -282,6 +285,7 @@
 		jqgrids.each(function(index) {
 			var gridId = $(this).attr('id');
 	    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	    	console.log(gridParentWidth);
 	    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
 	    });
 	};

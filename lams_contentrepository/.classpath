@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_4.0_spec-1.0.0.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/servlet-api">
 		<attributes>
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>
@@ -17,5 +21,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/persistence/api/main/javax.persistence-api-2.2.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/persistence-api"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/hibernate/main/hibernate-core-5.3.6.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/hibernate-core"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/io/main/commons-io-2.5.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/commons-io"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -84,6 +84,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
@@ -886,6 +887,23 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    contentFilter.renameField(problemClass, "activityEvaluations", "evaluation");
 	    contentFilter.transformXML(fullFilePath);
 	}
+
+	boolean isEarlierVersionThan32 = !VersionUtil.isSameOrLaterVersion("3.2", versionString);
+	if (isEarlierVersionThan32) {
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaContent",
+		    "org.lamsfoundation.lams.tool.qa.model.QaContent");
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaCondition",
+		    "org.lamsfoundation.lams.tool.qa.model.QaCondition");
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaQueContent",
+		    "org.lamsfoundation.lams.tool.qa.model.QaQueContent");
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaQueUsr",
+		    "org.lamsfoundation.lams.tool.qa.model.QaQueUsr");
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaSession",
+		    "org.lamsfoundation.lams.tool.qa.model.QaSession");
+	    contentFilter.renameClass("org.lamsfoundation.lams.tool.qa.QaUsrResp",
+		    "org.lamsfoundation.lams.tool.qa.model.QaUsrResp");
+	    contentFilter.transformXML(fullFilePath);
+	}
     }
 
     private WorkspaceFolder getWorkspaceFolderForDesign(User importer, Integer workspaceFolderUid)
@@ -1444,6 +1462,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 	baseDAO.insertOrUpdateAll(allCompetenceMappings);
+
+	// Process annotations (regions and labels)
+	if (dto.getAnnotations() != null) {
+	    for (LearningDesignAnnotation annotation : dto.getAnnotations()) {
+		annotation.setUid(null);
+		annotation.setLearningDesignId(ld.getLearningDesignId());
+		baseDAO.insert(annotation);
+	    }
+	}
 
 	return ld.getLearningDesignId();
     }

@@ -20,29 +20,37 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JLabel;
 
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.scilab.forge.jlatexmath.DefaultTeXFont;
 import org.scilab.forge.jlatexmath.ParseException;
 import org.scilab.forge.jlatexmath.TeXConstants;
 import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
+import org.scilab.forge.jlatexmath.cyrillic.CyrillicRegistration;
+import org.scilab.forge.jlatexmath.greek.GreekRegistration;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 /**
  * Servlet produces LaTex images based on the provided formulas. It's used by CKEditor's JLaTeXMath plugin.
@@ -51,6 +59,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
  */
 public class JlatexmathServlet extends HttpServlet {
 
+    private static final long serialVersionUID = -3544723631369530849L;
     private static Logger log = Logger.getLogger(JlatexmathServlet.class);
 
     @Override
@@ -76,32 +85,33 @@ public class JlatexmathServlet extends HttpServlet {
 	    }
 	    return;
 	}
+	TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, fontSize);
+	
+	//produce SVG image and stream it out to ServletOutputStream 
+        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document = domImpl.createDocument(svgNS, "svg", null);
+        SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
 
-	TeXIcon icon = formula.new TeXIconBuilder().setStyle(TeXConstants.STYLE_DISPLAY).setSize(fontSize).build();
+        final boolean FONT_AS_SHAPES = true;
+        SVGGraphics2D g2 = new SVGGraphics2D(ctx, FONT_AS_SHAPES);
 
-	BufferedImage b = null;
-	// TeXFormula fomule = new TeXFormula(formula);
-	// TeXIcon ti = fomule.createTeXIcon(TeXConstants.STYLE_DISPLAY, 40);
-	try {
-	    b = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-	} catch (IllegalArgumentException e) {
-	    // don't throw a full-blown exception whenever an user makes a mistake in the formula
-	    if (JlatexmathServlet.log.isTraceEnabled()) {
-		JlatexmathServlet.log.trace(e.getMessage());
-	    }
-	    return;
-	}
-	// Color transparent = new Color(0, true);
-	// ((Graphics2D)b.getGraphics()).setBackground(transparent);
-	// b.getGraphics().clearRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
+        DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
+        DefaultTeXFont.registerAlphabet(new GreekRegistration());
 
-	((Graphics2D) b.getGraphics()).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5F));
-	icon.paintIcon(new JLabel(), b.getGraphics(), 0, 0);
+        g2.setSVGCanvasSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
 
-	response.setContentType("image/png");
-	OutputStream out = response.getOutputStream();
-	ImageIO.write(b, "png", out);
-	out.close();
+        JLabel jl = new JLabel();
+        jl.setForeground(new Color(0, 0, 0));
+        icon.paintIcon(jl, g2, 0, 0);
+
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("image/svg+xml");
+        Writer writer = new OutputStreamWriter(out, "UTF-8");
+        final boolean USE_CSS = true;
+        g2.stream(writer, USE_CSS);
+        out.flush();
+        IOUtils.closeQuietly(out);
     }
 
     @Override

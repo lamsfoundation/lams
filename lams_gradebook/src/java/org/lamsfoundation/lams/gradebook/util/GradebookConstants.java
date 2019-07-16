@@ -45,6 +45,7 @@ public class GradebookConstants {
     public static final String PARAM_VIEW = "view";
     public static final String PARAM_START_DATE = "startDate";
     public static final String PARAM_GROUP_ID = "groupId";
+    public static final String PARAM_SEQUENCE = "sequence";
 
     // Sort
     public static final String SORT_DESC = "desc";

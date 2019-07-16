@@ -15,7 +15,7 @@
  	       		
  	       	var table = jQuery("#userSummary${assessmentResult.sessionId}");
  	     	table.addRowData(${i.index + 1}, {
- 	   	    		id:"${i.index + 1}",
+ 	   	    	id:"${i.index + 1}",
  	   	   		questionResultUid:"${questionResult.uid}",
  	   	   		title:"${fn:escapeXml(title)}",
  	   	   		response:responseStr,

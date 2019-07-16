@@ -48,7 +48,7 @@ public class ForumImportContentVersionFilter extends ToolContentVersionFilter {
 	this.renameField(Forum.class, "limitedInput", "limitedMaxCharacters");
     }
 
-    public void up20170101To20181202() {
+    public void up20180806To20181202() {
 	this.renameClass("org.lamsfoundation.lams.tool.forum.persistence.",
 		"org.lamsfoundation.lams.tool.forum.model.");
     }

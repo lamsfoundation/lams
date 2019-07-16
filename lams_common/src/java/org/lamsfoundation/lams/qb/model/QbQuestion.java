@@ -65,7 +65,7 @@ public class QbQuestion implements Serializable, Cloneable {
 
     @Column(name = "create_date")
     private Date createDate = new Date();
-    
+
     @Column(name = "content_folder_id")
     private String contentFolderId;
 
@@ -106,7 +106,7 @@ public class QbQuestion implements Serializable, Cloneable {
     // only one of shuffle and prefixAnswersWithLetters should be on. Both may be off
     @Column
     private boolean shuffle;
-    
+
     @Column(name = "prefix_answers_with_letters")
     private boolean prefixAnswersWithLetters;
 
@@ -122,7 +122,7 @@ public class QbQuestion implements Serializable, Cloneable {
     // only for essay type of question
     @Column(name = "max_words_limit")
     private int maxWordsLimit;
-    
+
     // only for essay type of question
     @Column(name = "min_words_limit")
     private int minWordsLimit;
@@ -132,11 +132,11 @@ public class QbQuestion implements Serializable, Cloneable {
     private boolean hedgingJustificationEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<QbOption> qbOptions = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
     // checks if important parts of another question are the same as current question's.
@@ -278,7 +278,7 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setCreateDate(Date createDate) {
 	this.createDate = createDate;
     }
-    
+
     public String getContentFolderId() {
 	return contentFolderId;
     }
@@ -318,7 +318,6 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setFeedback(String feedback) {
 	this.feedback = StringUtils.isBlank(feedback) ? null : feedback.trim();
     }
-    
 
     public float getPenaltyFactor() {
 	return penaltyFactor;
@@ -447,11 +446,11 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public boolean isPrefixAnswersWithLetters() {
-        return prefixAnswersWithLetters;
+	return prefixAnswersWithLetters;
     }
 
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
-        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     public List<QbOption> getQbOptions() {
@@ -461,7 +460,7 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setQbOptions(List<QbOption> options) {
 	this.qbOptions = options;
     }
-    
+
     public List<QbQuestionUnit> getUnits() {
 	return units;
     }

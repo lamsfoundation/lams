@@ -35,7 +35,7 @@ public class QuestionsController {
 
     @RequestMapping("/questions")
     public String execute(@RequestParam(name = "file", required = false) MultipartFile file,
-	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,
+	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,  @RequestParam String callerID,
 	    HttpServletRequest request) throws Exception {
 
 	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
@@ -54,6 +54,10 @@ public class QuestionsController {
 	// this parameter is not really used at the moment
 	request.setAttribute("returnURL", returnURL);
 
+	// this parameter is used by the authoring templates. TBL uses QTI import for both the Questions and Assessments tab
+	request.setAttribute("callerID", callerID);
+	
+	
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 

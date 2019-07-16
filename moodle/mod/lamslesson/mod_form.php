@@ -132,7 +132,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 
         $mform->addElement('static', 'sequencemessage', '', $html);
     	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
-    	$mform->addElement('checkbox', 'allowLearnerRestart', get_string('allowLearnerRestart', 'lamslesson'));
+    	$mform->addElement('checkbox', 'allowlearnerrestart', get_string('allowlearnerrestart', 'lamslesson'));
 
 		//-------------------------------------------------------------------------------
 		$this->standard_grading_coursemodule_elements();

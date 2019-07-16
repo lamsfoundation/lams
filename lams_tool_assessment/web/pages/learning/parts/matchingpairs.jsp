@@ -13,7 +13,7 @@
 				</td>
 				
 				<td style="width: 100px;">
-					<select name="question${status.index}_${option.displayOrder}" <c:if test="${!hasEditRight}">disabled="disabled"</c:if>>
+					<select name="question${status.index}_${option.uid}" <c:if test="${!hasEditRight}">disabled="disabled"</c:if>>
 						<option value="-1">
 							<fmt:message key="label.learning.matching.pairs.choose" />
 						</option>

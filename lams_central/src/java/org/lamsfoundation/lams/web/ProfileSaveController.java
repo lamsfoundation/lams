@@ -46,6 +46,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author jliew
@@ -53,7 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ProfileSaveController {
     private static Logger log = Logger.getLogger(ProfileSaveController.class);
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -61,7 +62,8 @@ public class ProfileSaveController {
     private MessageService messageService;
 
     @RequestMapping(path = "/saveprofile")
-    public String execute(@ModelAttribute("newForm") UserForm userForm, HttpServletRequest request) throws Exception {
+    public String execute(@ModelAttribute("newForm") UserForm userForm, @RequestParam boolean editNameOnly,
+	    HttpServletRequest request) throws Exception {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
@@ -69,7 +71,7 @@ public class ProfileSaveController {
 		return "forward:/profile/edit.do";
 	    }
 	}
-	
+
 	request.setAttribute("submitted", true);
 
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
@@ -101,17 +103,19 @@ public class ProfileSaveController {
 	}
 
 	//user email validation
-	String userEmail = (userForm.getEmail() == null) ? null : (String) userForm.getEmail();
-	if (StringUtils.isBlank(userEmail)) {
-	    errorMap.add("email", messageService.getMessage("error.email.required"));
-	} else if (!ValidationUtil.isEmailValid(userEmail)) {
-	    errorMap.add("email", messageService.getMessage("error.valid.email.required"));
-	}
+	if (!editNameOnly) {
+	    String userEmail = (userForm.getEmail() == null) ? null : (String) userForm.getEmail();
+	    if (StringUtils.isBlank(userEmail)) {
+		errorMap.add("email", messageService.getMessage("error.email.required"));
+	    } else if (!ValidationUtil.isEmailValid(userEmail)) {
+		errorMap.add("email", messageService.getMessage("error.valid.email.required"));
+	    }
 
-	//country validation
-	String country = (userForm.getCountry() == null) ? null : (String) userForm.getCountry();
-	if (StringUtils.isBlank(country) || "0".equals(country)) {
-	    errorMap.add("email", messageService.getMessage("error.country.required"));
+	    //country validation
+	    String country = (userForm.getCountry() == null) ? null : (String) userForm.getCountry();
+	    if (StringUtils.isBlank(country) || "0".equals(country)) {
+		errorMap.add("email", messageService.getMessage("error.country.required"));
+	    }
 	}
 
 	if (!errorMap.isEmpty()) {
@@ -127,10 +131,14 @@ public class ProfileSaveController {
 	    requestor.setEveningPhone(userForm.getEveningPhone());
 	    requestor.setMobilePhone(userForm.getMobilePhone());
 	    requestor.setFax(userForm.getFax());
+	} else if (editNameOnly) {
+	    requestor.setFirstName(userForm.getFirstName());
+	    requestor.setLastName(requestor.getLastName());
 	} else {
 	    // update all fields
 	    BeanUtils.copyProperties(requestor, userForm);
-	    SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class, userForm.getLocaleId());
+	    SupportedLocale locale = (SupportedLocale) userManagementService.findById(SupportedLocale.class,
+		    userForm.getLocaleId());
 	    requestor.setLocale(locale);
 
 	    Theme cssTheme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());

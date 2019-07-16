@@ -15,14 +15,7 @@ and a text field field named question${questionNumber}option${optionNumber} --%>
 			<lams:CKEditor id="${qnon}" value="${optionText}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor> 
 		</td>
 		<td width="60px">
-			<c:choose>
-			<c:when test="${option.correct}">
-				<input type="radio" name="question${questionNumber}correct" value="${optionNumber}" id="${qnon}correct"/ checked> 
-			</c:when>
-			<c:otherwise>
-				<input type="radio" name="question${questionNumber}correct" value="${optionNumber}" id="${qnon}correct"/ > 
-			</c:otherwise>
-			</c:choose>
+				<input type="radio" name="question${questionNumber}correct" value="${optionNumber}" id="${qnon}correct" ${optionCorrect?"checked":""}/> 
 		</td>
 		<td class="arrows" width="40px">
 			<!-- Don't display up icon if first line -->

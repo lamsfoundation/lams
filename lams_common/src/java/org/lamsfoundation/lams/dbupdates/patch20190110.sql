@@ -486,7 +486,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
-INSERT INTO lams_qb_question SELECT NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 
+INSERT INTO lams_qb_question SELECT NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 'temp_folder',
 				IFNULL(aq.question, ''), aq.description, IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
 				aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,

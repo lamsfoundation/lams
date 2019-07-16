@@ -44,7 +44,6 @@ public class SecurityService implements ISecurityService {
     private static Logger log = Logger.getLogger(SecurityService.class);
 
     private static final String[] GROUP_MONITOR_ROLES = new String[] { Role.GROUP_MANAGER, Role.MONITOR };
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private ISecurityDAO securityDAO;
     private ILogEventService logEventService;
@@ -342,15 +341,15 @@ public class SecurityService implements ISecurityService {
 	    }
 
 	    // check for super roles in the parent organisations
-	    List<String> roleList = new ArrayList<String>(Arrays.asList(roles));
-	    if (!roleList.contains(Role.GROUP_MANAGER)) {
+	    List<String> roleList = new ArrayList<>(Arrays.asList(roles));
+	    if (roleList.contains(Role.GROUP_MANAGER)) {
 		Organisation organisation = (Organisation) securityDAO.find(Organisation.class, orgId);
 		if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
 		    organisation = organisation.getParentOrganisation();
 		}
 
 		if (securityDAO.hasOrgRole(organisation.getOrganisationId(), userId,
-			roleList.toArray(SecurityService.EMPTY_STRING_ARRAY))) {
+			new String[] { Role.GROUP_MANAGER })) {
 		    return true;
 		}
 	    }

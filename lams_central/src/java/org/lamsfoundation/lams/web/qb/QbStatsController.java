@@ -23,10 +23,15 @@
 package org.lamsfoundation.lams.web.qb;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
+import org.lamsfoundation.lams.outcome.service.OutcomeService;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -55,26 +60,42 @@ public class QbStatsController {
     @Autowired
     private IQbService qbService;
 
+    @Autowired
+    private IOutcomeService outcomeService;
+
     @RequestMapping("/show")
     public String showStats(@RequestParam long qbQuestionUid, Model model) throws Exception {
 	QbStatsDTO stats = qbService.getQuestionStats(qbQuestionUid);
 	model.addAttribute("stats", stats);
 
+	Integer userId = getUserId();
+	int qbQuestionId = stats.getQuestion().getQuestionId();
+	boolean managementAllowed = qbService.isQuestionInUserCollection(qbQuestionId, userId);
+	model.addAttribute("managementAllowed", managementAllowed);
+
 	Collection<QbCollection> existingCollections = qbService.getQuestionCollectionsByUid(qbQuestionUid);
 	model.addAttribute("existingCollections", existingCollections);
 
-	Integer userId = getUserId();
-	Collection<QbCollection> availableCollections = qbService.getUserCollections(userId);
-	availableCollections.removeAll(existingCollections);
-	model.addAttribute("availableCollections", availableCollections);
+	if (managementAllowed) {
+	    Collection<QbCollection> availableCollections = qbService.getUserCollections(userId);
+	    availableCollections.removeAll(existingCollections);
+	    model.addAttribute("availableCollections", availableCollections);
 
-	boolean permanentRemove = existingCollections.size() <= 1;
-	model.addAttribute("permanentRemove", permanentRemove);
-	model.addAttribute("permanentRemovePossible",
-		permanentRemove ? qbService.removeQuestionPossibleByUid(qbQuestionUid) : false);
+	    boolean permanentRemove = existingCollections.size() <= 1;
+	    model.addAttribute("permanentRemove", permanentRemove);
+	    model.addAttribute("permanentRemovePossible",
+		    permanentRemove ? qbService.removeQuestionPossibleByUid(qbQuestionUid) : false);
 
-	model.addAttribute("transferAllowed",
-		Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW));
+	    model.addAttribute("transferAllowed",
+		    Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW));
+
+	} else {
+	    List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(null, null, null, qbQuestionId);
+	    OutcomeService.filterQuestionMappings(outcomeMappings);
+	    List<String> outcomes = outcomeMappings.stream()
+		    .collect(Collectors.mapping(m -> m.getOutcome().getName(), Collectors.toList()));
+	    model.addAttribute("outcomes", outcomes);
+	}
 
 	return "qb/stats";
     }

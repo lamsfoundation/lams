@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -65,6 +66,9 @@ public class QbCollectionController {
     @Autowired
     private IQbService qbService;
 
+    @Autowired
+    private IOutcomeService outcomeService;
+
     @RequestMapping("/show")
     public String showUserCollections(Model model) throws Exception {
 	Integer userId = getUserId();
@@ -92,12 +96,11 @@ public class QbCollectionController {
 	return "qb/collection";
     }
 
-    @RequestMapping("/getCollectionGridData")
+    @RequestMapping(path = "/getCollectionGridData")
     @ResponseBody
-    public String getCollectionGridData(@RequestParam long collectionUid,
-	    @RequestParam(defaultValue = "false") boolean showUsage, HttpServletRequest request,
-	    HttpServletResponse response) {
-	response.setContentType("text/xml; charset=utf-8");
+    public String getCollectionGridData(@RequestParam long collectionUid, @RequestParam String view,
+	    HttpServletRequest request, HttpServletResponse response) {
+	response.setContentType("application/xml;charset=UTF-8");
 
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
@@ -111,22 +114,21 @@ public class QbCollectionController {
 		sortOrder, searchString);
 	int total = qbService.getCountCollectionQuestions(collectionUid, searchString);
 	int maxPages = total / rowLimit + 1;
-	return toGridXML(questions, page, maxPages, total, showUsage, false);
+	return toGridXML(questions, page, maxPages, total, view);
     }
 
-    @RequestMapping("/getQuestionVersionGridData")
+    @RequestMapping(path = "/getQuestionVersionGridData", produces = "application/xml;charset=utf-8")
     @ResponseBody
-    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, HttpServletRequest request,
+    public String getQuestionVersionGridData(@RequestParam int qbQuestionId, @RequestParam String view,
 	    HttpServletResponse response) {
-	response.setContentType("text/xml; charset=utf-8");
+	response.setContentType("application/xml;charset=UTF-8");
 
 	List<QbQuestion> questions = qbService.getQuestionsByQuestionId(qbQuestionId);
 	questions = questions.subList(1, questions.size());
-	return toGridXML(questions, 1, 1, questions.size(), true, true);
+	return toGridXML(questions, 1, 1, questions.size(), view);
     }
 
-    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, boolean showUsage,
-	    boolean isVersionGrid) {
+    private String toGridXML(List<QbQuestion> questions, int page, int maxPages, int totalCount, String view) {
 	try {
 	    Document document = WebUtil.getDocument();
 
@@ -151,15 +153,20 @@ public class QbCollectionController {
 		rowElement.setAttribute(CommonConstants.ELEMENT_ID, uid);
 
 		// the last cell is for creating stats button
-		String usage = showUsage
-			? String.valueOf(isVersionGrid ? qbService.getCountQuestionActivitiesByUid(question.getUid())
+		String usage = !view.equalsIgnoreCase("list") ? String.valueOf(
+			view.equalsIgnoreCase("version") ? qbService.getCountQuestionActivitiesByUid(question.getUid())
 				: qbService.getCountQuestionActivitiesByQuestionId(question.getQuestionId()))
 			: null;
 		boolean hasVersions = qbService.countQuestionVersions(question.getQuestionId()) > 1;
+		String learningOutcomes = view.equalsIgnoreCase("single")
+			? outcomeService.getOutcomeMappings(null, null, null, question.getQuestionId()).stream()
+				.map(m -> m.getOutcome().getName()).collect(Collectors.joining("<br>"))
+			: null;
+
 		String[] data = { question.getQuestionId().toString(),
 			WebUtil.removeHTMLtags(question.getName()).trim(),
-			isVersionGrid ? null : question.getType().toString(), question.getVersion().toString(), usage,
-			uid, String.valueOf(hasVersions) };
+			view.equalsIgnoreCase("version") ? null : question.getType().toString(),
+			question.getVersion().toString(), learningOutcomes, usage, uid, String.valueOf(hasVersions) };
 
 		for (String cell : data) {
 		    Element cellElement = document.createElement(CommonConstants.ELEMENT_CELL);

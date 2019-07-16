@@ -97,6 +97,11 @@ public interface IMcService extends ICommonToolService {
      */
     int getAttemptsCountPerOption(Long optionUid);
 
+    /**
+     * Checks whether anyone has attempted this assessment.
+     */
+    boolean isMcContentAttempted(Long mcContentUid);
+
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
     void saveOrUpdateMcQueContent(McQueContent mcQueContent);
@@ -217,8 +222,7 @@ public interface IMcService extends ICommonToolService {
 
     void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
 
-    void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs,
-	    List<McQuestionDTO> deletedQuestions);
+    void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs);
 
     /**
      *

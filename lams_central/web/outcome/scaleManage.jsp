@@ -17,8 +17,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
-		var organisationId = '${param.organisationID}',
-			LAMS_URL = '<lams:LAMSURL/>',
+		var LAMS_URL = '<lams:LAMSURL/>',
 			
 			decoderDiv = $('<div />'),
 			LABELS = {
@@ -44,9 +43,6 @@
 			<div class="col-xs-3">
 				<fmt:message key='outcome.manage.add.code' />
 			</div>
-			<div class="col-xs-2">
-				<fmt:message key='outcome.manage.scope' />
-			</div>
 			<div class="col-xs-1">
 			</div>
 			<div class="col-xs-1">
@@ -60,19 +56,9 @@
 				<div class="col-xs-3">
 					<c:out value="${scale.code}" />
 				</div>
-				<div class="col-xs-2">
-					<c:choose>
-						<c:when test="${empty scale.organisation}">
-							<fmt:message key='outcome.manage.scope.global' />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key='outcome.manage.scope.course' />
-						</c:otherwise>
-					</c:choose>
-				</div>
 				<div class="col-xs-1">
 					<c:choose>
-						<c:when test="${scale.scaleId != 1 and (not empty scale.organisation or canManageGlobal)}">
+						<c:when test="${scale.scaleId != 1}">
 							<i class="manageButton fa fa-pencil" title="<fmt:message key='scale.manage.edit' />"
 						   	   onClick="javascript:openEditScaleDialog(${scale.scaleId})" >
 							</i>
@@ -85,7 +71,7 @@
 					</c:choose>
 				</div>
 				<div class="col-xs-1">
-					<c:if test="${scale.scaleId != 1 and (not empty scale.organisation or canManageGlobal)}">
+					<c:if test="${scale.scaleId != 1}">
 						<i class="manageButton fa fa-remove" title="<fmt:message key='scale.manage.remove' />"
 					   	   onClick="javascript:removeScale(${scale.scaleId})" >
 						</i>
@@ -93,21 +79,19 @@
 				</div>
 			</div>
 		</c:forEach>
-		<c:if test="${canManageGlobal}">
-			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome(true)"
-				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
-				<i class="fa fa-download"></i>
-				<span class="hidden-xs">
-					<fmt:message key="outcome.export" />
-				</span>
-			</div> 
-			<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
-				<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
-			</div>
-			<form id="importForm" action="scaleImport.do" method="post" enctype="multipart/form-data">
-				<input type="file" id="importInput" name="file"/>
-			</form>
-		</c:if>
+		<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome(true)"
+			 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
+			<i class="fa fa-download"></i>
+			<span class="hidden-xs">
+				<fmt:message key="outcome.export" />
+			</span>
+		</div> 
+		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
+		</div>
+		<form id="importForm" action="scaleImport.do" method="post" enctype="multipart/form-data">
+			<input type="file" id="importInput" name="file"/>
+		</form>
 		<div id="addButton" class="btn btn-primary" onClick="javascript:openEditScaleDialog()">
 			<i class="fa fa-plus"></i>
 			<span><fmt:message key='scale.manage.add' /></span>

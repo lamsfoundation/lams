@@ -57,11 +57,11 @@ public class ProgressEngine {
     public static final String AUDIT_ACTIVITY_START_KEY = "audit.activity.started";
     public static final String AUDIT_ACTIVITY_STOP_KEY = "audit.activity.stopped";
     public static final String AUDIT_LESSON_COMPLETE_KEY = "audit.learner.lesson.complete";
-	    
+
     private IActivityDAO activityDAO;
     private ILogEventService logEventService;
     private MessageService messageService;
-    
+
     /**
      * Method determines next step for a learner based on the activity they have
      * just completed. Will clear the Parallel Waiting Complete value if it is
@@ -327,6 +327,7 @@ public class ProgressEngine {
 
 	    ComplexActivity complexParent = (ComplexActivity) activityDAO
 		    .getActivityByActivityId(parent.getActivityId(), ComplexActivity.class);
+	    complexParent.getComplexActivityStrategy().setActivityDAO(activityDAO);
 	    if (!learnerProgress.getCompletedActivities().containsKey(complexParent)
 		    && !complexParent.areChildrenCompleted(learnerProgress)) {
 		Activity nextActivity = complexParent.getNextActivityByParent(completedActivity);
@@ -434,9 +435,9 @@ public class ProgressEngine {
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
     }
-    public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
-    }
 
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
 
 }

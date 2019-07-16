@@ -812,30 +812,56 @@ public class MonitoringService implements IMonitoringFullService {
 		.withDescription(scheduleGate.getTitle() + ":" + lessonName)
 		.usingJobData("gateId", scheduleGate.getActivityId()).build();
 
-	// create customized triggers
-	Trigger openGateTrigger = TriggerBuilder.newTrigger()
-		.withIdentity("openGateTrigger:" + scheduleGate.getActivityId())
-		.startAt(scheduleGate.getGateOpenTime(schedulingStartTime)).build();
-
-	Trigger closeGateTrigger = TriggerBuilder.newTrigger()
-		.withIdentity("closeGateTrigger:" + scheduleGate.getActivityId())
-		.startAt(scheduleGate.getGateCloseTime(schedulingStartTime)).build();
-
 	// start the scheduling job
-	try {
-	    if (((scheduleGate.getGateStartTimeOffset() == null) && (scheduleGate.getGateEndTimeOffset() == null))
-		    || ((scheduleGate.getGateStartTimeOffset() != null)
-			    && (scheduleGate.getGateEndTimeOffset() == null))) {
-		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-	    } else if (openGateTrigger.getStartTime().before(closeGateTrigger.getStartTime())) {
-		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
-		scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
-	    }
+	boolean startGateOnly = ((scheduleGate.getGateStartTimeOffset() == null)
+		&& (scheduleGate.getGateEndTimeOffset() == null))
+		|| ((scheduleGate.getGateStartTimeOffset() != null) && (scheduleGate.getGateEndTimeOffset() == null));
+	String openGateTriggerName = "openGateTrigger:" + scheduleGate.getActivityId();
+	String closeGateTriggerName = "closeGateTrigger:" + scheduleGate.getActivityId();
 
+	Trigger openGateTrigger = null;
+	Trigger closeGateTrigger = null;
+	try {
+	    openGateTrigger = scheduler.getTrigger(TriggerKey.triggerKey(openGateTriggerName));
+	    closeGateTrigger = scheduler.getTrigger(TriggerKey.triggerKey(closeGateTriggerName));
 	} catch (SchedulerException e) {
-	    throw new MonitoringServiceException("Error occurred at [runGateScheduler] - fail to start scheduling", e);
+	    MonitoringService.log.error(
+		    "Error occurred at [runGateScheduler] - fail to start scheduling. Error while fetching Quartz trigger \""
+			    + openGateTriggerName + "\"",
+		    e);
 	}
 
+	try {
+	    if (openGateTrigger != null) {
+		openGateTrigger = openGateTrigger.getTriggerBuilder()
+			.startAt(scheduleGate.getGateOpenTime(schedulingStartTime)).build();
+		scheduler.rescheduleJob(openGateTrigger.getKey(), openGateTrigger);
+	    } else {
+		// create customized triggers
+		openGateTrigger = TriggerBuilder.newTrigger().withIdentity(openGateTriggerName)
+			.startAt(scheduleGate.getGateOpenTime(schedulingStartTime)).build();
+		scheduler.scheduleJob(openScheduleGateJob, openGateTrigger);
+	    }
+
+	    if (!startGateOnly) {
+		if (closeGateTrigger != null) {
+		    closeGateTrigger = closeGateTrigger.getTriggerBuilder()
+			    .startAt(scheduleGate.getGateCloseTime(schedulingStartTime)).build();
+		    scheduler.rescheduleJob(openGateTrigger.getKey(), closeGateTrigger);
+		} else {
+		    // create customized triggers
+		    closeGateTrigger = TriggerBuilder.newTrigger()
+			    .withIdentity("closeGateTrigger:" + scheduleGate.getActivityId())
+			    .startAt(scheduleGate.getGateCloseTime(schedulingStartTime)).build();
+		    scheduler.scheduleJob(closeScheduleGateJob, closeGateTrigger);
+		}
+	    }
+	} catch (SchedulerException e) {
+	    MonitoringService.log.error(
+		    "Error occurred at [runGateScheduler] - fail to start scheduling. Error while setting up gate open/close triggers. Open Gate Trigger name \""
+			    + openGateTriggerName + "\"",
+		    e);
+	}
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("Scheduler for Gate " + scheduleGate.getActivityId() + " started...");
 	}

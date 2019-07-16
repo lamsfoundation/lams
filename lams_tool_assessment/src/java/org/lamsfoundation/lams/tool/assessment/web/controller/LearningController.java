@@ -48,7 +48,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -324,11 +323,11 @@ public class LearningController {
 	}
 
 	//paging
-	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<Set<QuestionDTO>>();
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
 		? assessment.getQuestionsPerPage()
 		: questionDtos.size();
-	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
 	for (QuestionDTO questionDto : questionDtos) {
@@ -643,62 +642,6 @@ public class LearningController {
     }
 
     /**
-     * Move up current option.
-     */
-    @RequestMapping("/upOption")
-    public String upOption(HttpServletRequest request) {
-	return switchOption(request, true);
-    }
-
-    /**
-     * Move down current option.
-     */
-    @RequestMapping("/downOption")
-    public String downOption(HttpServletRequest request) {
-	return switchOption(request, false);
-    }
-
-    @SuppressWarnings("unchecked")
-    private String switchOption(HttpServletRequest request, boolean up) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
-	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
-
-	QuestionDTO questionDto = null;
-	for (QuestionDTO questionDtoIter : questionsForOnePage) {
-	    if (questionDtoIter.getUid().equals(questionUid)) {
-		questionDto = questionDtoIter;
-		break;
-	    }
-	}
-
-	Set<OptionDTO> optionDtoList = questionDto.getOptionDtos();
-
-	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
-	if (optionIndex != -1) {
-	    List<OptionDTO> rList = new ArrayList<>(optionDtoList);
-
-	    // get current and the target item, and switch their sequnece
-	    OptionDTO option = rList.remove(optionIndex);
-	    if (up) {
-		rList.add(--optionIndex, option);
-	    } else {
-		rList.add(++optionIndex, option);
-	    }
-
-	    // put back list
-	    optionDtoList = new LinkedHashSet<>(rList);
-	    questionDto.setOptionDtos(optionDtoList);
-	}
-
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, questionDto);
-	return "pages/learning/parts/ordering";
-    }
-
-    /**
      * auto saves responses
      */
     @RequestMapping("/autoSaveAnswers")
@@ -822,14 +765,15 @@ public class LearningController {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
-			String answerString = request.getParameter(
-				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder());
+			String answerString = request
+				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 			answerBoolean = !StringUtils.isBlank(answerString);
 		    } else {
-			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-			if (answerString != null) {
-			    int optionDisplayOrder = Integer.parseInt(answerString);
-			    answerBoolean = (optionDto.getDisplayOrder() == optionDisplayOrder);
+			String optionUidSelectedStr = request
+				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+			if (optionUidSelectedStr != null) {
+			    Long optionUidSelected = Long.parseLong(optionUidSelectedStr);
+			    answerBoolean = optionDto.getUid().equals(optionUidSelected);
 			}
 		    }
 		    optionDto.setAnswerBoolean(answerBoolean);
@@ -838,7 +782,7 @@ public class LearningController {
 	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerInt = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder());
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 		    optionDto.setAnswerInt(answerInt);
 		}
 
@@ -863,13 +807,22 @@ public class LearningController {
 		questionDto.setAnswerString(answerString);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    int answerSequenceId = WebUtil.readIntParam(request,
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
+		    optionDto.setDisplayOrder(answerSequenceId);
+		}
+		//sort accrording to the new sequenceIds
+		Set<OptionDTO> sortedOptions = new TreeSet<>();
+		sortedOptions.addAll(questionDto.getOptionDtos());
+		questionDto.setOptionDtos(sortedOptions);
 
 	    } else if (questionType == QbQuestion.TYPE_MARK_HEDGING) {
 
 		//store hedging marks
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    Integer markHedging = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getDisplayOrder(), true);
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid(), true);
 		    if (markHedging != null) {
 			optionDto.setAnswerInt(markHedging);
 		    }
@@ -918,8 +871,7 @@ public class LearningController {
 		int questionType = questionDto.getType();
 
 		//enforce all hedging marks question type to be answered as well
-		if (questionDto.isAnswerRequired()
-			|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
+		if (questionDto.isAnswerRequired() || (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
 
 		    boolean isAnswered = false;
 
@@ -966,8 +918,7 @@ public class LearningController {
 
 		}
 
-		if ((questionDto.getType() == QbQuestion.TYPE_ESSAY)
-			&& (questionDto.getMinWordsLimit() > 0)) {
+		if ((questionDto.getType() == QbQuestion.TYPE_ESSAY) && (questionDto.getMinWordsLimit() > 0)) {
 
 		    if (questionDto.getAnswerString() == null) {
 			isAllQuestionsReachedMinWordsLimit = false;
@@ -1062,7 +1013,7 @@ public class LearningController {
 	    result.setTimeTaken(timeTaken);
 	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
 		int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
-		ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<AssessmentOverallFeedback>(
+		ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<>(
 			assessment.getOverallFeedbacks());
 		int lastBorder = 0;
 		for (int i = overallFeedbacks.size() - 1; i >= 0; i--) {
@@ -1087,7 +1038,7 @@ public class LearningController {
 	    // if answers are going to be disclosed, prepare data for the table in results page
 	    if (assessment.isAllowDiscloseAnswers()) {
 		// such entities should not go into session map, but as request attributes instead
-		SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(
+		SortedSet<AssessmentSession> sessions = new TreeSet<>(
 			new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
 		request.setAttribute("sessions", sessions);

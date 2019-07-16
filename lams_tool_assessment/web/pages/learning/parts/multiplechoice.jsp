@@ -18,13 +18,13 @@
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
+							<input type="checkbox" name="question${status.index}_${option.uid}" value="${true}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.displayOrder}"
+							<input type="radio" name="question${status.index}" value="${option.uid}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>

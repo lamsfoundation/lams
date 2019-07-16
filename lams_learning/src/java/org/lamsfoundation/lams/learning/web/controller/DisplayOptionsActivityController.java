@@ -32,12 +32,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.OptionsActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -85,28 +88,60 @@ public class DisplayOptionsActivityController {
 	form.setActivityID(activity.getActivityId());
 
 	List<ActivityURL> activityURLs = new ArrayList<>();
-	Set<Activity> subActivities = optionsActivity.getActivities();
-	Iterator<Activity> i = subActivities.iterator();
-	int completedCount = 0;
+	Set<Activity> optionsChildActivities = optionsActivity.getActivities();
+	Iterator<Activity> i = optionsChildActivities.iterator();
+	int completedActivitiesCount = 0;
 	while (i.hasNext()) {
-	    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, i.next(), false, false);
+	    Activity optionsChildActivity = i.next();
+	    ActivityURL activityURL = activityMapping.getActivityURL(learnerProgress, optionsChildActivity, false, false);
+
 	    if (activityURL.isComplete()) {
-		completedCount++;
+		completedActivitiesCount++;
+
+		//create list of activityURLs of all children activities
+		if (optionsChildActivity.isSequenceActivity()) {
+		    activityURL.setUrl(null);
+		    
+		    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
+		    // it here again
+		    SequenceActivity optionsChildActivityInit;
+		    Hibernate.initialize(activity);
+		    if (optionsChildActivity instanceof HibernateProxy) {
+			optionsChildActivityInit = (SequenceActivity) ((HibernateProxy) optionsChildActivity).getHibernateLazyInitializer()
+				.getImplementation();
+		    } else {
+			optionsChildActivityInit = (SequenceActivity) optionsChildActivity;
+		    }
+		    
+		    List<ActivityURL> childActivities = new ArrayList<>();
+		    for (Activity sequenceChildActivity : optionsChildActivityInit.getActivities()) {
+			ActivityURL sequenceActivityURL = activityMapping.getActivityURL(
+				learnerProgress, sequenceChildActivity, false, false);
+			childActivities.add(sequenceActivityURL);
+		    }
+		    activityURL.setChildActivities(childActivities);
+		}
 	    }
 	    activityURLs.add(activityURL);
 	}
 	form.setActivityURLs(activityURLs);
 
-	if (optionsActivity.getMinNumberOfOptionsNotNull().intValue() <= completedCount) {
-	    form.setFinished(true);
+	if (completedActivitiesCount >= optionsActivity.getMinNumberOfOptionsNotNull().intValue()) {
+	    form.setMinimumLimitReached(true);
+	}
+	
+	if (completedActivitiesCount > 0) {
+	    form.setHasCompletedActivities(true);
 	}
 
-	if (completedCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()) {
+	if (completedActivitiesCount >= optionsActivity.getMaxNumberOfOptionsNotNull().intValue()) {
 	    form.setMaxActivitiesReached(true);
 	}
 
-	form.setMinimum(optionsActivity.getMinNumberOfOptionsNotNull().intValue());
-	form.setMaximum(optionsActivity.getMaxNumberOfOptionsNotNull().intValue());
+	int minNumberOfOptions = optionsActivity.getMinNumberOfOptions() == null ? 0 : optionsActivity.getMinNumberOfOptions();
+	form.setMinimum(minNumberOfOptions);
+	int maxNumberOfOptions = optionsActivity.getMaxNumberOfOptions() == null ? 0 : optionsActivity.getMaxNumberOfOptions();
+	form.setMaximum(maxNumberOfOptions);
 	form.setDescription(optionsActivity.getDescription());
 	form.setTitle(optionsActivity.getTitle());
 	form.setLessonID(learnerProgress.getLesson().getLessonId());

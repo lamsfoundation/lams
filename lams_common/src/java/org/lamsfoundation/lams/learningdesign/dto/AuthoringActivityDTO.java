@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
 import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.util.HelpUtil;
 
 /**
@@ -255,6 +256,8 @@ public class AuthoringActivityDTO extends BaseDTO {
     private Integer endXCoord;
     private Integer endYCoord;
 
+    private Boolean branchingOrderedAsc;
+
     /** Used for I18N the URLS. Does not need to be sent to clients, so no getter exists. */
     private String languageCode;
 
@@ -378,6 +381,9 @@ public class AuthoringActivityDTO extends BaseDTO {
 	startYCoord = activity.getStartYcoord();
 	endXCoord = activity.getEndXcoord();
 	endYCoord = activity.getEndYcoord();
+	if (activity.isToolBranchingActivity()) {
+	    branchingOrderedAsc = ((ToolBranchingActivity) activity).getBranchingOrderedAsc();
+	}
     }
 
     private void addFloatingActivityAttributes(FloatingActivity floatingActivity) {
@@ -1186,6 +1192,14 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setStartYCoord(Integer startYCoord) {
 	this.startYCoord = startYCoord;
+    }
+
+    public Boolean getBranchingOrderedAsc() {
+	return branchingOrderedAsc;
+    }
+
+    public void setBranchingOrderedAsc(Boolean branchingOrderedAsc) {
+	this.branchingOrderedAsc = branchingOrderedAsc;
     }
 
     public String getAdminURL() {

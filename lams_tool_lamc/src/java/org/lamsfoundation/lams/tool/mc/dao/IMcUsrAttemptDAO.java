@@ -113,6 +113,11 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     int getAttemptsCountPerOption(Long optionUid);
+    
+    /**
+     * Checks whether anyone has attempted this assessment.
+     */
+    boolean isMcContentAttempted(Long mcContentUid);
 
     /**
      * Calculate what is the total mark scored by user in this activity. Only responseFinalised is taken into account.

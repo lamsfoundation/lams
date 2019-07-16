@@ -26,8 +26,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String FIND_MAX_VERSION = "SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId";
 
-    private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM ToolActivity AS a, QbToolQuestion AS q "
-	    + "WHERE a.toolContentId = q.toolContentId AND a.learningDesign.lessons IS NOT EMPTY AND q.qbQuestion.uid = :qbQuestionUid";
+    private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM QbToolQuestion AS q, ToolActivity AS a JOIN a.learningDesign.lessons AS l "
+	    + "WHERE a.toolContentId = q.toolContentId AND l IS NOT EMPTY AND l.lessonStateId IN (3,4,5,6) AND q.qbQuestion.uid = :qbQuestionUid "
+	    + "ORDER BY l.organisation.name, l.lessonName";
 
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
@@ -62,7 +63,15 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_COLLECTION_QUESTIONS = "SELECT q.* FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id WHERE "
 	    + "q.version = (SELECT MAX(version) FROM lams_qb_question WHERE question_id = q.question_id) "
-	    + "AND cq.collection_uid = :collectionUid";
+	    + "AND cq.collection_uid = :collectionUid ?";
+
+    private static final String FIND_COLLECTION_QUESTIONS_BY_USAGE = "SELECT q.* FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id "
+	    + "JOIN lams_qb_tool_question AS tq ON q.uid = tq.qb_question_uid "
+	    + "JOIN lams_learning_activity AS a USING (tool_content_id) "
+	    + "JOIN lams_lesson AS l USING (learning_design_id) WHERE l.lesson_state_id IN (3,4,5,6) "
+	    + "AND q.version = (SELECT MAX(version) FROM lams_qb_question WHERE question_id = q.question_id) "
+	    + "AND cq.collection_uid = :collectionUid ? GROUP BY q.question_id ORDER BY COUNT(l.lesson_id)";
 
     private static final String FIND_QUESTION_COLLECTIONS_BY_UID = "SELECT c.* FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid JOIN lams_qb_question AS q ON cq.qb_question_id = q.question_id "
@@ -82,6 +91,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_COLLECTION_QUESTIONS_EXCLUDED = "SELECT qb_question_id FROM lams_qb_collection_question "
 	    + "WHERE collection_uid = :collectionUid AND qb_question_id NOT IN :qbQuestionIds";
 
+    private static final String FIND_QUESTIONS_BY_TOOL_CONTENT_ID = "SELECT tq.qbQuestion FROM QbToolQuestion AS tq "
+	    + "WHERE tq.toolContentId = :toolContentId";
+
+    private static final String IS_QUESTION_IN_USER_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
+	    + "(c.user_id = :userId OR c.user_id IS NULL) AND cq.qb_question_id = :qbQuestionId";
+
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
@@ -96,6 +112,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	Query q = getSession().createQuery(FIND_QUESTIONS_BY_QUESTION_ID, QbQuestion.class);
 	q.setParameter("questionId", questionId);
 	return q.getResultList();
+    }
+
+    @Override
+    public List<QbQuestion> getQuestionsByToolContentId(long toolContentId) {
+	return getSession().createQuery(FIND_QUESTIONS_BY_TOOL_CONTENT_ID, QbQuestion.class)
+		.setParameter("toolContentId", toolContentId).getResultList();
     }
 
     @Override
@@ -329,6 +351,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	return result;
     }
 
+    @Override
+    public boolean isQuestionInUserCollection(int userId, int qbQuestionId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_USER_COLLECTION).setParameter("userId", userId)
+		.setParameter("qbQuestionId", qbQuestionId).getSingleResult() != null;
+    }
+
     private boolean questionInCollectionExists(long collectionUid, int qbQuestionId) {
 	return !getSession().createNativeQuery(EXISTS_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
 		.setParameter("qbQuestionId", qbQuestionId).getResultList().isEmpty();
@@ -338,12 +366,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    String search, boolean isCount) {
 	StringBuilder queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS);
 
-	if (StringUtils.isNotBlank(search)) {
-	    queryBuilder.append(" AND (q.name LIKE :search OR q.description LIKE :search)");
-	}
-
 	if (!isCount && StringUtils.isNotBlank(orderBy)) {
-	    queryBuilder.append(" ORDER BY ").append(orderBy);
+	    if (orderBy.equalsIgnoreCase("usage")) {
+		queryBuilder = new StringBuilder(FIND_COLLECTION_QUESTIONS_BY_USAGE);
+	    } else {
+		queryBuilder.append(" ORDER BY ").append(orderBy);
+	    }
 	    if (StringUtils.isNotBlank(orderDirection)) {
 		queryBuilder.append(" ").append(orderDirection);
 	    }
@@ -353,6 +381,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	if (isCount) {
 	    queryText = queryText.replace("q.*", "COUNT(*)");
 	}
+
+	queryText = queryText.replace("?",
+		(StringUtils.isBlank(search) ? "" : " AND (q.name LIKE :search OR q.description LIKE :search)"));
 
 	Query query = isCount ? getSession().createNativeQuery(queryText)
 		: getSession().createNativeQuery(queryText, QbQuestion.class);
