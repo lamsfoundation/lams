@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -190,6 +191,7 @@ public class QbService implements IQbService {
 	Lesson lesson = learningDesign.getLessons().iterator().next();
 	Long lessonId = lesson.getLessonId();
 	List<GradebookUserLesson> userLessonGrades = gradebookService.getGradebookUserLesson(lessonId);
+	userLessonGrades = userLessonGrades.stream().filter(g -> g.getMark() != null).collect(Collectors.toList());
 	int participantCount = userLessonGrades.size();
 
 	QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
@@ -223,7 +225,7 @@ public class QbService implements IQbService {
 	    double incorrectUserMarkSum = 0;
 
 	    // sort grades by highest mark
-	    Collections.sort(userLessonGrades, (a, b) -> a.getMark().compareTo(b.getMark()));
+	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark));
 	    // see how many learners should be in top/bottom 27% of the group
 	    int groupCount = (int) Math.ceil(
 		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS) / 100.0 * participantCount);
