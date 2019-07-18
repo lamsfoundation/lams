@@ -27,13 +27,6 @@
 		
 		//load question bank div
 		$('#question-bank-collapse').on('show.bs.collapse', function () {
-			<c:url var="tempUrl" value="">
-				<c:param name="output">
-					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}
-				</c:param>
-			</c:url>
-			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
-
 			$('#question-bank-collapse.contains-nothing').load(
 				"<lams:LAMSURL/>/searchQB/start.do",
 				{
