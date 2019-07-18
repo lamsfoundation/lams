@@ -533,8 +533,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public int getAttemptsCountPerOption(Long optionUid) {
-	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
+    public int getAttemptsCountPerOption(Long optionUid, Long mcQueContentUid) {
+	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid, mcQueContentUid);
     }
 
     @Override
@@ -1048,7 +1048,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	    int totalPercentage = 0;
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
-		int optionAttemptCount = mcUsrAttemptDAO.getAttemptsCountPerOption(option.getUid());
+		int optionAttemptCount = getAttemptsCountPerOption(option.getUid(), question.getUid());
 		cell = row.createCell(count++);
 		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
 		cell.setCellValue(percentage + "%");

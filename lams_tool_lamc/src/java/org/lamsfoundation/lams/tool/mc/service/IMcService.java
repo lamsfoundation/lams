@@ -95,7 +95,7 @@ public interface IMcService extends ICommonToolService {
      * @param optionUid
      * @return
      */
-    int getAttemptsCountPerOption(Long optionUid);
+    int getAttemptsCountPerOption(Long optionUid, Long mcQueContentUid);
 
     /**
      * Checks whether anyone has attempted this assessment.
@@ -183,7 +183,8 @@ public interface IMcService extends ICommonToolService {
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
-     * for a particular activity such as the answer to the third questionDescription contains the word Koala and hence the need for
+     * for a particular activity such as the answer to the third questionDescription contains the word Koala and hence
+     * the need for
      * the toolContentId
      *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
