@@ -6,9 +6,31 @@
 	#itemList .panel-heading.panel-title {
 		overflow:hidden;
 	}
+	#question-bank-div {
+    	margin-top: 75px;
+	}
+	#add-question-div {
+		margin-top: -5px;
+	}
 </style>
 
 <script type="text/javascript">
+	$(document).ready(function(){
+		//question bank div
+		$('#question-bank-collapse').on('show.bs.collapse', function () {
+			$('#question-bank-collapse.contains-nothing').load(
+				"<lams:LAMSURL/>/searchQB/start.do",
+				{
+					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapId=${sessionMapId}",
+					toolContentId: ${sessionMap.toolContentID}
+				},
+				function() {
+					$(this).removeClass("contains-nothing");
+				}
+			);
+		})
+	});
+
 	function removeQuestion(questionIndex) {
 		document.forms.mcAuthoringForm.questionIndex.value=questionIndex;
 		document.forms.mcAuthoringForm.action='removeQuestion.do'; 
@@ -46,11 +68,29 @@
 <div id="itemArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
+
 <c:if test="${!isAuthoringRestricted}">
-	<p>
+	<div id="add-question-div" class="form-inline form-group pull-right">
 		<a href="<lams:WebAppURL />authoring/editQuestionBox.do?sessionMapId=${sessionMapId}&KeepThis=true&TB_iframe=true&modal=true"
 			class="btn btn-default btn-sm thickbox"> 
-			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
+			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.save.question" />"></i>&nbsp;
+			<fmt:message key="label.save.question" /> 
 		</a>
-	</p>
+	</div>
+
+	<!-- Question Bank -->
+	<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
+	    <div class="panel panel-default" >
+	        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
+	        	<span class="panel-title">
+			    	<a class="collapsed" role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse" >
+		          		<fmt:message key="label.question.bank" />
+		        	</a>
+	      		</span>
+	        </div>
+	
+			<div id="question-bank-collapse" class="panel-body panel-collapse collapse contains-nothing" role="tabpanel" aria-labelledby="question-bank-heading">
+			</div>
+		</div>
+	</div>
 </c:if>

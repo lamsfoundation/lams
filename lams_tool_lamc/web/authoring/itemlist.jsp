@@ -25,26 +25,11 @@
 </script>
 
 <div id="itemList">
-	<div class="panel panel-default add-file">
+<div class="panel panel-default add-file">
 	
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
-		
-		<c:if test="${!isAuthoringRestricted}">
-			<div class="roffset5 pull-right">
-				<c:url var="tempUrl" value="">
-					<c:param name="output">
-						<c:url value='/authoring/importQbQuestion.do'/>?sessionMapId=${sessionMapId}
-					</c:param>
-				</c:url>
-				<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
-		
-				<a href="<lams:LAMSURL/>/searchQB/start.do?returnUrl=${returnUrl}&toolContentId=${sessionMap.toolContentID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default btn-xs loffset5 thickbox"> 
-					<fmt:message key="label.import.from.question.bank"/>
-				</a>
-			</div>
-		</c:if>
 	</div>
 
 	<table id="itemTable" class="table table-striped table-condensed">
@@ -76,6 +61,12 @@
 								<c:out value="${questionDto.description}" escapeXml="false" />
 							</div>
 						</c:if>
+						
+						<!-- 
+					    <span class='pull-right alert-info btn-xs loffset5 roffset5'>
+					    	v.&nbsp;${questionDto.version}
+					    </span>	
+					     -->
 					</div>
 				</td>
 
@@ -120,5 +111,5 @@
 		</c:forEach>
 
 	</table>
-	</div>
+</div>
 </div>
