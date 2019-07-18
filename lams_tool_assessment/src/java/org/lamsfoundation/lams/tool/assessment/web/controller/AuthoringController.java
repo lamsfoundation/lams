@@ -545,10 +545,10 @@ public class AuthoringController {
      */
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
-    private String importQbQuestion(HttpServletRequest request, @RequestParam Long qbQuestionUid) {
+    private String importQbQuestion(HttpServletRequest request, @RequestParam String sessionMapID,
+	    @RequestParam Long qbQuestionUid) {
 	//TODO perform updateQuestionReferencesMaxMarks prior to runnning this method
 	
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);

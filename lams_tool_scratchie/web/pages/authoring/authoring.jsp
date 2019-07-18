@@ -16,24 +16,27 @@
 		#display-confidence-levels-activities {
 			margin-top: 8px;
 		}
+		#question-bank-div {
+    		margin-top: 75px;
+		}
 	</style>
 	
 	<script>
         function init(){
             var tag = document.getElementById("currentTab");
-		    	if (tag.value != "") {
-		    		selectTab(tag.value);
-		    	} else {
-	            selectTab(1); //select the default tab;
-		    	}
+		    if (tag.value != "") {
+		   		selectTab(tag.value);
+		   	} else {
+	       	    selectTab(1); //select the default tab;
+		    }
         }     
         
         function doSelectTab(tabId) {
-        		// start optional tab controller stuff
-        		var tag = document.getElementById("currentTab");
-	    		tag.value = tabId;
-	    		// end optional tab controller stuff
-	    		selectTab(tabId);	    	
+        	// start optional tab controller stuff
+        	var tag = document.getElementById("currentTab");
+	    	tag.value = tabId;
+	    	// end optional tab controller stuff
+	    	selectTab(tabId);	    	
         }
     </script>
  
