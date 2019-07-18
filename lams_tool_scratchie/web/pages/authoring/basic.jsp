@@ -6,7 +6,6 @@
 </c:if>
 
 <script lang="javascript">
-
 	$(document).ready(function(){	
 		//question bank div
 		$('#question-bank-collapse').on('show.bs.collapse', function () {
@@ -14,8 +13,7 @@
 				"<lams:LAMSURL/>/searchQB/start.do",
 				{
 					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}",
-					toolContentId: ${sessionMap.toolContentID},
-					isFullJspRequested: false
+					toolContentId: ${sessionMap.toolContentID}
 				},
 				function() {
 					$(this).removeClass("contains-nothing");
@@ -85,11 +83,11 @@
 </div>
 
 <!-- Items -->
-<div  id="itemArea">
+<div id="itemArea">
 	<%@ include file="parts/itemlist.jsp"%>
 </div>
 
-<div class="form-inline form-group pull-right" style="margin-top: -5px;">
+<div id="add-question-div" class="form-inline form-group pull-right">
 	<c:set var="addItemUrl" >
 		<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
 	</c:set>

@@ -19,6 +19,9 @@
 		#question-bank-div {
     		margin-top: 75px;
 		}
+		#add-question-div {
+			margin-top: -5px;
+		}
 	</style>
 	
 	<script>
