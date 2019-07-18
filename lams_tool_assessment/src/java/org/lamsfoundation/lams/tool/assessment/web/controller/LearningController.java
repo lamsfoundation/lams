@@ -193,29 +193,30 @@ public class LearningController {
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	questionReferences.addAll(assessment.getQuestionReferences());
 	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<>();
-	ArrayList<AssessmentQuestion> takenQuestion = new ArrayList<>();
-
-	//add non-random questions
-	for (QuestionReference questionReference : questionReferences) {
-	    if (!questionReference.isRandomQuestion()) {
-		AssessmentQuestion question = questionReference.getQuestion();
-		takenQuestion.add(question);
-		questionToReferenceMap.put(questionReference.getUid(), question);
+	
+	// init random pool questions
+	List<AssessmentQuestion> availableRandomQuestions = new ArrayList<>();
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.isRandomQuestion()) {
+		availableRandomQuestions.add(question);
 	    }
 	}
-
-	Set<AssessmentQuestion> allQuestions = assessment.getQuestions();
-	Collection<AssessmentQuestion> availableQuestions = CollectionUtils.subtract(allQuestions, takenQuestion);
-	//add random questions (actually replacing them with real ones)
+	
 	for (QuestionReference questionReference : questionReferences) {
+	    //add non-random questions
+	    if (!questionReference.isRandomQuestion()) {
+		AssessmentQuestion question = questionReference.getQuestion();
+		questionToReferenceMap.put(questionReference.getUid(), question);
+	    }
+	    
+	    //add random questions (actually replacing them with real ones)
 	    if (questionReference.isRandomQuestion()) {
 		//pick a random element
 		Random rand = new Random(System.currentTimeMillis());
-		AssessmentQuestion question = (AssessmentQuestion) availableQuestions.toArray()[rand
-			.nextInt(availableQuestions.size())];
-		takenQuestion.add(question);
+		AssessmentQuestion question = (AssessmentQuestion) availableRandomQuestions.toArray()[rand
+			.nextInt(availableRandomQuestions.size())];
 		questionToReferenceMap.put(questionReference.getUid(), question);
-		availableQuestions.remove(question);
+		availableRandomQuestions.remove(question);
 	    }
 	}
 

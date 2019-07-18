@@ -195,7 +195,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
-	final String ORDER_BY_NAME = "ORDER BY question.name ";
+	final String ORDER_BY_NAME = "ORDER BY question.name, question.description ";
 	final String ORDER_BY_SMTH_ELSE = "ORDER BY question.question_id ";
 
 	//TODO check the following query with real data. and see maybe it's better than the current (it's unlikely though) [https://stackoverflow.com/a/28090544/10331386 and https://stackoverflow.com/a/612268/10331386]

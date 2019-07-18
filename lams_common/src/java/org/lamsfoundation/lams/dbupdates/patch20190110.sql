@@ -602,6 +602,13 @@ UPDATE tl_laasse10_option_answer AS sa, tl_laasse10_question_option AS o, lams_q
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
 	SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
+	
+-- fill content_folder_id with real values from learning designs
+UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learning_activity AS activity, lams_learning_design AS design
+	SET qbque.content_folder_id = design.content_folder_id
+	WHERE qbque.uid = toolque.qb_question_uid
+		AND toolque.tool_content_id = activity.tool_content_id
+		AND activity.learning_design_id = design.learning_design_id;
 
 
 -- cleanup
