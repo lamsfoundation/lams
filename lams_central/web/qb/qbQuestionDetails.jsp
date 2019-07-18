@@ -15,6 +15,11 @@
 		<fmt:message key="button.import"/>
 	</a>
 	
+	<a class="btn btn-xs btn-default pull-right loffset5" href="#nogo" onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${question.uid}", "_blank")' title='Show stats'>
+		<i class='fa fa-bar-chart'></i>&nbsp;
+		Stats
+	</a>
+	
 	<div class="pull-right">
 		<c:choose>
 			<c:when test="${fn:length(otherVersions) == 1}">
