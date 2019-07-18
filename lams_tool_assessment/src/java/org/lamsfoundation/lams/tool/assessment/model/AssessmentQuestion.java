@@ -29,14 +29,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
-import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 
 /**
@@ -48,11 +46,10 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 @Table(name = "tl_laasse10_assessment_question")
 //in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
 @PrimaryKeyJoinColumn(name = "uid")
-public class AssessmentQuestion extends QbToolQuestion
-	implements Serializable, Cloneable, Comparable<AssessmentQuestion> {
+public class AssessmentQuestion extends QbToolQuestion implements Serializable, Cloneable {
     private static final long serialVersionUID = -7767327140430305575L;
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
-    
+
     @Column(name = "random_question")
     private boolean randomQuestion;
 
@@ -91,11 +88,6 @@ public class AssessmentQuestion extends QbToolQuestion
     }
 
     @Override
-    public int compareTo(AssessmentQuestion anotherQuestion) {
-	return displayOrder - anotherQuestion.getDisplayOrder();
-    }
-
-    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -118,6 +110,7 @@ public class AssessmentQuestion extends QbToolQuestion
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+    @Override
     public Long getUid() {
 	return uid;
     }
@@ -125,7 +118,7 @@ public class AssessmentQuestion extends QbToolQuestion
     public void setUid(Long userID) {
 	this.uid = userID;
     }
-    
+
     public boolean isRandomQuestion() {
 	return randomQuestion;
     }

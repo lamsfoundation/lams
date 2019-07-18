@@ -1,5 +1,7 @@
 package org.lamsfoundation.lams.qb.model;
 
+import java.util.Comparator;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +25,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "lams_qb_tool_question")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class QbToolQuestion {
+public abstract class QbToolQuestion implements Comparable<QbToolQuestion> {
+    public static final Comparator<QbToolQuestion> COMPARATOR = Comparator.comparing(QbToolQuestion::getDisplayOrder);
+
+    // it makes sense to put comparator here as an internal class, so we do not need to look for it in other classes
+    public static class QbToolQuestionComparator implements Comparator<QbToolQuestion> {
+	@Override
+	public int compare(QbToolQuestion o1, QbToolQuestion o2) {
+	    return COMPARATOR.compare(o1, o2);
+	}
+    }
+
     @Id
     @Column(name = "tool_question_uid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +53,11 @@ public abstract class QbToolQuestion {
 
     @Column(name = "display_order")
     protected int displayOrder = 1;
+
+    @Override
+    public int compareTo(QbToolQuestion other) {
+	return COMPARATOR.compare(this, other);
+    }
 
     public Long getUid() {
 	return this.uid;
