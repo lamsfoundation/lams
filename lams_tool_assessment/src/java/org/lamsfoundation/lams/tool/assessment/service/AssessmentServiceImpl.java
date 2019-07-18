@@ -439,13 +439,6 @@ public class AssessmentServiceImpl
     @Override
     public void releaseFromCache(Object object) {
 	assessmentDao.releaseFromCache(object);
-
-	if (object instanceof QuestionReference) {
-	    QuestionReference reference = (QuestionReference) object;
-	    if (reference.getQuestion() != null) {
-		assessmentDao.releaseFromCache(reference.getQuestion());
-	    }
-	}
     }
 
     @Override

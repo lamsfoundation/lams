@@ -52,10 +52,6 @@ public class AssessmentForm {
 
     public void setAssessment(Assessment assessment) {
 	this.assessment = assessment;
-	// set Form special varaible from given forum
-	if (assessment == null) {
-	    logger.error("Initial AssessmentForum failed by null value of Assessment.");
-	}
     }
 
     public void reset(HttpServletRequest request) {

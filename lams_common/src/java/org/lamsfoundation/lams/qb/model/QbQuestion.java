@@ -304,7 +304,7 @@ public class QbQuestion implements Serializable, Cloneable {
     }
 
     public Integer getMaxMark() {
-	return maxMark;
+	return maxMark == null ? 1 : maxMark;
     }
 
     public void setMaxMark(Integer maxMark) {

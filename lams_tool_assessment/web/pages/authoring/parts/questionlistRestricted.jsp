@@ -18,16 +18,18 @@
 				<td>
 					<c:choose>
 						<c:when test="${questionReference.randomQuestion}">
-							<fmt:message key="label.authoring.basic.random.question" />
+							<fmt:message key="label.authoring.basic.type.random.question" />
 						</c:when>
 						<c:otherwise>
 							<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
 					
-			        <span class='pull-right alert-info btn-xs loffset5 roffset5'>
-			       		v.&nbsp;${question.qbQuestion.version}
-			        </span>
+					<c:if test="${!questionReference.randomQuestion}">
+				        <span class='pull-right alert-info btn-xs loffset5 roffset5'>
+				       		v.&nbsp;${question.qbQuestion.version}
+				        </span>
+			        </c:if>
 			        
 			       	<span class='pull-right alert-info btn-xs'>
 						<c:choose>

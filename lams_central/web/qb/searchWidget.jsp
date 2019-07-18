@@ -20,7 +20,6 @@
 		.question-title-grid {
 		    overflow-x: hidden;
 		}
-		
 
 		#import-button {
 			margin-left: 5px;
@@ -40,6 +39,10 @@
 		/* jqGrid padding */
 		.ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow>td {
 			padding: 10px;
+		}
+		
+		#grid-container {
+			min-height: 300px;
 		}
 		
 		/* padding of #grid-container's two columns */
@@ -100,6 +103,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -133,12 +137,7 @@
 			   		var questionUid = jQuery("#questions-grid").getCell(rowid, 'questionUid');
 			   		loadQuestionDetailsArea(questionUid);
 				},
-		  	  	gridComplete: function () {
-			  	  	//highlight search results
-					if ($("#filter-questions").val()) {
-						$('>tbody>tr.jqgrow>td:nth-child(2)', this).highlight($("#filter-questions").val());
-					}
-				},
+		  	  	gridComplete: gridSearchHighlight,
 			    loadError: function(xhr,textStatus,errorThrown) {
 			    	$("#questions-grid").clearGridData();
 			    	$("#question-detail-area").hide().html("");
@@ -191,43 +190,6 @@
 				);
 	        });
 		});
-
-		//auxiliary formatter for jqGrid's question column
-		function questionNameFormatter (cellvalue, options, rowObject) {
-	       	var questionDescription = rowObject[2] ? rowObject[2] : "";
-
-	       	var text = "<div class='question-title-grid'>" + cellvalue + "</div>";
-	       	text += "<div class='question-description-grid small'>";
-	       	if (questionDescription.length > 0) {
-	       		text += questionDescription;
-			}
-	        text += "</div>"
-	        	
-			return text;
-		}
-
-	    //search field handler
-	    var timeoutHnd;
-	    function doSearch(ev){
-			//	var elem = ev.target||ev.srcElement;
-	       	if(timeoutHnd)
-	       		clearTimeout(timeoutHnd)
-	       	timeoutHnd = setTimeout(gridSearch,500)
-	    }
-		function gridSearch(){
-			$("#questions-grid").jqGrid(
-				'setGridParam', {
-		           	postData: { 
-		           		questionType: $("#question-type").val(),
-			           	searchString: $("#filter-questions").val() 
-			        }
-		       	}, 
-				{ page: 1 }
-			).trigger('reloadGrid');
-
-		    $("#question-detail-area").hide("slow").html("");
-	        //jQuery("#bigset").jqGrid('setGridParam',{url:"bigset.php?nm_mask="+nm_mask+"&cd_mask="+cd_mask,page:1}).trigger("reloadGrid");
-	    }
 
 		//load up question details area
 	    function loadQuestionDetailsArea(questionUid) {
@@ -287,7 +249,7 @@
 				</c:if>
 			</div>
 
-			<div id="grid-container" style="min-height: 300px;">
+			<div id="grid-container">
 		 		<div class="grid-holder col-xs-12 col-sm-4">
 		 			<table id="questions-grid" class="scroll"></table>
 					<div id="questions-grid-pager" class="scroll"></div>

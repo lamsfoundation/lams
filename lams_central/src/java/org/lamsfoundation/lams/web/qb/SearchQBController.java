@@ -143,7 +143,6 @@ public class SearchQBController {
     private String getPagedQuestions(HttpServletRequest request, HttpServletResponse response) {
 	
 	Integer questionType = WebUtil.readIntParam(request, "questionType");
-//	boolean isPrivate = WebUtil.readBooleanParam(request, "isPrivate");
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
@@ -200,13 +199,5 @@ public class SearchQBController {
 	request.setAttribute("otherVersions", otherVersions);
 	
 	return "qb/qbQuestionDetails";
-    }
-    
-    @RequestMapping("/addQuestion")
-    private String addQuestion(HttpServletRequest request) {
-	Long questionUid = WebUtil.readLongParam(request, "questionUid");
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
-	
-	return "qb/";
     }
 }
