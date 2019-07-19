@@ -294,8 +294,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // persist candidate answers
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
 	    Set<McOptsContent> oldOptions = question.getMcOptionsContents();
-	    Set<McOptsContent> newOptions = new HashSet<McOptsContent>();
-	    Set<Long> wantedUids = new HashSet<Long>();
+	    Set<McOptsContent> newOptions = new HashSet<>();
+	    Set<Long> wantedUids = new HashSet<>();
 	    int displayOrderOption = 1;
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
@@ -315,12 +315,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		option.setCorrectOption(isCorrectOption);
 		option.setMcQueOptionText(optionText);
 		option.setMcQueContent(question);
-		
+
 		newOptions.add(option);
 		displayOrderOption++;
 	    }
 	    question.setMcOptionsContents(newOptions);
-	    
+
 	    // updating the existing question content
 	    saveOrUpdateMcQueContent(question);
 
@@ -330,7 +330,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public void releaseQuestionsFromCache(McContent content) {
-	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
+	for (McQueContent question : content.getMcQueContents()) {
 	    mcQueContentDAO.releaseQuestionFromCache(question);
 	}
     }
@@ -465,7 +465,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public int getAttemptsCountPerOption(Long optionUid) {
 	return mcUsrAttemptDAO.getAttemptsCountPerOption(optionUid);
     }
-    
+
     @Override
     public boolean isMcContentAttempted(Long mcContentUid) {
 	return mcUsrAttemptDAO.isMcContentAttempted(mcContentUid);
@@ -473,19 +473,19 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<AnswerDTO> getAnswersFromDatabase(McContent mcContent, McQueUsr user) {
-	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
+	List<AnswerDTO> answerDtos = new LinkedList<>();
 	List<McQueContent> questions = this.getQuestionsByContentUid(mcContent.getUid());
 
 	for (McQueContent question : questions) {
 	    AnswerDTO answerDto = new AnswerDTO();
 	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
-	    List<McOptsContent> optionList = new LinkedList<McOptsContent>(optionSet);
+	    List<McOptsContent> optionList = new LinkedList<>(optionSet);
 
 	    boolean randomize = mcContent.isRandomize();
 	    if (randomize) {
-		ArrayList<McOptsContent> shuffledList = new ArrayList<McOptsContent>(optionList);
+		ArrayList<McOptsContent> shuffledList = new ArrayList<>(optionList);
 		Collections.shuffle(shuffledList);
-		optionList = new LinkedList<McOptsContent>(shuffledList);
+		optionList = new LinkedList<>(shuffledList);
 	    }
 
 	    answerDto.setQuestion(question.getQuestion());
@@ -524,8 +524,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired) {
-	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
-	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<>();
+	Set<McSession> sessions = new TreeSet<>(new McSessionComparator());
 	sessions.addAll(mcContent.getMcSessions());
 	int numQuestions = mcContent.getMcQueContents().size();
 
@@ -535,7 +535,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
@@ -588,8 +588,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			    // find out the answered option's sequential letter - A,B,C...
 			    String answeredOptionLetter = "";
 			    int optionCount = 1;
-			    for (McOptsContent option : (Set<McOptsContent>) attempt.getMcQueContent()
-				    .getMcOptionsContents()) {
+			    for (McOptsContent option : attempt.getMcQueContent().getMcOptionsContents()) {
 				if (attempt.getMcOptionsContent().getUid().equals(option.getUid())) {
 				    answeredOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 				    break;
@@ -744,7 +743,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	int oldTotalMark = mcUsrAttemptDAO.getUserTotalMark(userUid);
 	int totalMark = (oldMark == null) ? oldTotalMark + newMark : (oldTotalMark - oldMark) + newMark;
 
-	List<McUsrAttempt> userAttempts = new ArrayList<McUsrAttempt>();
+	List<McUsrAttempt> userAttempts = new ArrayList<>();
 	McQueUsr groupLeader = mcSession.getGroupLeader();
 	if (groupLeader != null) {
 	    if (groupLeader.equals(selectedUser)) {
@@ -760,7 +759,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		logger.warn(error);
 	    }
 	} else {
-	    userAttempts = new ArrayList<McUsrAttempt>();
+	    userAttempts = new ArrayList<>();
 	    userAttempts.add(userAttemptToUpdate);
 	}
 
@@ -792,10 +791,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions,
 	    List<McQuestionDTO> questionDTOs) {
 	// create list of modified questions
-	List<McQuestionDTO> modifiedQuestions = new ArrayList<McQuestionDTO>();
+	List<McQuestionDTO> modifiedQuestions = new ArrayList<>();
 	// create list of questions where only mark was modified
-	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<McQuestionDTO>();
-	
+	List<McQuestionDTO> modifiedQuestionsMarksOnly = new ArrayList<>();
+
 	for (McQueContent oldQuestion : oldQuestions) {
 	    for (McQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
@@ -824,7 +823,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			    }
 			}
 		    }
-		    
+
 		    // a new option is added
 		    if (oldOptions.size() != optionDTOs.size()) {
 			isQuestionModified = true;
@@ -843,7 +842,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
-	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
 
 	    for (McQueUsr user : sessionUsers) {
 
@@ -878,7 +877,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    // [+] if the question is modified
 		    for (McQuestionDTO modifiedQuestion : modifiedQuestions) {
 			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    
+
 			    //check whether user has selected correct answer, taking into account changes done to modifiedQuestion
 			    boolean isAnswerCorrect = false;
 			    McOptsContent selectedOption = userAttempt.getMcOptionsContent();
@@ -887,7 +886,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 				    isAnswerCorrect = "Correct".equals(modifiedOption.getCorrect());
 				}
 			    }
-			    
+
 			    //recalculate mark
 			    Integer newActualMark = isAnswerCorrect ? Integer.valueOf(modifiedQuestion.getMark()) : 0;
 			    boolean passed = user.isMarkPassed(newActualMark);
@@ -895,7 +894,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			    userAttempt.setPassed(passed);
 			    userAttempt.setAttemptCorrect(isAnswerCorrect);
 			    mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
-			    
+
 			    newTotalMark += newActualMark - oldUserMark;
 
 			    break;
@@ -928,7 +927,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	}
 
 	int totalNumberOfUsers = 0;
-	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	for (McSession session : mcContent.getMcSessions()) {
 	    totalNumberOfUsers += session.getMcQueUsers().size();
 	}
 
@@ -974,7 +973,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    rowCount++;
 
 	    int totalPercentage = 0;
-	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+	    for (McOptsContent option : question.getMcOptionsContents()) {
 		int optionAttemptCount = mcUsrAttemptDAO.getAttemptsCountPerOption(option.getUid());
 		cell = row.createCell(count++);
 		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
@@ -1020,7 +1019,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	row = sheet.createRow(rowCount++);
 	count = 1;
-	ArrayList<String> correctAnswers = new ArrayList<String>();
+	ArrayList<String> correctAnswers = new ArrayList<>();
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.correct.answer"));
 	for (McQueContent question : questions) {
@@ -1028,7 +1027,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // find out the correct answer's sequential letter - A,B,C...
 	    String correctAnswerLetter = "";
 	    int answerCount = 1;
-	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+	    for (McOptsContent option : question.getMcOptionsContents()) {
 		if (option.isCorrectOption()) {
 		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
@@ -1047,7 +1046,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.learner"));
 
-	ArrayList<Integer> totalPercentList = new ArrayList<Integer>();
+	ArrayList<Integer> totalPercentList = new ArrayList<>();
 	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
@@ -1257,7 +1256,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
-	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	for (McSession session : mcContent.getMcSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getMcSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -1288,7 +1287,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	McContent content = mcContentDAO.findMcContentById(toolContentId);
 	if (content != null) {
-	    for (McSession session : (Set<McSession>) content.getMcSessions()) {
+	    for (McSession session : content.getMcSessions()) {
 		McQueUsr user = mcUserDAO.getMcUserBySession(userId.longValue(), session.getUid());
 		if (user != null) {
 		    mcUsrAttemptDAO.removeAllUserAttempts(user.getUid());
@@ -1379,7 +1378,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	McContent content = mcContentDAO.findMcContentById(toolContentId);
-	for (McSession session : (Set<McSession>) content.getMcSessions()) {
+	for (McSession session : content.getMcSessions()) {
 	    if (!session.getMcQueUsers().isEmpty()) {
 		return true;
 	    }
@@ -1415,7 +1414,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
-			McSession.INCOMPLETE, toolSessionName, mcContent, new TreeSet());
+			McSession.INCOMPLETE, toolSessionName, mcContent, new ArrayList<McQueUsr>());
 
 		mcSessionDAO.saveMcSession(mcSession);
 
@@ -1521,7 +1520,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
-	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<ConfidenceLevelDTO>();
+	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<>();
 	if (toolSessionId == null) {
 	    return confidenceLevelDtos;
 	}
@@ -1616,7 +1615,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1706,8 +1705,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
-	for (McSession mcSession : (Set<McSession>) mcContent.getMcSessions()) {
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
+	for (McSession mcSession : mcContent.getMcSessions()) {
 	    for (McQueUsr user : (Set<McQueUsr>) mcSession.getMcQueUsers()) {
 		// if all users mode or single user mode and found right user
 		if (userID == null || user.getQueUsrId().equals(userID)) {
@@ -1849,11 +1848,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     @SuppressWarnings("unchecked")
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
-	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
+	List<SessionDTO> sessionDtos = new ArrayList<>();
 
 	McContent mcContent = getMcContent(contentId);
 	if (mcContent != null) {
-	    Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	    Set<McSession> sessions = new TreeSet<>(new McSessionComparator());
 	    sessions.addAll(mcContent.getMcSessions());
 	    for (McSession session : sessions) {
 		SessionDTO sessionDto = new SessionDTO();

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -242,8 +241,8 @@ public class McLearningController {
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
-		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
-								     // Long(toolSessionID).longValue());
+		List<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
+								      // Long(toolSessionID).longValue());
 		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
@@ -325,11 +324,12 @@ public class McLearningController {
 	return null;
     }
 
-    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, Map<String, Integer> confidenceLevels, McContent content, HttpServletRequest request) {
+    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, Map<String, Integer> confidenceLevels,
+	    McContent content, HttpServletRequest request) {
 
 	List<AnswerDTO> answerDtos = new LinkedList<>();
 
-	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
+	for (McQueContent question : content.getMcQueContents()) {
 	    String questionUid = question.getUid().toString();
 	    int questionMark = question.getMark().intValue();
 
@@ -363,12 +363,13 @@ public class McLearningController {
 		answerDto.setMark(0);
 	    }
 
-	    // handle confidence levels 
+	    // handle confidence levels
 	    if (content.isEnableConfidenceLevels()) {
 		String wantedKey = "confidenceLevel" + question.getUid();
 		Integer confidenceLevel = confidenceLevels.get(wantedKey);
-		if ( confidenceLevel != null )
+		if (confidenceLevel != null) {
 		    answerDto.setConfidenceLevel(confidenceLevel);
+		}
 	    }
 
 	    answerDtos.add(answerDto);
@@ -397,14 +398,16 @@ public class McLearningController {
 		mcContent.isQuestionsSequenced());
 
 	Map<String, Integer> learnerConfidenceLevels = null;
-	if (mcContent.isEnableConfidenceLevels())
+	if (mcContent.isEnableConfidenceLevels()) {
 	    learnerConfidenceLevels = parseLearnerConfidenceLevels(mcLearningForm, request,
 		    mcContent.isQuestionsSequenced());
+	}
 
 	if (mcContent.isQuestionsSequenced()) {
 	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
-	    if ( mcContent.isEnableConfidenceLevels() ) 
+	    if (mcContent.isEnableConfidenceLevels()) {
 		sessionMap.put(McAppConstants.CONFIDENCE_LEVELS_KEY, learnerConfidenceLevels);
+	    }
 	}
 
 	mcLearningForm.resetCa(request);
@@ -469,7 +472,7 @@ public class McLearningController {
 		    mcContent.isQuestionsSequenced());
 	    sessionMap.put(McAppConstants.CONFIDENCE_LEVELS_KEY, learnerConfidenceLevels);
 	}
-	
+
 	//save user attempt
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
@@ -784,9 +787,10 @@ public class McLearningController {
 	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
 		mcContent.isQuestionsSequenced());
 	Map<String, Integer> learnerConfidenceLevels = null;
-	if (mcContent.isEnableConfidenceLevels())
+	if (mcContent.isEnableConfidenceLevels()) {
 	    learnerConfidenceLevels = parseLearnerConfidenceLevels(mcLearningForm, request,
 		    mcContent.isQuestionsSequenced());
+	}
 
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
 	mcService.saveUserAttempt(user, answerDtos);
@@ -838,12 +842,13 @@ public class McLearningController {
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	Map<String, Integer> confidenceLevels = new HashMap<String, Integer>();
+	Map<String, Integer> confidenceLevels = new HashMap<>();
 	if (isQuestionsSequenced) {
 	    Map<String, Integer> previousConfidenceLevels = (Map<String, Integer>) sessionMap
 		    .get(McAppConstants.CONFIDENCE_LEVELS_KEY);
-	    if ( previousConfidenceLevels != null )
+	    if (previousConfidenceLevels != null) {
 		confidenceLevels.putAll(previousConfidenceLevels);
+	    }
 	}
 
 	Map parameters = request.getParameterMap();
@@ -856,7 +861,7 @@ public class McLearningController {
 	}
 	return confidenceLevels;
     }
-    
+
     private McQueUsr getCurrentUser(String toolSessionId) {
 
 	// get back login user DTO
