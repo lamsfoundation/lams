@@ -49,9 +49,10 @@ public class Assessment {
 
     short type = 6;
     String title = null;
-    String questionText = null;
+    String text = null;
     Boolean required = false;
     int defaultGrade = 1;
+    boolean multipleAnswersAllowed = false; // only used if type == 1
     List<AssessMCAnswer> answers = null; // only used if type == 1
 
     public void setType(short type) {
@@ -81,12 +82,12 @@ public class Assessment {
 	return required;
     }
 
-    public void setQuestionText(String questionText) {
-	this.questionText = questionText;
+    public void setText(String text) {
+	this.text = text;
     }
 
-    public String getQuestionText() {
-	return questionText;
+    public String getText() {
+	return text;
     }
 
     public String getTitle() {
@@ -109,10 +110,17 @@ public class Assessment {
 	return answers;
     }
 
+    public boolean isMultipleAnswersAllowed() {
+        return multipleAnswersAllowed;
+    }
+
+    public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
+        this.multipleAnswersAllowed = multipleAnswersAllowed;
+    }
     public ObjectNode getAsObjectNode(int displayOrder) {
 	ObjectNode json = JsonNodeFactory.instance.objectNode();
 	json.put(RestTags.QUESTION_TITLE, title != null ? title : "");
-	json.put(RestTags.QUESTION_TEXT, questionText != null ? questionText : "");
+	json.put(RestTags.QUESTION_TEXT, text != null ? text : "");
 	json.put(RestTags.DISPLAY_ORDER, displayOrder);
 	json.put("answerRequired", required);
 	json.put("defaultGrade", defaultGrade);
@@ -123,6 +131,9 @@ public class Assessment {
 		answersJSON.add(answer.getAsObjectNode());
 	    }
 	    json.set(RestTags.ANSWERS, answersJSON);
+	    // if multiple answers are allowed then the mark should only apply if no incorrect answers are selected
+	    json.put("multipleAnswersAllowed", multipleAnswersAllowed);
+	    json.put("incorrectAnswerNullifiesMark", multipleAnswersAllowed);
 	} else {
 	    json.put("type", ASSESSMENT_QUESTION_TYPE_ESSAY);
 	}
@@ -133,7 +144,7 @@ public class Assessment {
     public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter,
 	    Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
 	boolean errorsExist = false;
-	if (questionText == null || questionText.length() == 0) {
+	if (text == null || text.length() == 0) {
 	    errorMessages.add(TextUtil.getText(appBundle, formatter,
 		    "authoring.error.application.exercise.question.must.not.be.blank.num",
 		    new Object[] { applicationExerciseTitle, title }));
@@ -145,7 +156,8 @@ public class Assessment {
 			"authoring.error.application.exercise.must.have.answer.num",
 			new Object[] { applicationExerciseTitle, "\""+ title +"\"" }));
 		errorsExist = true;
-	    } else {
+	    } else if ( !multipleAnswersAllowed ){
+		// multiple answers -> no validation, single answer -> must have one with 100%
 		boolean found100percent = false;
 		for (AssessMCAnswer answer : answers) {
 		    if (answer.getGrade() == 1) {

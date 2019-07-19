@@ -72,6 +72,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Andrey Balan
@@ -102,28 +103,23 @@ public class AuthoringController {
     }
 
     @RequestMapping("/definelater")
-    private String definelater(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
-	    throws ServletException {
+    private String definelater(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request,
+	    @RequestParam Long toolContentID) throws ServletException {
 	// update define later flag to true
-	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	Scratchie scratchie = scratchieService.getScratchieByContentId(contentId);
+	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentID);
 
 	scratchie.setDefineLater(true);
 	scratchieService.saveOrUpdateScratchie(scratchie);
 
 	//audit log the teacher has started editing activity in monitor
-	scratchieService.auditLogStartEditingActivityInMonitor(contentId);
+	scratchieService.auditLogStartEditingActivityInMonitor(toolContentID);
 
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	return starting(authoringForm, request);
-
     }
 
     private String starting(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
-	List<ScratchieItem> items = null;
-	Scratchie scratchie = null;
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -138,6 +134,8 @@ public class AuthoringController {
 	Long contentId = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID));
 	sessionMap.put(ScratchieConstants.PARAM_TOOL_CONTENT_ID, contentId);
 
+	List<ScratchieItem> items = null;
+	Scratchie scratchie = null;
 	try {
 	    scratchie = scratchieService.getScratchieByContentId(contentId);
 	    // if scratchie does not exist, try to use default content instead.
@@ -399,14 +397,14 @@ public class AuthoringController {
     /**
      * QB callback handler which adds selected QbQuestion into question list.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
-    private String importQbQuestion(HttpServletRequest request) {
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+    private String importQbQuestion(HttpServletRequest request, @RequestParam String sessionMapID,
+	    @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	
-	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
@@ -420,7 +418,6 @@ public class AuthoringController {
 	item.setDisplayOrder(maxSeq);
 	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
 	itemList.add(item);
-
 
 	// evict everything manually as we do not use DTOs, just real entities
 	// without eviction changes would be saved immediately into DB

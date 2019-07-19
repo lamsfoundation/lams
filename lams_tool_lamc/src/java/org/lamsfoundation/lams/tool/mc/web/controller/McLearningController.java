@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -242,8 +241,8 @@ public class McLearningController {
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
-		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
-								     // Long(toolSessionID).longValue());
+		List<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
+								      // Long(toolSessionID).longValue());
 		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);

@@ -45,6 +45,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
@@ -72,7 +74,7 @@ public class Assessment implements Cloneable {
     private String instructions;
 
     // *** advance tab ***
-    
+
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
@@ -120,7 +122,7 @@ public class Assessment implements Cloneable {
 
     @Column(name = "display_summary")
     private boolean displaySummary;
-    
+
     @Column(name = "define_later")
     private boolean defineLater;
 
@@ -134,7 +136,7 @@ public class Assessment implements Cloneable {
     private String reflectInstructions;
 
     // general information
-    
+
     @Column(name = "create_date")
     private Date created;
 
@@ -152,6 +154,7 @@ public class Assessment implements Cloneable {
     // Question bank questions
     @OneToMany
     @JoinColumn(name = "assessment_uid")
+    @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
     private Set<AssessmentQuestion> questions = new TreeSet<>();
 
     // assessment questions references that form question list

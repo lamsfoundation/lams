@@ -18,7 +18,10 @@
 		font-weight: 500;
 		font-style: normal;
 	}
-	    
+	
+	#add-question-div {
+		margin-top: -5px;
+	}
 </style>
 
 <script lang="javascript">
@@ -27,19 +30,11 @@
 		
 		//load question bank div
 		$('#question-bank-collapse').on('show.bs.collapse', function () {
-			<c:url var="tempUrl" value="">
-				<c:param name="output">
-					<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}
-				</c:param>
-			</c:url>
-			<c:set var="returnUrl" value="${fn:substringAfter(tempUrl, '=')}" />
-
 			$('#question-bank-collapse.contains-nothing').load(
 				"<lams:LAMSURL/>/searchQB/start.do",
 				{
 					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}",
-					toolContentId: ${sessionMap.toolContentID},
-					isFullJspRequested: false
+					toolContentId: ${sessionMap.toolContentID}
 				},
 				function() {
 					$(this).removeClass("contains-nothing");
@@ -174,7 +169,7 @@
 
 <c:if test="${!isAuthoringRestricted}">
 	<!-- Dropdown menu for choosing a question type -->
-	<div class="form-inline form-group pull-right" style="margin-top: -5px;">
+	<div id="add-question-div" class="form-inline form-group pull-right">
 		<select id="questionType" class="form-control input-sm">
 			<option selected="selected" value="1"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
 			<option value="2"><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>

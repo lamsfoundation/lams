@@ -80,7 +80,7 @@ public class TblMonitoringController {
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<>();
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
-		int optionAttemptCount = mcService.getAttemptsCountPerOption(option.getUid());
+		int optionAttemptCount = mcService.getAttemptsCountPerOption(option.getUid(), question.getUid());
 
 		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 

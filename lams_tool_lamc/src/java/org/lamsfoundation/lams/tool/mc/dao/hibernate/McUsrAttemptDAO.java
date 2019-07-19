@@ -61,7 +61,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.qbToolQuestion.uid, attempt.qbOption.uid";
 
     private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from " + McUsrAttempt.class.getName()
-	    + " as attempt where attempt.qbOption.uid=? AND attempt.mcQueUsr.responseFinalised = true";
+	    + " as attempt where attempt.qbOption.uid=? AND attempt.qbToolQuestion.uid = ? AND attempt.mcQueUsr.responseFinalised = true";
 
     private static final String FIND_USER_TOTAL_MARK = "select COALESCE(SUM(attempt.mark),0) from "
 	    + McUsrAttempt.class.getName()
@@ -162,8 +162,8 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     }
 
     @Override
-    public int getAttemptsCountPerOption(Long optionUid) {
-	List list = doFind(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
+    public int getAttemptsCountPerOption(Long optionUid, Long mcQueContentId) {
+	List list = doFind(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid, mcQueContentId });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -179,7 +179,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 	q.setParameter("mcContentUid", mcContentUid);
 	return q.uniqueResult();
     }
-    
+
     @Override
     public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
 
@@ -187,7 +187,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 		+ McQueUsr.class.getName()
 		+ " user WHERE user.mcSession.mcContent.mcContentId = ? AND user.responseFinalised = true";
 
-	List<Object[]> list = (List<Object[]>) doFind(FIND_MARKS_FOR_CONTENT_ID, new Object[] { toolContentId });
+	List<Object[]> list = doFind(FIND_MARKS_FOR_CONTENT_ID, new Object[] { toolContentId });
 
 	List<ToolOutputDTO> toolOutputDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {

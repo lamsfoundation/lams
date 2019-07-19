@@ -65,6 +65,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Action class that controls the logic of tool behavior.
@@ -439,18 +440,17 @@ public class McController {
      */
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
-    private String importQbQuestion(HttpServletRequest request) {
-	String sessionMapId = WebUtil.readStrParam(request, McAppConstants.ATTR_SESSION_MAP_ID);
+    private String importQbQuestion(HttpServletRequest request, @RequestParam String sessionMapId,
+	    @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	//get QbQuestion from DB
-	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);	
 	
-	//finding max displayOrder
+	//find max displayOrder
 	int maxDisplayOrder = 0;
 	for (McQuestionDTO questionDto : questionDtos) {
 	    int displayOrder = questionDto.getDisplayOrder();

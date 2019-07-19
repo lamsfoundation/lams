@@ -79,18 +79,20 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     List<McUsrAttempt> getFinalizedUserAttempts(Long queUserUid);
-    
+
     /**
-     * Returns attempts and portraitUiids left by all users in the specified session. It's used only by ToolSessionManager.getConfidenceLevels().
-     * 
+     * Returns attempts and portraitUiids left by all users in the specified session. It's used only by
+     * ToolSessionManager.getConfidenceLevels().
+     *
      * @param sessionId
      * @return
      */
     List<Object[]> getFinalizedAttemptsBySessionId(final Long sessionId);
-    
+
     /**
-     * Returns attempts and portraitUiids left by all leaders in the specified activity. It's used only by ToolSessionManager.getConfidenceLevels().
-     * 
+     * Returns attempts and portraitUiids left by all leaders in the specified activity. It's used only by
+     * ToolSessionManager.getConfidenceLevels().
+     *
      * @param contentId
      * @return
      */
@@ -105,15 +107,15 @@ public interface IMcUsrAttemptDAO {
      * Get the highest attempt order for a all users in a session for a particular questionDescription
      */
     List<McUsrAttempt> getUserAttemptsByQuestionSession(final Long sessionUid, final Long mcQueContentId);
-    
+
     /**
      * Count how many attempts done to this option
      *
      * @param optionUid
      * @return
      */
-    int getAttemptsCountPerOption(Long optionUid);
-    
+    int getAttemptsCountPerOption(Long optionUid, Long mcQueContentId);
+
     /**
      * Checks whether anyone has attempted this assessment.
      */
@@ -128,10 +130,10 @@ public interface IMcUsrAttemptDAO {
     int getUserTotalMark(final Long userUid);
 
     McUsrAttempt getUserAttemptByUid(Long uid);
-    
+
     /**
      * Returns all existing total marks for users belonging to tool content.
-     * 
+     *
      * @param toolContentId
      * @return
      */

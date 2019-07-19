@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.mc.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -40,7 +39,8 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * <p>
- * Persistent object/bean that defines the questionDescription content for the MCQ tool. Provides accessors and mutators to get/set
+ * Persistent object/bean that defines the questionDescription content for the MCQ tool. Provides accessors and mutators
+ * to get/set
  * attributes It maps to database table: tl_lamc11_que_content
  * </p>
  *
@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 @Table(name = "tl_lamc11_que_content")
 // in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
 @PrimaryKeyJoinColumn(name = "uid")
-public class McQueContent extends QbToolQuestion implements Serializable, Comparable<McQueContent> {
+public class McQueContent extends QbToolQuestion implements Serializable {
     private static final long serialVersionUID = 4022287106119453962L;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,7 +84,7 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
 		newMcContent);
 	return newQueContent;
     }
-    
+
     public String getName() {
 	return this.qbQuestion.getName();
     }
@@ -140,18 +140,6 @@ public class McQueContent extends QbToolQuestion implements Serializable, Compar
      */
     public void setFeedback(String feedback) {
 	qbQuestion.setFeedback(feedback);
-    }
-
-    @Override
-    public int compareTo(McQueContent queContent) {
-	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (uid == null) {
-	    return 1;
-	} else if (queContent.getUid() == null) {
-	    return -1;
-	} else {
-	    return (int) (uid.longValue() - queContent.getUid().longValue());
-	}
     }
 
     /**
