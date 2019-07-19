@@ -28,7 +28,9 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
@@ -40,6 +42,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
+import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
+import org.lamsfoundation.lams.authoring.template.Assessment;
 import org.lamsfoundation.lams.authoring.template.Option;
 import org.lamsfoundation.lams.authoring.template.TextUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -1366,7 +1370,7 @@ public abstract class LdTemplateController {
     public String importAssessmentQTI(HttpServletRequest request) throws UnsupportedEncodingException {
 	String contentFolderID = WebUtil.readStrParam(request, "contentFolderID");
 	String templatePage = WebUtil.readStrParam(request, "templatePage");
-	Question[] updatedQuestions = preprocessQuestions(QuestionParser.parseQuestionChoiceForm(request), contentFolderID);
+	List<Assessment> updatedQuestions = preprocessQuestions(QuestionParser.parseQuestionChoiceForm(request), contentFolderID);
 	request.setAttribute("questions", updatedQuestions);
 	request.setAttribute("questionNumber", WebUtil.readIntParam(request, "questionNumber"));
 	request.setAttribute("numQuestionsFieldname", WebUtil.readStrParam(request, "numQuestionsFieldname"));
@@ -1374,51 +1378,103 @@ public abstract class LdTemplateController {
 	return "/authoring/template/tool/" + templatePage;
     }
 
-    private Question[] preprocessQuestions(Question[] questions, String contentFolderID) {
+    private List<Assessment> preprocessQuestions(Question[] questions, String contentFolderID) {
+
+	List<Assessment> assessments = new ArrayList<Assessment>(questions.length);
 
 	// Processing based on QTIUtil from the Assessment tool 
-	for ( Question question : questions ) {
+	for (Question question : questions) {
 
-	    String correctAnswer = null;
+	    Assessment assessment = new Assessment();
+	    assessments.add(assessment);
+
 	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
-	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
-	    // int questionGrade = 1; Currently not supported by the templates.
+	    boolean isMultipleResponse = Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType());
+	    int defaultGrade = 1;
 
-	    question.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+	    assessment.setText(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
+	    assessment.setTitle(question.getTitle());
 
-	    if (question.getAnswers() != null) {
-		for (Answer answer : question.getAnswers()) {
+	    if (isMultipleChoice) {
+		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessment.setMultipleAnswersAllowed(false);
+		String correctAnswer = null;
 
-		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-			    question.getResourcesFolderPath());
-		    answer.setText(answerText);
+		if (question.getAnswers() != null) {
+		    int displayOrder = 1;
+		    for (Answer answer : question.getAnswers()) {
 
-		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			continue;
-		    }
-		    if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			// for fill in blanks question all answers are correct and get full grade
-			if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
-			    // whatever the correct answer holds, it becomes the question score
-			    // questionGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-			    // 100% goes to the correct answer
-			    answer.setScore(1F);
-			    correctAnswer = answerText;
-			} else {
-			    log.warn("Choosing only first correct answer, despite another one was found: "
-				    + answerText);
-			    answer.setScore(0F);
+			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
+			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
+			    continue;
 			}
-		    } else {
-			answer.setScore(0F);
-		    }
 
+			AssessMCAnswer newAnswer = new AssessMCAnswer(displayOrder++, answerText, 0F);
+
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    if (correctAnswer == null) {
+				// whatever the correct answer holds, it becomes the question score
+				defaultGrade = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+				// 100% goes to the correct answer
+				newAnswer.setGrade(1F);
+				correctAnswer = answerText;
+			    } else {
+				log.warn("Choosing only first correct answer, despite another one was found: "
+					+ answerText);
+			    }
+			}
+
+			assessment.getAnswers().add(newAnswer);
+		    }
 		}
+
+		if (correctAnswer == null) {
+		    log.warn("No correct answer found for question: " + question.getText());
+		    continue;
+		}
+
+	    } else if (isMultipleResponse) {
+		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessment.setMultipleAnswersAllowed(true);
+
+		if (question.getAnswers() != null) {
+		    float totalScore = 0;
+		    for (Answer answer : question.getAnswers()) {
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    // the question score information is stored as sum of answer scores
+			    totalScore += answer.getScore();
+			}
+		    }
+		    defaultGrade = Double.valueOf(Math.round(totalScore)).intValue();
+
+		    int displayOrder = 1;
+		    for (Answer answer : question.getAnswers()) {
+			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
+
+			AssessMCAnswer newAnswer = new AssessMCAnswer(displayOrder++, answerText, 0F);
+
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    // set the factor of score for correct answers
+			    newAnswer.setGrade(answer.getScore() / totalScore);
+			} else {
+			    newAnswer.setGrade(0F);
+			}
+			
+			assessment.getAnswers().add(newAnswer);
+		    }
+		}
+	    } else {
+		assessment.setType(Assessment.ASSESSMENT_QUESTION_TYPE_ESSAY);
 	    }
+
+	    assessment.setDefaultGrade(defaultGrade);
 	}
-	return questions;
+
+	return assessments;
     }
 	
     /**

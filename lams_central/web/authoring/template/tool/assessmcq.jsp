@@ -34,8 +34,18 @@
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}type" id="${containingDivName}assessment${questionNumber}type" value="mcq"/>
 	<lams:CKEditor id="${containingDivName}assessment${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 	
-	<label for="${containingDivName}assessment${questionNumber}mark" class="voffset5"><fmt:message key="label.marks"/></label>
-	<input type="number" step="1" min="1" value="1" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="form-control form-control-inline voffset5"/>
+	<div class="voffset5"> 
+	<label for="${containingDivName}assessment${questionNumber}mark"><fmt:message key="label.marks"/></label>
+	<input type="number" step="1" min="1" value="${not empty question.defaultGrade ? question.defaultGrade : 1}" name="${containingDivName}assessment${questionNumber}mark" id="${containingDivName}assessment${questionNumber}mark"  class="form-control form-control-inline voffset5"/>
+	
+	<span class="pull-right">
+		<div class="checkbox"><label for="${containingDivName}assessment${questionNumber}multiAllowed">
+			<input name="${containingDivName}assessment${questionNumber}multiAllowed" id="${containingDivName}assessment${questionNumber}multiAllowed" type="checkbox" value="true" ${question.multipleAnswersAllowed ? "checked=" : "" }/> 
+				<fmt:message key="authoring.application.exercise.allow.multiple.responses" />&nbsp; 
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="<fmt:message key='authoring.application.exercise.allow.multiple.responses.tooltip'/>"></i>
+				</label></div>
+	</span>
+	</div>
 	
 	<table class="table table-condensed table-no-border">
 	<tr><td></td><td></td>
@@ -59,9 +69,9 @@
 	<input type="hidden" name="${containingDivName}assmcq${questionNumber}numOptions" id="${containingDivName}assmcq${questionNumber}numOptions" value="${numAnswers}"/>
 	<c:set scope="request" var="optionCount">${numAnswers}</c:set>
 	<c:forEach items="${question.answers}" var="answer" varStatus="loopStatus">
-		<c:set scope="request" var="optionText">${answer.text}</c:set>
+		<c:set scope="request" var="optionText">${answer.answerText}</c:set>
 		<c:set scope="request" var="optionNumber">${loopStatus.count}</c:set>
-		<c:set scope="request" var="optionGrade">${answer.score}</c:set>
+		<c:set scope="request" var="optionGrade">${answer.grade}</c:set>
 		<div id="${containingDivName}divassmcq${questionNumber}opt${optionNumber}">
 		<%@ include file="assessoption.jsp" %>
 		</div>
@@ -110,5 +120,10 @@
        }
    }).on('shown', onShownForXEditable)
 	  .on('hidden', onHiddenForXEditable);
+
+   $(document).ready(function(){
+	   $('[data-toggle="tooltip"]').tooltip();
+   });
+</script>
 </script>
 	

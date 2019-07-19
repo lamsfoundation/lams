@@ -341,6 +341,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    int displayOrderOption = 1;
 	    Set<QbOption> qbOptionsToRemove = new HashSet<>(qbQuestion.getQbOptions());
 	    List<McOptionDTO> optionDTOs = questionDTO.getOptionDtos();
+
 	    for (McOptionDTO optionDTO : optionDTOs) {
 
 		String optionText = optionDTO.getCandidateAnswer();
@@ -611,7 +612,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
@@ -916,7 +917,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
-	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
 
 	    for (McQueUsr user : sessionUsers) {
 
@@ -1488,7 +1489,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
-			McSession.INCOMPLETE, toolSessionName, mcContent, new TreeSet());
+			McSession.INCOMPLETE, toolSessionName, mcContent, new ArrayList<McQueUsr>());
 
 		mcSessionDAO.saveMcSession(mcSession);
 

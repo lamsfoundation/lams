@@ -116,4 +116,5 @@ public class AssessMCAnswer {
 	this.answerFloat = answerFloat;
     }
 
+
 }
