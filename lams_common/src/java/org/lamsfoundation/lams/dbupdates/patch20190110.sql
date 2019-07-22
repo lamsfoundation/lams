@@ -266,8 +266,8 @@ INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, na
 	SELECT NULL, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
 		sq.question, sq.description, NULL, NULL, q.target_uid
 	FROM (SELECT uid,
-				 title AS question,
-				 description AS description,
+				 TRIM(title) AS question,
+				 TRIM(description) AS description,
 				 create_date
 		  FROM tl_lascrt11_scratchie_item) AS sq
 	JOIN (SELECT DISTINCT target_uid FROM tmp_question_match) AS q
@@ -299,7 +299,7 @@ UPDATE lams_qb_question AS q
 		ON q.uid = m.qb_question_uid
 	JOIN tl_lascrt11_scratchie_item AS si
 		ON si.uid = m.question_uid
-	SET q.name = si.title;
+	SET q.name = TRIM(si.title);
 		
 -- delete obsolete columns
 ALTER TABLE tl_lascrt11_scratchie_item DROP FOREIGN KEY FK_NEW_610529188_F52D1F93EC0D3147, 
@@ -453,7 +453,7 @@ UPDATE lams_qb_question AS q
 		ON q.uid = m.qb_question_uid
 	JOIN tl_laasse10_assessment_question AS aq
 		ON aq.uid = m.question_uid
-	SET q.name = aq.question;
+	SET q.name = TRIM(aq.question);
 
 -- create a mapping of Assessment question UID -> UID of one of Assessment questions which holds the same content
 INSERT INTO tmp_question_match
@@ -509,7 +509,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question SELECT NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 'temp_folder',
-				IFNULL(aq.question, ''), aq.description, IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
+				IFNULL(TRIM(aq.question), ''), TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
 				aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
 				aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid
