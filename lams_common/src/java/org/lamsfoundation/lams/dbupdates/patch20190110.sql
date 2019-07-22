@@ -8,8 +8,8 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
 							   `question_id` INT NOT NULL,
 							   `version` SMALLINT NOT NULL DEFAULT 1,
 							   `create_date` DATETIME NOT NULL DEFAULT NOW(),
-							   `content_folder_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-							   `name` TEXT NOT NULL,
+							   `content_folder_id` char(36),
+							   `name` TEXT,
 							   `description` TEXT,
 							   `max_mark` INT,
 							   `feedback` TEXT,
@@ -92,10 +92,15 @@ UPDATE tl_lamc11_options_content SET `mc_que_option_text` = TRIM(REPLACE(REPLACE
 
 -- create a mapping of MCQ question UID -> its question text + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
+-- Also remove all whitespace just for less demanding matching
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 						   content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(question, mc_que_option_text ORDER BY displayOrder) AS content		  
+			  REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(question, mc_que_option_text ORDER BY displayOrder))
+			  						  COLLATE utf8mb4_0900_ai_ci, 
+			  				  ' ', ''),
+			  		 '\t', ''), 
+			  '&nbsp;', '') AS content		  
 	FROM tl_lamc11_que_content AS q
 	JOIN tl_lamc11_options_content AS o ON q.uid = o.mc_que_content_id
 	GROUP BY q.uid;
@@ -106,9 +111,10 @@ ALTER TABLE tmp_question ADD INDEX (content(500));
 -- create a mapping of MCQ question UID -> UID of one of MCQ questions which holds the same content
 CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
 								 target_uid BIGINT)
-	AS SELECT q.question_uid, merged.question_uid AS target_uid
+	SELECT q.question_uid, merged.question_uid AS target_uid
 	FROM (SELECT * FROM tmp_question GROUP BY content) AS merged
-	JOIN tmp_question AS q USING (content);
+	JOIN tmp_question AS q USING (content)
+	GROUP BY q.question_uid;
 	
 ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 
@@ -118,7 +124,7 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
 							   
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
 	SELECT NULL, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-		mcq.question, NULL, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
+		SUBSTRING(TRIM(REPLACE(strip_tags(mcq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' ')), 1, 80), mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 question AS question,
 				 mark AS max_mark,
@@ -156,8 +162,9 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
 	ORDER BY  o.mc_que_content_id, o.displayOrder;
 
 ALTER TABLE tl_lamc11_usr_attempt DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_2, 
-								  DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_3;
-	
+								  DROP FOREIGN KEY FK_tl_lamc11_usr_attempt_3,
+								  DROP INDEX attempt_unique_index;
+
 -- rewrite references from MCQ options to QB options
 UPDATE tl_lamc11_usr_attempt AS ua, tl_lamc11_options_content AS mco, lams_qb_tool_question AS tq, lams_qb_option AS qo
 	SET ua.mc_que_option_id = qo.uid
@@ -171,35 +178,44 @@ INSERT INTO lams_qb_tool_answer
 	SELECT uid, mc_que_content_id, mc_que_option_id FROM tl_lamc11_usr_attempt;
 
 -- clean up
-ALTER TABLE tl_lamc11_usr_attempt DROP INDEX attempt_unique_index,
-								  DROP COLUMN mc_que_content_id,
+ALTER TABLE tl_lamc11_usr_attempt DROP COLUMN mc_que_content_id,
 								  DROP COLUMN mc_que_option_id;
 								  
 DROP TABLE tl_lamc11_options_content;
 
--- prepare for next tool migration
-DELETE FROM tmp_question;
-DELETE FROM tmp_question_match;
+-- prepare for next tool migration, recreate tables
+DROP TABLE tmp_question;
+DROP TABLE tmp_question_match;
+
+CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
+						   content MEDIUMTEXT);
+ALTER TABLE tmp_question ADD INDEX (content(500));
+
+CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
+								 target_uid BIGINT);
+ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 
 
 -- SCRATCHIE
 
-
--- remove characters that prevent detecting identical questions
-UPDATE tl_lascrt11_scratchie_item SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_lascrt11_scratchie_item SET `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_lascrt11_scratchie_answer SET `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-
 -- shift Scratchie question UIDs by offset equal to existing UIDs of MCQ in lams_qb_tool_question 
 SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
-UPDATE tl_lascrt11_scratchie_item SET uid = uid + @max_tool_question_id ORDER BY uid DESC;
+-- remove characters that prevent detecting identical questions
+UPDATE tl_lascrt11_scratchie_item SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+									  `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+									   uid = uid + @max_tool_question_id ORDER BY uid DESC;
+UPDATE tl_lascrt11_scratchie_answer SET `description` = TRIM(REPLACE(REPLACE(REPLACE(description, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
 -- UPDATE tl_lascrt11_scratchie_answer SET scratchie_item_uid = scratchie_item_uid + @max_tool_question_id ORDER BY scratchie_item_uid DESC;
 
--- create a mapping of Scratchie question UID -> its question text + all answers in a single column
+-- create a mapping of Scratchie question UID -> its question description + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.description, o.description ORDER BY o.order_id)
+	 		REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.description ORDER BY o.order_id))
+	 								COLLATE utf8mb4_0900_ai_ci,
+	 						' ', ''),
+	 				'\t', ''),
+	 		'&nbsp;', '')
 	FROM tl_lascrt11_scratchie_item AS q
 	JOIN tl_lascrt11_scratchie_answer AS o
 		ON q.uid = o.scratchie_item_uid
@@ -209,7 +225,11 @@ INSERT INTO tmp_question
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 						      content MEDIUMTEXT)
 	AS SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
+			  REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order))
+			  						  COLLATE utf8mb4_0900_ai_ci, 
+			  				  ' ', ''),
+			  		 '\t', ''), 
+			  '&nbsp;', '') AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
@@ -222,7 +242,8 @@ CREATE TABLE tmp_qb_question_match (question_uid BIGINT PRIMARY KEY, qb_question
 	AS SELECT q.question_uid, qb.question_uid AS qb_question_uid
 	FROM tmp_question AS q
 	JOIN tmp_qb_question AS qb
-		USING (content);
+		USING (content)
+	GROUP BY q.question_uid;
 
 ALTER TABLE tmp_qb_question_match ADD INDEX (qb_question_uid);
 
@@ -234,7 +255,8 @@ INSERT INTO tmp_question_match
 		USING (content)
 	LEFT JOIN tmp_qb_question_match AS qb
 		ON q.question_uid = qb.question_uid
-	WHERE qb.question_uid IS NULL;
+	WHERE qb.question_uid IS NULL
+	GROUP BY q.question_uid;
 
 -- reset column for matching QB questions with Scratchie questions
 UPDATE lams_qb_question SET tmp_question_id = -1;
@@ -261,12 +283,6 @@ INSERT INTO lams_qb_tool_question
 		ON q.question_uid = sq.uid
 	JOIN tl_lascrt11_scratchie AS s
 		ON sq.scratchie_uid = s.uid;
-
--- Since MCQ questions had only names and no descriptions, copy full information from matched Scratchie items
-UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_lascrt11_scratchie_item AS sq
-	SET q.name = sq.title, q.description = sq.description
-	WHERE q.uid = qb.qb_question_uid
-	AND   qb.question_uid = sq.uid;
 	
 -- set up references to QB question UIDs for existing questions
 INSERT INTO lams_qb_tool_question
@@ -276,6 +292,14 @@ INSERT INTO lams_qb_tool_question
 		ON qb.question_uid = sq.uid
 	JOIN tl_lascrt11_scratchie AS s
 		ON sq.scratchie_uid = s.uid;
+		
+-- update question names generated for MCQ with real names from Scratchie 
+UPDATE lams_qb_question AS q 
+	JOIN (SELECT * FROM tmp_qb_question_match GROUP BY qb_question_uid) AS m
+		ON q.uid = m.qb_question_uid
+	JOIN tl_lascrt11_scratchie_item AS si
+		ON si.uid = m.question_uid
+	SET q.name = si.title;
 		
 -- delete obsolete columns
 ALTER TABLE tl_lascrt11_scratchie_item DROP FOREIGN KEY FK_NEW_610529188_F52D1F93EC0D3147, 
@@ -339,46 +363,68 @@ ALTER TABLE tl_lascrt11_answer_log DROP COLUMN scratchie_item_uid,
 								   
 DROP TABLE tl_lascrt11_scratchie_answer;
 		   
--- prepare for next tool migration
-DELETE FROM tmp_question;
-DELETE FROM tmp_question_match;
-DELETE FROM tmp_qb_question;
-DELETE FROM tmp_qb_question_match;
+-- prepare for next tool migration, recreate tables
+DROP TABLE tmp_question;
+DROP TABLE tmp_question_match;
+DROP TABLE tmp_qb_question;
+DROP TABLE tmp_qb_question_match;
 
+CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
+						   content MEDIUMTEXT);
+ALTER TABLE tmp_question ADD INDEX (content(500));
+
+CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
+								 target_uid BIGINT);
+ALTER TABLE tmp_question_match ADD INDEX (target_uid);
+
+CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
+						      content MEDIUMTEXT);
+ALTER TABLE tmp_qb_question ADD INDEX (content(500));
+
+CREATE TABLE tmp_qb_question_match (question_uid BIGINT PRIMARY KEY,
+									qb_question_uid BIGINT);
+ALTER TABLE tmp_qb_question_match ADD INDEX (qb_question_uid);
 
 -- ASSESSMENT
 
-
--- remove characters that prevent detecting identical questions
-UPDATE tl_laasse10_assessment_question SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_laasse10_assessment_question SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_laasse10_question_option SET `option_string` = TRIM(REPLACE(REPLACE(REPLACE(option_string, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_laasse10_question_option SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-UPDATE tl_laasse10_question_result SET `answer_string` = TRIM(REPLACE(REPLACE(REPLACE(answer_string, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
-
 -- shift Assessment question UIDs by offset equal to existing UIDs of MCQ adn Scratchie in lams_qb_tool_question 
 SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
-UPDATE tl_laasse10_assessment_question SET uid = uid + @max_tool_question_id ORDER BY uid DESC;
+-- remove characters that prevent detecting identical questions
+UPDATE tl_laasse10_assessment_question SET `title` = TRIM(REPLACE(REPLACE(REPLACE(title, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+										   `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+										   uid = uid + @max_tool_question_id ORDER BY uid DESC;
+UPDATE tl_laasse10_question_option SET `option_string` = TRIM(REPLACE(REPLACE(REPLACE(option_string, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+									   `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+UPDATE tl_laasse10_question_result SET `answer_string` = TRIM(REPLACE(REPLACE(REPLACE(answer_string, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
 
 -- first, process questions with question_type=1 (as MCQ and Scratchie have only this type of questions)
 
--- create a mapping of Assessment question UID -> its question text + all answers in a single column
+-- create a mapping of Assessment question UID -> its question description + all answers in a single column
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
-
--- in the first run we compare both name and description of questions
+ALTER TABLE tl_laasse10_question_option ADD INDEX (sequence_id),
+										ADD INDEX tmp_index (sequence_id, question_uid);
+		
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.title, q.question, o.option_string ORDER BY o.sequence_id)
+		   REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id))
+		  						  COLLATE utf8mb4_0900_ai_ci, 
+		  				  ' ', ''),
+		  		 '\t', ''), 
+		  '&nbsp;', '')
 	FROM tl_laasse10_assessment_question AS q
 	JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
 	WHERE q.question_type = 1
 	GROUP BY q.uid;
 	
--- create a similar mapping for existing questions in QB (one which already have name and description)
+-- create a similar mapping for existing questions in QB
 INSERT INTO tmp_qb_question
 	SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.name, q.description, o.name ORDER BY o.display_order) AS content
+		   REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order))
+		  						  COLLATE utf8mb4_0900_ai_ci, 
+		  				  ' ', ''),
+		  		 '\t', ''), 
+		  '&nbsp;', '') AS content
 	FROM lams_qb_question AS q
 	JOIN lams_qb_option AS o
 		ON q.uid = o.qb_question_uid
@@ -390,11 +436,6 @@ INSERT INTO tmp_qb_question_match
 	FROM tmp_question AS q
 	JOIN tmp_qb_question AS qb
 		USING (content);
-
-UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_laasse10_assessment_question AS aq
-	SET q.name = aq.title, q.description = aq.question
-	WHERE q.uid = qb.qb_question_uid
-	AND   qb.question_uid = aq.uid;
 		
 -- set up references to QB question UIDs for existing questions
 INSERT INTO lams_qb_tool_question
@@ -405,51 +446,14 @@ INSERT INTO lams_qb_tool_question
 	JOIN tl_laasse10_assessment AS assess
 		ON aq.assessment_uid = assess.uid;
 		
--- prepare for second run: matching Assessment description with QB question name
-DELETE FROM tmp_question;
-DELETE FROM tmp_qb_question;
-DELETE FROM tmp_qb_question_match;
-
-INSERT INTO tmp_question
-	SELECT q.uid,
-		   GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id)
-	FROM tl_laasse10_assessment_question AS q
-	JOIN tl_laasse10_question_option AS o
-		ON q.uid = o.question_uid
-	LEFT JOIN lams_qb_tool_question AS tq
-		ON q.uid = tq.tool_question_uid
-	WHERE q.question_type = 1
-		AND tq.tool_question_uid IS NULL
-	GROUP BY q.uid;
-	
--- create a similar mapping for existing questions in QB (one which already have name and description)
-INSERT INTO tmp_qb_question
-	SELECT q.uid AS question_uid,
-			  GROUP_CONCAT(q.name, o.name ORDER BY o.display_order) AS content
-	FROM lams_qb_question AS q
-	JOIN lams_qb_option AS o
-		ON q.uid = o.qb_question_uid
-	GROUP BY q.uid;
-	
-INSERT INTO tmp_qb_question_match
-	SELECT q.question_uid, qb.question_uid
-	FROM tmp_question AS q
-	JOIN tmp_qb_question AS qb
-		USING (content);
-
-UPDATE lams_qb_question AS q, tmp_qb_question_match AS qb, tl_laasse10_assessment_question AS aq
-	SET q.name = aq.title, q.description = aq.question
-	WHERE q.uid = qb.qb_question_uid
-	AND   qb.question_uid = aq.uid;
-
--- set up references to QB question UIDs for existing questions
-INSERT INTO lams_qb_tool_question
-	SELECT qb.question_uid, qb.qb_question_uid, assess.content_id, aq.sequence_id
-	FROM tmp_qb_question_match qb
+		
+-- update question names generated for MCQ with real names from Assessment
+UPDATE lams_qb_question AS q 
+	JOIN (SELECT * FROM tmp_qb_question_match GROUP BY qb_question_uid) AS m
+		ON q.uid = m.qb_question_uid
 	JOIN tl_laasse10_assessment_question AS aq
-		ON qb.question_uid = aq.uid
-	JOIN tl_laasse10_assessment AS assess
-		ON aq.assessment_uid = assess.uid;
+		ON aq.uid = m.question_uid
+	SET q.name = aq.question;
 
 -- create a mapping of Assessment question UID -> UID of one of Assessment questions which holds the same content
 INSERT INTO tmp_question_match
@@ -459,27 +463,45 @@ INSERT INTO tmp_question_match
 		USING (content)
 	LEFT JOIN lams_qb_tool_question AS qb
 		ON qb.tool_question_uid = q.question_uid
-	WHERE qb.tool_question_uid IS NULL;	
+	WHERE qb.tool_question_uid IS NULL
+	GROUP BY q.question_uid;
 	
 	
--- third run, process questions with all other question_type
-DELETE FROM tmp_question;
+-- second run, process questions with all other question_type
+DROP TABLE tmp_question;
+
+CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
+						   content MEDIUMTEXT);
+ALTER TABLE tmp_question ADD INDEX (content(500));
 
 INSERT INTO tmp_question
 	SELECT q.uid,
-		   GROUP_CONCAT(q.question_type, IFNULL(q.question, ''), q.correct_answer,
-						IFNULL(CONCAT(IFNULL(o.question, ''), IFNULL(o.option_string, ''), o.option_float, o.correct), '') ORDER BY o.sequence_id)
+		  REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.question_type,
+		  												 IFNULL(q.question, ''),
+		   												 q.correct_answer,
+														 IFNULL(
+														 	CONCAT(IFNULL(o.question, ''),
+																   IFNULL(o.option_string, ''),
+																   o.option_float,
+																   o.correct),
+														 '')
+											ORDER BY o.sequence_id))
+									COLLATE utf8mb4_0900_ai_ci,
+						  ' ', ''),
+				  '\t', ''),
+		 '&nbsp;', '') 
 	FROM tl_laasse10_assessment_question AS q
 	LEFT JOIN tl_laasse10_question_option AS o
 		ON q.uid = o.question_uid
 	WHERE q.question_type != 1
 	GROUP BY q.uid;
-	
+
 INSERT INTO tmp_question_match
 	SELECT q.question_uid, merged.question_uid
 	FROM (SELECT * FROM tmp_question GROUP BY content) AS merged
 	JOIN tmp_question AS q
-		USING (content);
+		USING (content)
+	GROUP BY q.question_uid;
 	
 -- reset column for matching QB questions with Assessment questions
 UPDATE lams_qb_question SET tmp_question_id = -1;
@@ -556,7 +578,24 @@ ALTER TABLE tl_laasse10_assessment_question DROP FOREIGN KEY FK_NEW_1720029621_F
 									   DROP COLUMN hedging_justification_enabled,
 								   	   DROP COLUMN session_uid,
 								   	   DROP COLUMN sequence_id;
+									   
 
+-- delete corrupted data
+DELETE FROM  tl_laasse10_question_option WHERE question_uid IS NULL;
+
+-- some Assessment options can be ordered from 0, some from 1
+-- shift ones ordered from 0 by +1 to match the other group		
+CREATE TABLE tmp_assessment_option
+SELECT DISTINCT question_uid FROM tl_laasse10_question_option WHERE sequence_id = 0;
+
+ALTER TABLE tmp_assessment_option ADD PRIMARY KEY (question_uid);
+								   	   
+UPDATE tl_laasse10_question_option AS o
+SET sequence_id = sequence_id + 1
+WHERE EXISTS
+	(SELECT 1 FROM tmp_assessment_option WHERE question_uid = o.question_uid);
+		
+DROP TABLE tmp_assessment_option;
 
 -- fill table with options matching unique QB questions inserted above		  
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
@@ -566,7 +605,6 @@ INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, match
 	JOIN lams_qb_question AS q
 		ON o.question_uid = q.tmp_question_id
 	ORDER BY o.question_uid, o.sequence_id;
-	
 	
 -- fill table with units matching unique QB questions inserted above
 INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, name)
@@ -585,40 +623,54 @@ ALTER TABLE tl_laasse10_question_result DROP FOREIGN KEY FK_NEW_1720029621_69358
 
 -- rewrite references from Assessment options to QB options
 UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
-	SET sl.submitted_option_uid = qo.uid,
-		sl.assessment_question_uid = tq.tool_question_uid
+	SET sl.submitted_option_uid = qo.uid
 	WHERE   o.sequence_id = qo.display_order
 		AND sl.submitted_option_uid = o.uid
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND o.question_uid = tq.tool_question_uid;
 		
-UPDATE tl_laasse10_option_answer AS sa, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
-	SET sa.question_option_uid = qo.uid
-	WHERE   o.sequence_id = qo.display_order
-		AND sa.question_option_uid = o.uid
-		AND qo.qb_question_uid = tq.qb_question_uid
-		AND o.question_uid = tq.tool_question_uid;
+-- prepare for updating option IDs in tl_laasse10_option_answer
+CREATE TABLE tmp_option_answer 
+	SELECT DISTINCT sa.question_option_uid, qo.uid
+ 		FROM tl_laasse10_option_answer AS sa
+ 		JOIN tl_laasse10_question_option AS o FORCE INDEX (tmp_index) ON sa.question_option_uid = o.uid
+ 		JOIN lams_qb_option AS qo ON o.sequence_id = qo.display_order
+ 		JOIN lams_qb_tool_question AS tq ON qo.qb_question_uid = tq.qb_question_uid
+ 			AND o.question_uid = tq.tool_question_uid;
+ 
+ALTER TABLE tmp_option_answer ADD PRIMARY KEY (question_option_uid);
+
+-- there can be few malformed answers; delete them
+DELETE o 
+	FROM tl_laasse10_option_answer AS o
+	LEFT JOIN tmp_option_answer AS t USING (question_option_uid)
+	WHERE t.question_option_uid IS NULL;
+
+ALTER TABLE tl_laasse10_option_answer DROP FOREIGN KEY FK_tl_laasse10_option_answer_2;
+
+
+-- proper update
+UPDATE tl_laasse10_option_answer AS sa, tmp_option_answer AS t 
+	SET sa.question_option_uid = t.uid
+	WHERE sa.question_option_uid = t.question_option_uid;
+
+ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answer_2 
+	FOREIGN KEY (question_option_uid) REFERENCES lams_qb_option (uid) ON DELETE CASCADE ON UPDATE CASCADE;
 		
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
 	SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
-	
--- fill content_folder_id with real values from learning designs
-UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learning_activity AS activity, lams_learning_design AS design
-	SET qbque.content_folder_id = design.content_folder_id
-	WHERE qbque.uid = toolque.qb_question_uid
-		AND toolque.tool_content_id = activity.tool_content_id
-		AND activity.learning_design_id = design.learning_design_id;
 
 
 -- cleanup
 ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;
 ALTER TABLE tl_laasse10_question_result DROP COLUMN assessment_question_uid,
-								   DROP COLUMN submitted_option_uid;
+								   		DROP COLUMN submitted_option_uid;
 								   
 DROP TABLE tl_laasse10_question_option,
 		   tl_laasse10_assessment_unit,
 		   tmp_question,
 		   tmp_question_match,
 		   tmp_qb_question,
-		   tmp_qb_question_match;
+		   tmp_qb_question_match,
+		   tmp_option_answer;
