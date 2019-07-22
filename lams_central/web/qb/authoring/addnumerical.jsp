@@ -222,6 +222,10 @@
 						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
+					
+					<c:if test="${not empty assessmentQuestionForm.questionId}">
+						<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}" />
+					</c:if>
 				</div>			
 				
 			</form:form>
@@ -253,11 +257,7 @@
 
 		</div>		
 	</div>	
-		
-	<c:if test="${not empty assessmentQuestionForm.questionId}">
-		<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}" />
-	</c:if>
-	
+
 	<%@ include file="addQuestionFooter.jsp"%>
 </body>
 </lams:html>
