@@ -17,6 +17,7 @@
 <%@ attribute name="toolContentId" required="false" rtexprvalue="true" %>
 <%@ attribute name="itemId" required="false" rtexprvalue="true" %>
 <%@ attribute name="qbQuestionId" required="false" rtexprvalue="true" %>
+<%@ attribute name="inPanel" required="false" rtexprvalue="true" %>
 
 <%-- Support for multiple tags on one page --%>
 <c:set var="outcomeTagId" value="${empty outcomeTagId ? 1 : outcomeTagId + 1}" />
@@ -173,13 +174,35 @@
 	}
 </script>
 
-<lams:SimplePanel titleKey="outcome.authoring.title">
-	<div class="input-group">
-	    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-	    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
-	    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
-	</div>
-	<div class="voffset10">
-		<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
-	</div>
-</lams:SimplePanel>
+<c:choose>
+	<c:when test="${inPanel}">
+		<lams:SimplePanel titleKey="outcome.authoring.title">
+			<div class="input-group">
+			    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+			    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
+			    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
+			</div>
+			<div class="voffset10">
+				<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
+			</div>
+		</lams:SimplePanel>
+	</c:when>
+	<c:otherwise>
+		<div class="form-group row">
+		    <label for="outcomeSearchInput${outcomeTagId}" class="col-sm-3">
+		    	<fmt:message key="outcome.authoring.title" />
+		    </label>
+		    
+		    <div class="col-sm-9">
+		    	<div class="input-group">
+				    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+				    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
+				    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
+				</div>
+				<div class="voffset10">
+					<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
+				</div>
+			</div>
+		</div>
+	</c:otherwise>
+</c:choose>
