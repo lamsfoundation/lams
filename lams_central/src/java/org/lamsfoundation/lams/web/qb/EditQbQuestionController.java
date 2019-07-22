@@ -233,7 +233,7 @@ public class EditQbQuestionController {
 		// new version of the old question gets created
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
-		qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+		qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		qbQuestion.setCreateDate(new Date());
 	    }
 		break;

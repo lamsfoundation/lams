@@ -124,7 +124,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     public int getMaxQuestionId() {
 	Object result = this.getSession().createQuery(FIND_MAX_QUESTION_ID).uniqueResult();
 	Integer max = (Integer) result;
-	return max == null ? 1 : max + 1;
+	return max == null ? 1 : max;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	Object result = this.getSession().createQuery(FIND_MAX_VERSION).setParameter("questionId", qbQuestionId)
 		.uniqueResult();
 	Integer max = (Integer) result;
-	return max == null ? 1 : max + 1;
+	return max == null ? 1 : max;
     }
 
     @Override

@@ -286,7 +286,7 @@ public class AuthoringController {
 			QbQuestion qbQuestion = item.getQbQuestion().clone();
 			item.setQbQuestion(qbQuestion);
 			qbQuestion.clearID();
-			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()));
+			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 			qbQuestion.setCreateDate(new Date());
 		    }
 			break;
@@ -296,7 +296,7 @@ public class AuthoringController {
 			item.setQbQuestion(qbQuestion);
 			qbQuestion.clearID();
 			qbQuestion.setVersion(1);
-			qbQuestion.setQuestionId(maxQuestionId++);
+			qbQuestion.setQuestionId(++maxQuestionId);
 			qbQuestion.setCreateDate(new Date());
 		    }
 			break;

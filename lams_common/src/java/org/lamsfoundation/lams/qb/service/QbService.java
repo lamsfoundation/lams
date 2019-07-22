@@ -431,7 +431,7 @@ public class QbService implements IQbService {
 	    List<QbQuestion> questions = getQuestionsByQuestionId(qbQuestionId);
 	    QbQuestion question = questions.get(0);
 	    QbQuestion newQuestion = question.clone();
-	    addQbQuestionId = getMaxQuestionId();
+	    addQbQuestionId = getMaxQuestionId() + 1;
 	    newQuestion.setQuestionId(addQbQuestionId);
 	    newQuestion.setVersion(1);
 	    newQuestion.setCreateDate(new Date());
