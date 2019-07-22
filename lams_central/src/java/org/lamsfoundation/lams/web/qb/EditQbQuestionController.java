@@ -137,6 +137,7 @@ public class EditQbQuestionController {
 	
 	//populate question information to its form for editing
 	form.setUid(qbQuestion.getUid());
+	form.setQuestionId(qbQuestion.getQuestionId());
 	//TODO remove hardcoded value, once we transfer contentFolderId from old DB entries
 	form.setContentFolderID(qbQuestion.getContentFolderId() == null ? "temp" : qbQuestion.getContentFolderId());
 	form.setTitle(qbQuestion.getName());

@@ -32,6 +32,7 @@ package org.lamsfoundation.lams.qb.form;
 public class QbQuestionForm {
 
     private Long uid;
+    private Integer questionId;
     private String sessionMapID;
     private String contentFolderID;
     private Long oldCollectionUid;
@@ -61,7 +62,7 @@ public class QbQuestionForm {
     private int maxWordsLimit;
     private int minWordsLimit;
     private boolean hedgingJustificationEnabled;
-    
+
     private boolean authoringRestricted;
 
     public Long getUid() {
@@ -70,6 +71,14 @@ public class QbQuestionForm {
 
     public void setUid(Long uid) {
 	this.uid = uid;
+    }
+
+    public Integer getQuestionId() {
+	return questionId;
+    }
+
+    public void setQuestionId(Integer questionId) {
+	this.questionId = questionId;
     }
 
     public String getSessionMapID() {
@@ -87,7 +96,7 @@ public class QbQuestionForm {
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
     }
-    
+
     public Long getOldCollectionUid() {
 	return oldCollectionUid;
     }
@@ -95,7 +104,7 @@ public class QbQuestionForm {
     public void setOldCollectionUid(Long oldCollectionUid) {
 	this.oldCollectionUid = oldCollectionUid;
     }
-    
+
     public Long getNewCollectionUid() {
 	return newCollectionUid;
     }
@@ -103,6 +112,7 @@ public class QbQuestionForm {
     public void setNewCollectionUid(Long newCollectionUid) {
 	this.newCollectionUid = newCollectionUid;
     }
+
     public String getMode() {
 	return mode;
     }
@@ -254,7 +264,7 @@ public class QbQuestionForm {
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
     }
-    
+
     public boolean isPrefixAnswersWithLetters() {
 	return prefixAnswersWithLetters;
     }
@@ -262,7 +272,7 @@ public class QbQuestionForm {
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
-    
+
     public boolean isHedgingJustificationEnabled() {
 	return hedgingJustificationEnabled;
     }
@@ -270,7 +280,7 @@ public class QbQuestionForm {
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
     public boolean isAuthoringRestricted() {
 	return authoringRestricted;
     }

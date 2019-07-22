@@ -205,7 +205,11 @@
 			</div>
 
 		</div>		
-	</div>	
+	</div>		
+	
+	<c:if test="${not empty assessmentQuestionForm.questionId}">
+		<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}" />
+	</c:if>
 	
 	<%@ include file="addQuestionFooter.jsp"%>
 </body>

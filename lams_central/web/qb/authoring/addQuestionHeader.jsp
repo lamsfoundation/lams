@@ -4,6 +4,7 @@
  <!-- ********************  CSS ********************** -->
 <lams:css />
 <link href="<lams:LAMSURL/>/tool/laasse10/includes/css/assessment.css" rel="stylesheet" type="text/css">
+<link href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
 <link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 
 <!-- ********************  javascript ********************** -->
@@ -23,6 +24,7 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-option.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.slider.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.touch-punch.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
