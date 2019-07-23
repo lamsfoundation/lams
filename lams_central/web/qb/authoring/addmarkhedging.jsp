@@ -11,7 +11,7 @@
     <script>
 		$(document).ready(function(){
 		    $("#assessmentQuestionForm").validate({
-		    	ignore: 'hidden',
+		    	ignore: 'hidden, div.cke_editable',
 		    	rules: {
 		    		title: "required",
 		    		maxMark: {
