@@ -999,29 +999,6 @@ public class AuthoringController {
 	}
 	return paramMap;
     }
-
-    /**
-     * Removes redundant new line characters from options left by CKEditor (otherwise it will break Javascript in
-     * monitor)
-     *
-     * @param question
-     */
-    private void removeNewLineCharacters(AssessmentQuestion question) {
-	Collection<QbOption> options = question.getQbQuestion().getQbOptions();
-	if (options != null) {
-	    for (QbOption option : options) {
-		String name = option.getName();
-		if (name != null) {
-		    option.setName(name.replaceAll("[\n\r\f]", ""));
-		}
-
-		String matchingPair = option.getMatchingPair();
-		if (matchingPair != null) {
-		    option.setMatchingPair(matchingPair.replaceAll("[\n\r\f]", ""));
-		}
-	    }
-	}
-    }
     
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
