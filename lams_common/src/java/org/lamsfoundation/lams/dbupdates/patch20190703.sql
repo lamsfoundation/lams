@@ -4,9 +4,7 @@ SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 -- LDEV-4834 Add Learning Outcomes to QB questions
-ALTER TABLE lams_outcome_mapping ADD COLUMN qb_question_id INT,
-								 ADD CONSTRAINT FK_lams_outcome_mapping_4 FOREIGN KEY (qb_question_id)
-								 	REFERENCES lams_qb_question (question_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE lams_outcome_mapping ADD COLUMN qb_question_id INT;
 								 	
 ----------------------Put all sql statements above here-------------------------
 

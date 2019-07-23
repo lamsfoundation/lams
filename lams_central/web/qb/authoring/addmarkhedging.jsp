@@ -192,9 +192,7 @@
 							placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>
 					
-					<c:if test="${not empty assessmentQuestionForm.questionId}">
-						<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}"  />
-					</c:if>
+					<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}"  />
 				</div>
 			</form:form>
 			
