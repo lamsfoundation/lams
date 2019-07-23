@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,14 +95,19 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
-	    String searchString) {
-	return qbDAO.getPagedQuestions(questionType, page, size, sortBy, sortOrder, searchString);
+    public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size,
+	    String sortBy, String sortOrder, String searchString) {
+	return qbDAO.getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder, searchString);
+    }
+    
+    @Override
+    public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString) {
+	return qbDAO.getAllQuestionUids(collectionUids, sortBy, sortOrder, searchString);
     }
 
     @Override
-    public int getCountQuestions(Integer questionType, String searchString) {
-	return qbDAO.getCountQuestions(questionType, searchString);
+    public int getCountQuestions(String questionTypes, String collectionUids, String searchString) {
+	return qbDAO.getCountQuestions(questionTypes, collectionUids, searchString);
     }
 
     @Override

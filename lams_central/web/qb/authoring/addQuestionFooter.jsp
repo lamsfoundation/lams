@@ -6,7 +6,7 @@
        		<span <c:if test="${empty assessmentQuestionForm.sessionMapID}">style="visibility: hidden;"</c:if>>
 	       		Collection
 	        		
-				<select class="form-controlx btn btn-md btn-default" id="collection-uid-select">
+				<select class="btn btn-md btn-default" id="collection-uid-select">
 					<c:forEach var="collection" items="${userCollections}">
 						<option value="${collection.uid}"
 							<c:if test="${collection.uid == assessmentQuestionForm.oldCollectionUid}">selected="selected"</c:if>>

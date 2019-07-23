@@ -100,15 +100,15 @@
 		return serializedMaxMarks;
 	}
 
-	function createInitNewQuestionHref() {
+	function initNewReferenceHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.value;
 		
-		var newQuestionInitHref = "<c:url value='/authoring/initNewQuestion.do'/>?sessionMapID=${sessionMapID}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
+		var newQuestionInitHref = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref);
 	};
 	function createEditQuestionHref(idx){
-		var editHref = "<c:url value='/authoring/editQuestionReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=" + idx + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true"; 
+		var editHref = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=" + idx + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true"; 
 		$("#edit-ref-" + idx).attr("href", editHref);
 	}
 	
@@ -184,25 +184,25 @@
 			</option>
 		</select>
 		
-		<a onclick="createInitNewQuestionHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
+		<a onclick="initNewReferenceHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
 		</a>
 	</div>
-</c:if>
 
-<!-- Question Bank -->
-<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
-    <div class="panel panel-default" >
-        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
-        	<span class="panel-title">
-		    	<a class="collapsed" role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse" >
-	          		<fmt:message key="label.authoring.basic.question.bank.title" />
-	        	</a>
-      		</span>
-        </div>
-
-		<div id="question-bank-collapse" class="panel-body panel-collapse collapse contains-nothing" role="tabpanel" aria-labelledby="question-bank-heading">
-
+	<!-- Question Bank -->
+	<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
+	    <div class="panel panel-default" >
+	        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
+	        	<span class="panel-title">
+			    	<a class="collapsed" role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse" >
+		          		<fmt:message key="label.authoring.basic.question.bank.title" />
+		        	</a>
+	      		</span>
+	        </div>
+	
+			<div id="question-bank-collapse" class="panel-body panel-collapse collapse contains-nothing" role="tabpanel" aria-labelledby="question-bank-heading">
+	
+			</div>
 		</div>
 	</div>
-</div>
+</c:if>

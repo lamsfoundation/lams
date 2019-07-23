@@ -23,26 +23,32 @@
 
 package org.lamsfoundation.lams.web.qb;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -121,6 +127,11 @@ public class SearchQBController {
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
 	
+	//prepare data for displaying collections
+	Integer userId = getUserId();
+	Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
+	request.setAttribute("userCollections", userCollections);
+	
 	return "qb/search";
     }
     
@@ -135,9 +146,15 @@ public class SearchQBController {
      */
     @RequestMapping("/getPagedQuestions")
     @ResponseBody
-    private String getPagedQuestions(HttpServletRequest request, HttpServletResponse response) {
-	
-	Integer questionType = WebUtil.readIntParam(request, "questionType");
+    private String getPagedQuestions(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(required = false) String questionTypes,
+	    @RequestParam(required = false) String collectionUids) {
+	if (StringUtils.isEmpty(questionTypes)) {
+	    questionTypes = null;
+	}
+	if (StringUtils.isEmpty(collectionUids)) {
+	    collectionUids = null;
+	}
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
@@ -150,9 +167,9 @@ public class SearchQBController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = qbService.getPagedQuestions(questionType, page - 1, rowLimit, sortBy, sortOrder,
-		searchString);
-	int countQuestions = qbService.getCountQuestions(questionType, searchString);
+	List<QbQuestion> questions = (List<QbQuestion>) qbService.getPagedQuestions(questionTypes, collectionUids,
+		page - 1, rowLimit, sortBy, sortOrder, searchString);
+	int countQuestions = qbService.getCountQuestions(questionTypes, collectionUids, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
 
@@ -194,5 +211,11 @@ public class SearchQBController {
 	request.setAttribute("otherVersions", otherVersions);
 	
 	return "qb/qbQuestionDetails";
+    }
+    
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 }

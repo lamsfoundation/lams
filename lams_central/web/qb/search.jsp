@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-select.css" type="text/css"/>
 	
 <style>
 	#grid-holder {
@@ -98,22 +97,28 @@
 	#question-type {
 		display: inline-flex;
 	}
+	
+	#advanced-search {
+		display: none;
+		padding-bottom: 20px;
+	}
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 			
-		jQuery("#questions-grid").jqGrid({
+		$("#questions-grid").jqGrid({
 		   	multiselect: false,
 			datatype: "json",
 			url: "<c:url value="/searchQB/getPagedQuestions.do"/>",
-			postData: { 
-           		questionType: ${questionType} 
-	        },
+			//postData: { 
+           	//	questionType: ${questionType} 
+	        //},
 			height: '100%',
 			autowidth: true,
 			shrinkToFit: true,
@@ -185,6 +190,45 @@
 				}
 			);
         });
+
+		//handler for "Advanced search" button
+    	$("#advanced-search-button").click(function() {
+			$(this).toggleClass("btn-primary");
+			$("#advanced-search").toggle('fast');
+        });
+
+		//handler for Collections select
+    	$('#collections-select').selectpicker({ 
+            iconBase: 'fa',
+            tickIcon: 'fa-check',
+            actionsBox:"true",
+            selectedTextFormat:"count>3",
+            countSelectedText : "{0} collections selected",
+            noneSelectedText : "Display all collections",
+            selectAllText:"Select all",
+            deselectAllText:"Deselect all",
+            style:"btn btn-sm btn-default",
+            <c:if test="${fn:length(userCollections) > 10}">liveSearch: true</c:if>
+       	});
+    	//workaround for $('#collections-select').selectpicker('selectAll'); throwing exception 
+    	$("#collections-select option").prop("selected", "selected");
+    	$('#collections-select').selectpicker('refresh');
+
+		//handler for Types select
+    	$('#types-select').selectpicker({ 
+            iconBase: 'fa',
+            tickIcon: 'fa-check',
+            actionsBox:"true",
+            selectedTextFormat:"count>2",
+            countSelectedText : "{0} question types selected",
+            noneSelectedText : "Display all question types",
+            selectAllText:"Select all",
+            deselectAllText:"Deselect all",
+            style:"btn btn-sm btn-default"
+       	});
+    	//workaround for $('#types-select-select').selectpicker('selectAll'); throwing exception 
+    	$("#types-select option").prop("selected", "selected");
+    	$('#types-select').selectpicker('refresh');
 	});
 
 	//load up question details area
@@ -204,14 +248,29 @@
 	<input type="text" id="filter-questions" class="form-control" placeholder="Contains text" 
 		onkeydown="doSearch(arguments[0]||event)" />
 		
+	<a href="#nogo" class="btn btn-default btn-sm loffset10" id="advanced-search-button">  
+		<i class="fa fa-lg fa-question-circle" aria-hidden="true" title="Advanced search"></i>
+		Advanced search
+	</a>
+</div>
+	
+<div id="advanced-search">
+	Collections: &nbsp;
+	
+	<select id="collections-select" class="selectpicker" multiple>
+		<c:forEach var="collection" items="${userCollections}">
+			<option value="${collection.uid}">
+				<c:out value="${collection.name}" />
+			</option>
+		</c:forEach>
+	</select>
+	
 	<c:if test="${!empty questionTypesAvailable}">
-		<div class="loffset10 input-group-sm">
-			<fmt:message key="label.question.type" />
-			<select id="question-type" onchange="gridSearch();" class="form-control">
+		<fmt:message key="label.question.type" />&nbsp;
+		
+		<select id="types-select" class="selectpicker" multiple>
 				<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter">
-					<option value="${questionTypeIter}"
-						<c:if test="${questionTypeIter == questionType}">selected="selected"</c:if>>
-		  							
+					<option value="${questionTypeIter}">
 						<c:choose>
 							<c:when test="${questionTypeIter == 1}">
 								<fmt:message key="label.question.type.multiple.choice" />
@@ -240,8 +299,7 @@
 						</c:choose>
 					</option>
 				</c:forTokens>
-			</select>
-		</div>
+		</select>
 	</c:if>
 </div>
 

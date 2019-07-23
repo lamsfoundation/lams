@@ -271,7 +271,7 @@ public class EditQbQuestionController {
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    applicationcontext.getServletContext().getContext(serverURLContextPath + "tool/laasse10/")
-		    .getRequestDispatcher("/authoring/saveOrUpdateQuestion.do" + params).forward(request, response);
+		    .getRequestDispatcher("/authoring/saveOrUpdateReference.do" + params).forward(request, response);
 	    return null;
 
 	} else {
