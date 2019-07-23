@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.dao;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +47,12 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
-    List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
+    
+    List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString);
 
-    int getCountQuestions(Integer questionType, String searchString);
+    int getCountQuestions(String questionTypes, String collectionUids, String searchString);
 
     List<QbQuestion> getCollectionQuestions(long collectionUid);
 

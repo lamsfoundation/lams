@@ -8,9 +8,16 @@
 	<link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-select.css" type="text/css"/>
 	<style>
-		#filter-questions {
-			margin-bottom: 3px;
+		#grid-container {
+			min-height: 300px;
+		}
+		#search-widgets {
+			display: flex;
+		}
+		.form-control {
+			width: auto;
 		}
 	</style>
 
@@ -30,17 +37,20 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
     <script  type="text/javascript">
 		$(document).ready(function(){
-		    $("#assessmentQuestionForm").validate({
+		    $("#referenceForm").validate({
 		    	ignore: 'hidden',
    			    submitHandler: function(form) {
+					$("#questionUids").val(idsOfSelectedRows.join(","));
+   	   			    
 	    	    	var options = { 
 	    	    		target:  parent.jQuery('#itemArea'), 
 	    		   		success: afterRatingSubmit  // post-submit callback
 	    		    }; 				
 
-	    			$('#assessmentQuestionForm').ajaxSubmit(options);
+	    			$('#referenceForm').ajaxSubmit(options);
 	    		},
 	    		invalidHandler: formValidationInvalidHandler,
 				errorElement: "em",
@@ -49,14 +59,24 @@
 				highlight: formValidationHighlight,
 				unhighlight: formValidationUnhighlight
 		  	});
+
+		    var idsOfSelectedRows = [<c:forEach var="asQuestion" items="${randomPoolQuestions}">"${asQuestion.qbQuestion.uid}",</c:forEach>],
+				$grid = $("#questions-grid"),
+		    	updateIdsOfSelectedRows = function (id, isSelected) {
+		        var index = $.inArray(id, idsOfSelectedRows);
+		        if (!isSelected && index >= 0) {
+		            idsOfSelectedRows.splice(index, 1); // remove id from the list
+		        } else if (index < 0) {
+		            idsOfSelectedRows.push(id);
+		        }
+		    };
 			
-			jQuery("#questions-grid").jqGrid({
+			$("#questions-grid").jqGrid({
 			   	//multiselect: false,
 				datatype: "json",
 				url: "<c:url value="/authoring/getPagedRandomQuestions.do"/>",
 				postData: { 
-					sessionMapID:$("#sessionMapID").val(),
-	           		collectionUids: "" 
+					sessionMapID:"${sessionMapID}"
 		        },
 				height: '100%',
 				autowidth: true,
@@ -66,48 +86,50 @@
 			    rowNum:10,
 			    guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
+				multiselect: true,
+				onSelectRow: updateIdsOfSelectedRows,
+			    onSelectAll: function (aRowids, isSelected) {
+				    //in case deselect all - simply clear uids array
+			    	if (!isSelected) {
+			    		questionUids = [];
+			    		return;
+					}
+
+					// get all questionUids from DB
+					var gridParams = $(this).jqGrid("getGridParam");
+					$.ajax({ 
+					    url: '<c:url value="/authoring/getAllQbQuestionUids.do"/>',
+						type: 'POST',
+						data: {
+							sidx: gridParams.sortname,
+							sord: gridParams.sortorder,
+							collectionUids: "" + $("#collections-select").val(),
+					       	searchString: $("#filter-questions").val() 
+						}
+					}).done(function(data) {
+						//add all questionUids to idsOfSelectedRows array
+						data.questionUids.forEach(function(entry) {
+							updateIdsOfSelectedRows(entry, true);
+						});
+					});
+			    },
 			   	colNames:[
 				   	'questionUid',
-				   	'',
 					'<fmt:message key="label.authoring.basic.list.header.question"/>',
 					'questionDescription'
 				],
 			   	colModel:[
-			   		{name:'questionUid', index:'questionUid', width:0, hidden: true},
-			   		{name: 'belongsToRandomPool', index: 'belongsToRandomPool', width:20, editable:true, edittype:'checkbox', editoptions: {value:"True:False"}, 
-						formatter: "checkbox", formatoptions: {disabled : false}, sortable:false, search: false},
+			   		{name:'questionUid', key: true, index:'questionUid', width:0, hidden: true},
 			   		{name:'questionName', index:'questionName', width:570, search: true, searchoptions: { clearSearch: false }, formatter:questionNameFormatter},
 			   		{name:'questionDescription', index:'questionDescription', width:0, hidden: true}
 			   	],
 		  	  	gridComplete: gridSearchHighlight,
 			   	loadComplete: function() {
-					// storing belongToRandomPool change to DB
-				    $(":checkbox").on("click", function(event){
-					    var checkbox = $(this);
-					    
-					    var rowid = $(this).parent().parent().prop('id');
-					    var qbQuestionUid = $("#questions-grid").getCell(rowid, 'questionUid');
-						$.ajax({ 
-					 	    url: '<c:url value="/authoring/toggleBelongToRandomPool.do"/>',
-						    type: 'POST',
-							data: {
-								sessionMapID: $("#sessionMapID").val(),
-								qbQuestionUid: qbQuestionUid,
-								requestedToAdd: this.checked
-							}, 
-							function() {
-							}
-						}).done(function(data) { 
-						    //postsjson = $.parseJSON(posts);
-							$("#count-selected-questions").text(data.poolQuestionsCount);
-						    
-							//show successfull notification
-							var notification = checkbox.is(":checked") ? "Added question to the random pool" : "Removed question from the random pool";
-		                	$.growlUI('<i class="fa fa-lg fa-download"></i> ' + notification);
-
-						});
-				    	
-				    });
+				   	//select rows that form random pool
+			        var $this = $(this), i, count;
+			        for (i = 0, count = idsOfSelectedRows.length; i < count; i++) {
+			            $this.jqGrid('setSelection', idsOfSelectedRows[i], false);
+			        }
 			   	},
 			    loadError: function(xhr,textStatus,errorThrown) {
 			    	$("#questions-grid").clearGridData();
@@ -128,6 +150,23 @@
 	    	    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
 	    	    });
 	    	};
+
+			//handler for Collections select
+	    	$('#collections-select').selectpicker({ 
+	            iconBase: 'fa',
+	            tickIcon: 'fa-check',
+	            actionsBox:"true",
+	            selectedTextFormat:"count>3",
+	            countSelectedText : "{0} collections selected",
+	            noneSelectedText : "Display all collections",
+	            selectAllText:"Select all",
+	            deselectAllText:"Deselect all",
+	            style:"btn btn-sm btn-default",
+	            <c:if test="${fn:length(userCollections) > 10}">liveSearch: true</c:if>
+	       	});
+	    	//workaround for $('#collections-select').selectpicker('selectAll'); throwing exception 
+	    	$("#collections-select option").prop("selected", "selected");
+	    	$('#collections-select').selectpicker('refresh');
 		});
 	</script>
 </lams:head>
@@ -144,29 +183,32 @@
 				Select pool of random questions.
 			</h5>
 			
-			<form:form action="saveOrUpdateRandomQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm" 
-				method="post" autocomplete="off">
-				<form:hidden path="sessionMapID" id="sessionMapID"/>
-				<form:hidden path="uid" />
-				<form:hidden path="questionType" value="-1"/>
+			<form:form action="saveOrUpdateRandomReference.do" id="referenceForm" method="post">
+				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+				<input type="hidden" name="isReferenceNew" value="${isReferenceNew}"/>
+				<input type="hidden" name="questionUids" id="questionUids"/>
 			</form:form>
 			
 			<div id="search-widgets" class="input-group-sm">
-				<input type="text" id="filter-questions" class="form-control" placeholder="Contains text" 
+				<input type="text" id="filter-questions" class="form-control roffset10" placeholder="Contains text" 
 					onkeydown="doSearch(arguments[0]||event)" />
+					
+				<span style="padding-top: 5px;">Collections: &nbsp;</span>
+				
+				<select id="collections-select" class="selectpicker" multiple>
+					<c:forEach var="collection" items="${userCollections}">
+						<option value="${collection.uid}">
+							<c:out value="${collection.name}" />
+						</option>
+					</c:forEach>
+				</select>
 			</div>
 
-			<div id="grid-container" style="min-height: 300px;">
+			<div id="grid-container" class="voffset10">
 		 		<div class="grid-holder">
 		 			<table id="questions-grid" class="scroll"></table>
 					<div id="questions-grid-pager" class="scroll"></div>
 				</div>
-			</div>
-			
-			<div class="voffset10">
-				<span class="alert-warning">
-					Pool consists of <span id="count-selected-questions">${poolQuestionsCount}</span> question(s).
-				</span>
 			</div>
 
 		</div>		
@@ -178,7 +220,7 @@
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" />
 				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
+				<a href="#nogo" onclick="javascript:$('#referenceForm').submit();" class="btn btn-sm btn-default button-add-item">
 					<fmt:message key="label.authoring.save.button" />
 				</a>
 			</div>

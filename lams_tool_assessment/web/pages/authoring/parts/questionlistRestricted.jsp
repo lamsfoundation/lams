@@ -82,10 +82,10 @@
 
 				<td width="30px">
 					<c:if test="${!questionReference.randomQuestion}">
-						<c:set var="editQuestionReferenceUrl" >
-							<c:url value='/authoring/editQuestionReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
+						<c:set var="editReferenceUrl" >
+							<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>
-						<a href="${editQuestionReferenceUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
+						<a href="${editReferenceUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
 							<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 						</a>			
 					</c:if>

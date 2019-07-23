@@ -1,16 +1,22 @@
-		//auxiliary formatter for jqGrid's question column
-		function questionNameFormatter (cellvalue, options, rowObject) {
-	       	var questionDescription = rowObject[2] ? rowObject[2] : "";
+$(document).ready(function(){
+	$('.selectpicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+		gridSearch();
+	});
+});
 
-	       	var text = "<div class='question-title-grid'>" + cellvalue + "</div>";
-	       	text += "<div class='question-description-grid small'>";
-	       	if (questionDescription.length > 0) {
-	       		text += questionDescription;
-			}
-	        text += "</div>"
+//auxiliary formatter for jqGrid's question column
+function questionNameFormatter (cellvalue, options, rowObject) {
+   	var questionDescription = rowObject[2] ? rowObject[2] : "";
+
+   	var text = "<div class='question-title-grid'>" + cellvalue + "</div>";
+   	text += "<div class='question-description-grid small'>";
+   	if (questionDescription.length > 0) {
+   		text += questionDescription;
+   	}
+	text += "</div>"
 	        	
-			return text;
-		}
+	return text;
+}
 
 	    //search field handler
 	    var timeoutHnd;
@@ -24,7 +30,8 @@
 			$("#questions-grid").jqGrid(
 				'setGridParam', {
 		           	postData: { 
-		           		questionType: $("#question-type").val(),
+		           		questionTypes: "" + $("#types-select").val(),
+		           		collectionUids: "" + $("#collections-select").val(),
 			           	searchString: $("#filter-questions").val() 
 			        }
 		       	}, 
@@ -32,9 +39,7 @@
 			).trigger('reloadGrid');
 
 		    $("#question-detail-area").hide("slow").html("");
-	        //jQuery("#bigset").jqGrid('setGridParam',{url:"bigset.php?nm_mask="+nm_mask+"&cd_mask="+cd_mask,page:1}).trigger("reloadGrid");
 	    }
-		
 		
 		function gridSearchHighlight () {
 	  	  	//highlight search results

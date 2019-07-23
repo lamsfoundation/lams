@@ -100,15 +100,15 @@
 		return serializedMaxMarks;
 	}
 
-	function createInitNewQuestionHref() {
+	function initNewReferenceHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.value;
 		
-		var newQuestionInitHref = "<c:url value='/authoring/initNewQuestion.do'/>?sessionMapID=${sessionMapID}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
+		var newQuestionInitHref = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref);
 	};
 	function createEditQuestionHref(idx){
-		var editHref = "<c:url value='/authoring/editQuestionReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=" + idx + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true"; 
+		var editHref = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=" + idx + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true"; 
 		$("#edit-ref-" + idx).attr("href", editHref);
 	}
 	
@@ -184,7 +184,7 @@
 			</option>
 		</select>
 		
-		<a onclick="createInitNewQuestionHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
+		<a onclick="initNewReferenceHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
 		</a>
 	</div>

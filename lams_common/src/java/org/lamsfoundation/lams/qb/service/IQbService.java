@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.qb.service;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,10 +65,12 @@ public interface IQbService {
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
 
-    List<QbQuestion> getPagedQuestions(Integer questionType, int page, int size, String sortBy, String sortOrder,
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
+    
+    List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString);
 
-    int getCountQuestions(Integer questionType, String searchString);
+    int getCountQuestions(String questionTypes, String collectionUids, String searchString);
 
     QbCollection getCollectionByUid(Long collectionUid);
 

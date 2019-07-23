@@ -25,9 +25,11 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -359,20 +362,23 @@ public class AuthoringController {
     /**
      * Display empty page for new assessment question.
      */
-    @RequestMapping("/initNewQuestion")
-    public String initNewQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @RequestMapping("/initNewReference")
+    public String initNewReference(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 	if (type.equals(-1)) {//randomQuestion case
-	    questionForm.setUid(-1L);//which signifies it's a new question
-	    questionForm.setMaxMark(1);
-	    questionForm.setPenaltyFactor("0");
-	    questionForm.setAnswerRequired(false);
+	    request.setAttribute("isReferenceNew", true);//which signifies it's a new question
+
+	    //prepare data for displaying collections
+	    Integer userId = getUserId();
+	    Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
+	    request.setAttribute("userCollections", userCollections);
 	    
-	    request.setAttribute("poolQuestionsCount", getRandomPoolQuestions(sessionMap).size());
+	    List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	    request.setAttribute("randomPoolQuestions", randomPoolQuestions);
 	    return "pages/authoring/randomQuestion";
 	    
 	} else {
@@ -388,10 +394,9 @@ public class AuthoringController {
     /**
      * Display edit page for existing assessment question.
      */
-    @RequestMapping("/editQuestionReference")
-    public String editQuestionReference(@ModelAttribute("assessmentQuestionForm") QbQuestionForm questionForm,
-	    HttpServletRequest request, HttpServletResponse response, @RequestParam int questionReferenceIndex)
-	    throws ServletException, IOException {
+    @RequestMapping("/editReference")
+    public String editReference(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam int questionReferenceIndex) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	updateQuestionReferencesMaxMarks(request, sessionMap, false);
 	
@@ -400,9 +405,16 @@ public class AuthoringController {
 	QuestionReference questionReference = rList.get(questionReferenceIndex);
 	
 	if (questionReference.isRandomQuestion()) {
-	    questionForm.setUid(questionReference.getUid());
+	    request.setAttribute("isReferenceNew", false);
 	    
-	    request.setAttribute("poolQuestionsCount", getRandomPoolQuestions(sessionMap).size());
+	    //prepare data for displaying collections
+	    Integer userId = getUserId();
+	    Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
+	    request.setAttribute("userCollections", userCollections);
+	    
+	    List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	    request.setAttribute("randomPoolQuestions", randomPoolQuestions);
+	    
 	    return "pages/authoring/randomQuestion";
 	    
 	} else {
@@ -437,8 +449,8 @@ public class AuthoringController {
      * persisted.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/saveOrUpdateQuestion")
-    public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
+    @RequestMapping("/saveOrUpdateReference")
+    public String saveOrUpdateReference(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
 	    HttpServletRequest request, @RequestParam Long qbQuestionUid, @RequestParam int questionModificationStatus) {
 	String sessionMapId = form.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -506,17 +518,16 @@ public class AuthoringController {
      * Adds random QuestionReference into reference list.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/saveOrUpdateRandomQuestion", method = RequestMethod.POST)
-    private String saveOrUpdateRandomQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request) {
+    @RequestMapping(value = "/saveOrUpdateRandomReference", method = RequestMethod.POST)
+    private String saveOrUpdateRandomReference(HttpServletRequest request, @RequestParam String questionUids,
+	    @RequestParam boolean isReferenceNew) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	
 	// add
-	Long referenceUid = form.getUid();
-	if (referenceUid == -1) {
+	if (isReferenceNew) {
 	    //create new QuestionReference
 	    QuestionReference reference = new QuestionReference();
 	    reference.setRandomQuestion(true);
@@ -533,6 +544,44 @@ public class AuthoringController {
 	// edit
 	} else {
 	    //do nothing
+	}
+	
+	List<String> newQuestionUids = Arrays.asList(questionUids.split(","));
+	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
+	
+	//remove obsolete questions
+	for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
+	    if (!newQuestionUids.contains(randomPoolQuestion.getQbQuestion().getUid().toString())) {
+		randomPoolQuestions.remove(randomPoolQuestion);
+
+		// add to delList
+		List<AssessmentQuestion> deletedRandomPoolQuestions = getDeletedRandomPoolQuestions(sessionMap);
+		deletedRandomPoolQuestions.add(randomPoolQuestion);
+		break;
+	    }
+	}
+	
+	//add newly selected questions
+	for (String newQuestionUid : newQuestionUids) {
+	    Long newQuestionUidLong = Long.valueOf(newQuestionUid);
+	    
+	    //check if according AssessmentQuestion exists already
+	    boolean isAssessmentQuestionExist = false;
+	    for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
+		if (newQuestionUidLong.equals(randomPoolQuestion.getQbQuestion().getUid())) {
+		    isAssessmentQuestionExist = true;
+		    break;
+		}
+	    }
+	    
+	    if (!isAssessmentQuestionExist) {
+		AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+		QbQuestion qbQuestion = qbService.getQuestionByUid(newQuestionUidLong);
+		assessmentQuestion.setQbQuestion(qbQuestion);
+		assessmentQuestion.setRandomQuestion(true);
+		assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+		randomPoolQuestions.add(assessmentQuestion);
+	    }
 	}
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
@@ -658,81 +707,34 @@ public class AuthoringController {
 	}
     }
     
-    @RequestMapping("/toggleBelongToRandomPool")
+    @RequestMapping("/getAllQbQuestionUids")
     @ResponseBody
-    public String toggleBelongToRandomPool(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam Long qbQuestionUid, @RequestParam boolean requestedToAdd) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
-	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
-	
-	if (requestedToAdd) {
-	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    assessmentQuestion.setQbQuestion(qbQuestion);
-	    assessmentQuestion.setRandomQuestion(true);
-	    assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
-	    randomPoolQuestions.add(assessmentQuestion);
-	    
-	} else {
-	    for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
-		if (qbQuestionUid.equals(randomPoolQuestion.getQbQuestion().getUid())) {
-		    randomPoolQuestions.remove(randomPoolQuestion);
+    public String getAllQbQuestionUids(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(required = false) String collectionUids) {
+	// Getting the params passed in from the jqGrid
+	String sortOrder = WebUtil.readStrParam(request, CommonConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, CommonConstants.PARAM_SIDX, true);
+	if (StringUtils.isEmpty(sortBy)) {
+	    sortBy = "name";//"smth_else";
+	}
+	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
-		    // add to delList
-		    List<AssessmentQuestion> deletedRandomPoolQuestions = getDeletedRandomPoolQuestions(sessionMap);
-		    deletedRandomPoolQuestions.add(randomPoolQuestion);
-		    break;
-		}
-	    }	    
+	List<BigInteger> questionUids = qbService.getAllQuestionUids(collectionUids, sortBy, sortOrder, searchString);
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	for (BigInteger questionUid : questionUids) {
+	    rows.add(questionUid);
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("poolQuestionsCount", randomPoolQuestions.size());
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
-    }
-    
-    @RequestMapping("/addAllQuestionsToRandomPool")
-    @ResponseBody
-    public String addAllQuestionsToRandomPool(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam Long qbQuestionUid, @RequestParam boolean requestedToAdd) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
-	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
-	
-	if (requestedToAdd) {
-	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    assessmentQuestion.setQbQuestion(qbQuestion);
-	    assessmentQuestion.setRandomQuestion(true);
-	    assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
-	    randomPoolQuestions.add(assessmentQuestion);
-	    
-	} else {
-	    for (AssessmentQuestion randomPoolQuestion : randomPoolQuestions) {
-		if (qbQuestionUid.equals(randomPoolQuestion.getQbQuestion().getUid())) {
-		    randomPoolQuestions.remove(randomPoolQuestion);
-
-		    // add to delList
-		    List<AssessmentQuestion> deletedRandomPoolQuestions = getDeletedRandomPoolQuestions(sessionMap);
-		    deletedRandomPoolQuestions.add(randomPoolQuestion);
-		    break;
-		}
-	    }	    
-	}
-
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isDone", true);
+	responseJSON.set("questionUids", rows);
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
     
     @RequestMapping("/getPagedRandomQuestions")
     @ResponseBody
-    private String getPagedRandomQuestions(HttpServletRequest request, HttpServletResponse response) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
-	Integer questionType = 1;
-
+    private String getPagedRandomQuestions(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(required = false) String collectionUids) {
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, CommonConstants.PARAM_ROWS);
@@ -744,9 +746,9 @@ public class AuthoringController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = qbService.getPagedQuestions(questionType, page - 1, rowLimit, sortBy, sortOrder,
-		searchString);
-	int countQuestions = qbService.getCountQuestions(questionType, searchString);
+	List<QbQuestion> questions = qbService.getPagedQuestions(null, collectionUids, page - 1, rowLimit, sortBy,
+		sortOrder, searchString);
+	int countQuestions = qbService.getCountQuestions(null, collectionUids, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
 
@@ -756,25 +758,16 @@ public class AuthoringController {
 	    ArrayNode questionData = JsonNodeFactory.instance.arrayNode();
 	    questionData.add(question.getUid());
 	    
-	    boolean belongsToRandomPool = false;
-	    for (AssessmentQuestion randomPoolQuestion: randomPoolQuestions) {
-		if (question.getUid().equals(randomPoolQuestion.getQbQuestion().getUid())) {
-		    belongsToRandomPool = true;
-		    break;
-		}
-	    }
-	    questionData.add(belongsToRandomPool);
-	    
 	    String title = question.getName() == null ? "" : question.getName().replaceAll("\\<.*?\\>", "").replaceAll("\\n", " ").trim();
 	    questionData.add(HtmlUtils.htmlEscape(title));
 	    String description = question.getDescription() == null ? "" : question.getDescription().replaceAll("\\<.*?\\>", "").trim();
 	    questionData.add(HtmlUtils.htmlEscape(description));
 
-	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
-	    userRow.put("id", i++);
-	    userRow.set("cell", questionData);
+	    ObjectNode questionRow = JsonNodeFactory.instance.objectNode();
+	    questionRow.put("id", question.getUid());
+	    questionRow.set("cell", questionData);
 
-	    rows.add(userRow);
+	    rows.add(questionRow);
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -1056,5 +1049,11 @@ public class AuthoringController {
 	}	
 
 	return maxDisplayOrder+1;
+    }
+    
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 }
