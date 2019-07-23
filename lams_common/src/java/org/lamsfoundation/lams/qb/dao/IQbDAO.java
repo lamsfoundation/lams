@@ -27,7 +27,7 @@ public interface IQbDAO extends IBaseDAO {
     List<QbQuestion> getQuestionsByToolContentId(long toolContentId);
 
     // finds next question ID for Question Bank question
-    int getMaxQuestionId();
+    int generateNextQuestionId();
 
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);

@@ -134,6 +134,7 @@
 				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="uid" />
+				<form:hidden path="questionId" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<input type="hidden" name="unitList" id="unitList" />

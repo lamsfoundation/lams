@@ -272,7 +272,7 @@ public class AuthoringController {
 	Set<ScratchieItem> items = new LinkedHashSet<>();
 	SortedSet<ScratchieItem> newItems = getItemList(sessionMap);
 	Iterator<ScratchieItem> iter = newItems.iterator();
-	int maxQuestionId = qbService.getMaxQuestionId();
+	int maxQuestionId = qbService.generateNextQuestionId();
 	while (iter.hasNext()) {
 	    ScratchieItem item = iter.next();
 	    if (item != null) {
@@ -296,7 +296,7 @@ public class AuthoringController {
 			item.setQbQuestion(qbQuestion);
 			qbQuestion.clearID();
 			qbQuestion.setVersion(1);
-			qbQuestion.setQuestionId(++maxQuestionId);
+			qbQuestion.setQuestionId(maxQuestionId);
 			qbQuestion.setCreateDate(new Date());
 		    }
 			break;

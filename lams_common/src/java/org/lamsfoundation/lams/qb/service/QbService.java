@@ -84,8 +84,8 @@ public class QbService implements IQbService {
     }
 
     @Override
-    public int getMaxQuestionId() {
-	return qbDAO.getMaxQuestionId();
+    public int generateNextQuestionId() {
+	return qbDAO.generateNextQuestionId();
     }
 
     @Override
@@ -431,7 +431,7 @@ public class QbService implements IQbService {
 	    List<QbQuestion> questions = getQuestionsByQuestionId(qbQuestionId);
 	    QbQuestion question = questions.get(0);
 	    QbQuestion newQuestion = question.clone();
-	    addQbQuestionId = getMaxQuestionId() + 1;
+	    addQbQuestionId = generateNextQuestionId();
 	    newQuestion.setQuestionId(addQbQuestionId);
 	    newQuestion.setVersion(1);
 	    newQuestion.setCreateDate(new Date());

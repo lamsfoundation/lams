@@ -56,7 +56,7 @@ public class ImsQtiController {
     @ResponseBody
     public void saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
 	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
-	int questionId = qbService.getMaxQuestionId();
+	int questionId = qbService.generateNextQuestionId();
 
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
@@ -67,7 +67,7 @@ public class ImsQtiController {
 	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
 	    qbQuestion.setPenaltyFactor(0);
-	    qbQuestion.setQuestionId(++questionId);
+	    qbQuestion.setQuestionId(questionId);
 
 	    int questionMark = 1;
 

@@ -62,7 +62,7 @@ public class XmlQuestionsController {
     @ResponseBody
     public void importQuestionsXml(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request,
 	    @RequestParam long collectionUid) throws ServletException {
-	int questionId = qbService.getMaxQuestionId();
+	int questionId = qbService.generateNextQuestionId();
 
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
@@ -85,7 +85,7 @@ public class XmlQuestionsController {
 	    List<QbQuestion> questions = (List<QbQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
 	    if (questions != null) {
 		for (QbQuestion qbQuestion : questions) {
-		    qbQuestion.setQuestionId(++questionId);
+		    qbQuestion.setQuestionId(questionId);
 		    qbQuestion.setCreateDate(new Date());
 		    userManagementService.save(qbQuestion);
 

@@ -674,3 +674,8 @@ DROP TABLE tl_laasse10_question_option,
 		   tmp_qb_question,
 		   tmp_qb_question_match,
 		   tmp_option_answer;
+
+-- add a table for generating questionId in QbQuestion and possible other sequences in the future
+CREATE TABLE lams_sequence_generator (lams_qb_question_question_id INT);
+CREATE UNIQUE INDEX IDX_lams_qb_question_question_id ON lams_sequence_generator(lams_qb_question_question_id);
+INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES ((SELECT MAX(question_id) FROM lams_qb_question));

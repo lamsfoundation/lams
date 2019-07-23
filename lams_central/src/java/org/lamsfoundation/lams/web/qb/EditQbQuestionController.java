@@ -69,6 +69,7 @@ public class EditQbQuestionController {
 	    @RequestParam(required = false) Long collectionUid) throws ServletException, IOException {
 
 	form.setUid(-1L);//which signifies it's a new question
+	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 	form.setMaxMark(1);
 	form.setPenaltyFactor("0");
 	form.setAnswerRequired(true);
@@ -215,6 +216,7 @@ public class EditQbQuestionController {
 	if (isAddingQuestion) {
 	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(form.getQuestionType());
+	    qbQuestion.setQuestionId(form.getQuestionId());
 
 	    // edit
 	} else {
@@ -238,8 +240,8 @@ public class EditQbQuestionController {
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
 		qbQuestion.setVersion(1);
-		qbQuestion.setQuestionId(qbService.getMaxQuestionId() + 1);
 		qbQuestion.setCreateDate(new Date());
+		// no need to bump question ID as the new question already has a new ID generated in initNewQuestion()
 	    }
 		break;
 	}

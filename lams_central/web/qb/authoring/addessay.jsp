@@ -120,6 +120,7 @@
 				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="uid" />
+				<form:hidden path="questionId" />
 				<form:hidden path="questionType" value="6"/>
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>

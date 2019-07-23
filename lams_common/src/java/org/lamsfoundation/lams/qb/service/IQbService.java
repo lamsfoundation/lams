@@ -49,7 +49,7 @@ public interface IQbService {
     QbQuestionUnit getQuestionUnitByUid(Long unitUid);
 
     // finds next question ID for Question Bank question
-    int getMaxQuestionId();
+    int generateNextQuestionId();
 
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);

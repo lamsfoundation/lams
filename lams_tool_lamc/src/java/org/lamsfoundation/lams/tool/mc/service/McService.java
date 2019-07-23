@@ -283,7 +283,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		// if it does not exist, create a new one
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		qbQuestion.setQuestionId(qbService.getMaxQuestionId() + 1);
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 	    }
 	    // make a clone to check if data changed
 	    QbQuestion qbQuestionClone = qbQuestion.clone();
@@ -315,7 +315,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    // new questionDescription gets created
 		    qbQuestion = qbQuestionClone;
 		    qbQuestion.setVersion(1);
-		    qbQuestion.setQuestionId(qbService.getMaxQuestionId() + 1);
+		    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		    qbQuestion.setCreateDate(new Date());
 		    break;
 	    }

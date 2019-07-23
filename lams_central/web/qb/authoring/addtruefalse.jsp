@@ -83,6 +83,7 @@
 				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="uid" />
+				<form:hidden path="questionId" />
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
