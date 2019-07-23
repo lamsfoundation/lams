@@ -124,7 +124,8 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
 							   
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
 	SELECT NULL, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-		SUBSTRING(TRIM(REPLACE(strip_tags(mcq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' ')), 1, 80), mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
+		SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(mcq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+		mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
 	FROM (SELECT uid,
 				 question AS question,
 				 mark AS max_mark,
@@ -264,10 +265,11 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id)
 	SELECT NULL, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
-		sq.question, sq.description, NULL, NULL, q.target_uid
+	TRIM(REPLACE(REPLACE(strip_tags(sq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')),
+	TRIM(sq.description), NULL, NULL, q.target_uid
 	FROM (SELECT uid,
-				 TRIM(title) AS question,
-				 TRIM(description) AS description,
+				 title AS question,
+				 description,
 				 create_date
 		  FROM tl_lascrt11_scratchie_item) AS sq
 	JOIN (SELECT DISTINCT target_uid FROM tmp_question_match) AS q
@@ -509,7 +511,8 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 	
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question SELECT NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 'temp_folder',
-				IFNULL(TRIM(aq.question), ''), TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
+			    TRIM(REPLACE(REPLACE(strip_tags(aq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', ' ')),
+				TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
 				aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
 				aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
 				aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid
