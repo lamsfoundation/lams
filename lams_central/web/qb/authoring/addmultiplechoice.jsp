@@ -273,7 +273,7 @@
 					</div>
 					
 					<c:if test="${not empty assessmentQuestionForm.questionId}">
-						<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}" inPanel="false"/>
+						<lams:OutcomeAuthor qbQuestionId="${assessmentQuestionForm.questionId}" />
 					</c:if>
 				</div><!-- settings tab ends -->
 			</form:form>
