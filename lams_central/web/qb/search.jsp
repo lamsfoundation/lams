@@ -116,9 +116,9 @@
 		   	multiselect: false,
 			datatype: "json",
 			url: "<c:url value="/searchQB/getPagedQuestions.do"/>",
-			//postData: { 
-           	//	questionType: ${questionType} 
-	        //},
+			postData: { 
+				questionTypes: "" + $("#types-select").val(), 
+	        },
 			height: '100%',
 			autowidth: true,
 			shrinkToFit: true,
@@ -265,10 +265,11 @@
 		</c:forEach>
 	</select>
 	
-	<c:if test="${!empty questionTypesAvailable}">
-		<fmt:message key="label.question.type" />&nbsp;
+	<c:choose>
+		<c:when test="${!empty questionTypesAvailable}">
+			<fmt:message key="label.question.type" />&nbsp;
 		
-		<select id="types-select" class="selectpicker" multiple>
+			<select id="types-select" class="selectpicker" multiple>
 				<c:forTokens items="${questionTypesAvailable}" delims="," var="questionTypeIter">
 					<option value="${questionTypeIter}">
 						<c:choose>
@@ -299,8 +300,13 @@
 						</c:choose>
 					</option>
 				</c:forTokens>
-		</select>
-	</c:if>
+			</select>
+		</c:when>
+		
+		<c:otherwise>
+			<input type="hidden" id="types-select" value="${questionType}">
+		</c:otherwise>
+	</c:choose>
 </div>
 
 <div id="grid-container">
