@@ -62,11 +62,11 @@
 							</div>
 						</c:if>
 						
-						<!-- 
+						<%--
 					    <span class='pull-right alert-info btn-xs loffset5 roffset5'>
 					    	v.&nbsp;${questionDto.version}
 					    </span>	
-					     -->
+					    --%>
 					</div>
 				</td>
 
