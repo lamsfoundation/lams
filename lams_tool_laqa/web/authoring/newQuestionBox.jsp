@@ -39,8 +39,11 @@
 	</div>
 </div>	
 	<div class="voffset5 pull-right">
-		<a href="#" onclick="hideMessage()" class="btn btn-default btn-xs loffset5"> <fmt:message key="label.cancel" /> </a>
-		<a href="#" onclick="submitMessage()" class="btn btn-default btn-xs"> <fmt:message key="label.save.question" /></a>
+		<a href="#" onclick="hideMessage()" class="btn btn-default btn-sm loffset5"> <fmt:message key="label.cancel" /> </a>
+		<a href="#" onclick="submitMessage()" class="btn btn-default btn-sm"> 
+			<i class="fa fa-lg fa-plus-circle"></i>
+			<fmt:message key="label.save.question" />
+		</a>
 	</div>
 </form:form>
 </div>

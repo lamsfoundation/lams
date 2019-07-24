@@ -72,6 +72,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -193,7 +194,7 @@ public class QaAuthoringController implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
 
-	List<QaQuestionDTO> questionDTOs = new LinkedList();
+	List<QaQuestionDTO> questionDTOs = new LinkedList<>();
 
 	/*
 	 * get the existing question content
@@ -603,13 +604,11 @@ public class QaAuthoringController implements QaAppConstants {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
     private String importQbQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm authoringForm,
-	    HttpServletRequest request) {
-	String httpSessionID = WebUtil.readStrParam(request, "httpSessionID");
+	    HttpServletRequest request, @RequestParam String httpSessionID, @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 	
 	//get QbQuestion from DB
-	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
 	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
