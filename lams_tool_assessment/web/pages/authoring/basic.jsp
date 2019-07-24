@@ -41,6 +41,18 @@
 				}
 			);
 		})
+
+    	//handler for "Import" button. Caches references maxMarks.
+    	$(document).on("click", '#import-button[disabled!=disabled]', function() {
+			$.ajax({ 
+			    url: '<c:url value="/authoring/cacheReferencesMaxMarks.do"/>',
+				type: 'POST',
+				data: {
+					sessionMapID: "${sessionMapID}",
+					referenceMaxMarks: serializeReferenceMaxMarks() 
+				}
+			});
+        });
 	});
 
 	//The panel of assessment list panel

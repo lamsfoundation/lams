@@ -76,12 +76,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
@@ -290,7 +292,7 @@ public class AuthoringController {
 
 	// ************************* Handle assessment questions *******************
 	List<AssessmentQuestion> newRandomQuestions = getRandomPoolQuestions(sessionMap);
-	Set<QuestionReference> newReferences = updateQuestionReferencesMaxMarks(request, sessionMap, true);
+	Set<QuestionReference> newReferences = cacheReferencesMaxMarks(request, sessionMap, true);
 	
 	TreeSet<AssessmentQuestion> newQuestions = new TreeSet<>();
 	newQuestions.addAll(newRandomQuestions);
@@ -358,6 +360,17 @@ public class AuthoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return "pages/authoring/authoring";
     }
+    
+    /**
+     * Caches references MaxMarks. Invoked on clicking import button. 
+     */
+    @RequestMapping("/cacheReferencesMaxMarks")
+    @ResponseStatus(HttpStatus.OK)
+    public void cacheReferencesMaxMarks(HttpServletRequest request)
+	    throws ServletException, IOException {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	cacheReferencesMaxMarks(request, sessionMap, false);
+    }
 
     /**
      * Display empty page for new assessment question.
@@ -366,7 +379,7 @@ public class AuthoringController {
     public String initNewReference(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
+	cacheReferencesMaxMarks(request, sessionMap, false);
 
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 	if (type.equals(-1)) {//randomQuestion case
@@ -398,7 +411,7 @@ public class AuthoringController {
     public String editReference(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam int questionReferenceIndex) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
+	cacheReferencesMaxMarks(request, sessionMap, false);
 	
 	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 	List<QuestionReference> rList = new ArrayList<>(questionReferences);
@@ -638,7 +651,7 @@ public class AuthoringController {
     @RequestMapping("/removeQuestionReference")
     public String removeQuestionReference(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
+	cacheReferencesMaxMarks(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
@@ -674,7 +687,7 @@ public class AuthoringController {
 
     private String switchQuestionReferences(HttpServletRequest request, boolean up) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	updateQuestionReferencesMaxMarks(request, sessionMap, false);
+	cacheReferencesMaxMarks(request, sessionMap, false);
 
 	int questionReferenceIdx = NumberUtils
 		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
@@ -881,7 +894,7 @@ public class AuthoringController {
 	return list;
     }
 
-    private Set<QuestionReference> updateQuestionReferencesMaxMarks(HttpServletRequest request,
+    private Set<QuestionReference> cacheReferencesMaxMarks(HttpServletRequest request,
 	    SessionMap<String, Object> sessionMap, boolean isFormSubmit) {
 	Map<String, String> paramMap = splitRequestParameter(request,
 		AssessmentConstants.ATTR_QUESTION_REFERENCES_MAX_MARKS);
