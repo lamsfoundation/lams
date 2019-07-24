@@ -105,9 +105,6 @@ CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 	JOIN tl_lamc11_options_content AS o ON q.uid = o.mc_que_content_id
 	GROUP BY q.uid;
 
--- to speed up matching; index has almost maximum allowed length
-ALTER TABLE tmp_question ADD INDEX (content(500));
-
 -- create a mapping of MCQ question UID -> UID of one of MCQ questions which holds the same content
 CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
 								 target_uid BIGINT)
@@ -190,7 +187,6 @@ DROP TABLE tmp_question_match;
 
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 						   content MEDIUMTEXT);
-ALTER TABLE tmp_question ADD INDEX (content(500));
 
 CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
 								 target_uid BIGINT);
@@ -198,6 +194,9 @@ ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 
 
 -- SCRATCHIE
+
+-- delete corrupted data
+DELETE FROM tl_lascrt11_scratchie_answer WHERE scratchie_item_uid IS NULL;
 
 -- shift Scratchie question UIDs by offset equal to existing UIDs of MCQ in lams_qb_tool_question 
 SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
@@ -236,8 +235,6 @@ CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 		ON q.uid = o.qb_question_uid
 	GROUP BY q.uid;
 	
-ALTER TABLE tmp_qb_question ADD INDEX (content(500));
-
 -- create a table which holds IDs of questions which are already in the question bank
 CREATE TABLE tmp_qb_question_match (question_uid BIGINT PRIMARY KEY, qb_question_uid BIGINT)
 	AS SELECT q.question_uid, qb.question_uid AS qb_question_uid
@@ -373,7 +370,6 @@ DROP TABLE tmp_qb_question_match;
 
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 						   content MEDIUMTEXT);
-ALTER TABLE tmp_question ADD INDEX (content(500));
 
 CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
 								 target_uid BIGINT);
@@ -381,7 +377,6 @@ ALTER TABLE tmp_question_match ADD INDEX (target_uid);
 
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
 						      content MEDIUMTEXT);
-ALTER TABLE tmp_qb_question ADD INDEX (content(500));
 
 CREATE TABLE tmp_qb_question_match (question_uid BIGINT PRIMARY KEY,
 									qb_question_uid BIGINT);
@@ -474,7 +469,6 @@ DROP TABLE tmp_question;
 
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
 						   content MEDIUMTEXT);
-ALTER TABLE tmp_question ADD INDEX (content(500));
 
 INSERT INTO tmp_question
 	SELECT q.uid,
