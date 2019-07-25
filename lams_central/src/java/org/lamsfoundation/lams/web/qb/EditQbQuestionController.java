@@ -480,9 +480,6 @@ public class EditQbQuestionController {
 		option.setName(name);
 		float maxMark = Float.valueOf(paramMap.get(QbConstants.ATTR_OPTION_MAX_MARK_PREFIX + i));
 		option.setMaxMark(maxMark);
-		if (maxMark == 1.0) {
-		    option.setCorrect(true);
-		}
 		option.setFeedback(paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 
 	    } else if (questionType == QbQuestion.TYPE_MATCHING_PAIRS) {

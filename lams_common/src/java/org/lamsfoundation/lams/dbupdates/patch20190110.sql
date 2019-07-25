@@ -46,7 +46,6 @@ CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
 							 `qb_question_uid` BIGINT NOT NULL,
 							 `display_order` TINYINT NOT NULL DEFAULT 1,
 							 `name` TEXT,
-							 `correct` TINYINT(1) NOT NULL DEFAULT 0,
 							 `matching_pair` TEXT,
 							 `numerical_option` float DEFAULT 0,
 							 `max_mark` float DEFAULT 0,
@@ -152,7 +151,7 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
 								  DROP COLUMN feedback;
 								  
 -- fill table with options matching unique QB questions inserted above
-INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
+INSERT INTO lams_qb_option (qb_question_uid, display_order, name, max_mark)
 	SELECT q.uid, o.displayOrder, o.mc_que_option_text, o.correct_option
 	FROM tl_lamc11_options_content AS o
 	JOIN lams_qb_question AS q
@@ -325,7 +324,7 @@ DROP TABLE tmp_scratchie_answer;
 
 
 -- fill table with options matching unique QB questions inserted above		  
-INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct)
+INSERT INTO lams_qb_option (qb_question_uid, display_order, name, max_mark)
 	SELECT q.uid, o.order_id, o.description, o.correct
 	FROM tl_lascrt11_scratchie_answer AS o
 	JOIN lams_qb_question AS q
@@ -450,7 +449,7 @@ UPDATE lams_qb_question AS q
 		ON q.uid = m.qb_question_uid
 	JOIN tl_laasse10_assessment_question AS aq
 		ON aq.uid = m.question_uid
-	SET q.name = TRIM(aq.question);
+	SET q.name = TRIM(aq.title);
 
 -- create a mapping of Assessment question UID -> UID of one of Assessment questions which holds the same content
 INSERT INTO tmp_question_match
@@ -595,8 +594,8 @@ WHERE EXISTS
 DROP TABLE tmp_assessment_option;
 
 -- fill table with options matching unique QB questions inserted above		  
-INSERT INTO lams_qb_option (qb_question_uid, display_order, name, correct, matching_pair, numerical_option, max_mark, accepted_error, feedback)
-	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.correct OR o.grade > 0, o.question, o.option_float,
+INSERT INTO lams_qb_option (qb_question_uid, display_order, name, matching_pair, numerical_option, max_mark, accepted_error, feedback)
+	SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.question, o.option_float,
 		   o.grade, o.accepted_error, o.feedback
 	FROM tl_laasse10_question_option AS o
 	JOIN lams_qb_question AS q
@@ -626,6 +625,7 @@ UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams
 		AND qo.qb_question_uid = tq.qb_question_uid
 		AND o.question_uid = tq.tool_question_uid;
 		
+
 -- prepare for updating option IDs in tl_laasse10_option_answer
 CREATE TABLE tmp_option_answer 
 	SELECT DISTINCT sa.question_option_uid, qo.uid
@@ -644,7 +644,6 @@ DELETE o
 	WHERE t.question_option_uid IS NULL;
 
 ALTER TABLE tl_laasse10_option_answer DROP FOREIGN KEY FK_tl_laasse10_option_answer_2;
-
 
 -- proper update
 UPDATE tl_laasse10_option_answer AS sa, tmp_option_answer AS t 

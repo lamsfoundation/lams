@@ -32,16 +32,13 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     @Column
     private String name;
 
-    @Column
-    private boolean correct = false;
-
     @Column(name = "display_order")
     private int displayOrder = 1;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "qb_question_uid")
     private QbQuestion qbQuestion;
-    
+
     // **********************************************************
     // Properties used only in Assessment
     // **********************************************************
@@ -77,13 +74,13 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     @Override
     public boolean equals(Object o) {
 	QbOption other = (QbOption) o;
-	return new EqualsBuilder().append(this.name, other.name).append(this.correct, other.correct)
+	return new EqualsBuilder().append(this.name, other.name).append(this.maxMark, other.maxMark)
 		.append(this.displayOrder, other.displayOrder).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(this.name).append(this.correct).toHashCode();
+	return new HashCodeBuilder().append(this.name).append(this.maxMark).toHashCode();
     }
 
     @Override
@@ -94,7 +91,7 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     public Long getUid() {
 	return uid;
     }
-    
+
     public void setUid(Long uid) {
 	this.uid = uid;
     }
@@ -108,11 +105,11 @@ public class QbOption implements Serializable, Cloneable, Comparable<QbOption> {
     }
 
     public boolean isCorrect() {
-	return correct;
+	return this.maxMark == 1f;
     }
 
     public void setCorrect(boolean correct) {
-	this.correct = correct;
+	this.maxMark = correct ? 1 : 0;
     }
 
     public int getDisplayOrder() {
