@@ -399,7 +399,19 @@ UPDATE tl_laasse10_question_result SET `answer_string` = TRIM(REPLACE(REPLACE(RE
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 ALTER TABLE tl_laasse10_question_option ADD INDEX (sequence_id),
 										ADD INDEX tmp_index (sequence_id, question_uid);
-		
+										
+-- check if patch20190423.sql in Assessment has already run
+-- if not, create index so we can use it in queries, then drop it								
+SET @exist := (SELECT COUNT(*) from information_schema.statistics WHERE 
+	table_name = 'tl_laasse10_option_answer' AND 
+	index_name = 'FK_tl_laasse10_option_answer_2' AND 
+	table_schema = database());
+SET @sqlstmt := IF(@exist > 0,
+	'SELECT ''INFO: Index FK_tl_laasse10_option_answer_2 already exists.''',
+	'ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answer_2 FOREIGN KEY (question_option_uid)	REFERENCES tl_laasse10_question_option (uid)');
+PREPARE stmt FROM @sqlstmt;
+EXECUTE stmt;
+
 INSERT INTO tmp_question
 	SELECT q.uid,
 		   REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id))
