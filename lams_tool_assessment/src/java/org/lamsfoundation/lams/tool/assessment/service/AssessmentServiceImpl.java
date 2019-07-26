@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -2164,12 +2165,13 @@ public class AssessmentServiceImpl
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
 
 	    if (QbQuestion.TYPE_ESSAY == oldQuestion.getType()
-		    || QbQuestion.TYPE_MATCHING_PAIRS == oldQuestion.getType()) {
+		    || QbQuestion.TYPE_MATCHING_PAIRS == oldQuestion.getType()
+		    || QbQuestion.TYPE_ORDERING == oldQuestion.getType()) {
 		continue;
 	    }
 
 	    for (AssessmentQuestion newQuestion : newQuestions) {
-		if (oldQuestion.getUid().equals(newQuestion.getUid())) {
+		if (oldQuestion.getDisplayOrder() == newQuestion.getDisplayOrder()) {
 
 		    boolean isQuestionModified = false;
 
@@ -2186,14 +2188,11 @@ public class AssessmentServiceImpl
 		    List<QbOption> newOptions = newQuestion.getQbQuestion().getQbOptions();
 		    for (QbOption oldOption : oldOptions) {
 			for (QbOption newOption : newOptions) {
-			    if (oldOption.getUid().equals(newOption.getUid())) {
+			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
-				//ordering
-				if (((oldQuestion.getType() == QbQuestion.TYPE_ORDERING)
-					&& (oldOption.getDisplayOrder() != newOption.getDisplayOrder()))
-					//short answer
-					|| ((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
-						&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
+				//short answer
+				if (((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
+					&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
 					//numbering
 					|| (oldOption.getNumericalOption() != newOption.getNumericalOption())
 					|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
@@ -2256,17 +2255,49 @@ public class AssessmentServiceImpl
 
 		    // [+] if the question is modified
 		    for (AssessmentQuestionResult questionResult : questionResults) {
-			QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
+			QbToolQuestion oldQuestion = questionResult.getQbToolQuestion();
+			Float oldQuestionAnswerMark = questionResult.getMark();
+			int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
+				: questionResult.getMaxMark().intValue();
 
 			//check whether according question was modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
-			    if (questionDto.getUid().equals(modifiedQuestion.getUid())) {
-				Float oldQuestionAnswerMark = questionResult.getMark();
-
+			    if (oldQuestion.getDisplayOrder() == modifiedQuestion.getDisplayOrder()) {
+				
+				//update questionResult's qbQuestion with the new one 
+				questionResult.setQbToolQuestion(modifiedQuestion);
+				//update questionResult's qbOption 
+//				for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
+//				    if (questionResult.getQbOption().getDisplayOrder() == newOption.getDisplayOrder()) {
+//					questionResult.setQbOption(newOption);
+//					break;
+//				    }
+//				}
+				//update questionResult's optionAnswers
+				for (AssessmentOptionAnswer oldOptionAnswer : questionResult.getOptionAnswers()) {
+				    
+				    //find according old qbOption
+				    QbOption oldOption = null;
+				    for (QbOption oldOptionIter: oldQuestion.getQbQuestion().getQbOptions()) {
+					if (oldOptionIter.getUid().equals(oldOptionAnswer.getOptionUid())) {
+					    oldOption = oldOptionIter;
+					}
+				    }
+				    
+				    //update
+				    for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
+					if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+					    oldOptionAnswer.setOptionUid(newOption.getUid());
+					    break;
+					}
+				    }
+				}		
+				
 				//actually recalculate marks
-				questionDto.setMaxMark(questionResult.getMaxMark().intValue());
-				loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
-				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, questionDto);
+				QuestionDTO modifiedQuestionDto = new QuestionDTO(modifiedQuestion);
+				modifiedQuestionDto.setMaxMark(oldResultMaxMark);
+				loadupQuestionResultIntoQuestionDto(modifiedQuestionDto, questionResult);
+				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, modifiedQuestionDto);
 				assessmentQuestionResultDao.saveObject(questionResult);
 
 				float newQuestionAnswerMark = questionResult.getMark();
@@ -2324,7 +2355,8 @@ public class AssessmentServiceImpl
 				int newReferenceMaxMark = modifiedReference.getMaxMark();
 				int oldReferenceMaxMark = modifiedReferences.get(modifiedReference);
 
-				if (randomQuestionResult.getMaxMark().intValue() == oldReferenceMaxMark) {
+				if (randomQuestionResult.getMaxMark() != null
+					&& randomQuestionResult.getMaxMark().intValue() == oldReferenceMaxMark) {
 
 				    // update question answer's mark
 				    Float oldQuestionResultMark = randomQuestionResult.getMark();
@@ -3187,11 +3219,6 @@ public class AssessmentServiceImpl
 		    "Assessment Tool does not support REST Authoring for anything but Essay Type and Multiple Choice. Found type "
 			    + type);
 	}
-	// public static final short QUESTION_TYPE_MATCHING_PAIRS = 2;
-	// public static final short QUESTION_TYPE_SHORT_ANSWER = 3;
-	// public static final short QUESTION_TYPE_NUMERICAL = 4;
-	// public static final short QUESTION_TYPE_TRUE_FALSE = 5;
-	// public static final short QUESTION_TYPE_ORDERING = 7;
     }
 
     @Override

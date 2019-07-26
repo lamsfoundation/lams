@@ -230,7 +230,6 @@ public class AuthoringController {
 	Assessment assessment = assessmentForm.getAssessment();
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
-	//TODO **part of markrecalculation**
 	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
@@ -243,12 +242,10 @@ public class AuthoringController {
 	    assessmentPO.setCreated(new Timestamp(new Date().getTime()));
 
 	} else {
-	    //TODO **part of markrecalculation**
 	    // copyProperties() below sets assessmentPO items to empty collection
 	    // but the items still exist in Hibernate cache, so we need to evict them now
 	    for (AssessmentQuestion question : oldQuestions) {
 		service.releaseFromCache(question);
-//		service.releaseFromCache(question.getQbQuestion());
 	    }
 	    for (QuestionReference reference : oldReferences) {
 		service.releaseFromCache(reference);
@@ -256,7 +253,6 @@ public class AuthoringController {
 		    service.releaseFromCache(reference.getQuestion());
 		}
 	    }
-	    assessmentPO.getQuestions().clear();
 	    
 	    Long uid = assessmentPO.getUid();
 	    assessmentUser = assessmentPO.getCreatedBy();
@@ -300,9 +296,7 @@ public class AuthoringController {
 	    if (!reference.isRandomQuestion()) {
 		AssessmentQuestion question = reference.getQuestion();
 		newQuestions.add(question);
-	    }	   
-	    //TODO check
-//	    removeNewLineCharacters(question);
+	    }
 	}
 
 	for (AssessmentQuestion question : newQuestions) {
@@ -311,13 +305,12 @@ public class AuthoringController {
 
 	assessmentPO.setQuestions(newQuestions);
 	
-	//TODO **part of markrecalculation**
 //	// recalculate results in case content is edited from monitoring and it's been already attempted by a student
-//	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
-//	if (isAuthoringRestricted) {
-//	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
-//		    newQuestions, oldReferences, newReferences);
-//	}
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	if (isAuthoringRestricted) {
+	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
+		    newQuestions, oldReferences, newReferences);
+	}
 
 	// Handle question references
 	assessmentPO.setQuestionReferences(newReferences);
@@ -507,7 +500,6 @@ public class AuthoringController {
 			    && oldQbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
 			AssessmentQuestion assessmentQuestion = reference.getQuestion();
 			assessmentQuestion.setQbQuestion(qbQuestion);
-			assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
 			break;
 		    }
 		}
@@ -608,9 +600,7 @@ public class AuthoringController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
     private String importQbQuestion(HttpServletRequest request, @RequestParam String sessionMapID,
-	    @RequestParam Long qbQuestionUid) {
-	//TODO perform updateQuestionReferencesMaxMarks prior to runnning this method
-	
+	    @RequestParam Long qbQuestionUid) {	
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);

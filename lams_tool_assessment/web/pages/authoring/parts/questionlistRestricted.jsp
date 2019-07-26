@@ -64,23 +64,12 @@
 	       			</span>
 				</td>
 				
-				<td width="70px" style="padding-right: 10px;">
+				<td width="70px">
 					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
 						id="maxMark${questionReference.sequenceId}" class="form-control input-sm">
 				</td>
-				
-				<td class="arrows">
-					<!-- Don't display up icon if first line -->
-					<c:if test="${not status.first}">
-		 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="javascript:upQuestionReference(${status.index})"/>
-		 			</c:if>
-					<!-- Don't display down icon if last line -->
-					<c:if test="${not status.last}">
-						<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="javascript:downQuestionReference(${status.index})"/>
-		 			</c:if>
-				</td>
 
-				<td width="30px">
+				<td width="30px" style="padding-right: 20px;">
 					<c:if test="${!questionReference.randomQuestion}">
 						<c:set var="editReferenceUrl" >
 							<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
