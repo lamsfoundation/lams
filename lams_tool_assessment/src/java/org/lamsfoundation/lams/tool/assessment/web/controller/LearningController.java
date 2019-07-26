@@ -975,29 +975,29 @@ public class LearningController {
 			    questionDto.setMark(questionResult.getMark());
 			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 			    questionDto.setPenalty(questionResult.getPenalty());
+			    
+			    //question feedback
 			    questionDto.setQuestionFeedback(null);
-			    questionDto.setAnswerBoolean(false);
+			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				if (questionResult.getQbOption() != null
+					&& optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+				    questionDto.setQuestionFeedback(optionDto.getFeedback());
+				    break;
+				}
+			    }
 
+			    // required for showing right/wrong answers icons on results page correctly
 			    if ((questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER
 				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
 				    && questionResult.getQbOption() != null) {
-
-				// required for showing right/wrong answers icons on results page correctly
+				boolean isAnsweredCorrectly = false;
 				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-					boolean isAnsweredCorrectly = optionDto.getMaxMark() > 0;
-					questionDto.setAnswerBoolean(isAnsweredCorrectly);
+					isAnsweredCorrectly = optionDto.getMaxMark() > 0;
 					break;
 				    }
 				}
-
-				//question feedback
-				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-				    if (optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
-					questionDto.setQuestionFeedback(optionDto.getFeedback());
-					break;
-				    }
-				}
+				questionDto.setAnswerBoolean(isAnsweredCorrectly);
 			    }
 
 			    // required for markandpenalty area and if it's on - on question's summary page
