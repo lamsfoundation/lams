@@ -177,7 +177,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	}
 	return map;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size,
@@ -185,18 +185,19 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	return (List<QbQuestion>) getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder,
 		searchString, false);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString) {
-	return (List<BigInteger>) getPagedQuestions(null, collectionUids, 0, 100000, sortBy, sortOrder,
-		searchString, true);
+    public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder,
+	    String searchString) {
+	return (List<BigInteger>) getPagedQuestions(null, collectionUids, 0, 100000, sortBy, sortOrder, searchString,
+		true);
     }
 
     private List<?> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
 	    String sortOrder, String searchString, boolean onlyUidsRequested) {
 	String RETURN_VALUE = onlyUidsRequested ? "question.uid" : "question.*";
-	
+
 	//we sort of strip out HTML tags from the search by using REGEXP_REPLACE which skips all the content between < >
 	final String SELECT_QUESTIONS = "SELECT DISTINCT " + RETURN_VALUE + " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_option qboption ON qboption.qb_question_uid = question.uid "
@@ -212,7 +213,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
 		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
 		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL " 
+		+ " WHERE biggerQuestion.version is NULL "
 		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
 		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
@@ -256,7 +257,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	if (!onlyUidsRequested) {
-	    query.addEntity(QbQuestion.class);    
+	    query.addEntity(QbQuestion.class);
 	}
 	List<?> queryResults = query.list();
 
@@ -268,8 +269,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	final String SELECT_QUESTIONS = "SELECT COUNT(DISTINCT question.uid) count "
 		+ " FROM lams_qb_question question  "
 		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON question.question_id = collection.qb_question_id "
-		+ " LEFT OUTER JOIN lams_qb_option qboption "
-		+ "	ON qboption.qb_question_uid = question.uid " 
+		+ " LEFT OUTER JOIN lams_qb_option qboption " + "	ON qboption.qb_question_uid = question.uid "
 		+ " LEFT JOIN ("//help finding questions with the max available version
 		+ "	SELECT biggerQuestion.* FROM lams_qb_question biggerQuestion "
 		+ " LEFT OUTER JOIN lams_qb_collection_question collection ON biggerQuestion.question_id = collection.qb_question_id "
@@ -281,14 +281,15 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		+ " 	OR biggerQuestion.name LIKE CONCAT('%', :searchString, '%') "
 		+ " 	OR REGEXP_REPLACE(qboption1.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) "
 		+ ") AS biggerQuestion ON question.question_id = biggerQuestion.question_id AND question.version < biggerQuestion.version "
-		+ " WHERE biggerQuestion.version is NULL " 
+		+ " WHERE biggerQuestion.version is NULL "
 		+ (questionTypes == null ? "" : " AND question.type in (:questionTypes) ")
 		+ (collectionUids == null ? "" : " AND collection.collection_uid in (:collectionUids) ")
 		+ " AND (REGEXP_REPLACE(question.description, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')"
 		+ " OR question.name LIKE CONCAT('%', :searchString, '%') "
 		+ " OR REGEXP_REPLACE(qboption.name, '<[^>]*>+', '') LIKE CONCAT('%', :searchString, '%')) ";
 
-	NativeQuery<?> query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count", IntegerType.INSTANCE);
+	NativeQuery<?> query = getSession().createNativeQuery(SELECT_QUESTIONS).addScalar("count",
+		IntegerType.INSTANCE);
 	if (questionTypes != null) {
 	    query.setParameterList("questionTypes", questionTypes.split(","));
 	}
@@ -395,7 +396,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public boolean isQuestionInUserCollection(int userId, int qbQuestionId) {
 	return getSession().createNativeQuery(IS_QUESTION_IN_USER_COLLECTION).setParameter("userId", userId)
-		.setParameter("qbQuestionId", qbQuestionId).getSingleResult() != null;
+		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
     }
 
     private boolean questionInCollectionExists(long collectionUid, int qbQuestionId) {

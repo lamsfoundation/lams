@@ -99,9 +99,10 @@ public class QbService implements IQbService {
 	    String sortBy, String sortOrder, String searchString) {
 	return qbDAO.getPagedQuestions(questionTypes, collectionUids, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
-    public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString) {
+    public List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder,
+	    String searchString) {
 	return qbDAO.getAllQuestionUids(collectionUids, sortBy, sortOrder, searchString);
     }
 
@@ -231,10 +232,10 @@ public class QbService implements IQbService {
 	    double incorrectUserMarkSum = 0;
 
 	    // sort grades by highest mark
-	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark));
+	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark).reversed());
 	    // see how many learners should be in top/bottom 27% of the group
 	    int groupCount = (int) Math.ceil(
-		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_MIN_PARTICIPANTS) / 100.0 * participantCount);
+		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
 
 	    // go through each grade and gather data for indexes
 	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
