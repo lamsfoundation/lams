@@ -4,6 +4,7 @@
 
 -- Create QB question table
 CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
+                               `uuid` BINARY(16) NOT NULL,
                                `type` TINYINT NOT NULL,
                                `question_id` INT NOT NULL,
                                `version` SMALLINT NOT NULL DEFAULT 1,
@@ -32,6 +33,12 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
                                PRIMARY KEY (uid),
                                INDEX (tmp_question_id),
                                CONSTRAINT UQ_question_version UNIQUE INDEX (question_id, version));
+                               
+-- Create a trigger to run before insert to generate the UUID for the uuid column
+CREATE TRIGGER before_insert_qb_question
+  BEFORE INSERT ON lams_qb_question
+  FOR EACH ROW
+  SET new.uuid = UUID_TO_BIN(UUID());
                                
 -- Create a question table from which tools' questions will inherit                           
 CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
@@ -515,7 +522,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 
     
 -- fill Question Bank question table with unique questions, with manually incremented question ID
-INSERT INTO lams_qb_question SELECT NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), 'temp_folder',
+INSERT INTO lams_qb_question SELECT NULL, NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), NULL,
                 TRIM(REPLACE(REPLACE(strip_tags(aq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', ' ')),
                 TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
                 aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
@@ -680,6 +687,12 @@ ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answe
 INSERT INTO lams_qb_tool_answer
     SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
 
+-- fill content_folder_id with real values from learning designs
+UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learning_activity AS activity, lams_learning_design AS design
+ 	SET qbque.content_folder_id = design.content_folder_id
+ 	WHERE qbque.uid = toolque.qb_question_uid
+	                AND toolque.tool_content_id = activity.tool_content_id
+	                AND activity.learning_design_id = design.learning_design_id;
 
 -- cleanup
 ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;

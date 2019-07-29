@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -49,6 +50,9 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
+    
+    @Column
+    private UUID uuid;
 
     // one of question types
     @Column
@@ -245,6 +249,10 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public Long getUid() {
 	return uid;
+    }
+    
+    public UUID getUuid() {
+	return uuid;
     }
 
     public Integer getType() {
