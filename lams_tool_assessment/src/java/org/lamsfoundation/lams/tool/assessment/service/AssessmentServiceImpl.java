@@ -418,9 +418,6 @@ public class AssessmentServiceImpl
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
 	for (QuestionReference reference : assessment.getQuestionReferences()) {
-	    if (!reference.isRandomQuestion()) {
-		assessmentQuestionDao.saveObject(reference.getQuestion());
-	    }
 	    assessmentQuestionDao.saveObject(reference);
 	}
 

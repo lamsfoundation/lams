@@ -31,10 +31,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -249,9 +251,9 @@ public class AuthoringController {
 	    }
 	    for (QuestionReference reference : oldReferences) {
 		service.releaseFromCache(reference);
-		if (reference.getQuestion() != null) {
-		    service.releaseFromCache(reference.getQuestion());
-		}
+//		if (reference.getQuestion() != null) {
+//		    service.releaseFromCache(reference.getQuestion());
+//		}
 	    }
 	    
 	    Long uid = assessmentPO.getUid();
@@ -288,7 +290,7 @@ public class AuthoringController {
 
 	// ************************* Handle assessment questions *******************
 	List<AssessmentQuestion> newRandomQuestions = getRandomPoolQuestions(sessionMap);
-	Set<QuestionReference> newReferences = cacheReferencesMaxMarks(request, sessionMap, true);
+	Set<QuestionReference> newReferences = getQuestionReferences(sessionMap);
 	
 	TreeSet<AssessmentQuestion> newQuestions = new TreeSet<>();
 	newQuestions.addAll(newRandomQuestions);
@@ -305,7 +307,7 @@ public class AuthoringController {
 
 	assessmentPO.setQuestions(newQuestions);
 	
-//	// recalculate results in case content is edited from monitoring and it's been already attempted by a student
+	// recalculate results in case content is edited from monitoring and it's been already attempted by a student
 	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	if (isAuthoringRestricted) {
 	    service.recalculateUserAnswers(assessmentPO.getUid(), assessmentPO.getContentId(), oldQuestions,
@@ -353,17 +355,6 @@ public class AuthoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return "pages/authoring/authoring";
     }
-    
-    /**
-     * Caches references MaxMarks. Invoked on clicking import button. 
-     */
-    @RequestMapping("/cacheReferencesMaxMarks")
-    @ResponseStatus(HttpStatus.OK)
-    public void cacheReferencesMaxMarks(HttpServletRequest request)
-	    throws ServletException, IOException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	cacheReferencesMaxMarks(request, sessionMap, false);
-    }
 
     /**
      * Display empty page for new assessment question.
@@ -372,7 +363,6 @@ public class AuthoringController {
     public String initNewReference(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	cacheReferencesMaxMarks(request, sessionMap, false);
 
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 	if (type.equals(-1)) {//randomQuestion case
@@ -402,13 +392,13 @@ public class AuthoringController {
      */
     @RequestMapping("/editReference")
     public String editReference(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam int questionReferenceIndex) throws ServletException, IOException {
+	    @RequestParam int referenceSequenceId) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	cacheReferencesMaxMarks(request, sessionMap, false);
-	
 	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	
+	//find reference to edit
 	List<QuestionReference> rList = new ArrayList<>(questionReferences);
-	QuestionReference questionReference = rList.get(questionReferenceIndex);
+	QuestionReference questionReference = rList.get(referenceSequenceId);
 	
 	if (questionReference.isRandomQuestion()) {
 	    request.setAttribute("isReferenceNew", false);
@@ -490,18 +480,13 @@ public class AuthoringController {
 	    
 	// edit
 	} else {
-	    //QbQuestion's uid is kept the same - means it's a minor change, do nothing
-	    if (oldQbQuestionUid.equals(qbQuestion.getUid())) {
-
 	    //replace QbQuestion with the new version of it
-	    } else {
-		for (QuestionReference reference : references) {
-		    if (!reference.isRandomQuestion()
-			    && oldQbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
-			AssessmentQuestion assessmentQuestion = reference.getQuestion();
-			assessmentQuestion.setQbQuestion(qbQuestion);
-			break;
-		    }
+	    for (QuestionReference reference : references) {
+		if (!reference.isRandomQuestion()
+			&& oldQbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
+		    AssessmentQuestion assessmentQuestion = reference.getQuestion();
+		    assessmentQuestion.setQbQuestion(qbQuestion);
+		    break;
 		}
 	    }
 	}
@@ -639,77 +624,23 @@ public class AuthoringController {
      * happen when user submit whole page. So this remove is just impact HttpSession values.
      */
     @RequestMapping("/removeQuestionReference")
-    public String removeQuestionReference(HttpServletRequest request) {
+    public String removeQuestionReference(HttpServletRequest request, @RequestParam int referenceSequenceId) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	cacheReferencesMaxMarks(request, sessionMap, false);
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 
-	int questionReferenceIdx = NumberUtils
-		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
-	if (questionReferenceIdx != -1) {
-	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
-	    List<QuestionReference> rList = new ArrayList<>(questionReferences);
-	    QuestionReference questionReference = rList.remove(questionReferenceIdx);
-	    questionReferences.clear();
-	    questionReferences.addAll(rList);
-	    // add to delList
-	    List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
-	    delList.add(questionReference);
-	}
+	//find reference to delete
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.remove(referenceSequenceId);
+
+	questionReferences.remove(questionReference);
+
+	// add to delList
+	List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
+	delList.add(questionReference);
 
 	return "pages/authoring/parts/questionlist";
     }
-
-    /**
-     * Move up current question reference.
-     */
-    @RequestMapping("/upQuestionReference")
-    public String upQuestionReference(HttpServletRequest request) {
-	return switchQuestionReferences(request, true);
-    }
-
-    /**
-     * Move down current question reference.
-     */
-    @RequestMapping("/downQuestionReference")
-    public String downQuestionReference(HttpServletRequest request) {
-	return switchQuestionReferences(request, false);
-    }
-
-    private String switchQuestionReferences(HttpServletRequest request, boolean up) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	cacheReferencesMaxMarks(request, sessionMap, false);
-
-	int questionReferenceIdx = NumberUtils
-		.toInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
-	if (questionReferenceIdx != -1) {
-	    SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	    List<QuestionReference> rList = new ArrayList<>(references);
-	    // get current and the target item, and switch their sequnece
-	    QuestionReference reference = rList.get(questionReferenceIdx);
-	    QuestionReference repReference;
-	    if (up) {
-		repReference = rList.get(--questionReferenceIdx);
-	    } else {
-		repReference = rList.get(++questionReferenceIdx);
-	    }
-	    int upSeqId = repReference.getSequenceId();
-	    repReference.setSequenceId(reference.getSequenceId());
-	    reference.setSequenceId(upSeqId);
-
-	    // put back list, it will be sorted again
-	    references.clear();
-	    references.addAll(rList);
-	}
-
-	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options
-	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
-	if (isAuthoringRestricted) {
-	    return "pages/authoring/parts/questionlistRestricted";    
-	} else {
-	    return "pages/authoring/parts/questionlist";
-	}
-    }
-    
+   
     @RequestMapping("/getAllQbQuestionUids")
     @ResponseBody
     public String getAllQbQuestionUids(HttpServletRequest request, HttpServletResponse response,
@@ -781,6 +712,47 @@ public class AuthoringController {
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
+    }
+    
+    /**
+     * Caches references order, along with this caches MaxMarks. 
+     */
+    @RequestMapping("/cacheReferencesOrder")
+    @ResponseStatus(HttpStatus.OK)
+    public void cacheReferencesOrder(HttpServletRequest request)
+	    throws ServletException, IOException {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Set<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	
+	//cache references' sequenceIds
+	Map<String, String> sequenceIdsParamMap = splitRequestParameter(request,
+		AssessmentConstants.ATTR_REFERENCES_SEQUENCE_IDS);
+	List<QuestionReference> updatedQuestionReferences = new LinkedList<>();
+	for (QuestionReference questionReference : questionReferences.toArray(new QuestionReference[0])) {
+	    String newSequenceId = sequenceIdsParamMap
+		    .get(AssessmentConstants.PARAM_SEQUENCE_ID + questionReference.getSequenceId());
+
+	    questionReference.setSequenceId(Integer.valueOf(newSequenceId));
+	    updatedQuestionReferences.add(questionReference);
+	}
+	questionReferences.clear();
+	questionReferences.addAll(updatedQuestionReferences);
+    }
+    
+    /**
+     * change reference's MaxMark 
+     */
+    @RequestMapping("/changeMaxMark")
+    @ResponseStatus(HttpStatus.OK)
+    public void changeMaxMark(HttpServletRequest request, @RequestParam int referenceSequenceId,
+	    @RequestParam int maxMark) throws ServletException, IOException {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+
+	//find reference to edit
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.get(referenceSequenceId);
+	questionReference.setMaxMark(maxMark);
     }
 
     /**
@@ -882,32 +854,6 @@ public class AuthoringController {
 	    sessionMap.put(name, list);
 	}
 	return list;
-    }
-
-    private Set<QuestionReference> cacheReferencesMaxMarks(HttpServletRequest request,
-	    SessionMap<String, Object> sessionMap, boolean isFormSubmit) {
-	Map<String, String> paramMap = splitRequestParameter(request,
-		AssessmentConstants.ATTR_QUESTION_REFERENCES_MAX_MARKS);
-
-	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
-	for (QuestionReference questionReference : questionReferences) {
-	    try {
-		int maxMark;
-		if (isFormSubmit) {
-		    maxMark = WebUtil.readIntParam(request,
-			    AssessmentConstants.PARAM_MAX_MARK + questionReference.getSequenceId());
-		} else {
-		    String maxMarkStr = paramMap.get(AssessmentConstants.PARAM_MAX_MARK + questionReference.getSequenceId());
-		    maxMark = Integer.valueOf(maxMarkStr);
-		}
-
-		questionReference.setMaxMark(maxMark);
-	    } catch (Exception e) {
-		log.debug(e.getMessage());
-	    }
-	}
-
-	return questionReferences;
     }
 
     /**

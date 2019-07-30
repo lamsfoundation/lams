@@ -50,8 +50,6 @@ public class AssessmentConstants {
     
     public static final String PARAM_QUESTION_DISPLAY_ORDER = "questionDisplayOrder";
 
-    public static final String PARAM_QUESTION_REFERENCE_INDEX = "questionReferenceIndex";
-
     public static final String PARAM_QUESTION_UID = "questionUid";
 
     public static final String PARAM_OPTION_INDEX = "optionIndex";
@@ -63,6 +61,8 @@ public class AssessmentConstants {
     public static final String PARAM_GRADE = "grade";
     
     public static final String PARAM_MAX_MARK = "maxMark";
+    
+    public static final String PARAM_SEQUENCE_ID = "sequenceId";
 
     public static final String PARAM_SESSION_ID = "sessionId";
 
@@ -101,7 +101,9 @@ public class AssessmentConstants {
 
     public static final String ATTR_UNIT_LIST = "unitList";
 
-    public static final String ATTR_QUESTION_REFERENCES_MAX_MARKS = "referenceMaxMarks";
+    public static final String ATTR_REFERENCES_MAX_MARKS = "referenceMaxMarks";
+    
+    public static final String ATTR_REFERENCES_SEQUENCE_IDS = "sequenceIds";
     
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
     

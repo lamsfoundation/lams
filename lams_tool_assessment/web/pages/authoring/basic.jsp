@@ -42,14 +42,38 @@
 			);
 		})
 
-    	//handler for "Import" button. Caches references maxMarks.
-    	$(document).on("click", '#import-button[disabled!=disabled]', function() {
+    	//handler for "delete" buttons
+    	$(document).on("click", '.delete-reference-link', function() {
+    		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+
+    		if (deletionConfirmed) {
+    			var sequenceId = $('.reference-sequence-id', $(this).parents('tr')).val();
+
+    			$(questionListTargetDiv).load(
+    				"<c:url value="/authoring/removeQuestionReference.do"/>",
+    				{
+    					referenceSequenceId: sequenceId, 
+    					sessionMapID: "${sessionMapID}"
+    				},
+    				function(){
+    					reinitializePassingMarkSelect(false);
+    					refreshThickbox();
+    				}
+    			);
+    		};
+        });
+
+    	//handler for "maxMark" inputs
+    	$(document).on("change", '.max-mark-input', function() {
+    		var sequenceId = $('.reference-sequence-id', $(this).parents('tr')).val();
+    		
 			$.ajax({ 
-			    url: '<c:url value="/authoring/cacheReferencesMaxMarks.do"/>',
+			    url: '<c:url value="/authoring/changeMaxMark.do"/>',
 				type: 'POST',
 				data: {
 					sessionMapID: "${sessionMapID}",
-					referenceMaxMarks: serializeReferenceMaxMarks() 
+					referenceSequenceId: sequenceId,
+					maxMark: this.value
 				}
 			});
         });
@@ -57,72 +81,25 @@
 
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#itemArea";
-	function deleteQuestionReference(idx){
-		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
-
-		if (deletionConfirmed) {
-			var url = "<c:url value="/authoring/removeQuestionReference.do"/>";
-			$(questionListTargetDiv).load(
-				url,
-				{
-					questionReferenceIndex: idx, 
-					sessionMapID: "${sessionMapID}",
-					referenceMaxMarks: serializeReferenceMaxMarks()
-				},
-				function(){
-					reinitializePassingMarkSelect(false);
-					refreshThickbox();
-				}
-			);
-		};
-	}
-	function upQuestionReference(idx){
-		var url = "<c:url value="/authoring/upQuestionReference.do"/>";
-		$(questionListTargetDiv).load(
-			url,
-			{
-				questionReferenceIndex: idx, 
-				sessionMapID: "${sessionMapID}",
-				referenceMaxMarks: serializeReferenceMaxMarks()
-			},
-			function(){
-				refreshThickbox();
-			}
-		);
-	}
-	function downQuestionReference(idx){
-		var url = "<c:url value="/authoring/downQuestionReference.do"/>";
-		$(questionListTargetDiv).load(
-			url,
-			{
-				questionReferenceIndex: idx, 
-				sessionMapID: "${sessionMapID}",
-				referenceMaxMarks: serializeReferenceMaxMarks()
-			},
-			function(){
-				refreshThickbox();
-			}
-		);
-	}
-	function serializeReferenceMaxMarks(){
-		var serializedMaxMarks = "";
-		$("[name^=maxMark]").each(function() {
-			serializedMaxMarks += "&" + this.name + "="  + this.value;
-		});
-		return serializedMaxMarks;
-	}
-
 	function initNewReferenceHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.value;
 		
-		var newQuestionInitHref = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}&questionType=" + questionType + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true";
+		var newQuestionInitHref = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}"
+			+ "&questionType=" + questionType 
+			+ "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref);
 	};
-	function createEditQuestionHref(idx){
-		var editHref = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=" + idx + "&referenceMaxMarks=" + encodeURIComponent(serializeReferenceMaxMarks()) + "&KeepThis=true&TB_iframe=true&modal=true"; 
-		$("#edit-ref-" + idx).attr("href", editHref);
-	}
+
+	//handler for "edit" buttons
+	function editReference(link) {
+		var sequenceId = $('.reference-sequence-id', $(link).parents('tr')).val();
+    	
+		var editHref = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}" 
+		+ "&referenceSequenceId=" + sequenceId 
+		+ "&KeepThis=true&TB_iframe=true&modal=true";
+		$(link).attr("href", editHref);
+    }
 	
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox

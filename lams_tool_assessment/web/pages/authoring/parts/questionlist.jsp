@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 <%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
+
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
 <script>
 	// Inform author whether the QB question was modified
 	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
@@ -20,6 +21,49 @@
 	if (qbMessage) {
 		alert(qbMessage);
 	}
+
+	$(document).ready(function(){
+		
+	    //init questions sorting
+	    <c:if test="${not empty sessionMap.questionReferences}">
+	    new Sortable($('#referencesTable tbody')[0], {
+		    animation: 150,
+		    direction: 'vertical',
+			store: {
+				set: function (sortable) {
+					//update all sequenceIds
+					for (var i = 0; i < sortable.el.rows.length; i++) {
+					 	var tr = sortable.el.rows[i];
+					 	var input = $("input[name^=sequenceId]", $(tr));
+					 	input.val(i);
+					}
+
+					//prepare SequenceIds parameter
+					var serializedSequenceIds = "";
+					$("[name^=sequenceId]").each(function() {
+						serializedSequenceIds += "&" + this.name + "="  + this.value;
+					});
+
+					$.ajax({ 
+					    url: '<c:url value="/authoring/cacheReferencesOrder.do"/>',
+						type: 'POST',
+						data: {
+							sessionMapID: "${sessionMapID}",
+							sequenceIds: serializedSequenceIds
+						}
+					});
+
+					//update names
+					$("[name^=sequenceId]").each(function() {
+						var newSequenceId = this.value;
+						//update name of the hidden input
+						this.name = "sequenceId" + newSequenceId;
+					});
+				}
+			}
+		});
+		</c:if>
+	});
 </script>
 
 <div class="panel panel-default voffset5">
@@ -39,6 +83,8 @@
 			<c:set var="question" value="${questionReference.question}" />
 			<tr>
 				<td>
+					<input type="hidden" name="sequenceId${questionReference.sequenceId}" value="${status.index}" class="reference-sequence-id">
+				
 					<c:choose>
 						<c:when test="${questionReference.randomQuestion}">
 							<fmt:message key="label.authoring.basic.type.random.question" />
@@ -88,31 +134,17 @@
 				</td>
 				
 				<td width="70px" style="padding-right: 10px;">
-					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
-						id="maxMark${questionReference.sequenceId}" class="form-control input-sm">
-				</td>
-				
-				<td class="arrows">
-					<!-- Don't display up icon if first line -->
-					<c:if test="${not status.first}">
-		 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="javascript:upQuestionReference(${status.index})"/>
-		 			</c:if>
-					<!-- Don't display down icon if last line -->
-					<c:if test="${not status.last}">
-						<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="javascript:downQuestionReference(${status.index})"/>
-		 			</c:if>
+					<input name="maxMark" value="${questionReference.maxMark}" class="form-control input-sm max-mark-input">
 				</td>
 				
 				<td width="30px">
-					<a href="#nogo" class="thickbox roffset5x" style="color: black;" id="edit-ref-${status.index}"
-						onclick="javascript:createEditQuestionHref(${status.index})"> 
+					<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
 						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>
 				</td>
 
 				<td width="30px">
-					<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
-						onclick="javascript:deleteQuestionReference(${status.index})"></i>
+					<i class="fa fa-times delete-reference-link" title="<fmt:message key="label.authoring.basic.delete" />"></i>
 				</td>
 			</tr>
 		</c:forEach>
