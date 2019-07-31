@@ -62,8 +62,6 @@ public class XmlQuestionsController {
     @ResponseBody
     public void importQuestionsXml(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request,
 	    @RequestParam long collectionUid) throws ServletException {
-	int questionId = qbService.generateNextQuestionId();
-
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
 	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
@@ -77,14 +75,15 @@ public class XmlQuestionsController {
 	    if (!fileExtension.equalsIgnoreCase("xml")) {
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
-	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
-
+	    
 	    // import learning design
-	    String fullFilePath = destinationFile.getAbsolutePath();// FileUtil.getFullPath(learningDesignPath,
-	    // ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
+	    String fullFilePath = destinationFile.getAbsolutePath();
+	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
+	    // FileUtil.getFullPath(learningDesignPath, ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    List<QbQuestion> questions = (List<QbQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
 	    if (questions != null) {
 		for (QbQuestion qbQuestion : questions) {
+		    int questionId = qbService.generateNextQuestionId();
 		    qbQuestion.setQuestionId(questionId);
 		    qbQuestion.setCreateDate(new Date());
 		    userManagementService.save(qbQuestion);
