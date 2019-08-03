@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.scratchie.ScratchieConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:if test="${mode == null}"><c:set var="mode" value="${sessionMap.mode}" /></c:if>
 
 <lams:html>
 <lams:head>

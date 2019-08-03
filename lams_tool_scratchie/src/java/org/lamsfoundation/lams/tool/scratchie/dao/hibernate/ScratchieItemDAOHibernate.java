@@ -47,9 +47,4 @@ public class ScratchieItemDAOHibernate extends LAMSBaseDAO implements ScratchieI
 	return (ScratchieItem) this.getObject(ScratchieItem.class, scratchieItemUid);
     }
 
-    @Override
-    public void releaseItemFromCache(ScratchieItem item) {
-	getSession().evict(item);
-    }
-
 }

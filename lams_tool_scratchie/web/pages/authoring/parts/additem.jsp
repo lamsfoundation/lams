@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.mode == 'teacher'}" />
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 		<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css" media="screen">
- 		
-		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 
-		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">
 			var addAnswerUrl = "<c:url value='/authoring/addAnswer.do'/>";
 		   	var removeAnswerUrl = "<c:url value='/authoring/removeAnswer.do'/>";
@@ -188,6 +188,7 @@
      			    	prepareAnswerEditorsForAjaxSubmit();
 		    			$("#optionList").val($("#answerForm").serialize(true));
 		    			$("#description").val(CKEDITOR.instances.description.getData());
+		    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 		    			
 		    	    	var items = { 
 		    	    		target:  parent.jQuery('#itemArea'), 
@@ -205,18 +206,15 @@
 		
 	</lams:head>
 	
-	<body class="stripes">
-	
-	<div class="row no-gutter">
-		<div class="col-xs-12">
-			<div class="container" id="content">
+	<body>
 			
-			<div class="panel panel-default panel-learner-page">
-				<div class="panel-heading">
-					<div class="panel-title panel-learner-title">
-						<fmt:message key="label.edit.question" />
-					</div>
+		<div class="panel-default add-file">
+			<div class="panel-heading">
+				<div class="panel-title panel-learner-title">
+					<fmt:message key="label.edit.question" />
 				</div>
+			</div>
+			
 			<div class="panel-body panel-${type}-body">
 	
 			<lams:errors/>
@@ -226,50 +224,69 @@
 				<input type="hidden" name="optionList" id="optionList" />
 				<form:hidden path="itemIndex" />
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
+				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
+				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
 	
-				<div class="form-group">
-					<label for="title"><fmt:message key="label.authoring.basic.question.name" /></label>
-					<form:input path="title" cssClass="form-control"/>
+				<div id="title-container" class="form-group">
+					<c:set var="TITLE_LABEL"><fmt:message key="label.authoring.basic.question.name"/> </c:set>
+					<form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
+					    	placeholder="${TITLE_LABEL}"/>
 				</div>
 
-				<div class="form-group">
-					<label for="description"><fmt:message key="label.authoring.basic.question.text" /></label>
-					<lams:CKEditor id="description" value="${scratchieItemForm.description}" contentFolderID="${authoringForm.contentFolderID}"></lams:CKEditor>
+				<div class="form-group form-group-cke">
+					<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.authoring.basic.question.text"/></c:set>
+					<lams:CKEditor id="description" value="${scratchieItemForm.description}" contentFolderID="${scratchieItemForm.contentFolderID}" 
+						placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 				</div>
 
 				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
 				<input type="text" name="hasAnswerFilled" id="hasAnswerFilled" class="fake-validation-input" >
 				<label for="hasFilledCorrectAnswer" class="error" style="display: none;"></label>
 				<input type="text" name="hasFilledCorrectAnswer" id="hasFilledCorrectAnswer" class="fake-validation-input">
-
-				<div class="form-group"><fmt:message key="label.authoring.scratchie.answers" /></div>
 			
 			</form:form>
 			
 			<!-- Options -->
 			<form id="answerForm" name="answerForm">
  				<%@ include file="optionlist.jsp"%>
- 				<a href="javascript:;" onclick="addAnswer();" class="btn btn-default btn-sm" style="margin-right: 40px; margin-top:0px">
-					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.add.blank.answer" /> 
-				</a>
+ 				
+ 				<div>
+	 				<a href="javascript:;" onclick="addAnswer();" class="btn btn-default btn-sm pull-right">
+						<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.add.blank.answer" /> 
+					</a>
+				</div>
 			</form>
-			<div class="pull-right">
-				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm">
-					<fmt:message key="label.authoring.cancel.button" /> 
-				</a>
-				<a href="#" onclick="$('#scratchieItemForm').submit();" onmousedown="self.focus();" class="btn btn-primary btn-sm">
-					<fmt:message key="label.authoring.save.button" /> 
-				</a>
-			</div>
-			
-			<div id="footer"></div>
-
-			</div>
-			</div>
 
 			</div>
 		</div>
-	</div>
+			
+<footer class="footer fixed-bottom">
+	<div class="panel-heading ">
+       	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
+       		<span>
+	       		Collection
+	        		
+				<select class="btn btn-md btn-default" id="collection-uid-select">
+					<c:forEach var="collection" items="${scratchieItemForm.userCollections}">
+						<option value="${collection.uid}"
+							<c:if test="${collection.uid == scratchieItemForm.oldCollectionUid}">selected="selected"</c:if>>
+							<c:out value="${collection.name}" />
+						</option>
+					</c:forEach>
+				</select>
+			</span>
+				
+        	<div class="pull-right col-xs-12x col-md-6x" style="margin-top: -5px;">
+			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
+					<fmt:message key="label.authoring.cancel.button" />
+				</a>
+				<a href="#nogo" onclick="javascript:$('#scratchieItemForm').submit();" class="btn btn-sm btn-default button-add-item">
+					<fmt:message key="label.authoring.save.button" />
+				</a>
+			</div>
+		</div>
+   	</div>
+</footer>
 					
 	</body>
 </lams:html>

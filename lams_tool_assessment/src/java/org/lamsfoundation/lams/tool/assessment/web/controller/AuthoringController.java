@@ -251,9 +251,6 @@ public class AuthoringController {
 	    }
 	    for (QuestionReference reference : oldReferences) {
 		service.releaseFromCache(reference);
-//		if (reference.getQuestion() != null) {
-//		    service.releaseFromCache(reference.getQuestion());
-//		}
 	    }
 	    
 	    Long uid = assessmentPO.getUid();

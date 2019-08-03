@@ -39,6 +39,4 @@ public interface ScratchieItemDAO extends DAO {
 
     ScratchieItem getByUid(Long scratchieItemUid);
 
-    void releaseItemFromCache(ScratchieItem item);
-
 }

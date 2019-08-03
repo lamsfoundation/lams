@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:if test="${mode == null}"><c:set var="mode" value="${sessionMap.mode}" /></c:if>
+<c:set var="isAuthoringRestricted" value="${mode == 'teacher'}" />
 
 <%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
 <script>
@@ -39,16 +41,18 @@
 				    	v.&nbsp;${item.qbQuestion.version}
 				    </span>		
 				</td>
-						
-				<td class="arrows" style="width:5%">
-					<c:if test="${not status.first}">
-						<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="return upItem(${status.index})"/>
-					</c:if>
-		
-					<c:if test="${not status.last}">
-						<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="return downItem(${status.index})"/>
-					</c:if>
-				</td>
+				
+				<c:if test="${!isAuthoringRestricted}">
+					<td class="arrows" style="width:5%">
+						<c:if test="${not status.first}">
+							<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="return upItem(${status.index})"/>
+						</c:if>
+			
+						<c:if test="${not status.last}">
+							<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="return downItem(${status.index})"/>
+						</c:if>
+					</td>
+				</c:if>
 					
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
@@ -58,10 +62,13 @@
 						<i class="fa fa-pencil"	title="<fmt:message key='label.edit' />"/></i>
 					</a>
 				</td>			
-					
-				<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
-						onclick="removeItem(${status.index})"></i>
-				</td>
+				
+				<c:if test="${!isAuthoringRestricted}">
+					<td align="center" style="width:5%">
+						<i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
+							onclick="removeItem(${status.index})"></i>
+					</td>
+				</c:if>
 			</tr>
 		</c:forEach>
 	</table>

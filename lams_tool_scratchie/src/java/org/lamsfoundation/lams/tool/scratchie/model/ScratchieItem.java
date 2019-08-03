@@ -59,12 +59,6 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private String burningQuestion;
     @Transient
     private List<QbOptionDTO> optionDtos = null;
-    @Transient
-    private int qbQuestionModified = IQbService.QUESTION_MODIFIED_NONE;
-
-    public ScratchieItem() {
-
-    }
 
     @Override
     public Object clone() {
@@ -108,14 +102,6 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 
     public void setBurningQuestion(String burningQuestion) {
 	this.burningQuestion = burningQuestion;
-    }
-
-    public int getQbQuestionModified() {
-	return qbQuestionModified;
-    }
-
-    public void setQbQuestionModified(int qbQuestionModified) {
-	this.qbQuestionModified = qbQuestionModified;
     }
 
 }

@@ -177,10 +177,8 @@ public class QbQuestion implements Serializable, Cloneable {
 			    //numbering
 			    || (oldOption.getNumericalOption() != newOption.getNumericalOption())
 			    || (oldOption.getAcceptedError() != newOption.getAcceptedError())
-			    //option grade
-			    || (oldOption.getMaxMark() != newOption.getMaxMark())
-			    //changed correct option
-			    || (oldOption.isCorrect() != newOption.isCorrect())) {
+			    //changed option maxMark (Assessment tool) or correctness of the option (MCQ/Scratchie/Q&A)
+			    || (oldOption.getMaxMark() != newOption.getMaxMark())) {
 			isModificationRequiresNewVersion = true;
 		    }
 		}

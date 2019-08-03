@@ -28,7 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,11 +41,14 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.QbUtils;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -58,11 +60,13 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
-import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieItemForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,10 +89,10 @@ public class AuthoringController {
 
     @Autowired
     private IScratchieService scratchieService;
-
     @Autowired
     private IQbService qbService;
-
+    @Autowired
+    private IUserManagementService userManagementService;
     @Autowired
     @Qualifier("scratchieMessageService")
     private MessageService messageService;
@@ -97,9 +101,7 @@ public class AuthoringController {
     private String start(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	return starting(authoringForm, request);
-
+	return starting(authoringForm, request, mode);
     }
 
     @RequestMapping("/definelater")
@@ -114,12 +116,11 @@ public class AuthoringController {
 	//audit log the teacher has started editing activity in monitor
 	scratchieService.auditLogStartEditingActivityInMonitor(toolContentID);
 
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-	return starting(authoringForm, request);
+	return starting(authoringForm, request, ToolAccessMode.TEACHER);
     }
 
-    private String starting(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
-	    throws ServletException {
+    private String starting(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request,
+	    ToolAccessMode mode) throws ServletException {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -131,23 +132,15 @@ public class AuthoringController {
 	authoringForm.setContentFolderID(contentFolderID);
 	
 	// save toolContentID into HTTPSession
-	Long contentId = new Long(WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID));
+	Long contentId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID);
 	sessionMap.put(ScratchieConstants.PARAM_TOOL_CONTENT_ID, contentId);
 
-	List<ScratchieItem> items = null;
 	Scratchie scratchie = null;
 	try {
 	    scratchie = scratchieService.getScratchieByContentId(contentId);
 	    // if scratchie does not exist, try to use default content instead.
 	    if (scratchie == null) {
 		scratchie = scratchieService.getDefaultContent(contentId);
-		if (scratchie.getScratchieItems() != null) {
-		    items = new ArrayList<>(scratchie.getScratchieItems());
-		} else {
-		    items = null;
-		}
-	    } else {
-		items = scratchieService.getAuthoredItems(scratchie.getUid());
 	    }
 
 	    authoringForm.setScratchie(scratchie);
@@ -171,14 +164,10 @@ public class AuthoringController {
 	sessionMap.put(ScratchieConstants.ATTR_IS_PRESET_MARKS_OVERWRITTEN, presetMarksOverwritten);
 	sessionMap.put(ScratchieConstants.ATTR_DEFAULT_PRESET_MARKS, defaultPresetMarks);
 
-	// init it to avoid null exception in following handling
-	if (items == null) {
-	    items = new ArrayList<>();
-	}
 	// init scratchie item list
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	itemList.clear();
-	itemList.addAll(items);
+	itemList.addAll(scratchie.getScratchieItems());
 	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
 
 	// If there is no order id, set it up
@@ -194,7 +183,7 @@ public class AuthoringController {
 	Set<ToolActivity> confidenceLevelsActivities = scratchieService
 		.getPrecedingConfidenceLevelsActivities(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
-
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
 	return "pages/authoring/start";
     }
@@ -205,9 +194,7 @@ public class AuthoringController {
     @RequestMapping("/init")
     private String initPage(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	ScratchieForm existForm = (ScratchieForm) sessionMap.get(ScratchieConstants.ATTR_RESOURCE_FORM);
 
 	try {
@@ -215,10 +202,6 @@ public class AuthoringController {
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
-
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	authoringForm.setMode(mode.toString());
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return "pages/authoring/authoring";
     }
@@ -229,7 +212,6 @@ public class AuthoringController {
     @RequestMapping("/update")
     private String updateContent(@ModelAttribute("authoringForm") ScratchieForm authoringForm,
 	    HttpServletRequest request) throws Exception {
-
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
@@ -239,11 +221,8 @@ public class AuthoringController {
 	// **********************************Get Scratchie PO*********************
 	Scratchie scratchiePO = scratchieService.getScratchieByContentId(authoringForm.getScratchie().getContentId());
 
-	//allow using old and modified questions and references altogether
-	Set<ScratchieItem> oldItems = null;
-	if (mode.isTeacher()) {
-	    oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
-	}
+	//allow using old and modified questions together
+	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
 
 	if (scratchiePO == null) {
 	    // new Scratchie, create it.
@@ -253,7 +232,9 @@ public class AuthoringController {
 	} else {
 	    // copyProperties() below sets scratchiePO's items to empty collection
 	    // but the items still exist in Hibernate cache, so we need to evict them now
-	    scratchieService.releaseItemsFromCache(scratchiePO);
+	    for (ScratchieItem item : oldItems) {
+		scratchieService.releaseFromCache(item);
+	    }
 	    scratchiePO.getScratchieItems().clear();
 	    Long uid = scratchiePO.getUid();
 	    PropertyUtils.copyProperties(scratchiePO, scratchie);
@@ -272,35 +253,11 @@ public class AuthoringController {
 	Set<ScratchieItem> items = new LinkedHashSet<>();
 	SortedSet<ScratchieItem> newItems = getItemList(sessionMap);
 	Iterator<ScratchieItem> iter = newItems.iterator();
-	int maxQuestionId = qbService.generateNextQuestionId();
 	while (iter.hasNext()) {
 	    ScratchieItem item = iter.next();
 	    if (item != null) {
 		item.setToolContentId(scratchiePO.getContentId());
-		removeNewLineCharacters(item);
 		items.add(item);
-		// modification status was already set in AuthoringController#saveItem()
-		switch (item.getQbQuestionModified()) {
-		    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
-			// new version of the old question gets created
-			QbQuestion qbQuestion = item.getQbQuestion().clone();
-			item.setQbQuestion(qbQuestion);
-			qbQuestion.clearID();
-			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
-			qbQuestion.setCreateDate(new Date());
-		    }
-			break;
-		    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
-			// new question gets created
-			QbQuestion qbQuestion = item.getQbQuestion().clone();
-			item.setQbQuestion(qbQuestion);
-			qbQuestion.clearID();
-			qbQuestion.setVersion(1);
-			qbQuestion.setQuestionId(maxQuestionId);
-			qbQuestion.setCreateDate(new Date());
-		    }
-			break;
-		}
 	    }
 	}
 	scratchiePO.setScratchieItems(items);
@@ -311,12 +268,12 @@ public class AuthoringController {
 	authoringForm.setScratchie(scratchiePO);
 
 	//recalculate results in case content is edited from monitoring
-	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
 	if (mode.isTeacher()) {
-	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems, deletedItems);
+	    scratchieService.recalculateUserAnswers(scratchiePO, oldItems, newItems);
 	}
 
-	// delete items from database.
+	// delete items from database
+	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
 	iter = deletedItems.iterator();
 	while (iter.hasNext()) {
 	    ScratchieItem item = iter.next();
@@ -336,15 +293,12 @@ public class AuthoringController {
      * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/addItem")
-    private String addItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+    private String addItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
 	    HttpServletRequest request) {
-
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	scratchieItemForm.setSessionMapID(sessionMapID);
-	scratchieItemForm.setContentFolderID(contentFolderID);
+	form.setSessionMapID(sessionMap.getSessionID());
+	form.setContentFolderID(contentFolderID);
 
 	List<QbOption> optionList = new ArrayList<>();
 	for (int i = 0; i < ScratchieConstants.INITIAL_OPTIONS_NUMBER; i++) {
@@ -353,6 +307,8 @@ public class AuthoringController {
 	    optionList.add(option);
 	}
 	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	
+	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "pages/authoring/parts/additem";
@@ -362,34 +318,31 @@ public class AuthoringController {
      * Display edit page for existed scratchie item.
      */
     @RequestMapping("/editItem")
-    private String editItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+    private String editItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
 	    HttpServletRequest request) {
-
 	// get back sessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	int itemIdx = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
-	ScratchieItem item = null;
-	if (itemIdx != -1) {
-	    SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	    List<ScratchieItem> rList = new ArrayList<>(itemList);
-	    item = rList.get(itemIdx);
-	    if (item != null) {
-		scratchieItemForm.setTitle(item.getQbQuestion().getName());
-		scratchieItemForm.setDescription(item.getQbQuestion().getDescription());
-		if (itemIdx >= 0) {
-		    scratchieItemForm.setItemIndex(new Integer(itemIdx).toString());
-		}
+	int itemIdx = WebUtil.readIntParam(request, ScratchieConstants.PARAM_ITEM_INDEX);
+	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
+	List<ScratchieItem> rList = new ArrayList<>(itemList);
+	ScratchieItem item = rList.get(itemIdx);
+	QbQuestion qbQuestion = item.getQbQuestion();
 
-		List<QbOption> optionList = item.getQbQuestion().getQbOptions();
-		request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
-
-		scratchieItemForm.setContentFolderID(contentFolderID);
-	    }
+	form.setTitle(qbQuestion.getName());
+	form.setDescription(qbQuestion.getDescription());
+	if (itemIdx >= 0) {
+	    form.setItemIndex(String.valueOf(itemIdx));
 	}
+
+	List<QbOption> optionList = qbQuestion.getQbOptions();
+	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+
+	form.setContentFolderID(contentFolderID);
+	form.setSessionMapID(sessionMap.getSessionID());
+	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
+	
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "pages/authoring/parts/additem";
     }
@@ -416,16 +369,7 @@ public class AuthoringController {
 	    maxSeq = last.getDisplayOrder() + 1;
 	}
 	item.setDisplayOrder(maxSeq);
-	item.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
 	itemList.add(item);
-
-	// evict everything manually as we do not use DTOs, just real entities
-	// without eviction changes would be saved immediately into DB
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item);
-//	scratchieService.releaseFromCache(item.getQbQuestion());
-	
-//	request.setAttribute("qbQuestionModified", item.getQbQuestionModified());
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -439,21 +383,22 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    private String saveItem(@ModelAttribute("scratchieItemForm") ScratchieItemForm scratchieItemForm,
+    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
 	    HttpServletRequest request) {
-
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(scratchieItemForm.getSessionMapID());
-	// check whether it is "edit(old Question)" or "add(new Question)"
+		.getAttribute(form.getSessionMapID());
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	int itemIdx = NumberUtils.toInt(scratchieItemForm.getItemIndex(), -1);
-	ScratchieItem item = null;
-
-	if (itemIdx == -1) { // add
-	    item = new ScratchieItem();
-	    QbQuestion qbQuestion = new QbQuestion();
+	int itemIdx = NumberUtils.toInt(form.getItemIndex(), -1);
+	
+	// check whether it is "edit(old Question)" or "add(new Question)"
+	QbQuestion qbQuestion;
+	ScratchieItem item;
+	final boolean isAddingQuestion = itemIdx == -1;
+	if (isAddingQuestion) { // add
+	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-	    item.setQbQuestion(qbQuestion);
+	    
+	    item = new ScratchieItem();
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
 		ScratchieItem last = itemList.last();
@@ -461,37 +406,71 @@ public class AuthoringController {
 	    }
 	    item.setDisplayOrder(maxSeq);
 	    itemList.add(item);
-	} else { // edit
+	    
+	// edit
+	} else { 
 	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
+	    qbQuestion = qbService.getQuestionByUid(item.getQbQuestion().getUid());
+	    qbService.releaseFromCache(qbQuestion);
 	}
 
-	QbQuestion baseLine = item.getQbQuestion().clone();
+	QbQuestion oldQbQuestion = qbQuestion.clone();
 	// evict everything manually as we do not use DTOs, just real entities
 	// without eviction changes would be saved immediately into DB
-	scratchieService.releaseFromCache(item);
-	scratchieService.releaseFromCache(baseLine);
-	scratchieService.releaseFromCache(item.getQbQuestion());
+	scratchieService.releaseFromCache(oldQbQuestion);
 
-	item.getQbQuestion().setName(scratchieItemForm.getTitle());
-	item.getQbQuestion().setDescription(scratchieItemForm.getDescription());
+	qbQuestion.setName(form.getTitle());
+	qbQuestion.setDescription(form.getDescription());
 
 	// set options
 	Set<QbOption> optionList = getOptionsFromRequest(request, true);
-	List<QbOption> options = new ArrayList<>();
-	int orderId = 0;
-	for (QbOption option : optionList) {
-	    option.setDisplayOrder(orderId++);
-	    options.add(option);
-	}
-	item.getQbQuestion().setQbOptions(options);
+	List<QbOption> options = new ArrayList<>(optionList);
+	qbQuestion.setQbOptions(options);
 
-	int isQbQuestionModified = item.getQbQuestion().isQbQuestionModified(baseLine);
-	item.setQbQuestionModified(isQbQuestionModified);
+	int isQbQuestionModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
+	QbQuestion updatedQuestion = null;
+	switch (isQbQuestionModified) {
+	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
+		// new version of the old question gets created
+		updatedQuestion = qbQuestion.clone();
+		updatedQuestion.clearID();
+		updatedQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
+		updatedQuestion.setCreateDate(new Date());
+	    }
+		break;
+	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
+		// new question gets created
+		updatedQuestion = qbQuestion.clone();
+		updatedQuestion.clearID();
+		updatedQuestion.setQuestionId(qbService.generateNextQuestionId());
+		updatedQuestion.setVersion(1);
+		updatedQuestion.setCreateDate(new Date());
+	    }
+		break;
+	    case IQbService.QUESTION_MODIFIED_NONE: {
+		// save the old question anyway, as it may contain some minor changes (like title or description change)
+		updatedQuestion = qbQuestion;
+	    }
+		break;		
+	}
+	userManagementService.save(updatedQuestion);
+	item.setQbQuestion(updatedQuestion);
 	request.setAttribute("qbQuestionModified", isQbQuestionModified);
+	
+	//take care about question's collections. add to collection first
+	Long oldCollectionUid = form.getOldCollectionUid();
+	Long newCollectionUid = form.getNewCollectionUid();
+	if (isAddingQuestion || !newCollectionUid.equals(oldCollectionUid)) {
+	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
+	}
+	//remove from the old collection, if needed
+	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
+	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(), false);
+	}
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, scratchieItemForm.getSessionMapID());
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, form.getSessionMapID());
 	return "pages/authoring/parts/itemlist";
     }
 
@@ -506,11 +485,7 @@ public class AuthoringController {
      */
     @RequestMapping("/removeItem")
     private String removeItem(HttpServletRequest request) {
-
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
@@ -558,10 +533,7 @@ public class AuthoringController {
     }
 
     private String switchItem(HttpServletRequest request, boolean up) {
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
@@ -744,6 +716,7 @@ public class AuthoringController {
      * @param request
      * @return
      */
+    @SuppressWarnings("unchecked")
     private SortedSet<ScratchieItem> getItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ScratchieItem> list = (SortedSet<ScratchieItem>) sessionMap.get(ScratchieConstants.ATTR_ITEM_LIST);
 	if (list == null) {
@@ -759,22 +732,12 @@ public class AuthoringController {
      * @param request
      * @return
      */
+    @SuppressWarnings("unchecked")
     private List<ScratchieItem> getDeletedItemList(SessionMap<String, Object> sessionMap) {
-	return getListFromSession(sessionMap, ScratchieConstants.ATTR_DELETED_ITEM_LIST);
-    }
-
-    /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
+	List<ScratchieItem> list = (List<ScratchieItem>) sessionMap.get(ScratchieConstants.ATTR_DELETED_ITEM_LIST);
 	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
+	    list = new ArrayList<>();
+	    sessionMap.put(ScratchieConstants.ATTR_DELETED_ITEM_LIST, list);
 	}
 	return list;
     }
@@ -854,22 +817,11 @@ public class AuthoringController {
 	}
 	return paramMap;
     }
-
-    /**
-     * Removes redundant new line characters from options left by CKEditor (otherwise it will break Javascript in
-     * monitor)
-     */
-    private void removeNewLineCharacters(ScratchieItem item) {
-	Collection<QbOption> options = item.getQbQuestion().getQbOptions();
-	if (options != null) {
-	    for (QbOption option : options) {
-		String optionDescription = option.getName();
-		if (optionDescription != null) {
-		    optionDescription = optionDescription.replaceAll("[\n\r\f]", "");
-		    option.setName(optionDescription);
-		}
-	    }
-
-	}
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
 }

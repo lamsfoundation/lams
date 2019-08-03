@@ -60,7 +60,6 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
-import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -210,21 +209,9 @@ public class ScratchieServiceImpl
     @Override
     public void saveOrUpdateScratchie(Scratchie scratchie) {
 	for (ScratchieItem item : scratchie.getScratchieItems()) {
-	    //update only in case QbQuestion was modified, to prevent updating the same QbQuestions received from SesssionMap
-	    if (item.getQbQuestionModified() != IQbService.QUESTION_MODIFIED_NONE) {
-		scratchieItemDao.saveObject(item.getQbQuestion());
-	    }
 	    scratchieItemDao.saveObject(item);
 	}
 	scratchieDao.saveObject(scratchie);
-    }
-
-    @Override
-    public void releaseItemsFromCache(Scratchie scratchie) {
-	for (ScratchieItem item : scratchie.getScratchieItems()) {
-	    scratchieItemDao.releaseItemFromCache(item);
-	    scratchieItemDao.releaseFromCache(item.getQbQuestion());
-	}
     }
 
     @Override
@@ -483,36 +470,32 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
-	    List<ScratchieItem> deletedItems) {
+    public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems) {
 
 	// create list of modified questions
 	List<ScratchieItem> modifiedItems = new ArrayList<>();
 	for (ScratchieItem oldItem : oldItems) {
 	    for (ScratchieItem newItem : newItems) {
-		if (oldItem.getUid().equals(newItem.getUid())) {
-
+		if (oldItem.getDisplayOrder() == newItem.getDisplayOrder()) {
 		    boolean isItemModified = false;
 
-		    // title or description is different
-		    if (!oldItem.getQbQuestion().getName().equals(newItem.getQbQuestion().getName()) || !oldItem
-			    .getQbQuestion().getDescription().equals(newItem.getQbQuestion().getDescription())) {
-			isItemModified = true;
-		    }
+		    // title or question is different - do nothing
 
 		    // options are different
 		    List<QbOption> oldOptions = oldItem.getQbQuestion().getQbOptions();
 		    List<QbOption> newOptions = newItem.getQbQuestion().getQbOptions();
 		    for (QbOption oldOption : oldOptions) {
 			for (QbOption newOption : newOptions) {
-			    if (oldOption.getUid().equals(newOption.getUid())) {
+			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
-				if (!StringUtils.equals(oldOption.getName(), newOption.getName())
-					|| (oldOption.isCorrect() != newOption.isCorrect())) {
+				if (oldOption.isCorrect() != newOption.isCorrect()) {
 				    isItemModified = true;
 				}
 			    }
 			}
+		    }
+		    if (oldOptions.size() != newOptions.size()) {
+			isItemModified = true;
 		    }
 
 		    if (isItemModified) {
@@ -528,14 +511,7 @@ public class ScratchieServiceImpl
 	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<>();
 	    boolean isRecalculateMarks = false;
 
-	    // remove all scratches for modified and removed items
-
-	    // [+] if the item was removed
-	    for (ScratchieItem deletedItem : deletedItems) {
-		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(toolSessionId,
-			deletedItem.getUid());
-		visitLogsToDelete.addAll(visitLogs);
-	    }
+	    // remove all scratches for modified items
 
 	    // [+] if the question is modified
 	    for (ScratchieItem modifiedItem : modifiedItems) {
@@ -872,7 +848,7 @@ public class ScratchieServiceImpl
 
 		for (ScratchieAnswerVisitLog attempt : sessionAttempts) {
 		    QbOptionDTO optionDto = optionMap.get(attempt.getQbOption().getUid());
-		    int[] attempts = optionDto.getAttempts();
+		    int[] attempts = optionDto == null ? new int[options.size()] : optionDto.getAttempts();
 		    // +1 for corresponding choice
 		    attempts[attemptNumber++]++;
 		}
