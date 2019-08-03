@@ -7,7 +7,7 @@
 	       		Collection
 	        		
 				<select class="btn btn-md btn-default" id="collection-uid-select">
-					<c:forEach var="collection" items="${userCollections}">
+					<c:forEach var="collection" items="${assessmentQuestionForm.userCollections}">
 						<option value="${collection.uid}"
 							<c:if test="${collection.uid == assessmentQuestionForm.oldCollectionUid}">selected="selected"</c:if>>
 							<c:out value="${collection.name}" />

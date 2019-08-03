@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,26 +14,23 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.QbConstants;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
-import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,24 +95,7 @@ public class EditQbQuestionController {
 	}
 	request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
 
-	//prepare data for displaying collections
-	Integer userId = getUserId();
-	Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
-	request.setAttribute("userCollections", userCollections);
-
-	//in case request came from assessment tool - set private collection as default, otherwise collectioUid is already supplied as parameter from collections.jsp
-	final boolean isRequestCameFromAssessmentTool = StringUtils.isNotBlank(form.getSessionMapID());
-	if (isRequestCameFromAssessmentTool) {
-	    for (QbCollection collection : userCollections) {
-		if (collection.isPersonal()) {
-		    form.setOldCollectionUid(collection.getUid());
-		    break;
-		}
-	    }
-
-	} else {
-	    form.setOldCollectionUid(collectionUid);
-	}
+	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
 	Integer type = NumberUtils.toInt(request.getParameter(QbConstants.ATTR_QUESTION_TYPE));
 	return findForwardByQuestionType(type);
@@ -140,7 +119,7 @@ public class EditQbQuestionController {
 	//TODO remove hardcoded value, once we transfer contentFolderId from old DB entries
 	form.setContentFolderID(qbQuestion.getContentFolderId() == null ? "temp" : qbQuestion.getContentFolderId());
 	form.setTitle(qbQuestion.getName());
-	form.setQuestion(qbQuestion.getDescription());
+	form.setDescription(qbQuestion.getDescription());
 	form.setMaxMark(qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark());
 	form.setPenaltyFactor(String.valueOf(qbQuestion.getPenaltyFactor()));
 	form.setAnswerRequired(qbQuestion.isAnswerRequired());
@@ -170,29 +149,8 @@ public class EditQbQuestionController {
 	    List<QbQuestionUnit> unitList = qbQuestion.getUnits();
 	    request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
 	}
-
-	//prepare data for displaying collections
-	Integer userId = getUserId();
-	Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
-	request.setAttribute("userCollections", userCollections);
-	//in case request came from assessment tool - set private collection as default, otherwise collectioUid is already supplied as parameter from collections.jsp
-	final boolean isRequestCameFromAssessmentTool = StringUtils.isNotBlank(form.getSessionMapID());
-	if (isRequestCameFromAssessmentTool) {
-	    Collection<QbCollection> questionCollections = qbService.getQuestionCollectionsByUid(qbQuestionUid);
-
-	    Long collectionUid = null;
-	    if (questionCollections.isEmpty()) {
-		for (QbCollection collection : userCollections) {
-		    if (collection.isPersonal()) {
-			collectionUid = collection.getUid();
-			break;
-		    }
-		}
-	    } else {
-		collectionUid = questionCollections.iterator().next().getUid();
-	    }
-	    form.setOldCollectionUid(collectionUid);
-	}
+	
+	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestionUid);
 
 	return findForwardByQuestionType(qbQuestion.getType());
     }
@@ -256,7 +214,7 @@ public class EditQbQuestionController {
 	    qbService.addQuestionToCollection(newCollectionUid, qbQuestion.getQuestionId(), false);
 	}
 
-	//remove from the old collection first, if needed
+	//remove from the old collection, if needed
 	if (!isAddingQuestion && IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL && !newCollectionUid.equals(oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, qbQuestion.getQuestionId(), false);
 	}
@@ -311,7 +269,7 @@ public class EditQbQuestionController {
 	qbService.releaseFromCache(oldQuestion);
 
 	qbQuestion.setName(form.getTitle());
-	qbQuestion.setDescription(form.getQuestion());
+	qbQuestion.setDescription(form.getDescription());
 
 	if (!form.isAuthoringRestricted()) {
 	    qbQuestion.setMaxMark(form.getMaxMark());
@@ -644,12 +602,6 @@ public class EditQbQuestionController {
 		break;
 	}
 	return forward;
-    }
-
-    private Integer getUserId() {
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	return user != null ? user.getUserID() : null;
     }
 
 }

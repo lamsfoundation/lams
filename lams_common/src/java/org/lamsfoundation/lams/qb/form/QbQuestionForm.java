@@ -23,6 +23,10 @@
 
 package org.lamsfoundation.lams.qb.form;
 
+import java.util.Collection;
+
+import org.lamsfoundation.lams.qb.model.QbCollection;
+
 /**
  * QB Question Form.
  *
@@ -35,15 +39,11 @@ public class QbQuestionForm {
     private Integer questionId;
     private String sessionMapID;
     private String contentFolderID;
-    private Long oldCollectionUid;
-    private Long newCollectionUid;
-
     // tool access mode;
     private String mode;
-
     private Integer questionType;
     private String title;
-    private String question;
+    private String description;
     private int maxMark;
     private String penaltyFactor;
     private boolean answerRequired;
@@ -62,8 +62,14 @@ public class QbQuestionForm {
     private int maxWordsLimit;
     private int minWordsLimit;
     private boolean hedgingJustificationEnabled;
-
     private boolean authoringRestricted;
+    
+    private Long oldCollectionUid;
+    private Long newCollectionUid;
+    private Collection<QbCollection> userCollections;
+    
+    //used only by Scratchie and Q&A tools
+    private String itemIndex;
 
     public Long getUid() {
 	return uid;
@@ -97,22 +103,6 @@ public class QbQuestionForm {
 	this.contentFolderID = contentFolderID;
     }
 
-    public Long getOldCollectionUid() {
-	return oldCollectionUid;
-    }
-
-    public void setOldCollectionUid(Long oldCollectionUid) {
-	this.oldCollectionUid = oldCollectionUid;
-    }
-
-    public Long getNewCollectionUid() {
-	return newCollectionUid;
-    }
-
-    public void setNewCollectionUid(Long newCollectionUid) {
-	this.newCollectionUid = newCollectionUid;
-    }
-
     public String getMode() {
 	return mode;
     }
@@ -129,12 +119,12 @@ public class QbQuestionForm {
 	this.title = title;
     }
 
-    public String getQuestion() {
-	return question;
+    public String getDescription() {
+	return description;
     }
 
-    public void setQuestion(String question) {
-	this.question = question;
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     public Integer getQuestionType() {
@@ -287,6 +277,38 @@ public class QbQuestionForm {
 
     public void setAuthoringRestricted(boolean authoringRestricted) {
 	this.authoringRestricted = authoringRestricted;
+    }
+    
+    public Long getOldCollectionUid() {
+	return oldCollectionUid;
+    }
+
+    public void setOldCollectionUid(Long oldCollectionUid) {
+	this.oldCollectionUid = oldCollectionUid;
+    }
+
+    public Long getNewCollectionUid() {
+	return newCollectionUid;
+    }
+
+    public void setNewCollectionUid(Long newCollectionUid) {
+	this.newCollectionUid = newCollectionUid;
+    }
+    
+    public Collection<QbCollection> getUserCollections() {
+	return userCollections;
+    }
+
+    public void setUserCollections(Collection<QbCollection> userCollections) {
+	this.userCollections = userCollections;
+    }
+    
+    public String getItemIndex() {
+	return itemIndex;
+    }
+
+    public void setItemIndex(String itemIndex) {
+	this.itemIndex = itemIndex;
     }
 
 }

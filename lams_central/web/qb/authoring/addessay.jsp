@@ -45,7 +45,7 @@
 	    			}
 	    		},
    			    submitHandler: function(form) {
-	    			$("#question").val(CKEDITOR.instances.question.getData());
+	    			$("#description").val(CKEDITOR.instances.description.getData());
 	    			$("#feedback").val(CKEDITOR.instances.feedback.getData());
 	    			$("#new-collection-uid").val($("#collection-uid-select option:selected").val());
 	     			    
@@ -145,7 +145,7 @@
 				
 					<div class="form-group form-group-cke">
 						<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.enter.question.description"/></c:set>
-						<lams:CKEditor id="question" value="${assessmentQuestionForm.question}" contentFolderID="${assessmentQuestionForm.contentFolderID}" 
+						<lams:CKEditor id="description" value="${assessmentQuestionForm.description}" contentFolderID="${assessmentQuestionForm.contentFolderID}" 
 							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
 					</div>
 				</div>
