@@ -16,6 +16,8 @@
 			<c:set var="question" value="${questionReference.question}" />
 			<tr>
 				<td>
+					<input type="hidden" name="sequenceId${questionReference.sequenceId}" value="${status.index}" class="reference-sequence-id">
+				
 					<c:choose>
 						<c:when test="${questionReference.randomQuestion}">
 							<fmt:message key="label.authoring.basic.type.random.question" />
@@ -65,16 +67,12 @@
 				</td>
 				
 				<td width="70px">
-					<input name="maxMark${questionReference.sequenceId}" value="${questionReference.maxMark}"
-						id="maxMark${questionReference.sequenceId}" class="form-control input-sm">
+					<input name="maxMark" value="${questionReference.maxMark}" class="form-control input-sm max-mark-input">
 				</td>
 
 				<td width="30px" style="padding-right: 20px;">
 					<c:if test="${!questionReference.randomQuestion}">
-						<c:set var="editReferenceUrl" >
-							<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}&questionReferenceIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
-						</c:set>
-						<a href="${editReferenceUrl}" class="thickbox roffset5" style="margin-left: 6px;"> 
+						<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
 							<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 						</a>			
 					</c:if>
