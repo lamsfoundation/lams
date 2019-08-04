@@ -25,20 +25,16 @@ package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.Nullable;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  *
@@ -51,192 +47,43 @@ import org.lamsfoundation.lams.tool.qa.Nullable;
  */
 @Entity
 @Table(name = "tl_laqa11_que_content")
-public class QaQueContent implements Serializable, Comparable, Nullable {
+//in this entity's table primary key is "uid", but it references "tool_question_uid" in lams_qb_tool_question
+@PrimaryKeyJoinColumn(name = "uid")
+public class QaQueContent extends QbToolQuestion implements Serializable {
 
     private static final long serialVersionUID = -4028785701106936621L;
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long uid;
-
-    @Column
-    private String question;
-
-    @Column(name = "display_order")
-    private int displayOrder;
-
-    @Column
-    private String feedback;
-
-    @Column(name = "answer_required")
-    private boolean required;
-
-    @Column(name = "min_words_limit")
-    private int minWordsLimit;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
 
-    /** default constructor */
     public QaQueContent() {
     }
 
-    public QaQueContent(String question, int displayOrder, String feedback, boolean required, int minWordsLimit,
-	    QaContent qaContent) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.feedback = feedback;
-	this.required = required;
-	this.minWordsLimit = minWordsLimit;
+    public QaQueContent(QbQuestion qbQuestion, int displayOrder, QaContent qaContent) {
+	this.qbQuestion = qbQuestion;
 	this.qaContent = qaContent;
+	this.displayOrder = displayOrder;
     }
 
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
-	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
-		queContent.getFeedback(), queContent.isRequired(), queContent.minWordsLimit, newQaContent);
+	QaQueContent newQueContent = new QaQueContent(queContent.getQbQuestion(), queContent.getDisplayOrder(),
+		newQaContent);
 	return newQueContent;
     }
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("qaQueContentId: ", getUid()).append("question: ", getQuestion())
+	return new ToStringBuilder(this).append("uid: ", getUid()).append("name: ", getQbQuestion().getName())
 		.append("displayOrder: ", getDisplayOrder()).toString();
     }
 
-    @Override
-    public boolean equals(Object other) {
-	if (!(other instanceof QaQueContent)) {
-	    return false;
-	}
-	QaQueContent castOther = (QaQueContent) other;
-	return new EqualsBuilder().append(this.getUid(), castOther.getUid()).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(getUid()).toHashCode();
-    }
-
-    /**
-     * @return Returns the displayOrder.
-     */
-    public int getDisplayOrder() {
-	return displayOrder;
-    }
-
-    /**
-     * @param required
-     *            Does this question have to be answered.
-     */
-    public void setRequired(boolean required) {
-	this.required = required;
-    }
-
-    /**
-     * @return Does this question have to be answered.
-     */
-    public boolean isRequired() {
-	return required;
-    }
-
-    /**
-     * @param minWordsLimit
-     *            minWordsLimit
-     */
-    public void setMinWordsLimit(int minWordsLimit) {
-	this.minWordsLimit = minWordsLimit;
-    }
-
-    /**
-     * @return minWordsLimit
-     */
-    public int getMinWordsLimit() {
-	return minWordsLimit;
-    }
-
-    /**
-     * @param displayOrder
-     *            The displayOrder to set.
-     */
-    public void setDisplayOrder(int displayOrder) {
-	this.displayOrder = displayOrder;
-    }
-
-    /**
-     * @return Returns the qaContent.
-     */
-    public org.lamsfoundation.lams.tool.qa.model.QaContent getQaContent() {
+    public QaContent getQaContent() {
 	return qaContent;
     }
 
-    /**
-     * @param qaContent
-     *            The qaContent to set.
-     */
-    public void setQaContent(org.lamsfoundation.lams.tool.qa.model.QaContent qaContent) {
+    public void setQaContent(QaContent qaContent) {
 	this.qaContent = qaContent;
-    }
-
-    /**
-     * @return Returns the question.
-     */
-    public String getQuestion() {
-	return question;
-    }
-
-    /**
-     * @param question
-     *            The question to set.
-     */
-    public void setQuestion(String question) {
-	this.question = question;
-    }
-
-    @Override
-    public boolean isNull() {
-	return false;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-	//QaQueContent queContent = (QaQueContent) o;
-
-	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	/*
-	 * if (uid == null) return 1; else return (int) (uid.longValue() - queContent.uid.longValue());
-	 */
-	return 1;
-    }
-
-    /**
-     * @return Returns the uid.
-     */
-    public Long getUid() {
-	return uid;
-    }
-
-    /**
-     * @param uid
-     *            The uid to set.
-     */
-    public void setUid(Long uid) {
-	this.uid = uid;
-    }
-
-    /**
-     * @return Returns the feedback.
-     */
-    public String getFeedback() {
-	return feedback;
-    }
-
-    /**
-     * @param feedback
-     *            The feedback to set.
-     */
-    public void setFeedback(String feedback) {
-	this.feedback = feedback;
+	this.toolContentId = qaContent.getQaContentId();
     }
 }

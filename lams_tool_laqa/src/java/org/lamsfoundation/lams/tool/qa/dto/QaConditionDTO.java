@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.dto;
 
 import java.util.Set;
@@ -32,13 +31,12 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 
 public class QaConditionDTO extends TextSearchConditionDTO {
-    private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
+    private Set<QaQueContent> questions = new TreeSet<>(new QaQueContentComparator());
 
     public QaConditionDTO(QaCondition condition, Integer toolActivityUIID) {
 	super(condition, toolActivityUIID);
 	for (QaQueContent question : condition.getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
-		    question.isRequired(), question.getMinWordsLimit(), null);
+	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(), null);
 	    getQuestions().add(questionCopy);
 	}
     }

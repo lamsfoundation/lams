@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
  *
  * @author Ozgur Demirtas
  */
-public class QaQuestionDTO implements Comparable {
+public class QaQuestionDTO implements Comparable<QaMonitoredUserDTO> {
     private Long uid;
     private String question;
     private String displayOrder;
@@ -39,11 +39,11 @@ public class QaQuestionDTO implements Comparable {
     private int minWordsLimit;
 
     public QaQuestionDTO(QaQueContent que) {
-	this.question = que.getQuestion();
-	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
-	this.feedback = que.getFeedback() != null ? que.getFeedback() : "";
-	this.required = que.isRequired();
-	this.minWordsLimit = que.getMinWordsLimit();
+	this.question = que.getQbQuestion().getName();
+	this.displayOrder = String.valueOf(que.getDisplayOrder());
+	this.feedback = que.getQbQuestion().getFeedback() != null ? que.getQbQuestion().getFeedback() : "";
+	this.required = que.getQbQuestion().isAnswerRequired();
+	this.minWordsLimit = que.getQbQuestion().getMinWordsLimit();
 	this.uid = que.getUid();
     }
 
@@ -56,10 +56,8 @@ public class QaQuestionDTO implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-	QaMonitoredUserDTO qaMonitoredUserDTO = (QaMonitoredUserDTO) o;
-
-	if (qaMonitoredUserDTO == null) {
+    public int compareTo(QaMonitoredUserDTO o) {
+	if (o == null) {
 	    return 1;
 	} else {
 	    return 0;
@@ -167,6 +165,6 @@ public class QaQuestionDTO implements Comparable {
 
     @Override
     public int hashCode() {
-	return new Integer(getDisplayOrder());
+	return Integer.valueOf(displayOrder);
     }
 }

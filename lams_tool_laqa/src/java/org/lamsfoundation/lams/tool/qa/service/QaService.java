@@ -47,6 +47,8 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -114,6 +116,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private ICoreNotebookService coreNotebookService;
     private IRatingService ratingService;
     private IEventNotificationService eventNotificationService;
+    private IQbService qbService;
     private MessageService messageService;
 
     private Random generator = new Random();
@@ -169,7 +172,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
-	for (QaUsrResp leaderResponse : (Set<QaUsrResp>) leader.getQaUsrResps()) {
+	for (QaUsrResp leaderResponse : leader.getQaUsrResps()) {
 	    QaQueContent question = leaderResponse.getQaQuestion();
 	    QaUsrResp response = qaUsrRespDAO.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 
@@ -235,8 +238,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void saveOrUpdateQuestion(QaQueContent question) {
-	qaQuestionDAO.saveOrUpdateQaQueContent(question);
+    public void saveOrUpdate(Object entity) {
+	qaQuestionDAO.saveOrUpdate(entity);
     }
 
     @Override
@@ -434,13 +437,13 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    List<QaQuestionDTO> questionDTOs, List<QaQuestionDTO> deletedQuestions) {
 
 	// create list of modified questions
-	List<QaQuestionDTO> modifiedQuestions = new ArrayList<QaQuestionDTO>();
+	List<QaQuestionDTO> modifiedQuestions = new ArrayList<>();
 	for (QaQueContent oldQuestion : oldQuestions) {
 	    for (QaQuestionDTO questionDTO : questionDTOs) {
 		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
 
 		    // question is different
-		    if (!oldQuestion.getQuestion().equals(questionDTO.getQuestion())) {
+		    if (!oldQuestion.getQbQuestion().getName().equals(questionDTO.getQuestion())) {
 			modifiedQuestions.add(questionDTO);
 		    }
 		}
@@ -534,7 +537,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    // save questions first, because if Hibernate decides to flush Conditions first,
 	    // there is no cascade to questions and it may trigger an error
 	    for (QaQueContent question : toContent.getQaQueContents()) {
-		qaQuestionDAO.saveOrUpdateQaQueContent(question);
+		qaQuestionDAO.saveOrUpdate(question);
 	    }
 	    qaDAO.saveQa(toContent);
 	}
@@ -550,7 +553,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
-	for (QaSession session : (Set<QaSession>) qaContent.getQaSessions()) {
+	for (QaSession session : qaContent.getQaSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getQaSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -570,10 +573,10 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	QaContent content = qaDAO.getQaByContentId(toolContentId);
 	if (content != null) {
-	    for (QaSession session : (Set<QaSession>) content.getQaSessions()) {
+	    for (QaSession session : content.getQaSessions()) {
 		QaQueUsr user = qaQueUsrDAO.getQaUserBySession(userId.longValue(), session.getQaSessionId());
 		if (user != null) {
-		    for (QaUsrResp response : (Set<QaUsrResp>) user.getQaUsrResps()) {
+		    for (QaUsrResp response : user.getQaUsrResps()) {
 			qaUsrRespDAO.removeUserResponse(response);
 		    }
 
@@ -620,7 +623,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	Date attemptTime = new Date();
 	String message = new String();
 	for (QaUsrResp response : responses) {
-	    String question = response.getQaQuestion().getQuestion();
+	    String question = response.getQaQuestion().getQbQuestion().getName();
 	    String answer = response.getAnswer();
 
 	    message += NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + question + " " + answer;
@@ -735,7 +738,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	QaContent content = qaDAO.getQaByContentId(toolContentId);
-	for (QaSession session : (Set<QaSession>) content.getQaSessions()) {
+	for (QaSession session : content.getQaSessions()) {
 	    if (!session.getQaQueUsers().isEmpty()) {
 		return true;
 	    }
@@ -899,7 +902,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
@@ -981,7 +984,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1057,6 +1060,10 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
+    }
+
+    public void setQbService(IQbService qbService) {
+	this.qbService = qbService;
     }
 
     // =========================================================================================
@@ -1222,11 +1229,20 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	// Questions
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
-	    QaQueContent question = new QaQueContent(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT),
-		    JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), JsonUtil.optString(questionData, "feedback"),
-		    JsonUtil.optBoolean(questionData, "required", Boolean.FALSE),
-		    JsonUtil.optInt(questionData, "minWordsLimit", 0), qa);
-	    saveOrUpdateQuestion(question);
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+	    qbQuestion.setVersion(1);
+
+	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+	    qbQuestion.setFeedback(JsonUtil.optString(questionData, "feedback"));
+	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionData, "required", Boolean.FALSE));
+	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionData, "minWordsLimit", 0));
+	    saveOrUpdate(qbQuestion);
+
+	    QaQueContent question = new QaQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
+		    qa);
+	    saveOrUpdate(question);
 	}
 
 	// TODO

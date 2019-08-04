@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -83,18 +84,23 @@ public class QaPedagogicalPlannerController {
 		    pedagogicalPlannerForm.removeQuestion(questionIndex);
 		} else {
 		    if (questionIndex < qaContent.getQaQueContents().size()) {
-			QaQueContent qaQuestion = qaService
-				.getQuestionByContentAndDisplayOrder(questionIndex + 1, qaContent.getUid());
-			qaQuestion.setQuestion(question);
-			qaService.saveOrUpdateQuestion(qaQuestion);
+			QaQueContent qaQuestion = qaService.getQuestionByContentAndDisplayOrder(questionIndex + 1,
+				qaContent.getUid());
+			qaQuestion.getQbQuestion().setName(question);
+			qaService.saveOrUpdate(qaQuestion.getQbQuestion());
 
 		    } else {
 			QaQueContent qaQuestion = new QaQueContent();
 			qaQuestion.setDisplayOrder(questionIndex + 1);
-			qaQuestion.setRequired(false);
 			qaQuestion.setQaContent(qaContent);
-			qaQuestion.setQuestion(question);
-			qaService.saveOrUpdateQuestion(qaQuestion);
+
+			QbQuestion qbQuestion = new QbQuestion();
+			qbQuestion.setAnswerRequired(false);
+			qbQuestion.setName(question);
+			qaService.saveOrUpdate(qbQuestion);
+
+			qaQuestion.setQbQuestion(qbQuestion);
+			qaService.saveOrUpdate(qaQuestion);
 		    }
 		    questionIndex++;
 		}

@@ -25,16 +25,17 @@ package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 
 /**
  * @author Ozgur Demirtas
  */
-public interface IQaQuestionDAO {
+public interface IQaQuestionDAO extends IBaseDAO {
 
     void createQueContent(QaQueContent queContent);
 
-    void saveOrUpdateQaQueContent(QaQueContent qaQuestion);
+    void saveOrUpdate(Object object);
 
     void removeQueContent(long qaQueContentId);
 

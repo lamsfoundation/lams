@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -254,7 +253,7 @@ public class QaLearningController implements QaAppConstants {
 		    QaQuestionDTO questionDTO = new QaQuestionDTO(qaQuestion);
 		    mapQuestions.put(displayOrder, questionDTO);
 
-		    mapQuestionStrings.put(new Integer(displayOrder).toString(), qaQuestion.getQuestion());
+		    mapQuestionStrings.put(new Integer(displayOrder).toString(), qaQuestion.getQbQuestion().getName());
 
 		}
 	    }
@@ -624,12 +623,13 @@ public class QaLearningController implements QaAppConstants {
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Integer(currentQuestionIndex),
-		    qaContent.getUid());
+	    QaQueContent currentQuestion = qaService
+		    .getQuestionByContentAndDisplayOrder(new Integer(currentQuestionIndex), qaContent.getUid());
 
-	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
+	    boolean isRequiredQuestionMissed = currentQuestion.getQbQuestion().isAnswerRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
-		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Integer(currentQuestionIndex), true);
+		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Integer(currentQuestionIndex),
+			true);
 	    }
 	}
     }
@@ -1240,7 +1240,7 @@ public class QaLearningController implements QaAppConstants {
 		// create itemIds list
 		List<Long> itemIds = new LinkedList<>();
 		for (QaUsrResp responseIter : userResponses) {
-		    itemIds.add(responseIter.getResponseId());
+		    itemIds.add(responseIter.getUid());
 		}
 
 		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
@@ -1258,7 +1258,7 @@ public class QaLearningController implements QaAppConstants {
 		    //find corresponding itemRatingDto
 		    ItemRatingDTO itemRatingDto = null;
 		    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
-			if (itemRatingDtoIter.getItemId().equals(response.getResponseId())) {
+			if (itemRatingDtoIter.getItemId().equals(response.getUid())) {
 			    itemRatingDto = itemRatingDtoIter;
 			    break;
 			}
@@ -1359,7 +1359,7 @@ public class QaLearningController implements QaAppConstants {
 	    //create itemIds list
 	    List<Long> itemIds = new LinkedList<>();
 	    for (QaUsrResp response : responses) {
-		itemIds.add(response.getResponseId());
+		itemIds.add(response.getUid());
 	    }
 
 	    //all comments required only for monitoring
@@ -1392,7 +1392,7 @@ public class QaLearningController implements QaAppConstants {
 	     */
 
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
-	    responseRow.put("responseUid", response.getResponseId().toString());
+	    responseRow.put("responseUid", response.getUid().toString());
 	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
@@ -1411,7 +1411,7 @@ public class QaLearningController implements QaAppConstants {
 		//find corresponding itemRatingDto
 		ItemRatingDTO itemRatingDto = null;
 		for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
-		    if (response.getResponseId().equals(itemRatingDtoIter.getItemId())) {
+		    if (response.getUid().equals(itemRatingDtoIter.getItemId())) {
 			itemRatingDto = itemRatingDtoIter;
 			break;
 		    }

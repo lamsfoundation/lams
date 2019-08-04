@@ -138,7 +138,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     List<QaQueContent> getAllQuestionEntriesSorted(final long qaContentId);
 
-    void saveOrUpdateQuestion(QaQueContent qaQuestion);
+    void saveOrUpdate(Object entity);
 
     /**
      * Return the qa session object according to the requested session id.

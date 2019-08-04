@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ public class QaOutputFactory extends OutputFactory {
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
-	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 	if (toolContentObject != null) {
 	    QaContent qaContent = (QaContent) toolContentObject;
 	    // Different definitions are provided, depending how the output will be used
@@ -99,9 +98,9 @@ public class QaOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IQaService qaService, Long toolSessionId,
 	    Long learnerId) {
 	// result
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 
 	if (names == null) {
 	    // output will be set for all the existing conditions
@@ -166,10 +165,10 @@ public class QaOutputFactory extends OutputFactory {
 	    String[] dummyStringArray = new String[] {};
 
 	    // answers sorted by time of adding, so "usersAndAnswers" has the newest answers at the beginning
-	    Map<Long, String[]> timeAndAnswers = new TreeMap<Long, String[]>();
+	    Map<Long, String[]> timeAndAnswers = new TreeMap<>();
 	    for (QaQueUsr user : users) {
 		if (user != null) {
-		    List<String> answers = new LinkedList<String>();
+		    List<String> answers = new LinkedList<>();
 		    long lastAttemptTime = Long.MAX_VALUE;
 		    for (QaQueContent question : questions) {
 
@@ -229,7 +228,7 @@ public class QaOutputFactory extends OutputFactory {
 	    String[] questionArray = new String[questions.size()];
 	    int questionIndex = 0;
 	    for (QaQueContent question : questions) {
-		questionArray[questionIndex++] = question.getQuestion();
+		questionArray[questionIndex++] = question.getQbQuestion().getName();
 	    }
 	    return new ToolOutput(name, getI18NText(QaAppConstants.QUESTIONS_DEFINITION_NAME, true), questionArray,
 		    false);

@@ -404,7 +404,7 @@ public class QaMonitoringController implements QaAppConstants {
 	    //create itemIds list
 	    List<Long> itemIds = new LinkedList<>();
 	    for (QaUsrResp usrResponse : responses) {
-		itemIds.add(usrResponse.getResponseId());
+		itemIds.add(usrResponse.getUid());
 	    }
 	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
 		    toolSessionID, itemIds, true, allUserIdValue);

@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -386,7 +385,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 		QaQueContent existingQaQueContent = qaService.getQuestionByUid(question.getUid());
 		existingQaQueContent.setDisplayOrder(displayOrder);
-		qaService.saveOrUpdateQuestion(existingQaQueContent);
+		qaService.saveOrUpdate(existingQaQueContent);
 		displayOrder++;
 	    }
 
@@ -564,22 +563,32 @@ public class QaAuthoringController implements QaAppConstants {
 
 	    // in case question doesn't exist
 	    if (question == null) {
-		question = new QaQueContent(questionText, displayOrder, questionDTO.getFeedback(),
-			questionDTO.isRequired(), questionDTO.getMinWordsLimit(), qaContent);
+		QbQuestion qbQuestion = new QbQuestion();
+		qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setVersion(1);
+		
+		qbQuestion.setName(questionText);
+		qbQuestion.setFeedback(questionDTO.getFeedback());
+		qbQuestion.setAnswerRequired(questionDTO.isRequired());
+		qbQuestion.setMinWordsLimit(questionDTO.getMinWordsLimit());
+
+		qaService.saveOrUpdate(qbQuestion);
+
+		question = new QaQueContent(qbQuestion, displayOrder, qaContent);
 		qaContent.getQaQueContents().add(question);
 		question.setQaContent(qaContent);
 
 		// in case question exists already
 	    } else {
-
-		question.setQuestion(questionText);
-		question.setFeedback(questionDTO.getFeedback());
-		question.setDisplayOrder(displayOrder);
-		question.setRequired(questionDTO.isRequired());
-		question.setMinWordsLimit(questionDTO.getMinWordsLimit());
+		QbQuestion qbQuestion = question.getQbQuestion();
+		qbQuestion.setName(questionText);
+		qbQuestion.setFeedback(questionDTO.getFeedback());
+		qbQuestion.setAnswerRequired(questionDTO.isRequired());
+		qbQuestion.setMinWordsLimit(questionDTO.getMinWordsLimit());
 	    }
 
-	    qaService.saveOrUpdateQuestion(question);
+	    qaService.saveOrUpdate(question);
 	}
 
 	for (QaCondition condition : conditions) {
@@ -597,7 +606,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	return qaContent;
     }
-    
+
     /**
      * Adds QbQuestion, selected in the question bank, to the current question list.
      */
@@ -607,7 +616,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    HttpServletRequest request, @RequestParam String httpSessionID, @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
-	
+
 	//get QbQuestion from DB
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
@@ -617,8 +626,8 @@ public class QaAuthoringController implements QaAppConstants {
 	    String displayOrder = String.valueOf(questionDTOs.size() + 1);
 	    boolean requiredBoolean = false;
 	    int minWordsLimit = 0;
-	    QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qbQuestion.getName(), displayOrder, qbQuestion.getFeedback(),
-		    requiredBoolean, minWordsLimit);
+	    QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qbQuestion.getName(), displayOrder,
+		    qbQuestion.getFeedback(), requiredBoolean, minWordsLimit);
 	    questionDTOs.add(qaQuestionDTO);
 	} else {
 	    //entry duplicate, not adding
@@ -626,7 +635,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	
+
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	String toolContentID = (String) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	authoringForm.setContentFolderID(contentFolderID);

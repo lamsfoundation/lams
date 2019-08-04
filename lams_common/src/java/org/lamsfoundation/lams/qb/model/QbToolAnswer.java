@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  *
  * @author Marcin Cieslak
@@ -51,5 +54,23 @@ public abstract class QbToolAnswer {
 
     public Long getUid() {
 	return this.uid;
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(getUid()).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (!(obj instanceof QbToolAnswer)) {
+	    return false;
+	}
+
+	QbToolAnswer other = (QbToolAnswer) obj;
+	return new EqualsBuilder().append(this.getUid(), other.getUid()).isEquals();
     }
 }

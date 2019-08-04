@@ -97,24 +97,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     @Transient
     private QuestionDTO questionDto;
 
-    @Override
-    public int hashCode() {
-	return new HashCodeBuilder().append(getUid()).toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (!(obj instanceof AssessmentQuestionResult)) {
-	    return false;
-	}
-
-	final AssessmentQuestionResult genericEntity = (AssessmentQuestionResult) obj;
-	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).isEquals();
-    }
-
     public QbQuestion getQbQuestion() {
 	return qbToolQuestion.getQbQuestion();
     }
