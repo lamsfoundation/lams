@@ -633,21 +633,15 @@ INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, n
     ORDER BY u.question_uid, u.sequence_id;
 
 
--- shift Assessment answer UIDs by offset equal to existing UIDs of MCQ and Assessment answers in lams_qb_tool_answer                                    
-SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
 
 ALTER TABLE tl_laasse10_question_result DROP FOREIGN KEY FK_NEW_1720029621_693580A438BF8DFE;
-					
--- for Talca for following queries we need to turn off foreign key checking
--- otherwise when updating UIDs, we get a foreign key error for FK_tl_laasse10_question_result_1, which has nothing to do with UID
--- no other method seems to work
--- after the update a manual check of FK_tl_laasse10_question_result_1 shows that everything is still correct
-SET FOREIGN_KEY_CHECKS=0;
+	
+-- clean up corrupted Assessment results
+DELETE r FROM tl_laasse10_question_result AS r LEFT JOIN tl_laasse10_assessment_result AS a ON r.result_uid = a.uid WHERE a.uid IS NULL;
 
+-- shift Assessment answer UIDs by offset equal to existing UIDs of MCQ and Assessment answers in lams_qb_tool_answer                                    
+SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
 UPDATE tl_laasse10_question_result SET uid = uid + @max_answer_uid ORDER BY uid DESC;
-UPDATE tl_laasse10_option_answer SET question_result_uid = question_result_uid + @max_answer_uid;
-
-SET FOREIGN_KEY_CHECKS=1;
 
 -- rewrite references from Assessment options to QB options
 UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
