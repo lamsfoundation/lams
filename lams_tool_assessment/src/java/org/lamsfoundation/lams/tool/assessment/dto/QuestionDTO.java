@@ -70,7 +70,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     
     private String titleEscaped;
 
-    private String answerString;
+    private String answer;
 
     private float answerFloat;
 
@@ -342,12 +342,12 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     }
     // ============= variable properties =============
 
-    public String getAnswerString() {
-	return answerString;
+    public String getAnswer() {
+	return answer;
     }
 
-    public void setAnswerString(String answerString) {
-	this.answerString = answerString;
+    public void setAnswer(String answer) {
+	this.answer = answer;
     }
 
     public float getAnswerFloat() {

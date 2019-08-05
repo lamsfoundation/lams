@@ -28,6 +28,9 @@ public abstract class QbToolAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long uid;
 
+    @Column
+    protected String answer;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "tool_question_uid")
     protected QbToolQuestion qbToolQuestion;
@@ -35,6 +38,18 @@ public abstract class QbToolAnswer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qb_option_uid")
     protected QbOption qbOption;
+
+    public Long getUid() {
+	return this.uid;
+    }
+
+    public String getAnswer() {
+	return answer;
+    }
+
+    public void setAnswer(String answer) {
+	this.answer = answer;
+    }
 
     public QbToolQuestion getQbToolQuestion() {
 	return qbToolQuestion;
@@ -50,10 +65,6 @@ public abstract class QbToolAnswer {
 
     public void setQbOption(QbOption qbOption) {
 	this.qbOption = qbOption;
-    }
-
-    public Long getUid() {
-	return this.uid;
     }
 
     @Override

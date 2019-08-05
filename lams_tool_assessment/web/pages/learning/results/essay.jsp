@@ -8,7 +8,7 @@
 	<table class="table table-hover table-condensed">
 		<tr>
 			<td>
-				${question.answerString}
+				${question.answer}
 			</td>
 		</tr>
 	</table>
@@ -33,7 +33,7 @@
 						<c:set var="sessionResults" 
 							value="${questionSummaries[question.uid].questionResultsPerSession[status.index]}" />
 						<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
-						<c:set var="answer" value="${sessionResults.answerString}" />
+						<c:set var="answer" value="${sessionResults.answer}" />
 					</c:if>
 					<td class="text-center">
 						<c:out value="${answer}" escapeXml="false" /> 

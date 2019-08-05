@@ -258,7 +258,7 @@ public class AssessmentServiceImpl
 		if (userQuestionResult.getQbToolQuestion().getUid()
 			.equals(leaderQuestionResult.getQbToolQuestion().getUid())) {
 
-		    userQuestionResult.setAnswerString(leaderQuestionResult.getAnswerString());
+		    userQuestionResult.setAnswer(leaderQuestionResult.getAnswer());
 		    userQuestionResult.setAnswerFloat(leaderQuestionResult.getAnswerFloat());
 		    userQuestionResult.setAnswerBoolean(leaderQuestionResult.getAnswerBoolean());
 		    userQuestionResult.setQbOption(leaderQuestionResult.getQbOption());
@@ -667,7 +667,7 @@ public class AssessmentServiceImpl
 	// store question answer values
 	questionResult.setAnswerBoolean(questionDto.getAnswerBoolean());
 	questionResult.setAnswerFloat(questionDto.getAnswerFloat());
-	questionResult.setAnswerString(questionDto.getAnswerString());
+	questionResult.setAnswer(questionDto.getAnswer());
 
 	int j = 0;
 	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
@@ -762,8 +762,8 @@ public class AssessmentServiceImpl
 		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswerString() != null)
-			? pattern.matcher(questionDto.getAnswerString().trim()).matches()
+		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswer() != null)
+			? pattern.matcher(questionDto.getAnswer().trim()).matches()
 			: false;
 
 		if (isAnswerMatchedCurrentOption) {
@@ -775,12 +775,12 @@ public class AssessmentServiceImpl
 	    }
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_NUMERICAL) {
-	    String answerString = questionDto.getAnswerString();
-	    if (answerString != null) {
+	    String answer = questionDto.getAnswer();
+	    if (answer != null) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
-			float answerFloat = Float.valueOf(questionDto.getAnswerString());
+			float answerFloat = Float.valueOf(questionDto.getAnswer());
 			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getNumericalOption()
 				- optionDto.getAcceptedError()))
 				&& (answerFloat <= (optionDto.getNumericalOption() + optionDto.getAcceptedError())));
@@ -792,9 +792,9 @@ public class AssessmentServiceImpl
 			    String regex = ".*" + unit.getName() + "$";
 			    Pattern pattern = Pattern.compile(regex,
 				    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-			    if (pattern.matcher(answerString).matches()) {
-				String answerFloatStr = answerString.substring(0,
-					answerString.length() - unit.getName().length());
+			    if (pattern.matcher(answer).matches()) {
+				String answerFloatStr = answer.substring(0,
+					answer.length() - unit.getName().length());
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
@@ -821,7 +821,7 @@ public class AssessmentServiceImpl
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_TRUE_FALSE) {
 	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer())
-		    && (questionDto.getAnswerString() != null)) {
+		    && (questionDto.getAnswer() != null)) {
 		mark = maxMark;
 	    }
 
@@ -923,7 +923,7 @@ public class AssessmentServiceImpl
     private void loadupQuestionResultIntoQuestionDto(QuestionDTO questionDto, AssessmentQuestionResult questionResult) {
 	questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
 	questionDto.setAnswerFloat(questionResult.getAnswerFloat());
-	questionDto.setAnswerString(questionResult.getAnswerString());
+	questionDto.setAnswer(questionResult.getAnswer());
 	questionDto.setMark(questionResult.getMark());
 	questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 	questionDto.setPenalty(questionResult.getPenalty());
@@ -2025,7 +2025,7 @@ public class AssessmentServiceImpl
 		summaryNACount++;
 	    }
 	} else if (question.getType() == QbQuestion.TYPE_TRUE_FALSE) {
-	    if (questionResult.getAnswerString() == null) {
+	    if (questionResult.getAnswer() == null) {
 		summaryNACount++;
 	    } else {
 		long key = questionResult.getAnswerBoolean() ? 1 : 0;
@@ -2260,10 +2260,10 @@ public class AssessmentServiceImpl
 			//check whether according question was modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
 			    if (oldQuestion.getDisplayOrder() == modifiedQuestion.getDisplayOrder()) {
-				
-				//update questionResult's qbQuestion with the new one 
+
+				//update questionResult's qbQuestion with the new one
 				questionResult.setQbToolQuestion(modifiedQuestion);
-				//update questionResult's qbOption 
+				//update questionResult's qbOption
 //				for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 //				    if (questionResult.getQbOption().getDisplayOrder() == newOption.getDisplayOrder()) {
 //					questionResult.setQbOption(newOption);
@@ -2272,15 +2272,15 @@ public class AssessmentServiceImpl
 //				}
 				//update questionResult's optionAnswers
 				for (AssessmentOptionAnswer oldOptionAnswer : questionResult.getOptionAnswers()) {
-				    
+
 				    //find according old qbOption
 				    QbOption oldOption = null;
-				    for (QbOption oldOptionIter: oldQuestion.getQbQuestion().getQbOptions()) {
+				    for (QbOption oldOptionIter : oldQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOptionIter.getUid().equals(oldOptionAnswer.getOptionUid())) {
 					    oldOption = oldOptionIter;
 					}
 				    }
-				    
+
 				    //update
 				    for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
@@ -2288,13 +2288,14 @@ public class AssessmentServiceImpl
 					    break;
 					}
 				    }
-				}		
-				
+				}
+
 				//actually recalculate marks
 				QuestionDTO modifiedQuestionDto = new QuestionDTO(modifiedQuestion);
 				modifiedQuestionDto.setMaxMark(oldResultMaxMark);
 				loadupQuestionResultIntoQuestionDto(modifiedQuestionDto, questionResult);
-				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, modifiedQuestionDto);
+				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult,
+					modifiedQuestionDto);
 				assessmentQuestionResultDao.saveObject(questionResult);
 
 				float newQuestionAnswerMark = questionResult.getMark();
@@ -2852,18 +2853,18 @@ public class AssessmentServiceImpl
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER) {
-		    answers.add(questionResult.getAnswerString());
+		    answers.add(questionResult.getAnswer());
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_NUMERICAL) {
-		    answers.add(questionResult.getAnswerString());
+		    answers.add(questionResult.getAnswer());
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_TRUE_FALSE) {
-		    if (questionResult.getAnswerString() != null) {
+		    if (questionResult.getAnswer() != null) {
 			answers.add("" + questionResult.getAnswerBoolean());
 		    }
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_ESSAY) {
-		    answers.add(questionResult.getAnswerString());
+		    answers.add(questionResult.getAnswer());
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_ORDERING) {
 

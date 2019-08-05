@@ -3,6 +3,7 @@
 -- AUTO COMMIT stays ON because there is so many ALTER TABLE statements which are committed immediately anyway, that it does not make a difference
 
 -- Create QB question table
+
 CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
                                `uuid` BINARY(16) NOT NULL,
                                `type` TINYINT NOT NULL,
@@ -75,6 +76,7 @@ CREATE TABLE lams_qb_question_unit (`uid` BIGINT AUTO_INCREMENT,
 CREATE TABLE lams_qb_tool_answer (`answer_uid` BIGINT AUTO_INCREMENT,
                                   `tool_question_uid` BIGINT NOT NULL,
                                   `qb_option_uid` BIGINT DEFAULT NULL,
+                                  `answer` MEDIUMTEXT,
                                   PRIMARY KEY (answer_uid),
                                   CONSTRAINT FK_lams_qb_tool_answer_1 FOREIGN KEY (tool_question_uid) 
                                       REFERENCES lams_qb_tool_question (tool_question_uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -179,7 +181,7 @@ UPDATE tl_lamc11_usr_attempt AS ua, tl_lamc11_options_content AS mco, lams_qb_to
 
 -- prepare for answer inheritance        
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, mc_que_content_id, mc_que_option_id FROM tl_lamc11_usr_attempt;
+    SELECT uid, mc_que_content_id, mc_que_option_id, NULL FROM tl_lamc11_usr_attempt;
 
 -- clean up
 ALTER TABLE tl_lamc11_usr_attempt DROP COLUMN mc_que_content_id,
@@ -359,7 +361,7 @@ UPDATE tl_lascrt11_answer_log AS sl, tl_lascrt11_scratchie_answer AS sa, lams_qb
         
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, scratchie_item_uid, scratchie_answer_uid FROM tl_lascrt11_answer_log;
+    SELECT uid, scratchie_item_uid, scratchie_answer_uid, NULL FROM tl_lascrt11_answer_log;
 
 
 -- cleanup
@@ -685,7 +687,7 @@ ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answe
         
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
+    SELECT uid, assessment_question_uid, submitted_option_uid, answer_string FROM tl_laasse10_question_result;
 
 -- fill content_folder_id with real values from learning designs
 UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learning_activity AS activity, lams_learning_design AS design
@@ -696,7 +698,8 @@ UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learnin
 
 -- cleanup
 ALTER TABLE tl_laasse10_question_result DROP COLUMN assessment_question_uid,
-                                           DROP COLUMN submitted_option_uid; 
+                                        DROP COLUMN submitted_option_uid,
+                                        DROP COLUMN answer_string;
                                            
 DROP TABLE tl_laasse10_question_option,
            tl_laasse10_assessment_unit;
@@ -793,10 +796,11 @@ UPDATE tl_laqa11_usr_resp SET uid = uid + @max_answer_uid ORDER BY uid DESC;
 
 -- prepare for answer inheritance        
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, qa_que_content_id, NULL FROM tl_laqa11_usr_resp;
+    SELECT uid, qa_que_content_id, NULL, answer FROM tl_laqa11_usr_resp;
 
 -- clean up
-ALTER TABLE tl_laqa11_usr_resp DROP COLUMN qa_que_content_id;
+ALTER TABLE tl_laqa11_usr_resp DROP COLUMN qa_que_content_id,
+							   DROP COLUMN answer;
                                
 
 ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;

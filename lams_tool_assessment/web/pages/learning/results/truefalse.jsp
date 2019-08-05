@@ -9,7 +9,7 @@
 		<tr>
 			<td class="complete-item-gif">
 				
-				<c:if test="${(question.answerString != null) 
+				<c:if test="${(question.answer != null) 
 						&& (assessment.allowRightAnswersAfterQuestion && (question.answerBoolean == question.correctAnswer) 
 						|| assessment.allowWrongAnswersAfterQuestion && (question.answerBoolean != question.correctAnswer)) }">
 					
@@ -39,7 +39,7 @@
 		<tr>
 			<td class="complete-item-gif">
 				
-				<c:if test="${(question.answerString != null) 
+				<c:if test="${(question.answer != null) 
 						&& (assessment.allowRightAnswersAfterQuestion && (question.answerBoolean == question.correctAnswer) 
 						|| assessment.allowWrongAnswersAfterQuestion && (question.answerBoolean != question.correctAnswer)) }">
 					
@@ -57,7 +57,7 @@
 						
 			<td class="has-radio-button">
 				<input type="radio" name="question${status.index}" value="${false}"
-	 				<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
+	 				<c:if test="${(!question.answerBoolean) and (question.answer != null)}">checked="checked"</c:if>
 					disabled="disabled"
 				/>
 			</td>

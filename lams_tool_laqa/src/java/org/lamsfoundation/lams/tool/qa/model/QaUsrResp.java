@@ -58,9 +58,6 @@ public class QaUsrResp extends QbToolAnswer implements Serializable {
 
     private static final long serialVersionUID = 3446870699674533029L;
 
-    @Column
-    private String answer;
-
     @Column(name = "answer_autosaved")
     private String answerAutosaved;
 
@@ -109,14 +106,6 @@ public class QaUsrResp extends QbToolAnswer implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("uid: ", getUid()).append("answer:", getAnswer())
 		.append("attempt time: ", getAttemptTime()).toString();
-    }
-
-    public String getAnswer() {
-	return answer;
-    }
-
-    public void setAnswer(String answer) {
-	this.answer = answer;
     }
 
     public String getAnswerAutosaved() {

@@ -766,9 +766,9 @@ public class LearningController {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
-			String answerString = request
+			String answer = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
-			answerBoolean = !StringUtils.isBlank(answerString);
+			answerBoolean = !StringUtils.isBlank(answer);
 		    } else {
 			String optionUidSelectedStr = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
@@ -788,24 +788,24 @@ public class LearningController {
 		}
 
 	    } else if (questionType == QbQuestion.TYPE_SHORT_ANSWER) {
-		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		questionDto.setAnswerString(answerString);
+		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_NUMERICAL) {
-		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		questionDto.setAnswerString(answerString);
+		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_TRUE_FALSE) {
-		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		if (answerString != null) {
-		    questionDto.setAnswerBoolean(Boolean.parseBoolean(answerString));
-		    questionDto.setAnswerString("answered");
+		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		if (answer != null) {
+		    questionDto.setAnswerBoolean(Boolean.parseBoolean(answer));
+		    questionDto.setAnswer("answered");
 		}
 
 	    } else if (questionType == QbQuestion.TYPE_ESSAY) {
-		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		answerString = answerString.replaceAll("[\n\r\f]", "");
-		questionDto.setAnswerString(answerString);
+		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		answer = answer.replaceAll("[\n\r\f]", "");
+		questionDto.setAnswer(answer);
 
 	    } else if (questionType == QbQuestion.TYPE_ORDERING) {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
@@ -831,9 +831,9 @@ public class LearningController {
 
 		//store justification of hedging if enabled
 		if (questionDto.isHedgingJustificationEnabled()) {
-		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-//		    answerString = answerString.replaceAll("[\n\r\f]", "");
-		    questionDto.setAnswerString(answerString);
+		    String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+//		    answer = answer.replaceAll("[\n\r\f]", "");
+		    questionDto.setAnswer(answer);
 		}
 	    }
 
@@ -891,7 +891,7 @@ public class LearningController {
 			    || (questionType == QbQuestion.TYPE_NUMERICAL)
 			    || (questionType == QbQuestion.TYPE_TRUE_FALSE)
 			    || (questionType == QbQuestion.TYPE_ESSAY)) {
-			isAnswered |= StringUtils.isNotBlank(questionDto.getAnswerString());
+			isAnswered |= StringUtils.isNotBlank(questionDto.getAnswer());
 
 		    } else if (questionType == QbQuestion.TYPE_ORDERING) {
 			isAnswered = true;
@@ -907,7 +907,7 @@ public class LearningController {
 
 			//verify justification of hedging is provided if it was enabled
 			if (questionDto.isHedgingJustificationEnabled()) {
-			    isAnswered &= StringUtils.isNotBlank(questionDto.getAnswerString());
+			    isAnswered &= StringUtils.isNotBlank(questionDto.getAnswer());
 			}
 		    }
 
@@ -921,13 +921,13 @@ public class LearningController {
 
 		if ((questionDto.getType() == QbQuestion.TYPE_ESSAY) && (questionDto.getMinWordsLimit() > 0)) {
 
-		    if (questionDto.getAnswerString() == null) {
+		    if (questionDto.getAnswer() == null) {
 			isAllQuestionsReachedMinWordsLimit = false;
 			break;
 
 		    } else {
 			boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(
-				questionDto.getAnswerString(), questionDto.getMinWordsLimit(),
+				questionDto.getAnswer(), questionDto.getMinWordsLimit(),
 				questionDto.isAllowRichEditor());
 			// check min words limit is reached
 			if (!isMinWordsLimitReached) {

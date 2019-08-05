@@ -63,6 +63,7 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
     public QaQueContent(QbQuestion qbQuestion, int displayOrder, QaContent qaContent) {
 	this.qbQuestion = qbQuestion;
 	this.qaContent = qaContent;
+	this.toolContentId = qaContent.getQaContentId();
 	this.displayOrder = displayOrder;
     }
 

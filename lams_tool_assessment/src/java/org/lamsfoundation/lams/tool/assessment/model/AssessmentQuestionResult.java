@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.model;
 
 import java.util.Date;
@@ -39,8 +38,6 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
@@ -55,45 +52,42 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
 @PrimaryKeyJoinColumn(name = "uid")
 public class AssessmentQuestionResult extends QbToolAnswer implements Comparable<AssessmentQuestionResult> {
-    
-    @Column(name = "answer_string")
-    private String answerString;
-    
+
     @Column(name = "answer_float")
     private float answerFloat;
-    
+
     @Column(name = "answer_boolean")
     private boolean answerBoolean;
-    
+
     @Column
     private float mark;
-    
+
     @Column(name = "max_mark")
     private Float maxMark;
-    
+
     @Column
     private float penalty;
-    
+
     @Column(name = "finish_date")
     private Date finishDate;
-    
+
     @Column(name = "confidence_level")
     private int confidenceLevel;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
     private AssessmentResult assessmentResult;
-    
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "question_result_uid")
     private Set<AssessmentOptionAnswer> optionAnswers = new LinkedHashSet<>();
 
     // *************** NON Persist Fields ********************
-    
+
     @Transient
     private AssessmentUser user;
     @Transient
-    private String answerStringEscaped;
+    private String answerEscaped;
     @Transient
     private QuestionDTO questionDto;
 
@@ -107,17 +101,6 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 
     public void setAssessmentResult(AssessmentResult assessmentResult) {
 	this.assessmentResult = assessmentResult;
-    }
-
-    /**
-     * @return Returns the possible answer.
-     */
-    public String getAnswerString() {
-	return answerString;
-    }
-
-    public void setAnswerString(String answerString) {
-	this.answerString = answerString;
     }
 
     /**
@@ -193,7 +176,7 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
     }
-    
+
     public int getConfidenceLevel() {
 	return confidenceLevel;
     }
@@ -210,14 +193,14 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 	this.user = user;
     }
 
-    public String getAnswerStringEscaped() {
-	return answerStringEscaped;
+    public String getanswerEscaped() {
+	return answerEscaped;
     }
 
-    public void setAnswerStringEscaped(String answerStringEscaped) {
-	this.answerStringEscaped = answerStringEscaped;
-    } 
-    
+    public void setanswerEscaped(String answerEscaped) {
+	this.answerEscaped = answerEscaped;
+    }
+
     public QuestionDTO getQuestionDto() {
 	return questionDto;
     }
