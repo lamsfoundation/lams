@@ -59,6 +59,9 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     @Column(name = "ext_groups_url")
     private String extGroupsUrl;
+    
+    @Column(name = "membership_url")
+    private String membershipUrl;
 
     @Column
     private Boolean disabled;
@@ -195,6 +198,14 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setExtGroupsUrl(String extGroupsUrl) {
 	this.extGroupsUrl = extGroupsUrl;
+    }
+    
+    public String getMembershipUrl() {
+	return this.membershipUrl;
+    }
+
+    public void setMembershipUrl(String membershipUrl) {
+	this.membershipUrl = membershipUrl;
     }
 
     public Boolean getDisabled() {

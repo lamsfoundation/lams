@@ -150,7 +150,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
-	String method = LtiUtils.isStaff(roles) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
+	String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
 		? LoginRequestDispatcher.METHOD_AUTHOR
 		: LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
 

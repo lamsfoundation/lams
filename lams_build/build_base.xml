@@ -46,6 +46,8 @@
 			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
 			<include name="org/apache/commons/beanutils/main/commons-beanutils-*.jar" />
 			<include name="org/apache/commons/collections/main/commons-collections-*.jar" />
+			<include name="org/apache/httpcomponents/core/main/httpclient-*.jar" />
+			<include name="org/apache/httpcomponents/core/main/httpcore-*.jar" />
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
