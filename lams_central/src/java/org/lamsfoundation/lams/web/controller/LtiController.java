@@ -144,6 +144,13 @@ public class LtiController {
 	    extServer.setLessonFinishUrl(lessonFinishCallbackUrl);
 	    userManagementService.save(extServer);
 	}
+	
+	//update MembershipUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
+	String membershipUrl = request.getParameter("custom_context_memberships_url");
+	if (StringUtils.isNotBlank(membershipUrl) && StringUtils.isBlank(extServer.getMembershipUrl())) {
+	    extServer.setMembershipUrl(membershipUrl);
+	    userManagementService.save(extServer);
+	}
 
 	//check if learner tries to access the link that hasn't been authored by teacher yet
 	String method = request.getParameter("_" + LoginRequestDispatcher.PARAM_METHOD);
@@ -260,6 +267,7 @@ public class LtiController {
 		extServer.getLiveEditEnabled(), extServer.getEnableLessonNotifications(),
 		extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
 		extServer.getGradebookOnComplete(), null, null);
+	Long lessonId = lesson.getLessonId();
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
@@ -267,13 +275,19 @@ public class LtiController {
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
-	monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+	monitoringService.createLessonClassForLesson(lessonId, organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
 		user.getUserId());
 	// 3. start lesson
-	monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+	monitoringService.startLesson(lessonId, user.getUserId());
 	// store information which extServer has started the lesson
-	integrationService.createExtServerLessonMap(lesson.getLessonId(), resourceLinkId, extServer);
+	integrationService.createExtServerLessonMap(lessonId, resourceLinkId, extServer);
+	
+	integrationService.addExtUsersToLesson(extServer, lessonId, contextId, resourceLinkId);
+	
+//	Thread t = new Thread(new AddUsersToLessonThread(serverId, datetime, username, hashValue, lsIdStr,
+//		courseId, country, lang, learnerIds, monitorIds, firstNames, lastNames, emails, request));
+//	t.start();
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -443,4 +457,146 @@ public class LtiController {
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
     }
+
+//  private class AddUsersToLessonThread implements Runnable {
+//
+//	private String serverId;
+//	private String datetime;
+//	private String username;
+//	private String hashValue;
+//	private String lsIdStr;
+//	private String courseId;
+//	private String country;
+//	private String lang;
+//	private String learnerIds;
+//	private String monitorIds;
+//	private String firstNames;
+//	private String lastNames;
+//	private String emails;
+//	private HttpServletRequest request;
+//
+//	public AddUsersToLessonThread(String serverId, String datetime, String username, String hashValue,
+//		String lsIdStr, String courseId, String country, String lang, String learnerIds, String monitorIds,
+//		String firstNames, String lastNames, String emails, HttpServletRequest request) {
+//	    this.serverId = serverId;
+//	    this.datetime = datetime;
+//	    this.username = username;
+//	    this.hashValue = hashValue;
+//	    this.lsIdStr = lsIdStr;
+//	    this.courseId = courseId;
+//	    this.country = country;
+//	    this.lang = lang;
+//	    this.learnerIds = learnerIds;
+//	    this.monitorIds = monitorIds;
+//	    this.firstNames = firstNames;
+//	    this.lastNames = lastNames;
+//	    this.emails = emails;
+//	    this.request = request;
+//	}
+//
+//	@Override
+//	public void run() {
+//	    addUsersToLesson(serverId, datetime, username, hashValue, lsIdStr, courseId, country, lang, learnerIds,
+//		    monitorIds, firstNames, lastNames, emails, request);
+//	}
+//
+//	/**
+//	 * Adds each user in learnerIds and monitorIds as learner and staff to the given lesson id; authenticates using
+//	 * the 3rd party server requestor's username.
+//	 *
+//	 * @param serverId
+//	 * @param datetime
+//	 * @param hashValue
+//	 * @param lsIdStr
+//	 * @param learnerIds
+//	 * @param monitorIds
+//	 * @param request
+//	 * @return
+//	 */
+//	public Boolean addUsersToLesson(String serverId, String datetime, String requestorUsername, String hashValue,
+//		String lsIdStr, String courseId, String countryIsoCode, String langIsoCode, String learnerIds,
+//		String monitorIds, String firstNames, String lastNames, String emails, HttpServletRequest request) {
+//	    try {
+//
+//		// get Server map
+//		ExtServer extServer = integrationService.getExtServer(serverId);
+//		// authenticate
+//		Authenticator.authenticate(extServer, datetime, requestorUsername, hashValue);
+//
+//		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
+//		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
+//		String[] firstNameArray = (firstNames != null)
+//			? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
+//			: new String[0];
+//		String[] lastNameArray = (lastNames != null) ? lastNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
+//			: new String[0];
+//		String[] emailArray = (emails != null) ? emails.split(",") : new String[0];
+//
+//		// in case there is firstNames available - check all arrays have the same length, as otherwise it's
+//		// prone to ArrayOutOfBounds exceptions
+//		if ((firstNames != null) && ((firstNameArray.length != lastNameArray.length)
+//			|| (firstNameArray.length != emailArray.length)
+//			|| (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
+//		    log.error("Invalid parameters sent: wrong array length. " + "learnerIds=" + learnerIds
+//			    + " &monitorIds=" + monitorIds + " &firstNames=" + firstNames + " &lastNames=" + lastNames
+//			    + " &emails=" + emails + " &array lengths=" + learnerIdArray.length + "!"
+//			    + monitorIdArray.length + "!" + firstNameArray.length + "!" + lastNameArray.length + "!"
+//			    + emailArray.length);
+//		    return false;
+//		}
+//
+//		int i = 0;
+//		for (String userName : learnerIdArray) {
+//		    String firstName = null;
+//		    String lastName = null;
+//		    String email = null;
+//		    if (firstNames != null) {
+//			// unescape values passed from the external server. Works OK even if the values were not escaped
+//			firstName = StringEscapeUtils.unescapeCsv(firstNameArray[i]);
+//			lastName = StringEscapeUtils.unescapeCsv(lastNameArray[i]);
+//			email = StringEscapeUtils.unescapeCsv(emailArray[i]);
+//		    }
+//
+//	    if (StringUtils.isNotBlank(userName)) {
+//		addUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName, firstName,
+//			lastName, email, courseId, countryIsoCode, langIsoCode);
+//		    }
+//		    i++;
+//		}
+//
+//		for (String userName : monitorIdArray) {
+//		    String firstName = null;
+//		    String lastName = null;
+//		    String email = null;
+//		    if (firstNames != null) {
+//			// unescape values passed from the external server. Works OK even if the values were not escaped
+//			firstName = StringEscapeUtils.unescapeCsv(firstNameArray[i]);
+//			lastName = StringEscapeUtils.unescapeCsv(lastNameArray[i]);
+//			email = StringEscapeUtils.unescapeCsv(emailArray[i]);
+//		    }
+//
+//	    if (StringUtils.isNotBlank(userName)) {
+//		integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr,
+//			userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
+//		    }
+//		    i++;
+//		}
+//
+//		return true;
+//	    } catch (UserInfoFetchException e) {
+//		log.error(e, e);
+//		return false;
+//	    } catch (UserInfoValidationException e) {
+//		log.error(e, e);
+//		return false;
+//	    } catch (AuthenticationException e) {
+//		log.error(e, e);
+//		return false;
+//	    }
+//	}
+//
+//
+//  }
+
+
 }

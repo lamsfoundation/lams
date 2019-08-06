@@ -927,8 +927,10 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName,
-				firstName, lastName, email, courseId, locale, country);
+//			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr,
+//				userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
+			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr,
+				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;
 		}
@@ -945,8 +947,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, userName,
-				firstName, lastName, email, courseId, locale, country);
+			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr,
+				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;
 		}
@@ -962,45 +964,6 @@ public class LessonManagerServlet extends HttpServlet {
 		log.error(e, e);
 		return false;
 	    }
-	}
-
-	private void addUserToLesson(HttpServletRequest request, ExtServer extServer, String method, String lsIdStr,
-		String username, String firstName, String lastName, String email, String courseId, String locale,
-		String country) throws UserInfoFetchException, UserInfoValidationException {
-
-	    if (log.isDebugEnabled()) {
-		log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
-	    }
-
-	    ExtUserUseridMap userMap = null;
-	    if ((firstName == null) && (lastName == null)) {
-		userMap = integrationService.getExtUserUseridMap(extServer, username);
-	    } else {
-		final boolean usePrefix = true;
-		final boolean isUpdateUserDetails = false;
-		userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, firstName, lastName,
-			locale, country, email, usePrefix, isUpdateUserDetails);
-	    }
-
-	    // ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer,
-	    // username);
-	    // adds user to group
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
-		    method);
-
-	    User user = userMap.getUser();
-	    if (user == null) {
-		String error = "Unable to add user to lesson class as user is missing from the user map";
-		log.error(error);
-		throw new UserInfoFetchException(error);
-	    }
-
-	    if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
-		lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
-	    } else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-		lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
-	    }
-
 	}
     }
 
