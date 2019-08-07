@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lamsfoundation.lams.integration.ExtServer;
+
 public class LtiUtils {
 
     public static final String OAUTH_CONSUMER_KEY = "oauth_consumer_key";
@@ -32,11 +34,16 @@ public class LtiUtils {
      *
      * @return <code>true</code> if the user has a role of instructor, contentdeveloper or teachingassistant
      */
-    public static boolean isStaff(String roles) {
+    public static boolean isStaff(String roles, ExtServer extServer) {
 	List<String> rolesToSearchFor = new LinkedList<String>();
 	rolesToSearchFor.add("urn:lti:role:ims/lis/Instructor");
 	rolesToSearchFor.add("urn:lti:role:ims/lis/ContentDeveloper");
 	rolesToSearchFor.add("urn:lti:role:ims/lis/TeachingAssistant");
+	
+	String toolConsumerMonitorRoles = extServer.getLtiToolConsumerMonitorRoles();
+	if (toolConsumerMonitorRoles != null) {
+	    rolesToSearchFor.addAll(Arrays.asList(toolConsumerMonitorRoles.split(",")));
+	}
 	
 	return hasRole(roles, rolesToSearchFor);
     }
