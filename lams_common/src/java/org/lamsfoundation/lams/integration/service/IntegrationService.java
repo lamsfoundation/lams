@@ -977,7 +977,8 @@ public class IntegrationService implements IIntegrationService {
             
         	JsonNode member = membership.get("member");
         	String extUserId = member.get("userId").asText();
-        	String firstName = member.get("givenName").asText();
+        	//to address Moodle version 3.7.1 bug
+        	String firstName = member.get("givenName") == null ? member.get("giveName").asText() : member.get("giveName").asText();
         	String lastName = member.get("familyName").asText();
         	String fullName = member.get("name").asText();
         	String email = member.get("email").asText();
@@ -1036,7 +1037,7 @@ public class IntegrationService implements IIntegrationService {
 
 
 		JsonNode messages = membership.get("message");
-		log.info("membership" + i + " messages: " + messages.toString());
+		log.info("membership" + i + " messages: " + (messages == null ? "" : messages.toString()));
 		if (messages != null && messages.size() > 0) {
 		    for (int k = 0; k < messages.size(); k++) {
 			JsonNode message = messages.get(k);
