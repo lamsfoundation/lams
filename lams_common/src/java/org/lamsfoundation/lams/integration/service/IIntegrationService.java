@@ -122,12 +122,7 @@ public interface IIntegrationService {
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
    
     /**
-     * Get the memberships.
-     *
-     * @param string    $role   Role for which memberships are to be requested (optional, default is all roles)
-     * @param int       $limit  Limit on the number of memberships to be returned (optional, default is all)
-     *
-     * @return mixed The array of User objects if successful, otherwise false
+     * Try to get users from ext server using membership service.
      */
     void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
 	    throws IOException, UserInfoFetchException, UserInfoValidationException;
