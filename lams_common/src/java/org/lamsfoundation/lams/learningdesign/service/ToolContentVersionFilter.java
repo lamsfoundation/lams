@@ -46,10 +46,14 @@ public class ToolContentVersionFilter {
     private Map<String, String> renamedClassMap;
 
     public ToolContentVersionFilter() {
-	removedFieldList = new ArrayList<RemovedField>();
-	addedFieldList = new ArrayList<AddedField>();
-	renamedFieldList = new ArrayList<RenamedField>();
-	renamedClassMap = new HashMap<String, String>();
+	clearChanges();
+    }
+
+    protected void clearChanges() {
+	removedFieldList = new ArrayList<>();
+	addedFieldList = new ArrayList<>();
+	renamedFieldList = new ArrayList<>();
+	renamedClassMap = new HashMap<>();
     }
 
     // container class for removed class

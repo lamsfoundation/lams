@@ -39,7 +39,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +46,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -63,6 +63,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -911,7 +912,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// if workspaceFolderUid == null use the user's default folder
 	WorkspaceFolder folder = null;
 	if (workspaceFolderUid != null) {
-	    folder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderUid);
+	    folder = baseDAO.find(WorkspaceFolder.class, workspaceFolderUid);
 	}
 	if (folder == null && importer.getWorkspaceFolder() != null) {
 	    folder = importer.getWorkspaceFolder();
@@ -1075,6 +1076,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
+    @SuppressWarnings("unchecked")
     private void filterVersion(String toolFilePath, String fromVersion, String toVersion) throws Exception {
 	float from = 0;
 	try {
@@ -1096,7 +1098,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	log.debug("Version filter class will filter from version " + from + " to " + to);
 
-	Object filter = filterClass.newInstance();
+	ToolContentVersionFilter filter = (ToolContentVersionFilter) filterClass.getConstructor(new Class[0])
+		.newInstance(new Object[0]);
 	Method[] methods = filterClass.getDeclaredMethods();
 	Map<Float, Method> methodNeeds = new TreeMap<>();
 	for (Method method : methods) {
@@ -1120,14 +1123,32 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 	    }
 	}
-	Collection<Method> calls = methodNeeds.values();
-	for (Method method : calls) {
-	    method.invoke(filter, new Object[] {});
-	    log.debug("Version filter class method " + method.getName() + " is executed.");
-	}
-	Method transform = filterClass.getMethod("transformXML", new Class[] { String.class });
-	transform.invoke(filter, new Object[] { toolFilePath });
 
+	Method transform = filterClass.getMethod("transformXML", new Class[] { String.class });
+	for (Entry<Float, Method> methodEntry : methodNeeds.entrySet()) {
+	    Method method = methodEntry.getValue();
+	    Class<?>[] parameterTypes = method.getParameterTypes();
+	    if (parameterTypes.length == 0) {
+		method.invoke(filter, new Object[0]);
+		log.debug("Version filter class method " + method.getName() + " is executed.");
+	    } else if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(String.class)) {
+		// We encountered a method which transforms tool XML
+		// First we need to flush existing stacked up changes (add/remove/rename field etc.)
+		Float currentVersionStep = methodEntry.getKey();
+		log.debug("Flushing changes up to version " + currentVersionStep);
+		transform.invoke(filter, new Object[] { toolFilePath });
+		// then call the method that transforms XML
+		log.debug("Transforming XML For version " + currentVersionStep);
+		method.invoke(filter, new Object[] { toolFilePath });
+		// then clear flushed changes so they are not called again after iteration
+		filter.clearChanges();
+	    } else {
+		throw new InvalidParameterException("Can not run version filter method " + method.getName()
+			+ ". Unsupported number or type of parameters.");
+	    }
+	}
+	// perform final XML transformation
+	transform.invoke(filter, new Object[] { toolFilePath });
     }
 
     /**
