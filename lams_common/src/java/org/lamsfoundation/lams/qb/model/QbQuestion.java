@@ -81,7 +81,7 @@ public class QbQuestion implements Serializable, Cloneable {
     private String description;
 
     @Column(name = "max_mark")
-    private Integer maxMark;
+    private Integer maxMark = 1;
 
     @Column
     private String feedback;

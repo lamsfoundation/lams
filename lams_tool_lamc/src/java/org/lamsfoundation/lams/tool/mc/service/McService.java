@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -1419,10 +1420,29 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			"Import MC tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    McContent toolContentObj = (McContent) toolPOJO;
-
 	    // reset it to new toolContentId
 	    toolContentObj.setMcContentId(toolContentId);
 	    toolContentObj.setCreatedBy(newUserUid);
+
+	    // we need to save QB questions and options first
+	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
+		QbQuestion qbQuestion = mcQuestion.getQbQuestion();
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		mcQuestion.setToolContentId(toolContentId);
+
+		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
+		qbQuestion.getQbOptions().clear();
+
+		mcQueContentDAO.insert(qbQuestion);
+
+		qbQuestion.getQbOptions().addAll(qbOptions);
+		for (QbOption qbOption : qbOptions) {
+		    qbOption.setQbQuestion(qbQuestion);
+		    mcQueContentDAO.insert(qbOption);
+		}
+		qbOptions.clear();
+	    }
+
 	    mcContentDAO.saveMcContent(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
