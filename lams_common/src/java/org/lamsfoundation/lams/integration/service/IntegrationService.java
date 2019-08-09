@@ -956,143 +956,17 @@ public class IntegrationService implements IIntegrationService {
     @Override
     public void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
 	    throws IOException, UserInfoFetchException, UserInfoValidationException {
-
-//        $isLink = is_a($this->source, 'IMSGlobal\LTI\ToolProvider\ResourceLink');
-
-	log.info("addExtUsersToLesson invoked. params: courseId " + courseId + "resourceLinkId " + resourceLinkId);
-	JsonNode json = send(extServer, resourceLinkId);
-        if (json == null) {
-//            $users = false;
-        } else {
-            
-//            $users = array();
-//            if ($isLink) {
-//                $oldUsers = $this->source->getUserResultSourcedIDs(true, ToolProvider\ToolProvider::ID_SCOPE_RESOURCE);
-//            }
-            
-            JsonNode memberships = json.get("pageOf").get("membershipSubject").get("membership");
-            for (int i = 0;  i < memberships.size(); i++) {
-        	JsonNode membership = memberships.get(i);
-        	log.info("membership" + i + ": " + membership.toString());
-            
-        	JsonNode member = membership.get("member");
-        	String extUserId = member.get("userId").asText();
-        	//to address Moodle version 3.7.1 bug
-        	String firstName = member.get("givenName") == null ? member.get("giveName").asText() : member.get("giveName").asText();
-        	String lastName = member.get("familyName").asText();
-        	String fullName = member.get("name").asText();
-        	String email = member.get("email").asText();
-        	// Set the user name and email
-    	    	String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
-
-    	 String countryIsoCode = defaultLangCountry[1] ; 
-	    String langIsoCode = defaultLangCountry[0];
-//        	ExtUserUseridMap extUser = getImplicitExtUserUseridMap(extServer, extUserId, firstName, lastName, defaultLangCountry[1],
-//        		    defaultLangCountry[0], email, StringUtils.isNotBlank(extServer.getPrefix()), true);
-        	    //?? getUserDataFromExtServer
-        	
-
-// Set the user roles
-	    	JsonNode jsonRoles = membership.get("role");
-	    	log.info("membership" + i + " roles: " + jsonRoles.toString());
-        	String roles = new String();
-        	for (int j = 0;  j < jsonRoles.size(); j++) {
-        	    String role = jsonRoles.get(j).asText();
-        	    roles += role + ",";
-        	}
-        	
-        	String method;
-        	ExtUserUseridMap extUser;
-		if (LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)) {
-		    log.info("Adding user as monitor");
-        	    method = LoginRequestDispatcher.METHOD_MONITOR;
-        	    
-        	    extUser = addExtUserToLesson(extServer, method, lessonId.toString(), extUserId, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
-
-        	} else {
-        	    log.info("Adding user as learner");
-        	    method = LoginRequestDispatcher.METHOD_LEARNER;
-        	    extUser = addExtUserToLesson(extServer, method, lessonId.toString(), extUserId, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
-        	}
-        	
-//                if (isset($membership->role)) {
-//                    if (!is_array($roles)) {
-//                        $roles = explode(',', $roles);
-//                    }
-//                    $parsedRoles = array();
-//                    foreach ($roles as $role) {
-//                        $role = trim($role);
-//                        if (!empty($role)) {
-//                            if (substr($role, 0, 4) !== 'urn:') {
-//                                $role = 'urn:lti:role:ims/lis/' . $role;
-//                            }
-//                            $parsedRoles[] = $role;
-//                        }
-//                    }
-//                    $user->roles = roles;
-//                }
-
-// If a result sourcedid is provided save the user
-		
-
-
-		JsonNode messages = membership.get("message");
-		log.info("membership" + i + " messages: " + (messages == null ? "" : messages.toString()));
-		if (messages != null && messages.size() > 0) {
-		    for (int k = 0; k < messages.size(); k++) {
-			JsonNode message = messages.get(k);
-			String messageType = message.get("message_type").asText();
-			String tcGradebookId = message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID) == null ? ""
-				: message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID).asText();
-
-			if (StringUtils.isNotBlank(messageType) && "basic-lti-launch-request".equals(messageType)) {
-			    if (StringUtils.isNotBlank(tcGradebookId)) {
-				log.info("User setTcGradebookId tcGradebookId:" + tcGradebookId);
-				extUser.setTcGradebookId(tcGradebookId);
-				service.save(extUser);
-			    }
-			    break;
-			}
-		    }
-		}
-
-// Remove old user (if it exists)
-//                if ($isLink) {
-//                    unset($oldUsers[$user->getId(ToolProvider\ToolProvider::ID_SCOPE_RESOURCE)]);
-//                }
-            }
-
-// Delete any old users which were not in the latest list from the tool consumer
-//            if ($isLink) {
-//                foreach ($oldUsers as $id => $user) {
-//                    $user->delete();
-//                }
-//            }
-        }
-    }
-    
-    /**
-     * Send a service request.
-     *
-     * @param array
-     *            $parameters Query parameters to add to endpoint (optional, default is none)
-     *
-     * @return HTTPMessage HTTP object containing request and response details
-     * @throws LtiSigningException
-     * @throws IOException
-     * @throws ClientProtocolException
-     */
-    public JsonNode send(ExtServer extServer, String resourceLinkId) throws IOException {
-
+	
 	String membershipUrl = extServer.getMembershipUrl();
 	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users 
 	if (StringUtils.isBlank(membershipUrl)) {
-	    return null;
+	    return;
 	}
 
 	membershipUrl += membershipUrl.contains("?") ? "&" : "?";
 	membershipUrl += "rlid=" + resourceLinkId;
     	
+        log.debug("Make a call to remote membershipUrl:" + membershipUrl);
         HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
         ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
 //	request.setEntity(new StringEntity(xml, "UTF-8"));
@@ -1105,10 +979,6 @@ public class IntegrationService implements IIntegrationService {
 //            $header .= "\nContent-Type: {$type}";
 //            $header .= "\nContent-Length: " . strlen($data);
 //        }
-        
-        log.info("Call membershipUrl:" + membershipUrl);
-        
-//        BasicLTIUtil.validateMessage(request, URL, oauth_secret)
 
 	LtiSigner ltiSigner = new LtiOauthSigner();
 	try {
@@ -1126,36 +996,67 @@ public class IntegrationService implements IIntegrationService {
 	}
 	
 	String responseString = EntityUtils.toString(response.getEntity());
-	log.info("Response: " + responseString);
-	JsonNode actualObj = new ObjectMapper().readTree(responseString);
+	log.debug("membershipUrl responded with the following message: " + responseString);
+	JsonNode json = new ObjectMapper().readTree(responseString);
 	
-//	JSONObject jsonObject = new JSONObject(EntityUtils.toString(response.getEntity())); 
-	return actualObj;
-//	    Gson gson = new GsonBuilder().create();
-//	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
-        
-//        LtiVerifier verifier = new LtiOauthVerifier();
-//        LtiVerificationResult result = verifier.verify(ltiServiceGetRequest, extServer.getServerkey());
+	//no users provided by membership service
+        if (json == null) {
+            return;
+        }
+            
+        //process users provided by membership service
+	JsonNode memberships = json.get("pageOf").get("membershipSubject").get("membership");
+	for (int i = 0; i < memberships.size(); i++) {
+	    JsonNode membership = memberships.get(i);
+	    log.debug("membership" + i + ": " + membership.toString());
 
-        
+	    JsonNode member = membership.get("member");
+	    String extUserId = member.get("userId").asText();
+	    //to address Moodle version 3.7.1 bug
+	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
+		    : member.get("giveName").asText();
+	    String lastName = member.get("familyName").asText();
+	    String fullName = member.get("name").asText();
+	    String email = member.get("email").asText();
+	    // Set the user country and lang
+	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
+	    String countryIsoCode = defaultLangCountry[1];
+	    String langIsoCode = defaultLangCountry[0];
 
+	    // check user roles and add user to the lesson
+	    JsonNode jsonRoles = membership.get("role");
+	    log.debug("membership" + i + " roles: " + jsonRoles.toString());
+	    String roles = new String();
+	    for (int j = 0; j < jsonRoles.size(); j++) {
+		String role = jsonRoles.get(j).asText();
+		roles += role + ",";
+	    }
+	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
+		    ? LoginRequestDispatcher.METHOD_MONITOR
+		    : LoginRequestDispatcher.METHOD_LEARNER;
+	    ExtUserUseridMap extUser = addExtUserToLesson(extServer, method, lessonId.toString(), extUserId, firstName,
+		    lastName, email, courseId, countryIsoCode, langIsoCode);
 
-//            if (!$this->unsigned) {
-//                $header = ToolProvider\ToolConsumer::addSignature(membershipUrl, $this->consumer->getKey(), $this->consumer->secret, body, "GET", $this->mediaType);
-//            } else {
-//                $header = null;
-//            }
+	    // If a result sourcedid is providedm, save it to the user object
+	    JsonNode messages = membership.get("message");
+	    if (messages != null && messages.size() > 0) {
+		for (int k = 0; k < messages.size(); k++) {
+		    JsonNode message = messages.get(k);
+		    String messageType = message.get("message_type").asText();
+		    String tcGradebookId = message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID) == null ? ""
+			    : message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID).asText();
 
-    // Connect to tool consumer
-//            $http = new HTTPMessage(membershipUrl, "GET", body, $header);
-    // Parse JSON response
-//            if ($http->send() && !empty($http->response)) {
-//                $http->responseJson = json_decode($http->response);
-//                $http->ok = !is_null($http->responseJson);
-//            }
-//
-//            return $http;
-
+		    if (StringUtils.isNotBlank(messageType) && "basic-lti-launch-request".equals(messageType)) {
+			if (StringUtils.isNotBlank(tcGradebookId)) {
+			    log.debug("Storing user's tcGradebookId:" + tcGradebookId);
+			    extUser.setTcGradebookId(tcGradebookId);
+			    service.save(extUser);
+			}
+			break;
+		    }
+		}
+	    }
+	}
     }
    
     // ---------------------------------------------------------------------
