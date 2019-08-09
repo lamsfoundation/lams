@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -93,10 +94,12 @@ public class LtiController {
 	String extUserId = request.getParameter(BasicLTIConstants.USER_ID);
 
 	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
+	
 	//support for ContentItemSelectionRequest. If lesson was created during such request, update its ExtServerLesson's resourceLinkId for the first time
-	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_isContentItemSelection", false);
+	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
 	if (lesson == null && isContentItemSelection) {
-	    Long lessonId = WebUtil.readLongParam(request, "custom_lessonId");
+	    Long lessonId = WebUtil.readLongParam(request, "custom_lessonid");
 	    lesson = integrationService.getExtServerLessonMap(lessonId);
 	    lesson.setResourceLinkId(resourceLinkId);
 	    userManagementService.save(lesson);
@@ -104,9 +107,15 @@ public class LtiController {
 
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
 	String lessonFinishCallbackUrl = request.getParameter(BasicLTIConstants.LIS_OUTCOME_SERVICE_URL);
-	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && StringUtils.isBlank(extServer.getLessonFinishUrl())) {
 	    extServer.setLessonFinishUrl(lessonFinishCallbackUrl);
+	    userManagementService.save(extServer);
+	}
+	
+	//update MembershipUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
+	String membershipUrl = request.getParameter("custom_context_memberships_url");
+	if (StringUtils.isNotBlank(membershipUrl) && StringUtils.isBlank(extServer.getMembershipUrl())) {
+	    extServer.setMembershipUrl(membershipUrl);
 	    userManagementService.save(extServer);
 	}
 
@@ -134,7 +143,6 @@ public class LtiController {
 
 	    return learnerMonitor(request, respnse);
 	}
-
     }
 
     /**
@@ -218,12 +226,13 @@ public class LtiController {
 	Organisation organisation = monitoringService.getOrganisation(organisationId);
 
 	// 1. init lesson
+	Boolean liveEditEnabled = extServer.getLiveEditEnabled() == null ? false : extServer.getLiveEditEnabled();
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
 		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
-		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(),
-		extServer.getLiveEditEnabled(), extServer.getEnableLessonNotifications(),
-		extServer.getForceLearnerRestart(), extServer.getAllowLearnerRestart(),
-		extServer.getGradebookOnComplete(), null, null);
+		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(), liveEditEnabled,
+		extServer.getEnableLessonNotifications(), extServer.getForceLearnerRestart(),
+		extServer.getAllowLearnerRestart(), extServer.getGradebookOnComplete(), null, null);
+	Long lessonId = lesson.getLessonId();
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(user);
@@ -231,13 +240,15 @@ public class LtiController {
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
-	monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+	monitoringService.createLessonClassForLesson(lessonId, organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
 		user.getUserId());
 	// 3. start lesson
-	monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+	monitoringService.startLesson(lessonId, user.getUserId());
 	// store information which extServer has started the lesson
-	integrationService.createExtServerLessonMap(lesson.getLessonId(), resourceLinkId, extServer);
+	integrationService.createExtServerLessonMap(lessonId, resourceLinkId, extServer);
+	
+	integrationService.addExtUsersToLesson(extServer, lessonId, contextId, resourceLinkId);
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -338,12 +349,15 @@ public class LtiController {
 	contentItemJSON.put("title", lesson.getLessonName());
 	contentItemJSON.put("text", lesson.getLessonDescription());
 	ObjectNode customJSON = JsonNodeFactory.instance.objectNode();
-	customJSON.put("lessonId", lesson.getLessonId().toString());
-	customJSON.put("isContentItemSelection", "true");
+	customJSON.put("lessonid", lesson.getLessonId().toString());
+	customJSON.put("iscontentitemselection", "true");
 	contentItemJSON.set("custom", customJSON);
+	
+	ArrayNode graph = JsonNodeFactory.instance.arrayNode();
+	graph.add(contentItemJSON);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.set("@graph", contentItemJSON);
+	responseJSON.set("@graph", graph);
 	responseJSON.put("@context", "http://purl.imsglobal.org/ctx/lti/v1/ContentItem");
 
 	String content_items = URLEncoder.encode(responseJSON.toString(), "UTF-8");
@@ -413,4 +427,5 @@ public class LtiController {
     private User getRealUser(UserDTO dto) {
 	return userManagementService.getUserByLogin(dto.getLogin());
     }
+
 }

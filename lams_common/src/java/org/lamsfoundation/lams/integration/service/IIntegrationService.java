@@ -23,9 +23,12 @@
 
 package org.lamsfoundation.lams.integration.service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
+import org.imsglobal.lti.launch.LtiSigningException;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServer;
@@ -117,7 +120,13 @@ public interface IIntegrationService {
      * @return
      */
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
-    
+   
+    /**
+     * Try to get users from ext server using membership service.
+     */
+    void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException;
+
     ExtServerLessonMap getExtServerLessonMap(Long lessonId);
 
     /**
@@ -223,6 +232,10 @@ public interface IIntegrationService {
     List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
 
     ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
+
+    ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, String lsIdStr, String username, String firstName,
+	    String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Creates an external org and normal org. It does not set roles for the creator.

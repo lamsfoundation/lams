@@ -27,6 +27,7 @@
       <module name="org.apache.commons.lang" export="true" />
       <module name="org.apache.commons.codec" export="true" />
       <module name="org.apache.commons.fileupload" export="true" />
+      <module name="org.apache.httpcomponents.core" export="true" />
       <module name="org.apache.commons.validator" export="true" />
       <module name="org.apache.xmlcommons" export="true" />
       <module name="org.infinispan" export="true" />
