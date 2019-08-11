@@ -430,7 +430,7 @@ public class ScratchieServiceImpl
 	    log = new ScratchieAnswerVisitLog();
 	    log.setQbOption(option);
 	    log.setSessionId(sessionId);
-	    QbToolQuestion qbToolQuestion = (QbToolQuestion) scratchieDao.find(QbToolQuestion.class, itemUid);
+	    QbToolQuestion qbToolQuestion = scratchieDao.find(QbToolQuestion.class, itemUid);
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
@@ -1874,16 +1874,6 @@ public class ScratchieServiceImpl
 
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
-
-	// wipe out the links from QbOptionDTO back to ScratchieItem, or it will try to
-	// include the hibernate object version of the ScratchieItem within the XML
-	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
-	for (ScratchieItem item : items) {
-	    Collection<QbOption> options = item.getQbQuestion().getQbOptions();
-	    for (QbOption option : options) {
-		option.setQbQuestion(null);
-	    }
-	}
 
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler,
