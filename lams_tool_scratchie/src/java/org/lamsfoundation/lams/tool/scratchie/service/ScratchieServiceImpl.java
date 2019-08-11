@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -149,6 +150,8 @@ public class ScratchieServiceImpl
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
+
+    private IQbService qbService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
 
@@ -1912,7 +1915,28 @@ public class ScratchieServiceImpl
 		user.setUserId(newUserUid.longValue());
 	    }
 
+	    // we need to save QB questions and options first
+	    for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
+		QbQuestion qbQuestion = scratchieItem.getQbQuestion();
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+
+		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
+		qbQuestion.getQbOptions().clear();
+
+		scratchieDao.insert(qbQuestion);
+
+		qbQuestion.getQbOptions().addAll(qbOptions);
+		for (QbOption qbOption : qbOptions) {
+		    qbOption.setQbQuestion(qbQuestion);
+		    scratchieDao.insert(qbOption);
+		}
+		qbOptions.clear();
+
+		scratchieDao.insert(scratchieItem);
+	    }
+	    
 	    scratchieDao.saveObject(toolContentObj);
+
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -2170,6 +2194,10 @@ public class ScratchieServiceImpl
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
+    }
+
+    public void setQbService(IQbService qbService) {
+	this.qbService = qbService;
     }
 
     @Override
