@@ -104,11 +104,11 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
 		XMLUtil.addTextElement(qbQuestion, "createDate", createDate);
-		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1", true);
-		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, true,
+		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1", false, true);
+		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, false, true,
 			QbUtils.QB_MIGRATION_TRIMMER);
 		String description = XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "question", "description", null,
-			true, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
+			false, true, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		// get name out of description as there were no descriptions in MCQ before
 		if (description != null) {
 		    XMLUtil.addTextElement(qbQuestion, "name",
@@ -125,7 +125,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		Element qbOptions = document.createElement("qbOptions");
 		qbQuestion.appendChild(qbOptions);
 		int maxDisplayOrder = 0;
-		for (int mcOptionIndex = 0; mcOptionIndex < mcQuestions.getLength(); mcOptionIndex++) {
+		for (int mcOptionIndex = 0; mcOptionIndex < mcOptions.getLength(); mcOptionIndex++) {
 		    Element mcOption = (Element) mcOptions.item(mcOptionIndex);
 		    Element qbOption = document.createElement("org.lamsfoundation.lams.qb.model.QbOption");
 		    qbOptions.appendChild(qbOption);
@@ -135,10 +135,11 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 			    .valueOf(XMLUtil.getChildElementValue(mcOption, "correctOption", "false"));
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
-		    maxDisplayOrder = Math.max(Integer.valueOf(XMLUtil.rewriteTextElement(mcOption, qbOption,
-			    "displayOrder", "displayOrder", String.valueOf(maxDisplayOrder + 1), true)),
+		    maxDisplayOrder = Math.max(
+			    Integer.valueOf(XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder",
+				    "displayOrder", String.valueOf(maxDisplayOrder + 1), false, true)),
 			    maxDisplayOrder);
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, true,
+		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, false, true,
 			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		}
 
