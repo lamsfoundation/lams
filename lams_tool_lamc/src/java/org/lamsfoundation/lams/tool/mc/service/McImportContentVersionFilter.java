@@ -103,10 +103,10 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
 		XMLUtil.addTextElement(qbQuestion, "createDate", createDate);
-		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1");
-		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null);
-		String description = XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "question", "description",
-			null);
+		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1", true);
+		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, true);
+		String description = XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "question", "description", null,
+			true);
 		// get name out of description as there were no descriptions in MCQ before
 		if (description != null) {
 		    description = description.trim();
@@ -133,12 +133,13 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 			    .valueOf(XMLUtil.getChildElementValue(mcOption, "correctOption", "false"));
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder", "displayOrder", "1");
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null);
+		    XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder", "displayOrder", "1", true);
+		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, true);
 		}
 
 		// get rid of junk
 		mcQuestion.removeChild(mcOptions.item(0).getParentNode());
+		XMLUtil.removeElement(mcQuestion, "questionHash");
 	    }
 	});
     }
