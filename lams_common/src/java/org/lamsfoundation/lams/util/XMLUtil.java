@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.util;
 
 import java.security.InvalidParameterException;
+import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -44,6 +45,20 @@ public class XMLUtil {
      */
     public static String rewriteTextElement(Element sourceParent, Element targetParent, String sourceElementName,
 	    String targetElementName, String defaultValue, boolean removeSource) {
+	return XMLUtil.rewriteTextElement(sourceParent, targetParent, sourceElementName, targetElementName,
+		defaultValue, removeSource, (Function<String, String>[]) null);
+    }
+
+    /**
+     * Find an element in source, takes its value and puts it under a different name in target.
+     * If no value is found, default value is used.
+     * The source source element can be removed, depending on the parameter.
+     * If valueConverter function is provided, it is applied on value or defaultValue before setting it in target.
+     */
+    @SafeVarargs
+    public static String rewriteTextElement(Element sourceParent, Element targetParent, String sourceElementName,
+	    String targetElementName, String defaultValue, boolean removeSource,
+	    Function<String, String>... valueConverters) {
 	String value = XMLUtil.getChildElementValue(sourceParent, sourceElementName, defaultValue);
 	if (removeSource) {
 	    if (sourceParent == null || sourceElementName == null) {
@@ -57,6 +72,11 @@ public class XMLUtil {
 	if (StringUtils.isNotBlank(value)) {
 	    Document document = targetParent.getOwnerDocument();
 	    Element field = document.createElement(targetElementName);
+	    if (valueConverters != null) {
+		for (Function<String, String> function : valueConverters) {
+		    value = function.apply(value);
+		}
+	    }
 	    field.setTextContent(value);
 	    targetParent.appendChild(field);
 	}

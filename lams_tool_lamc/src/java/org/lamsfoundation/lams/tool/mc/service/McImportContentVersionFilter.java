@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
 import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.model.McQueContent;
@@ -104,14 +105,14 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
 		XMLUtil.addTextElement(qbQuestion, "createDate", createDate);
 		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1", true);
-		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, true);
+		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, true,
+			QbUtils.QB_MIGRATION_TRIMMER);
 		String description = XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "question", "description", null,
-			true);
+			true, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		// get name out of description as there were no descriptions in MCQ before
 		if (description != null) {
-		    description = description.trim();
 		    XMLUtil.addTextElement(qbQuestion, "name",
-			    description.substring(0, Math.min(description.length(), 80)));
+			    QbUtils.QB_MIGRATION_QUESTION_NAME_GENERATOR.apply(description));
 		}
 
 		// now it's time for options
@@ -134,7 +135,8 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
 		    XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder", "displayOrder", "1", true);
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, true);
+		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, true,
+			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		}
 
 		// get rid of junk
