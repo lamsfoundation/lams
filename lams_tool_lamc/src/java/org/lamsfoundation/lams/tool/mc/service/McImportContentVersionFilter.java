@@ -124,6 +124,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
 		Element qbOptions = document.createElement("qbOptions");
 		qbQuestion.appendChild(qbOptions);
+		int maxDisplayOrder = 0;
 		for (int mcOptionIndex = 0; mcOptionIndex < mcQuestions.getLength(); mcOptionIndex++) {
 		    Element mcOption = (Element) mcOptions.item(mcOptionIndex);
 		    Element qbOption = document.createElement("org.lamsfoundation.lams.qb.model.QbOption");
@@ -134,7 +135,9 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 			    .valueOf(XMLUtil.getChildElementValue(mcOption, "correctOption", "false"));
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder", "displayOrder", "1", true);
+		    maxDisplayOrder = Math.max(Integer.valueOf(XMLUtil.rewriteTextElement(mcOption, qbOption,
+			    "displayOrder", "displayOrder", String.valueOf(maxDisplayOrder + 1), true)),
+			    maxDisplayOrder);
 		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, true,
 			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		}
