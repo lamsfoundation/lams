@@ -156,12 +156,13 @@ public class LtiController {
 	//check if learner tries to access the link that hasn't been authored by teacher yet
 	String method = request.getParameter("_" + LoginRequestDispatcher.PARAM_METHOD);
 	if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
-	    String errorMsg = "Learner tries to access the link that hasn't been authored by teacher yet. resource_link_id: "
-		    + tcGradebookId;
-	    log.debug(errorMsg);
-	    request.setAttribute("error", errorMsg);
-	    request.setAttribute("javax.servlet.error.exception", new UserAccessDeniedException(errorMsg));
-	    return "error";
+	    String roles = request.getParameter(BasicLTIConstants.ROLES);
+	    //try to detect monitor with custom roles not supported by LTI specification
+	    String messageKey = roles.contains("Instructor") || roles.contains("Admin") ? "message.teacher.role.not.recognized"
+		    : "message.lesson.not.started.cannot.participate";
+
+	    request.setAttribute("messageKey", messageKey);
+	    return "msgContent";
 	}
 
 	//determine whether to show author or learnerMonitor pages
