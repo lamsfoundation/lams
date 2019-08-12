@@ -6,8 +6,10 @@ import static org.imsglobal.lti.BasicLTIConstants.LTI_VERSION;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -33,6 +35,7 @@ import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
+import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -92,17 +95,48 @@ public class LtiController {
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String tcGradebookId = request.getParameter(BasicLTIConstants.LIS_RESULT_SOURCEDID);
 	String extUserId = request.getParameter(BasicLTIConstants.USER_ID);
+	Long customLessonId = WebUtil.readLongParam(request, "custom_lessonid", true);
+	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
 
-	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
+	ExtServerLessonMap extLessonMap = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	
-	//support for ContentItemSelectionRequest. If lesson was created during such request, update its ExtServerLesson's resourceLinkId for the first time
-	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
-	if (lesson == null && isContentItemSelection) {
-	    Long lessonId = WebUtil.readLongParam(request, "custom_lessonid");
-	    lesson = integrationService.getExtServerLessonMap(lessonId);
-	    lesson.setResourceLinkId(resourceLinkId);
-	    userManagementService.save(lesson);
+//	log.info("" request.getParameter(name));
+	Map params = request.getParameterMap();
+	Iterator i = params.keySet().iterator();
+	while (i.hasNext()) {
+	    String key = (String) i.next();
+	    String value = ((String[]) params.get(key))[0];
+	    log.info("#### Parameter " + key + ": " + value);
+	}
+	
+	//it's the case of ContentItemSelection request or course-copy. (Currently we support course-copy only for links created using ContentItemSelection)
+	if (extLessonMap == null && (customLessonId != null) && isContentItemSelection) {
+	    Lesson lesson = lessonService.getLesson(customLessonId);
+
+	    String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), extCourseId);
+	    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+
+	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side.
+	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one)
+	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
+		    && !lesson.getOrganisation().getOrganisationId().equals(organisationId);
+	    if (isLessonCopyRequired) {
+		// clone lesson
+		Integer creatorId = lesson.getUser().getUserId();
+		Long newLessonId = monitoringService.cloneLesson(customLessonId, creatorId, true, true, null, null,
+			orgMap.getOrganisation());
+		// store information which extServer has started the lesson
+		extLessonMap = integrationService.createExtServerLessonMap(newLessonId, extServer);	
+            
+	    } else {
+		//support for ContentItemSelectionRequest. If lesson was created during such request, update its ExtServerLesson's resourceLinkId for the first time
+		extLessonMap = integrationService.getExtServerLessonMap(customLessonId);
+	    }
+
+	    extLessonMap.setResourceLinkId(resourceLinkId);
+	    userManagementService.save(extLessonMap);
 	}
 
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
@@ -121,7 +155,7 @@ public class LtiController {
 
 	//check if learner tries to access the link that hasn't been authored by teacher yet
 	String method = request.getParameter("_" + LoginRequestDispatcher.PARAM_METHOD);
-	if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && lesson == null) {
+	if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
 	    String errorMsg = "Learner tries to access the link that hasn't been authored by teacher yet. resource_link_id: "
 		    + tcGradebookId;
 	    log.debug(errorMsg);
@@ -131,7 +165,7 @@ public class LtiController {
 	}
 
 	//determine whether to show author or learnerMonitor pages
-	if (lesson == null) {
+	if (extLessonMap == null) {
 	    return addLesson(request, respnse);
 
 	} else {
@@ -160,8 +194,8 @@ public class LtiController {
 	String resourceLinkDescription = request.getParameter(BasicLTIConstants.RESOURCE_LINK_DESCRIPTION);
 
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
-	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
-	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+	ExtCourseClassMap extCourse = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
+	Integer organisationId = extCourse.getOrganisation().getOrganisationId();
 	//only monitors are allowed to create lesson
 	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
@@ -213,7 +247,7 @@ public class LtiController {
 	String desc = request.getParameter(CentralConstants.PARAM_DESC);
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-	Integer organisationId = new Integer(WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID));
+	Integer organisationId = WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID);
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
 	//only monitors are allowed to create lesson
@@ -381,12 +415,6 @@ public class LtiController {
 	Integer userId = getUser().getUserID();
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
-
-	//get orgId
-//	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-//	ExtServer extServer = integrationService.getExtServer(consumerKey);
-//	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
-//	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 
 	//get lesson
 	ExtServerLessonMap extLesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);

@@ -196,7 +196,7 @@ public interface IIntegrationService {
      * @param lessonId
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, ExtServer extServer);
+    ExtServerLessonMap createExtServerLessonMap(Long lessonId, ExtServer extServer);
 
     /**
      * Creates new ExtServerLessonMap object. Method is suitable for creating lessons via LTI tool consumers as long as
@@ -207,7 +207,7 @@ public interface IIntegrationService {
      *            resource_link_id parameter sent by LTI tool consumer
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
+    ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
 
     /**
      * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
