@@ -124,7 +124,7 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 		XMLUtil.rewriteTextElement(scratchieQuestion, qbQuestion, "title", "name", null, false, true,
 			QbUtils.QB_MIGRATION_CKEDITOR_CLEANER, QbUtils.QB_MIGRATION_TAG_CLEANER);
 		XMLUtil.rewriteTextElement(scratchieQuestion, qbQuestion, "description", "description", null, false,
-			true, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER, QbUtils.QB_MIGRATION_TRIMMER);
+			true, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		XMLUtil.rewriteTextElement(scratchieQuestion, scratchieQuestion, "orderId", "displayOrder", null, false,
 			true);
 
