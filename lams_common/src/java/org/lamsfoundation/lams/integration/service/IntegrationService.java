@@ -618,18 +618,18 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void createExtServerLessonMap(Long lessonId, ExtServer extServer) {
-	createExtServerLessonMap(lessonId, null, extServer);
-	;
+    public ExtServerLessonMap createExtServerLessonMap(Long lessonId, ExtServer extServer) {
+	return createExtServerLessonMap(lessonId, null, extServer);
     }
 
     @Override
-    public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
+    public ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
 	map.setLessonId(lessonId);
 	map.setResourceLinkId(resourceLinkId);
 	map.setExtServer(extServer);
 	service.save(map);
+	return map;
     }
 
     @Override
