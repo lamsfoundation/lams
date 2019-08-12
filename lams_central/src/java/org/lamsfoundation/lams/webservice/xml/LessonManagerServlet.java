@@ -71,7 +71,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,7 +98,7 @@ public class LessonManagerServlet extends HttpServlet {
     private IUserManagementService userManagementService;
     @Autowired
     private ISecurityService securityService;
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -429,9 +428,9 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate, String countryIsoCode, String langIsoCode,
-	    String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
-	    throws RemoteException {
+	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate,
+	    String countryIsoCode, String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable,
+	    Boolean enableNotifications) throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -1115,6 +1114,8 @@ public class LessonManagerServlet extends HttpServlet {
 	Document document = lessonElement.getOwnerDocument();
 	Element learnerElement = document.createElement("Learner");
 	learnerElement.setAttribute("extUsername", extUser.getExtUsername());
+	String email = extUser.getUser().getEmail();
+	learnerElement.setAttribute("email", StringUtils.isBlank(email) ? "" : email);
 	String userTotalMark = gradebookUserLessonMark == null ? "" : gradebookUserLessonMark.toString();
 	learnerElement.setAttribute("userTotalMark", userTotalMark);
 
@@ -1203,6 +1204,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
 	    learnerElement.setAttribute("firstName", learner.getFirstName());
 	    learnerElement.setAttribute("lastName", learner.getLastName());
+	    String email = learner.getEmail();
+	    learnerElement.setAttribute("email", StringUtils.isBlank(email) ? "" : email);
 
 	    // find required learnerProgress from learnerProgresses (this way we don't querying DB).
 	    LearnerProgress learnerProgress = null;
