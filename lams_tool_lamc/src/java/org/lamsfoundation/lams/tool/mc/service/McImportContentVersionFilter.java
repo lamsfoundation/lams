@@ -135,11 +135,9 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 			    .valueOf(XMLUtil.getChildElementValue(mcOption, "correctOption", "false"));
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
-		    maxDisplayOrder = Math.max(
-			    Integer.valueOf(XMLUtil.rewriteTextElement(mcOption, qbOption, "displayOrder",
-				    "displayOrder", String.valueOf(maxDisplayOrder + 1), false, true)),
-			    maxDisplayOrder);
-		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, false, true,
+		    maxDisplayOrder = Math.max(Integer.valueOf(XMLUtil.rewriteTextElement(mcOption, qbOption,
+			    "displayOrder", "displayOrder", String.valueOf(maxDisplayOrder + 1))), maxDisplayOrder);
+		    XMLUtil.rewriteTextElement(mcOption, qbOption, "mcQueOptionText", "name", null, false, false,
 			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		}
 

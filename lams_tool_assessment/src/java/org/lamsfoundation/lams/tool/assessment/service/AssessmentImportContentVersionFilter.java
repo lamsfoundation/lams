@@ -169,6 +169,9 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "hedgingJustificationEnabled",
 			"hedgingJustificationEnabled", "false", false, true);
 
+		// get rid of junk
+		XMLUtil.removeElement(assessmentQuestion, "questionHash");
+
 		// now it's time for options
 		NodeList assessmentOptions = assessmentQuestion
 			.getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption");
@@ -205,15 +208,49 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 			sequenceId++;
 		    }
 		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "sequenceId", "displayOrder",
-			    String.valueOf(sequenceId), false, true);
-		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "grade", "maxMark", "1", false, true);
-		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "optionString", "name", null, false, true,
+			    String.valueOf(sequenceId));
+		    String correct = XMLUtil.getChildElementValue(assessmentOption, "correct", "false");
+		    if (Boolean.TRUE.toString().equalsIgnoreCase(correct)) {
+			XMLUtil.addTextElement(qbOption, "maxMark", "1.0");
+		    } else {
+			XMLUtil.rewriteTextElement(assessmentOption, qbOption, "grade", "maxMark", "0");
+		    }
+		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "optionString", "name", null, false, false,
 			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
+		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "feedback", "feedback", null);
+		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "question", "matchingPair", null, false,
+			    false, QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
+		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "acceptedError", "acceptedError", null);
+		    XMLUtil.rewriteTextElement(assessmentOption, qbOption, "optionFloat", "numericalOption", null);
 		}
 
 		// get rid of junk
 		assessmentQuestion.removeChild(assessmentOptions.item(0).getParentNode());
 		XMLUtil.removeElement(assessmentQuestion, "questionHash");
+
+		// now rewrite units
+		NodeList assessmentUnits = assessmentQuestion
+			.getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit");
+		if (assessmentUnits.getLength() == 0) {
+		    continue;
+		}
+
+		Element qbUnits = document.createElement("units");
+		qbQuestion.appendChild(qbUnits);
+
+		for (int assessmentUnitIndex = 0; assessmentUnitIndex < assessmentUnits
+			.getLength(); assessmentUnitIndex++) {
+		    Element assessmentUnit = (Element) assessmentUnits.item(assessmentUnitIndex);
+		    Element qbUnit = document.createElement("org.lamsfoundation.lams.qb.model.QbQuestionUnit");
+		    qbUnits.appendChild(qbUnit);
+
+		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "sequenceId", "displayOrder", null);
+		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "unit", "name", null);
+		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "multiplier", "multiplier", null);
+		}
+
+		// remove old units section from the legacy assessment question
+		assessmentQuestion.removeChild(assessmentUnits.item(0).getParentNode());
 	    }
 
 	    // now rewrite question references
@@ -228,6 +265,12 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		Element questionReference = (Element) questionReferences.item(questionReferenceIndex);
 		XMLUtil.rewriteTextElement(questionReference, questionReference, "defaultGrade", "maxMark", "1", false,
 			true);
+
+		// question reference type gets removed, if it exists
+		List<Element> type = XMLUtil.findChildren(questionReference, "type");
+		if (!type.isEmpty()) {
+		    questionReference.removeChild(type.get(0));
+		}
 	    }
 	});
     }

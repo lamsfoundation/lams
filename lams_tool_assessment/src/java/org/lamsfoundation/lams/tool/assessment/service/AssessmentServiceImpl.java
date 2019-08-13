@@ -2652,14 +2652,26 @@ public class AssessmentServiceImpl
 		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
 		qbQuestion.getQbOptions().clear();
 
-		assessmentDao.insert(qbQuestion);
+		Collection<QbQuestionUnit> units = qbQuestion.getUnits();
+		qbQuestion.getUnits().clear();
 
+		assessmentDao.insert(qbQuestion);
+		
+		qbQuestion.getUnits().addAll(units);
+		for (QbQuestionUnit unit : units) {
+		    unit.setQbQuestion(qbQuestion);
+		    assessmentDao.insert(units);
+		}
+		units.clear();
+		
 		qbQuestion.getQbOptions().addAll(qbOptions);
 		for (QbOption qbOption : qbOptions) {
 		    qbOption.setQbQuestion(qbQuestion);
 		    assessmentDao.insert(qbOption);
 		}
 		qbOptions.clear();
+
+		
 
 		assessmentDao.insert(assessmentQuestion);
 	    }

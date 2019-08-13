@@ -149,12 +149,10 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 			    .valueOf(XMLUtil.getChildElementValue(scratchieOption, "correct", "false"));
 		    XMLUtil.addTextElement(qbOption, "maxMark", correctOption ? "1" : "0");
 
-		    maxDisplayOrder = Math.max(
-			    Integer.valueOf(XMLUtil.rewriteTextElement(scratchieOption, qbOption, "orderId",
-				    "displayOrder", String.valueOf(maxDisplayOrder + 1), false, true)),
-			    maxDisplayOrder);
+		    maxDisplayOrder = Math.max(Integer.valueOf(XMLUtil.rewriteTextElement(scratchieOption, qbOption,
+			    "orderId", "displayOrder", String.valueOf(maxDisplayOrder + 1))), maxDisplayOrder);
 
-		    XMLUtil.rewriteTextElement(scratchieOption, qbOption, "description", "name", null, false, true,
+		    XMLUtil.rewriteTextElement(scratchieOption, qbOption, "description", "name", null, false, false,
 			    QbUtils.QB_MIGRATION_CKEDITOR_CLEANER);
 		}
 
