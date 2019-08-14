@@ -22,8 +22,13 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.qb.QbUtils;
@@ -105,13 +110,29 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	this.removeField(QuestionReference.class, "type");
     }
 
+    /**
+     * Migration to Question Bank
+     */
     public void up20190704To20190809(String toolFilePath) throws IOException {
+	// find LD's content folder ID to use it in new QB questions
+	String contentFolderId = null;
+	try {
+	    File ldFile = new File(new File(toolFilePath).getParentFile().getParentFile(), "learning_design.xml");
+	    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    Document doc = docBuilder.parse(new FileInputStream(ldFile));
+	    Element ldRoot = doc.getDocumentElement();
+	    contentFolderId = XMLUtil.getChildElementValue(ldRoot, "contentFolderID", null);
+	} catch (Exception e) {
+	    throw new IOException("Error while extracting LD content folder ID for Question Bank migration", e);
+	}
+	final String contentFolderIdFinal = contentFolderId;
+
 	// tell which file to process and what to do with its root element
-	transformXML(toolFilePath, root -> {
-	    Document document = root.getOwnerDocument();
+	transformXML(toolFilePath, toolRoot -> {
+	    Document document = toolRoot.getOwnerDocument();
 
 	    // first find questions
-	    NodeList assessmentQuestions = root
+	    NodeList assessmentQuestions = toolRoot
 		    .getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion");
 	    if (assessmentQuestions.getLength() == 0) {
 		return;
@@ -129,7 +150,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "type", "type", null, false, true);
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
-		XMLUtil.rewriteTextElement(root, qbQuestion, "created", "createDate", null, true, false);
+		XMLUtil.addTextElement(qbQuestion, "contentFolderId", contentFolderIdFinal);
+		XMLUtil.rewriteTextElement(toolRoot, qbQuestion, "created", "createDate", null, true, false);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "title", "name", null, false, true,
 			QbUtils.QB_MIGRATION_CKEDITOR_CLEANER, QbUtils.QB_MIGRATION_TAG_CLEANER);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "question", "description", null, false, true,
@@ -244,9 +266,9 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		    Element qbUnit = document.createElement("org.lamsfoundation.lams.qb.model.QbQuestionUnit");
 		    qbUnits.appendChild(qbUnit);
 
-		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "sequenceId", "displayOrder", null);
-		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "unit", "name", null);
-		    XMLUtil.rewriteTextElement(assessmentUnit, assessmentUnit, "multiplier", "multiplier", null);
+		    XMLUtil.rewriteTextElement(assessmentUnit, qbUnit, "sequenceId", "displayOrder", null);
+		    XMLUtil.rewriteTextElement(assessmentUnit, qbUnit, "unit", "name", null);
+		    XMLUtil.rewriteTextElement(assessmentUnit, qbUnit, "multiplier", "multiplier", null);
 		}
 
 		// remove old units section from the legacy assessment question
@@ -254,7 +276,7 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	    }
 
 	    // now rewrite question references
-	    NodeList questionReferences = root
+	    NodeList questionReferences = toolRoot
 		    .getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.QuestionReference");
 	    if (questionReferences.getLength() == 0) {
 		return;

@@ -2649,29 +2649,37 @@ public class AssessmentServiceImpl
 		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 
-		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
-		qbQuestion.getQbOptions().clear();
+		Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
+			: new ArrayList<>(qbQuestion.getQbOptions());
+		if (qbOptions != null) {
+		    qbQuestion.getQbOptions().clear();
+		}
 
-		Collection<QbQuestionUnit> units = qbQuestion.getUnits();
-		qbQuestion.getUnits().clear();
+		Collection<QbQuestionUnit> units = qbQuestion.getUnits() == null ? null
+			: new ArrayList<>(qbQuestion.getUnits());
+		if (units != null) {
+		    qbQuestion.getUnits().clear();
+		}
 
 		assessmentDao.insert(qbQuestion);
-		
-		qbQuestion.getUnits().addAll(units);
-		for (QbQuestionUnit unit : units) {
-		    unit.setQbQuestion(qbQuestion);
-		    assessmentDao.insert(units);
-		}
-		units.clear();
-		
-		qbQuestion.getQbOptions().addAll(qbOptions);
-		for (QbOption qbOption : qbOptions) {
-		    qbOption.setQbQuestion(qbQuestion);
-		    assessmentDao.insert(qbOption);
-		}
-		qbOptions.clear();
 
-		
+		if (units != null) {
+		    qbQuestion.getUnits().addAll(units);
+		    for (QbQuestionUnit unit : units) {
+			unit.setQbQuestion(qbQuestion);
+			assessmentDao.insert(unit);
+		    }
+		    units.clear();
+		}
+
+		if (qbOptions != null) {
+		    qbQuestion.getQbOptions().addAll(qbOptions);
+		    for (QbOption qbOption : qbOptions) {
+			qbOption.setQbQuestion(qbQuestion);
+			assessmentDao.insert(qbOption);
+		    }
+		    qbOptions.clear();
+		}
 
 		assessmentDao.insert(assessmentQuestion);
 	    }
