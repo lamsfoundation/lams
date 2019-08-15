@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,6 +37,7 @@ import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -138,6 +141,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		return;
 	    }
 
+	    String defaultCreateDate = new SimpleDateFormat(DateUtil.EXPORT_LD_FORMAT).format(new Date());
+
 	    // go through each question
 	    for (int assessmentQuestionIndex = 0; assessmentQuestionIndex < assessmentQuestions
 		    .getLength(); assessmentQuestionIndex++) {
@@ -151,7 +156,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
 		XMLUtil.addTextElement(qbQuestion, "contentFolderId", contentFolderIdFinal);
-		XMLUtil.rewriteTextElement(toolRoot, qbQuestion, "created", "createDate", null, true, false);
+		XMLUtil.rewriteTextElement(toolRoot, qbQuestion, "created", "createDate", defaultCreateDate, true,
+			false);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "title", "name", null, false, true,
 			QbUtils.QB_MIGRATION_CKEDITOR_CLEANER, QbUtils.QB_MIGRATION_TAG_CLEANER);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "question", "description", null, false, true,
