@@ -1924,11 +1924,14 @@ public class ScratchieServiceImpl
 		QbQuestion qbQuestion = scratchieItem.getQbQuestion();
 		qbQuestion.clearID();
 
+		// try to match the question to an existing QB question in DB
 		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
 		if (existingQuestion == null) {
+		    // none found, create a new QB question
 		    qbService.insertQuestion(qbQuestion);
 		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
 		} else {
+		    // found, use the existing one
 		    scratchieItem.setQbQuestion(existingQuestion);
 		}
 

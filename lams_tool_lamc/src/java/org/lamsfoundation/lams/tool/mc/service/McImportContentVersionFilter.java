@@ -1,8 +1,13 @@
 package org.lamsfoundation.lams.tool.mc.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.qb.QbUtils;
@@ -79,6 +84,19 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
      * Migration to Question Bank
      */
     public void up20190517To20190809(String toolFilePath) throws IOException {
+	// find LD's content folder ID to use it in new QB questions
+	String contentFolderId = null;
+	try {
+	    File ldFile = new File(new File(toolFilePath).getParentFile().getParentFile(), "learning_design.xml");
+	    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    Document doc = docBuilder.parse(new FileInputStream(ldFile));
+	    Element ldRoot = doc.getDocumentElement();
+	    contentFolderId = XMLUtil.getChildElementValue(ldRoot, "contentFolderID", null);
+	} catch (Exception e) {
+	    throw new IOException("Error while extracting LD content folder ID for Question Bank migration", e);
+	}
+	final String contentFolderIdFinal = contentFolderId;
+
 	// tell which file to process and what to do with its root element
 	transformXML(toolFilePath, toolRoot -> {
 	    Document document = toolRoot.getOwnerDocument();
@@ -106,6 +124,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 		XMLUtil.addTextElement(qbQuestion, "type", "1");
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
+		XMLUtil.addTextElement(qbQuestion, "contentFolderId", contentFolderIdFinal);
 		XMLUtil.addTextElement(qbQuestion, "createDate", createDate);
 		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "mark", "maxMark", "1", false, true);
 		XMLUtil.rewriteTextElement(mcQuestion, qbQuestion, "feedback", "feedback", null, false, true,
