@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -149,6 +150,8 @@ public class ScratchieServiceImpl
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
+
+    private IQbService qbService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
 
@@ -430,7 +433,7 @@ public class ScratchieServiceImpl
 	    log = new ScratchieAnswerVisitLog();
 	    log.setQbOption(option);
 	    log.setSessionId(sessionId);
-	    QbToolQuestion qbToolQuestion = (QbToolQuestion) scratchieDao.find(QbToolQuestion.class, itemUid);
+	    QbToolQuestion qbToolQuestion = scratchieDao.find(QbToolQuestion.class, itemUid);
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
@@ -1874,17 +1877,9 @@ public class ScratchieServiceImpl
 
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
-
-	// wipe out the links from QbOptionDTO back to ScratchieItem, or it will try to
-	// include the hibernate object version of the ScratchieItem within the XML
-	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
-	for (ScratchieItem item : items) {
-	    Collection<QbOption> options = item.getQbQuestion().getQbOptions();
-	    for (QbOption option : options) {
-		option.setQbQuestion(null);
-	    }
+	for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
+	    qbService.prepareQuestionForExport(scratchieItem.getQbQuestion());
 	}
-
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler,
 		    rootPath);
@@ -1922,7 +1917,29 @@ public class ScratchieServiceImpl
 		user.setUserId(newUserUid.longValue());
 	    }
 
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
+	    // we need to save QB questions and options first
+	    for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
+		QbQuestion qbQuestion = scratchieItem.getQbQuestion();
+		qbQuestion.clearID();
+
+		// try to match the question to an existing QB question in DB
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    // none found, create a new QB question
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    // found, use the existing one
+		    scratchieItem.setQbQuestion(existingQuestion);
+		}
+
+		scratchieDao.insert(scratchieItem);
+	    }
+
 	    scratchieDao.saveObject(toolContentObj);
+
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -2180,6 +2197,10 @@ public class ScratchieServiceImpl
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
+    }
+
+    public void setQbService(IQbService qbService) {
+	this.qbService = qbService;
     }
 
     @Override

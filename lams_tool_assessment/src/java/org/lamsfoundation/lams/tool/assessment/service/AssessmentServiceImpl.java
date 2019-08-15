@@ -2260,10 +2260,10 @@ public class AssessmentServiceImpl
 			//check whether according question was modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
 			    if (oldQuestion.getDisplayOrder() == modifiedQuestion.getDisplayOrder()) {
-				
-				//update questionResult's qbQuestion with the new one 
+
+				//update questionResult's qbQuestion with the new one
 				questionResult.setQbToolQuestion(modifiedQuestion);
-				//update questionResult's qbOption 
+				//update questionResult's qbOption
 //				for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 //				    if (questionResult.getQbOption().getDisplayOrder() == newOption.getDisplayOrder()) {
 //					questionResult.setQbOption(newOption);
@@ -2272,15 +2272,15 @@ public class AssessmentServiceImpl
 //				}
 				//update questionResult's optionAnswers
 				for (AssessmentOptionAnswer oldOptionAnswer : questionResult.getOptionAnswers()) {
-				    
+
 				    //find according old qbOption
 				    QbOption oldOption = null;
-				    for (QbOption oldOptionIter: oldQuestion.getQbQuestion().getQbOptions()) {
+				    for (QbOption oldOptionIter : oldQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOptionIter.getUid().equals(oldOptionAnswer.getOptionUid())) {
 					    oldOption = oldOptionIter;
 					}
 				    }
-				    
+
 				    //update
 				    for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
@@ -2288,13 +2288,14 @@ public class AssessmentServiceImpl
 					    break;
 					}
 				    }
-				}		
-				
+				}
+
 				//actually recalculate marks
 				QuestionDTO modifiedQuestionDto = new QuestionDTO(modifiedQuestion);
 				modifiedQuestionDto.setMaxMark(oldResultMaxMark);
 				loadupQuestionResultIntoQuestionDto(modifiedQuestionDto, questionResult);
-				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, modifiedQuestionDto);
+				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult,
+					modifiedQuestionDto);
 				assessmentQuestionResultDao.saveObject(questionResult);
 
 				float newQuestionAnswerMark = questionResult.getMark();
@@ -2605,6 +2606,10 @@ public class AssessmentServiceImpl
 	}
 
 	toolContentObj = Assessment.newInstance(toolContentObj, toolContentId);
+	for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
+	    qbService.prepareQuestionForExport(assessmentQuestion.getQbQuestion());
+	}
+
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
 		    rootPath);
@@ -2642,6 +2647,26 @@ public class AssessmentServiceImpl
 		user.setAssessment(toolContentObj);
 	    }
 	    toolContentObj.setCreatedBy(user);
+
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
+	    // we need to save QB questions and options first
+	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
+		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+
+		// try to match the question to an existing QB question in DB
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    // none found, create a new QB question
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    // found, use the existing one
+		    assessmentQuestion.setQbQuestion(existingQuestion);
+		}
+
+		assessmentDao.insert(assessmentQuestion);
+	    }
 
 	    saveOrUpdateAssessment(toolContentObj);
 	} catch (ImportToolContentException e) {

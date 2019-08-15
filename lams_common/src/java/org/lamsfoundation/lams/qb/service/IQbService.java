@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.qb.service;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
@@ -37,6 +38,8 @@ public interface IQbService {
      */
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
 
+    QbQuestion getQuestionByUUID(UUID uuid);
+
     /**
      * @param optionUid
      * @return QbOption by its uid. Besides, it releases returned object and associated qbQuestion from the cache.
@@ -65,9 +68,9 @@ public interface IQbService {
 
     QbStatsActivityDTO getActivityStats(Long activityId, Long qbQuestionUid, Collection<Long> correctOptionUids);
 
-    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy, String sortOrder,
-	    String searchString);
-    
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
     List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString);
 
     int getCountQuestions(String questionTypes, String collectionUids, String searchString);
@@ -103,7 +106,7 @@ public interface IQbService {
 
     void unshareCollection(long collectionUid, int organisationId);
 
-    void addQuestionToCollection(long collectionUid, int qbQuestionUid, boolean copy);
+    void addQuestionToCollection(long collectionUid, int qbQuestionId, boolean copy);
 
     void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
 	    Collection<Integer> excludedQbQuestionIds, boolean copy);
@@ -133,4 +136,8 @@ public interface IQbService {
     void releaseFromCache(Object object);
 
     boolean isQuestionInUserCollection(int qbQuestionId, int userId);
+
+    void insertQuestion(QbQuestion qbQuestion);
+
+    void prepareQuestionForExport(QbQuestion qbQuestion);
 }

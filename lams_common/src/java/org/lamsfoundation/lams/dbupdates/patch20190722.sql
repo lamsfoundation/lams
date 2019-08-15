@@ -616,7 +616,7 @@ DROP TABLE tmp_assessment_option;
 -- fill table with options matching unique QB questions inserted above          
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, matching_pair, numerical_option, max_mark, accepted_error, feedback)
     SELECT q.uid, o.sequence_id, IFNULL(o.option_string, ''), o.question, o.option_float,
-           o.grade, o.accepted_error, o.feedback
+           IF(o.correct = 1, 1, o.grade), o.accepted_error, o.feedback
     FROM tl_laasse10_question_option AS o
     JOIN lams_qb_question AS q
         ON o.question_uid = q.tmp_question_id

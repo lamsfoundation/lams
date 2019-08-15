@@ -50,7 +50,7 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column
     private UUID uuid;
 
@@ -81,7 +81,7 @@ public class QbQuestion implements Serializable, Cloneable {
     private String description;
 
     @Column(name = "max_mark")
-    private Integer maxMark;
+    private Integer maxMark = 1;
 
     @Column
     private String feedback;
@@ -135,11 +135,11 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "hedging_justification_enabled")
     private boolean hedgingJustificationEnabled;
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<QbOption> qbOptions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
 
@@ -237,18 +237,22 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void clearID() {
 	this.uid = null;
-	for (QbOption option : qbOptions) {
-	    option.uid = null;
+	if (qbOptions != null) {
+	    for (QbOption option : qbOptions) {
+		option.uid = null;
+	    }
 	}
-	for (QbQuestionUnit unit : units) {
-	    unit.uid = null;
+	if (units != null) {
+	    for (QbQuestionUnit unit : units) {
+		unit.uid = null;
+	    }
 	}
     }
 
     public Long getUid() {
 	return uid;
     }
-    
+
     public UUID getUuid() {
 	return uuid;
     }

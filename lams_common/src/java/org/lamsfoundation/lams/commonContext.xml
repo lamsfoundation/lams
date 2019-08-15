@@ -273,6 +273,7 @@
 		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
 		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
 		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
+		<property name="qbDAO"><ref bean="qbDAO"/></property>
 	</bean>
 	
 	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

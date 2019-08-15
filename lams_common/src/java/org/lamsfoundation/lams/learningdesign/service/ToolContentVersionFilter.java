@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,10 +47,14 @@ public class ToolContentVersionFilter {
     private Map<String, String> renamedClassMap;
 
     public ToolContentVersionFilter() {
-	removedFieldList = new ArrayList<RemovedField>();
-	addedFieldList = new ArrayList<AddedField>();
-	renamedFieldList = new ArrayList<RenamedField>();
-	renamedClassMap = new HashMap<String, String>();
+	clearChanges();
+    }
+
+    protected void clearChanges() {
+	removedFieldList = new ArrayList<>();
+	addedFieldList = new ArrayList<>();
+	renamedFieldList = new ArrayList<>();
+	renamedClassMap = new HashMap<>();
     }
 
     // container class for removed class
@@ -162,13 +167,20 @@ public class ToolContentVersionFilter {
      * @throws IOException
      */
     public void transformXML(String toolFilePath) throws IOException {
+	transformXML(toolFilePath, root -> retrieveXML(root));
+    }
+
+    /**
+     * Reads a XML file from given path and applies a transforming method on it
+     */
+    protected void transformXML(String toolFilePath, Consumer<Element> converter) throws IOException {
 	File toolFile = new File(toolFilePath);
 
 	try {
 	    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	    Document doc = docBuilder.parse(new FileInputStream(toolFile));
 	    Element root = doc.getDocumentElement();
-	    retrieveXML(root);
+	    converter.accept(root);
 
 	    toolFile.renameTo(new File(toolFilePath + "_oldver"));
 	    File newToolFile = new File(toolFilePath);
@@ -178,7 +190,7 @@ public class ToolContentVersionFilter {
 	}
     }
 
-    private void retrieveXML(Element root) throws IOException {
+    private void retrieveXML(Element root) {
 	for (Entry<String, String> renamed : renamedClassMap.entrySet()) {
 	    // if root element was replaced in one of tool.xml files, it needs to be fetched here for further processing
 	    root = (Element) ToolContentVersionFilter.renameClass(root, renamed.getKey(), renamed.getValue());

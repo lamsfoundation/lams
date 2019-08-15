@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -66,6 +67,15 @@ public class QbService implements IQbService {
     @Override
     public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
 	return qbDAO.getQuestionsByQuestionId(questionId);
+    }
+
+    @Override
+    public QbQuestion getQuestionByUUID(UUID uuid) {
+	if (uuid == null) {
+	    return null;
+	}
+	List<QbQuestion> result = qbDAO.findByProperty(QbQuestion.class, "uuid", uuid);
+	return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
@@ -234,8 +244,8 @@ public class QbService implements IQbService {
 	    // sort grades by highest mark
 	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark).reversed());
 	    // see how many learners should be in top/bottom 27% of the group
-	    int groupCount = (int) Math.ceil(
-		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
+	    int groupCount = (int) Math
+		    .ceil(Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
 
 	    // go through each grade and gather data for indexes
 	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
@@ -562,6 +572,61 @@ public class QbService implements IQbService {
     @Override
     public boolean isQuestionInUserCollection(int qbQuestionId, int userId) {
 	return qbDAO.isQuestionInUserCollection(userId, qbQuestionId);
+    }
+
+    /**
+     * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
+     * New QbQuestions need to be saved step by step.
+     */
+    @Override
+    public void insertQuestion(QbQuestion qbQuestion) {
+	if (qbQuestion.getQuestionId() == null) {
+	    qbQuestion.setQuestionId(generateNextQuestionId());
+	}
+
+	Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
+		: new ArrayList<>(qbQuestion.getQbOptions());
+	if (qbOptions != null) {
+	    qbQuestion.getQbOptions().clear();
+	}
+
+	Collection<QbQuestionUnit> units = qbQuestion.getUnits() == null ? null
+		: new ArrayList<>(qbQuestion.getUnits());
+	if (units != null) {
+	    qbQuestion.getUnits().clear();
+	}
+
+	qbDAO.insert(qbQuestion);
+
+	if (units != null) {
+	    qbQuestion.getUnits().addAll(units);
+	    for (QbQuestionUnit unit : units) {
+		unit.setQbQuestion(qbQuestion);
+		qbDAO.insert(unit);
+	    }
+	}
+
+	if (qbOptions != null) {
+	    qbQuestion.getQbOptions().addAll(qbOptions);
+	    for (QbOption qbOption : qbOptions) {
+		qbOption.setQbQuestion(qbQuestion);
+		qbDAO.insert(qbOption);
+	    }
+	}
+    }
+
+    /**
+     * When exporting a LD, QbQuestion's server-specific detail need not be exported
+     */
+    @Override
+    public void prepareQuestionForExport(QbQuestion qbQuestion) {
+	releaseFromCache(qbQuestion);
+	qbQuestion.clearID();
+	qbQuestion.setQuestionId(null);
+	qbQuestion.setVersion(null);
+	// use plain Java collections instead of Hibernate ones, so XML is more simple
+	qbQuestion.setQbOptions(new ArrayList<>(qbQuestion.getQbOptions()));
+	qbQuestion.setUnits(new ArrayList<>(qbQuestion.getUnits()));
     }
 
     public void setQbDAO(IQbDAO qbDAO) {

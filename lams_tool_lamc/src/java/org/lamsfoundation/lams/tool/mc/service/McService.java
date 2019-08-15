@@ -1399,6 +1399,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // set ToolContentHandler as null to avoid copy file node in repository again.
 	    toolContentObj = McContent.newInstance(toolContentObj, toolContentId);
 	    toolContentObj.setMcSessions(null);
+	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
+		qbService.prepareQuestionForExport(mcQuestion.getQbQuestion());
+	    }
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, mcToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
@@ -1419,10 +1422,29 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			"Import MC tool content failed. Deserialized object is " + toolPOJO);
 	    }
 	    McContent toolContentObj = (McContent) toolPOJO;
-
 	    // reset it to new toolContentId
 	    toolContentObj.setMcContentId(toolContentId);
 	    toolContentObj.setCreatedBy(newUserUid);
+
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
+	    // we need to save QB questions and options first
+	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
+		QbQuestion qbQuestion = mcQuestion.getQbQuestion();
+		qbQuestion.clearID();
+
+		// try to match the question to an existing QB question in DB
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    // none found, create a new QB question
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    // found, use the existing one
+		    mcQuestion.setQbQuestion(existingQuestion);
+		}
+	    }
+
 	    mcContentDAO.saveMcContent(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
