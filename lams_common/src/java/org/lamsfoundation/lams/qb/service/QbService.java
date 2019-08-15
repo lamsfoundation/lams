@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -66,6 +67,15 @@ public class QbService implements IQbService {
     @Override
     public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
 	return qbDAO.getQuestionsByQuestionId(questionId);
+    }
+
+    @Override
+    public QbQuestion getQuestionByUUID(UUID uuid) {
+	if (uuid == null) {
+	    return null;
+	}
+	List<QbQuestion> result = qbDAO.findByProperty(QbQuestion.class, "uuid", uuid);
+	return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
@@ -568,6 +578,7 @@ public class QbService implements IQbService {
      * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
      * New QbQuestions need to be saved step by step.
      */
+    @Override
     public void insertQuestion(QbQuestion qbQuestion) {
 	if (qbQuestion.getQuestionId() == null) {
 	    qbQuestion.setQuestionId(generateNextQuestionId());

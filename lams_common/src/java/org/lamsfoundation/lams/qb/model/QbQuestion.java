@@ -237,11 +237,15 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void clearID() {
 	this.uid = null;
-	for (QbOption option : qbOptions) {
-	    option.uid = null;
+	if (qbOptions != null) {
+	    for (QbOption option : qbOptions) {
+		option.uid = null;
+	    }
 	}
-	for (QbQuestionUnit unit : units) {
-	    unit.uid = null;
+	if (units != null) {
+	    for (QbQuestionUnit unit : units) {
+		unit.uid = null;
+	    }
 	}
     }
 

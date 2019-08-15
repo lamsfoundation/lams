@@ -2649,8 +2649,16 @@ public class AssessmentServiceImpl
 	    // we need to save QB questions and options first
 	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
 		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-		qbService.insertQuestion(qbQuestion);
-		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		qbQuestion.clearID();
+
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    assessmentQuestion.setQbQuestion(existingQuestion);
+		}
+
 		assessmentDao.insert(assessmentQuestion);
 	    }
 

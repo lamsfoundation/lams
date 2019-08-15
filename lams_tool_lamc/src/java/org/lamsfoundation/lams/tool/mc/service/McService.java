@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -1429,8 +1428,15 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // we need to save QB questions and options first
 	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
 		QbQuestion qbQuestion = mcQuestion.getQbQuestion();
-		qbService.insertQuestion(qbQuestion);
-		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		qbQuestion.clearID();
+
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    mcQuestion.setQbQuestion(existingQuestion);
+		}
 	    }
 
 	    mcContentDAO.saveMcContent(toolContentObj);
