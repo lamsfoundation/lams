@@ -22,15 +22,10 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.qb.QbUtils;
@@ -117,19 +112,6 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
      * Migration to Question Bank
      */
     public void up20190704To20190809(String toolFilePath) throws IOException {
-	// find LD's content folder ID to use it in new QB questions
-	String contentFolderId = null;
-	try {
-	    File ldFile = new File(new File(toolFilePath).getParentFile().getParentFile(), "learning_design.xml");
-	    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	    Document doc = docBuilder.parse(new FileInputStream(ldFile));
-	    Element ldRoot = doc.getDocumentElement();
-	    contentFolderId = XMLUtil.getChildElementValue(ldRoot, "contentFolderID", null);
-	} catch (Exception e) {
-	    throw new IOException("Error while extracting LD content folder ID for Question Bank migration", e);
-	}
-	final String contentFolderIdFinal = contentFolderId;
-
 	// tell which file to process and what to do with its root element
 	transformXML(toolFilePath, toolRoot -> {
 	    Document document = toolRoot.getOwnerDocument();
@@ -155,7 +137,6 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "type", "type", null, false, true);
 		// Question ID will be filled later as it requires QbService
 		XMLUtil.addTextElement(qbQuestion, "version", "1");
-		XMLUtil.addTextElement(qbQuestion, "contentFolderId", contentFolderIdFinal);
 		XMLUtil.rewriteTextElement(toolRoot, qbQuestion, "created", "createDate", defaultCreateDate, true,
 			false);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "title", "name", null, false, true,

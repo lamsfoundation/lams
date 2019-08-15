@@ -115,6 +115,8 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
+import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
@@ -237,6 +239,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private ILearningDesignDAO learningDesignDAO;
 
     private ILearningLibraryDAO learningLibraryDAO;
+
+    private IQbDAO qbDAO;
 
     /**
      * Class of tool attachment file handler class and relative fields information container.
@@ -770,6 +774,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			contentManager.importToolContent(newContent.getToolContentId(), importer.getUserId(), toolPath,
 				fromVersion, toVersion);
 		    }
+
+		    List<QbQuestion> activityQbQuestions = qbDAO
+			    .getQuestionsByToolContentId(newContent.getToolContentId());
+		    for (QbQuestion qbQuestion : activityQbQuestions) {
+			if (qbQuestion.getContentFolderId() == null) {
+			    qbQuestion.setContentFolderId(ldDto.getContentFolderID());
+			    qbDAO.update(qbQuestion);
+			}
+		    }
+
 		    log.debug("Tool content import success.");
 		} catch (Exception e) {
 		    String error = messageService.getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
@@ -2023,6 +2037,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
+    }
+
+    public void setQbDAO(IQbDAO qbDAO) {
+	this.qbDAO = qbDAO;
     }
 
     public ILicenseDAO getLicenseDAO() {

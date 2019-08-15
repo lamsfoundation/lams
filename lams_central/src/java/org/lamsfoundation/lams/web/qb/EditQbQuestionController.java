@@ -116,8 +116,7 @@ public class EditQbQuestionController {
 	//populate question information to its form for editing
 	form.setUid(qbQuestion.getUid());
 	form.setQuestionId(qbQuestion.getQuestionId());
-	//TODO remove hardcoded value, once we transfer contentFolderId from old DB entries
-	form.setContentFolderID(qbQuestion.getContentFolderId() == null ? "temp" : qbQuestion.getContentFolderId());
+	form.setContentFolderID(qbQuestion.getContentFolderId());
 	form.setTitle(qbQuestion.getName());
 	form.setDescription(qbQuestion.getDescription());
 	form.setMaxMark(qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark());
@@ -149,7 +148,7 @@ public class EditQbQuestionController {
 	    List<QbQuestionUnit> unitList = qbQuestion.getUnits();
 	    request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
 	}
-	
+
 	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestionUid);
 
 	return findForwardByQuestionType(qbQuestion.getType());
