@@ -1429,21 +1429,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // we need to save QB questions and options first
 	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
 		QbQuestion qbQuestion = mcQuestion.getQbQuestion();
-		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-		mcQuestion.setToolContentId(toolContentId);
-
-		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
-		qbQuestion.getQbOptions().clear();
-
-		mcQueContentDAO.insert(qbQuestion);
-
-		qbQuestion.getQbOptions().addAll(qbOptions);
-		for (QbOption qbOption : qbOptions) {
-		    qbOption.setQbQuestion(qbQuestion);
-		    mcQueContentDAO.insert(qbOption);
-		}
-		qbOptions.clear();
-
+		qbService.insertQuestion(qbQuestion);
 		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
 	    }
 

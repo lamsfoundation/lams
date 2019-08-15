@@ -1920,22 +1920,8 @@ public class ScratchieServiceImpl
 	    // we need to save QB questions and options first
 	    for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
 		QbQuestion qbQuestion = scratchieItem.getQbQuestion();
-		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-
-		Collection<QbOption> qbOptions = new ArrayList<>(qbQuestion.getQbOptions());
-		qbQuestion.getQbOptions().clear();
-
-		scratchieDao.insert(qbQuestion);
-
-		qbQuestion.getQbOptions().addAll(qbOptions);
-		for (QbOption qbOption : qbOptions) {
-		    qbOption.setQbQuestion(qbQuestion);
-		    scratchieDao.insert(qbOption);
-		}
-		qbOptions.clear();
-
+		qbService.insertQuestion(qbQuestion);
 		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
-
 		scratchieDao.insert(scratchieItem);
 	    }
 
