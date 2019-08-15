@@ -248,7 +248,6 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 
 		// get rid of junk
 		assessmentQuestion.removeChild(assessmentOptions.item(0).getParentNode());
-		XMLUtil.removeElement(assessmentQuestion, "questionHash");
 
 		// now rewrite units
 		NodeList assessmentUnits = assessmentQuestion
@@ -287,12 +286,6 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 		Element questionReference = (Element) questionReferences.item(questionReferenceIndex);
 		XMLUtil.rewriteTextElement(questionReference, questionReference, "defaultGrade", "maxMark", "1", false,
 			true);
-
-		// question reference type gets removed, if it exists
-		List<Element> type = XMLUtil.findChildren(questionReference, "type");
-		if (!type.isEmpty()) {
-		    questionReference.removeChild(type.get(0));
-		}
 	    }
 	});
     }

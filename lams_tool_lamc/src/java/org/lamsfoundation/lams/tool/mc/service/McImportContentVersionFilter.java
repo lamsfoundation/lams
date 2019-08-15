@@ -165,7 +165,6 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
 		// get rid of junk
 		mcQuestion.removeChild(mcOptions.item(0).getParentNode());
-		XMLUtil.removeElement(mcQuestion, "questionHash");
 	    }
 	});
     }
