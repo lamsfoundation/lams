@@ -234,8 +234,8 @@ public class QbService implements IQbService {
 	    // sort grades by highest mark
 	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark).reversed());
 	    // see how many learners should be in top/bottom 27% of the group
-	    int groupCount = (int) Math.ceil(
-		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
+	    int groupCount = (int) Math
+		    .ceil(Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
 
 	    // go through each grade and gather data for indexes
 	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
@@ -562,6 +562,46 @@ public class QbService implements IQbService {
     @Override
     public boolean isQuestionInUserCollection(int qbQuestionId, int userId) {
 	return qbDAO.isQuestionInUserCollection(userId, qbQuestionId);
+    }
+
+    /**
+     * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
+     * New QbQuestions need to be saved step by step.
+     */
+    public void insertQuestion(QbQuestion qbQuestion) {
+	if (qbQuestion.getQuestionId() == null) {
+	    qbQuestion.setQuestionId(generateNextQuestionId());
+	}
+
+	Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
+		: new ArrayList<>(qbQuestion.getQbOptions());
+	if (qbOptions != null) {
+	    qbQuestion.getQbOptions().clear();
+	}
+
+	Collection<QbQuestionUnit> units = qbQuestion.getUnits() == null ? null
+		: new ArrayList<>(qbQuestion.getUnits());
+	if (units != null) {
+	    qbQuestion.getUnits().clear();
+	}
+
+	qbDAO.insert(qbQuestion);
+
+	if (units != null) {
+	    qbQuestion.getUnits().addAll(units);
+	    for (QbQuestionUnit unit : units) {
+		unit.setQbQuestion(qbQuestion);
+		qbDAO.insert(unit);
+	    }
+	}
+
+	if (qbOptions != null) {
+	    qbQuestion.getQbOptions().addAll(qbOptions);
+	    for (QbOption qbOption : qbOptions) {
+		qbOption.setQbQuestion(qbQuestion);
+		qbDAO.insert(qbOption);
+	    }
+	}
     }
 
     public void setQbDAO(IQbDAO qbDAO) {
