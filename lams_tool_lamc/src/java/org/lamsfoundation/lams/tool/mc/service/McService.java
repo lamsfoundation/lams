@@ -1424,6 +1424,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    toolContentObj.setMcContentId(toolContentId);
 	    toolContentObj.setCreatedBy(newUserUid);
 
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
 	    // we need to save QB questions and options first
 	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
 		QbQuestion qbQuestion = mcQuestion.getQbQuestion();
@@ -1441,6 +1443,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    mcQueContentDAO.insert(qbOption);
 		}
 		qbOptions.clear();
+
+		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
 	    }
 
 	    mcContentDAO.saveMcContent(toolContentObj);

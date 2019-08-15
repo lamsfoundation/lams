@@ -2644,6 +2644,8 @@ public class AssessmentServiceImpl
 	    }
 	    toolContentObj.setCreatedBy(user);
 
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
 	    // we need to save QB questions and options first
 	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
 		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
@@ -2680,6 +2682,8 @@ public class AssessmentServiceImpl
 		    }
 		    qbOptions.clear();
 		}
+
+		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
 
 		assessmentDao.insert(assessmentQuestion);
 	    }

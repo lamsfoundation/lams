@@ -103,7 +103,7 @@ public interface IQbService {
 
     void unshareCollection(long collectionUid, int organisationId);
 
-    void addQuestionToCollection(long collectionUid, int qbQuestionUid, boolean copy);
+    void addQuestionToCollection(long collectionUid, int qbQuestionId, boolean copy);
 
     void addQuestionToCollection(long sourceCollectionUid, long targetCollectionUid,
 	    Collection<Integer> excludedQbQuestionIds, boolean copy);

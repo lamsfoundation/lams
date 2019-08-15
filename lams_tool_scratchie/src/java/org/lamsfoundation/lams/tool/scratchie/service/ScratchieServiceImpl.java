@@ -1915,6 +1915,8 @@ public class ScratchieServiceImpl
 		user.setUserId(newUserUid.longValue());
 	    }
 
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
 	    // we need to save QB questions and options first
 	    for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
 		QbQuestion qbQuestion = scratchieItem.getQbQuestion();
@@ -1932,9 +1934,11 @@ public class ScratchieServiceImpl
 		}
 		qbOptions.clear();
 
+		qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+
 		scratchieDao.insert(scratchieItem);
 	    }
-	    
+
 	    scratchieDao.saveObject(toolContentObj);
 
 	} catch (ImportToolContentException e) {
