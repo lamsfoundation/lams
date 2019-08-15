@@ -1877,7 +1877,9 @@ public class ScratchieServiceImpl
 
 	// set ScratchieToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Scratchie.newInstance(toolContentObj, toolContentId);
-
+	for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
+	    qbService.prepareQuestionForExport(scratchieItem.getQbQuestion());
+	}
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler,
 		    rootPath);

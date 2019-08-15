@@ -2606,6 +2606,10 @@ public class AssessmentServiceImpl
 	}
 
 	toolContentObj = Assessment.newInstance(toolContentObj, toolContentId);
+	for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
+	    qbService.prepareQuestionForExport(assessmentQuestion.getQbQuestion());
+	}
+
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
 		    rootPath);
@@ -2649,7 +2653,6 @@ public class AssessmentServiceImpl
 	    // we need to save QB questions and options first
 	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
 		QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-		qbQuestion.clearID();
 
 		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
 		if (existingQuestion == null) {

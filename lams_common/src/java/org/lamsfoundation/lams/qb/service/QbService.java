@@ -615,6 +615,20 @@ public class QbService implements IQbService {
 	}
     }
 
+    /**
+     * When exporting a LD, QbQuestion's server-specific detail need not be exported
+     */
+    @Override
+    public void prepareQuestionForExport(QbQuestion qbQuestion) {
+	releaseFromCache(qbQuestion);
+	qbQuestion.clearID();
+	qbQuestion.setQuestionId(null);
+	qbQuestion.setVersion(null);
+	// use plain Java collections instead of Hibernate ones, so XML is more simple
+	qbQuestion.setQbOptions(new ArrayList<>(qbQuestion.getQbOptions()));
+	qbQuestion.setUnits(new ArrayList<>(qbQuestion.getUnits()));
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }

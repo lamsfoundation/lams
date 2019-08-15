@@ -1399,6 +1399,9 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // set ToolContentHandler as null to avoid copy file node in repository again.
 	    toolContentObj = McContent.newInstance(toolContentObj, toolContentId);
 	    toolContentObj.setMcSessions(null);
+	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
+		qbService.prepareQuestionForExport(mcQuestion.getQbQuestion());
+	    }
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, mcToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
 	    throw new ToolException(e);
