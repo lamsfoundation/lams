@@ -302,4 +302,5 @@ public class ConfigurationKeys {
     public static String QB_MONITORS_READ_ONLY = "QbMonitorsReadOnly";
     public static String QB_STATS_MIN_PARTICIPANTS = "QbStatsMinParticipants";
     public static String QB_STATS_GROUP_SIZE = "QbStatsGroupSize";
+    public static String QB_MERGE_ENABLE = "QbMergeEnable";
 }
