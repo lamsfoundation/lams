@@ -96,7 +96,7 @@ public class McContent implements Serializable {
 
     @Column
     private boolean displayAnswers;
-    
+
     @Column(name = "display_feedback_only")
     private boolean displayFeedbackOnly;
 
@@ -114,29 +114,26 @@ public class McContent implements Serializable {
 
     @Column(name = "pass_mark")
     private Integer passMark;
-    
+
     @Column(name = "enable_confidence_levels")
     private boolean enableConfidenceLevels;
 
     @Column
     private String reflectionSubject;
 
-    @OneToMany(mappedBy = "mcContent",
-	    cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
     @OrderBy("displayOrder")
     private Set<McQueContent> mcQueContents;
 
-    @OneToMany(mappedBy = "mcContent",
-	    cascade = CascadeType.ALL,
-	    orphanRemoval = true)
+    @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<McSession> mcSessions;
 
     /** full constructor */
     public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
 	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
 	    boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
-	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput, 
-	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject, 
+	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput,
+	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject,
 	    Set<McQueContent> mcQueContents, Set<McSession> mcSessions) {
 
 	this.mcContentId = mcContentId;
@@ -159,21 +156,21 @@ public class McContent implements Serializable {
 	this.showMarks = showMarks;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
-	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<McQueContent>();
-	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<McSession>();
+	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<>();
+	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<>();
     }
 
     /** default constructor */
     public McContent() {
-	this.mcQueContents = new HashSet<McQueContent>();
-	this.mcSessions = new HashSet<McSession>();
+	this.mcQueContents = new HashSet<>();
+	this.mcSessions = new HashSet<>();
     }
 
     /** minimal constructor */
     public McContent(Long mcContentId, Set<McQueContent> mcQueContents, Set<McSession> mcSessions) {
 	this.mcContentId = mcContentId;
-	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<McQueContent>();
-	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<McSession>();
+	this.mcQueContents = mcQueContents != null ? mcQueContents : new HashSet<>();
+	this.mcSessions = mcSessions != null ? mcSessions : new HashSet<>();
     }
 
     /**
@@ -208,7 +205,7 @@ public class McContent implements Serializable {
      */
     public Set<McQueContent> deepCopyMcQueContent(McContent newMcContent) {
 
-	Set<McQueContent> newMcQueContent = new TreeSet<McQueContent>();
+	Set<McQueContent> newMcQueContent = new TreeSet<>();
 	for (McQueContent queContent : this.getMcQueContents()) {
 	    if (queContent.getMcContent() != null) {
 		McQueContent mcQueContent = McQueContent.newInstance(queContent, newMcContent);
@@ -232,6 +229,9 @@ public class McContent implements Serializable {
 
     public void setMcContentId(Long mcContentId) {
 	this.mcContentId = mcContentId;
+	for (McQueContent mcQuestion : mcQueContents) {
+	    mcQuestion.setToolContentId(mcContentId);
+	}
     }
 
     public String getTitle() {
@@ -289,18 +289,18 @@ public class McContent implements Serializable {
     public void setPassMark(Integer passMark) {
 	this.passMark = passMark;
     }
-    
-    /**
-    *
-    * @return
-    */
-   public boolean isEnableConfidenceLevels() {
-	return enableConfidenceLevels;
-   }
 
-   public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
+    /**
+     *
+     * @return
+     */
+    public boolean isEnableConfidenceLevels() {
+	return enableConfidenceLevels;
+    }
+
+    public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
 	this.enableConfidenceLevels = enableConfidenceLevels;
-   }
+    }
 
     public Set<McQueContent> getMcQueContents() {
 	return this.mcQueContents;
