@@ -71,7 +71,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,7 +98,7 @@ public class LessonManagerServlet extends HttpServlet {
     private IUserManagementService userManagementService;
     @Autowired
     private ISecurityService securityService;
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -429,9 +428,9 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate, String countryIsoCode, String langIsoCode,
-	    String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
-	    throws RemoteException {
+	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate,
+	    String countryIsoCode, String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable,
+	    Boolean enableNotifications) throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -928,8 +927,10 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName,
-				firstName, lastName, email, courseId, locale, country);
+//			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr,
+//				userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
+			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr,
+				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;
 		}
@@ -946,8 +947,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, userName,
-				firstName, lastName, email, courseId, locale, country);
+			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr,
+				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;
 		}
@@ -963,45 +964,6 @@ public class LessonManagerServlet extends HttpServlet {
 		log.error(e, e);
 		return false;
 	    }
-	}
-
-	private void addUserToLesson(HttpServletRequest request, ExtServer extServer, String method, String lsIdStr,
-		String username, String firstName, String lastName, String email, String courseId, String locale,
-		String country) throws UserInfoFetchException, UserInfoValidationException {
-
-	    if (log.isDebugEnabled()) {
-		log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
-	    }
-
-	    ExtUserUseridMap userMap = null;
-	    if ((firstName == null) && (lastName == null)) {
-		userMap = integrationService.getExtUserUseridMap(extServer, username);
-	    } else {
-		final boolean usePrefix = true;
-		final boolean isUpdateUserDetails = false;
-		userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, firstName, lastName,
-			locale, country, email, usePrefix, isUpdateUserDetails);
-	    }
-
-	    // ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer,
-	    // username);
-	    // adds user to group
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
-		    method);
-
-	    User user = userMap.getUser();
-	    if (user == null) {
-		String error = "Unable to add user to lesson class as user is missing from the user map";
-		log.error(error);
-		throw new UserInfoFetchException(error);
-	    }
-
-	    if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
-		lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
-	    } else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-		lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
-	    }
-
 	}
     }
 
@@ -1152,6 +1114,8 @@ public class LessonManagerServlet extends HttpServlet {
 	Document document = lessonElement.getOwnerDocument();
 	Element learnerElement = document.createElement("Learner");
 	learnerElement.setAttribute("extUsername", extUser.getExtUsername());
+	String email = extUser.getUser().getEmail();
+	learnerElement.setAttribute("email", StringUtils.isBlank(email) ? "" : email);
 	String userTotalMark = gradebookUserLessonMark == null ? "" : gradebookUserLessonMark.toString();
 	learnerElement.setAttribute("userTotalMark", userTotalMark);
 
@@ -1240,6 +1204,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
 	    learnerElement.setAttribute("firstName", learner.getFirstName());
 	    learnerElement.setAttribute("lastName", learner.getLastName());
+	    String email = learner.getEmail();
+	    learnerElement.setAttribute("email", StringUtils.isBlank(email) ? "" : email);
 
 	    // find required learnerProgress from learnerProgresses (this way we don't querying DB).
 	    LearnerProgress learnerProgress = null;
