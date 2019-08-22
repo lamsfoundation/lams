@@ -1056,6 +1056,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    Element lessonElement = document.createElement(CentralConstants.ELEM_LESSON);
 	    lessonElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
 	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
+        String createDateTime = lesson.getCreateDateTime().toString();
+        lessonElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
 
 	    // calculate lesson's MaxPossibleMark
 	    Long lessonMaxPossibleMark = lamsCoreToolService.getLessonMaxPossibleMark(lesson);
@@ -1215,6 +1217,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	toolOutputsElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
 	toolOutputsElement.setAttribute("name", lesson.getLessonName());
+    String createDateTime = lesson.getCreateDateTime().toString();
+    toolOutputsElement.setAttribute("createDateTime", StringUtils.isBlank(createDateTime) ? "" : createDateTime);
 
 	List<LearnerProgress> learnerProgresses = lessonService.getUserProgressForLesson(lesson.getLessonId());
 	List<ToolSession> toolSessions = lamsCoreToolService.getToolSessionsByLesson(lesson);
