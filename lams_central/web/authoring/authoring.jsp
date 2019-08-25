@@ -9,20 +9,17 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css" type="text/css" media="screen" />
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-treeview.css" type="text/css" media="screen" />
 	<lams:css suffix="authoring"/>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.simple-color.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/yahoo-dom-event.js" ></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/animation-min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/treeview-min.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	

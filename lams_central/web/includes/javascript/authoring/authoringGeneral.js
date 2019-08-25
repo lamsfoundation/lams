@@ -320,7 +320,8 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
-				ldNode = tree.getHighlightedNode();
+				ldNode = tree.treeview('getSelected')[0];
+			// no LD was chosen
     		if (!ldNode) {
     			return;
     		}
@@ -335,7 +336,7 @@ GeneralInitLib = {
     			return;
     		}
 			
-			var parentFolder = ldNode.data.learningDesignId ? ldNode.parent : ldNode;
+			var parentFolder = ldNode.learningDesignId ? tree.treeview('getParent', ldNode) : ldNode;
 			$.each(parentFolder.children, function(){
 				if (this.label == title) {
 					alert(LABELS.FOLDER_EXISTS_ERROR);
@@ -355,11 +356,10 @@ GeneralInitLib = {
 				dataType : 'text',
 				data : {
 					'name' 		     : title,
-					'parentFolderID' : parentFolder.data.folderID
+					'parentFolderID' : parentFolder.folderID
 				},
 				success : function() {
-					tree.removeChildren(parentFolder);
-					parentFolder.expand();
+					ldTreeview.refresh(tree, parentFolder);
 				}
 			});
 		});
@@ -369,13 +369,13 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
-				ldNode = tree.getHighlightedNode(),
-				isFolder = ldNode && !ldNode.data.learningDesignId,
+				ldNode = tree.treeview('getSelected')[0],
+				isFolder = ldNode && !ldNode.learningDesignId,
 				isCut = $(this).is('#ldStoreDialogCutButton');
     		if (!ldNode) {
     			return;
     		}
-    		if (isCut && !ldNode.data.canModify) {
+    		if (isCut && !ldNode.canModify) {
     			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
@@ -392,8 +392,8 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
-				ldNode = tree.getHighlightedNode(),
-				folderNode = ldNode ? (ldNode.data.learningDesignId ? ldNode.parent : ldNode) : null,
+				ldNode = tree.treeview('getSelected')[0],
+				folderNode = ldNode ? (ldNode.learningDesignId ? tree.treeview('getParent', ldNode) : ldNode) : null,
 				copiedResource = dialog.data('copiedResource');
 
 			if (!folderNode || !copiedResource) {
@@ -401,13 +401,13 @@ GeneralInitLib = {
     		}
 			
 			if (copiedResource.isCut) {
-				var parent = ldNode.parent;
-				while (parent) {
-					if (parent.index == copiedResource.resourceNode.index) {
+				var parent = tree.treeview('getParent', ldNode);
+				while (parent && parent.nodeId) {
+					if (parent.nodeId == copiedResource.resourceNode.nodeId) {
 						alert(LABELS.FOLDER_MOVE_TO_CHILD_ERROR);
 						return;
 					}
-					parent = parent.parent;
+					parent = tree.treeview('getParent', parent);
 				}
 			}
 
@@ -416,17 +416,17 @@ GeneralInitLib = {
 				url : copiedResource.isCut ? LAMS_URL + "workspace/moveResource.do" : LAMS_URL + "workspace/copyResource.do",
 				dataType : 'text',
 				data : {
-					'targetFolderID' : folderNode.data.folderID,
-					'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.data.folderID
-															   : copiedResource.resourceNode.data.learningDesignId ,
+					'targetFolderID' : folderNode.folderID,
+					'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.folderID
+															   : copiedResource.resourceNode.learningDesignId ,
 					'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
 				},
 				success : function() {
 					if (copiedResource.isCut) {
-						tree.removeNode(copiedResource.resourceNode, true);
+						var parent = tree.treeview('getParent', copiedResource.resourceNode);
+						ldTreeview.refresh(tree, parent);
 					}
-					tree.removeChildren(folderNode);
-					folderNode.expand();
+					ldTreeview.refresh(tree, folderNode);
 					
 					dialog.data('copiedResource', null);
 				}
@@ -439,16 +439,16 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
-				ldNode = tree.getHighlightedNode();
+				ldNode = tree.treeview('getSelected')[0];
     		if (!ldNode) {
     			return;
     		}
-    		if (!ldNode.data.canModify) {
+    		if (!ldNode.canModify) {
     			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
-    		var isFolder = !ldNode.data.learningDesignId;
-    		if (!confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
+    		var isFolder = !ldNode.learningDesignId;
+    		if (!confirm(LABELS.DELETE_NODE_CONFIRM + ' ' + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
     			return;
     		}
 			
@@ -458,13 +458,12 @@ GeneralInitLib = {
 				url : LAMS_URL + "workspace/deleteResource.do",
 				dataType : 'text',
 				data : {
-					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceID'   : isFolder? ldNode.folderID : ldNode.learningDesignId,
 					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
 				},
 				success : function() {
-					var parentFolder = ldNode.parent;
-					tree.removeChildren(parentFolder);
-					parentFolder.expand();
+					var parentFolder = tree.treeview('getParent', ldNode);
+					ldTreeview.refresh(tree, parentFolder);
 				}
 			});
 		});
@@ -474,20 +473,20 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
-				ldNode = tree.getHighlightedNode();
+				ldNode = tree.treeview('getSelected')[0];
     		if (!ldNode) {
     			return;
     		}
-    		if (!ldNode.data.canModify) {
+    		if (!ldNode.canModify) {
     			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
-    		var isFolder = !ldNode.data.learningDesignId,
-    			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-						+ ' "' + ldNode.data.label + '"');
+    		var isFolder = !ldNode.learningDesignId,
+    			title = prompt(LABELS.RENAME_TITLE_PROMPT + ' ' + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
+						+ ' "' + ldNode.label + '"');
 			
 			// skip if no name or the same name was provided
-			if (!title || ldNode.data.label == title) {
+			if (!title || ldNode.label == title) {
 				return;
 			}
 			if (!GeneralLib.validateName(title)) {
@@ -495,8 +494,8 @@ GeneralInitLib = {
     			return;
     		}
 			
-			$.each(ldNode.parent.children, function(){
-				if (this.data.label == title && (isFolder == (this.data.folderID != null))) {
+			$.each(tree.treeview('getSiblings', ldNode), function(){
+				if (this.label == title && (isFolder == (this.folderID != null))) {
 					alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
 					title = null;
 					return false;
@@ -513,29 +512,16 @@ GeneralInitLib = {
 				dataType : 'text',
 				data : {
 					'name' 		   : title,
-					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceID'   : isFolder? ldNode.folderID : ldNode.learningDesignId,
 					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
 				},
 				success : function(response) {
-					if (isFolder) {
-						ldNode.data.label = title;
-						ldNode.getLabelEl().innerHTML = title;
-					} else {
-						// refresh all opened folders in the tree
-	    				var folders = tree.getRoot().children;
-	    				if (folders) {
-	    					$.each(folders, function(){
-	    						var expanded = this.expanded;
-								tree.removeChildren(this);
-	    						if (expanded) {
-	    							this.expand();
-	    						}
-	    					});
-	    				}
-	    				
-	    				// fetch access list again
-						GeneralLib.updateAccess(null, true);
-					}
+    				var parentNode = tree.treeview('getParent', ldNode);
+    				ldTreeview.refresh(tree, parentNode);
+    				tree.treeview('selectNode', ldNode);
+
+    				// fetch access list again
+					GeneralLib.updateAccess(null, true);
 				}
 			});
 		});
@@ -557,16 +543,16 @@ GeneralInitLib = {
 			var folderNode = null,
 				folderID = null,
 				tree = dialog.data('ldTree'),
-				node = tree.getHighlightedNode();
+				node = tree.treeview('getSelected')[0];
 			if (node) {
 	    		// get folder from LD tree
-				folderNode = node.data.learningDesignId ? node.parent : node;
-				if (!folderNode.data.canSave) {
+				folderNode = node.learningDesignId ? tree.treeview('getParent', node) : node;
+				if (!folderNode.canSave) {
 					alert(LABELS.FOLDER_CAN_NOT_SAVE_ERROR);
 					saveButton.button('reset');
 					return;
 				}
-				folderID = folderNode.data.folderID;
+				folderID = folderNode.folderID;
 			} else {
 				// get data from "recently used sequences" list
 				var selectedAccess = $('#ldStoreDialogAccessDiv > div.selected', dialog);
@@ -587,30 +573,31 @@ GeneralInitLib = {
 			// if a node is highlighted but user modified the title,
 			// it is considered a new sequence
 			// otherwise check if there is no other sequence with the same name
-			var nodeData = null;
-			if (folderNode && folderNode.children) {
-				$.each(folderNode.children, function(){
-					if (this.data.label == title) {
-						this.highlight();
-						nodeData = this.data;
+			var node = null;
+			if (folderNode && folderNode.nodes) {
+				$.each(folderNode.nodes, function(){
+					if (this.label == title) {
+						tree.treeview('selectNode', this);
+						node = this;
 						return false;
 					}
 				});
 			}
-			if (nodeData && (!nodeData.canModify || (!canSetReadOnly && nodeData.readOnly))){
+			if (node && (!node.canModify || (!canSetReadOnly && node.readOnly))){
 				alert(LABELS.READONLY_FORBIDDEN_ERROR);
 				saveButton.button('reset');
 				return;
 			}
-			if (nodeData && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+			if (node && !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
 				saveButton.button('reset');
 				return;
 			}
-			var readOnly = (nodeData && !nodeData.canModify) || 
+			var readOnly = (node && !node.canModify) || 
 						   (canSetReadOnly && $('#ldStoreDialogReadOnlyCheckbox', dialog).prop('checked')),
-				learningDesignID = nodeData ? nodeData.learningDesignId : null,
+				learningDesignID = node ? node.learningDesignId : null,
 				result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title, readOnly);
 			if (result) {
+				ldTreeview.refresh(tree, folderNode);
 				GeneralLib.openLearningDesign();
 				dialog.modal('hide');
 			}
@@ -621,8 +608,8 @@ GeneralInitLib = {
     		var dialog = layout.ldStoreDialog,
     			openButton = $('#ldStoreDialogOpenButton', dialog),
 				tree = dialog.data('ldTree'),
-				ldNode = tree.getHighlightedNode(),
-				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
+				ldNode = tree.treeview('getSelected')[0],
+				learningDesignID = ldNode ? ldNode.learningDesignId : null;
     		
     		openButton.button('loading');
 			if (!learningDesignID) {
@@ -760,7 +747,6 @@ GeneralInitLib = {
 				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
 					// only Save As uses highlightFolder; otherwise the first folder in top level gets expanded and highlighted
 					layout.folderPathCurrent = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
-					MenuLib.loadLearningDesignTree();
 					
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
@@ -937,84 +923,61 @@ GeneralInitLib = {
 		
 		layout.dialogs.push(layout.ldStoreDialog);
 
-		// there should be no focus, just highlight
-		YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
-		var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
-		// store the tree in the dialog's data
-		layout.ldStoreDialog.data('ldTree', tree);
-		// make folder contents load dynamically on open
-		tree.setDynamicLoad(function(node, callback){
-			// load subfolder contents
-			var childNodeData = MenuLib.getFolderContents(node.data.folderID, node.data.canSave, node.data.canHaveReadOnly);
-			if (childNodeData) {
-				$.each(childNodeData, function(){
-						// create and add a leaf
-						new YAHOO.widget.HTMLNode(this, node);
-					});
-			}
-			
-			// expand the folder where existing LD resides, if applicable
-			MenuLib.highlightFolder(node);
-			
-			// required by YUI
-			callback();
-		});
-		tree.singleNodeHighlight = true;
-		tree.subscribe('clickEvent', function(event) {
-			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden')
-				nodeData = event.node.data;
-			
-			//prevent item from being deselected on any subsequent clicks
-			if (isOpenDialog && event.node.highlightState == 1) {
-				return false;
-			}
-			
-			//disable edit buttons if no elements is selected
-			$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
-				.prop('disabled', event.node.highlightState > 0);
-			
-			if (canSetReadOnly && !isOpenDialog) {
-				// detect which folders/sequences are marked as read-only
-				// and which ones are immutable
-				if (event.node.isLeaf) {
-					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
-						.prop('disabled', !nodeData.canModify || !nodeData.canHaveReadOnly)
-						.prop('checked', nodeData.readOnly || !nodeData.canModify);
-				} else {
-					$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
-						.prop('disabled', !nodeData.canSave || !nodeData.canHaveReadOnly)
-						.prop('checked', !nodeData.canSave);
-				}
-			} else {
-				// is this is normal user or open dialog, only show/hide read-only label
-				if (event.node.isLeaf ? nodeData.readOnly || !nodeData.canModify : !nodeData.canSave){
-					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
-				} else {
-					$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();
-				}
-			}
-			
-			// if it's a folder in load sequence dialog - highlight but stop processing
-			if (isOpenDialog && !nodeData.learningDesignId){
-				return true;
-			}
-			
-			//show LearningDesign thumbnail and title
-			var learningDesignID = event.node.highlightState == 0   ? +nodeData.learningDesignId : null,
-				title            = !isOpenDialog && learningDesignID ? nodeData.label : null;
-			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);				
-		});
-		tree.subscribe('clickEvent', tree.onEventToggleHighlight);
 		
-		tree.subscribe('dblClickEvent', function(event){
-			
-			//trigger "clickEvent" first so that save/open function will know which element is selected 
-			tree.fireEvent("clickEvent", event);
-			
-			// open/save sequence
-			var buttonToClick = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible') 
-					? '#ldStoreDialogSaveButton' : '#ldStoreDialogOpenButton'; 
-			$(buttonToClick, $('#ldStoreDialogContents')).trigger( "click" );
+		var ldTree = $('#ldStoreDialogTree');
+		layout.ldStoreDialog.data('ldTree', ldTree);
+		
+		ldTreeview.init('#ldStoreDialogTree', 
+		   function(event, node) {
+				var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden'),
+					isSelected = node.state.selected;
+				
+				//disable edit buttons if no elements is selected
+				$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
+					.prop('disabled', !isSelected);
+				
+				if (canSetReadOnly && !isOpenDialog) {
+					// detect which folders/sequences are marked as read-only
+					// and which ones are immutable
+					if (!node.nodes) {
+						$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+							.prop('disabled', !node.canModify || !node.canHaveReadOnly)
+							.prop('checked', node.readOnly || !node.canModify);
+					} else {
+						$('#ldStoreDialogReadOnlyCheckbox', layout.ldStoreDialog)
+							.prop('disabled', !node.canSave || !node.canHaveReadOnly)
+							.prop('checked', !node.canSave);
+					}
+				} else {
+					// is this is normal user or open dialog, only show/hide read-only label
+					if (node.nodes ? !node.canSave : node.readOnly || !node.canModify){
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).show();
+					} else {
+						$('#ldStoreDialogReadOnlySpan', layout.ldStoreDialog).hide();
+					}
+				}
+				
+				// if it's a folder in load sequence dialog - highlight but stop processing
+				if (isOpenDialog && !node.learningDesignId){
+					return true;
+				}
+				
+				//show LearningDesign thumbnail and title
+				var learningDesignID = isSelected					     ? +node.learningDesignId : null,
+					title            = !isOpenDialog && learningDesignID ? node.label 			  : null;
+				GeneralLib.showLearningDesignThumbnail(learningDesignID, title);	
+		}, function(event, node) {
+				if (!node.learningDesignId){
+					if (!node.state.expanded) {
+						ldTreeview.refresh(ldTree, node);
+					}
+					return;
+				}
+				
+				// open/save sequence
+				var buttonToClick = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible') 
+						? '#ldStoreDialogSaveButton' : '#ldStoreDialogOpenButton'; 
+				$(buttonToClick, $('#ldStoreDialogContents')).trigger( "click" );
 		});
 		
 		GeneralLib.updateAccess(initAccess);
@@ -3106,10 +3069,10 @@ GeneralLib = {
 			}
 			
 			var tree =  layout.ldStoreDialog.data('ldTree'),
-				ldNode = tree.getHighlightedNode();
+				ldNode = tree.treeview('getSelected')[0];
 				// no LD was chosen
-			if (ldNode && learningDesignID != ldNode.data.learningDesignId) {
-				ldNode.unhighlight(true);
+			if (ldNode && learningDesignID != ldNode.learningDesignId) {
+				tree.treeview('unselectNode', ldNode, {silent : false});
 			}
 		}
 		
@@ -3211,12 +3174,12 @@ GeneralLib = {
 								
 								var dialog = layout.ldStoreDialog,
 									tree = dialog.data('ldTree'),
-									node = tree.getHighlightedNode(),
+									node = tree.treeview('getSelected')[0],
 									learningDesignID = +accessEntry.data('learningDesignId'),
 									title = accessEntry.text();
 									
 								if (node) {
-									node.unhighlight(true);
+									tree.treeview('unselectNode', node, {silent : false});
 								}
 									
 								GeneralLib.showLearningDesignThumbnail(learningDesignID, title);

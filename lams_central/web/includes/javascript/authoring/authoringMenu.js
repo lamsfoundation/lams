@@ -390,42 +390,6 @@ var MenuLib = {
 	},
 	
 	/**
-	 * Highlights the folder where existing LD already resides
-	 * or the user folder otherwise.
-	 */
-	highlightFolder : function(folder) {
-		// if there are no children or stop condition (no path) was reached
-		if (folder.children.length === 0 || layout.folderPathCurrent === null) {
-			return;
-		}
-		var chosenFolder = null;
-		// are there any steps left?
-		if (layout.folderPathCurrent.length > 0) {
-			// look for target folder in children
-			var folderID = layout.folderPathCurrent.shift();
-			$.each(folder.children, function(index, child){
-				if (folderID == child.data.folderID) {
-					chosenFolder = child;
-					return false;
-				}
-			});
-		}
-		// if last piece of folder path was consumed, set stop condition
-		if (layout.folderPathCurrent.length === 0) {
-			layout.folderPathCurrent = null;
-		}
-		// no folder found or path was empty from the beginning
-		if (!chosenFolder) {
-			chosenFolder = folder.children[0];
-		}
-		// if folder, highlight and expand
-		if (!chosenFolder.isLeaf) {
-			chosenFolder.expand();
-			chosenFolder.highlight();
-		}
-	},
-	
-	/**
 	 * Opens a pop up for importing LD. Loads the imported LD to canvas.
 	 */
 	importLearningDesign : function(){
@@ -473,7 +437,6 @@ var MenuLib = {
 			}, 1000);
 	},
 	
-	
 	/**
 	 * Opens "Import activities" dialog where an user can choose activities from an existing Learning Design. 
 	 */
@@ -482,28 +445,6 @@ var MenuLib = {
 				'#ldStoreDialogImportPartButton, #ldStoreDialogCancelButton, #ldStoreDialogImportPartFrame', false);
 		layout.ldStoreDialog.modal('show');
 	},
-	
-	
-	/**
-	 * Loads Learning Design Tree from DB
-	 */
-	loadLearningDesignTree : function(){
-		var tree = layout.ldStoreDialog.data('ldTree'),
-			rootNode = tree.getRoot();
-		// remove existing folders
-		$.each(rootNode.children, function(){
-			tree.removeNode(this);
-		});
-		// (re)load user's folders and LDs
-		tree.buildTreeFromObject(MenuLib.getFolderContents());
-		tree.render();
-		
-		// expand the first folder or the one where existing LD resides
-		MenuLib.highlightFolder(tree.getRoot());
-		
-		return tree;
-	},
-	
 	
 	/**
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.

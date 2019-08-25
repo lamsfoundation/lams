@@ -406,7 +406,7 @@ public class AuthoringController {
      * Gets a list of recently used Learning Designs for currently logged in user.
      */
     @ResponseBody
-    @RequestMapping("/")
+    @RequestMapping("/getLearningDesignAccess")
     public String getLearningDesignAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = getUserId();
 
