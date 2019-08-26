@@ -71,7 +71,7 @@ var ldTreeview = {
 							// folderID == -2 is courses folder
 							var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
 							result.push({'text'                : (this.isRunSequencesFolder ? runSequencesFolderLabel : this.name)
-																	+ (canSave ? '' : ' <i class="fa fa-lock"></i>'),
+																	+ (canSave ? '' : '&nbsp;<i class="fa fa-lock read-only-folder"></i>'),
 										 'nodes'			   : [],
 									  	 'folderID'		       : this.folderID,
 									  	 'isRunSequenceFolder' : this.isRunSequencesFolder,
