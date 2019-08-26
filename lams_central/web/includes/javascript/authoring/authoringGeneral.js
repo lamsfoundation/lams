@@ -746,7 +746,7 @@ GeneralInitLib = {
 			'data' : {
 				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFolder){
 					// only Save As uses highlightFolder; otherwise the first folder in top level gets expanded and highlighted
-					layout.folderPathCurrent = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
+					ldTreeview.preselectedFolderPath = highlightFolder && layout.ld.folderPath ? layout.ld.folderPath.slice() : [];
 					
 					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
@@ -927,6 +927,7 @@ GeneralInitLib = {
 		var ldTree = $('#ldStoreDialogTree');
 		layout.ldStoreDialog.data('ldTree', ldTree);
 		
+		ldTreeview.allowInvalidDesigns = true;
 		ldTreeview.init('#ldStoreDialogTree', 
 		   function(event, node) {
 				var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden'),

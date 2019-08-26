@@ -1,4 +1,6 @@
 var ldTreeview = {
+		allowInvalidDesigns : false,
+		preselectedFolderPath : null,
 		DOUBLE_CLICK_PERIOD : 1000,
 		nodeLastSelectedTime : null,
 		nodeLastSelectedId : null,
@@ -16,6 +18,7 @@ var ldTreeview = {
 				showBorder : false,
 				expandIcon : 'fa fa-folder',
 				collapseIcon : 'fa fa-folder-open',
+				emptyIcon : '',
 				lazyLoad : true,
 				lazyLoadFunction : function(parentNode, callback, options) {
 					callback(parentNode, ldTreeview.getFolderContents(parentNode), options);
@@ -36,7 +39,7 @@ var ldTreeview = {
 				url : LAMS_URL + 'home/getFolderContents.do',
 				data : {
 					'folderID' : folderID,
-					'allowInvalidDesigns' : true
+					'allowInvalidDesigns' : this.allowInvalidDesigns
 				},
 				cache : false,
 				async: false,
@@ -114,14 +117,14 @@ var ldTreeview = {
 		 */
 		selectFolder :  function(folder) {
 			// if there are no children or stop condition (no path) was reached
-			if (!folder.nodes || folder.nodes.length === 0 || layout.folderPathCurrent == null) {
+			if (!this.preselectedFolderPath || !folder.nodes || folder.nodes.length === 0) {
 				return;
 			}
 			var chosenFolder = null;
 			// are there any steps left?
-			if (layout.folderPathCurrent.length > 0) {
+			if (this.preselectedFolderPath.length > 0) {
 				// look for target folder in children
-				var folderID = layout.folderPathCurrent.shift();
+				var folderID = this.preselectedFolderPath.shift();
 				$.each(folder.nodes, function(index, child){
 					if (folderID == child.folderID) {
 						chosenFolder = child;
@@ -130,8 +133,8 @@ var ldTreeview = {
 				});
 			}
 			// if last piece of folder path was consumed, set stop condition
-			if (layout.folderPathCurrent.length === 0) {
-				layout.folderPathCurrent = null;
+			if (this.preselectedFolderPath.length === 0) {
+				this.preselectedFolderPath = null;
 			}
 			// no folder found or path was empty from the beginning
 			if (!chosenFolder) {

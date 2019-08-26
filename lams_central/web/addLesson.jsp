@@ -8,26 +8,22 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	<link rel="stylesheet" href="${lams}css/yui/treeview.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="${lams}css/yui/folders.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="${lams}css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${lams}css/bootstrap-treeview.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="${lams}css/addLesson.css" type="text/css" media="screen" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/yui/yahoo-dom-event.js" ></script>
-	<script type="text/javascript" src="${lams}includes/javascript/yui/animation-min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/yui/json-min.js" ></script> 
-	<script type="text/javascript" src="${lams}includes/javascript/yui/treeview-min.js" ></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-treeview.js" ></script>
+	<script type="text/javascript" src="${lams}includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/addLesson.js"></script>
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>',
-			folderContents = ${folderContents},
 			users = ${users},
 			
 			LAMS_URL = '<lams:LAMSURL/>',

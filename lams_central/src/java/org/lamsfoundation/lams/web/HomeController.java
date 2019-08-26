@@ -258,9 +258,6 @@ public class HomeController {
 	    return null;
 	}
 
-	// get all user accessible folders and LD descriptions as JSON
-	String folderContentsJSON = workspaceManagementService.getFolderContentsJSON(null, userDTO.getUserID(), false);
-	req.setAttribute("folderContents", folderContentsJSON);
 	ObjectNode users = JsonNodeFactory.instance.objectNode();
 
 	// get learners available for newly created lesson

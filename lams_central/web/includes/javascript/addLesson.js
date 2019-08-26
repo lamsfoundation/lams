@@ -18,74 +18,33 @@ function doSelectTab(tabId) {
  * Sets up widgets on the main.jsp page
  */
 function initLessonTab(){
+	tree = $('#learningDesignTree');
 	
-	// generate LD initial tree; folderContents is declared in newLesson.jsp
-	var treeNodes = parseFolderContents(folderContents);
-	// there should be no focus, just highlight
-	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
-	tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
-	tree.setDynamicLoad(function(node, callback){
-		// load subfolder contents
-		$.ajax({
-			url : LAMS_URL + 'home/getFolderContents.do',
-			data : {
-				'folderID' : node.data.folderID
-			},
-			cache : false,
-			async: false,
-			dataType : 'json',
-			success : function(result) {
-				var childNodeData = parseFolderContents(result);
-				$.each(childNodeData, function(){
-						new YAHOO.widget.TextNode(this, node);
-					});
+	ldTreeview.init('#learningDesignTree', 
+	   function(event, node) {
+			$('.ldChoiceDependentCanvasElement').css('display', 'none');
+			if (node.state.selected && node.learningDesignId) {
+				$('#lessonNameInput').val(node.label);
+				//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
+				if (isElementInViewport($('#lessonNameInput'))) {
+					$('#lessonNameInput').focus();
 				}
+				// display "loading" animation and finally LD thumbnail
+				loadLearningDesignSVG(node.learningDesignId);
+			} else {
+				$('#lessonNameInput').val(null);
+				toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 			}
-		);
-		
-		// required by YUI
-		callback();
-	});
-	
-	tree.singleNodeHighlight = true;
-	tree.subscribe('clickEvent', function(event) {
-		// if it's a folder - do not select it. if design is already selected - do not allow deselecting it on subsequent click
-		if (!event.node.data.learningDesignId || event.node.highlightState == 1) {
-			return false;
-		}
-		
-		$('#lessonNameInput').val(event.node.label);
-		//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
-		if (isElementInViewport($('#lessonNameInput'))) {
-			$('#lessonNameInput').focus();
-		}
-		
-		// display "loading" animation and finally LD thumbnail
-		$('.ldChoiceDependentCanvasElement').css('display', 'none');
-		if (event.node.highlightState == 0) {
-			loadLearningDesignSVG(event.node.data.learningDesignId);
-		} else {
-			toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
-		}
-	});
-	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
-	tree.subscribe('dblClickEvent', function(event){
-		
-		// if it's a folder - do not select it
-		if (!event.node.data.learningDesignId) {
-			return false;
-		}
-		
-		//trigger "clickEvent" first so that addLesson() function will know which element is selected 
-		tree.fireEvent("clickEvent", event);
-		
-		// start lesson
-		addLesson();
-	});
-	tree.render();
-	
-	// expand the first (user) folder
-	tree.getRoot().children[0].expand();
+		},
+	  function(event, node) {
+			// if it's a folder - do nothing
+			if (!node.learningDesignId) {
+				return false;
+			}
+			
+			// start lesson
+			addLesson();
+	  });
 	
 	// ability to start a lesson on pressing Enter button in a lesson name input
 	$('#lessonNameInput').on('keyup', function (e) {
@@ -321,13 +280,13 @@ function addLesson(){
 		$('#lessonNameInput').removeClass('errorBorder');
 	}
 	
-	var ldNode = tree.getHighlightedNode();
-	if (!ldNode || !ldNode.data.learningDesignId) {
+	var ldNode = tree.treeview('getSelected')[0];
+	if (!ldNode || !ldNode.learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
 	}
-	$('#ldIdField').val(ldNode.data.learningDesignId);
+	$('#ldIdField').val(ldNode.learningDesignId);
 	
 	if (lessonName){
 		var nameValidator = /^[^<>^*@%$]*$/igm;	
@@ -395,11 +354,11 @@ function addLesson(){
 }
 
 function previewLesson(){
-	var ldNode = tree.getHighlightedNode(),
+	var ldNode = tree.treeview('getSelected')[0],
 		popupWidth = 1280,
 		popupHeight = 720;
 
-	if (!ldNode || !ldNode.data.learningDesignId) {
+	if (!ldNode || !ldNode.learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
@@ -409,7 +368,7 @@ function previewLesson(){
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/initializeLesson.do',
 		data : {
-			'learningDesignID' : ldNode.data.learningDesignId,
+			'learningDesignID' : ldNode.learningDesignId,
 			'copyType' : 3,
 			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
 		},
@@ -557,35 +516,6 @@ function toggleCanvasResize(mode) {
 		resizeSequenceThumbnail(true);
 		break;
 	}
-}
-
-
-/**
- * Parses response in JSON format into readable for YUI.
- */
-function parseFolderContents(nodeJSON) {
-	var result = [];
-
-	if (nodeJSON.folders) {
-		$.each(nodeJSON.folders, function(){
-			result.push({'type'            : 'text',
-					  	 'label'           : this.isRunSequencesFolder ?
-					  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
-					  	 'folderID'		   : this.folderID
-						 });
-		});
-	}
-	if (nodeJSON.learningDesigns) {
-		$.each(nodeJSON.learningDesigns, function(){
-			result.push({'type'             : 'text',
-			  	         'label'            : this.name,
-			  	         'isLeaf'           : true,
-			  	         'learningDesignId' : this.learningDesignId
-				        });
-		});
-	}
-	
-	return result;
 }
 
 // ********** CLASS TAB FUNCTIONS **********
