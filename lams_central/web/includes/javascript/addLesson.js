@@ -20,9 +20,15 @@ function doSelectTab(tabId) {
 function initLessonTab(){
 	tree = $('#learningDesignTree');
 	
+	// customise treeview label
+	ldTreeview.LABEL_RUN_SEQUENCES_FOLDER = LABEL_RUN_SEQUENCES_FOLDER;
+	
 	ldTreeview.init('#learningDesignTree', 
 	   function(event, node) {
+			// hide existing LD image
 			$('.ldChoiceDependentCanvasElement').css('display', 'none');
+			
+			// if a LD is selected
 			if (node.state.selected && node.learningDesignId) {
 				$('#lessonNameInput').val(node.label);
 				//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
@@ -32,18 +38,21 @@ function initLessonTab(){
 				// display "loading" animation and finally LD thumbnail
 				loadLearningDesignSVG(node.learningDesignId);
 			} else {
+				// a folder got selected or LD got deselected
 				$('#lessonNameInput').val(null);
 				toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 			}
 		},
 	  function(event, node) {
-			// if it's a folder - do nothing
-			if (!node.learningDesignId) {
-				return false;
+			if (!node.learningDesignId){
+				if (!node.state.expanded) {
+					ldTreeview.refresh(tree, node);
+				}
+				return;
 			}
 			
 			// start lesson
-			addLesson();
+			addLesson(node.learningDesignId, node.label);
 	  });
 	
 	// ability to start a lesson on pressing Enter button in a lesson name input
@@ -269,24 +278,30 @@ function initConditionsTab(){
 }
 
 
-function addLesson(){
+function addLesson(learningDesignId, lessonName){
 	// prevent double clicking of Add button
 	if (submitInProgress) {
 		return;
 	}
 	// some validation at first
-	var lessonName = $('#lessonNameInput').val();
+	if (!lessonName) {
+		lessonName = $('#lessonNameInput').val();
+	}
 	if (lessonName){
 		$('#lessonNameInput').removeClass('errorBorder');
 	}
 	
-	var ldNode = tree.treeview('getSelected')[0];
-	if (!ldNode || !ldNode.learningDesignId) {
+	if (!learningDesignId) {
+		var ldNode = tree.treeview('getSelected')[0];
+		learningDesignId = ldNode.learningDesignId;
+	}
+	
+	if (!learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
 	}
-	$('#ldIdField').val(ldNode.learningDesignId);
+	$('#ldIdField').val(learningDesignId);
 	
 	if (lessonName){
 		var nameValidator = /^[^<>^*@%$]*$/igm;	

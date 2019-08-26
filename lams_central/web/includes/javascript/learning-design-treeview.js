@@ -1,45 +1,65 @@
 var ldTreeview = {
+		// for authoring, we show invalid designs
+		// for add lesson and other places we need to choose a real LD, we hide them
 		allowInvalidDesigns : false,
-		preselectedFolderPath : null,
+		// for simulating double click as treeview does not support it
 		DOUBLE_CLICK_PERIOD : 1000,
 		nodeLastSelectedTime : null,
 		nodeLastSelectedId : null,
+		// reference to the rendered treeview
 		ldTree : null,
+		// can be i18n
+		LABEL_RUN_SEQUENCES_FOLDER : 'Run sequences',
 		
+		
+		/**
+		 * Initialises a Learning Design treeview
+		 */
 		init : function(targetElementSelector, onNodeClick, onNodeDblClick) {
-			var ldTree = $(targetElementSelector);
-			this.ldTree = ldTree;
+			this.ldTree = $(targetElementSelector);
 			
+			// get top level folders
 			var mainFolders = ldTreeview.getFolderContents();
+			// get contents of the first folder
 			mainFolders[0].nodes = ldTreeview.getFolderContents(mainFolders[0]);
 		
-			ldTree.treeview({
+			// initialise the treeview
+			this.ldTree.treeview({
 				data : mainFolders,
 				showBorder : false,
+				// use Font Awesome icons
 				expandIcon : 'fa fa-folder',
 				collapseIcon : 'fa fa-folder-open',
 				emptyIcon : '',
+				// this has been added to treeview in pull request #350
+				// the JS script was then additionally customised for LAMS
 				lazyLoad : true,
 				lazyLoadFunction : function(parentNode, callback, options) {
 					callback(parentNode, ldTreeview.getFolderContents(parentNode), options);
-					ldTreeview.selectFolder(parentNode);
 				},
+				// run same function on any click
 				onNodeSelected   : function(event, node){ldTreeview.onClickInternal(event, node, onNodeClick, onNodeDblClick)},
 				onNodeUnselected : function(event, node){ldTreeview.onClickInternal(event, node, onNodeClick, onNodeDblClick)}
 			});
 		},
 		
+		/**
+		 * Fetches folders and LDs from back end and parses them for treeview
+		 */
 		getFolderContents : function(folder) {
+			// if folder is NULL, then we fetch top folders
 			var folderID = folder ? folder.folderID : null,
 				canSave = folder ? folder.canSave : null,
 				canHaveReadOnly = folder ? folder.canHaveReadOnly : null,
+				allowInvalidDesigns = this.allowInvalidDesigns,
+				runSequencesFolderLabel = this.LABEL_RUN_SEQUENCES_FOLDER,
 				result = [];
 				
 			$.ajax({
 				url : LAMS_URL + 'home/getFolderContents.do',
 				data : {
 					'folderID' : folderID,
-					'allowInvalidDesigns' : this.allowInvalidDesigns
+					'allowInvalidDesigns' : allowInvalidDesigns
 				},
 				cache : false,
 				async: false,
@@ -50,7 +70,7 @@ var ldTreeview = {
 						$.each(response.folders, function(index){
 							// folderID == -2 is courses folder
 							var canSave = this.folderID > 0 && !this.isRunSequencesFolder;
-							result.push({'text'                : (this.isRunSequencesFolder ? LABELS.RUN_SEQUENCES_FOLDER : this.name)
+							result.push({'text'                : (this.isRunSequencesFolder ? runSequencesFolderLabel : this.name)
 																	+ (canSave ? '' : ' <i class="fa fa-lock"></i>'),
 										 'nodes'			   : [],
 									  	 'folderID'		       : this.folderID,
@@ -77,23 +97,36 @@ var ldTreeview = {
 				}
 			});
 			
+			// if folder is empty, we need to shift its icon a bit to the right 
 			if (result.length === 0) {
-				folder.icon = 'fa fa-folder-open roffset10';
+				folder.icon = 'fa fa-folder-open treeview-empty';
 			}
 			return result;
 		},
 		
+		/**
+		 * Closes a folder and opens it again, fetching fresh data from server.
+		 * Treeview library had to be customised for this.
+		 */
 		refresh : function(ldTree, node) {
 			node = ldTree.treeview('getNode', node.nodeId);
 			node.nodes = [];
 			ldTree.treeview('collapseNode', node);
+			// toggleNode was hidded in the original script
+			// 'refresh' was not recognised in the original script
 			ldTree.treeview('toggleNode', ['refresh', node]);
 		},
 		
+		/**
+		 * Handler for a click.
+		 * It detects and simulates a double click too. 
+		 */
 		onClickInternal : function(event, node, onNodeClick, onNodeDblClick) {
+			// node deselected or other node selected
 			if (event.type != 'nodeSelected' && this.nodeLastSelectedId !== node.nodeId){
 				this.nodeLastSelectedTime = null;
 			}
+			// if there is no double click handler or the node was deselected, just run the single click
 			if (!onNodeDblClick || event.type != 'nodeSelected') {
 				if (onNodeClick) {
 					onNodeClick(event, node);
@@ -101,6 +134,7 @@ var ldTreeview = {
 				return;
 			}
 			
+			// if user selected the same node again withing a given timeout, simulate double click
 			var currentTimestamp = event.timeStamp;
 			if (this.nodeLastSelectedId == node.nodeId &&
 				this.nodeLastSelectedTime && currentTimestamp - this.nodeLastSelectedTime < this.DOUBLE_CLICK_PERIOD) {
@@ -108,41 +142,8 @@ var ldTreeview = {
 			} else if (onNodeClick){
 				onNodeClick(event, node);
 			}
+			// update counters for next click
 			this.nodeLastSelectedTime = currentTimestamp;
 			this.nodeLastSelectedId = node.nodeId;
-		},
-		
-		/**
-		 * Highlights the folder where existing LD already resides
-		 */
-		selectFolder :  function(folder) {
-			// if there are no children or stop condition (no path) was reached
-			if (!this.preselectedFolderPath || !folder.nodes || folder.nodes.length === 0) {
-				return;
-			}
-			var chosenFolder = null;
-			// are there any steps left?
-			if (this.preselectedFolderPath.length > 0) {
-				// look for target folder in children
-				var folderID = this.preselectedFolderPath.shift();
-				$.each(folder.nodes, function(index, child){
-					if (folderID == child.folderID) {
-						chosenFolder = child;
-						return false;
-					}
-				});
-			}
-			// if last piece of folder path was consumed, set stop condition
-			if (this.preselectedFolderPath.length === 0) {
-				this.preselectedFolderPath = null;
-			}
-			// no folder found or path was empty from the beginning
-			if (!chosenFolder) {
-				return;
-			}
-			// if folder, highlight and expand
-			if (!chosenFolder.isLeaf) {
-				ldTree.treeview('selectNode', chosenFolder);
-			}
 		}
 }
