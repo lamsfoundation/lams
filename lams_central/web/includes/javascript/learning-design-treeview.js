@@ -20,8 +20,6 @@ var ldTreeview = {
 			
 			// get top level folders
 			var mainFolders = ldTreeview.getFolderContents();
-			// get contents of the first folder
-			mainFolders[0].nodes = ldTreeview.getFolderContents(mainFolders[0]);
 		
 			// initialise the treeview
 			this.ldTree.treeview({
@@ -41,6 +39,9 @@ var ldTreeview = {
 				onNodeSelected   : function(event, node){ldTreeview.onClickInternal(event, node, onNodeClick, onNodeDblClick)},
 				onNodeUnselected : function(event, node){ldTreeview.onClickInternal(event, node, onNodeClick, onNodeDblClick)}
 			});
+			
+			ldTreeview.refresh(this.ldTree, this.ldTree.treeview('getNode', 0));
+			this.ldTree.treeview('expandNode', 0);
 		},
 		
 		/**
@@ -78,8 +79,7 @@ var ldTreeview = {
 									  	 // either take parent's setting or take 2nd (courses) and 3rd (public) folder 
 									  	 'canHaveReadOnly'	   : folderID ? canHaveReadOnly : index > 0,
 									  	 'canSave'		       : canSave,
-							  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder
-										});
+							  	         'canModify'	       : this.canModify && !this.isRunSequenceFolder										});
 						});
 					}
 					if (response.learningDesigns) {
