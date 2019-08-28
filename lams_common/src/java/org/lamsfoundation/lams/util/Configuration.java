@@ -268,6 +268,11 @@ public class Configuration implements InitializingBean {
 
 	for (int i = 0; i < originalList.size(); i++) {
 	    ConfigurationItem item = originalList.get(i);
+	    if (StringUtils.isBlank(item.getDescriptionKey())) {
+		// mechanism added for LKC-213; if a configuration key does not have a description, it does not show in config screen
+		// it can still be used by back end
+		continue;
+	    }
 	    String header = item.getHeaderName();
 
 	    switch (filter) {

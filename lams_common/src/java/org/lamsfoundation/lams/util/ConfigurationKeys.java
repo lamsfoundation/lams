@@ -302,4 +302,7 @@ public class ConfigurationKeys {
     public static String QB_MONITORS_READ_ONLY = "QbMonitorsReadOnly";
     public static String QB_STATS_MIN_PARTICIPANTS = "QbStatsMinParticipants";
     public static String QB_STATS_GROUP_SIZE = "QbStatsGroupSize";
+    
+    // LKC-213 LKC Workflow Automation
+    public static String WORKFLOW_AUTOMATION_ENABLE = "WorkflowAutomationEnable";
 }
