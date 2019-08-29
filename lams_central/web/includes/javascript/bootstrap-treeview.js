@@ -17,6 +17,11 @@
  * limitations under the License.
  * ========================================================= */
 
+
+/*
+ * Modified for LAMS. Look for "LAMS" string in the file contents. 
+ */
+
 ;(function ($, window, document, undefined) {
 
   /*global jQuery, console*/
