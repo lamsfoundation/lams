@@ -1014,9 +1014,9 @@ public class IntegrationService implements IIntegrationService {
 	    String extUserId = member.get("userId").asText();
 	    //to address Moodle version 3.7.1 bug
 	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
-		    : member.get("giveName").asText();
+		    : member.get("givenName").asText();
 	    String lastName = member.get("familyName").asText();
-	    String fullName = member.get("name").asText();
+//	    String fullName = member.get("name").asText();
 	    String email = member.get("email").asText();
 	    // Set the user country and lang
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
