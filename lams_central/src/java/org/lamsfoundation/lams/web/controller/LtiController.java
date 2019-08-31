@@ -415,6 +415,7 @@ public class LtiController {
 	ObjectNode lineItem = JsonNodeFactory.instance.objectNode();
 	lineItem.put("reportingMethod", "http://purl.imsglobal.org/ctx/lis/v2p1/Result#totalScore");
 	lineItem.put("@type", "LineItem");
+	lineItem.put("label", lesson.getLessonName());
 	ObjectNode assignedActivity = JsonNodeFactory.instance.objectNode();
 	assignedActivity.put("activityId", key + "_" + lesson.getLessonId().toString());
 	lineItem.set("assignedActivity", assignedActivity);
