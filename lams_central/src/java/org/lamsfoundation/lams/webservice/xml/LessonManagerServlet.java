@@ -928,7 +928,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    if (StringUtils.isNotBlank(userName)) {
 //			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lessonId,
 //				userName, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
-			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lessonId,
+			integrationService.addExtUserToCourseAndLesson(extServer, LoginRequestDispatcher.METHOD_LEARNER, lessonId,
 				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;
@@ -946,7 +946,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			integrationService.addExtUserToLesson(extServer, LoginRequestDispatcher.METHOD_MONITOR, lessonId,
+			integrationService.addExtUserToCourseAndLesson(extServer, LoginRequestDispatcher.METHOD_MONITOR, lessonId,
 				userName, firstName, lastName, email, courseId, country, locale);
 		    }
 		    i++;

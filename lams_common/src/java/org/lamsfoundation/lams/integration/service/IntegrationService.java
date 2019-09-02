@@ -871,12 +871,12 @@ public class IntegrationService implements IIntegrationService {
     }
     
     @Override
-    public ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, Long lesssonId, String username,
-	    String firstName, String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
+    public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
+	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
+	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId + "'.");
 	}
 
 	ExtUserUseridMap userMap = null;
@@ -890,10 +890,25 @@ public class IntegrationService implements IIntegrationService {
 	}
 
 	// adds user to group
-	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, courseId, null, method);
+	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
 	//TODO when merging to newer branch, check and maybe change to the following
 //		getExtCourseClassMap(extServer, userMap, courseId, countryIsoCode, langIsoCode, null,
 //		method);
+
+	return userMap;
+    }
+    
+    @Override
+    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId, String username,
+	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException {
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
+	}
+	
+	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email, extCourseId,
+		countryIsoCode, langIsoCode);
 
 	User user = userMap.getUser();
 	if (user == null) {
@@ -953,7 +968,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
+    public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
 	    throws IOException, UserInfoFetchException, UserInfoValidationException {
 	
 	String membershipUrl = extServer.getMembershipUrl();
@@ -968,16 +983,6 @@ public class IntegrationService implements IIntegrationService {
         log.debug("Make a call to remote membershipUrl:" + membershipUrl);
         HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
         ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
-//	request.setEntity(new StringEntity(xml, "UTF-8"));
-//	ltiServiceGetRequest.setAdditionalParameters(parameters);
-//        if (empty($data)) {
-//            if (!empty($type)) {
-//                $header .= "\nAccept: {$type}";
-//            }
-//        } else if (isset($type)) {
-//            $header .= "\nContent-Type: {$type}";
-//            $header .= "\nContent-Length: " . strlen($data);
-//        }
 
 	LtiSigner ltiSigner = new LtiOauthSigner();
 	try {
@@ -1033,8 +1038,13 @@ public class IntegrationService implements IIntegrationService {
 	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
 		    ? LoginRequestDispatcher.METHOD_MONITOR
 		    : LoginRequestDispatcher.METHOD_LEARNER;
-	    ExtUserUseridMap extUser = addExtUserToLesson(extServer, method, lessonId, extUserId, firstName, lastName,
-		    email, courseId, countryIsoCode, langIsoCode);
+	    
+	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
+	    ExtUserUseridMap extUser = lessonId == null
+		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
+			    countryIsoCode, langIsoCode)
+		    : addExtUserToCourseAndLesson(extServer, method, lessonId, extUserId, firstName, lastName, email,
+			    courseId, countryIsoCode, langIsoCode);
 
 	    // If a result sourcedid is provided, save it to the user object
 	    JsonNode messages = membership.get("message");

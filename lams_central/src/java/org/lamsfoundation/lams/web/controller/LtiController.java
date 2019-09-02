@@ -131,6 +131,10 @@ public class LtiController {
 	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
 		    && !lesson.getOrganisation().getOrganisationId().equals(currentOrganisationId);
 	    if (isLessonCopyRequired) {
+		
+		//add users to the course
+		integrationService.addUsersUsingMembershipService(extServer, null, extCourseId, resourceLinkId);
+		
 		// clone lesson
 		Integer creatorId = lesson.getUser().getUserId();
 		Long newLessonId = monitoringService.cloneLesson(lesson.getLessonId(), creatorId, true, true, null, null,
@@ -258,7 +262,7 @@ public class LtiController {
 	String title = request.getParameter(CentralConstants.PARAM_TITLE);
 	String desc = request.getParameter(CentralConstants.PARAM_DESC);
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
+	String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	Integer organisationId = WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID);
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
@@ -294,7 +298,7 @@ public class LtiController {
 	// store information which extServer has started the lesson
 	integrationService.createExtServerLessonMap(lessonId, resourceLinkId, extServer);
 	
-	integrationService.addExtUsersToLesson(extServer, lessonId, contextId, resourceLinkId);
+	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId);
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -330,7 +334,7 @@ public class LtiController {
 	    String redirectURL = "redirect:/lti/learnerMonitor.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, LtiUtils.OAUTH_CONSUMER_KEY, consumerKey);
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.RESOURCE_LINK_ID, resourceLinkId);
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.CONTEXT_ID, contextId);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.CONTEXT_ID, extCourseId);
 	    return redirectURL;
 	}
     }
