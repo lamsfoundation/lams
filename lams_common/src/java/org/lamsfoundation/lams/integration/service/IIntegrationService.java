@@ -233,7 +233,7 @@ public interface IIntegrationService {
 
     ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
 
-    ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, String lsIdStr, String username, String firstName,
+    ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, Long lessonId, String username, String firstName,
 	    String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException;
 

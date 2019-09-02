@@ -871,12 +871,12 @@ public class IntegrationService implements IIntegrationService {
     }
     
     @Override
-    public ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, String lsIdStr, String username,
+    public ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, Long lesssonId, String username,
 	    String firstName, String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
+	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
 	}
 
 	ExtUserUseridMap userMap = null;
@@ -889,7 +889,6 @@ public class IntegrationService implements IIntegrationService {
 		    email, usePrefix, isUpdateUserDetails);
 	}
 
-	// ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 	// adds user to group
 	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, courseId, null, method);
 	//TODO when merging to newer branch, check and maybe change to the following
@@ -904,9 +903,9 @@ public class IntegrationService implements IIntegrationService {
 	}
 
 	if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
-	    lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
+	    lessonService.addLearner(lesssonId, user.getUserId());
 	} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-	    lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
+	    lessonService.addStaffMember(lesssonId, user.getUserId());
 	}
 
 	return userMap;
@@ -1034,10 +1033,10 @@ public class IntegrationService implements IIntegrationService {
 	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
 		    ? LoginRequestDispatcher.METHOD_MONITOR
 		    : LoginRequestDispatcher.METHOD_LEARNER;
-	    ExtUserUseridMap extUser = addExtUserToLesson(extServer, method, lessonId.toString(), extUserId, firstName,
-		    lastName, email, courseId, countryIsoCode, langIsoCode);
+	    ExtUserUseridMap extUser = addExtUserToLesson(extServer, method, lessonId, extUserId, firstName, lastName,
+		    email, courseId, countryIsoCode, langIsoCode);
 
-	    // If a result sourcedid is providedm, save it to the user object
+	    // If a result sourcedid is provided, save it to the user object
 	    JsonNode messages = membership.get("message");
 	    if (messages != null && messages.size() > 0) {
 		for (int k = 0; k < messages.size(); k++) {
