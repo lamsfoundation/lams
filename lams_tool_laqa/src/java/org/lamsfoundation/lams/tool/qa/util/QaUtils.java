@@ -25,64 +25,14 @@ package org.lamsfoundation.lams.tool.qa.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Common utility functions live here.
  *
  * @author Ozgur Demirtas
  */
-public abstract class QaUtils implements QaAppConstants {
-
-    public static void setFormProperties(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
-	    String strToolContentID, String httpSessionID) {
-
-	qaAuthoringForm.setHttpSessionID(httpSessionID);
-
-	qaAuthoringForm.setToolContentID(strToolContentID);
-
-	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
-	qaAuthoringForm.setUsernameVisible(usernameVisible);
-
-	String allowRateAnswers = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
-	qaAuthoringForm.setAllowRateAnswers(allowRateAnswers);
-
-	String notifyTeachersOnResponseSubmit = request.getParameter(QaAppConstants.NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
-	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmit);
-
-	String showOtherAnswers = request.getParameter("showOtherAnswers");
-	qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);
-
-	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
-	qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
-
-	String lockWhenFinished = request.getParameter("lockWhenFinished");
-	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
-
-	int minimumRates = WebUtil.readIntParam(request, QaAppConstants.MINIMUM_RATES, true) == null ? 0
-		: WebUtil.readIntParam(request, QaAppConstants.MINIMUM_RATES);
-	qaAuthoringForm.setMinimumRates(minimumRates);
-
-	int maximumRates = WebUtil.readIntParam(request, QaAppConstants.MAXIMUM_RATES, true) == null ? 0
-		: WebUtil.readIntParam(request, QaAppConstants.MAXIMUM_RATES);
-	qaAuthoringForm.setMaximumRates(maximumRates);
-
-	String reflect = request.getParameter(QaAppConstants.REFLECT);
-
-	qaAuthoringForm.setReflect(reflect);
-
-	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
-
-	qaAuthoringForm.setReflectionSubject(reflectionSubject);
-
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-    }
-
+public abstract class QaUtils {
     /**
      * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and ACTIVITY_TITLE ACTIVITY_INSTRUCTIONS
      * cleanUpSessionAbsolute(HttpServletRequest request)
@@ -91,15 +41,7 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static void cleanUpSessionAbsolute(HttpServletRequest request) {
 	request.getSession().removeAttribute(QaAppConstants.MY_SIGNATURE);
-	request.getSession().removeAttribute(QaAppConstants.AUTHORING_STARTER);
-	request.getSession().removeAttribute(QaAppConstants.LOAD_LEARNER);
-	request.getSession().removeAttribute(QaAppConstants.LEARNING_STARTER);
-	request.getSession().removeAttribute(QaAppConstants.MONITORING_STARTER);
-	request.getSession().removeAttribute(QaAppConstants.EDITABLE_RESPONSE_ID);
-	request.getSession().removeAttribute(QaAppConstants.COPY_TOOL_CONTENT);
 	request.getSession().removeAttribute(QaAppConstants.TOOL_SESSION_ID);
-	request.getSession().removeAttribute(QaAppConstants.LOAD_QUESTIONS);
-	request.getSession().removeAttribute(QaAppConstants.LOAD_STARTER);
 	request.getSession().removeAttribute(QaAppConstants.LEARNING_MODE);
 	request.getSession().removeAttribute(QaAppConstants.IS_ADD_QUESTION);
 	request.getSession().removeAttribute(QaAppConstants.IS_REMOVE_QUESTION);
@@ -159,29 +101,6 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(QaAppConstants.CURRENT_ANSWER);
 	request.getSession().removeAttribute(QaAppConstants.DEFINE_LATER);
 	request.getSession().removeAttribute(QaAppConstants.SOURCE_MC_STARTER);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT_VIEWONLY);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_PREVIEW);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT_PROGRESS);
-
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_WRONG_FORMAT);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_UNCOMPATIBLE_IDS);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_NUMBERFORMAT);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_USER_DOESNOTEXIST);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_CONTENTID_REQUIRED);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_TOOLSESSIONID_REQUIRED);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_USERID_NOTAVAILABLE);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_USERID_NOTNUMERIC);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_USERID_EXISTING);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_NO_TOOL_SESSIONS);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_NO_STUDENT_ACTIVITY);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_CONTENT_IN_USE);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_MODE_REQUIRED);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_MODE_INVALID);
-	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_QUESTIONS_DUPLICATE);
     }
 
 }

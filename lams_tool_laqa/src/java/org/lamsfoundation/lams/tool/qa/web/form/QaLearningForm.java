@@ -42,7 +42,7 @@ public class QaLearningForm implements QaAppConstants {
     protected String forwardtoReflection;
 
     protected String totalQuestionCount;
-    protected String httpSessionID;
+    protected String sessionMapID;
     protected String toolSessionID;
     protected String questionIndex;
     protected String userID;
@@ -294,18 +294,18 @@ public class QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the httpSessionID.
+     * @return Returns the sessionMapID.
      */
-    public String getHttpSessionID() {
-	return httpSessionID;
+    public String getSessionMapID() {
+	return sessionMapID;
     }
 
     /**
-     * @param httpSessionID
-     *            The httpSessionID to set.
+     * @param sessionMapID
+     *            The sessionMapID to set.
      */
-    public void setHttpSessionID(String httpSessionID) {
-	this.httpSessionID = httpSessionID;
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
     }
 
     /**

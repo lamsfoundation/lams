@@ -54,7 +54,7 @@
 	<c:if test="${question.hedgingJustificationEnabled}">
 		<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select margin-top-minus-10"
 						disabled="disabled" rows="4" cols="60">
-			<c:out value="${question.answerString}" />
+			<c:out value="${question.answer}" />
 		</lams:textarea>
 	</c:if>
 	

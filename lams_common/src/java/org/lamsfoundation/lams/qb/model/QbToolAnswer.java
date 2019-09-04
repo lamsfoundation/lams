@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  *
  * @author Marcin Cieslak
@@ -25,6 +28,9 @@ public abstract class QbToolAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long uid;
 
+    @Column
+    protected String answer;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "tool_question_uid")
     protected QbToolQuestion qbToolQuestion;
@@ -32,6 +38,18 @@ public abstract class QbToolAnswer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qb_option_uid")
     protected QbOption qbOption;
+
+    public Long getUid() {
+	return this.uid;
+    }
+
+    public String getAnswer() {
+	return answer;
+    }
+
+    public void setAnswer(String answer) {
+	this.answer = answer;
+    }
 
     public QbToolQuestion getQbToolQuestion() {
 	return qbToolQuestion;
@@ -49,7 +67,21 @@ public abstract class QbToolAnswer {
 	this.qbOption = qbOption;
     }
 
-    public Long getUid() {
-	return this.uid;
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(getUid()).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (!(obj instanceof QbToolAnswer)) {
+	    return false;
+	}
+
+	QbToolAnswer other = (QbToolAnswer) obj;
+	return new EqualsBuilder().append(this.getUid(), other.getUid()).isEquals();
     }
 }

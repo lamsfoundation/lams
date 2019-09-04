@@ -67,18 +67,18 @@
 							</table>
 						</c:when>
 						<c:when test="${question.type == 3}">
-							${questionResult.answerString}
+							${questionResult.answer}
 						</c:when>
 						<c:when test="${question.type == 4}">
-							${questionResult.answerString}
+							${questionResult.answer}
 						</c:when>
 						<c:when test="${question.type == 5}">
-							<c:if test="${questionResult.answerString != null}">			
+							<c:if test="${questionResult.answer != null}">			
 								${questionResult.answerBoolean}
 							</c:if>
 						</c:when>
 						<c:when test="${question.type == 6}">
-							${questionResult.answerString}
+							${questionResult.answer}
 						</c:when>
 						<c:when test="${question.type == 7}">
 							<c:forEach var="i" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">

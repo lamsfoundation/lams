@@ -3,7 +3,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
 
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 <c:set var="qaContent" value="${content}" />
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -352,7 +352,7 @@
 	
 	<form:hidden path="currentUid"/>
 	<form:hidden path="toolContentID"/>
-	<form:hidden path="httpSessionID"/>					
+	<form:hidden path="sessionMapID"/>					
 	<form:hidden path="contentFolderID"/>	
 	
 	<lams:Page title="${title}" type="navbar">

@@ -46,14 +46,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
+ * Holds tool sessions
  *
  * @author Ozgur Demirtas
- *
- *         QaSession Value Object The value object that maps to our model database
- *         table: tl_laqa11_session The relevant hibernate mapping resides in:
- *         QaSession.hbm.xml
- *
- *         Holds tool sessions
+ * 
  */
 @Entity
 @Table(name = "tl_laqa11_session")

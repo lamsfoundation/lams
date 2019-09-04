@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="httpSessionID" value="${authoringForm.httpSessionID}" />
-<c:set var="sessionMap" value="${sessionScope[httpSessionID]}" />
+<c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <style>
 	#question-bank-div {
@@ -8,9 +8,6 @@
 	}
 	#add-question-div {
 		margin-top: -5px;
-	}
-	#messageArea {
-		margin-top: 60px;
 	}
 </style>
 
@@ -21,7 +18,7 @@
 			$('#question-bank-collapse.contains-nothing').load(
 				"<lams:LAMSURL/>/searchQB/start.do",
 				{
-					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?httpSessionID=${authoringForm.httpSessionID}",
+					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${authoringForm.sessionMapID}",
 					toolContentId: ${sessionMap.toolContentID}
 				},
 				function() {
@@ -31,59 +28,57 @@
 		})
 	});
 
-	/**
-	 * Launches the popup window for the instruction files
-	 */
-	function showMessage(url) {
-		 $.ajaxSetup({ cache: true });
-		 $("#messageArea").load(url, function() {
-			 $(this).show("fast");
-			 $('#saveCancelButtons, #question-bank-div, #addTopic').hide();
-		 });
-		location.hash = "messageArea";
-	}
-	function hideMessage(){
-		 $("#messageArea").hide();
-		 $('#saveCancelButtons, #question-bank-div, #addTopic').show();
-	}
-	
+	var itemTargetDiv = "#itemArea";
 	function removeQuestion(questionIndex){
-		document.forms.authoringForm.questionIndex.value=questionIndex;
-        submitMethod('removeQuestion');
+		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+		
+		if (deletionConfirmed) {
+			var url = "<c:url value="/authoring/removeQuestion.do"/>";
+			$(itemTargetDiv).load(
+				url,
+				{
+					questionIndex: questionIndex,
+					sessionMapID: "${sessionMapID}"
+				},
+				function(){
+					refreshThickbox();
+				}
+			);
+		};
 	}
 
-	function submitMessage(){
-		if ( typeof CKEDITOR !== 'undefined' ) {
-			for ( instance in CKEDITOR.instances )
-				CKEDITOR.instances[instance].updateElement();
-		}
-
-		var formData = new FormData(document.getElementById("newQuestionForm"));
-		
-	    $.ajax({ // create an AJAX call...
-			data: formData, 
-	        processData: false, // tell jQuery not to process the data
-	        contentType: false, // tell jQuery not to set contentType
-           	type: $("#newQuestionForm").attr('method'),
-			url: $("#newQuestionForm").attr('action'),
-			success: function(data) {
-				$('#itemArea').html($(data).find('#itemList'));
-				hideMessage();
+	function moveQuestion(questionIndex, actionMethod){
+		var url = "<c:url value="/authoring/"/>" + actionMethod + ".do";
+		$(itemTargetDiv).load(
+			url,
+			{
+				questionIndex: questionIndex,
+				sessionMapID: "${sessionMapID}"
+			},
+			function(){
 				refreshThickbox();
 			}
-	    });
+		);
+	}
+
+	function refreshThickbox() {
+		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	}
 </script>
 
 <form:hidden path="questionIndex" />
 
 <div class="form-group">
-    <label for="title"><fmt:message key="label.authoring.title.col"/></label>
-    <form:input path="title" cssClass="form-control"/>
+    <label for="title">
+    	<fmt:message key="label.authoring.title.col"/>
+    </label>
+    <form:input path="qa.title" id="title" cssClass="form-control"/>
 </div>
 <div class="form-group">
-    <label for="instructions"><fmt:message key="label.authoring.instructions.col" /></label>
-    <lams:CKEditor id="instructions" value="${authoringForm.instructions}" contentFolderID="${authoringForm.contentFolderID}">
+    <label for="instructions">
+    	<fmt:message key="label.authoring.instructions.col" />
+    </label>
+    <lams:CKEditor id="qa.instructions" value="${authoringForm.qa.instructions}" contentFolderID="${authoringForm.contentFolderID}">
     </lams:CKEditor>
 </div>
 
@@ -92,9 +87,14 @@
 </div>
 
 <div id="add-question-div" class="form-inline form-group pull-right">
-	<a href="javascript:showMessage('<lams:WebAppURL/>authoring/newQuestionBox.do?contentFolderID=${authoringForm.contentFolderID}&httpSessionID=${authoringForm.httpSessionID}&toolContentID=${sessionMap.toolContentID}&usernameVisible=${authoringForm.usernameVisible}&showOtherAnswers=${authoringForm.showOtherAnswers}&lockWhenFinished=${authoringForm.lockWhenFinished}&questionsSequenced=${authoringForm.questionsSequenced}');"
-		id="addTopic" class="btn btn-default btn-sm">
-		<i class="fa fa-lg fa-plus-circle"></i>&nbsp;<fmt:message key="label.add.new.question" /> 
+	<c:set var="addItemUrl" >
+		<c:url value='/authoring/newQuestionBox.do'/>?contentFolderID=${authoringForm.contentFolderID}&sessionMapID=${authoringForm.sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
+	</c:set>
+	
+	<a href="${addItemUrl}" id="addTopic" class="btn btn-default btn-sm thickbox">
+		<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.add.new.question" /> "></i>
+		&nbsp;
+		<fmt:message key="label.add.new.question" /> 
 	</a>
 </div>
 
@@ -113,5 +113,3 @@
 		</div>
 	</div>
 </div>
-
-<div id="messageArea"></div>

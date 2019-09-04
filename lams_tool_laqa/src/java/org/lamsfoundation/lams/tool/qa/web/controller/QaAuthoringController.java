@@ -24,11 +24,12 @@
 package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -38,26 +39,27 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.QbUtils;
+import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.model.QaCondition;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
-import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
+import org.lamsfoundation.lams.tool.qa.util.QaQuestionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -67,8 +69,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -90,413 +90,125 @@ public class QaAuthoringController implements QaAppConstants {
 
     @Autowired
     private IQbService qbService;
+    
+    @Autowired
+    private IUserManagementService userManagementService;
 
     @Autowired
     @Qualifier("qaMessageService")
     private MessageService messageService;
 
-    @RequestMapping("")
-    public String unspecified() {
-	return "authoring/AuthoringTabsHolder";
-    }
-
     @RequestMapping("/authoring")
-    public String execute(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request)
-	    throws IOException, ServletException, QaApplicationException {
-
+    public String execute(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request,
+	    @RequestParam Long toolContentID) throws IOException, ServletException, QaApplicationException {
 	QaUtils.cleanUpSessionAbsolute(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	authoringForm.setContentFolderID(contentFolderID);
+	form.setContentFolderID(contentFolderID);
 
-	authoringForm.resetRadioBoxes();
-
-	validateDefaultContent(request, authoringForm);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	authoringForm.setToolContentID(strToolContentID);
+	form.setToolContentID(toolContentID.toString());
 
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, "");
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, strToolContentID);
-	authoringForm.setHttpSessionID(sessionMap.getSessionID());
+	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	form.setSessionMapID(sessionMap.getSessionID());
 
-	if (strToolContentID == null || strToolContentID.equals("")) {
-	    QaUtils.cleanUpSessionAbsolute(request);
-	    throw new ServletException("No Tool Content ID found");
-	}
-
-	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
-	if (qaContent == null) {
+	QaContent qa = qaService.getQaContent(toolContentID);
+	if (qa == null) {
 	    /* fetch default content */
 	    long defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    qaContent = qaService.getQaContent(defaultContentID);
-	    qaContent = QaContent.newInstance(qaContent, new Long(strToolContentID));
+	    qa = qaService.getQaContent(defaultContentID);
+	    qa = QaContent.newInstance(qa, toolContentID);
 	}
 
-	prepareDTOandForm(request, authoringForm, qaContent, qaService, sessionMap);
+	form.setQa(qa);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	/*
+	 * get the existing question content
+	 */
+	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
+	qaQuestions.clear();
+	qaQuestions.addAll(qa.getQaQueContents());
+
+	form.resetUserAction();
+
 	// request is from monitoring module
 	if (mode.isTeacher()) {
-	    qaService.setDefineLater(strToolContentID, true);
+	    qaService.setDefineLater(toolContentID, true);
 	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
+	//process conditions
+	for (QaCondition condition : qa.getConditions()) {
+	    for (QaQueContent qaQuestion : qaQuestions) {
+		for (QaQueContent conditionQuestion : condition.getQuestions()) {
+		    if (qaQuestion.getDisplayOrder() == conditionQuestion.getDisplayOrder()) {
+			condition.temporaryQaQuestions.add(qaQuestion);
+		    }
+		}
+	    }
+	}
+	SortedSet<QaCondition> conditionList = getConditions(sessionMap);
 	conditionList.clear();
-	conditionList.addAll(qaContent.getConditions());
+	conditionList.addAll(qa.getConditions());
 
-	authoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
-	authoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
-
-	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, authoringForm);
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, form);
 
 	// get rating criterias from DB
-	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
+	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qa.getQaContentId());
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
 
 	return "authoring/AuthoringTabsHolder";
     }
 
     /**
-     * retrives the existing content information from the db and prepares the data for presentation purposes.
-     *
-     * @param request
-     * @param mapping
-     * @param authoringForm
-     * @param mapQuestionContent
-     * @param toolContentID
-     * @return ActionForward
-     */
-    protected QaContent prepareDTOandForm(HttpServletRequest request,
-	    @ModelAttribute("authoringForm") QaAuthoringForm authoringForm, QaContent qaContent, IQaService qaService,
-	    SessionMap<String, Object> sessionMap) {
-
-	authoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
-	authoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
-	authoringForm.setNotifyTeachersOnResponseSubmit(qaContent.isNotifyTeachersOnResponseSubmit() ? "1" : "0");
-	authoringForm.setShowOtherAnswers(qaContent.isShowOtherAnswers() ? "1" : "0");
-	authoringForm.setQuestionsSequenced(qaContent.isQuestionsSequenced() ? "1" : "0");
-	authoringForm.setLockWhenFinished(qaContent.isLockWhenFinished() ? "1" : "0");
-	authoringForm.setNoReeditAllowed(qaContent.isNoReeditAllowed() ? "1" : "0");
-	authoringForm.setMaximumRates(qaContent.getMaximumRates());
-	authoringForm.setMinimumRates(qaContent.getMinimumRates());
-	authoringForm.setReflect(qaContent.isReflect() ? "1" : "0");
-	authoringForm.setReflectionSubject(qaContent.getReflectionSubject());
-	authoringForm.setTitle(qaContent.getTitle());
-	authoringForm.setInstructions(qaContent.getInstructions());
-	authoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
-	authoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
-
-	List<QaQuestionDTO> questionDTOs = new LinkedList<>();
-
-	/*
-	 * get the existing question content
-	 */
-	Iterator queIterator = qaContent.getQaQueContents().iterator();
-	while (queIterator.hasNext()) {
-
-	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
-	    if (qaQuestion != null) {
-		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
-		questionDTOs.add(qaQuestionDTO);
-	    }
-	}
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	SortedSet<QaCondition> conditionSet = new TreeSet<>(new TextSearchConditionComparator());
-	for (QaCondition condition : qaContent.getConditions()) {
-	    conditionSet.add(condition);
-	    for (QaQuestionDTO dto : questionDTOs) {
-		for (QaQueContent question : condition.getQuestions()) {
-		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
-			condition.temporaryQuestionDTOSet.add(dto);
-		    }
-		}
-	    }
-	}
-	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
-
-	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
-	sessionMap.put(QaAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
-
-	authoringForm.resetUserAction();
-
-	return qaContent;
-    }
-
-    /**
-     * each tool has a signature. QA tool's signature is stored in MY_SIGNATURE.
-     * The default tool content id and other depending content ids are obtained
-     * in this method. if all the default content has been setup properly the
-     * method persists DEFAULT_CONTENT_ID in the session.
-     *
-     * @param request
-     * @param mapping
-     * @return ActionForward
-     */
-    public boolean validateDefaultContent(HttpServletRequest request,
-	    @ModelAttribute("authoringForm") QaAuthoringForm authoringForm) {
-
-	/*
-	 * retrieve the default content id based on tool signature
-	 */
-	long defaultContentID = 0;
-	try {
-	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    if (defaultContentID == 0) {
-		QaAuthoringController.logger.debug("default content id has not been setup");
-		return false;
-	    }
-	} catch (Exception e) {
-	    QaAuthoringController.logger.error("error getting the default content id: " + e.getMessage());
-	    persistError(request, "error.defaultContent.notSetup");
-	    return false;
-	}
-
-	/*
-	 * retrieve uid of the content based on default content id determined above
-	 */
-	try {
-	    //retrieve uid of the content based on default content id determined above
-	    QaContent qaContent = qaService.getQaContent(defaultContentID);
-	    if (qaContent == null) {
-		QaAuthoringController.logger.error("Exception occured: No default content");
-		persistError(request, "error.defaultContent.notSetup");
-		return false;
-	    }
-
-	} catch (Exception e) {
-	    QaAuthoringController.logger.error("Exception occured: No default question content");
-	    persistError(request, "error.defaultContent.notSetup");
-	    return false;
-	}
-
-	return true;
-    }
-
-    /**
-     * persists error messages to request scope
-     *
-     * @param request
-     * @param message
-     */
-    public void persistError(HttpServletRequest request, String message) {
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	errorMap.add("GLOBAL", messageService.getMessage(message));
-	request.setAttribute("errorMap", errorMap);
-    }
-
-    private SortedSet<QaCondition> getQaConditionList(SessionMap<String, Object> sessionMap) {
-	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
-	if (list == null) {
-	    list = new TreeSet<>(new TextSearchConditionComparator());
-	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
-	}
-	return list;
-    }
-
-    /**
      * submits content into the tool database
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     @RequestMapping("/submitAllContent")
-    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm,
-	    HttpServletRequest request) throws IOException, ServletException {
+    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request) throws IOException, ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	Long toolContentID = form.getQa().getQaContentId();
+	QaContent qa = form.getQa();
+	QaContent qaPO = qaService.getQaContent(toolContentID);
 
-	String httpSessionID = authoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+	if (qaPO == null) {
+	    // new Scratchie, create it.
+	    qaPO = qa;
+	    qaPO.setCreationDate(new Timestamp(new Date().getTime()));
+	    qaPO.setUpdateDate(new Timestamp(new Date().getTime()));
+	    
+	} else {
+	    qaPO.getQaQueContents().clear();
+	    qaPO.getConditions().clear();
+	    Long uid = qaPO.getUid();
+	    PropertyUtils.copyProperties(qaPO, qa);
+	    
+	    // set back UID
+	    qaPO.setUid(uid);
 
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	authoringForm.setContentFolderID(contentFolderID);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Long toolContentID = new Long(strToolContentID);
-
-	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	if (questionDTOs.size() == 0) {
-	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
-	}
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	authoringForm.setTitle(richTextTitle);
-	authoringForm.setInstructions(richTextInstructions);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	if (!errorMap.isEmpty()) {
-	    request.setAttribute("errorMap", errorMap);
-	    QaAuthoringController.logger.debug("errors saved: " + errorMap);
-	}
-
-	QaContent qaContent = qaService.getQaContent(toolContentID);
-	if (errorMap.isEmpty()) {
-	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-
-	    List<QaQuestionDTO> deletedQuestionDTOs = (List<QaQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);
-
-	    // in case request is from monitoring module - recalculate User Answers
+	    // if it is Teacher (from monitor) - change define later status
 	    if (mode.isTeacher()) {
-		Set<QaQueContent> oldQuestions = qaContent.getQaQueContents();
-		qaService.removeQuestionsFromCache(qaContent);
-		qaService.setDefineLater(strToolContentID, false);
+		qaPO.setDefineLater(false);
 
 		// audit log the teacher has started editing activity in monitor
 		qaService.auditLogStartEditingActivityInMonitor(toolContentID);
 
-		// recalculate User Answers
-		qaService.recalculateUserAnswers(qaContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
+		// recalculate User Answers - not required, as long as any question modification is minor and does not lead to changing question version or uid
 	    }
 
-	    // remove deleted questions
-	    for (QaQuestionDTO deletedQuestionDTO : deletedQuestionDTOs) {
-		QaQueContent removeableQuestion = qaService.getQuestionByUid(deletedQuestionDTO.getUid());
-		if (removeableQuestion != null) {
-		    qaContent.getQaQueContents().remove(removeableQuestion);
-		    qaService.removeQuestion(removeableQuestion);
-		}
-	    }
-
-	    // store content
-	    SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
-		    .get(QaAppConstants.ATTR_CONDITION_SET);
-	    qaContent = saveOrUpdateQaContent(questionDTOs, request, qaContent, toolContentID, conditionSet);
-
-	    //reOrganizeDisplayOrder
-	    List<QaQueContent> sortedQuestions = qaService.getAllQuestionEntriesSorted(qaContent.getUid().longValue());
-	    Iterator<QaQueContent> iter = sortedQuestions.iterator();
-	    int displayOrder = 1;
-	    while (iter.hasNext()) {
-		QaQueContent question = iter.next();
-
-		QaQueContent existingQaQueContent = qaService.getQuestionByUid(question.getUid());
-		existingQaQueContent.setDisplayOrder(displayOrder);
-		qaService.saveOrUpdateQuestion(existingQaQueContent);
-		displayOrder++;
-	    }
-
-	    // ************************* Handle rating criterias *******************
-	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
-		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
-	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
-
-	    QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
-
-	    request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-
-	} else {
-	    if (qaContent != null) {
-		QaUtils.setFormProperties(request, authoringForm, strToolContentID, httpSessionID);
-	    }
+	    qaPO.setUpdateDate(new Timestamp(new Date().getTime()));
 	}
-
-	List<QaCondition> delConditionList = getDeletedQaConditionList(sessionMap);
-	Iterator<QaCondition> iter = delConditionList.iterator();
-	while (iter.hasNext()) {
-	    QaCondition condition = iter.next();
-	    iter.remove();
-	    qaService.deleteCondition(condition);
-	}
-
-	authoringForm.resetUserAction();
-	authoringForm.setToolContentID(strToolContentID);
-	authoringForm.setHttpSessionID(httpSessionID);
-	authoringForm.setCurrentTab("1");
-
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	return "authoring/AuthoringTabsHolder";
-    }
-
-    private QaContent saveOrUpdateQaContent(List<QaQuestionDTO> questionDTOs, HttpServletRequest request,
-	    QaContent qaContent, Long toolContentId, Set<QaCondition> conditions) {
+	
+	// *******************************Handle user*******************
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
-	String allowRateQuestions = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
-	String notifyTeachersOnResponseSubmit = request.getParameter(QaAppConstants.NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
-	String showOtherAnswers = request.getParameter("showOtherAnswers");
-	String questionsSequenced = request.getParameter(QaAppConstants.QUESTIONS_SEQUENCED);
-	String lockWhenFinished = request.getParameter("lockWhenFinished");
-	String noReeditAllowed = request.getParameter("noReeditAllowed");
-	String allowRichEditor = request.getParameter("allowRichEditor");
-	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
-	String reflect = request.getParameter(QaAppConstants.REFLECT);
-	String reflectionSubject = request.getParameter(QaAppConstants.REFLECTION_SUBJECT);
-	int minimumRates = WebUtil.readIntParam(request, "minimumRates");
-	int maximumRates = WebUtil.readIntParam(request, "maximumRates");
-
-	boolean questionsSequencedBoolean = false;
-	boolean lockWhenFinishedBoolean = false;
-	boolean noReeditAllowedBoolean = false;
-	boolean usernameVisibleBoolean = false;
-	boolean allowRateQuestionsBoolean = false;
-	boolean notifyTeachersOnResponseSubmitBoolean = false;
-	boolean showOtherAnswersBoolean = false;
-	boolean reflectBoolean = false;
-	boolean allowRichEditorBoolean = false;
-	boolean useSelectLeaderToolOuputBoolean = false;
-
-	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
-	    questionsSequencedBoolean = true;
-	}
-
-	if (lockWhenFinished != null && lockWhenFinished.equalsIgnoreCase("1")) {
-	    lockWhenFinishedBoolean = true;
-	}
-
-	if (noReeditAllowed != null && noReeditAllowed.equalsIgnoreCase("1")) {
-	    noReeditAllowedBoolean = true;
-	    lockWhenFinishedBoolean = true;
-	}
-
-	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
-	    usernameVisibleBoolean = true;
-	}
-
-	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
-	    showOtherAnswersBoolean = true;
-	}
-
-	if (allowRateQuestions != null && allowRateQuestions.equalsIgnoreCase("1") && showOtherAnswersBoolean) {
-	    allowRateQuestionsBoolean = true;
-	}
-
-	if (notifyTeachersOnResponseSubmit != null && notifyTeachersOnResponseSubmit.equalsIgnoreCase("1")) {
-	    notifyTeachersOnResponseSubmitBoolean = true;
-	}
-
-	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("true")) {
-	    allowRichEditorBoolean = true;
-	}
-
-	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("true")) {
-	    useSelectLeaderToolOuputBoolean = true;
-	}
-
-	if (reflect != null && reflect.equalsIgnoreCase("1")) {
-	    reflectBoolean = true;
-	}
 	long userId = 0;
 	if (toolUser != null) {
 	    userId = toolUser.getUserID().longValue();
@@ -509,413 +221,238 @@ public class QaAuthoringController implements QaAppConstants {
 		userId = 0;
 	    }
 	}
-
-	boolean newContent = false;
-	if (qaContent == null) {
-	    qaContent = new QaContent();
-	    newContent = true;
-	}
-
-	qaContent.setQaContentId(toolContentId);
-	qaContent.setTitle(richTextTitle);
-	qaContent.setInstructions(richTextInstructions);
-	qaContent.setUpdateDate(new Date(System.currentTimeMillis()));
-	/** keep updating this one */
-	qaContent.setCreatedBy(userId);
-	/** make sure we are setting the userId from the User object above */
-
-	qaContent.setUsernameVisible(usernameVisibleBoolean);
-	qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
-	qaContent.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmitBoolean);
-	qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
-	qaContent.setQuestionsSequenced(questionsSequencedBoolean);
-	qaContent.setLockWhenFinished(lockWhenFinishedBoolean);
-	qaContent.setNoReeditAllowed(noReeditAllowedBoolean);
-	qaContent.setReflect(reflectBoolean);
-	qaContent.setReflectionSubject(reflectionSubject);
-	qaContent.setAllowRichEditor(allowRichEditorBoolean);
-	qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
-	qaContent.setMinimumRates(minimumRates);
-	qaContent.setMaximumRates(maximumRates);
-
-	qaContent.setConditions(new TreeSet<QaCondition>(new TextSearchConditionComparator()));
-	if (newContent) {
-	    qaService.createQaContent(qaContent);
-	} else {
-	    qaService.updateQaContent(qaContent);
-	}
-
-	qaContent = qaService.getQaContent(toolContentId);
-
-	// persist questions
-	int displayOrder = 0;
-	for (QaQuestionDTO questionDTO : questionDTOs) {
-
-	    String questionText = questionDTO.getQuestion();
-
-	    // skip empty questions
-	    if (questionText.isEmpty()) {
-		continue;
-	    }
-
-	    ++displayOrder;
-
-	    QaQueContent question = qaService.getQuestionByUid(questionDTO.getUid());
-
-	    // in case question doesn't exist
-	    if (question == null) {
-		question = new QaQueContent(questionText, displayOrder, questionDTO.getFeedback(),
-			questionDTO.isRequired(), questionDTO.getMinWordsLimit(), qaContent);
-		qaContent.getQaQueContents().add(question);
-		question.setQaContent(qaContent);
-
-		// in case question exists already
-	    } else {
-
-		question.setQuestion(questionText);
-		question.setFeedback(questionDTO.getFeedback());
-		question.setDisplayOrder(displayOrder);
-		question.setRequired(questionDTO.isRequired());
-		question.setMinWordsLimit(questionDTO.getMinWordsLimit());
-	    }
-
-	    qaService.saveOrUpdateQuestion(question);
-	}
-
+	qaPO.setCreatedBy(userId);
+	qaService.saveOrUpdateQaContent(qaPO);
+	
+	// ************************* Handle Q&A conditions *******************
+	Set<QaQueContent> newItems = getQuestions(sessionMap);
+	SortedSet<QaCondition> conditions = getConditions(sessionMap);
 	for (QaCondition condition : conditions) {
-	    condition.setQuestions(new TreeSet<>(new QaQueContentComparator()));
-	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
-		for (QaQueContent queContent : qaContent.getQaQueContents()) {
-		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
-			condition.getQuestions().add(queContent);
+	    condition.setQuestions(new TreeSet<>(new QaQuestionComparator()));
+	    for (QaQueContent qaQuestion : condition.temporaryQaQuestions) {
+		//TODO check how conditions get saved
+		
+		for (QaQueContent question : newItems) {
+		    if (qaQuestion.getDisplayOrder() == question.getDisplayOrder()) {
+			condition.getQuestions().add(question);
 		    }
 		}
 	    }
 	}
-	qaContent.setConditions(conditions);
-	qaService.updateQaContent(qaContent);
+	qaPO.setConditions(conditions);
+	
+	// ************************* Handle Q&A questions *******************
+	Set<QaQueContent> items = new LinkedHashSet<>();
+	Iterator<QaQueContent> iter = newItems.iterator();
+	int displayOrder = 1;
+	while (iter.hasNext()) {
+	    QaQueContent question = iter.next();
+	    if (question != null) {
+		question.setQaContent(qaPO);
+		question.setToolContentId(qaPO.getQaContentId());
+		question.setDisplayOrder(displayOrder++);
+		qaService.saveOrUpdate(question);
+		items.add(question);
+	    }
+	}
+	qaPO.setQaQueContents(items);
+	
+	qaService.saveOrUpdateQaContent(qaPO);
 
-	return qaContent;
+	// ************************* Handle rating criterias *******************
+	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
+
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
+	
+	// remove deleted questions
+	List<QaQueContent> deletedQuestions = getDeletedQuestions(sessionMap);
+	for (QaQueContent deletedQuestion : deletedQuestions) {
+	    QaQueContent removeableQuestion = qaService.getQuestionByUid(deletedQuestion.getUid());
+	    if (removeableQuestion != null) {
+		qaService.removeQuestion(removeableQuestion);
+	    }
+	}
+
+	// delete conditions from database
+	List<QaCondition> delConditionList = QaAuthoringConditionController.getDeletedQaConditionList(sessionMap);
+	Iterator<QaCondition> delIter = delConditionList.iterator();
+	while (delIter.hasNext()) {
+	    QaCondition condition = delIter.next();
+	    delIter.remove();
+	    qaService.deleteCondition(condition);
+	}
+
+	form.resetUserAction();
+	return "authoring/AuthoringTabsHolder";
     }
-    
+
     /**
      * Adds QbQuestion, selected in the question bank, to the current question list.
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/importQbQuestion", method = RequestMethod.POST)
-    private String importQbQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm authoringForm,
-	    HttpServletRequest request, @RequestParam String httpSessionID, @RequestParam Long qbQuestionUid) {
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-	
+    private String importQbQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm form, HttpServletRequest request,
+	    @RequestParam String sessionMapID, @RequestParam Long qbQuestionUid) {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	SortedSet<QaQueContent> qaQuestions = getQuestions(sessionMap);
+
 	//get QbQuestion from DB
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
-	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-	boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, qbQuestion.getName());
-	if (!duplicates) {
-	    String displayOrder = String.valueOf(questionDTOs.size() + 1);
-	    boolean requiredBoolean = false;
-	    int minWordsLimit = 0;
-	    QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qbQuestion.getName(), displayOrder, qbQuestion.getFeedback(),
-		    requiredBoolean, minWordsLimit);
-	    questionDTOs.add(qaQuestionDTO);
-	} else {
-	    //entry duplicate, not adding
+	//create new ScratchieItem and assign imported qbQuestion to it
+	QaQueContent item = new QaQueContent();
+	item.setQbQuestion(qbQuestion);
+	int maxSeq = 1;
+	if (qaQuestions != null && qaQuestions.size() > 0) {
+	    QaQueContent last = qaQuestions.last();
+	    maxSeq = last.getDisplayOrder() + 1;
 	}
+	item.setDisplayOrder(maxSeq);
+	qaQuestions.add(item);
 
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	String toolContentID = (String) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	authoringForm.setContentFolderID(contentFolderID);
-	authoringForm.setHttpSessionID(httpSessionID);
-	authoringForm.setToolContentID(toolContentID);
-	request.setAttribute("authoringForm", authoringForm);
 	return "authoring/itemlist";
     }
 
     /**
-     * saveSingleQuestion
+     * saveQuestion
      */
-    @RequestMapping("/saveSingleQuestion")
-    public String saveSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
-	    HttpServletRequest request) throws IOException, ServletException {
+    @RequestMapping("/saveQuestion")
+    public String saveQuestion(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request)
+	    throws IOException, ServletException {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	SortedSet<QaQueContent> qaQuestions = getQuestions(sessionMap);
+	int itemIdx = NumberUtils.toInt(form.getItemIndex(), -1);
 
-	String httpSessionID = newQuestionForm.getHttpSessionID();
+	// check whether it is "edit(old Question)" or "add(new Question)"
+	QbQuestion qbQuestion;
+	QaQueContent qaQuestion;
+	final boolean isAddingQuestion = itemIdx == -1;
+	if (isAddingQuestion) { // add
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	String newQuestion = request.getParameter("newQuestion");
-
-	String feedback = request.getParameter("feedback");
-
-	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
-
-	boolean requiredBoolean = newQuestionForm.isRequired();
-
-	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
-
-	if (newQuestion != null && newQuestion.length() > 0) {
-	    if (editQuestionBoxRequest != null && editQuestionBoxRequest.equals("false")) {
-		//request for add and save
-		boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, newQuestion);
-
-		if (!duplicates) {
-		    QaQuestionDTO qaQuestionDTO = null;
-		    Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-		    while (iter.hasNext()) {
-			qaQuestionDTO = iter.next();
-
-			String displayOrder = qaQuestionDTO.getDisplayOrder();
-			if (displayOrder != null && !displayOrder.equals("")) {
-			    if (displayOrder.equals(editableQuestionIndex)) {
-				break;
-			    }
-
-			}
-		    }
-
-		    qaQuestionDTO.setQuestion(newQuestion);
-		    qaQuestionDTO.setFeedback(feedback);
-		    qaQuestionDTO.setDisplayOrder(editableQuestionIndex);
-		    qaQuestionDTO.setRequired(requiredBoolean);
-		    qaQuestionDTO.setMinWordsLimit(minWordsLimit);
-
-		    questionDTOs = AuthoringUtil.reorderUpdateQuestionDTOs(questionDTOs, qaQuestionDTO,
-			    editableQuestionIndex);
-		} else {
-		    //duplicate question entry, not adding
-		}
-	    } else {
-		//request for edit and save
-		QaQuestionDTO qaQuestionDTO = null;
-		Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-		while (iter.hasNext()) {
-		    qaQuestionDTO = iter.next();
-
-		    String displayOrder = qaQuestionDTO.getDisplayOrder();
-
-		    if (displayOrder != null && !displayOrder.equals("")) {
-			if (displayOrder.equals(editableQuestionIndex)) {
-			    break;
-			}
-
-		    }
-		}
-
-		qaQuestionDTO.setQuestion(newQuestion);
-		qaQuestionDTO.setFeedback(feedback);
-		qaQuestionDTO.setDisplayOrder(editableQuestionIndex);
-		qaQuestionDTO.setRequired(requiredBoolean);
-		qaQuestionDTO.setMinWordsLimit(minWordsLimit);
-
-		questionDTOs = AuthoringUtil.reorderUpdateQuestionDTOs(questionDTOs, qaQuestionDTO,
-			editableQuestionIndex);
+	    String title = form.getTitle();
+	    boolean duplicates = checkDuplicateQuestions(qaQuestions, title);
+	    if (duplicates) {
+		return "authoring/itemlist";
 	    }
+
+	    qbQuestion = new QbQuestion();
+	    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+
+	    qaQuestion = new QaQueContent();
+	    int maxSeq = 1;
+	    if (qaQuestions != null && qaQuestions.size() > 0) {
+		QaQueContent last = qaQuestions.last();
+		maxSeq = last.getDisplayOrder() + 1;
+	    }
+	    qaQuestion.setDisplayOrder(maxSeq);
+	    qaQuestions.add(qaQuestion);
+
+	// edit
 	} else {
-	    //entry blank, not adding
+	    List<QaQueContent> rList = new ArrayList<>(qaQuestions);
+	    qaQuestion = rList.get(itemIdx);
+	    qbQuestion = qbService.getQuestionByUid(qaQuestion.getQbQuestion().getUid());
+	    qbService.releaseFromCache(qbQuestion);
 	}
 
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
+	QbQuestion oldQbQuestion = qbQuestion.clone();
+	// evict everything manually as we do not use DTOs, just real entities
+	// without eviction changes would be saved immediately into DB
+	qaService.releaseFromCache(oldQbQuestion);
 
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
+	qbQuestion.setName(form.getTitle());
+	qbQuestion.setDescription(form.getDescription());
+	qbQuestion.setAnswerRequired(form.isAnswerRequired());
+	qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
+	qbQuestion.setFeedback(form.getFeedback());
 
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	newQuestionForm.setToolContentID(strToolContentID);
-	newQuestionForm.setHttpSessionID(httpSessionID);
-	newQuestionForm.setCurrentTab("1");
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-
-	return "authoring/AuthoringTabsHolder";
-    }
-
-    /**
-     * addSingleQuestion
-     */
-    @RequestMapping("/addSingleQuestion")
-    public String addSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
-	    HttpServletRequest request) throws IOException, ServletException {
-
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	String newQuestion = request.getParameter("newQuestion");
-	String feedback = request.getParameter("feedback");
-	boolean requiredBoolean = newQuestionForm.isRequired();
-	int minWordsLimit = WebUtil.readIntParam(request, "minWordsLimit");
-
-	int listSize = questionDTOs.size();
-
-	if (newQuestion != null && newQuestion.length() > 0) {
-	    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(questionDTOs, newQuestion);
-
-	    if (!duplicates) {
-		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(newQuestion, new Long(listSize + 1).toString(),
-			feedback, requiredBoolean, minWordsLimit);
-		questionDTOs.add(qaQuestionDTO);
-	    } else {
-		//entry duplicate, not adding
+	int isQbQuestionModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
+	QbQuestion updatedQuestion = null;
+	switch (isQbQuestionModified) {
+	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
+		// impossible scenario as long as ESSAY question type can't have version
+		throw new RuntimeException("Impossible scenario as long as ESSAY question type can't have version");
 	    }
-	} else {
-	    //entry blank, not adding
+	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
+		// new question gets created
+		updatedQuestion = qbQuestion.clone();
+		updatedQuestion.clearID();
+		updatedQuestion.setQuestionId(qbService.generateNextQuestionId());
+		updatedQuestion.setVersion(1);
+		updatedQuestion.setCreateDate(new Date());
+	    }
+		break;
+	    case IQbService.QUESTION_MODIFIED_NONE: {
+		// save the old question anyway, as it may contain some minor changes (like title or description change)
+		updatedQuestion = qbQuestion;
+	    }
+		break;
+	}
+	userManagementService.save(updatedQuestion);
+	qaQuestion.setQbQuestion(updatedQuestion);
+	request.setAttribute("qbQuestionModified", isQbQuestionModified);
+
+	//take care about question's collections. add to collection first
+	Long oldCollectionUid = form.getOldCollectionUid();
+	Long newCollectionUid = form.getNewCollectionUid();
+	if (isAddingQuestion || !newCollectionUid.equals(oldCollectionUid)) {
+	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
+	}
+	//remove from the old collection, if needed
+	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
+	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
+		    false);
 	}
 
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	newQuestionForm.setToolContentID(strToolContentID);
-	newQuestionForm.setHttpSessionID(httpSessionID);
-	newQuestionForm.setCurrentTab("1");
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-	return "authoring/AuthoringTabsHolder";
+	return "authoring/itemlist";
     }
-
+    
     /**
-     * opens up an new screen within the current page for adding a new question
+     * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/newQuestionBox")
-    public String newQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
-	    HttpServletRequest request) throws IOException, ServletException {
+    private String newQuestionBox(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam String sessionMapID, @RequestParam String contentFolderID) {
+	form.setSessionMapID(sessionMapID);
+	form.setContentFolderID(contentFolderID);
+	
+	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	Collection<QaQuestionDTO> questionDTOs = (Collection<QaQuestionDTO>) sessionMap
-		.get(QaAppConstants.LIST_QUESTION_DTOS);
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/newQuestionBox";
     }
 
     /**
-     * opens up an new screen within the current page for editing a question
+     * Display edit page for existed scratchie item.
      */
     @RequestMapping("/newEditableQuestionBox")
-    public String newEditableQuestionBox(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
-	    HttpServletRequest request) throws IOException, ServletException {
-
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-
+    private String newEditableQuestionBox(@ModelAttribute("newQuestionForm") QbQuestionForm form,
+	    HttpServletRequest request, @RequestParam String sessionMapID, @RequestParam Integer questionIndex) {
+	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
+	
+	List<QaQueContent> rList = new ArrayList<>(qaQuestions);
+	QaQueContent qaQuestion = rList.get(questionIndex);
+	QbQuestion qbQuestion = qaQuestion.getQbQuestion();
 
-	String questionIndex = request.getParameter("questionIndex");
-
-	newQuestionForm.setEditableQuestionIndex(questionIndex);
-
-	List<QaQuestionDTO> questionDTOs = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	String editableQuestion = "";
-	String editableFeedback = "";
-	boolean requiredBoolean = false;
-	int minWordsLimit = 0;
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = iter.next();
-	    String displayOrder = qaQuestionDTO.getDisplayOrder();
-
-	    if (displayOrder != null && !displayOrder.equals("")) {
-		if (displayOrder.equals(questionIndex)) {
-		    editableFeedback = qaQuestionDTO.getFeedback();
-		    editableQuestion = qaQuestionDTO.getQuestion();
-		    requiredBoolean = qaQuestionDTO.isRequired();
-		    minWordsLimit = qaQuestionDTO.getMinWordsLimit();
-		    break;
-		}
-
-	    }
+	form.setTitle(qbQuestion.getName());
+	form.setDescription(qbQuestion.getDescription());
+	if (questionIndex >= 0) {
+	    form.setItemIndex(String.valueOf(questionIndex));
 	}
+	form.setAnswerRequired(qbQuestion.isAnswerRequired());
+	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
+	form.setFeedback(qbQuestion.getFeedback());
 
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	newQuestionForm.setRequired(requiredBoolean);
-	newQuestionForm.setMinWordsLimit(minWordsLimit);
-	newQuestionForm.setEditableQuestionText(editableQuestion);
-	newQuestionForm.setFeedback(editableFeedback);
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-
+	form.setContentFolderID(contentFolderID);
+	form.setSessionMapID(sessionMapID);
+	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
+	
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/newQuestionBox";
     }
 
@@ -923,300 +460,162 @@ public class QaAuthoringController implements QaAppConstants {
      * removes a question from the questions map
      */
     @RequestMapping("/removeQuestion")
-    public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
-	    HttpServletRequest request) throws IOException, ServletException {
+    public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm form, HttpServletRequest request)
+	    throws IOException, ServletException {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	int questionIndex = NumberUtils.toInt(request.getParameter("questionIndex"), -1);
+	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
+	
+	if (questionIndex != -1) {
+	    List<QaQueContent> rList = new ArrayList<>(qaQuestions);
+	    QaQueContent questionToDelete = rList.remove(questionIndex);
+	    qaQuestions.clear();
+	    qaQuestions.addAll(rList);
 
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String questionIndexToDelete = request.getParameter("questionIndex");
-	QaQuestionDTO questionToDelete = null;
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<>();
-	int queIndex = 0;
-	for (QaQuestionDTO questionDTO : questionDTOs) {
-
-	    String questionText = questionDTO.getQuestion();
-	    String displayOrder = questionDTO.getDisplayOrder();
-
-	    if (questionText != null && !questionText.equals("") && (!displayOrder.equals(questionIndexToDelete))) {
-
-		++queIndex;
-		questionDTO.setDisplayOrder(new Integer(queIndex).toString());
-		listFinalQuestionDTO.add(questionDTO);
-	    }
-	    if ((questionText != null) && (!questionText.isEmpty()) && displayOrder.equals(questionIndexToDelete)) {
-		List<QaQuestionDTO> deletedQuestionDTOs = (List<QaQuestionDTO>) sessionMap
-			.get(LIST_DELETED_QUESTION_DTOS);
-		;
-		deletedQuestionDTOs.add(questionDTO);
-		sessionMap.put(LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
-		questionToDelete = questionDTO;
-	    }
-	}
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, listFinalQuestionDTO);
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, listFinalQuestionDTO);
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listFinalQuestionDTO.size()));
-
-	SortedSet<QaCondition> conditions = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
-	Iterator<QaCondition> conditionIter = conditions.iterator();
-	while (conditionIter.hasNext()) {
-	    QaCondition condition = conditionIter.next();
-	    Iterator<QaQuestionDTO> dtoIter = condition.temporaryQuestionDTOSet.iterator();
-	    while (dtoIter.hasNext()) {
-		if (dtoIter.next() == questionToDelete) {
-		    dtoIter.remove();
+	    // add to delList
+	    List<QaQueContent> delList = getDeletedQuestions(sessionMap);
+	    delList.add(questionToDelete);
+	    
+	    //take care about conditions
+	    SortedSet<QaCondition> conditions = getConditions(sessionMap);
+	    Iterator<QaCondition> conditionIter = conditions.iterator();
+	    while (conditionIter.hasNext()) {
+		QaCondition condition = conditionIter.next();
+		Iterator<QaQueContent> questionToDeleteIter = condition.temporaryQaQuestions.iterator();
+		while (questionToDeleteIter.hasNext()) {
+		    if (questionToDeleteIter.next() == questionToDelete) {
+			questionToDeleteIter.remove();
+		    }
+		}
+		if (condition.temporaryQaQuestions.isEmpty()) {
+		    conditionIter.remove();
 		}
 	    }
-	    if (condition.temporaryQuestionDTOSet.isEmpty()) {
-		conditionIter.remove();
-	    }
 	}
 
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	newQuestionForm.setContentFolderID(contentFolderID);
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-	newQuestionForm.setToolContentID(strToolContentID);
-	newQuestionForm.setHttpSessionID(httpSessionID);
-	newQuestionForm.setCurrentTab("1");
-	request.setAttribute("authoringForm", newQuestionForm);
-
-	return "authoring/AuthoringTabsHolder";
+	return "authoring/itemlist";
     }
 
     /**
      * moves a question down in the list
      */
     @RequestMapping("/moveQuestionDown")
-    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
 	    HttpServletRequest request) throws IOException, ServletException {
+	swapQuestions(form, request, "down");
 
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String questionIndex = request.getParameter("questionIndex");
-
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
-		.get(QaAppConstants.ATTR_CONDITION_SET);
-
-	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
-
-	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
-
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	newQuestionForm.setToolContentID(strToolContentID);
-	newQuestionForm.setHttpSessionID(httpSessionID);
-	newQuestionForm.setCurrentTab("1");
-
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-	return "authoring/AuthoringTabsHolder";
+	return "authoring/itemlist";
     }
 
     /**
      * moves a question up in the list
      */
     @RequestMapping("/moveQuestionUp")
-    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
+    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
 	    HttpServletRequest request) throws IOException, ServletException {
+	swapQuestions(form, request, "up");
 
-	String httpSessionID = newQuestionForm.getHttpSessionID();
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
-
-	String questionIndex = request.getParameter("questionIndex");
-
-	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
-
-	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
-		.get(QaAppConstants.ATTR_CONDITION_SET);
-	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
-
-	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
-
-	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
-	newQuestionForm.setContentFolderID(contentFolderID);
-
-	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
-
-	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-
-	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	newQuestionForm.setTitle(richTextTitle);
-	newQuestionForm.setInstructions(richTextInstructions);
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	QaUtils.setFormProperties(request, newQuestionForm, strToolContentID, httpSessionID);
-
-	newQuestionForm.setToolContentID(strToolContentID);
-	newQuestionForm.setHttpSessionID(httpSessionID);
-	newQuestionForm.setCurrentTab("1");
-
-	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
-
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
-	request.setAttribute("authoringForm", newQuestionForm);
-	return "authoring/AuthoringTabsHolder";
+	return "authoring/itemlist";
     }
 
-    private static List<QaQuestionDTO> swapQuestions(List<QaQuestionDTO> questionDTOs, String questionIndex,
-	    String direction, Set<QaCondition> conditions) {
+    private Set<QaQueContent> swapQuestions(QaAuthoringForm form, HttpServletRequest request, String direction) {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	Set<QaQueContent> questions = getQuestions(sessionMap);
+	SortedSet<QaCondition> conditions = getConditions(sessionMap);
+	int originalQuestionIndex = WebUtil.readIntParam(request, "questionIndex");
+	int replacedQuestionIndex = direction.equals("down") ? originalQuestionIndex + 1 : originalQuestionIndex - 1;
 
-	int intQuestionIndex = new Integer(questionIndex).intValue();
-	int intOriginalQuestionIndex = intQuestionIndex;
+	List<QaQueContent> rList = new ArrayList<>(questions);
+	// get current and the target item, and switch their sequence
+	QaQueContent originalQuestion = rList.get(originalQuestionIndex);
+	QaQueContent replacedQuestion = rList.get(replacedQuestionIndex);
+	
+	int upSeqId = replacedQuestion.getDisplayOrder();
+	replacedQuestion.setDisplayOrder(originalQuestion.getDisplayOrder());
+	originalQuestion.setDisplayOrder(upSeqId);
 
-	int replacedQuestionIndex = 0;
-	if (direction.equals("down")) {
-	    // direction down
-	    replacedQuestionIndex = ++intQuestionIndex;
-	} else {
-	    // direction up
-	    replacedQuestionIndex = --intQuestionIndex;
-	}
-
-	QaQuestionDTO mainQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
-		intOriginalQuestionIndex);
-
-	QaQuestionDTO replacedQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
-		replacedQuestionIndex);
-
-	List<QaQuestionDTO> newQuestionDtos = new LinkedList<>();
-
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO questionDTO = iter.next();
-	    QaQuestionDTO tempQuestion = null;
-
-	    if (!questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
-		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// normal copy
-		tempQuestion = questionDTO;
-
-	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
-		// move type 1
-		tempQuestion = replacedQuestion;
-
-	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
-		// move type 1
-		tempQuestion = mainQuestion;
-	    }
-
-	    newQuestionDtos.add(tempQuestion);
-	}
+	// put back list, it will be sorted again
+	questions.clear();
+	questions.addAll(rList);
 
 	// references in conditions also need to be changed
 	if (conditions != null) {
 	    for (QaCondition condition : conditions) {
-		SortedSet<QaQuestionDTO> newQuestionDTOSet = new TreeSet<>(new QaQuestionContentDTOComparator());
-		for (QaQuestionDTO dto : newQuestionDtos) {
-		    if (condition.temporaryQuestionDTOSet.contains(dto)) {
-			newQuestionDTOSet.add(dto);
+		SortedSet<QaQueContent> newQuestionSet = new TreeSet<>(new QaQuestionComparator());
+		for (QaQueContent question : questions) {
+		    if (condition.temporaryQaQuestions.contains(question)) {
+			newQuestionSet.add(question);
 		    }
 		}
-		condition.temporaryQuestionDTOSet = newQuestionDTOSet;
+		condition.temporaryQaQuestions = newQuestionSet;
 	    }
 	}
-
-	return newQuestionDtos;
+	
+	return questions;
     }
 
-    private static QaQuestionDTO getQuestionAtDisplayOrder(List<QaQuestionDTO> questionDTOs,
-	    int intOriginalQuestionIndex) {
-
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = iter.next();
-	    if (new Integer(intOriginalQuestionIndex).toString().equals(qaQuestionDTO.getDisplayOrder())) {
-		return qaQuestionDTO;
+    private boolean checkDuplicateQuestions(Set<QaQueContent> questions, String newQuestion) {
+	for (QaQueContent qaQuestion : questions) {
+	    if (qaQuestion.getQbQuestion().getName().equals(newQuestion)) {
+		return true;
 	    }
 	}
-	return null;
+	return false;
     }
-
-    private static List<QaQuestionDTO> reorderQuestionDTOs(List<QaQuestionDTO> questionDTOs) {
-	List<QaQuestionDTO> listFinalQuestionDTO = new LinkedList<>();
-
-	int queIndex = 0;
-	Iterator<QaQuestionDTO> iter = questionDTOs.iterator();
-	while (iter.hasNext()) {
-	    QaQuestionDTO qaQuestionDTO = iter.next();
-
-	    String question = qaQuestionDTO.getQuestion();
-	    String feedback = qaQuestionDTO.getFeedback();
-	    boolean required = qaQuestionDTO.isRequired();
-	    int minWordsLimit = qaQuestionDTO.getMinWordsLimit();
-
-	    if (question != null && !question.equals("")) {
-		++queIndex;
-
-		qaQuestionDTO.setQuestion(question);
-		qaQuestionDTO.setDisplayOrder(new Integer(queIndex).toString());
-		qaQuestionDTO.setFeedback(feedback);
-		qaQuestionDTO.setRequired(required);
-		qaQuestionDTO.setMinWordsLimit(minWordsLimit);
-
-		listFinalQuestionDTO.add(qaQuestionDTO);
-	    }
-	}
-	return listFinalQuestionDTO;
-    }
-
+    
     /**
-     * Get the deleted condition list, which could be persisted or non-persisted
-     * items.
+     * List current Q&A questions.
      *
      * @param request
      * @return
      */
-    private List<QaCondition> getDeletedQaConditionList(SessionMap<String, Object> sessionMap) {
-	List<QaCondition> list = (List<QaCondition>) sessionMap.get(QaAppConstants.ATTR_DELETED_CONDITION_LIST);
+    @SuppressWarnings("unchecked")
+    private SortedSet<QaQueContent> getQuestions(SessionMap<String, Object> sessionMap) {
+	SortedSet<QaQueContent> list = (SortedSet<QaQueContent>) sessionMap.get(QaAppConstants.LIST_QUESTIONS);
 	if (list == null) {
-	    list = new ArrayList<>();
-	    sessionMap.put(QaAppConstants.ATTR_DELETED_CONDITION_LIST, list);
+	    list = new TreeSet<>(new QaQuestionComparator());
+	    sessionMap.put(QaAppConstants.LIST_QUESTIONS, list);
 	}
 	return list;
+    }
+    
+    /**
+     * List save deleted scratchie items, which could be persisted or non-persisted items.
+     *
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private List<QaQueContent> getDeletedQuestions(SessionMap<String, Object> sessionMap) {
+	List<QaQueContent> list = (List<QaQueContent>) sessionMap.get(QaAppConstants.LIST_DELETED_QUESTIONS);
+	if (list == null) {
+	    list = new ArrayList<>();
+	    sessionMap.put(QaAppConstants.LIST_DELETED_QUESTIONS, list);
+	}
+	return list;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private SortedSet<QaCondition> getConditions(SessionMap<String, Object> sessionMap) {
+	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
+	if (list == null) {
+	    list = new TreeSet<>(new TextSearchConditionComparator());
+	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
+	}
+	return list;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(QaAuthoringForm form, HttpServletRequest request) {
+	String sessionMapID = form.getSessionMapID();
+	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(QbQuestionForm form, HttpServletRequest request) {
+	String sessionMapID = form.getSessionMapID();
+	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
 }

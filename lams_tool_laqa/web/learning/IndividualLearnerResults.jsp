@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 
 <lams:html>
 <lams:head>
@@ -53,7 +53,7 @@
 
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="userID" />
-			<form:hidden path="httpSessionID" />
+			<form:hidden path="sessionMapID" />
 			<form:hidden path="totalQuestionCount" />
 
 			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">

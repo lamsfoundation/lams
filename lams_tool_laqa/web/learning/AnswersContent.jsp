@@ -4,7 +4,7 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" scope="request" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request" />
 <c:set var="mode" value="${sessionMap.mode}" scope="request" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request" />
@@ -230,7 +230,7 @@
 
 			<form:hidden path="toolSessionID" id="tool-session-id" />
 			<form:hidden path="userID" />
-			<form:hidden path="httpSessionID" />
+			<form:hidden path="sessionMapID" />
 			<form:hidden path="questionIndex" />
 			<form:hidden path="totalQuestionCount" />
 

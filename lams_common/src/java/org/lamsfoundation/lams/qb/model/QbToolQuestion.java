@@ -15,6 +15,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  *
  * Serves as a super class for all tools' questions.
@@ -86,4 +89,19 @@ public abstract class QbToolQuestion implements Comparable<QbToolQuestion> {
     public void setDisplayOrder(int displayOrder) {
 	this.displayOrder = displayOrder;
     }
+
+    @Override
+    public boolean equals(Object other) {
+	if (!(other instanceof QbToolQuestion)) {
+	    return false;
+	}
+	QbToolQuestion castOther = (QbToolQuestion) other;
+	return new EqualsBuilder().append(this.getUid(), castOther.getUid()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(getUid()).toHashCode();
+    }
+
 }

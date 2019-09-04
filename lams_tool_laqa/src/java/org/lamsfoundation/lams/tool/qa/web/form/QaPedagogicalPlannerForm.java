@@ -84,7 +84,7 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 	    if (questions != null) {
 		int topicIndex = 0;
 		for (QaQueContent message : (Set<QaQueContent>) questions) {
-		    setQuestion(topicIndex++, message.getQuestion());
+		    setQuestion(topicIndex++, message.getQbQuestion().getName());
 		}
 	    }
 	}

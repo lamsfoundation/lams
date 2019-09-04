@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -48,17 +49,15 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
- * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
- * hibernate mapping resides in: QaContent.hbm.xml
- *
  * Holds content representation for the tool. Default content is made available to the tool by the database.
  *
  * @author Ozgur Demirtas
  */
-@SuppressWarnings("serial")
 @Entity
 @Table(name = "tl_laqa11_content")
 public class QaContent implements Serializable {
+
+    private static final long serialVersionUID = 7300602981184988326L;
 
     @Id
     @Column
@@ -140,7 +139,7 @@ public class QaContent implements Serializable {
     @OrderBy("displayOrder")
     private Set<QaQueContent> qaQueContents;
 
-    @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "qaContent", cascade = CascadeType.ALL)
     private Set<QaSession> qaSessions;
 
     @OneToMany(cascade = CascadeType.ALL)

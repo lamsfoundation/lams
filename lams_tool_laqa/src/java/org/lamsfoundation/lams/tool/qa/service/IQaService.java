@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -33,7 +32,6 @@ import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
-import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.model.QaCondition;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
@@ -73,7 +71,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      */
     void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader);
 
-    void setDefineLater(String strToolContentID, boolean value);
+    void setDefineLater(Long toolContentID, boolean value);
 
     /**
      * Get users by given toolSessionID.
@@ -94,6 +92,8 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     QaContent getQaContent(long toolContentId);
 
     void saveOrUpdateQaContent(QaContent qa);
+    
+    void releaseFromCache(Object object);
 
     void updateUser(QaQueUsr qaQueUsr);
 
@@ -138,7 +138,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     List<QaQueContent> getAllQuestionEntriesSorted(final long qaContentId);
 
-    void saveOrUpdateQuestion(QaQueContent qaQuestion);
+    void saveOrUpdate(Object entity);
 
     /**
      * Return the qa session object according to the requested session id.
@@ -155,10 +155,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     void updateSession(QaSession qaSession);
 
-    void updateQaContent(QaContent qa);
-
-    void createQaContent(QaContent qa);
-
     void updateResponseVisibility(Long responseUid, boolean visible);
 
     boolean isRatingsEnabled(QaContent qaContent);
@@ -168,9 +164,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     void removeUserResponse(QaUsrResp resp);
 
     List getAllQuestionEntries(final Long uid);
-
-    void recalculateUserAnswers(QaContent content, Set<QaQueContent> oldQuestions, List<QaQuestionDTO> questionDTOs,
-	    List<QaQuestionDTO> deletedQuestions);
 
     /**
      * copyToolContent(Long fromContentId, Long toContentId) return void

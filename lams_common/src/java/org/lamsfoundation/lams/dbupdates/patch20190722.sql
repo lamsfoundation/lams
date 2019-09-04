@@ -3,6 +3,7 @@
 -- AUTO COMMIT stays ON because there is so many ALTER TABLE statements which are committed immediately anyway, that it does not make a difference
 
 -- Create QB question table
+
 CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
                                `uuid` BINARY(16) NOT NULL,
                                `type` TINYINT NOT NULL,
@@ -75,6 +76,7 @@ CREATE TABLE lams_qb_question_unit (`uid` BIGINT AUTO_INCREMENT,
 CREATE TABLE lams_qb_tool_answer (`answer_uid` BIGINT AUTO_INCREMENT,
                                   `tool_question_uid` BIGINT NOT NULL,
                                   `qb_option_uid` BIGINT DEFAULT NULL,
+                                  `answer` MEDIUMTEXT,
                                   PRIMARY KEY (answer_uid),
                                   CONSTRAINT FK_lams_qb_tool_answer_1 FOREIGN KEY (tool_question_uid) 
                                       REFERENCES lams_qb_tool_question (tool_question_uid) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -179,7 +181,7 @@ UPDATE tl_lamc11_usr_attempt AS ua, tl_lamc11_options_content AS mco, lams_qb_to
 
 -- prepare for answer inheritance        
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, mc_que_content_id, mc_que_option_id FROM tl_lamc11_usr_attempt;
+    SELECT uid, mc_que_content_id, mc_que_option_id, NULL FROM tl_lamc11_usr_attempt;
 
 -- clean up
 ALTER TABLE tl_lamc11_usr_attempt DROP COLUMN mc_que_content_id,
@@ -359,7 +361,7 @@ UPDATE tl_lascrt11_answer_log AS sl, tl_lascrt11_scratchie_answer AS sa, lams_qb
         
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, scratchie_item_uid, scratchie_answer_uid FROM tl_lascrt11_answer_log;
+    SELECT uid, scratchie_item_uid, scratchie_answer_uid, NULL FROM tl_lascrt11_answer_log;
 
 
 -- cleanup
@@ -631,21 +633,15 @@ INSERT INTO lams_qb_question_unit (qb_question_uid, display_order, multiplier, n
     ORDER BY u.question_uid, u.sequence_id;
 
 
--- shift Assessment answer UIDs by offset equal to existing UIDs of MCQ and Assessment answers in lams_qb_tool_answer                                    
-SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
 
 ALTER TABLE tl_laasse10_question_result DROP FOREIGN KEY FK_NEW_1720029621_693580A438BF8DFE;
-					
--- for Talca for following queries we need to turn off foreign key checking
--- otherwise when updating UIDs, we get a foreign key error for FK_tl_laasse10_question_result_1, which has nothing to do with UID
--- no other method seems to work
--- after the update a manual check of FK_tl_laasse10_question_result_1 shows that everything is still correct
-SET FOREIGN_KEY_CHECKS=0;
+	
+-- clean up corrupted Assessment results
+DELETE r FROM tl_laasse10_question_result AS r LEFT JOIN tl_laasse10_assessment_result AS a ON r.result_uid = a.uid WHERE a.uid IS NULL;
 
+-- shift Assessment answer UIDs by offset equal to existing UIDs of MCQ and Assessment answers in lams_qb_tool_answer                                    
+SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
 UPDATE tl_laasse10_question_result SET uid = uid + @max_answer_uid ORDER BY uid DESC;
-UPDATE tl_laasse10_option_answer SET question_result_uid = question_result_uid + @max_answer_uid;
-
-SET FOREIGN_KEY_CHECKS=1;
 
 -- rewrite references from Assessment options to QB options
 UPDATE tl_laasse10_question_result AS sl, tl_laasse10_question_option AS o, lams_qb_tool_question AS tq, lams_qb_option AS qo
@@ -685,7 +681,7 @@ ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answe
         
 -- prepare for answer inheritance
 INSERT INTO lams_qb_tool_answer
-    SELECT uid, assessment_question_uid, submitted_option_uid FROM tl_laasse10_question_result;
+    SELECT uid, assessment_question_uid, submitted_option_uid, answer_string FROM tl_laasse10_question_result;
 
 -- fill content_folder_id with real values from learning designs
 UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learning_activity AS activity, lams_learning_design AS design
@@ -695,13 +691,114 @@ UPDATE lams_qb_question AS qbque, lams_qb_tool_question AS toolque, lams_learnin
 	                AND activity.learning_design_id = design.learning_design_id;
 
 -- cleanup
-ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;
 ALTER TABLE tl_laasse10_question_result DROP COLUMN assessment_question_uid,
-                                           DROP COLUMN submitted_option_uid;
-                                   
+                                        DROP COLUMN submitted_option_uid,
+                                        DROP COLUMN answer_string;
+                                           
 DROP TABLE tl_laasse10_question_option,
-           tl_laasse10_assessment_unit,
-           tmp_question,
+           tl_laasse10_assessment_unit;
+           
+-- prepare for next tool migration, recreate tables
+DROP TABLE tmp_question;
+DROP TABLE tmp_question_match;
+
+CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
+                           content MEDIUMTEXT);
+
+CREATE TABLE tmp_question_match (question_uid BIGINT PRIMARY KEY,
+                                 target_uid BIGINT);
+ALTER TABLE tmp_question_match ADD INDEX (target_uid);           
+           
+           
+           
+-- QUESTION & ANSWERS (Q&A)
+
+SET @max_tool_question_id = (SELECT MAX(tool_question_uid) FROM lams_qb_tool_question);
+-- remove characters that prevent detecting identical questions
+UPDATE tl_laqa11_que_content SET `question` = TRIM(REPLACE(REPLACE(REPLACE(question, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+								 `feedback` = TRIM(REPLACE(REPLACE(REPLACE(feedback, '>&nbsp;', '>' ), '\r', '' ), '\n', '')),
+								  uid = uid + @max_tool_question_id ORDER BY uid DESC;
+UPDATE tl_laqa11_usr_resp SET `answer` = TRIM(REPLACE(REPLACE(REPLACE(answer, '>&nbsp;', '>' ), '\r', '' ), '\n', ''));
+                                        
+-- create a mapping of Q&A question UID -> its question text in a single column
+-- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
+-- Also remove all whitespace just for less demanding matching
+
+INSERT INTO tmp_question
+    SELECT q.uid AS question_uid,
+              REPLACE(REPLACE(REPLACE(strip_tags(question) COLLATE utf8mb4_0900_ai_ci, 
+                                ' ', ''),
+                       '\t', ''), 
+              '&nbsp;', '') AS content          
+    FROM tl_laqa11_que_content AS q
+    GROUP BY q.uid;
+
+-- create a mapping of Q&A question UID -> UID of one of Q&A questions which holds the same content
+INSERT INTO tmp_question_match
+    SELECT q.question_uid, merged.question_uid AS target_uid
+    FROM (SELECT * FROM tmp_question GROUP BY content) AS merged
+    JOIN tmp_question AS q USING (content)
+    GROUP BY q.question_uid;
+                                    
+-- reset column for matching QB questions with Scratchie questions
+UPDATE lams_qb_question SET tmp_question_id = -1;
+
+INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, 
+		name,
+		description, max_mark, feedback, answer_required, min_words_limit, tmp_question_id) 
+    SELECT NULL, 6, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
+        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+        qa.question, 1, qa.feedback, qa.answer_required, qa.min_words_limit, q.target_uid
+    FROM (SELECT uid,
+                 question AS question,
+                 IF(TRIM(feedback) = '', NULL, TRIM(feedback)) AS feedback,
+                 answer_required,
+                 min_words_limit,
+                 qa_content_id
+          FROM tl_laqa11_que_content) AS qa
+    JOIN (SELECT DISTINCT target_uid FROM tmp_question_match) AS q
+        ON qa.uid = q.target_uid
+    JOIN tl_laqa11_content AS c
+        ON qa.qa_content_id = c.uid;
+
+-- set up references to QB question UIDs created above
+INSERT INTO lams_qb_tool_question
+    SELECT q.question_uid, qb.uid, c.qa_content_id, qa.display_order
+    FROM lams_qb_question AS qb
+    JOIN tmp_question_match AS q
+        ON qb.tmp_question_id = q.target_uid
+    JOIN tl_laqa11_que_content AS qa
+        ON q.question_uid = qa.uid
+    JOIN tl_laqa11_content AS c
+        ON qa.qa_content_id = c.uid;
+
+-- remove columns from Q&A which are duplicated in Question Bank
+ALTER TABLE tl_laqa11_que_content DROP COLUMN question,
+                                  DROP COLUMN display_order,
+                                  DROP COLUMN feedback,
+                                  DROP COLUMN answer_required,
+                                  DROP COLUMN min_words_limit;
+                                  
+ALTER TABLE tl_laqa11_usr_resp DROP FOREIGN KEY FK_tl_laqa11_usr_resp_2,
+							   -- to keep consistency with other tools
+							   RENAME COLUMN response_id TO uid;
+
+-- shift Q&A answer UIDs by offset equal to existing UIDs of Q&A and Assessment answers in lams_qb_tool_answer                                    
+SET @max_answer_uid = (SELECT MAX(answer_uid) FROM lams_qb_tool_answer);
+UPDATE tl_laqa11_usr_resp SET uid = uid + @max_answer_uid ORDER BY uid DESC;
+
+
+-- prepare for answer inheritance        
+INSERT INTO lams_qb_tool_answer
+    SELECT uid, qa_que_content_id, NULL, answer FROM tl_laqa11_usr_resp;
+
+-- clean up
+ALTER TABLE tl_laqa11_usr_resp DROP COLUMN qa_que_content_id,
+							   DROP COLUMN answer;
+                               
+
+ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;
+DROP TABLE tmp_question,
            tmp_question_match,
            tmp_qb_question,
            tmp_qb_question_match,

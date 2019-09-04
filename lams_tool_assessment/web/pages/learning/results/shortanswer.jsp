@@ -17,7 +17,7 @@
 			</td>
 			
 			<td>
-				<input type="text" autocomplete="off" name="question${status.index}" value="<c:out value='${question.answerString}' />"  class="form-control" 
+				<input type="text" autocomplete="off" name="question${status.index}" value="<c:out value='${question.answer}' />"  class="form-control" 
 					disabled="disabled"
 				/>	
 			</td>	

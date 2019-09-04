@@ -4,7 +4,7 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="qaContent" value="${sessionMap.content}" />
@@ -306,7 +306,7 @@
 						</div>
 						<div class="panel-body">
 							<div class="panel">
-								<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
+								<c:out value="${userResponse.qaQuestion.qbQuestion.name}" escapeXml="false" />
 							</div>
 
 							<div class="row no-gutter">
@@ -370,7 +370,7 @@
 				<p>
 					<strong> <fmt:message key="label.question" /> ${status.count}:
 					</strong>
-					<c:out value="${question.question}" escapeXml="false" />
+					<c:out value="${question.qbQuestion.name}" escapeXml="false" />
 				</p>
 
 				<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
@@ -468,7 +468,7 @@
 		<form:form action="/lams/tool/laqa11/learning/learning.do" modelAttribute="qaLearningForm" method="POST" target="_self">
 			<form:hidden path="toolSessionID" id="toolSessionID" />
 			<form:hidden path="userID" id="userID" />
-			<form:hidden path="httpSessionID" />
+			<form:hidden path="sessionMapID" />
 			<form:hidden path="totalQuestionCount" />
 		</form:form>
 
