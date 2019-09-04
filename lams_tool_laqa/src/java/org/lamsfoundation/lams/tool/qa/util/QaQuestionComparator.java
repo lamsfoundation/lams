@@ -5,16 +5,13 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 
 /**
- * Comparator for <code>QaQueContent</code>. Only the display order is
- * compared.
+ * Comparator for <code>QaQueContent</code>. Only the display order
+ * is compared.
  *
  * @author Marcin Cieslak
  */
-public class QaQueContentComparator implements Comparator<QaQueContent> {
+public class QaQuestionComparator implements Comparator<QaQueContent> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compare(QaQueContent o1, QaQueContent o2) {
 	if (o1 != null && o2 != null) {
@@ -25,5 +22,4 @@ public class QaQueContentComparator implements Comparator<QaQueContent> {
 	    return -1;
 	}
     }
-
 }

@@ -183,15 +183,15 @@ public class QaLearningController implements QaAppConstants {
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<>();
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = httpSessionID == null ? null
-		: (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	String sessionMapID = qaLearningForm.getSessionMapID();
+	SessionMap<String, Object> sessionMap = sessionMapID == null ? null
+		: (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	if (sessionMap == null) {
 	    sessionMap = new SessionMap<>();
 	    Map mapSequentialAnswers = new HashMap();
 	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+	    qaLearningForm.setSessionMapID(sessionMap.getSessionID());
 
 	    sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		    qaService.getLearnerContentFolder(new Long(toolSessionID), user.getQueUsrId()));
@@ -210,7 +210,7 @@ public class QaLearningController implements QaAppConstants {
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
 	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
-	generalLearnerFlowDTO.setHttpSessionID(sessionMapId);
+	generalLearnerFlowDTO.setSessionMapID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 
@@ -492,9 +492,9 @@ public class QaLearningController implements QaAppConstants {
 
 	String forwardName = QaAppConstants.INDIVIDUAL_LEARNER_RESULTS;
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
+	String sessionMapID = qaLearningForm.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	/* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate the answers here */
@@ -550,9 +550,9 @@ public class QaLearningController implements QaAppConstants {
 
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+	qaLearningForm.setSessionMapID(sessionMap.getSessionID());
 	qaLearningForm.resetAll();
-	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+	generalLearnerFlowDTO.setSessionMapID(sessionMap.getSessionID());
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
@@ -659,13 +659,13 @@ public class QaLearningController implements QaAppConstants {
 
 	qaLearningForm.setCurrentQuestionIndex(new Integer(1).toString());
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
+	String sessionMapID = qaLearningForm.getSessionMapID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
-	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+	qaLearningForm.setSessionMapID(sessionMap.getSessionID());
+	generalLearnerFlowDTO.setSessionMapID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
 
 	// create mapQuestions
@@ -716,11 +716,11 @@ public class QaLearningController implements QaAppConstants {
 
 	if (qaContent.isShowOtherAnswers()) {
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
-	    String httpSessionID = qaLearningForm.getHttpSessionID();
-	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
+	    String sessionMapID = qaLearningForm.getSessionMapID();
+	    generalLearnerFlowDTO.setSessionMapID(sessionMapID);
 
 	    /** Set up the data for the view all answers screen */
-	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
+	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		    generalLearnerFlowDTO);
 
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -789,17 +789,17 @@ public class QaLearningController implements QaAppConstants {
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	qaLearningForm.setHttpSessionID(httpSessionID);
-	generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
+	String sessionMapID = qaLearningForm.getSessionMapID();
+	qaLearningForm.setSessionMapID(sessionMapID);
+	generalLearnerFlowDTO.setSessionMapID(sessionMapID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
 
 	/* recreate the users and responses */
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
-	QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
+	QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -857,8 +857,8 @@ public class QaLearningController implements QaAppConstants {
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	qaLearningForm.setToolSessionID(toolSessionID);
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	String sessionMapID = qaLearningForm.getSessionMapID();
+	qaLearningForm.setSessionMapID(sessionMapID);
 
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
@@ -894,9 +894,9 @@ public class QaLearningController implements QaAppConstants {
      */
     private Object[] storeSequentialAnswer(QaLearningForm qaLearningForm, HttpServletRequest request,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
-	String httpSessionID = qaLearningForm.getHttpSessionID();
+	String sessionMapID = qaLearningForm.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
 
 	String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 
@@ -959,8 +959,8 @@ public class QaLearningController implements QaAppConstants {
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	sessionMap.put(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
-	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
+	qaLearningForm.setSessionMapID(sessionMap.getSessionID());
+	generalLearnerFlowDTO.setSessionMapID(sessionMap.getSessionID());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -1018,8 +1018,8 @@ public class QaLearningController implements QaAppConstants {
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	String sessionMapID = qaLearningForm.getSessionMapID();
+	qaLearningForm.setSessionMapID(sessionMapID);
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	qaLearningForm.setToolSessionID(toolSessionID);
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
@@ -1082,9 +1082,9 @@ public class QaLearningController implements QaAppConstants {
 	qaSession.setSession_status(QaAppConstants.COMPLETED);
 	qaService.updateSession(qaSession);
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
-	// request.getSession().removeAttribute(httpSessionID);
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	String sessionMapID = qaLearningForm.getSessionMapID();
+	// request.getSession().removeAttribute(sessionMapID);
+	qaLearningForm.setSessionMapID(sessionMapID);
 
 	qaLearningForm.resetAll();
 
@@ -1112,9 +1112,9 @@ public class QaLearningController implements QaAppConstants {
 
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
+	String sessionMapID = qaLearningForm.getSessionMapID();
 
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	qaLearningForm.setSessionMapID(sessionMapID);
 
 	String toolSessionIDString = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	qaLearningForm.setToolSessionID(toolSessionIDString);
@@ -1159,9 +1159,9 @@ public class QaLearningController implements QaAppConstants {
     public String forwardtoReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request) throws IOException, ServletException, ToolException {
 
-	String httpSessionID = qaLearningForm.getHttpSessionID();
+	String sessionMapID = qaLearningForm.getSessionMapID();
 
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	qaLearningForm.setSessionMapID(sessionMapID);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -1209,10 +1209,10 @@ public class QaLearningController implements QaAppConstants {
      * data being analysed is the current user.
      */
     public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, QaSession qaSession,
-	    IQaService qaService, String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
+	    IQaService qaService, String sessionMapID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(httpSessionID);
+		.getAttribute(sessionMapID);
 	Long userId = user.getQueUsrId();
 	Set<QaQueContent> questions = qaContent.getQaQueContents();
 	generalLearnerFlowDTO.setQuestions(questions);
@@ -1349,8 +1349,7 @@ public class QaLearningController implements QaAppConstants {
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId,
-		isOnlyLeadersIncluded, searchString));
+	responcedata.put("total_rows", 1);
 
 	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
 	// calculated as they may have been averages over more than one criteria.

@@ -113,9 +113,9 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	return filteredSearchString;
     }
 
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_SELECT = "SELECT resp.*, AVG(rating.rating) avg_rating ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_SELECT = "SELECT resp.*, ans.*, AVG(rating.rating) avg_rating ";
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_FROM = " FROM tl_laqa11_usr_resp resp ";
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN = " JOIN lams_qb_tool_answer ans ON ans.uid = resp.uid "
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING_JOIN = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId JOIN tl_laqa11_que_usr usr"
 	    + " ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId "
 	    + " JOIN tl_laqa11_session sess ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId";
@@ -125,9 +125,9 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	    + " 	ON rat.rating_criteria_id = crit.rating_criteria_id AND crit.tool_content_id = :toolContentId"
 	    + " 	) rating ON rating.item_id = resp.uid GROUP BY resp.uid ORDER BY ";
 
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_SELECT = "SELECT resp.*, COUNT(rating_comment.item_id) count_comment ";
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_SELECT = "SELECT resp.*, ans.*, COUNT(rating_comment.item_id) count_comment ";
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_FROM = " FROM tl_laqa11_usr_resp resp ";
-    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN = " JOIN lams_qb_tool_answer ans ON ans.uid = resp.uid "
+    private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_JOIN = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId "
 	    + " JOIN tl_laqa11_que_usr usr ON resp.que_usr_id = usr.uid AND usr.que_usr_id!=:excludeUserId "
 	    + " JOIN tl_laqa11_session sess "
@@ -138,9 +138,9 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_COMMENT_COUNT_ORDER_BY = " GROUP BY resp.uid ORDER BY count_comment ASC, "
 	    + "resp.uid ASC";
 
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_SELECT = "SELECT resp.* ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_SELECT = "SELECT resp.*, ans.* ";
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_FROM = " FROM tl_laqa11_usr_resp resp ";
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN1 = " JOIN lams_qb_tool_answer ans ON ans.uid = resp.uid "
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_JOIN1 = " JOIN lams_qb_tool_answer ans ON ans.answer_uid = resp.uid "
 	    + " AND ans.answer IS NOT NULL AND ans.tool_question_uid = :questionId JOIN tl_laqa11_que_usr usr"
 	    + " ON resp.que_usr_id = usr.uid " + " AND usr.que_usr_id!=:excludeUserId "
 	    + " JOIN tl_laqa11_session sess "

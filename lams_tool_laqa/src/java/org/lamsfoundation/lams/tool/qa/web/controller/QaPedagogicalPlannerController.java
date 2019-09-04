@@ -92,7 +92,7 @@ public class QaPedagogicalPlannerController {
 		    } else {
 			QaQueContent qaQuestion = new QaQueContent();
 			qaQuestion.setDisplayOrder(questionIndex + 1);
-			qaQuestion.setQaContent(qaContent);
+			qaQuestion.setToolContentId(qaContent.getQaContentId());
 
 			QbQuestion qbQuestion = new QbQuestion();
 			qbQuestion.setAnswerRequired(false);
@@ -100,6 +100,7 @@ public class QaPedagogicalPlannerController {
 			qaService.saveOrUpdate(qbQuestion);
 
 			qaQuestion.setQbQuestion(qbQuestion);
+			qaQuestion.setQaContent(qaContent);
 			qaService.saveOrUpdate(qaQuestion);
 		    }
 		    questionIndex++;

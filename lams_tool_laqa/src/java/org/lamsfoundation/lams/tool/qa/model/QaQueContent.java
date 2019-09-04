@@ -37,13 +37,9 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
+ * Holds question content within a particular content
  *
  * @author Ozgur Demirtas
- *
- *         The value object that maps to our model database table: tl_laqa11_que_content The relevant hibernate mapping
- *         resides in: QaQueContent.hbm.xml
- *
- *         Holds question content within a particular content
  */
 @Entity
 @Table(name = "tl_laqa11_que_content")

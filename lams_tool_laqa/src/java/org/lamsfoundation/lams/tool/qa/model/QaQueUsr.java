@@ -45,13 +45,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
- *
+ * 
+ * Represents tool users.
+ * 
  * @author Ozgur Demirtas
- *
- *         The value object that maps to our model database table:
- *         tl_laqa11_que_usr The relevant hibernate mapping resides in: QaQueUsr.hbm.xml
- *
- *         Represents tool users.
  */
 @Entity
 @Table(name = "tl_laqa11_que_usr")

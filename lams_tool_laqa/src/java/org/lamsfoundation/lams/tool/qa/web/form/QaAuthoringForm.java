@@ -25,18 +25,20 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Authoring environment*/
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.model.QaContent;
 
 /**
  * @author Ozgur Demirtas
  */
 public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
+    
+    private QaContent qa;
+    
     protected String addContent;
     protected String removeContent;
     protected String removeAllContent;
     protected String submitAllContent;
     protected String submitTabDone;
-    protected String currentTab;
 
     protected String choice;
     protected String choiceBasic;
@@ -44,8 +46,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String choiceInstructions;
 
     /* basic content */
-    protected String title;
-    protected String instructions;
     protected String questionIndex;
     protected String isRemoveContent;
 
@@ -54,17 +54,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String reportTitle;
     protected String monitoringReportTitle;
     protected String endLearningMessage;
-    protected String usernameVisible;
-    protected String allowRateAnswers;
-    protected String notifyTeachersOnResponseSubmit;
-    protected String showOtherAnswers;
-    protected String questionsSequenced;
-    protected String lockWhenFinished;
-    protected String noReeditAllowed;
-    protected String reflect;
-    protected String reflectionSubject;
-    protected int maximumRates;
-    protected int minimumRates;
 
     /* proxy controllers for Monitoring tabs */
     protected String summaryMonitoring;
@@ -74,18 +63,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     protected String edit;
     private String contentFolderID;
-    private String addSingleQuestion;
-    private String editableQuestionIndex;
-    protected String editableQuestionText;
-    private String feedback;
-    private boolean required;
-    private int minWordsLimit;
-    private String editQuestionBoxRequest;
-
-    protected IQaService qaService;
-
-    protected boolean allowRichEditor;
-    protected boolean useSelectLeaderToolOuput;
 
     public void resetUserAction() {
 	this.addContent = null;
@@ -99,57 +76,13 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.editActivityMonitoring = null;
 	this.statsMonitoring = null;
 	this.edit = null;
-	this.allowRichEditor = false;
-	this.useSelectLeaderToolOuput = false;
     }
-
-    public void reset() {
-	this.addContent = null;
-	this.removeContent = null;
-	this.removeAllContent = null;
-	this.submitAllContent = null;
-	this.submitTabDone = null;
-
-	this.choice = null;
-	this.choiceBasic = null;
-	this.choiceAdvanced = null;
-	this.choiceInstructions = null;
-
-	this.title = null;
-	this.instructions = null;
-	this.questionIndex = null;
-	this.isRemoveContent = null;
-
-	this.endLearningMessage = null;
-	this.reportTitle = null;
-	this.monitoringReportTitle = null;
-	this.questionsSequenced = null;
-	this.lockWhenFinished = null;
-	this.noReeditAllowed = null;
-	this.reflect = null;
-	this.allowRichEditor = false;
-	this.useSelectLeaderToolOuput = false;
-
-	this.summaryMonitoring = null;
-	this.instructionsMonitoring = null;
-	this.editActivityMonitoring = null;
-	this.statsMonitoring = null;
-	this.edit = null;
-	this.toolContentID = null;
-	this.currentTab = null;
+    
+    public QaContent getQa() {
+	return qa;
     }
-
-    public void resetRadioBoxes() {
-	this.usernameVisible = OPTION_OFF;
-	this.allowRateAnswers = OPTION_OFF;
-	this.notifyTeachersOnResponseSubmit = OPTION_OFF;
-	this.questionsSequenced = OPTION_OFF;
-	this.lockWhenFinished = OPTION_OFF;
-	this.noReeditAllowed = OPTION_OFF;
-	this.reflect = OPTION_OFF;
-	this.allowRichEditor = false;
-	this.required = false;
-	this.useSelectLeaderToolOuput = false;
+    public void setQa(QaContent qa) {
+	this.qa = qa;
     }
 
     /**
@@ -245,36 +178,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the instructions.
-     */
-    public String getInstructions() {
-	return instructions;
-    }
-
-    /**
-     * @param instructions
-     *            The instructions to set.
-     */
-    public void setInstructions(String instructions) {
-	this.instructions = instructions;
-    }
-
-    /**
-     * @return Returns the title.
-     */
-    public String getTitle() {
-	return title;
-    }
-
-    /**
-     * @param title
-     *            The title to set.
-     */
-    public void setTitle(String title) {
-	this.title = title;
-    }
-
-    /**
      * @return Returns the choiceAdvanced.
      */
     public String getChoiceAdvanced() {
@@ -350,51 +253,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the usernameVisible.
-     */
-    public String getUsernameVisible() {
-	return usernameVisible;
-    }
-
-    /**
-     * @param usernameVisible
-     *            The usernameVisible to set.
-     */
-    public void setUsernameVisible(String usernameVisible) {
-	this.usernameVisible = usernameVisible;
-    }
-
-    /**
-     * @return Returns the allowRateAnswers.
-     */
-    public String getAllowRateAnswers() {
-	return allowRateAnswers;
-    }
-
-    /**
-     * @param allowRateAnswers
-     *            The allowRateAnswers to set.
-     */
-    public void setAllowRateAnswers(String allowRateAnswers) {
-	this.allowRateAnswers = allowRateAnswers;
-    }
-
-    /**
-     * @return Returns the notifyTeachersOnResponseSubmit.
-     */
-    public String getNotifyTeachersOnResponseSubmit() {
-	return notifyTeachersOnResponseSubmit;
-    }
-
-    /**
-     * @param notifyTeachersOnResponseSubmit
-     *            The notifyTeachersOnResponseSubmit to set.
-     */
-    public void setNotifyTeachersOnResponseSubmit(String notifyTeachersOnResponseSubmit) {
-	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
-    }
-
-    /**
      * @return Returns the submitTabDone.
      */
     public String getSubmitTabDone() {
@@ -407,43 +265,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setSubmitTabDone(String submitTabDone) {
 	this.submitTabDone = submitTabDone;
-    }
-
-    /**
-     * @return Returns the questionsSequenced.
-     */
-    public String getQuestionsSequenced() {
-	return questionsSequenced;
-    }
-
-    /**
-     * @param questionsSequenced
-     *            The questionsSequenced to set.
-     */
-    public void setQuestionsSequenced(String questionsSequenced) {
-	this.questionsSequenced = questionsSequenced;
-    }
-
-    /**
-     * @return
-     */
-    public int getMaximumRates() {
-	return maximumRates;
-    }
-
-    public void setMaximumRates(int maximumRates) {
-	this.maximumRates = maximumRates;
-    }
-
-    /**
-     * @return
-     */
-    public int getMinimumRates() {
-	return minimumRates;
-    }
-
-    public void setMinimumRates(int minimumRates) {
-	this.minimumRates = minimumRates;
     }
 
     /**
@@ -567,66 +388,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the currentTab.
-     */
-    public String getCurrentTab() {
-	return currentTab;
-    }
-
-    /**
-     * @param currentTab
-     *            The currentTab to set.
-     */
-    public void setCurrentTab(String currentTab) {
-	this.currentTab = currentTab;
-    }
-
-    /**
-     * @return Returns the qaService.
-     */
-    public IQaService getQaService() {
-	return qaService;
-    }
-
-    /**
-     * @param qaService
-     *            The qaService to set.
-     */
-    public void setQaService(IQaService qaService) {
-	this.qaService = qaService;
-    }
-
-    /**
-     * @return Returns the reflect.
-     */
-    public String getReflect() {
-	return reflect;
-    }
-
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
-    }
-
-    /**
      * @return Returns the contentFolderID.
      */
     public String getContentFolderID() {
@@ -639,157 +400,5 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
-    }
-
-    /**
-     * @return Returns the addSingleQuestion.
-     */
-    public String getAddSingleQuestion() {
-	return addSingleQuestion;
-    }
-
-    /**
-     * @param addSingleQuestion
-     *            The addSingleQuestion to set.
-     */
-    public void setAddSingleQuestion(String addSingleQuestion) {
-	this.addSingleQuestion = addSingleQuestion;
-    }
-
-    /**
-     * @return Returns the editableQuestionIndex.
-     */
-    public String getEditableQuestionIndex() {
-	return editableQuestionIndex;
-    }
-
-    /**
-     * @param editableQuestionIndex
-     *            The editableQuestionIndex to set.
-     */
-    public void setEditableQuestionIndex(String editableQuestionIndex) {
-	this.editableQuestionIndex = editableQuestionIndex;
-    }
-
-    /**
-     * @return Returns the editableQuestionText.
-     */
-    public String getEditableQuestionText() {
-	return editableQuestionText;
-    }
-
-    /**
-     * @param editableQuestionText
-     *            The editableQuestionText to set.
-     */
-    public void setEditableQuestionText(String editableQuestionText) {
-	this.editableQuestionText = editableQuestionText;
-    }
-
-    /**
-     * @return Returns the feedback.
-     */
-    public String getFeedback() {
-	return feedback;
-    }
-
-    /**
-     * @param feedback
-     *            The feedback to set.
-     */
-    public void setFeedback(String feedback) {
-	this.feedback = feedback;
-    }
-
-    /**
-     * @return Returns the editQuestionBoxRequest.
-     */
-    public String getEditQuestionBoxRequest() {
-	return editQuestionBoxRequest;
-    }
-
-    /**
-     * @param editQuestionBoxRequest
-     *            The editQuestionBoxRequest to set.
-     */
-    public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
-	this.editQuestionBoxRequest = editQuestionBoxRequest;
-    }
-
-    /**
-     * @return Returns the lockWhenFinished.
-     */
-    public String getLockWhenFinished() {
-	return lockWhenFinished;
-    }
-
-    /**
-     * @param lockWhenFinished
-     *            The lockWhenFinished to set.
-     */
-    public void setLockWhenFinished(String lockWhenFinished) {
-	this.lockWhenFinished = lockWhenFinished;
-    }
-
-    /**
-     * @return Returns the noReeditAllowed.
-     */
-    public String getNoReeditAllowed() {
-	return noReeditAllowed;
-    }
-
-    /**
-     * @param noReeditAllowed
-     *            The noReeditAllowed to set.
-     */
-    public void setNoReeditAllowed(String noReeditAllowed) {
-	this.noReeditAllowed = noReeditAllowed;
-    }
-
-    /**
-     * @return Returns the showOtherAnswers.
-     */
-    public String getShowOtherAnswers() {
-	return showOtherAnswers;
-    }
-
-    /**
-     * @param showOtherAnswers
-     *            The showOtherAnswers to set.
-     */
-    public void setShowOtherAnswers(String showOtherAnswers) {
-	this.showOtherAnswers = showOtherAnswers;
-    }
-
-    public boolean isAllowRichEditor() {
-	return allowRichEditor;
-    }
-
-    public void setAllowRichEditor(boolean allowRichEditor) {
-	this.allowRichEditor = allowRichEditor;
-    }
-
-    public boolean isUseSelectLeaderToolOuput() {
-	return useSelectLeaderToolOuput;
-    }
-
-    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
-    }
-
-    public boolean isRequired() {
-	return required;
-    }
-
-    public void setRequired(boolean required) {
-	this.required = required;
-    }
-
-    public void setMinWordsLimit(int minWordsLimit) {
-	this.minWordsLimit = minWordsLimit;
-    }
-
-    public int getMinWordsLimit() {
-	return minWordsLimit;
     }
 }

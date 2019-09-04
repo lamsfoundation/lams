@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -70,7 +69,6 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.model.QaCondition;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
@@ -193,12 +191,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void setDefineLater(String strToolContentID, boolean value) {
-	QaContent qaContent = getQaContent(new Long(strToolContentID).longValue());
+    public void setDefineLater(Long toolContentID, boolean value) {
+	QaContent qaContent = getQaContent(toolContentID);
 
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
-	    updateQaContent(qaContent);
+	    saveOrUpdateQaContent(qaContent);
 	}
     }
 
@@ -209,11 +207,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void createQaContent(QaContent qaContent) {
-	qaDAO.saveQa(qaContent);
-    }
-
-    @Override
     public QaContent getQaContent(long toolContentID) {
 	return qaDAO.getQaByContentId(toolContentID);
     }
@@ -221,6 +214,11 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     @Override
     public void saveOrUpdateQaContent(QaContent qa) {
 	qaDAO.saveOrUpdateQa(qa);
+    }
+    
+    @Override
+    public void releaseFromCache(Object object) {
+	qaQuestionDAO.releaseFromCache(object);
     }
 
     @Override
@@ -362,11 +360,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void updateQaContent(QaContent qa) {
-	qaDAO.updateQa(qa);
-    }
-
-    @Override
     public void updateSession(QaSession qaSession) {
 	qaSessionDAO.UpdateQaSession(qaSession);
     }
@@ -433,71 +426,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void recalculateUserAnswers(QaContent content, Set<QaQueContent> oldQuestions,
-	    List<QaQuestionDTO> questionDTOs, List<QaQuestionDTO> deletedQuestions) {
-
-	// create list of modified questions
-	List<QaQuestionDTO> modifiedQuestions = new ArrayList<>();
-	for (QaQueContent oldQuestion : oldQuestions) {
-	    for (QaQuestionDTO questionDTO : questionDTOs) {
-		if (oldQuestion.getUid().equals(questionDTO.getUid())) {
-
-		    // question is different
-		    if (!oldQuestion.getQbQuestion().getName().equals(questionDTO.getQuestion())) {
-			modifiedQuestions.add(questionDTO);
-		    }
-		}
-	    }
-	}
-
-	Set<QaSession> sessionList = content.getQaSessions();
-	for (QaSession session : sessionList) {
-	    Long toolSessionId = session.getQaSessionId();
-	    Set<QaQueUsr> sessionUsers = session.getQaQueUsers();
-
-	    for (QaQueUsr user : sessionUsers) {
-
-		// get all finished user results
-		List<QaUsrResp> userAttempts = qaUsrRespDAO.getResponsesByUserUid(user.getUid());
-		Iterator<QaUsrResp> iter = userAttempts.iterator();
-		while (iter.hasNext()) {
-		    QaUsrResp resp = iter.next();
-
-		    QaQueContent question = resp.getQaQuestion();
-
-		    boolean isRemoveQuestionResult = false;
-
-		    // [+] if the question is modified
-		    for (QaQuestionDTO modifiedQuestion : modifiedQuestions) {
-			if (question.getUid().equals(modifiedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
-			    break;
-			}
-		    }
-
-		    // [+] if the question was removed
-		    for (QaQuestionDTO deletedQuestion : deletedQuestions) {
-			if (question.getUid().equals(deletedQuestion.getUid())) {
-			    isRemoveQuestionResult = true;
-			    break;
-			}
-		    }
-
-		    if (isRemoveQuestionResult) {
-			iter.remove();
-			qaUsrRespDAO.removeUserResponse(resp);
-		    }
-
-		    // [+] doing nothing if the new question was added
-
-		}
-
-	    }
-	}
-
-    }
-
-    @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
 	if (qaContent == null) {
@@ -505,7 +433,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    throw new DataMissingException("qaContent is missing");
 	}
 	qaContent.setDefineLater(false);
-	updateQaContent(qaContent);
+	saveOrUpdateQaContent(qaContent);
     }
 
     @Override
@@ -539,12 +467,11 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    for (QaQueContent question : toContent.getQaQueContents()) {
 		qaQuestionDAO.saveOrUpdate(question);
 	    }
-	    qaDAO.saveQa(toContent);
+	    saveOrUpdateQaContent(toContent);
 	}
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void removeToolContent(Long toolContentId) throws ToolException {
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
@@ -565,7 +492,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);

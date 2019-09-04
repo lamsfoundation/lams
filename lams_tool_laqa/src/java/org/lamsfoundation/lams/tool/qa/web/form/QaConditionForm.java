@@ -24,8 +24,8 @@ package org.lamsfoundation.lams.tool.qa.web.form;
 
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.web.form.TextSearchForm;
 
 /**
@@ -61,10 +61,10 @@ public class QaConditionForm extends TextSearchForm {
 	super.populateForm(condition);
 	setOrderId(condition.getOrderId());
 	setDisplayName(condition.getDisplayName());
-	Integer[] selectedItems = new Integer[condition.temporaryQuestionDTOSet.size()];
+	Integer[] selectedItems = new Integer[condition.temporaryQaQuestions.size()];
 	int questionIndex = 0;
-	for (QaQuestionDTO question : condition.temporaryQuestionDTOSet) {
-	    selectedItems[questionIndex] = new Integer(question.getDisplayOrder());
+	for (QaQueContent qaQuestion : condition.temporaryQaQuestions) {
+	    selectedItems[questionIndex] = qaQuestion.getDisplayOrder();
 	    questionIndex++;
 	}
 	setSelectedItems(selectedItems);

@@ -53,22 +53,8 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
     }
 
     @Override
-    public void updateQa(QaContent qa) {
-	getSession().update(qa);
-    }
-
-    @Override
-    public void saveQa(QaContent qa) {
-	getSession().save(qa);
-    }
-
-    @Override
     public void saveOrUpdateQa(QaContent qa) {
 	getSession().saveOrUpdate(qa);
-    }
-
-    public void createQa(QaContent qa) {
-	getSession().save(qa);
     }
 
     @Override

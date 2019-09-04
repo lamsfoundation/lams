@@ -40,28 +40,21 @@ public interface QaAppConstants {
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";
-    public static final String ACTIVITY_TITLE_KEY = "activityTitleKey";
-    public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
-    public static final String LIST_QUESTION_DTOS = "questionDTOs";
-    public static final String LIST_DELETED_QUESTION_DTOS = "deletedQuestionDTOs";
+    public static final String LIST_QUESTIONS = "questions";
+    public static final String LIST_DELETED_QUESTIONS = "deletedQuestions";
     public static final String QUESTION_DTO = "questionDTO";
     public static final String RESPONSES = "responses";
     
     public static final String TOOL_SERVICE = "toolService";
-    public static final String AUTHORING_STARTER = "starter";
     public static final String TITLE = "title";
     public static final String INSTRUCTIONS = "instructions";
     public static final String LOAD_LEARNER = "learning/AnswersContent";
-    public static final String LEARNING_STARTER = "learningStarter";
-    public static final String MONITORING_STARTER = "monitoringStarter";
     public static final String VIEW_ALL_RESULTS = "viewAllResults";
     public static final String INDIVIDUAL_LEARNER_RESULTS = "learning/IndividualLearnerResults";
     public static final String MAP_ALL_RESULTS_KEY = "mapAllResultsKey";
     public static final String SOURCE_QA_STARTER = "sourceQaStarter";
-    public static final String EDITABLE_RESPONSE_ID = "editableResponseId";
     public static final String RESPONSE_UID = "responseUid";
     public static final String IS_HIDE_ITEM = "isHideItem";
-    public static final String COPY_TOOL_CONTENT = "copyToolContent";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String TOOL_SESSION_ID = "toolSessionID";
     public static final String NOTEBOOK = "notebook";
@@ -75,29 +68,18 @@ public interface QaAppConstants {
     public static final String REMOVABLE_QUESTION_INDEX = "removableQuestionIndex";
     public static final String DEFINE_LATER = "defineLater";
     public static final String WAIT_FOR_LEADER = "waitForLeader";
-    public static final String USERNAME_VISIBLE = "usernameVisible";
-    public static final String ALLOW_RATE_ANSWERS = "allowRateAnswers";
-    public static final String NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT = "notifyTeachersOnResponseSubmit";
-    public static final String QUESTIONS_SEQUENCED = "questionsSequenced";
-    public static final String MAXIMUM_RATES = "maximumRates";
-    public static final String MINIMUM_RATES = "minimumRates";
 
     public static final String SOURCE_MC_STARTER = "sourceMcStarter";
-    public static final Integer MAX_QUESTION_COUNT = new Integer(50);
-
-    public static final String REFLECT = "reflect";
-    public static final String REFLECTION_SUBJECT = "reflectionSubject";
+    public static final Integer MAX_QUESTION_COUNT = 50;
 
     public static final String GENERAL_LEARNER_FLOW_DTO = "generalLearnerFlowDTO";
 
-    public static final Long INITIAL_QUESTION_COUNT = new Long(1);
+    public static final Long INITIAL_QUESTION_COUNT = 1L;
 
     /*
      * Struts level constants
      */
     public static final String LOAD_MONITORING = "loadMonitoring";
-    public static final String LOAD_QUESTIONS = "load";
-    public static final String LOAD_STARTER = "starter";
     public static final String LEARNING_MODE = "learningMode";
     public static final String SUCCESS = "success";
 
@@ -129,26 +111,6 @@ public interface QaAppConstants {
 
     public static final String MAP_TOOL_SESSIONS = "mapToolSessions";
     public static final Integer MAX_TOOL_SESSION_COUNT = new Integer(500);
-    public static final String USER_EXCEPTION_WRONG_FORMAT = "userExceptionWrongFormat";
-    public static final String USER_EXCEPTION_UNCOMPATIBLE_IDS = "userExceptionUncompatibleIds";
-    public static final String USER_EXCEPTION_NUMBERFORMAT = "userExceptionNumberFormat";
-    // public static final String USER_EXCEPTION_CONTENT_DOESNOTEXIST
-    // ="userExceptionContentDoesNotExist";
-    public static final String USER_EXCEPTION_TOOLSESSION_DOESNOTEXIST = "userExceptionToolSessionDoesNotExist";
-    public static final String USER_EXCEPTION_CONTENTID_REQUIRED = "userExceptionContentIdRequired";
-    public static final String USER_EXCEPTION_TOOLSESSIONID_REQUIRED = "userExceptionToolSessionIdRequired";
-    public static final String USER_EXCEPTION_USERID_NOTAVAILABLE = "userExceptionUserIdNotAvailable";
-    public static final String USER_EXCEPTION_USERID_NOTNUMERIC = "userExceptionUserIdNotNumeric";
-    public static final String USER_EXCEPTION_ONLYCONTENT_ANDNOSESSIONS = "userExceptionOnlyContentAndNoSessions";
-    public static final String USER_EXCEPTION_USERID_EXISTING = "userExceptionUserIdExisting";
-    public static final String USER_EXCEPTION_USER_DOESNOTEXIST = "userExceptionUserDoesNotExist";
-    public static final String USER_EXCEPTION_MONITORINGTAB_CONTENTID_REQUIRED = "userExceptionMonitoringTabContentIdRequired";
-    public static final String USER_EXCEPTION_NO_TOOL_SESSIONS = "userExceptionNoToolSessions";
-    public static final String USER_EXCEPTION_NO_STUDENT_ACTIVITY = "userExceptionNoStudentActivity";
-    public static final String USER_EXCEPTION_CONTENT_IN_USE = "userExceptionContentInUse";
-    public static final String USER_EXCEPTION_MODE_REQUIRED = "userExceptionModeRequired";
-    public static final String USER_EXCEPTION_MODE_INVALID = "userExceptionModeInvalid";
-    public static final String USER_EXCEPTION_QUESTIONS_DUPLICATE = "userExceptionQuestionsDuplicate";
     public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
 
     public static final String COUNT_ALL_USERS = "countAllUsers";
@@ -187,10 +149,6 @@ public interface QaAppConstants {
     public static final String TO_TOOL_CONTENT_ID = "toToolContentId";
     public static final String LEARNER_REPORT = "learnerRep";
     public static final String LEARNER_REP = "individualLearnerRep";
-    public static final String REQUEST_LEARNING_REPORT = "requestLearningReport";
-    public static final String REQUEST_LEARNING_REPORT_PROGRESS = "requestLearningReportProgress";
-    public static final String REQUEST_PREVIEW = "requestPreview";
-    public static final String REQUEST_LEARNING_REPORT_VIEWONLY = "requestLearningReportViewOnly";
     public static final String REVISITED_LEARNER_REP = "revisitedLearnerRep";
     public static final String IS_DISABLED = "isDisabled";
 

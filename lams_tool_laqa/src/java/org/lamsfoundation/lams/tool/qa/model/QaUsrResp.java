@@ -43,13 +43,8 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 /**
  * Holds user responses to questions
  *
- * QaUsrResp Value Object The value object that maps to our model database
- * table: tl_laqa11_usr_resp The relevant hibernate mapping resides in:
- * QaQueResp.hbm.xml
- *
  * @author Ozgur Demirtas
  */
-
 @Entity
 @Table(name = "tl_laqa11_usr_resp")
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer

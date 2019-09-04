@@ -38,13 +38,13 @@ public class QaQuestionDTO implements Comparable<QaMonitoredUserDTO> {
     private boolean required;
     private int minWordsLimit;
 
-    public QaQuestionDTO(QaQueContent que) {
-	this.question = que.getQbQuestion().getName();
-	this.displayOrder = String.valueOf(que.getDisplayOrder());
-	this.feedback = que.getQbQuestion().getFeedback() != null ? que.getQbQuestion().getFeedback() : "";
-	this.required = que.getQbQuestion().isAnswerRequired();
-	this.minWordsLimit = que.getQbQuestion().getMinWordsLimit();
-	this.uid = que.getUid();
+    public QaQuestionDTO(QaQueContent qaQuestion) {
+	this.question = qaQuestion.getQbQuestion().getName();
+	this.displayOrder = String.valueOf(qaQuestion.getDisplayOrder());
+	this.feedback = qaQuestion.getQbQuestion().getFeedback() != null ? qaQuestion.getQbQuestion().getFeedback() : "";
+	this.required = qaQuestion.getQbQuestion().isAnswerRequired();
+	this.minWordsLimit = qaQuestion.getQbQuestion().getMinWordsLimit();
+	this.uid = qaQuestion.getUid();
     }
 
     public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required, int minWordsLimit) {
