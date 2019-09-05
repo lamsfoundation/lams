@@ -53,7 +53,9 @@
 			<div class="panel-heading">
 				<a href="javascript:launchPopup('<lams:WebAppURL/>monitoring/getPrintAnswers.do?questionUid=${questionDto.uid}&toolSessionID=${groupDto.sessionId}');"	
 					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
-				<c:out value="${questionDto.question}" escapeXml="false"/>
+				<c:out value="${questionDto.name}" escapeXml="false"/>
+				<br>
+				<c:out value="${questionDto.description}" escapeXml="false"/>
 			</div>
 			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${questionDto.uid}'">
