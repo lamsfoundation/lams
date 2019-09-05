@@ -137,7 +137,7 @@ input.borderless-text-input:-o-input-placeholder {
    	z-index: 2;
    	visibility:hidden;
 }	
-#assessmentQuestionForm:hover #question-settings-link, #question-settings-link.btn-primary {
+form:hover #question-settings-link, #question-settings-link.btn-primary {
 	visibility:visible;
 }
 

@@ -334,6 +334,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
+	    qbQuestion.setQuestionId(form.getQuestionId());
 
 	    qaQuestion = new QaQueContent();
 	    int maxSeq = 1;
@@ -368,13 +369,12 @@ public class QaAuthoringController implements QaAppConstants {
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
 		// impossible scenario as long as ESSAY question type can't have version
-		throw new RuntimeException("Impossible scenario as long as ESSAY question type can't have version");
+		throw new RuntimeException("Impossible scenario as long as ESSAY question type can't have new versions");
 	    }
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
 		// new question gets created
 		updatedQuestion = qbQuestion.clone();
 		updatedQuestion.clearID();
-		updatedQuestion.setQuestionId(qbService.generateNextQuestionId());
 		updatedQuestion.setVersion(1);
 		updatedQuestion.setCreateDate(new Date());
 	    }
@@ -412,6 +412,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    @RequestParam String sessionMapID, @RequestParam String contentFolderID) {
 	form.setSessionMapID(sessionMapID);
 	form.setContentFolderID(contentFolderID);
+	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 	
 	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
@@ -435,6 +436,7 @@ public class QaAuthoringController implements QaAppConstants {
 	QaQueContent qaQuestion = rList.get(questionIndex);
 	QbQuestion qbQuestion = qaQuestion.getQbQuestion();
 
+	form.setQuestionId(qbQuestion.getQuestionId());
 	form.setTitle(qbQuestion.getName());
 	form.setDescription(qbQuestion.getDescription());
 	if (questionIndex >= 0) {

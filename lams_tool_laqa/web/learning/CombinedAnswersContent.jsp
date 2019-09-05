@@ -11,16 +11,16 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<strong> 
-									<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" />
-								</strong>
+								<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" />
 							</div>
 						</div>
 						
 						<div class="panel-body">
-							<div class="panel">
-								<c:out value="${questionEntry.value.description}" escapeXml="false" />
-							</div>
+							<c:if test="${not empty questionEntry.value.description}">
+								<div class="panel">
+									<c:out value="${questionEntry.value.description}" escapeXml="false" />
+								</div>
+							</c:if>
 						
 							<div class="answer-req">
 								<fmt:message key="label.learning.yourAnswer" /> 

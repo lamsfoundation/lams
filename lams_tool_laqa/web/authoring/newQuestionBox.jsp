@@ -73,7 +73,13 @@
 		    		    };
 		    		    				
 		    			$('#newQuestionForm').ajaxSubmit(items);
-		    		}
+		    		},
+		    		invalidHandler: formValidationInvalidHandler,
+					errorElement: "em",
+					errorPlacement: formValidationErrorPlacement,
+					success: formValidationSuccess,
+					highlight: formValidationHighlight,
+					unhighlight: formValidationUnhighlight
 		  		});
 
 			   	//spinner
@@ -102,56 +108,65 @@
 			</div>
 			
 			<div class="panel-body panel-${type}-body">
-	
-			<lams:errors/>
-			
 			<form:form action="/lams/tool/laqa11/authoring/saveQuestion.do" method="post" modelAttribute="newQuestionForm" id="newQuestionForm">
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="itemIndex" />
 				<form:hidden path="contentFolderID"/>
+				<form:hidden path="questionId" />
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
+			
+				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
+					<fmt:message key="label.settings" />
+				</button>
+				
+				<div class="question-tab">
+					<lams:errors/>
 	
-				<div id="title-container" class="form-group">
-					<c:set var="TITLE_LABEL"><fmt:message key="label.title"/> </c:set>
-					<form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
-					    	placeholder="${TITLE_LABEL}"/>
-				</div>
-
-				<div class="form-group form-group-cke">
-					<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.question"/></c:set>
-					<lams:CKEditor id="description" value="${newQuestionForm.description}" contentFolderID="${newQuestionForm.contentFolderID}" 
-						placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
+					<div id="title-container" class="form-group">
+						<c:set var="TITLE_LABEL"><fmt:message key="label.title"/> </c:set>
+						<form:input path="title" id="title" cssClass="form-control borderless-text-input" tabindex="1" maxlength="255" 
+						    	placeholder="${TITLE_LABEL}"/>
+					</div>
+	
+					<div class="form-group form-group-cke">
+						<c:set var="QUESTION_DESCRIPTION_LABEL"><fmt:message key="label.question"/></c:set>
+						<lams:CKEditor id="description" value="${newQuestionForm.description}" contentFolderID="${newQuestionForm.contentFolderID}" 
+							placeholder="${QUESTION_DESCRIPTION_LABEL}"	 />
+					</div>
 				</div>
 				
-				<div class="checkbox">
-					<label> 
-						<form:checkbox path="answerRequired"/>&nbsp;<fmt:message key="label.required.desc" />
-					</label>
-				</div>
-			
-				<div class="form-group row form-inline" style="display: flex; align-items: center;">
-				    <label for="min-words-limit-checkbox" class="col-sm-3">
-						<input type="checkbox" id="min-words-limit-checkbox" name="noname"
-							<c:if test="${newQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
-				    	<fmt:message key="label.minimum.number.words" >
-							<fmt:param> </fmt:param>
-						</fmt:message>
-				    </label>
-					    
-				    <div class="col-sm-9">
-				    	<form:input path="minWordsLimit" id="min-words-limit"/>
-				    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
-				    </div>
-				</div>
+				<div class="settings-tab">
+					<div class="checkbox">
+						<label> 
+							<form:checkbox path="answerRequired"/>&nbsp;<fmt:message key="label.required.desc" />
+						</label>
+					</div>
+				
+					<div class="form-group row form-inline" style="display: flex; align-items: center;">
+					    <label for="min-words-limit-checkbox" class="col-sm-4">
+							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
+								<c:if test="${newQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
+					    	<fmt:message key="label.minimum.number.words" >
+								<fmt:param> </fmt:param>
+							</fmt:message>
+					    </label>
+						    
+					    <div class="col-sm-8">
+					    	<form:input path="minWordsLimit" id="min-words-limit"/>
+					    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
+					    </div>
+					</div>
+						
+					<div class="form-group">
+						<c:set var="FEEDBACK_LABEL"><fmt:message key="label.feedback"/></c:set>
+						<lams:CKEditor id="feedback" value="${newQuestionForm.feedback}" 
+							placeholder="${FEEDBACK_LABEL}" contentFolderID="${newQuestionForm.contentFolderID}" />
+					</div>
 					
-				<div class="form-group">
-					<c:set var="FEEDBACK_LABEL"><fmt:message key="label.feedback"/></c:set>
-					<lams:CKEditor id="feedback" value="${newQuestionForm.feedback}" 
-						placeholder="${FEEDBACK_LABEL}" contentFolderID="${newQuestionForm.contentFolderID}" />
+					<lams:OutcomeAuthor qbQuestionId="${newQuestionForm.questionId}"  />
 				</div>
 			</form:form>
-
 			</div>
 		</div>
 			

@@ -305,9 +305,11 @@
 						</div>
 						
 						<div class="panel-body">
-							<div class="panel">
-								<c:out value="${userResponse.qaQuestion.qbQuestion.description}" escapeXml="false" />
-							</div>
+							<c:if test="${not empty userResponse.qaQuestion.qbQuestion.description}">
+								<div class="panel">
+									<c:out value="${userResponse.qaQuestion.qbQuestion.description}" escapeXml="false" />
+								</div>
+							</c:if>
 
 							<div class="row no-gutter">
 								<!-- split if ratings are on -->
@@ -368,9 +370,7 @@
 			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 
 				<p>
-					<strong> 
-						${status.count}. <c:out value="${question.qbQuestion.name}" escapeXml="false" />
-					</strong>
+					${status.count}. <c:out value="${question.qbQuestion.name}" escapeXml="false" />
 				</p>
 
 				<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
