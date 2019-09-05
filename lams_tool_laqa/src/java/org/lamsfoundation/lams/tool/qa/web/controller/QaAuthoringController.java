@@ -54,9 +54,7 @@ import org.lamsfoundation.lams.tool.qa.model.QaCondition;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -100,8 +98,7 @@ public class QaAuthoringController implements QaAppConstants {
 
     @RequestMapping("/authoring")
     public String execute(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request,
-	    @RequestParam Long toolContentID) throws IOException, ServletException, QaApplicationException {
-	QaUtils.cleanUpSessionAbsolute(request);
+	    @RequestParam Long toolContentID) throws IOException, ServletException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -132,8 +129,6 @@ public class QaAuthoringController implements QaAppConstants {
 	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
 	qaQuestions.clear();
 	qaQuestions.addAll(qa.getQaQueContents());
-
-	form.resetUserAction();
 
 	// request is from monitoring module
 	if (mode.isTeacher()) {
@@ -284,7 +279,6 @@ public class QaAuthoringController implements QaAppConstants {
 	    qaService.deleteCondition(condition);
 	}
 
-	form.resetUserAction();
 	return "authoring/AuthoringTabsHolder";
     }
 

@@ -53,9 +53,7 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -91,15 +89,12 @@ public class QaMonitoringController implements QaAppConstants {
 
     @RequestMapping("/monitoring")
     private String execute(@ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm,
-	    HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
-	QaUtils.cleanUpSessionAbsolute(request);
-
+	    HttpServletRequest request) throws IOException, ServletException {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	if ((strToolContentID == null) || (strToolContentID.length() == 0)) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No Tool Content ID found");
 	}
 	qaMonitoringForm.setToolContentID(strToolContentID);
@@ -107,7 +102,6 @@ public class QaMonitoringController implements QaAppConstants {
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	QaContent qaContent = qaService.getQaContent(new Long(toolContentID).longValue());
 	if (qaContent == null) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
 

@@ -58,10 +58,8 @@ import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.LearningUtil;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -111,10 +109,7 @@ public class QaLearningController implements QaAppConstants {
 
     @RequestMapping("/learning")
     public String execute(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm, HttpServletRequest request)
-	    throws IOException, ServletException, QaApplicationException {
-
-	QaUtils.cleanUpSessionAbsolute(request);
-
+	    throws IOException, ServletException {
 	/* validate learning mode parameters */
 	validateParameters(request, qaLearningForm);
 	String mode = qaLearningForm.getMode();
@@ -128,13 +123,11 @@ public class QaLearningController implements QaAppConstants {
 	 */
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
 	if (qaSession == null) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No session found");
 	}
 
 	QaContent qaContent = qaSession.getQaContent();
 	if (qaContent == null) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No QA content found");
 	}
 
@@ -231,7 +224,6 @@ public class QaLearningController implements QaAppConstants {
 	 * Is the tool activity been checked as Define Later in the property inspector?
 	 */
 	if (qaContent.isDefineLater()) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    return "learning/defineLater";
 	}
 
@@ -551,7 +543,6 @@ public class QaLearningController implements QaAppConstants {
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setSessionMapID(sessionMap.getSessionID());
-	qaLearningForm.resetAll();
 	generalLearnerFlowDTO.setSessionMapID(sessionMap.getSessionID());
 
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
@@ -684,7 +675,6 @@ public class QaLearningController implements QaAppConstants {
 	LearningUtil.populateAnswers(sessionMap, qaContent, qaQueUsr, mapQuestions, generalLearnerFlowDTO, qaService);
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	qaLearningForm.resetAll();
 	request.setAttribute("learningForm", qaLearningForm);
 	return "learning/AnswersContent";
     }
@@ -711,9 +701,6 @@ public class QaLearningController implements QaAppConstants {
 
 	// LearningUtil.storeResponses(mapAnswers, qaService, toolContentID, new Long(toolSessionID));
 
-	qaLearningForm.resetUserActions();
-	qaLearningForm.setSubmitAnswersContent(null);
-
 	if (qaContent.isShowOtherAnswers()) {
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
 	    String sessionMapID = qaLearningForm.getSessionMapID();
@@ -725,10 +712,7 @@ public class QaLearningController implements QaAppConstants {
 
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(false).toString());
-
 	    generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-
-	    qaLearningForm.resetAll();
 
 	    boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
@@ -796,8 +780,6 @@ public class QaLearningController implements QaAppConstants {
 		.getAttribute(sessionMapID);
 
 	/* recreate the users and responses */
-	qaLearningForm.resetUserActions();
-	qaLearningForm.setSubmitAnswersContent(null);
 
 	QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		generalLearnerFlowDTO);
@@ -807,8 +789,6 @@ public class QaLearningController implements QaAppConstants {
 
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 	// generalLearnerFlowDTO.setNotebookEntriesVisible(new Boolean(false).toString());
-
-	qaLearningForm.resetAll();
 
 	boolean lockWhenFinished;
 	boolean noReeditAllowed;
@@ -877,7 +857,6 @@ public class QaLearningController implements QaAppConstants {
 
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, true);
 
-	qaLearningForm.resetAll();
 	request.setAttribute("learningForm", qaLearningForm);
 	return "learning/AnswersContent";
     }
@@ -953,8 +932,6 @@ public class QaLearningController implements QaAppConstants {
 	}
 	generalLearnerFlowDTO.setUserFeedback(userFeedback);
 	generalLearnerFlowDTO.setRemainingQuestionCount("" + remainingQuestionCount);
-
-	qaLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
 
 	sessionMap.put(QaAppConstants.MAP_ALL_RESULTS_KEY, mapAnswers);
 	sessionMap.put(QaAppConstants.MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
@@ -1036,10 +1013,8 @@ public class QaLearningController implements QaAppConstants {
 	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
-
 	storeSequentialAnswer(qaLearningForm, request, generalLearnerFlowDTO, false);
 
-	qaLearningForm.resetAll();
 	return "learning/AnswersContent";
     }
 
@@ -1085,8 +1060,6 @@ public class QaLearningController implements QaAppConstants {
 	String sessionMapID = qaLearningForm.getSessionMapID();
 	// request.getSession().removeAttribute(sessionMapID);
 	qaLearningForm.setSessionMapID(sessionMapID);
-
-	qaLearningForm.resetAll();
 
 	String nextActivityUrl = qaService.leaveToolSession(new Long(toolSessionID),
 		new Long(user.getUserID().longValue()));
@@ -1142,7 +1115,6 @@ public class QaLearningController implements QaAppConstants {
 	    qaService.updateEntry(entry);
 	}
 
-	qaLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
 	return endLearning(qaLearningForm, request, response);
     }
 
@@ -1196,9 +1168,7 @@ public class QaLearningController implements QaAppConstants {
 	}
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	reflectionForm.resetUserActions(); /* resets all except submitAnswersContent */
 
-	reflectionForm.resetAll();
 	return "learning/Notebook";
     }
 

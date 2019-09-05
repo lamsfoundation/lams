@@ -75,7 +75,6 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -417,15 +416,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public boolean isStudentActivityOccurredGlobal(QaContent qaContent) {
-	int countResponses = 0;
-	if (qaContent != null) {
-	    countResponses = qaUsrRespDAO.getCountResponsesByQaContent(qaContent.getQaContentId());
-	}
-	return countResponses > 0;
-    }
-
-    @Override
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException {
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentId.longValue());
 	if (qaContent == null) {
@@ -709,8 +699,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	QaSession qaSession = null;
 	try {
 	    qaSession = getSessionById(toolSessionId.longValue());
-	} catch (QaApplicationException e) {
-	    throw new DataMissingException("error retrieving qaSession: " + e);
 	} catch (Exception e) {
 	    throw new ToolException("error retrieving qaSession: " + e);
 	}
@@ -720,11 +708,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    throw new DataMissingException("qaSession is missing");
 	}
 
-	try {
-	    qaSessionDAO.deleteQaSession(qaSession);
-	} catch (QaApplicationException e) {
-	    throw new ToolException("error deleting qaSession:" + e);
-	}
+	qaSessionDAO.deleteQaSession(qaSession);
     }
 
     @Override
@@ -1147,9 +1131,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	qa.setQuestionsSequenced(JsonUtil.optBoolean(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
 	// submissionDeadline is set in monitoring
-	// qa.setMonitoringReportTitle(); Can't find this field in the database - assuming unused.
-	// qa.setReportTitle(); Can't find this field in the database - assuming unused.
-	// qa.setContent(content); Can't find this field in the database - assuming unused.
 
 	saveOrUpdateQaContent(qa);
 	// Questions

@@ -49,7 +49,6 @@ public interface QaAppConstants {
     public static final String TITLE = "title";
     public static final String INSTRUCTIONS = "instructions";
     public static final String LOAD_LEARNER = "learning/AnswersContent";
-    public static final String VIEW_ALL_RESULTS = "viewAllResults";
     public static final String INDIVIDUAL_LEARNER_RESULTS = "learning/IndividualLearnerResults";
     public static final String MAP_ALL_RESULTS_KEY = "mapAllResultsKey";
     public static final String SOURCE_QA_STARTER = "sourceQaStarter";
@@ -66,88 +65,27 @@ public interface QaAppConstants {
     public static final String IS_TOOL_SESSION_AVAILABLE = "isToolSessionAvailable";
 
     public static final String REMOVABLE_QUESTION_INDEX = "removableQuestionIndex";
-    public static final String DEFINE_LATER = "defineLater";
     public static final String WAIT_FOR_LEADER = "waitForLeader";
-
-    public static final String SOURCE_MC_STARTER = "sourceMcStarter";
     public static final Integer MAX_QUESTION_COUNT = 50;
-
     public static final String GENERAL_LEARNER_FLOW_DTO = "generalLearnerFlowDTO";
-
     public static final Long INITIAL_QUESTION_COUNT = 1L;
 
     /*
      * Struts level constants
      */
     public static final String LOAD_MONITORING = "loadMonitoring";
-    public static final String LEARNING_MODE = "learningMode";
     public static final String SUCCESS = "success";
-
-    /*
-     * authoring mode controllers
-     */
-    public static final String IS_ADD_QUESTION = "isAddQuestion";
-    public static final String IS_REMOVE_QUESTION = "isRemoveQuestion";
-    public static final String IS_REMOVE_CONTENT = "isRemoveContent";
-
-    /*
-     * authoring mode constants
-     */
-    public static final String MAP_QUESTION_CONTENT = "mapQuestionContent";
-    public static final String END_LEARNING_MESSSAGE = "endLearningMessage";
-    public static final String ON = "ON";
-    public static final String OFF = "OFF";
-    public static final String RICHTEXT_TITLE = "richTextTitle";
-    public static final String RICHTEXT_INSTRUCTIONS = "richTextInstructions";
-    public static final String RICHTEXT_BLANK = "<p>&nbsp;</p>";
-
-    public static final String USER_ID = "userID";
 
     public final long ONE_DAY = 60 * 60 * 1000 * 24;
 
-    public final static String NOT_ATTEMPTED = "NOT_ATTEMPTED";
-    public final static String INCOMPLETE = "INCOMPLETE";
     public static final String COMPLETED = "COMPLETED";
-
-    public static final String MAP_TOOL_SESSIONS = "mapToolSessions";
-    public static final Integer MAX_TOOL_SESSION_COUNT = new Integer(500);
-    public static final String COUNT_SESSION_COMPLETE = "countSessionComplete";
-
-    public static final String COUNT_ALL_USERS = "countAllUsers";
-    public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
 
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";
-    public static final String IS_USERNAME_VISIBLE = "isUsernameVisible";
-    public static final String CURRENT_ANSWER = "currentAnswer";
 
     public static final String MODE = "mode";
-    public static final String LEARNER = "learner";
-    public static final String TEACHER = "teacher";
-
-    /*
-     * user actions
-     */
-    public static final String ADD_NEW_QUESTION = "addNewQuestion";
-    public static final String REMOVE_QUESTION = "removeQuestion";
-    public static final String REMOVE_ALL_CONTENT = "removeAllContent";
-    public static final String SUBMIT_ALL_CONTENT = "submitAllContent";
-    public static final String SUBMIT_TAB_DONE = "submitTabDone";
-
-    public static final String OPTION_OFF = "false";
 
     // LEARNER mode contants
-    public static final String MAP_QUESTION_CONTENT_LEARNER = "mapQuestionContentLearner";
-    public static final String CURRENT_QUESTION_INDEX = "currentQuestionIndex";
-    public static final String TOTAL_QUESTION_COUNT = "totalQuestionCount";
-    public static final String MAP_ANSWERS = "mapAnswers";
-    public static final String USER_FEEDBACK = "userFeedback";
-    public static final String REPORT_TITLE_LEARNER = "reportTitleLearner";
-    public static final String END_LEARNING_MESSAGE = "endLearningMessage";
-    public static final String CHECK_ALL_SESSIONS_COMPLETED = "checkAllSessionsCompleted";
-    public static final String FROM_TOOL_CONTENT_ID = "fromToolContentId";
-    public static final String TO_TOOL_CONTENT_ID = "toToolContentId";
-    public static final String LEARNER_REPORT = "learnerRep";
     public static final String LEARNER_REP = "individualLearnerRep";
     public static final String REVISITED_LEARNER_REP = "revisitedLearnerRep";
     public static final String IS_DISABLED = "isDisabled";
@@ -155,10 +93,6 @@ public interface QaAppConstants {
     /*
      * Monitoring Mode constants
      */
-    public static final String EDITACTIVITY_EDITMODE = "editActivityEditMode";
-    public static final String RENDER_MONITORING_EDITACTIVITY = "renderMonitoringEditActivity";
-    public static final String NO_AVAILABLE_SESSIONS = "noAvailableSessions";
-    public static final String NO_TOOL_SESSIONS_AVAILABLE = "noToolSessionAvailable";
     public static final String ATTR_CONTENT = "content";
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
@@ -168,13 +102,9 @@ public interface QaAppConstants {
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     public static final String ATTR_GROUP_LEADER = "groupLeader";
 
-    public static final String TIMEZONE = "timeZone";
-    public static final String TIMEZONE_ID = "timeZoneId";
     /*
      * Monitor and Learning common constants - used in jsp reporting
      */
-
-    public static final String QUESTION_LISTING_MODE = "questionListingMode";
     public static final String QUESTION_LISTING_MODE_SEQUENTIAL = "questionListingModeSequential";
     public static final String QUESTION_LISTING_MODE_PREVIEW = "questionListingModePreview";
     public static final String QUESTION_LISTING_MODE_COMBINED = "questionListingModeCombined";
@@ -183,7 +113,6 @@ public interface QaAppConstants {
     public static final String FEEDBACK_TYPE_COMBINED = "You are being presented total of: ";
     public static final String QUESTIONS = " questions.";
 
-    public static final String SUBMIT_SUCCESS = "sbmtSuccess";
     // for condition management use
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     public static final String ATTR_CONDITION_SET = "conditionList";

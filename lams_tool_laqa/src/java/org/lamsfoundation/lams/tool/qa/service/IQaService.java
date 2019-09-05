@@ -38,7 +38,6 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 
 /**
@@ -172,15 +171,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      * @param toContentId
      */
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
-
-    /**
-     * checks the paramter content in the user responses table
-     *
-     * @param qa
-     * @return boolean
-     * @throws QaApplicationException
-     */
-    boolean isStudentActivityOccurredGlobal(QaContent qaContent);
 
     /**
      * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId)

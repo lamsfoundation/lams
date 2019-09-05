@@ -51,9 +51,6 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     private static final String LOAD_ATTEMPT_FOR_USER = "from qaUsrResp in class QaUsrResp "
 	    + "where qaUsrResp.qaQueUser.uid=:userUid order by qaUsrResp.qbToolQuestion.displayOrder asc";
 
-    private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from " + QaUsrResp.class.getName()
-	    + " as r where r.qbToolQuestion.toolContentId=?";
-
     @Override
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	getSession().save(qaUsrResp);
@@ -258,16 +255,6 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	List<QaUsrResp> list = getSessionFactory().getCurrentSession().createQuery(LOAD_ATTEMPT_FOR_USER)
 		.setParameter("userUid", userUid.longValue()).list();
 	return list;
-    }
-
-    @Override
-    public int getCountResponsesByQaContent(final Long qaContentId) {
-
-	List<?> list = doFind(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
-	if (list == null || list.size() == 0) {
-	    return 0;
-	}
-	return ((Number) list.get(0)).intValue();
     }
 
     private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) FROM "

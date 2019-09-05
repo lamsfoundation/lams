@@ -43,8 +43,6 @@ public interface IQaUsrRespDAO {
 
     public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId);
 
-    int getCountResponsesByQaContent(final Long qaContentId);
-
     List<QaUsrResp> getResponsesByUserUid(final Long userUid);
 
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);

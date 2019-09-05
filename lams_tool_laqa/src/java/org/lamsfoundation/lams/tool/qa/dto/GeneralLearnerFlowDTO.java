@@ -74,8 +74,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String notebookEntry;
 
-    protected String endLearningMessage;
-
     protected String userNameVisible;
 
     protected boolean showOtherAnswers;
@@ -321,21 +319,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public Integer getTotalQuestionCount() {
 	return totalQuestionCount;
-    }
-
-    /**
-     * @return Returns the endLearningMessage.
-     */
-    public String getEndLearningMessage() {
-	return endLearningMessage;
-    }
-
-    /**
-     * @param endLearningMessage
-     *            The endLearningMessage to set.
-     */
-    public void setEndLearningMessage(String endLearningMessage) {
-	this.endLearningMessage = endLearningMessage;
     }
 
     /**
