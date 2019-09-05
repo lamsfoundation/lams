@@ -13,13 +13,14 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">
-							<strong> <fmt:message key="label.question" /> <c:out value="${questionEntry.key}" />
+							<strong>
+								<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" />
 							</strong>
 						</div>
 					</div>
 					<div class="panel-body">
 						<div class="panel">
-							<c:out value="${questionEntry.value.question}" escapeXml="false" />
+							<c:out value="${questionEntry.value.description}" escapeXml="false" />
 						</div>
 						<div class="answer-req">
 							<fmt:message key="label.learning.yourAnswer" />
