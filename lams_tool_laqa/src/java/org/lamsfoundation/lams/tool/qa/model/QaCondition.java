@@ -62,7 +62,7 @@ public class QaCondition extends TextSearchCondition {
      * the words that make the condition's parameters.
      */
     @ManyToMany
-    @Cascade({ CascadeType.SAVE_UPDATE })
+//    @Cascade({ CascadeType.SAVE_UPDATE })
     @JoinTable(name = "tl_laqa11_condition_questions", joinColumns = @JoinColumn(name = "condition_id"), inverseJoinColumns = @JoinColumn(name = "question_uid"))
     @OrderBy("uid ASC")
     private Set<QaQueContent> questions = new TreeSet<>(new QaQuestionComparator());
@@ -162,7 +162,6 @@ public class QaCondition extends TextSearchCondition {
      * tool content.
      */
     public QaCondition clone(QaContent qaContent) {
-
 	Set<QaQueContent> questionsCopy = new TreeSet<>(new QaQuestionComparator());
 	for (QaQueContent conditionQuestion : getQuestions()) {
 	    for (QaQueContent contentQuestion : qaContent.getQaQueContents()) {

@@ -116,7 +116,6 @@ public interface QaAppConstants {
     // for condition management use
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     public static final String ATTR_CONDITION_SET = "conditionList";
-    public static final String ATTR_QA_AUTHORING_FORM = "QaAuthoringForm";
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final int QUESTION_CUTOFF_INDEX = 40;

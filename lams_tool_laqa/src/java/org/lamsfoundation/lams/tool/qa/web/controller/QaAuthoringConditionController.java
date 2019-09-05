@@ -24,10 +24,8 @@ package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -105,7 +103,7 @@ public class QaAuthoringConditionController {
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	QaCondition condition = null;
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
@@ -175,7 +173,7 @@ public class QaAuthoringConditionController {
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    QaCondition condition = conditionList.remove(orderId);
 	    for (QaCondition otherCondition : conditionSet) {
@@ -223,7 +221,7 @@ public class QaAuthoringConditionController {
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    QaCondition condition = conditionList.get(orderId);
@@ -257,7 +255,7 @@ public class QaAuthoringConditionController {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private SortedSet<QaCondition> getQaConditionSet(SessionMap<String, Object> sessionMap) {
+    public static SortedSet<QaCondition> getConditions(SessionMap<String, Object> sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
 	    list = new TreeSet<>(new TextSearchConditionComparator());
@@ -360,7 +358,7 @@ public class QaAuthoringConditionController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(form.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
-	SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	int orderId = form.getOrderId();
 	QaCondition condition = null;
 
@@ -415,7 +413,7 @@ public class QaAuthoringConditionController {
 
 	    String sessionMapID = QaConditionForm.getSessionMapID();
 	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    for (QaCondition condition : conditionSet) {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {

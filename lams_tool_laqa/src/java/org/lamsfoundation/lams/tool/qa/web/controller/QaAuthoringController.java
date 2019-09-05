@@ -42,7 +42,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -146,11 +145,9 @@ public class QaAuthoringController implements QaAppConstants {
 		}
 	    }
 	}
-	SortedSet<QaCondition> conditionList = getConditions(sessionMap);
+	SortedSet<QaCondition> conditionList = QaAuthoringConditionController.getConditions(sessionMap);
 	conditionList.clear();
 	conditionList.addAll(qa.getConditions());
-
-	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, form);
 
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qa.getQaContentId());
@@ -181,6 +178,12 @@ public class QaAuthoringController implements QaAppConstants {
 	    qaPO.setUpdateDate(new Timestamp(new Date().getTime()));
 	    
 	} else {
+	    // copyProperties() below sets qaPO's conditions to empty collection
+	    // but the conditions still exist in Hibernate cache, so we need to evict them now
+	    for (QaCondition condition : qaPO.getConditions()) {
+		qaService.releaseFromCache(condition);
+	    }
+	    
 	    qaPO.getQaQueContents().clear();
 	    qaPO.getConditions().clear();
 	    Long uid = qaPO.getUid();
@@ -219,14 +222,22 @@ public class QaAuthoringController implements QaAppConstants {
 	qaPO.setCreatedBy(userId);
 	qaService.saveOrUpdateQaContent(qaPO);
 	
-	// ************************* Handle Q&A conditions *******************
+	// ************************* Handle Q&A questions *******************
+	Set<QaQueContent> items = new LinkedHashSet<>();
 	Set<QaQueContent> newItems = getQuestions(sessionMap);
-	SortedSet<QaCondition> conditions = getConditions(sessionMap);
+	for (QaQueContent question : newItems) {
+	    question.setQaContent(qaPO);
+	    question.setToolContentId(qaPO.getQaContentId());
+	    qaService.saveOrUpdate(question);
+	    items.add(question);
+	}
+	qaPO.setQaQueContents(items);
+	
+	// ************************* Handle Q&A conditions *******************
+	SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
 	for (QaCondition condition : conditions) {
 	    condition.setQuestions(new TreeSet<>(new QaQuestionComparator()));
 	    for (QaQueContent qaQuestion : condition.temporaryQaQuestions) {
-		//TODO check how conditions get saved
-		
 		for (QaQueContent question : newItems) {
 		    if (qaQuestion.getDisplayOrder() == question.getDisplayOrder()) {
 			condition.getQuestions().add(question);
@@ -236,21 +247,12 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 	qaPO.setConditions(conditions);
 	
-	// ************************* Handle Q&A questions *******************
-	Set<QaQueContent> items = new LinkedHashSet<>();
-	Iterator<QaQueContent> iter = newItems.iterator();
+	//reorder questions so displayOrder numbers come in strictly sequential order (it's required for proper work of learning)
 	int displayOrder = 1;
-	while (iter.hasNext()) {
-	    QaQueContent question = iter.next();
-	    if (question != null) {
-		question.setQaContent(qaPO);
-		question.setToolContentId(qaPO.getQaContentId());
-		question.setDisplayOrder(displayOrder++);
-		qaService.saveOrUpdate(question);
-		items.add(question);
-	    }
+	for (QaQueContent question : newItems) {
+	    question.setDisplayOrder(displayOrder++);
+	    qaService.saveOrUpdate(question);
 	}
-	qaPO.setQaQueContents(items);
 	
 	qaService.saveOrUpdateQaContent(qaPO);
 
@@ -471,7 +473,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    delList.add(questionToDelete);
 	    
 	    //take care about conditions
-	    SortedSet<QaCondition> conditions = getConditions(sessionMap);
+	    SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
 	    Iterator<QaCondition> conditionIter = conditions.iterator();
 	    while (conditionIter.hasNext()) {
 		QaCondition condition = conditionIter.next();
@@ -515,7 +517,6 @@ public class QaAuthoringController implements QaAppConstants {
     private Set<QaQueContent> swapQuestions(QaAuthoringForm form, HttpServletRequest request, String direction) {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	Set<QaQueContent> questions = getQuestions(sessionMap);
-	SortedSet<QaCondition> conditions = getConditions(sessionMap);
 	int originalQuestionIndex = WebUtil.readIntParam(request, "questionIndex");
 	int replacedQuestionIndex = direction.equals("down") ? originalQuestionIndex + 1 : originalQuestionIndex - 1;
 
@@ -531,19 +532,6 @@ public class QaAuthoringController implements QaAppConstants {
 	// put back list, it will be sorted again
 	questions.clear();
 	questions.addAll(rList);
-
-	// references in conditions also need to be changed
-	if (conditions != null) {
-	    for (QaCondition condition : conditions) {
-		SortedSet<QaQueContent> newQuestionSet = new TreeSet<>(new QaQuestionComparator());
-		for (QaQueContent question : questions) {
-		    if (condition.temporaryQaQuestions.contains(question)) {
-			newQuestionSet.add(question);
-		    }
-		}
-		condition.temporaryQaQuestions = newQuestionSet;
-	    }
-	}
 	
 	return questions;
     }
@@ -585,16 +573,6 @@ public class QaAuthoringController implements QaAppConstants {
 	if (list == null) {
 	    list = new ArrayList<>();
 	    sessionMap.put(QaAppConstants.LIST_DELETED_QUESTIONS, list);
-	}
-	return list;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private SortedSet<QaCondition> getConditions(SessionMap<String, Object> sessionMap) {
-	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
-	if (list == null) {
-	    list = new TreeSet<>(new TextSearchConditionComparator());
-	    sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, list);
 	}
 	return list;
     }
