@@ -26,11 +26,11 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +46,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -194,6 +193,14 @@ public class LearningController {
 	questionReferences.addAll(assessment.getQuestionReferences());
 	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<>();
 	
+	//add non-random questions
+	for (QuestionReference questionReference : questionReferences) {
+	    if (!questionReference.isRandomQuestion()) {
+		AssessmentQuestion question = questionReference.getQuestion();
+		questionToReferenceMap.put(questionReference.getUid(), question);
+	    }
+	}
+	
 	// init random pool questions
 	List<AssessmentQuestion> availableRandomQuestions = new ArrayList<>();
 	for (AssessmentQuestion question : assessment.getQuestions()) {
@@ -201,22 +208,39 @@ public class LearningController {
 		availableRandomQuestions.add(question);
 	    }
 	}
-	
+	//add random questions (actually replacing them with real ones)
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
 	for (QuestionReference questionReference : questionReferences) {
-	    //add non-random questions
-	    if (!questionReference.isRandomQuestion()) {
-		AssessmentQuestion question = questionReference.getQuestion();
-		questionToReferenceMap.put(questionReference.getUid(), question);
-	    }
-	    
-	    //add random questions (actually replacing them with real ones)
 	    if (questionReference.isRandomQuestion()) {
-		//pick a random element
-		Random rand = new Random(System.currentTimeMillis());
-		AssessmentQuestion question = (AssessmentQuestion) availableRandomQuestions.toArray()[rand
-			.nextInt(availableRandomQuestions.size())];
-		questionToReferenceMap.put(questionReference.getUid(), question);
-		availableRandomQuestions.remove(question);
+		
+		//find random question that will be shown to the user
+		AssessmentQuestion randomQuestion = null;
+		if (lastResult == null) {
+		    //pick element randomly
+		    Random rand = new Random(System.currentTimeMillis());
+		    randomQuestion = (AssessmentQuestion) availableRandomQuestions.toArray()[rand
+			    .nextInt(availableRandomQuestions.size())];
+		    availableRandomQuestions.remove(randomQuestion);
+
+		} else {
+		    //pick element from the last result
+		    for (Iterator<AssessmentQuestion> iter = availableRandomQuestions.iterator(); iter.hasNext();) {
+			AssessmentQuestion availableRandomQuestion = iter.next();
+
+			for (AssessmentQuestionResult questionResult : lastResult.getQuestionResults()) {
+			    if (availableRandomQuestion.getUid().equals(questionResult.getQbToolQuestion().getUid())) {
+				randomQuestion = availableRandomQuestion;
+				iter.remove();
+				break;
+			    }
+			}
+		    }
+		}
+		if (randomQuestion == null) {
+		    throw new RuntimeException("Random question is null. Something went wrong. questionReference's uid:"
+			    + questionReference.getUid());
+		}
+		questionToReferenceMap.put(questionReference.getUid(), randomQuestion);
 	    }
 	}
 
@@ -225,7 +249,6 @@ public class LearningController {
 		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
 
 	//showResults if user has finished the last result
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
 	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
 
 	// get notebook entry
@@ -357,7 +380,7 @@ public class LearningController {
 	} else {
 	    // set attempt started
 	    if (hasEditRight) {
-		service.setAttemptStarted(assessment, user, toolSessionId);
+		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
 	    }
 
 	    return "pages/learning/learning";
@@ -587,13 +610,16 @@ public class LearningController {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	
 	Long userId = assessmentUser.getUserId();
 	service.unsetSessionFinished(toolSessionId, userId);
 
 	Date lastAttemptStartingDate = service.getLastAssessmentResult(assessment.getUid(), userId).getStartDate();
 
-	// set attempt started: create a new one + mark previous as not being the latest any longer
-	service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
+	// set attempt started: create a new one + mark previous one as not being the latest any longer
+	service.setAttemptStarted(assessment, assessmentUser, toolSessionId, pagedQuestionDtos);
 
 	// in case of content was modified in monitor - redirect to start.do in order to refresh info from the DB
 	if (assessment.isContentModifiedInMonitor(lastAttemptStartingDate)) {

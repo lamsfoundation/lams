@@ -475,8 +475,16 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
-	Set<AssessmentQuestion> questions = assessment.getQuestions();
+    public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId,
+	    List<Set<QuestionDTO>> pagedQuestionDtos) {
+	//create list of all questions that user is going to answer (it will exclude random questions that user not going to answer)
+	Set<AssessmentQuestion> questions = new TreeSet<>();
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
+	    for (QuestionDTO questionDto : questionsForOnePage) {
+		AssessmentQuestion question = assessmentQuestionDao.getByUid(questionDto.getUid());
+		questions.add(question);
+	    }
+	}
 
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
 	if (lastResult != null) {
