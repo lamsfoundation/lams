@@ -64,7 +64,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SearchQBController {
 
     private static Logger log = Logger.getLogger(SearchQBController.class);
-    
+
     public static final String PARAM_SEARCH = "_search";
     public static final String PARAM_SEARCH_FIELD = "searchField";
     public static final String PARAM_SEARCH_OPERATION = "searchOper";
@@ -81,28 +81,33 @@ public class SearchQBController {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
-	ToolContent toolContent = (ToolContent) userManagementService.findById(ToolContent.class, toolContentId);
-	if (toolContent == null) {
-	    String error = "The toolContentID " + toolContentId
-		    + " is not valid. No such record exists on the database.";
-	    throw new DataMissingException(error);
+	// LKC-215 QB in not always initiated from within tools; tool signature is used to control question types
+	String toolSignature = WebUtil.readStrParam(request, "toolSignature", true);
+	if (StringUtils.isBlank(toolSignature)) {
+	    Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
+	    ToolContent toolContent = (ToolContent) userManagementService.findById(ToolContent.class, toolContentId);
+	    if (toolContent == null) {
+		String error = "The toolContentID " + toolContentId
+			+ " is not valid. No such record exists on the database.";
+		throw new DataMissingException(error);
+	    }
+	    Tool tool = toolContent.getTool();
+	    toolSignature = tool.getToolSignature();
 	}
-	Tool tool = toolContent.getTool();
-	String toolSignature = tool.getToolSignature();
 
 	//empty questionTypesAvailable means no other questionTypes available for this tool
-	StringBuilder questionTypesAvailable = new StringBuilder(); 
+	StringBuilder questionTypesAvailable = new StringBuilder();
 	//by default show MCQ type of questions (except for Q&A tool)
 	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE;
-	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature) || CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-	    
-	//CommonConstants.TOOL_SIGNATURE_SURVEY
+	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)
+		|| CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+
+	    //CommonConstants.TOOL_SIGNATURE_SURVEY
 	} else if ("lasurv11".equals(toolSignature)) {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
-	    
+
 	} else if (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
@@ -119,22 +124,22 @@ public class SearchQBController {
 	    questionTypesAvailable.append(QbQuestion.TYPE_ORDERING);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
-	   
-	//CommonConstants.TOOL_SIGNATURE_QA
+
+	    //CommonConstants.TOOL_SIGNATURE_QA
 	} else if ("laqa11".equals(toolSignature)) {
 	    questionTypeDefault = QbQuestion.TYPE_ESSAY;
 	}
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
-	
+
 	//prepare data for displaying collections
 	Integer userId = getUserId();
 	Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
 	request.setAttribute("userCollections", userCollections);
-	
+
 	return "qb/search";
     }
-    
+
     /**
      * Returns an xml representation of the lesson grid for a course for gradebook
      *
@@ -167,8 +172,8 @@ public class SearchQBController {
 	String searchString = WebUtil.readStrParam(request, "searchString", true);
 
 	// Get the user list from the db
-	List<QbQuestion> questions = (List<QbQuestion>) qbService.getPagedQuestions(questionTypes, collectionUids,
-		page - 1, rowLimit, sortBy, sortOrder, searchString);
+	List<QbQuestion> questions = qbService.getPagedQuestions(questionTypes, collectionUids, page - 1, rowLimit,
+		sortBy, sortOrder, searchString);
 	int countQuestions = qbService.getCountQuestions(questionTypes, collectionUids, searchString);
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countQuestions) / Double.valueOf(rowLimit)))
 		.intValue();
@@ -179,9 +184,11 @@ public class SearchQBController {
 
 	    ArrayNode questionData = JsonNodeFactory.instance.arrayNode();
 	    questionData.add(question.getUid());
-	    String title = question.getName() == null ? "" : question.getName().replaceAll("\\<.*?\\>", "").replaceAll("\\n", " ").trim();
+	    String title = question.getName() == null ? ""
+		    : question.getName().replaceAll("\\<.*?\\>", "").replaceAll("\\n", " ").trim();
 	    questionData.add(HtmlUtils.htmlEscape(title));
-	    String description = question.getDescription() == null ? "" : question.getDescription().replaceAll("\\<.*?\\>", "").trim();
+	    String description = question.getDescription() == null ? ""
+		    : question.getDescription().replaceAll("\\<.*?\\>", "").trim();
 	    questionData.add(HtmlUtils.htmlEscape(description));
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -200,19 +207,19 @@ public class SearchQBController {
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
-    
+
     @RequestMapping("/displayQuestionDetails")
     private String displayQuestionDetails(HttpServletRequest request) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	QbQuestion qbQuestion = (QbQuestion) userManagementService.findById(QbQuestion.class, questionUid);
 	request.setAttribute("question", qbQuestion);
-	
+
 	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
 	request.setAttribute("otherVersions", otherVersions);
-	
+
 	return "qb/qbQuestionDetails";
     }
-    
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);

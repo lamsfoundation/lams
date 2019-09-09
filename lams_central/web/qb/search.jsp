@@ -36,7 +36,7 @@
 	}
 		
 	/* jqGrid padding */
-	.ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow>td {
+	#grid-container .ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow>td {
 		padding: 10px;
 	}
 		
@@ -81,7 +81,7 @@
 	}
 		
 	/* jqGrid header */
-	.ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th div {
+	#grid-container .ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th div {
 	    font-size: 14px;
    		margin: 6px;
 	}
