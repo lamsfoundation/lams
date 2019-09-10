@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
@@ -40,7 +41,8 @@ import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -49,7 +51,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * The LoginRequestServlet handles login request by an integrated external system. This servlet checks for the UserId,
@@ -60,9 +61,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 @SuppressWarnings("serial")
 public class LoginRequestServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LoginRequestServlet.class);
+    
+    private static final String URL_DEFAULT = "/index.jsp";
+
+    private static final String URL_AUTHOR = "/home/author.do";
+
+    private static final String URL_LEARNER = "/home/learner.do?lessonID=";
+
+    private static final String URL_MONITOR = "/home/monitorLesson.do?lessonID=";
+
+    private static final String URL_GRADEBOOK = "/services/Gradebook?";
 
     @Autowired
     private IntegrationService integrationService;
+    @Autowired
+    private ILessonService lessonService;
     
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
@@ -89,26 +102,27 @@ public class LoginRequestServlet extends HttpServlet {
      *             if an error occurred
      */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	HttpSession hses = request.getSession(true);
 
-	String extUsername = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
-	String serverId = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
-	String extCourseId = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
-	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
-	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
-	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
-	String country = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
-	String locale = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
+	String extUsername = request.getParameter(IntegrationConstants.PARAM_USER_ID);
+	String serverId = request.getParameter(IntegrationConstants.PARAM_SERVER_ID);
+	String extCourseId = request.getParameter(IntegrationConstants.PARAM_COURSE_ID);
+	String timestamp = request.getParameter(IntegrationConstants.PARAM_TIMESTAMP);
+	String hash = request.getParameter(IntegrationConstants.PARAM_HASH);
+	String method = request.getParameter(IntegrationConstants.PARAM_METHOD);
+	String country = request.getParameter(IntegrationConstants.PARAM_COUNTRY);
+	String locale = request.getParameter(IntegrationConstants.PARAM_LANGUAGE);
 	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	boolean isUpdateUserDetails = WebUtil.readBooleanParam(request,
-		LoginRequestDispatcher.PARAM_IS_UPDATE_USER_DETAILS, false);
+		IntegrationConstants.PARAM_IS_UPDATE_USER_DETAILS, false);
+	String lessonId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
 
 	// implicit login params
-	String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
-	String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
-	String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+	String firstName = request.getParameter(IntegrationConstants.PARAM_FIRST_NAME);
+	String lastName = request.getParameter(IntegrationConstants.PARAM_LAST_NAME);
+	String email = request.getParameter(IntegrationConstants.PARAM_EMAIL);
 
 	if ((extUsername == null) || (method == null) || (serverId == null) || (timestamp == null) || (hash == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
@@ -136,9 +150,9 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
-	    String lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
-	    if ((LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
-		    || LoginRequestDispatcher.METHOD_MONITOR.equals(method)) && lsId == null) {
+	    String lsId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
+	    if ((IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
+		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && lsId == null) {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
 		return;
 	    }
@@ -160,25 +174,39 @@ public class LoginRequestServlet extends HttpServlet {
 		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
 			prefix);
 	    }
-
+	    
 	    User user = userMap.getUser();
+	    if (user == null) {
+		String error = "Unable to add user to lesson class as user is missing from the user map";
+		log.error(error);
+		throw new UserInfoFetchException(error);
+	    }
+	    
+	    //adds users to the lesson with respective roles
+	    if (StringUtils.isNotEmpty(lessonId)) {
+		if (IntegrationConstants.METHOD_LEARNER.equals(method)
+			|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
+		    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
+
+		} else if (IntegrationConstants.METHOD_MONITOR.equals(method)
+			|| IntegrationConstants.METHOD_AUTHOR.equals(method)) {
+		    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
+		}
+	    }
+	    
 	    String login = user.getLogin();
 	    UserDTO loggedInUserDTO = (UserDTO) hses.getAttribute(AttributeNames.USER);
 	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
 	    // for checking if requested role is the same as already assigned
-	    String role = method.equals(LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION)
-		    ? LoginRequestDispatcher.METHOD_LEARNER
+	    String role = method.equals(IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION)
+		    ? IntegrationConstants.METHOD_LEARNER
 		    : method;
+	    // check if there is a redirect URL parameter already
+	    String requestUrl = LoginRequestServlet.getRequestURL(request);
 	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
-		String url = LoginRequestDispatcher.getRequestURL(request);
-		response.sendRedirect(response.encodeRedirectURL(url));
+		response.sendRedirect(response.encodeRedirectURL(requestUrl));
 		return;
 	    }
-
-	    // check if there is a redirect URL parameter already; besides, LoginRequestDispatcher.getRequestURL() method also adds
-	    // users to the lesson with respective roles
-	    String redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
-	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 
 	    // login.jsp knows what to do with these
 	    hses.setAttribute("login", login);
@@ -187,6 +215,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    // notify the login module that the user has been authenticated correctly
 	    UniversalLoginModule.setAuthenticationToken(token);
 
+	    String redirectURL = WebUtil.getBaseServerURL() + requestUrl;
+	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {
 	    log.error("Authentication error: ", e);
@@ -219,5 +249,63 @@ public class LoginRequestServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
+    }
+    
+    /**
+     * If there is a redirectURL parameter then this becomes the redirect, otherwise it
+     * fetches the method parameter from HttpServletRequest and builds the redirect url.
+     */
+    private static String getRequestURL(HttpServletRequest request) {
+	String method = request.getParameter(IntegrationConstants.PARAM_METHOD);
+	String lessonId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
+	String mode = request.getParameter(IntegrationConstants.PARAM_MODE);
+
+	// get the location from an explicit parameter if it exists
+	String redirect = request.getParameter("redirectURL");
+	if (redirect != null) {
+	    return request.getContextPath() + "/" + redirect;
+	}
+
+	if (IntegrationConstants.MODE_GRADEBOOK.equals(mode)) {
+	    return request.getContextPath() + URL_GRADEBOOK + request.getQueryString();
+	}
+	/** AUTHOR * */
+	else if (IntegrationConstants.METHOD_AUTHOR.equals(method)) {
+	    String authorUrl = request.getContextPath() + URL_AUTHOR;
+
+	    // append the extra parameters if they are present in the request
+	    String ldID = request.getParameter(IntegrationConstants.PARAM_LEARNING_DESIGN_ID);
+	    if (ldID != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, "learningDesignID", ldID);
+	    }
+
+	    // Custom CSV string to be used for tool adapters
+	    String customCSV = request.getParameter(IntegrationConstants.PARAM_CUSTOM_CSV);
+	    if (customCSV != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, IntegrationConstants.PARAM_CUSTOM_CSV, customCSV);
+	    }
+
+	    String extLmsId = request.getParameter(IntegrationConstants.PARAM_SERVER_ID);
+	    if (extLmsId != null) {
+		authorUrl = WebUtil.appendParameterToURL(authorUrl, IntegrationConstants.PARAM_EXT_LMS_ID, extLmsId);
+	    }
+
+	    return authorUrl;
+	}
+	/** MONITOR * */
+	else if (IntegrationConstants.METHOD_MONITOR.equals(method) && lessonId != null) {
+	    return request.getContextPath() + URL_MONITOR + lessonId;
+	}
+	/** LEARNER * */
+	else if ((IntegrationConstants.METHOD_LEARNER.equals(method)
+		|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) && lessonId != null) {
+	    String url = request.getContextPath() + URL_LEARNER + lessonId;
+	    if (mode != null) {
+		url += "&" + IntegrationConstants.PARAM_MODE + "=" + mode;
+	    }
+	    return url;
+	} else {
+	    return request.getContextPath() + URL_DEFAULT;
+	}
     }
 }
