@@ -232,15 +232,7 @@ public class EditQbQuestionController {
 	    return null;
 
 	} else {
-
-	    // in case adding new question - return nothing
-	    if (isAddingQuestion) {
-		return null;
-
-		// edit question case - return question's uid
-	    } else {
-		return "forward:returnQuestionUid.do?qbQuestionUid=" + qbQuestion.getUid();
-	    }
+	    return "forward:returnQuestionUid.do?qbQuestionUid=" + qbQuestion.getUid();
 	}
     }
 
