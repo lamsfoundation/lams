@@ -24,9 +24,9 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -83,7 +83,7 @@ public class Scratchie implements Cloneable {
 
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
-    private Set<ScratchieItem> scratchieItems = new HashSet<>();
+    private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "extra_point")
     private boolean extraPoint;
@@ -132,7 +132,7 @@ public class Scratchie implements Cloneable {
 	    scratchie.setUid(null);
 	    if (scratchieItems != null) {
 		Iterator<ScratchieItem> iter = scratchieItems.iterator();
-		Set<ScratchieItem> set = new HashSet<>();
+		Set<ScratchieItem> set = new TreeSet<>();
 		while (iter.hasNext()) {
 		    ScratchieItem item = iter.next();
 		    ScratchieItem newItem = (ScratchieItem) item.clone();
