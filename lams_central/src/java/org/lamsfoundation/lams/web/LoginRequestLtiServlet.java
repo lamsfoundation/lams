@@ -41,7 +41,7 @@ import org.imsglobal.lti.launch.LtiVerifier;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -151,8 +151,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
 	String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
-		? LoginRequestDispatcher.METHOD_AUTHOR
-		: LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
+		? IntegrationConstants.METHOD_AUTHOR
+		: IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION;
 
 	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
 	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
@@ -163,13 +163,13 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	// regular case: [ts + uid + method + serverID + serverKey]
 	String plaintext = timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim()
 		+ method.toLowerCase().trim()
-		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
+		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha1(plaintext);
 
 	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
-	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + LoginRequestDispatcher.PARAM_METHOD, method);
+	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + IntegrationConstants.PARAM_METHOD, method);
 	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 	    String paramName = e.nextElement();
 
@@ -183,22 +183,22 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 
 	String url = "LoginRequest";
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_USER_ID,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_USER_ID,
 		URLEncoder.encode(extUsername, "UTF8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_METHOD, method);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_TIMESTAMP, timestamp);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_SERVER_ID, consumerKey);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_HASH, hash);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_METHOD, method);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_TIMESTAMP, timestamp);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_SERVER_ID, consumerKey);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_HASH, hash);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_COURSE_ID, contextId);
 	url = WebUtil.appendParameterToURL(url, CentralConstants.PARAM_COURSE_NAME, contextLabel);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_FIRST_NAME,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_COUNTRY, countryIsoCode);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LANGUAGE, langIsoCode);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_FIRST_NAME,
 		URLEncoder.encode(firstName, "UTF-8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LAST_NAME,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LAST_NAME,
 		URLEncoder.encode(lastName, "UTF-8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_EMAIL, email);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LESSON_ID, lessonId);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_EMAIL, email);
 	url = WebUtil.appendParameterToURL(url, "redirectURL", URLEncoder.encode(redirectUrl, "UTF-8"));
 	response.sendRedirect(response.encodeRedirectURL(url));
     }

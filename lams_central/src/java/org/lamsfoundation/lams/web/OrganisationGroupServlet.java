@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
@@ -108,7 +108,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    // get local user and organisation
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, null,
-		    LoginRequestDispatcher.METHOD_MONITOR);
+		    IntegrationConstants.METHOD_MONITOR);
 	    user = userMap.getUser();
 	    organisation = orgMap.getOrganisation();
 

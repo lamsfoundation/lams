@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -92,12 +92,12 @@ public abstract class RestServlet extends HttpServlet {
     private UserDTO authenticate(JsonNode authenticationJSON) {
 	User user = null;
 	try {
-	    String serverName = authenticationJSON.get(LoginRequestDispatcher.PARAM_SERVER_ID).asText();
+	    String serverName = authenticationJSON.get(IntegrationConstants.PARAM_SERVER_ID).asText();
 	    ExtServer extServer = integrationService.getExtServer(serverName);
-	    String userName = authenticationJSON.get(LoginRequestDispatcher.PARAM_USER_ID).asText();
-	    String method = authenticationJSON.get(LoginRequestDispatcher.PARAM_METHOD).asText().toLowerCase();
-	    String timestamp = authenticationJSON.get(LoginRequestDispatcher.PARAM_TIMESTAMP).asText();
-	    String hash = authenticationJSON.get(LoginRequestDispatcher.PARAM_HASH).asText();
+	    String userName = authenticationJSON.get(IntegrationConstants.PARAM_USER_ID).asText();
+	    String method = authenticationJSON.get(IntegrationConstants.PARAM_METHOD).asText().toLowerCase();
+	    String timestamp = authenticationJSON.get(IntegrationConstants.PARAM_TIMESTAMP).asText();
+	    String hash = authenticationJSON.get(IntegrationConstants.PARAM_HASH).asText();
 
 	    // Throws AuthenticationException if it fails
 	    Authenticator.authenticateLoginRequest(extServer, timestamp, userName, method, null, hash);

@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -96,16 +96,16 @@ public class GradebookServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	HttpSession hses = request.getSession(true);
 
-	String username = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
-	String serverId = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
-	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
-	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
-	String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
-	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
-	String extCourseId = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
-	String lessonId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
+	String username = request.getParameter(IntegrationConstants.PARAM_USER_ID);
+	String serverId = request.getParameter(IntegrationConstants.PARAM_SERVER_ID);
+	String timestamp = request.getParameter(IntegrationConstants.PARAM_TIMESTAMP);
+	String hash = request.getParameter(IntegrationConstants.PARAM_HASH);
+	String countryIsoCode = request.getParameter(IntegrationConstants.PARAM_COUNTRY);
+	String langIsoCode = request.getParameter(IntegrationConstants.PARAM_LANGUAGE);
+	String extCourseId = request.getParameter(IntegrationConstants.PARAM_COURSE_ID);
+	String lessonId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
 	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
-	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
+	String method = request.getParameter(IntegrationConstants.PARAM_METHOD);
 
 	// either lesson ID or course ID is required; if both provided, only lesson ID is used
 	if ((username == null) || (serverId == null) || (timestamp == null) || (hash == null)
@@ -117,8 +117,8 @@ public class GradebookServlet extends HttpServlet {
 		// if request comes from LoginRequest, method parameter was meaningful there
 		// if it's a direct call, it can be anything
 		Authenticator.authenticate(extServer, timestamp, username, method, hash);
-		boolean isTeacher = StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
-			|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR);
+		boolean isTeacher = StringUtils.equals(method, IntegrationConstants.METHOD_AUTHOR)
+			|| StringUtils.equals(method, IntegrationConstants.METHOD_MONITOR);
 
 		if (lessonId == null) {
 		    String gradebookServletURL = isTeacher ? GRADEBOOK_MONITOR_ORGANISATION_URL

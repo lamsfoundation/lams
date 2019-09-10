@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -166,8 +166,8 @@ public class LtiController {
 	}
 
 	//check if learner tries to access the link that hasn't been authored by teacher yet
-	String method = request.getParameter("_" + LoginRequestDispatcher.PARAM_METHOD);
-	if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
+	String method = request.getParameter("_" + IntegrationConstants.PARAM_METHOD);
+	if (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
 	    String roles = request.getParameter(BasicLTIConstants.ROLES);
 	    //try to detect monitor with custom roles not supported by LTI specification
 	    String messageKey = roles.contains("Instructor") || roles.contains("Admin") ? "message.teacher.role.not.recognized"
