@@ -67,7 +67,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -243,10 +243,10 @@ public class IntegrationService implements IIntegrationService {
 	}
 	
 	Integer[] roles;
-	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)) {
+	if (StringUtils.equals(method, IntegrationConstants.METHOD_AUTHOR)) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
 	    
-	} else if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+	} else if (StringUtils.equals(method, IntegrationConstants.METHOD_MONITOR)) {
 	    roles = new Integer[] { Role.ROLE_MONITOR };
 	    
 	} else {
@@ -839,7 +839,7 @@ public class IntegrationService implements IIntegrationService {
 		    Integer userId = extUserUseridMap.getUser().getUserId();
 
 		    //add user to organisation if it's not there
-		    updateUserRoles(user, organisation, LoginRequestDispatcher.METHOD_LEARNER);
+		    updateUserRoles(user, organisation, IntegrationConstants.METHOD_LEARNER);
 
 		    //check if user belong to the lesson. and if not - add it
 		    if (!lesson.getLessonClass().getLearnersGroup().hasLearner(user)) {
@@ -917,9 +917,9 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(error);
 	}
 
-	if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
+	if (IntegrationConstants.METHOD_LEARNER.equals(method)) {
 	    lessonService.addLearner(lesssonId, user.getUserId());
-	} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
+	} else if (IntegrationConstants.METHOD_MONITOR.equals(method)) {
 	    lessonService.addStaffMember(lesssonId, user.getUserId());
 	}
 
@@ -1036,8 +1036,8 @@ public class IntegrationService implements IIntegrationService {
 		roles += role + ",";
 	    }
 	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
-		    ? LoginRequestDispatcher.METHOD_MONITOR
-		    : LoginRequestDispatcher.METHOD_LEARNER;
+		    ? IntegrationConstants.METHOD_MONITOR
+		    : IntegrationConstants.METHOD_LEARNER;
 	    
 	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
 	    ExtUserUseridMap extUser = lessonId == null
