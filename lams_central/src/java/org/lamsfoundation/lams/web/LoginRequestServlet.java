@@ -152,7 +152,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    // in case of request for learner with strict authentication check cache should also contain lsid
 	    String lsId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
 	    if ((IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
-		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && lsId == null) {
+		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && StringUtils.isBlank(lsId)) {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
 		return;
 	    }

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
@@ -66,14 +65,14 @@
 			<fmt:message key="sysadmin.maintain" />
 		</a>
 		
-		<a href="<lams:LAMSURL/>admin/serverlist.do" class="btn btn-default">
+		<a href="<lams:LAMSURL/>admin/extserver/serverlist.do" class="btn btn-default">
 			<fmt:message key="sysadmin.maintain.external.servers" />
 		</a>
 	</p>
 	
 	<lams:errors/>
 			
-	<form:form action="../serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
+	<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 		<form:hidden path="sid" />
 		
 		<div class="form-group">
@@ -123,48 +122,13 @@
 		    <form:input path="extGroupsUrl" size="70" cssClass="form-control"/>
 		</div> 
 		
-		<h3><fmt:message key="sysadmin.lesson.default" /></h3>
-		<div class="checkbox">
-		    <label>
-		    <form:checkbox path="gradebookOnComplete" /><fmt:message key="sysadmin.lesson.gradebook.complete" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="forceLearnerRestart" /><fmt:message key="sysadmin.lesson.force.restart" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="allowLearnerRestart" /><fmt:message key="sysadmin.lesson.allow.restart" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="liveEditEnabled" /><fmt:message key="sysadmin.lesson.liveedit" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		    <form:checkbox path="enableLessonNotifications" /><fmt:message key="sysadmin.lesson.notification" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="learnerPresenceAvailable" styleId="learnerPresenceAvailable" /><fmt:message key="sysadmin.lesson.presence" />
-		    </label>
-		</div>
-		<div class="checkbox">
-		    <label>
-		     <form:checkbox path="learnerImAvailable" styleId="learnerImAvailable" /><fmt:message key="sysadmin.lesson.im" />
-		    </label>
-		</div>
+		<%@ include file="extLessonForm.jsp"%>
 
-	<div class="pull-right">
-		<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
-		<a href="<lams:LAMSURL/>admin/serverlist.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-		<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
-	</div>
+		<div class="pull-right">
+			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
+			<a href="<lams:LAMSURL/>admin/extserver/serverlist.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+		</div>
 	</form:form>
 </lams:Page>
 

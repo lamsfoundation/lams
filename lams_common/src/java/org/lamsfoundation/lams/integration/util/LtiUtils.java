@@ -37,6 +37,7 @@ public class LtiUtils {
     public static boolean isStaff(String roles, ExtServer extServer) {
 	List<String> rolesToSearchFor = new LinkedList<String>();
 	rolesToSearchFor.add("urn:lti:role:ims/lis/Instructor");
+	rolesToSearchFor.add("urn:lti:instrole:ims/lis/Instructor");
 	rolesToSearchFor.add("urn:lti:role:ims/lis/ContentDeveloper");
 	rolesToSearchFor.add("urn:lti:role:ims/lis/TeachingAssistant");
 	
