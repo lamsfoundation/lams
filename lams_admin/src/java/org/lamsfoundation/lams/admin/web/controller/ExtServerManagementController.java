@@ -22,6 +22,7 @@
  */
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -47,7 +49,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
-public class ServerSaveController {
+@RequestMapping("/extserver")
+public class ExtServerManagementController {
 
     @Autowired
     private IIntegrationService integrationService;
@@ -56,9 +59,28 @@ public class ServerSaveController {
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
+    
+    @RequestMapping(path = "/serverlist")
+    public String serverlist(HttpServletRequest request) throws Exception {
+	List<ExtServer> extServers = integrationService.getAllExtServers();
+	Collections.sort(extServers);
+	request.setAttribute("servers", extServers);
+	return "integration/serverlist";
+    }
+
+    @RequestMapping(path = "/edit")
+    public String edit(@ModelAttribute ExtServerForm extServerForm, HttpServletRequest request) throws Exception {
+	
+	Integer sid = WebUtil.readIntParam(request, "sid", true);
+	if (sid != null) {
+	    ExtServer map = integrationService.getExtServer(sid);
+	    BeanUtils.copyProperties(extServerForm, map);
+	}
+	return "integration/servermaintain";
+    }
 
     @RequestMapping(path = "/serversave")
-    public String execute(@ModelAttribute ExtServerForm extServerForm, BindingResult bindingResult,
+    public String serversave(@ModelAttribute ExtServerForm extServerForm, BindingResult bindingResult,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
@@ -129,10 +151,36 @@ public class ServerSaveController {
 		BeanUtils.copyProperties(map, extServerForm);
 	    }
 	    integrationService.saveExtServer(map);
-	    return "forward:/serverlist.do";
+	    return "forward:/extserver/serverlist.do";
 	} else {
 	    request.setAttribute("errorMap", errorMap);
-	    return "servermaintain";
+	    return "integration/servermaintain";
 	}
     }
+
+    @RequestMapping(path = "/disable")
+    public String disable(HttpServletRequest request) throws Exception {
+	Integer sid = WebUtil.readIntParam(request, "sid", false);
+	ExtServer map = integrationService.getExtServer(sid);
+	map.setDisabled(true);
+	integrationService.saveExtServer(map);
+	return "redirect:/extserver/serverlist.do";
+    }
+
+    @RequestMapping(path = "/enable")
+    public String enable(HttpServletRequest request) throws Exception {
+	Integer sid = WebUtil.readIntParam(request, "sid", false);
+	ExtServer map = integrationService.getExtServer(sid);
+	map.setDisabled(false);
+	integrationService.saveExtServer(map);
+	return "redirect:/extserver/serverlist.do";
+    }
+
+    @RequestMapping(path = "/delete")
+    public String delete(HttpServletRequest request) throws Exception {
+	Integer sid = WebUtil.readIntParam(request, "sid", false);
+	userManagementService.deleteById(ExtServer.class, sid);
+	return "redirect:/extserver/serverlist.do";
+    }
+
 }
