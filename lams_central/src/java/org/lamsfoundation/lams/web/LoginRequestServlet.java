@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,8 @@ public class LoginRequestServlet extends HttpServlet {
     private IntegrationService integrationService;
     @Autowired
     private ILessonService lessonService;
+    @Autowired
+    private MessageService centralMessageService;
     
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
@@ -149,21 +152,26 @@ public class LoginRequestServlet extends HttpServlet {
 			lastName, locale, country, email, prefix, isUpdateUserDetails);
 	    }
 
-	    // in case of request for learner with strict authentication check cache should also contain lsid
-	    String lsId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
+	    // in case of request for learner with strict authentication check cache should also contain lessonId
 	    if ((IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
-		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && StringUtils.isBlank(lsId)) {
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
+		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && StringUtils.isBlank(lessonId)) {
+		//show different messages for LTI learners (as this is a typical expected scenario) and all others
+		String errorMessage = IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
+			&& extServer.isLtiConsumer()
+				? centralMessageService.getMessage("message.lesson.not.started.cannot.participate")
+				: "Login Failed - lsId parameter missing";
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMessage);
 		return;
 	    }
-	    Authenticator.authenticateLoginRequest(extServer, timestamp, extUsername, method, lsId, hash);
+	    
+	    Authenticator.authenticateLoginRequest(extServer, timestamp, extUsername, method, lessonId, hash);
 
-	    if (extCourseId == null && lsId != null) {
+	    if (extCourseId == null && StringUtils.isNotBlank(lessonId)) {
 		// derive course ID from lesson ID
 		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(extServer.getSid(),
-			Long.parseLong(lsId));
+			Long.parseLong(lessonId));
 		if (classMap == null) {
-		    log.warn("Lesson " + lsId + " is not mapped to any course for server " + extServer.getServername());
+		    log.warn("Lesson " + lessonId + " is not mapped to any course for server " + extServer.getServername());
 		} else {
 		    extCourseId = classMap.getCourseid();
 		}
@@ -183,7 +191,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	    
 	    //adds users to the lesson with respective roles
-	    if (StringUtils.isNotEmpty(lessonId)) {
+	    if (StringUtils.isNotBlank(lessonId)) {
 		if (IntegrationConstants.METHOD_LEARNER.equals(method)
 			|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
 		    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());

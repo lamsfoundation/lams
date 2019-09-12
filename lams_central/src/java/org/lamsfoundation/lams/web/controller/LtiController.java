@@ -120,6 +120,12 @@ public class LtiController {
 			resourceLinkIdHistory);
 		lesson = lessonService.getLesson(oldExtLessonMap.getLessonId());		
 	    }
+	    
+	    if (lesson == null) {
+		//abort as this is not normal case
+		request.setAttribute("messageKey", "lessonsearch.noresults");
+		return "msgContent";
+	    }
 
 	    String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	    ExtCourseClassMap currentOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), extCourseId);
