@@ -236,6 +236,8 @@
 		</div>
 	</div>
 	
+	<!-- Optional Worfklow Automation Module Placeholder - do not remove -->
+	
 	<c:if test="${not empty question.qbOptions}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
