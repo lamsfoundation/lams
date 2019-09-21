@@ -528,13 +528,20 @@ function markGroupLocked(container) {
  * Show a printable version of the groups. Open the same size as the current window
  */
 function showPrintPage() {
-	var url = LAMS_URL + '/monitoring/grouping/printGrouping.do';
-	if ( groupingActivityId )
-		url += '&activityID='+groupingActivityId;
-	if ( lessonId )
-		url += '&lessonID='+lessonId;
-	if ( grouping && grouping.groupingId )
-		url += '&groupingId='+grouping.groupingId;
+	var url = LAMS_URL + 'monitoring/grouping/printGrouping.do',
+		queryChar = '?';
+	if ( groupingActivityId ) {
+		url += queryChar + 'activityID='+groupingActivityId;
+		queryChar = '&';
+	}
+	if ( lessonId ) {
+		url += queryChar + 'lessonID='+lessonId;
+		queryChar = '&';
+	}
+	if ( grouping && grouping.groupingId ) {
+		url += queryChar + 'groupingId='+grouping.groupingId;
+		queryChar = '&';
+	}
 	var height = Math.min(550, $(window).height()),
 		width = Math.max(1093, $(window).width());
 	var wd = window.open(url,LABELS.GROUP_PREFIX_LABEL,'height='+height+',width='+width+',resizable,scrollbars').focus();
