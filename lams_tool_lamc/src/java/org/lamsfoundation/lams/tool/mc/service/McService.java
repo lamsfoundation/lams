@@ -535,7 +535,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
@@ -842,7 +842,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 
 	    for (McQueUsr user : sessionUsers) {
 
@@ -1414,7 +1414,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
-			McSession.INCOMPLETE, toolSessionName, mcContent, new ArrayList<McQueUsr>());
+			McSession.INCOMPLETE, toolSessionName, mcContent, new HashSet<McQueUsr>());
 
 		mcSessionDAO.saveMcSession(mcSession);
 
