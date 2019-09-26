@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.qa.web.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -37,9 +36,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.model.QaCondition;
+import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.util.QaQuestionComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaConditionForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -103,7 +103,7 @@ public class QaAuthoringConditionController {
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	QaCondition condition = null;
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    condition = conditionList.get(orderId);
 	    if (condition != null) {
@@ -173,7 +173,7 @@ public class QaAuthoringConditionController {
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    QaCondition condition = conditionList.remove(orderId);
 	    for (QaCondition otherCondition : conditionSet) {
@@ -184,7 +184,7 @@ public class QaAuthoringConditionController {
 	    conditionSet.clear();
 	    conditionSet.addAll(conditionList);
 	    // add to delList
-	    List deletedList = getDeletedQaConditionList(sessionMap);
+	    List deletedList = QaAuthoringConditionController.getDeletedQaConditionList(sessionMap);
 	    deletedList.add(condition);
 	}
 
@@ -221,7 +221,7 @@ public class QaAuthoringConditionController {
 
 	int orderId = NumberUtils.stringToInt(request.getParameter(QaAppConstants.PARAM_ORDER_ID), -1);
 	if (orderId != -1) {
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    List<QaCondition> conditionList = new ArrayList<>(conditionSet);
 	    // get current and the target item, and switch their sequnece
 	    QaCondition condition = conditionList.get(orderId);
@@ -254,7 +254,8 @@ public class QaAuthoringConditionController {
      * @param request
      * @return
      */
-    private SortedSet<QaCondition> getQaConditionSet(SessionMap sessionMap) {
+    @SuppressWarnings("unchecked")
+    public static SortedSet<QaCondition> getConditions(SessionMap<String, Object> sessionMap) {
 	SortedSet<QaCondition> list = (SortedSet<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 	if (list == null) {
 	    list = new TreeSet<>(new TextSearchConditionComparator());
@@ -269,11 +270,12 @@ public class QaAuthoringConditionController {
      * @param request
      * @return
      */
-    private List<QaQuestionDTO> getQuestionList(SessionMap sessionMap) {
-	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
+    @SuppressWarnings("unchecked")
+    private SortedSet<QaQueContent> getQuestions(SessionMap<String, Object> sessionMap) {
+	SortedSet<QaQueContent> list = (SortedSet<QaQueContent>) sessionMap.get(QaAppConstants.LIST_QUESTIONS);
 	if (list == null) {
-	    list = new LinkedList<>();
-	    sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, list);
+	    list = new TreeSet<>(new QaQuestionComparator());
+	    sessionMap.put(QaAppConstants.LIST_QUESTIONS, list);
 	}
 	return list;
     }
@@ -285,26 +287,16 @@ public class QaAuthoringConditionController {
      * @param request
      * @return
      */
-    private List getDeletedQaConditionList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, QaAppConstants.ATTR_DELETED_CONDITION_LIST);
-    }
-
-    /**
-     * Get <code>java.util.List</code> from HttpSession by given name.
-     *
-     * @param request
-     * @param name
-     * @return
-     */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
+    @SuppressWarnings("unchecked")
+    public static List<QaCondition> getDeletedQaConditionList(SessionMap<String, Object> sessionMap) {
+	List<QaCondition> list = (List<QaCondition>) sessionMap.get(QaAppConstants.ATTR_DELETED_CONDITION_LIST);
 	if (list == null) {
-	    list = new ArrayList();
-	    sessionMap.put(name, list);
+	    list = new ArrayList<>();
+	    sessionMap.put(QaAppConstants.ATTR_DELETED_CONDITION_LIST, list);
 	}
 	return list;
     }
-
+    
     /**
      * This method will populate condition information to its form for edit use.
      *
@@ -333,15 +325,15 @@ public class QaAuthoringConditionController {
 	    HttpServletRequest request) {
 	// get back sessionMAP
 	String sessionMapID = QaConditionForm.getSessionMapID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
-	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
+	SortedSet<QaQueContent> questions = getQuestions(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 	Map<String, String> possibleItems = new HashMap<>(questions.size());
 	int i = 0;
-	for (QaQuestionDTO question : questions) {
-	    String nonHTMLQuestion = question.getQuestion();
+	for (QaQueContent question : questions) {
+	    String nonHTMLQuestion = question.getQbQuestion().getName();
 	    if (nonHTMLQuestion != null) {
 		nonHTMLQuestion = WebUtil.removeHTMLtags(nonHTMLQuestion);
 		// we don't want to cite the whole question, so we just leave some first characters; it should be enough
@@ -363,10 +355,10 @@ public class QaAuthoringConditionController {
      * @throws QaException
      */
     private void extractFormToQaCondition(HttpServletRequest request, QaConditionForm form) throws Exception {
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(form.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
-	SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	int orderId = form.getOrderId();
 	QaCondition condition = null;
 
@@ -388,13 +380,13 @@ public class QaAuthoringConditionController {
 	}
 
 	Integer[] selectedItems = form.getSelectedItems();
-	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
+	SortedSet<QaQueContent> questions = getQuestions(sessionMap);
 
-	condition.temporaryQuestionDTOSet.clear();
+	condition.temporaryQaQuestions.clear();
 	for (Integer selectedItem : selectedItems) {
-	    for (QaQuestionDTO question : questions) {
+	    for (QaQueContent question : questions) {
 		if (selectedItem.equals(new Integer(question.getDisplayOrder()))) {
-		    condition.temporaryQuestionDTOSet.add(question);
+		    condition.temporaryQaQuestions.add(question);
 		}
 	    }
 	}
@@ -421,7 +413,7 @@ public class QaAuthoringConditionController {
 
 	    String sessionMapID = QaConditionForm.getSessionMapID();
 	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	    SortedSet<QaCondition> conditionSet = getQaConditionSet(sessionMap);
+	    SortedSet<QaCondition> conditionSet = getConditions(sessionMap);
 	    for (QaCondition condition : conditionSet) {
 		if (formConditionName.equals(condition.getDisplayName())
 			&& !formConditionOrderId.equals(condition.getOrderId())) {

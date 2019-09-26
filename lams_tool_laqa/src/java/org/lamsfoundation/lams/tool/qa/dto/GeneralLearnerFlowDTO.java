@@ -52,7 +52,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String toolSessionID;
 
-    protected String httpSessionID;
+    protected String sessionMapID;
 
     protected String toolContentID;
 
@@ -73,8 +73,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected String reflectionSubject;
 
     protected String notebookEntry;
-
-    protected String endLearningMessage;
 
     protected String userNameVisible;
 
@@ -324,21 +322,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the endLearningMessage.
-     */
-    public String getEndLearningMessage() {
-	return endLearningMessage;
-    }
-
-    /**
-     * @param endLearningMessage
-     *            The endLearningMessage to set.
-     */
-    public void setEndLearningMessage(String endLearningMessage) {
-	this.endLearningMessage = endLearningMessage;
-    }
-
-    /**
      * @return Returns the userNameVisible.
      */
     public String getUserNameVisible() {
@@ -384,18 +367,18 @@ public class GeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the httpSessionID.
+     * @return Returns the sessionMapID.
      */
-    public String getHttpSessionID() {
-	return httpSessionID;
+    public String getSessionMapID() {
+	return sessionMapID;
     }
 
     /**
-     * @param httpSessionID
-     *            The httpSessionID to set.
+     * @param sessionMapID
+     *            The sessionMapID to set.
      */
-    public void setHttpSessionID(String httpSessionID) {
-	this.httpSessionID = httpSessionID;
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
     }
 
     /**

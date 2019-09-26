@@ -53,9 +53,7 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
-import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -91,15 +89,12 @@ public class QaMonitoringController implements QaAppConstants {
 
     @RequestMapping("/monitoring")
     private String execute(@ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm,
-	    HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
-	QaUtils.cleanUpSessionAbsolute(request);
-
+	    HttpServletRequest request) throws IOException, ServletException {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	if ((strToolContentID == null) || (strToolContentID.length() == 0)) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No Tool Content ID found");
 	}
 	qaMonitoringForm.setToolContentID(strToolContentID);
@@ -107,27 +102,24 @@ public class QaMonitoringController implements QaAppConstants {
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	QaContent qaContent = qaService.getQaContent(new Long(toolContentID).longValue());
 	if (qaContent == null) {
-	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("Data not initialised in Monitoring");
 	}
-
-	qaMonitoringForm.setCurrentTab("1");	
 
 	/* this section is related to summary tab. Starts here. */
 //	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 //	sessionMap.put(ACTIVITY_TITLE_KEY, qaContent.getTitle());
 //	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
 //
-//	qaMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
+//	qaMonitoringForm.setSessionMapID(sessionMap.getSessionID());
 //	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	List questionDTOs = new LinkedList();
+	List<QaQuestionDTO> questionDTOs = new LinkedList<>();
 	for (QaQueContent question : qaContent.getQaQueContents()) {
 	    QaQuestionDTO questionDTO = new QaQuestionDTO(question);
 	    questionDTOs.add(questionDTO);
 	}
-	request.setAttribute(LIST_QUESTION_DTOS, questionDTOs);
-//	sessionMap.put(LIST_QUESTION_DTOS, questionDTOs);
+	request.setAttribute(LIST_QUESTIONS, questionDTOs);
+//	sessionMap.put(LIST_QUESTIONS, questionDTOs);
 //	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
 	//session dto list
@@ -208,21 +200,18 @@ public class QaMonitoringController implements QaAppConstants {
 
 	Long responseUid = WebUtil.readLongParam(request, QaAppConstants.RESPONSE_UID);
 	String updatedResponse = request.getParameter("updatedResponse");
-	QaUsrResp qaUsrResp = qaService.getResponseById(responseUid);
+	QaUsrResp userResponse = qaService.getResponseById(responseUid);
 
 	/*
 	 * write out the audit log entry. If you move this after the update of the response, then make sure you update
 	 * the audit call to use a copy of the original answer
 	 */
-	Long toolContentId = null;
-	if (qaUsrResp.getQaQuestion() != null && qaUsrResp.getQaQuestion().getQaContent() != null) {
-	    toolContentId = qaUsrResp.getQaQuestion().getQaContent().getQaContentId();
-	}
-	qaService.getLogEventService().logChangeLearnerContent(qaUsrResp.getQaQueUser().getQueUsrId(),
-		qaUsrResp.getQaQueUser().getUsername(), toolContentId, qaUsrResp.getAnswer(), updatedResponse);
+	Long toolContentId = userResponse.getQaQueUser().getQaSession().getQaContent().getQaContentId();
+	qaService.getLogEventService().logChangeLearnerContent(userResponse.getQaQueUser().getQueUsrId(),
+		userResponse.getQaQueUser().getUsername(), toolContentId, userResponse.getAnswer(), updatedResponse);
 
-	qaUsrResp.setAnswer(updatedResponse);
-	qaService.updateUserResponse(qaUsrResp);
+	userResponse.setAnswer(updatedResponse);
+	qaService.updateUserResponse(userResponse);
 
 	return null;
     }
@@ -404,7 +393,7 @@ public class QaMonitoringController implements QaAppConstants {
 	    //create itemIds list
 	    List<Long> itemIds = new LinkedList<>();
 	    for (QaUsrResp usrResponse : responses) {
-		itemIds.add(usrResponse.getResponseId());
+		itemIds.add(usrResponse.getUid());
 	    }
 	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(),
 		    toolSessionID, itemIds, true, allUserIdValue);

@@ -227,11 +227,10 @@ public interface IAssessmentService extends ICommonToolService {
     List<AssessmentSession> getSessionsByContentId(Long toolContentId);
 
     /**
-     * Save or update assessment result.
-     *
-     * @param assessmentResult
+     * Create new assessment result object.
      */
-    void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);
+    void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId,
+	    List<Set<QuestionDTO>> pagedQuestionDtos);
     
     void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    Long singleMarkHedgingQuestionUid)

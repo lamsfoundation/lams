@@ -30,36 +30,28 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
  *
  * @author Ozgur Demirtas
  */
-public class QaQuestionDTO implements Comparable {
+public class QaQuestionDTO implements Comparable<QaMonitoredUserDTO> {
     private Long uid;
-    private String question;
+    private String name;
+    private String description;
     private String displayOrder;
     private String feedback;
     private boolean required;
     private int minWordsLimit;
 
-    public QaQuestionDTO(QaQueContent que) {
-	this.question = que.getQuestion();
-	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
-	this.feedback = que.getFeedback() != null ? que.getFeedback() : "";
-	this.required = que.isRequired();
-	this.minWordsLimit = que.getMinWordsLimit();
-	this.uid = que.getUid();
-    }
-
-    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required, int minWordsLimit) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.feedback = feedback;
-	this.required = required;
-	this.minWordsLimit = minWordsLimit;
+    public QaQuestionDTO(QaQueContent qaQuestion) {
+	this.name = qaQuestion.getQbQuestion().getName();
+	this.description = qaQuestion.getQbQuestion().getDescription();
+	this.displayOrder = String.valueOf(qaQuestion.getDisplayOrder());
+	this.feedback = qaQuestion.getQbQuestion().getFeedback() != null ? qaQuestion.getQbQuestion().getFeedback() : "";
+	this.required = qaQuestion.getQbQuestion().isAnswerRequired();
+	this.minWordsLimit = qaQuestion.getQbQuestion().getMinWordsLimit();
+	this.uid = qaQuestion.getUid();
     }
 
     @Override
-    public int compareTo(Object o) {
-	QaMonitoredUserDTO qaMonitoredUserDTO = (QaMonitoredUserDTO) o;
-
-	if (qaMonitoredUserDTO == null) {
+    public int compareTo(QaMonitoredUserDTO o) {
+	if (o == null) {
 	    return 1;
 	} else {
 	    return 0;
@@ -112,22 +104,30 @@ public class QaQuestionDTO implements Comparable {
     }
 
     /**
-     * @return Returns the question.
+     * @return Returns the name.
      */
-    public String getQuestion() {
-	return question;
+    public String getName() {
+	return name;
     }
 
     /**
-     * @param question
-     *            The question to set.
+     * @param name
+     *            The name to set.
      */
-    public void setQuestion(String question) {
-	this.question = question;
+    public void setName(String question) {
+	this.name = question;
+    }
+    
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     /**
-     * @return Is this question required?
+     * @return Is this name required?
      */
     public boolean isRequired() {
 	return required;
@@ -135,7 +135,7 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param required
-     *            Is this question required
+     *            Is this name required
      */
     public void setRequired(boolean required) {
 	this.required = required;
@@ -167,6 +167,6 @@ public class QaQuestionDTO implements Comparable {
 
     @Override
     public int hashCode() {
-	return new Integer(getDisplayOrder());
+	return Integer.valueOf(displayOrder);
     }
 }

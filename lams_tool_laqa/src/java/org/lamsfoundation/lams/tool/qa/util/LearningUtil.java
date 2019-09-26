@@ -53,8 +53,8 @@ public class LearningUtil implements QaAppConstants {
 	String userID = request.getParameter("userID");
 	qaLearningForm.setUserID(userID);
 
-	String httpSessionID = request.getParameter("httpSessionID");
-	qaLearningForm.setHttpSessionID(httpSessionID);
+	String sessionMapID = request.getParameter("sessionMapID");
+	qaLearningForm.setSessionMapID(sessionMapID);
 
 	String totalQuestionCount = request.getParameter("totalQuestionCount");
 	qaLearningForm.setTotalQuestionCount(totalQuestionCount);

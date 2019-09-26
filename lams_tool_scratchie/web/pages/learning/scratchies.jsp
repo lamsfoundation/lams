@@ -48,7 +48,7 @@
 						<c:out value="${optionDto.qbOption.name}" escapeXml="false" />
 					</div>
 					
-					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">
+					<c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">
 						<hr class="hr-confidence-level" />
 					
 						<div>

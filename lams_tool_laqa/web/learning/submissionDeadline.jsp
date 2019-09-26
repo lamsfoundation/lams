@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
@@ -35,7 +35,7 @@
 		<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" id="qaLearningForm">
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="userID" />
-			<form:hidden path="httpSessionID" />
+			<form:hidden path="sessionMapID" />
 			<form:hidden path="totalQuestionCount" />
 
 

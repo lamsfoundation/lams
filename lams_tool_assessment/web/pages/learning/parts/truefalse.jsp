@@ -20,7 +20,7 @@
 		<tr>
 			<td class="has-radio-button">
 				<input type="radio" name="question${status.index}" value="${false}"
-	 				<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
+	 				<c:if test="${(!question.answerBoolean) and (question.answer != null)}">checked="checked"</c:if>
 					<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 				/>
 			</td>
