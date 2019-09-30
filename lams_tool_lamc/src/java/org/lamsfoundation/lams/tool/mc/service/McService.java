@@ -99,6 +99,7 @@ import org.lamsfoundation.lams.tool.mc.model.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.mc.util.McStringComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -121,7 +122,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Ozgur Demirtas
  */
-public class McService implements IMcService, ToolContentManager, ToolSessionManager, ToolRestManager, McAppConstants {
+public class McService
+	implements IMcService, ToolContentManager, ToolSessionManager, ToolRestManager, McAppConstants, IQbToolService {
     private static Logger logger = Logger.getLogger(McService.class.getName());
 
     private IMcContentDAO mcContentDAO;
@@ -2115,6 +2117,24 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	// run check again, this time with modified options
 	return !baseLine.equals(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
 		: IQbService.QUESTION_MODIFIED_NONE;
+    }
+
+    @Override
+    public void replaceQuestions(long toolContentId, List<QbQuestion> newQuestions) {
+	// remove all existing questions
+	McContent mcContent = getMcContent(toolContentId);
+	for (McQueContent mcQuestion : mcContent.getMcQueContents()) {
+	    mcQueContentDAO.delete(mcQuestion);
+	}
+	// this is needed, otherwise Hibernate wants to re-save the deleted MC questions
+	mcContent.getMcQueContents().clear();
+
+	// populate MC with new questions
+	int displayOrder = 1;
+	for (QbQuestion qbQuestion : newQuestions) {
+	    McQueContent mcQuestion = new McQueContent(qbQuestion, displayOrder++, mcContent);
+	    mcQueContentDAO.insert(mcQuestion);
+	}
     }
 
     private void releaseQbQuestionFromCache(QbQuestion qbQuestion) {

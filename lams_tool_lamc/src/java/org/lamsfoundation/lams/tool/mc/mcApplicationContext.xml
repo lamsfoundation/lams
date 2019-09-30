@@ -100,6 +100,7 @@
 					<prop key="update*">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="get*">PROPAGATION_REQUIRED, -MccpApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="replaceQuestions">PROPAGATION_REQUIRED, -MccpApplicationException</prop>
                 	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 					<prop key="persistFile">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
