@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -111,7 +112,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Andrey Balan
  */
 public class ScratchieServiceImpl
-	implements IScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager {
+	implements IScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager, IQbToolService {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -1807,6 +1808,34 @@ public class ScratchieServiceImpl
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
+    }
+
+    @Override
+    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	if (newActivityName != null) {
+	    scratchie.setTitle(newActivityName);
+	    scratchieDao.update(scratchie);
+	}
+
+	// remove all existing questions
+	for (ScratchieItem scratchieItem : scratchie.getScratchieItems()) {
+	    scratchieItemDao.delete(scratchieItem);
+	}
+	// this is needed, otherwise Hibernate wants to re-save the deleted Scratchie questions
+	scratchie.getScratchieItems().clear();
+
+	// populate Scratchie with new questions
+	int displayOrder = 1;
+	for (QbQuestion qbQuestion : newQuestions) {
+	    ScratchieItem scratchieItem = new ScratchieItem();
+	    scratchieItem.setDisplayOrder(displayOrder++);
+	    scratchieItem.setQbQuestion(qbQuestion);
+	    scratchieItem.setToolContentId(toolContentId);
+	    scratchieItemDao.insert(scratchieItem);
+	    scratchie.getScratchieItems().add(scratchieItem);
+	}
+	scratchieDao.update(scratchie);
     }
 
     // *****************************************************************************

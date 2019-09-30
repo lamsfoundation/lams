@@ -158,6 +158,7 @@
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="replaceQuestions">PROPAGATION_REQUIRED</prop>
             </props>
         </property>
     </bean>

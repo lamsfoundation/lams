@@ -104,6 +104,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -121,7 +122,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Andrey Balan
  */
 public class AssessmentServiceImpl
-	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
+	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager, IQbToolService {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -801,8 +802,7 @@ public class AssessmentServiceImpl
 			    Pattern pattern = Pattern.compile(regex,
 				    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 			    if (pattern.matcher(answer).matches()) {
-				String answerFloatStr = answer.substring(0,
-					answer.length() - unit.getName().length());
+				String answerFloatStr = answer.substring(0, answer.length() - unit.getName().length());
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
@@ -2525,6 +2525,47 @@ public class AssessmentServiceImpl
 	return summary;
     }
 
+    @Override
+    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	if (newActivityName != null) {
+	    assessment.setTitle(newActivityName);
+	    assessmentDao.update(assessment);
+	}
+
+	// remove all existing question references
+	for (QuestionReference oldReference : assessment.getQuestionReferences()) {
+	    assessmentQuestionDao.delete(oldReference);
+	}
+	assessment.getQuestionReferences().clear();
+
+	// remove all existing questions
+	for (AssessmentQuestion oldQuestion : assessment.getQuestions()) {
+	    assessmentQuestionDao.delete(oldQuestion);
+	}
+	// this is needed, otherwise Hibernate wants to re-save the deleted Assessment questions
+	assessment.getQuestions().clear();
+
+	// populate Assessment with new questions and references
+	int displayOrder = 1;
+	for (QbQuestion qbQuestion : newQuestions) {
+	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	    assessmentQuestion.setDisplayOrder(displayOrder++);
+	    assessmentQuestion.setQbQuestion(qbQuestion);
+	    assessmentQuestion.setToolContentId(toolContentId);
+	    assessmentQuestionDao.insert(assessmentQuestion);
+	    assessment.getQuestions().add(assessmentQuestion);
+
+	    QuestionReference questionReference = new QuestionReference();
+	    questionReference.setQuestion(assessmentQuestion);
+	    questionReference.setSequenceId(displayOrder);
+	    assessmentQuestionDao.insert(questionReference);
+	    assessment.getQuestionReferences().add(questionReference);
+
+	    displayOrder++;
+	}
+	assessmentDao.update(assessment);
+    }
     // *****************************************************************************
     // private methods
     // *****************************************************************************

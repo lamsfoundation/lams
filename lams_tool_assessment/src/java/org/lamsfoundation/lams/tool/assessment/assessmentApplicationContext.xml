@@ -153,6 +153,7 @@
 				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="recalculate*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="releaseFromCache">readOnly, PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="replaceQuestions">PROPAGATION_REQUIRED</prop>
             </props>
         </property>
     </bean>

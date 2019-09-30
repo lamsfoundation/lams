@@ -2120,9 +2120,14 @@ public class McService
     }
 
     @Override
-    public void replaceQuestions(long toolContentId, List<QbQuestion> newQuestions) {
-	// remove all existing questions
+    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
 	McContent mcContent = getMcContent(toolContentId);
+	if (newActivityName != null) {
+	    mcContent.setTitle(newActivityName);
+	    mcContentDAO.updateMcContent(mcContent);
+	}
+	
+	// remove all existing questions
 	for (McQueContent mcQuestion : mcContent.getMcQueContents()) {
 	    mcQueContentDAO.delete(mcQuestion);
 	}
