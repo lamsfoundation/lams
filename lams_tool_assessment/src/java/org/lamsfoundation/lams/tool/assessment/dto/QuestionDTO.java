@@ -61,6 +61,8 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     private int minWordsLimit;
 
     private boolean hedgingJustificationEnabled;
+    
+    private boolean autocompleteEnabled;
 
     private boolean correctAnswersDisclosed;
 
@@ -137,6 +139,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
 	this.minWordsLimit = qbQuestion.getMinWordsLimit();
 	this.hedgingJustificationEnabled = qbQuestion.isHedgingJustificationEnabled();
+	this.autocompleteEnabled = qbQuestion.isAutocompleteEnabled();
 
 	optionDtos = new TreeSet<>();
 	for (QbOption option : qbQuestion.getQbOptions()) {
@@ -331,6 +334,14 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
+    
+    public boolean isAutocompleteEnabled() {
+	return autocompleteEnabled;
+    }
+
+    public void setAutocompleteEnabled(boolean autocompleteEnabled) {
+	this.autocompleteEnabled = autocompleteEnabled;
     }
 
     public boolean isCorrectAnswersDisclosed() {

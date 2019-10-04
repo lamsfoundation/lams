@@ -22,27 +22,43 @@
 
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.util.HashUtil;
 
 /**
  * Tool may contain several questions. Which in turn contain options.
  *
  * @author Andrey Balan
  */
-public class QbOptionDTO implements Comparable<QbOptionDTO> {
-    private QbOption qbOption;
-
+public class OptionDTO implements Comparable<OptionDTO> {
     private boolean scratched;
     private int attemptOrder;
     private int[] attempts;
+    //VSA questions doesn't have confidenceLevelDto.qbOptionUid
     private List<ConfidenceLevelDTO> confidenceLevelDtos;
+    
+    //****for MCQ questions***
+    private QbOption qbOption;
+    
+    //****for VSA questions***
+    private Long qbQuestionUid;
+    private String answer;
+    private int answerHash;
+    boolean correct;
+    private Long userId;
+
+    public OptionDTO() {
+	//init confidenceLevelDtos list
+	this.confidenceLevelDtos = new LinkedList<>();
+    }
 
     @Override
-    public int compareTo(QbOptionDTO o) {
-	return this.qbOption.compareTo(o.qbOption);
+    public int compareTo(OptionDTO o) {
+	return qbOption == null ? this.answer.compareTo(o.answer) : this.qbOption.compareTo(o.qbOption);
     }
 
     public QbOption getQbOption() {
@@ -51,6 +67,47 @@ public class QbOptionDTO implements Comparable<QbOptionDTO> {
 
     public void setQbOption(QbOption qbOption) {
 	this.qbOption = qbOption;
+    }
+    
+    public void setQbQuestionUid(Long qbQuestionUid) {
+	this.qbQuestionUid = qbQuestionUid;
+    }
+
+    public Long getQbQuestionUid() {
+	return this.qbQuestionUid;
+    }
+    
+    public void setAnswer(String answer) {
+	this.answer = answer;
+	this.answerHash = answer.hashCode();
+    }
+
+    public String getAnswer() {
+	return this.answer;
+    }
+    
+    public void setAnswerHash(int answerHash) {
+	this.answerHash = answerHash;
+    }
+
+    public int getAnswerHash() {
+	return this.answerHash;
+    }
+    
+    public boolean isCorrect() {
+	return this.correct;
+    }
+
+    public void setCorrect(boolean correct) {
+	this.correct = correct;
+    }
+    
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
+
+    public Long getUserId() {
+	return this.userId;
     }
 
     public void setScratched(boolean complete) {

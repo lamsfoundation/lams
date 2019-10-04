@@ -186,6 +186,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 			"prefixAnswersWithLetters", "false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "caseSensitive", "caseSensitive", "false",
 			false, true);
+		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "autocompleteEnabled",
+			"autocompleteEnabled", "false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "correctAnswer", "correctAnswer", "false",
 			false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "allowRichEditor", "allowRichEditor",

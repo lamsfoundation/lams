@@ -29,9 +29,19 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
 public interface ScratchieAnswerVisitDAO extends DAO {
 
+    /**
+     * Get log for MCQ question.
+     */
     ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId);
+  
+    /**
+     * Get log for VSA question.
+     */
+    ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, String answer);
 
     int getLogCountTotal(Long sessionId);
+    
+    int getLogCountPerItem(Long sessionId, Long itemUid);
 
     List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid);
 

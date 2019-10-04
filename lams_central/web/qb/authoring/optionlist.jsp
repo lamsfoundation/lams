@@ -83,7 +83,7 @@
 	<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 	
 	<div id="option-table" 
-		<c:if test="${!assessmentQuestionForm.authoringRestricted}">class="sortable-on"</c:if>>
+		<c:if test="${!assessmentQuestionForm.authoringRestricted && questionType != 3}">class="sortable-on"</c:if>>
 		
 		<c:forEach var="option" items="${optionList}" varStatus="status">
 			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
@@ -101,8 +101,8 @@
 								<%@ include file="matchingpairoption.jsp"%>
 							</c:when>
 							<c:when test="${questionType == 3}">
-								<%@ include file="shortansweroption.jsp"%>
-							</c:when>					
+								<%@ include file="vsaOption.jsp"%>
+							</c:when>
 							<c:when test="${questionType == 4}">
 								<%@ include file="numericaloption.jsp"%>
 							</c:when>

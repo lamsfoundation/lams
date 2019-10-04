@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -357,7 +359,7 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
-    public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
+    public Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId) {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
 
 	//if specifiedActivity is null - most likely author hasn't saved the sequence yet
@@ -366,7 +368,7 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
-	findPrecedingConfidenceProvidingActivities(specifiedActivity, confidenceProvidingActivityIds);
+	findPrecedingAssessmentAndMcqActivities(specifiedActivity, confidenceProvidingActivityIds, true);
 
 	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
@@ -383,8 +385,8 @@ public class LamsToolService implements ILamsToolService {
      * them). Please note, it does not check whether enableConfidenceLevels advanced option is ON in those activities.
      */
     @SuppressWarnings("rawtypes")
-    private void findPrecedingConfidenceProvidingActivities(Activity activity,
-	    Set<Long> confidenceProvidingActivityIds) {
+    private void findPrecedingAssessmentAndMcqActivities(Activity activity,
+	    Set<Long> confidenceProvidingActivityIds, boolean isMcqIncluded) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
 	if (activityClass.equals(ToolActivity.class)) {
@@ -401,7 +403,8 @@ public class LamsToolService implements ILamsToolService {
 	    }
 
 	    String toolSignature = toolActivity.getTool().getToolSignature();
-	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature) || TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
 		confidenceProvidingActivityIds.add(toolActivity.getActivityId());
 	    }
 
@@ -412,7 +415,7 @@ public class LamsToolService implements ILamsToolService {
 		if (activityIter instanceof ToolActivity) {
 		    String toolSignatureIter = ((ToolActivity) activityIter).getTool().getToolSignature();
 		    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignatureIter)
-			    || TOOL_SIGNATURE_MCQ.equals(toolSignatureIter)) {
+			    || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(toolSignatureIter)) {
 			confidenceProvidingActivityIds.add(activityIter.getActivityId());
 		    }
 		}
@@ -424,16 +427,38 @@ public class LamsToolService implements ILamsToolService {
 	Transition transitionTo = activity.getTransitionTo();
 	if (transitionTo != null) {
 	    Activity fromActivity = transitionTo.getFromActivity();
-	    findPrecedingConfidenceProvidingActivities(fromActivity, confidenceProvidingActivityIds);
+	    findPrecedingAssessmentAndMcqActivities(fromActivity, confidenceProvidingActivityIds, isMcqIncluded);
 	    return;
 	}
 
 	// check parent activity
 	Activity parent = activity.getParentActivity();
 	if (parent != null) {
-	    findPrecedingConfidenceProvidingActivities(parent, confidenceProvidingActivityIds);
+	    findPrecedingAssessmentAndMcqActivities(parent, confidenceProvidingActivityIds, isMcqIncluded);
 	    return;
 	}
+    }
+    
+    @Override
+    public Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId) {
+	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
+
+	//if specifiedActivity is null - most likely author hasn't saved the sequence yet
+	if (specifiedActivity == null) {
+	    return null;
+	}
+
+	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<Long>();
+	findPrecedingAssessmentAndMcqActivities(specifiedActivity, providingVsaAnswersActivityIds, false);
+
+	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<ToolActivity>();
+	for (Long confidenceProvidingActivityId : providingVsaAnswersActivityIds) {
+	    ToolActivity activityProvidingVsaAnswers = (ToolActivity) activityDAO
+		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
+	    activitiesProvidingVsaAnswers.add(activityProvidingVsaAnswers);
+	}
+
+	return activitiesProvidingVsaAnswers;
     }
 
     @Override
@@ -457,6 +482,25 @@ public class LamsToolService implements ILamsToolService {
 		.getConfidenceLevelsByToolSession(confidenceLevelSession);
 
 	return confidenceLevelDtos;
+    }
+    
+    @Override
+    public Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
+	    Integer requestorUserId, Long requestorToolSessionId) {
+	User user = (User) activityDAO.find(User.class, requestorUserId);
+	if (user == null) {
+	    throw new ToolException("No user found for userId=" + requestorUserId);
+	}
+
+	ToolSession requestorSession = toolSessionDAO.getToolSession(requestorToolSessionId);
+	if (requestorSession == null) {
+	    throw new ToolException("No session found for toolSessionId=" + requestorToolSessionId);
+	}
+
+	Activity activityProvidingVsaAnswers = activityDAO.getActivityByUIID(activityUiidProvidingVsaAnswers,
+		requestorSession.getToolActivity().getLearningDesign());
+	ToolSession assessmentSession = toolSessionDAO.getToolSessionByLearner(user, activityProvidingVsaAnswers);
+	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
     }
 
     @Override

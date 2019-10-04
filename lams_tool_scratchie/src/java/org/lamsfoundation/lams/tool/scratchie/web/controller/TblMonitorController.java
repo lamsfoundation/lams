@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -163,12 +163,12 @@ public class TblMonitorController {
 		String optionsSequence = groupRow[i].getCellValue().toString();
 		String[] optionLetters = optionsSequence.split(", ");
 
-		List<QbOptionDTO> optionDtos = new LinkedList<>();
+		List<OptionDTO> optionDtos = new LinkedList<>();
 		for (int j = 0; j < optionLetters.length; j++) {
 		    String optionLetter = optionLetters[j];
 		    String correctOptionLetter = correctOptionsRow[i].getCellValue().toString();
 
-		    QbOptionDTO optionDto = new QbOptionDTO();
+		    OptionDTO optionDto = new OptionDTO();
 		    QbOption qbOption = new QbOption();
 		    optionDto.setQbOption(qbOption);
 		    qbOption.setName(optionLetter);

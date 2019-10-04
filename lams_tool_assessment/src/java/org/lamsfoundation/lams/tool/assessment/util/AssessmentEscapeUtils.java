@@ -159,7 +159,7 @@ public class AssessmentEscapeUtils {
 		    break;
 
 		case QbQuestion.TYPE_NUMERICAL:
-		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		case QbQuestion.TYPE_ESSAY:
 		    responseStr.append(questionResult.getAnswer());
 		    break;
@@ -243,7 +243,7 @@ public class AssessmentEscapeUtils {
 		    return questionResult.getAnswer();
 		case QbQuestion.TYPE_ORDERING:
 		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING);
-		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		    return questionResult.getAnswer();
 		case QbQuestion.TYPE_TRUE_FALSE:
 		    return questionResult.getAnswerBoolean();

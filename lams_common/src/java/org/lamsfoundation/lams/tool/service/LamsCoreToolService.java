@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.service;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -62,6 +64,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -533,6 +536,45 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
     }
 
+    @Override
+    public Collection<VsaAnswerDTO> getVsaAnswersByToolSession(ToolSession toolSession) {
+
+	if (toolSession == null) {
+	    String error = "The toolSession is null. Unable to get confidence levels";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	Tool tool = toolSession.getToolActivity().getTool();
+	if (tool == null) {
+	    String error = "The tool for toolSession " + toolSession.getToolSessionId() + " is missing.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+	
+	if (!CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(tool.getToolSignature())) {
+	    String error = "Only Assessment is capable of providing VSA answers. Bu this session belongs to tool: "
+		    + tool.getToolSignature();
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	try {
+	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) findToolService(tool);
+	    return sessionManager.getVsaAnswers(toolSession.getToolSessionId());
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
+		    + toolSession.getToolActivity().getActivityId();
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	} catch (java.lang.AbstractMethodError e) {
+	    String message = "Tool " + tool.getToolDisplayName()
+		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}
+    }
+    
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession) {
 

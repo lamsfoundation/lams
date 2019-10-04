@@ -105,31 +105,33 @@ function initializeAnswers() {
 	}
     
     //init options sorting feature
-    new Sortable($('#option-table.sortable-on')[0], {
-	    animation: 150,
-	    ghostClass: 'sortable-placeholder',
-	    direction: 'vertical',
-		onStart: function (evt) {
-			//stop answers' hover effect, once element dragging started
-			//$("#option-table").removeClass("hover-active");
-		},
-		onEnd: function (evt) {
-			//activate answers' hover effect, once element dragging ended
-			//$("#option-table").delay(50).queue(function(next){
-			//    $(this).addClass("hover-active");
-			//    next();
-			//});
-		},
-		store: {
-			set: function (sortable) {
-				//update all displayOrders in order to later save it as options' order
-				var order = sortable.toArray();
-				for (var i = 0; i < order.length; i++) {
-				    var optionIndex = order[i];
-				    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+	if ($('#option-table.sortable-on').length) {
+	    new Sortable($('#option-table.sortable-on')[0], {
+		    animation: 150,
+		    ghostClass: 'sortable-placeholder',
+		    direction: 'vertical',
+			onStart: function (evt) {
+				//stop answers' hover effect, once element dragging started
+				//$("#option-table").removeClass("hover-active");
+			},
+			onEnd: function (evt) {
+				//activate answers' hover effect, once element dragging ended
+				//$("#option-table").delay(50).queue(function(next){
+				//    $(this).addClass("hover-active");
+				//    next();
+				//});
+			},
+			store: {
+				set: function (sortable) {
+					//update all displayOrders in order to later save it as options' order
+					var order = sortable.toArray();
+					for (var i = 0; i < order.length; i++) {
+					    var optionIndex = order[i];
+					    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+					}
 				}
 			}
-		}
-	});
+		});
+	}
 
 }

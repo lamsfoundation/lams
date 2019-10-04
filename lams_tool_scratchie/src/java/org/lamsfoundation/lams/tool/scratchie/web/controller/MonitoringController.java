@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -145,7 +145,7 @@ public class MonitoringController {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
-	if (itemUid.equals(-1)) {
+	if (itemUid.equals(-1L)) {
 	    return null;
 	}
 	ScratchieItem item = scratchieService.getScratchieItemByUid(itemUid);
@@ -156,10 +156,12 @@ public class MonitoringController {
 
 	// escape JS sensitive characters in option descriptions
 	for (GroupSummary summary : summaryList) {
-	    for (QbOptionDTO optionDto : summary.getOptionDtos()) {
-		String description = (optionDto.getQbOption().getName() == null) ? ""
-			: StringEscapeUtils.escapeJavaScript(optionDto.getQbOption().getName());
-		optionDto.getQbOption().setName(description);
+	    for (OptionDTO optionDto : summary.getOptionDtos()) {
+		if (optionDto.getQbOption() != null) {
+		    String optionName = optionDto.getQbOption().getName() == null ? ""
+			    : StringEscapeUtils.escapeJavaScript(optionDto.getQbOption().getName());
+		    optionDto.getQbOption().setName(optionName);
+		}
 	    }
 	}
 

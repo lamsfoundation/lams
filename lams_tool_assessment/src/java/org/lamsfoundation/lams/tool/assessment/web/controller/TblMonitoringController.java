@@ -250,7 +250,7 @@ public class TblMonitoringController {
 		    return sb.toString();
 
 		case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			if (optionDto.getMaxMark() == 1f) {
 			    return optionDto.getName();

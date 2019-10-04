@@ -29,11 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.qb.model.QbOption;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
-import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
@@ -53,9 +49,9 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
+ * Interface that defines the contract that all ShareAssessment service provider must follow.
+ * 
  * @author Andrey Balan
- *
- *         Interface that defines the contract that all ShareAssessment service provider must follow.
  */
 public interface IAssessmentService extends ICommonToolService {
 
@@ -86,8 +82,6 @@ public interface IAssessmentService extends ICommonToolService {
      */
     void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader)
 	    throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
-
-    List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId);
 
     /**
      * Stores date when user has started activity with time limit.
@@ -430,6 +424,9 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
+    
+    void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
+	    Long questionResultUid);
 
     /**
      * For export purposes

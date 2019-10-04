@@ -2,9 +2,13 @@
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 
 <div class="form-group">
-	<c:set var="OPTION_LABEL"><fmt:message key="label.authoring.basic.option.answer"/></c:set>
-	<input type="text" name="optionName${status.index}" class="borderless-text-input"
-		value="<c:out value='${option.name}' />" placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"/>
+	<c:set var="OPTION_LABEL">
+		<fmt:message key="label.authoring.basic.option.answer"/>
+	</c:set>
+	<textarea name="optionName${status.index}" rows="3" class="form-control borderless-text-input"
+		placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}"
+		oninput="autoGrowTextarea(this)"
+		><c:out value='${option.name}' /></textarea>
 </div>
 
 <div class="option-settings-hidden" style="display: none;">

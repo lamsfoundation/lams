@@ -47,6 +47,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbOption;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlann
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -181,8 +183,13 @@ public class AuthoringController {
 
 	//display confidence providing activities
 	Set<ToolActivity> confidenceLevelsActivities = scratchieService
-		.getPrecedingConfidenceLevelsActivities(contentId);
-	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
+		.getActivitiesProvidingConfidenceLevels(contentId);
+	sessionMap.put(ScratchieConstants.ATTR_ACTIVITIES_PROVIDING_CONFIDENCE_LEVELS, confidenceLevelsActivities);
+
+	//display activities providing VSA answers
+	Set<ToolActivity> activitiesProvidingVsaAnswers = scratchieService.getActivitiesProvidingVsaAnswers(contentId);
+	sessionMap.put(ScratchieConstants.ATTR_ACTIVITIES_PROVIDING_VSA_ANSWERS, activitiesProvidingVsaAnswers);
+
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
 	return "pages/authoring/start";
@@ -250,7 +257,7 @@ public class AuthoringController {
 	}
 
 	// ************************* Handle scratchie items *******************
-	Set<ScratchieItem> items = new LinkedHashSet<>();
+	Set<ScratchieItem> items = new TreeSet<>();
 	SortedSet<ScratchieItem> newItems = getItemList(sessionMap);
 	Iterator<ScratchieItem> iter = newItems.iterator();
 	while (iter.hasNext()) {
@@ -293,25 +300,31 @@ public class AuthoringController {
      * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/addItem")
-    private String addItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
-	    HttpServletRequest request) {
+    private String addItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam Integer questionType) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	form.setSessionMapID(sessionMap.getSessionID());
-	form.setContentFolderID(contentFolderID);
 
 	List<QbOption> optionList = new ArrayList<>();
-	for (int i = 0; i < ScratchieConstants.INITIAL_OPTIONS_NUMBER; i++) {
+	int initialOptionsNumber = questionType == QbQuestion.TYPE_MULTIPLE_CHOICE
+		? ScratchieConstants.INITIAL_MCQ_OPTIONS_NUMBER
+		: 2;
+	for (int i = 0; i < initialOptionsNumber; i++) {
 	    QbOption option = new QbOption();
 	    option.setDisplayOrder(i + 1);
 	    optionList.add(option);
 	}
-	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
-	
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
+
 	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
+	// generate a new contentFolderID for new question
+	String contentFolderID = FileUtil.generateUniqueContentFolderID();
+	form.setContentFolderID(contentFolderID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return "pages/authoring/parts/additem";
+
+	return questionType == QbQuestion.TYPE_MULTIPLE_CHOICE ? "pages/authoring/parts/addMcq"
+		: "pages/authoring/parts/addVsa";
     }
 
     /**
@@ -322,7 +335,6 @@ public class AuthoringController {
 	    HttpServletRequest request) {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	int itemIdx = WebUtil.readIntParam(request, ScratchieConstants.PARAM_ITEM_INDEX);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
@@ -335,16 +347,25 @@ public class AuthoringController {
 	if (itemIdx >= 0) {
 	    form.setItemIndex(String.valueOf(itemIdx));
 	}
+	form.setQuestionType(qbQuestion.getType());
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	if (!isMcqQuestionType) {
+	    form.setFeedback(qbQuestion.getFeedback());
+	    form.setAnswerRequired(qbQuestion.isAnswerRequired());
+	    form.setCaseSensitive(qbQuestion.isCaseSensitive());
+	    form.setAutocompleteEnabled(qbQuestion.isAutocompleteEnabled());
+	}
 
 	List<QbOption> optionList = qbQuestion.getQbOptions();
-	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 
-	form.setContentFolderID(contentFolderID);
 	form.setSessionMapID(sessionMap.getSessionID());
 	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
 	
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return "pages/authoring/parts/additem";
+	form.setContentFolderID(qbQuestion.getContentFolderId());
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
+	return isMcqQuestionType ? "pages/authoring/parts/addMcq"
+		: "pages/authoring/parts/addVsa";
     }
     
     /**
@@ -396,7 +417,9 @@ public class AuthoringController {
 	final boolean isAddingQuestion = itemIdx == -1;
 	if (isAddingQuestion) { // add
 	    qbQuestion = new QbQuestion();
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    qbQuestion.setType(form.getQuestionType());
+	    qbQuestion.setMaxMark(1);
+	    qbQuestion.setPenaltyFactor(0);
 	    
 	    item = new ScratchieItem();
 	    int maxSeq = 1;
@@ -420,11 +443,21 @@ public class AuthoringController {
 	// without eviction changes would be saved immediately into DB
 	scratchieService.releaseFromCache(oldQbQuestion);
 
-	qbQuestion.setName(form.getTitle());
-	qbQuestion.setDescription(form.getDescription());
+	qbQuestion.setName(form.getTitle().strip());
+	qbQuestion.setDescription(form.getDescription().strip());
+	qbQuestion.setContentFolderId(form.getContentFolderID());
+	
+	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	//handle VSA question type
+	if (!isMcqQuestionType) {
+	    qbQuestion.setFeedback(form.getFeedback());
+	    qbQuestion.setAnswerRequired(form.isAnswerRequired());
+	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
+	}
 
 	// set options
-	Set<QbOption> optionList = getOptionsFromRequest(request, true);
+	Set<QbOption> optionList = getOptionsFromRequest(request, isMcqQuestionType, true);
 	List<QbOption> options = new ArrayList<>(optionList);
 	qbQuestion.setQbOptions(options);
 
@@ -576,7 +609,7 @@ public class AuthoringController {
     @RequestMapping("/addAnswer")
     private String addAnswer(HttpServletRequest request) {
 
-	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, true, false);
 
 	QbOption option = new QbOption();
 	int maxSeq = 1;
@@ -587,7 +620,7 @@ public class AuthoringController {
 	option.setDisplayOrder(maxSeq);
 	optionList.add(option);
 
-	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	return "pages/authoring/parts/optionlist";
@@ -605,7 +638,7 @@ public class AuthoringController {
     @RequestMapping("/removeAnswer")
     private String removeAnswer(HttpServletRequest request) {
 
-	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, true, false);
 
 	int optionIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
@@ -615,7 +648,7 @@ public class AuthoringController {
 	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	return "pages/authoring/parts/optionlist";
@@ -650,7 +683,7 @@ public class AuthoringController {
     }
 
     private String switchOption(HttpServletRequest request, boolean up) {
-	SortedSet<QbOption> optionList = getOptionsFromRequest(request, false);
+	SortedSet<QbOption> optionList = getOptionsFromRequest(request, true, false);
 
 	int optionIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
@@ -674,7 +707,7 @@ public class AuthoringController {
 	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(ScratchieConstants.ATTR_OPTION_LIST, optionList);
+	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	return "pages/authoring/parts/optionlist";
     }
 
@@ -750,22 +783,22 @@ public class AuthoringController {
      *            whether the blank options will be preserved or not
      *
      */
-    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
-	Map<String, String> paramMap = splitRequestParameter(request, ScratchieConstants.ATTR_OPTION_LIST);
-	Integer correctOptionIndex = (paramMap.get(ScratchieConstants.ATTR_OPTION_CORRECT) == null) ? null
-		: NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_OPTION_CORRECT));
+    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isMcqQuestion, boolean isForSaving) {
+	Map<String, String> paramMap = splitRequestParameter(request, QbConstants.ATTR_OPTION_LIST);
+	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null) ? null
+		: NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_CORRECT));
 
-	int count = NumberUtils.toInt(paramMap.get(ScratchieConstants.ATTR_OPTION_COUNT));
+	int count = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_COUNT));
 	TreeSet<QbOption> optionList = new TreeSet<>();
 	for (int i = 0; i < count; i++) {
 
-	    String optionDescription = paramMap.get(ScratchieConstants.ATTR_OPTION_DESCRIPTION_PREFIX + i);
-	    if ((optionDescription == null) && isForSaving) {
+	    String optionName = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
+	    if ((optionName == null) && isForSaving && isMcqQuestion) {
 		continue;
 	    }
 
 	    QbOption option = null;
-	    String uidStr = paramMap.get(ScratchieConstants.ATTR_OPTION_UID_PREFIX + i);
+	    String uidStr = paramMap.get(QbConstants.ATTR_OPTION_UID_PREFIX + i);
 	    if (uidStr != null) {
 		Long uid = NumberUtils.toLong(uidStr);
 		option = scratchieService.getQbOptionByUid(uid);
@@ -774,13 +807,22 @@ public class AuthoringController {
 		option = new QbOption();
 	    }
 
-	    String orderIdStr = paramMap.get(ScratchieConstants.ATTR_OPTION_ORDER_ID_PREFIX + i);
-	    Integer orderId = NumberUtils.toInt(orderIdStr);
-	    option.setDisplayOrder(orderId);
-	    option.setName(optionDescription);
-	    if ((correctOptionIndex != null) && correctOptionIndex.equals(orderId)) {
+	    Integer displayOrder = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i));
+	    option.setDisplayOrder(displayOrder);
+	    option.setName(optionName);
+	    if ((correctOptionIndex != null) && correctOptionIndex.equals(displayOrder) && isMcqQuestion) {
 		option.setCorrect(true);
 	    }
+	    
+	    //handle VSA question type
+	    if (!isMcqQuestion) {
+		float maxMark = i == 0 ? 1 : 0;
+		option.setMaxMark(maxMark);
+
+		String feedback = paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
+		option.setFeedback(feedback);
+	    }
+	    
 	    optionList.add(option);
 
 	}

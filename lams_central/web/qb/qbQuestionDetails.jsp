@@ -10,10 +10,20 @@
 <div class="panel-body">
 	<input type="hidden" id="selected-question-uid" value="${question.uid}">
 	
-	<a id="import-button" class="btn btn-xs btn-default pull-right button-add-item" href="#nogo"
-		title="Import question from the question bank">
-		<fmt:message key="button.import"/>
-	</a>
+	<!-- hide import button in case of VSA which is not compatible with TBL -->
+	<c:choose>
+		<c:when test="${(question.type != 3) || !isScratchie || isVsaAndCompatibleWithTbl}">
+			<a id="import-button" class="btn btn-xs btn-default pull-right button-add-item" href="#nogo"
+				title="Import question from the question bank">
+				<fmt:message key="button.import"/>
+			</a>
+		</c:when>
+		<c:otherwise>
+			<span class="alert-warning pull-right loffset10">
+				Not compatible with TBL
+			</span>
+		</c:otherwise>
+	</c:choose>
 	
 	<a class="btn btn-xs btn-default pull-right loffset5" href="#nogo" onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${question.uid}", "_blank")' title='Show stats'>
 		<i class='fa fa-bar-chart'></i>&nbsp;

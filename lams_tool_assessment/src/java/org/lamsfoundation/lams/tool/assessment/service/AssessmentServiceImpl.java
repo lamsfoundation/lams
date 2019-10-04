@@ -49,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -103,6 +104,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -111,6 +113,7 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -120,8 +123,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl
-	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
+public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessmentService, ToolContentManager,
+	ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -743,7 +746,7 @@ public class AssessmentServiceImpl
 		}
 	    }
 
-	} else if (questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER) {
+	} else if (questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 	    //clear previous answer
 	    questionResult.setQbOption(null);
 
@@ -1315,8 +1318,130 @@ public class AssessmentServiceImpl
     @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = question.getQbQuestion();
+	List<AssessmentQuestionResult> allQuestionResults = assessmentQuestionResultDao
+		.getQuestionResultsByQuestionUid(questionUid);
 
-	return new QuestionSummary(question);
+	QuestionSummary questionSummary = new QuestionSummary(question);
+
+	//prepare extra data for VSA type of questions, so teachers can allocate answers into groups
+	if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	    //find all questionResults that are not allocated into groups yet
+	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
+	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
+		String answer = questionResult.getAnswer();
+
+		boolean isAnswerAllocated = false;
+		for (QbOption option : qbQuestion.getQbOptions()) {
+		    String[] alternatives = option.getName().split("\r\n");
+		    for (String alternative : alternatives) {
+			if (answer != null && alternative.equals(answer)) {
+			    isAnswerAllocated = true;
+			    break;
+			}
+		    }
+		}
+
+		if (!isAnswerAllocated) {
+		    notAllocatedQuestionResults.add(questionResult);
+		}
+	    }
+	    questionSummary.setNotAllocatedQuestionResults(notAllocatedQuestionResults);
+
+	    //check is it a TBL case, i.e. only two option groups available, one has 0%, second - 100%
+	    boolean isCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();  
+	    questionSummary.setTbl(isCompatibleWithTbl);
+	}
+	
+	return questionSummary;
+    }
+
+    @Override
+    public void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
+	    Long questionResultUid) {
+	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = question.getQbQuestion();
+	AssessmentQuestionResult questionResult = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+	String answer = questionResult.getAnswer();
+	
+	//adding
+	if (previousOptionUid.equals(-1L)) {
+	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
+		if (targetOption.getUid().equals(targetOptionUid)) {
+		    String name = targetOption.getName();
+		    name += "\r\n" + answer;
+		    targetOption.setName(name);
+		    assessmentDao.saveObject(targetOption);
+		    break;
+		}
+	    }
+
+	}
+	//removing
+	else if (targetOptionUid.equals(-1L)) {
+	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
+		if (previousOption.getUid().equals(previousOptionUid)) {
+		    String name = previousOption.getName();
+		    String[] alternatives = name.split("\r\n");
+		    
+		    String nameWithoutUserAnswer = "";
+		    for (String alternative : alternatives) {
+			if (!alternative.equals(answer)) {
+			    nameWithoutUserAnswer += alternative + "\r\n";
+			}
+		    }
+		    if (nameWithoutUserAnswer.length() > 2) {
+			previousOption.setName(nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2));
+			assessmentDao.saveObject(previousOption);
+		    }
+		    break;
+		}
+	    }
+	    
+	}
+	//reshuffling inside the same container - do nothing
+	else if (targetOptionUid.equals(previousOptionUid)) {
+	    
+	}
+	//moving from one to another
+	else {
+	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
+		if (targetOption.getUid().equals(targetOptionUid)) {
+		    String name = targetOption.getName();
+		    name += "\r\n" + answer;
+		    targetOption.setName(name);
+		    assessmentDao.saveObject(targetOption);
+		    break;
+		}
+	    }
+	    
+	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
+		if (previousOption.getUid().equals(previousOptionUid)) {
+		    String name = previousOption.getName();
+		    String[] alternatives = name.split("\r\n");
+		    
+		    String nameWithoutUserAnswer = "";
+		    for (String alternative : alternatives) {
+			if (!alternative.equals(answer)) {
+			    nameWithoutUserAnswer += alternative + "\r\n";
+			}
+		    }
+		    if (nameWithoutUserAnswer.length() > 2) {
+			nameWithoutUserAnswer = nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2);
+		    }
+		    previousOption.setName(nameWithoutUserAnswer);
+		    assessmentDao.saveObject(previousOption);
+		    break;
+		}
+	    }
+	}
+	
+	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
+	if (!targetOptionUid.equals(previousOptionUid)) {
+	    //TODO
+	    //recalculateUserAnswers(assessmentUid, toolContentId, oldQuestions, newQuestions, oldReferences, newReferences);
+
+	}
     }
 
     @Override
@@ -1599,7 +1724,7 @@ public class AssessmentServiceImpl
 
 		// set up the summary table data for the top of the question area.
 		boolean doSummaryTable = question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
-			|| question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+			|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 			|| question.getType() == QbQuestion.TYPE_NUMERICAL
 			|| question.getType() == QbQuestion.TYPE_TRUE_FALSE;
 		// For MC, Numeric & Short Answer Key is optionUid, Value is number of answers
@@ -1959,7 +2084,7 @@ public class AssessmentServiceImpl
 	    Long trueKey, Long falseKey) {
 	ExcelCell[] summaryTable;
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    List<QbOption> options = question.getQbQuestion().getQbOptions();
 	    summaryTable = new ExcelCell[options.size() + 1];
@@ -2015,7 +2140,7 @@ public class AssessmentServiceImpl
 	    if (!foundOption) {
 		summaryNACount++;
 	    }
-	} else if (question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	} else if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    Long submittedOptionUid = questionResult.getQbOption() == null ? null
 		    : questionResult.getQbOption().getUid();
@@ -2057,7 +2182,7 @@ public class AssessmentServiceImpl
 	    total += value;
 	}
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
@@ -2092,7 +2217,7 @@ public class AssessmentServiceImpl
 		return "Numerical";
 	    case QbQuestion.TYPE_ORDERING:
 		return "Ordering";
-	    case QbQuestion.TYPE_SHORT_ANSWER:
+	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		return "Short Answer";
 	    case QbQuestion.TYPE_TRUE_FALSE:
 		return "True/False";
@@ -2196,7 +2321,7 @@ public class AssessmentServiceImpl
 			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
 				//short answer
-				if (((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
+				if (((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 					&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
 					//numbering
 					|| (oldOption.getNumericalOption() != newOption.getNumericalOption())
@@ -2884,7 +3009,7 @@ public class AssessmentServiceImpl
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER) {
+		} else if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 		    answers.add(questionResult.getAnswer());
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_NUMERICAL) {
@@ -2933,6 +3058,78 @@ public class AssessmentServiceImpl
 	}
 
 	return confidenceLevelDtos;
+    }
+    
+    @Override
+    public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
+	if (toolSessionId == null) {
+	    return new ArrayList<>();
+	}
+	
+	Map<String, VsaAnswerDTO> uid_answerToVsaAnswerDtoMap = new LinkedHashMap<>();
+
+	Assessment assessment = getAssessmentBySessionId(toolSessionId);
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
+	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
+		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
+		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
+
+	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
+	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
+	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
+		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
+	    AssessmentUser user = assessmentResult.getUser();
+
+	    //fill in question's and user answer's hashes
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		QbQuestion qbQuestion = questionResult.getQbQuestion();
+
+		if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+		    //uid_answer should be unique in the final list
+		    String uid_answer = qbQuestion.getUid() + "_" + questionResult.getAnswer();
+		    
+		    //find VsaAnswerDTO in the map, or create the new one if it doesn't exist
+		    VsaAnswerDTO vsaAnswerDTO;
+		    if (uid_answerToVsaAnswerDtoMap.containsKey(uid_answer)) {
+			vsaAnswerDTO = uid_answerToVsaAnswerDtoMap.get(uid_answer);
+			
+		    } else {
+			vsaAnswerDTO = new VsaAnswerDTO();
+			vsaAnswerDTO.setQbQuestionUid(qbQuestion.getUid());
+			vsaAnswerDTO.setAnswer(questionResult.getAnswer());
+			vsaAnswerDTO.setCorrect(questionResult.getMark() > 0);
+			vsaAnswerDTO.setUserId(user.getUserId());
+			uid_answerToVsaAnswerDtoMap.put(uid_answer, vsaAnswerDTO);
+			
+			//find and store optionUid
+			for (QbOption option : qbQuestion.getQbOptions()) {
+			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+				if (optionAnswer.getAnswerBoolean()
+					&& (optionAnswer.getOptionUid().equals(option.getUid()))) {
+				    Long optionUid = option.getUid();
+				    vsaAnswerDTO.setQbOptionUid(optionUid);
+				    break;
+				}
+			    }
+			}
+		    }
+		    
+		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+		    confidenceLevelDto.setUserId(user.getUserId().intValue());
+		    String userName = StringUtils.isBlank(user.getFirstName())
+			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+				    : user.getFirstName() + " " + user.getLastName();
+		    confidenceLevelDto.setUserName(userName);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+
+		    vsaAnswerDTO.getConfidenceLevels().add(confidenceLevelDto);		    
+		}
+	    }
+
+	}
+
+	return uid_answerToVsaAnswerDtoMap.values();
     }
 
     @Override

@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +50,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -70,6 +73,8 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AlphanumComparator;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -85,6 +90,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -698,6 +704,39 @@ public class LearningController {
 
 	service.launchTimeLimit(assessmentUid, userId);
     }
+    
+    @RequestMapping("/vsaAutocomplete")
+    @ResponseBody
+    public String vsaAutocomplete(HttpServletRequest request, HttpServletResponse response) {
+	String userAnswer = WebUtil.readStrParam(request, "term", true);
+	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	QbQuestion qbQuestion = question.getQbQuestion();
+	
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	if (StringUtils.isNotBlank(userAnswer)) {
+	    userAnswer = userAnswer.trim();
+	    userAnswer = qbQuestion.isCaseSensitive() ? userAnswer : userAnswer.toLowerCase();
+	    
+	    for (QbOption option : qbQuestion.getQbOptions()) {
+
+		//filter out options not starting with 'term' and containing '*'		
+		String optionTitle = qbQuestion.isCaseSensitive() ? option.getName() : option.getName().toLowerCase();
+		int i = 0;
+		for (String optionAnswer : optionTitle.split("\\r\\n")) {
+		    if (optionAnswer.startsWith(userAnswer) && !optionAnswer.contains("*")) {
+			ObjectNode optionJSON = JsonNodeFactory.instance.objectNode();
+			String originalOptionAnswer = option.getName().split("\\r\\n")[i];
+			optionJSON.put("label", originalOptionAnswer);
+			responseJSON.add(optionJSON);
+		    }
+		    i++;
+		}
+	    }
+	}
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
+    }
 
     /**
      * Display empty reflection form.
@@ -813,7 +852,7 @@ public class LearningController {
 		    optionDto.setAnswerInt(answerInt);
 		}
 
-	    } else if (questionType == QbQuestion.TYPE_SHORT_ANSWER) {
+	    } else if (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 		String answer = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		questionDto.setAnswer(answer);
 
@@ -913,7 +952,7 @@ public class LearningController {
 			    isAnswered |= optionDto.getAnswerInt() != 0;
 			}
 
-		    } else if ((questionType == QbQuestion.TYPE_SHORT_ANSWER)
+		    } else if ((questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 			    || (questionType == QbQuestion.TYPE_NUMERICAL)
 			    || (questionType == QbQuestion.TYPE_TRUE_FALSE)
 			    || (questionType == QbQuestion.TYPE_ESSAY)) {
@@ -1013,7 +1052,7 @@ public class LearningController {
 			    }
 
 			    // required for showing right/wrong answers icons on results page correctly
-			    if ((questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER
+			    if ((questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 				    || questionDto.getType() == QbQuestion.TYPE_NUMERICAL)
 				    && questionResult.getQbOption() != null) {
 				boolean isAnsweredCorrectly = false;
