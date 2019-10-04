@@ -90,7 +90,7 @@ public class ImsQtiController {
 		    qbQuestion.setPrefixAnswersWithLetters(false);
 
 		} else {
-		    qbQuestion.setType(QbQuestion.TYPE_SHORT_ANSWER);
+		    qbQuestion.setType(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
 		    qbQuestion.setCaseSensitive(false);
 		}
 
@@ -400,7 +400,7 @@ public class ImsQtiController {
 		    }
 		    break;
 
-		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
 
 		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {

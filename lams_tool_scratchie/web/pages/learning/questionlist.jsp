@@ -81,10 +81,22 @@
 			$('#finishButton').show();
 			return;
 		}
-		
+
+		// only updates come via websockets
 		$.each(input, function(itemUid, options) {
 			$.each(options, function(optionUid, isCorrect){
-				// only updates come via websockets
+				
+				var isVsaItem = !Number.isInteger(optionUid);
+				if (isVsaItem) {
+					var answer = optionUid;
+					optionUid = hashCode(optionUid);
+
+					//check if such image exists, create it otherwise
+					if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
+						paintNewVsaAnswer(eval(itemUid), answer);
+					}
+				}
+				
 				scratchImage(itemUid, optionUid, isCorrect);
 			});
 		});

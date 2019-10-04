@@ -33,21 +33,36 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
 
-    private static final String FIND_BY_SESSION_AND_OPTION = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.qbToolQuestion.uid = ?";
-
     private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? and r.qbToolQuestion.uid = ?  order by r.accessDate asc";
 
     private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId=? order by r.accessDate asc";
 
-    private static final String FIND_VIEW_COUNT_BY_SESSION = "select count(*) from "
+    private static final String FIND_COUNT_BY_SESSION = "select count(*) from "
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=?";
+    
+    private static final String FIND_COUNT_BY_SESSION_AND_ITEM = "select count(*) from "
+	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and r.qbToolQuestion.uid = ?";
 
     @Override
     public ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId) {
+	final String FIND_BY_SESSION_AND_OPTION = "from " + ScratchieAnswerVisitLog.class.getName()
+		+ " as r where r.sessionId = ? and r.qbToolQuestion.uid = ? and r.qbOption.uid=?";
+	
 	List list = doFind(FIND_BY_SESSION_AND_OPTION, new Object[] { sessionId, itemUid, optionUid });
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+	return (ScratchieAnswerVisitLog) list.get(0);
+    }
+    
+    @Override
+    public ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, String answer) {
+	final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
+		+ " as r where r.sessionId = ? and r.qbToolQuestion.uid = ? and r.answer=?";
+	
+	List list = doFind(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, itemUid, answer });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
@@ -56,7 +71,16 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
 
     @Override
     public int getLogCountTotal(Long sessionId) {
-	List list = doFind(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId });
+	List list = doFind(FIND_COUNT_BY_SESSION, new Object[] { sessionId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+    
+    @Override
+    public int getLogCountPerItem(Long sessionId, Long itemUid) {
+	List list = doFind(FIND_COUNT_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

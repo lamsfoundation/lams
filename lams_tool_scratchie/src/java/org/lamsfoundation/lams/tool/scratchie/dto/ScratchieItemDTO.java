@@ -12,7 +12,7 @@ public class ScratchieItemDTO implements Cloneable {
 
     private Long uid;
     private String title;
-    private List<QbOptionDTO> optionDtos;
+    private List<OptionDTO> optionDtos;
     private boolean unraveledOnFirstAttempt;
     private int userMark;
     private int userAttempts;
@@ -45,11 +45,11 @@ public class ScratchieItemDTO implements Cloneable {
 	this.title = title;
     }
 
-    public List<QbOptionDTO> getOptionDtos() {
+    public List<OptionDTO> getOptionDtos() {
 	return optionDtos;
     }
 
-    public void setOptionDtos(List<QbOptionDTO> optionDtos) {
+    public void setOptionDtos(List<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
     }
 

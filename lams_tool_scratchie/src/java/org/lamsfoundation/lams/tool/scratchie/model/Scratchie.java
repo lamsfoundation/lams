@@ -40,6 +40,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 /**
  * Scratchie
@@ -99,6 +100,10 @@ public class Scratchie implements Cloneable {
 
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
+    
+    
+    @Column(name = "activity_uuid_providing_vsa_answers")
+    private Integer activityUiidProvidingVsaAnswers;
 
     //overwrites default preset marks stored as admin config setting
     @Column(name = "preset_marks")
@@ -377,6 +382,31 @@ public class Scratchie implements Cloneable {
      */
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
+    }
+    
+    public boolean isAnswersFetchingEnabledAndVsaQuestionsAvailable() {
+	//check Scratchie contains VSA questions
+	boolean hasVsaQuestion = false;
+	for (ScratchieItem item : scratchieItems) {
+	    hasVsaQuestion |= QbQuestion.TYPE_VERY_SHORT_ANSWERS == item.getQbQuestion().getType();
+	}
+	
+	return activityUiidProvidingVsaAnswers != null && hasVsaQuestion;
+    }
+    
+    /**
+     * @return which preceding activity should be queried for VSA answers
+     */
+    public Integer getActivityUiidProvidingVsaAnswers() {
+	return activityUiidProvidingVsaAnswers;
+    }
+
+    /**
+     * @param activityUiidProvidingVsaAnswers
+     *            preceding activity that should be queried for VSA answers
+     */
+    public void setActivityUiidProvidingVsaAnswers(Integer activityUiidProvidingVsaAnswers) {
+	this.activityUiidProvidingVsaAnswers = activityUiidProvidingVsaAnswers;
     }
 
     /**

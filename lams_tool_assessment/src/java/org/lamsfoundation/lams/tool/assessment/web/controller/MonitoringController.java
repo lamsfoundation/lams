@@ -73,9 +73,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -187,6 +190,14 @@ public class MonitoringController {
 
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
 	return "pages/monitoring/parts/questionsummary";
+    }
+    
+    @RequestMapping("/allocateUserAnswer")
+    @ResponseStatus(HttpStatus.OK)
+    public void allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
+	    @RequestParam Long questionResultUid) {
+	service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, questionResultUid);
     }
 
     @RequestMapping("/userSummary")

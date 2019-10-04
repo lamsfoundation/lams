@@ -73,6 +73,17 @@ public interface IScratchieService extends ICommonToolService {
      */
     void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items);
+    
+//    /**
+//     * Populate scratchie items with the VSA answers from the Assessment activity specified in author
+//     *
+//     * @param userId
+//     * @param toolSessionId
+//     * @param confidenceLevelsActivityUiid
+//     * @param items
+//     */
+//    void populateItemsWithVsaAnswers(Long userId, Long toolSessionId, Integer activityUiidProvidingVsaAnswers,
+//	    Collection<ScratchieItem> items);
 
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
@@ -81,8 +92,17 @@ public interface IScratchieService extends ICommonToolService {
      *            toolContentId of the specified activity
      * @return
      */
-    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
-
+    Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
+    
+    /**
+     * Returns all activities that precede specified activity and produce VSA answers (only Assessments at the moment).
+     *
+     * @param toolContentId
+     *            toolContentId of the specified activity
+     * @return
+     */
+    Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId);
+    
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      *
@@ -228,31 +248,27 @@ public interface IScratchieService extends ICommonToolService {
     void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
 
     /**
-     * Fill in scratchieItems with information about whether they were unraveled; and options with information on their
+     * First, prepares all items and options (incl. getting VSA answers from Assessment for VSA question types). Second,
+     * fills scratchieItems with information whether they were unraveled; and options whether they were
      * scratched.
      *
      * @param scratchieItemList
-     * @param item
-     *            item parameter is optional. In case it's provided - these item collection is used instead of quering
-     *            DB
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
-
-    /**
-     * The same as getItemsWithIndicatedScratches(Long toolSessionId), but items are provided as parameter and not
-     * queried from DB.
-     *
-     * @param scratchieItemList
-     * @param item
-     *            this item collection is used instead of quering DB
-     */
-    Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items);
+    
+    boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
      * update all the marks.
      */
     void recordItemScratched(Long toolSessionId, Long itemUid, Long scratchieItemUid);
+    
+    /**
+     * Leader has left this answer. We will store this answer for all users in his group. It will also
+     * update all the marks.
+     */
+    void recordVsaAnswer(Long sessionId, Long itemUid, String answer);
 
     /**
      * Recalculate mark for leader and sets it to all members of a group

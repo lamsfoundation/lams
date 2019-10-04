@@ -138,6 +138,7 @@
                 <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="unset*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="allocateAnswerToOption">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

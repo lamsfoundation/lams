@@ -42,6 +42,9 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 	    + AssessmentQuestionResult.class.getName() + " AS q, " + AssessmentResult.class.getName() + " AS r "
 	    + " WHERE q.assessmentResult.uid = r.uid and r.assessment.uid = ? AND r.user.userId =? AND q.qbToolQuestion.uid =? ORDER BY r.startDate ASC";
 
+    private static final String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName()
+	    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid ORDER BY queRes.finishDate ASC";
+    
     private static final String FIND_WRONG_ANSWERS_NUMBER = "SELECT COUNT(q) FROM  "
 	    + AssessmentQuestionResult.class.getName() + " AS q, " + AssessmentResult.class.getName() + " AS r "
 	    + " WHERE q.assessmentResult.uid = r.uid AND r.assessment.uid = ? AND r.user.userId =? AND q.qbToolQuestion.uid =? AND (ROUND(q.mark + q.penalty) < q.maxMark) AND (r.finishDate != null)";
@@ -74,6 +77,16 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
 	    return null;
 	}
 	return (AssessmentQuestionResult) list.get(0);
+    }
+
+    @Override
+    public List<AssessmentQuestionResult> getQuestionResultsByQuestionUid(final Long questionUid) {
+	String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName()
+		    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid ORDER BY queRes.finishDate ASC";
+	Query<AssessmentQuestionResult> q = getSession().createQuery(FIND_BY_QUESTION_UID,
+		AssessmentQuestionResult.class);
+	q.setParameter("questionUid", questionUid);
+	return q.getResultList();
     }
 
     @Override

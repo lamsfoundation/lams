@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="questionDto" value="${questionSummary.questionDto}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="assessment" value="${sessionMap.assessment}"/>
+<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-		<c:set var="assessment" value="${sessionMap.assessment}"/>
-		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
-		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<style>
+			.sortable-on {
+				background: lightgoldenrodyellow;
+    			min-height: 110px;
+    			padding: 10px;
+			}
+		</style>
 		
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -118,6 +125,43 @@
 	  		        }
 	  			});
 	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+	  		    //init options sorting feature
+	  			$('.sortable-on').each(function() {
+	  			    new Sortable($(this)[0], {
+	  			    	group: 'shared',
+	  				    animation: 150,
+	  				    //ghostClass: 'sortable-placeholder',
+	  				    //direction: 'vertical',
+	  					onStart: function (evt) {
+	  						//stop answers' hover effect, once element dragging started
+	  						//$("#option-table").removeClass("hover-active");
+	  					},
+	  					onEnd: function (evt) {
+	  				        $.ajax({
+	  				            url: '<c:url value="/monitoring/allocateUserAnswer.do"/>',
+	  				            data: {
+	  				            	sessionMapID: "${sessionMapID}",
+	  				            	questionUid: ${questionDto.uid},
+	  				            	targetOptionUid: $(evt.to).data("option-uid"),
+	  				            	previousOptionUid: $(evt.from).data("option-uid"),
+	  				            	questionResultUid: $(evt.item).data("question-result-uid")
+	  						    },
+	  				            type: 'post'
+	  				       	});
+	  					},
+	  					store: {
+	  						set: function (sortable) {
+	  							//update all displayOrders in order to later save it as options' order
+	  							var order = sortable.toArray();
+	  							for (var i = 0; i < order.length; i++) {
+	  							    var optionIndex = order[i];
+	  							    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+	  							}
+	  						}
+	  					}
+	  				});
+	  			});
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -154,7 +198,6 @@
                 
             <c:out value="${questionDto.question}" escapeXml="false"/>
 
-
             <div class="row"><div class="col-xs-12 col-sm-6">
             <h5><fmt:message key="label.question.options"/></h5>    
 			<table class="table table-condensed table-striped">
@@ -176,7 +219,6 @@
 						<c:out value="${questionDto.maxMark}" escapeXml="true"/>
 					</td>
 				</tr>
-					
 				<tr>
 					<td>
 						<fmt:message key="label.monitoring.question.summary.penalty" />:
@@ -188,14 +230,101 @@
 			</table>
             </div></div>
             
+            <!--history responses-->
             <h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
-			
-			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
+			<c:forEach var="sessionDto" items="${sessionDtos}">
 				<div class="voffset20">
 					<table id="session${sessionDto.sessionId}"></table>
 					<div id="pager${sessionDto.sessionId}"></div>
 				</div>	
 			</c:forEach>
+			
+            <!--allocate responses-->
+			<c:if test="${questionDto.type == 3}">
+				<br><br>
+				
+				<div class="row">
+					<div class="col-sm-4 text-center">
+						<c:set var="option0" value="${questionDto.optionDtos.toArray()[0]}"/>
+						<h4>
+							<c:choose>
+								<c:when test="${questionSummary.tbl && option0.maxMark == 1}">
+									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
+								</c:when>
+								<c:when test="${questionSummary.tbl && option0.maxMark == 0}">
+									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="label.authoring.basic.option.grade"/>: ${option0.maxMark}
+								</c:otherwise>
+							</c:choose>
+						</h4>
+						
+						<fmt:message key="label.answer.alternatives" />: 
+						${fn:replace(option0.name, newLineChar, ', ')}
+						
+						<div class="list-group col sortable-on" data-option-uid="${option0.uid}"></div>	
+					</div>
+					
+					<div class="col-sm-4 text-center">
+		            	<h4><fmt:message key="label.answer.queue" /></h4>
+	            		(<fmt:message key="label.drag.and.drop" />)	
+	            		
+	            		<div class="list-group col sortable-on" data-option-uid="-1">
+		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
+		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
+		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>&nbsp;
+		            				${questionResult.answer}
+		            			</div>
+		            		</c:forEach>
+	            		</div>		
+					</div>
+					
+					<div class="col-sm-4 text-center">
+						<c:set var="option1" value="${questionDto.optionDtos.toArray()[1]}"/>
+						<h4>
+							<c:choose>
+								<c:when test="${questionSummary.tbl && option1.maxMark == 1}">
+									<i class="fa fa-check fa-lg text-success"></i> <fmt:message key="label.correct" />
+								</c:when>
+								<c:when test="${questionSummary.tbl && option1.maxMark == 0}">
+									<i class="fa fa-times fa-lg text-danger"></i>	<fmt:message key="label.incorrect" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="label.authoring.basic.option.grade"/>: ${option1.maxMark}
+								</c:otherwise>
+							</c:choose>
+						</h4>
+						
+						<fmt:message key="label.answer.alternatives" />: 
+						${fn:replace(option1.name, newLineChar, ', ')}
+						
+						<div class="list-group col sortable-on" data-option-uid="${option1.uid}"></div>	
+					</div>
+				</div>
+				
+				<c:forEach var="optionDto" items="${questionDto.optionDtos}" begin="2" varStatus="status">
+				
+					<c:if test="${status.count % 3 == 0}">
+						<div class="row">
+					</c:if>
+				
+					<div class="col-sm-4 text-center">
+						<h4>
+							<fmt:message key="label.authoring.basic.option.grade"/>: ${optionDto.maxMark}
+						</h4>
+	
+						<fmt:message key="label.answer.alternatives" />: 
+						${fn:replace(optionDto.name, newLineChar, ', ')}
+						
+						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}"></div>	
+					</div>
+					
+					<c:if test="${status.count % 3 == 0 || status.last}">
+						</div>
+					</c:if>
+				</c:forEach>
+			</c:if>
 			
 			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
 				<fmt:message key="label.close" /> 

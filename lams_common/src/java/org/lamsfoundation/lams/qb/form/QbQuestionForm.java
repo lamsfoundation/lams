@@ -62,6 +62,7 @@ public class QbQuestionForm {
     private int maxWordsLimit;
     private int minWordsLimit;
     private boolean hedgingJustificationEnabled;
+    private boolean autocompleteEnabled;
     private boolean authoringRestricted;
     
     private Long oldCollectionUid;
@@ -269,6 +270,14 @@ public class QbQuestionForm {
 
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
+    
+    public boolean isAutocompleteEnabled() {
+	return autocompleteEnabled;
+    }
+
+    public void setAutocompleteEnabled(boolean autocompleteEnabled) {
+	this.autocompleteEnabled = autocompleteEnabled;
     }
 
     public boolean isAuthoringRestricted() {
