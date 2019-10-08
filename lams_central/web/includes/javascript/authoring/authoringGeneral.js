@@ -1689,7 +1689,7 @@ GeneralLib = {
 		}
 		// get LD details
 		$.ajax({
-			async : true,
+			async : false,
 			cache : false,
 			url : LAMS_URL + "authoring/openLearningDesign.do",
 			dataType : 'json',
@@ -2777,7 +2777,9 @@ GeneralLib = {
 		ld.learningDesignID	= learningDesignID;
 		ld.workspaceFolderID = folderID;
 		ld.title = title.trim();
-		ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
+		if (!isReadOnlyMode) {
+			ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
+		}
 		ld.saveMode = layout.ld.learningDesignID && layout.ld.learningDesignID != learningDesignID
 		   			  ? 1 : 0;
 		ld.readOnly = readOnly;
@@ -2913,7 +2915,9 @@ GeneralLib = {
 				}
 			},
 			error : function(){
-				layout.infoDialog.data('show')(LABELS.SEQUENCE_SAVE_ERROR);
+				if (!isReadOnlyMode) {
+					layout.infoDialog.data('show')(LABELS.SEQUENCE_SAVE_ERROR);
+				}
 			}
 		});
 		return result;
