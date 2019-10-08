@@ -97,6 +97,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
+import org.lamsfoundation.lams.tool.service.ICommonScratchieService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -113,7 +114,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Andrey Balan
  */
 public class ScratchieServiceImpl
-	implements IScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager {
+	implements IScratchieService, ICommonScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
 
     private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
@@ -468,7 +469,7 @@ public class ScratchieServiceImpl
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
 	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
-	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
+	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
 	String[] presetMarks = getPresetMarks(scratchie);
@@ -477,7 +478,7 @@ public class ScratchieServiceImpl
 	int mark = 0;
 	if (!items.isEmpty()) {
 	    for (ScratchieItem item : items) {
-		mark += getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
+		mark += ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
 	    }
 	}
 
@@ -487,7 +488,7 @@ public class ScratchieServiceImpl
 
 	// propagade changes to Gradebook
 	if (isPropagateToGradebook) {
-	    List<ScratchieUser> users = this.getUsersBySession(sessionId);
+	    List<ScratchieUser> users = getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
 		toolService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
@@ -562,7 +563,15 @@ public class ScratchieServiceImpl
 		recalculateMarkForSession(toolSessionId, true);
 	    }
 	}
+    }
 
+    @Override
+    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid);
+	// recalculate marks if it's required
+	for (Long sessionId : sessionIds) {
+	    recalculateMarkForSession(sessionId, true);
+	}
     }
 
     @Override
@@ -781,7 +790,7 @@ public class ScratchieServiceImpl
 		optionDto.setScratched(isScratched);
 	    }
 
-	    boolean isItemUnraveled = isItemUnraveled(item, userLogs);
+	    boolean isItemUnraveled = ScratchieServiceImpl.isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
 
@@ -845,7 +854,7 @@ public class ScratchieServiceImpl
 			optionDto.setQbQuestionUid(itemQbQuestionUid);
 			String answer = userLog.getAnswer();
 			optionDto.setAnswer(answer);
-			boolean isCorrect = isItemUnraveledByAnswers(item, List.of(answer));
+			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
 			optionDto.setCorrect(isCorrect);
 			item.getOptionDtos().add(optionDto);
 		    }
@@ -874,7 +883,7 @@ public class ScratchieServiceImpl
      *            uses logs from it (The main reason to have this parameter is to reduce number of queries to DB)
      * @return
      */
-    private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
+    private static boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
 	if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()) {
@@ -903,20 +912,19 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    isItemUnraveled = isItemUnraveledByAnswers(item, userAnswers);
+	    isItemUnraveled = ScratchieServiceImpl.isItemUnraveledByAnswers(item, userAnswers);
 	}
 
 	return isItemUnraveled;
     }
     
-    @Override
-    public boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
+    public static boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
 	QbQuestion qbQuestion = item.getQbQuestion();
 
 	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).getMaxMark() == 1
 		? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
-	String[] correctAnswers = correctAnswersGroup.getName().split("\\r\\n");
+	String[] correctAnswers = correctAnswersGroup.getName().strip().split("\\r\\n");
 	for (String correctAnswer : correctAnswers) {
 	    correctAnswer = correctAnswer.strip();
 	    
@@ -962,13 +970,13 @@ public class ScratchieServiceImpl
      *            presetMarks to reduce number of queries to DB
      * @return
      */
-    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
+    private static int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
 	    String[] presetMarks) {
 
 	int mark = 0;
 	// add mark only if an item was unraveled
-	if (isItemUnraveled(item, userLogs)) {
-	    int itemAttempts = getNumberAttemptsForItem(userLogs, item);
+	if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
+	    int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
 	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
 		    : presetMarks[presetMarks.length - 1];
 	    mark = Integer.parseInt(markStr);
@@ -985,7 +993,7 @@ public class ScratchieServiceImpl
     /**
      * Returns number of scraches user done for the specified item.
      */
-    private int getNumberAttemptsForItem(List<ScratchieAnswerVisitLog> userLogs, ScratchieItem item) {
+    private static int getNumberAttemptsForItem(List<ScratchieAnswerVisitLog> userLogs, ScratchieItem item) {
 	int itemAttempts = 0;
 	for (ScratchieAnswerVisitLog userLog : userLogs) {
 	    if (userLog.getQbToolQuestion().getUid().equals(item.getUid())) {
@@ -1929,9 +1937,9 @@ public class ScratchieServiceImpl
 		    numberOfAttempts = itemLogs.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, logs, presetMarks);
+		    mark = (numberOfAttempts == 0) ? -1 : ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, logs, presetMarks);
 
-		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, logs);
+		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && ScratchieServiceImpl.isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
 		    for (ScratchieAnswerVisitLog itemAttempt : itemLogs) {

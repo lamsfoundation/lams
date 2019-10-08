@@ -255,8 +255,6 @@ public interface IScratchieService extends ICommonToolService {
      * @param scratchieItemList
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
-    
-    boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also

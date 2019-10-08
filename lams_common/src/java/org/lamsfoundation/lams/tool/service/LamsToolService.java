@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -61,9 +62,10 @@ import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Jacky Fang
@@ -72,6 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Ozgur Demirtas 24/06/2005
  */
 public class LamsToolService implements ILamsToolService {
+    private static final Logger log = Logger.getLogger(LamsToolService.class);
     // Leader selection tool Constants
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
@@ -501,6 +504,14 @@ public class LamsToolService implements ILamsToolService {
 		requestorSession.getToolActivity().getLearningDesign());
 	ToolSession assessmentSession = toolSessionDAO.getToolSessionByLearner(user, activityProvidingVsaAnswers);
 	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
+    }
+    
+    @Override
+    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
+	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
+	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
+		.findToolService(scratchieTool);
+	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid);
     }
 
     @Override

@@ -347,7 +347,6 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return isActivityReadOnlyFlag(activity);
     }
 
-    @SuppressWarnings("unchecked")
     private boolean isActivityReadOnlyFlag(Activity activity) {
 	if (activity.isComplexActivity()) {
 	    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) systemToolDAO.find(ComplexActivity.class,

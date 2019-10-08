@@ -224,6 +224,13 @@ public interface ILamsToolService {
      */
     Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
 	    Integer requestorUserId, Long requestorToolSessionId);
+    
+    /**
+     * Recalculate marks for all Scratchie activities that use specified QbQuestion.
+     * 
+     * @param qbQuestionUid
+     */
+    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);

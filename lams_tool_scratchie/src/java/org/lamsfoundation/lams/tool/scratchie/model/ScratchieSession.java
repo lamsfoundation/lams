@@ -79,10 +79,6 @@ public class ScratchieSession {
     @Column
     private int status;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "session_uid")
-    private Set<ScratchieItem> scratchieItems = new HashSet<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_leader_uid")
     private ScratchieUser groupLeader;
@@ -167,14 +163,6 @@ public class ScratchieSession {
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
-    }
-
-    public Set<ScratchieItem> getScratchieItems() {
-	return scratchieItems;
-    }
-
-    public void setScratchieItems(Set<ScratchieItem> scratchieItems) {
-	this.scratchieItems = scratchieItems;
     }
 
     public ScratchieUser getGroupLeader() {
