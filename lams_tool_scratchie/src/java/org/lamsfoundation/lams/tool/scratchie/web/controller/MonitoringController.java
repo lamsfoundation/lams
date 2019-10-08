@@ -85,7 +85,6 @@ public class MonitoringController {
 
     @RequestMapping("/summary")
     private String summary(HttpServletRequest request) {
-
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -138,7 +137,6 @@ public class MonitoringController {
 
     @RequestMapping("/itemSummary")
     private String itemSummary(HttpServletRequest request) {
-
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -171,7 +169,6 @@ public class MonitoringController {
 
     @RequestMapping("/saveUserMark")
     private String saveUserMark(HttpServletRequest request) {
-
 	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_USER_ID))
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {

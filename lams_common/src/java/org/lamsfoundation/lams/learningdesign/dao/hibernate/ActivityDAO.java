@@ -165,13 +165,9 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	return super.findAll(Activity.class);
     }
 
-    /*
-     * @see
-     * org.lamsfoundation.lams.learningdesign.dao.interfaces.IActivityDAO#getActivitiesByLearningDesignId(java.lang.
-     * Long)
-     */
+    @SuppressWarnings("unchecked")
     @Override
-    public List getActivitiesByLearningDesignId(Long learningDesignId) {
+    public List<Activity> getActivitiesByLearningDesignId(Long learningDesignId) {
 	return this.doFind(ActivityDAO.FIND_BY_LEARNING_DESIGN_ID, learningDesignId);
     }
 

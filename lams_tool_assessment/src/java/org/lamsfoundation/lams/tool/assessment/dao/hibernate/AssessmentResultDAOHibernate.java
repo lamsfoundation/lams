@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -108,6 +109,18 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
 	return (List<AssessmentResult>) doFind(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED,
 		new Object[] { userId, assessmentUid });
+    }
+    
+    @Override
+    public List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid) {
+	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT r FROM  " + AssessmentQuestionResult.class.getName()
+		+ " AS q, " + AssessmentResult.class.getName() + " AS r "
+		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid AND (r.finishDate != null) ORDER BY r.startDate ASC";
+	
+	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, AssessmentResult.class);
+	q.setParameter("qbQuestionUid", qbQuestionUid);
+//	q.addEntity("bq", AssessmentResult.class);
+	return q.list();
     }
 
     @Override

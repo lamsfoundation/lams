@@ -99,7 +99,7 @@ public interface IActivityDAO extends IBaseDAO {
      *            The id of the learningDesign
      * @return List of all the activities
      */
-    public List getActivitiesByLearningDesignId(Long learningDesignId);
+    public List<Activity> getActivitiesByLearningDesignId(Long learningDesignId);
 
     /**
      * Get all the grouping activities for this learning design.

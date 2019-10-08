@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -51,6 +52,9 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private static final long serialVersionUID = -2824051249870361117L;
 
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
+    
+    @Column(name = "scratchie_uid")
+    private Long scratchieUid;
 
     // ************************ DTO fields ***********************
     @Transient

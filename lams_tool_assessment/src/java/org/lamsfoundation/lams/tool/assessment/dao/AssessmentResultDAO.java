@@ -32,6 +32,8 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 public interface AssessmentResultDAO extends DAO {
 
     List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
+    
+    List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid);
 
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
 

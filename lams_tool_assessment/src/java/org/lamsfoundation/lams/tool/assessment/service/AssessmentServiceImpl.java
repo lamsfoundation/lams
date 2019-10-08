@@ -751,31 +751,36 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionResult.setQbOption(null);
 
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		String[] optionAnswers = optionDto.getName().strip().split("\\r\\n");
+		boolean isAnswerMatchedCurrentOption = false;
+		for (String optionAnswer : optionAnswers) {
+		    optionAnswer = optionAnswer.strip();
 
-		//prepare regex which takes into account only * special character
-		String regexWithOnlyAsteriskSymbolActive = "\\Q";
-		String name = optionDto.getName().trim();
-		for (int i = 0; i < name.length(); i++) {
-		    //everything in between \\Q and \\E are taken literally no matter which characters it contains
-		    if (name.charAt(i) == '*') {
-			regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+		    //prepare regex which takes into account only * special character
+		    String regexWithOnlyAsteriskSymbolActive = "\\Q";
+		    for (int i = 0; i < optionAnswer.length(); i++) {
+			//everything in between \\Q and \\E are taken literally no matter which characters it contains
+			if (optionAnswer.charAt(i) == '*') {
+			    regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+			} else {
+			    regexWithOnlyAsteriskSymbolActive += optionAnswer.charAt(i);
+			}
+		    }
+		    regexWithOnlyAsteriskSymbolActive += "\\E";
+
+		    //check whether answer matches regex
+		    Pattern pattern;
+		    if (questionDto.isCaseSensitive()) {
+			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
 		    } else {
-			regexWithOnlyAsteriskSymbolActive += name.charAt(i);
+			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
+				java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+		    }
+		    if (questionDto.getAnswer() != null && pattern.matcher(questionDto.getAnswer().strip()).matches()) {
+			isAnswerMatchedCurrentOption = true;
+			break;
 		    }
 		}
-		regexWithOnlyAsteriskSymbolActive += "\\E";
-
-		//check whether answer matches regex
-		Pattern pattern;
-		if (questionDto.isCaseSensitive()) {
-		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
-		} else {
-		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
-			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-		}
-		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswer() != null)
-			? pattern.matcher(questionDto.getAnswer().trim()).matches()
-			: false;
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getMaxMark() * maxMark;
@@ -1359,10 +1364,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
 	    Long questionResultUid) {
-	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
-	QbQuestion qbQuestion = question.getQbQuestion();
-	AssessmentQuestionResult questionResult = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
-	String answer = questionResult.getAnswer();
+	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+	AssessmentQuestionResult questionRes = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+	String answer = questionRes.getAnswer();
 	
 	//adding
 	if (previousOptionUid.equals(-1L)) {
@@ -1435,12 +1440,55 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 	    }
 	}
+	assessmentResultDao.flush();
 	
 	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
 	if (!targetOptionUid.equals(previousOptionUid)) {
-	    //TODO
-	    //recalculateUserAnswers(assessmentUid, toolContentId, oldQuestions, newQuestions, oldReferences, newReferences);
+	    
+	    // get all finished user results
+	    List<AssessmentResult> assessmentResults = assessmentResultDao
+		    .getAssessmentResultsByQbQuestion(qbQuestion.getUid());
 
+	    //stores userId->lastFinishedAssessmentResult
+	    Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
+	    for (AssessmentResult assessmentResult : assessmentResults) {
+		Long userId = assessmentResult.getUser().getUserId();
+		lastFinishedAssessmentResults.put(userId, assessmentResult);
+	    }
+
+	    for (AssessmentResult assessmentResult : assessmentResults) {
+		AssessmentUser user = assessmentResult.getUser();
+		float assessmentMark = assessmentResult.getGrade();
+		int assessmentMaxMark = assessmentResult.getMaximumGrade();
+
+		for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		    if (questionResult.getQbQuestion().getUid().equals(qbQuestion.getUid())) {
+			Float oldQuestionAnswerMark = questionResult.getMark();
+			int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
+				: questionResult.getMaxMark().intValue();
+
+			//actually recalculate marks
+			QuestionDTO questionDto = new QuestionDTO(assessmentQuestion);
+			questionDto.setMaxMark(oldResultMaxMark);
+			loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
+			calculateAnswerMark(assessmentResult.getAssessment().getUid(), user.getUserId(), questionResult,
+				questionDto);
+			assessmentQuestionResultDao.saveObject(questionResult);
+
+			float newQuestionAnswerMark = questionResult.getMark();
+			assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
+			break;
+		    }
+		}
+
+		// store new mark and maxMark if they were changed
+		AssessmentResult lastFinishedAssessmentResult = lastFinishedAssessmentResults.get(user.getUserId());
+		storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
+			assessmentMaxMark, user);
+	    }
+	    
+	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
+	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
 	}
     }
 
@@ -2396,7 +2444,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 				//update questionResult's qbQuestion with the new one
 				questionResult.setQbToolQuestion(modifiedQuestion);
-				//update questionResult's qbOption
+				//update questionResult's qbOption - it seems to be redundant, as it's done in loadupQuestionResultIntoQuestionDto()
 //				for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 //				    if (questionResult.getQbOption().getDisplayOrder() == newOption.getDisplayOrder()) {
 //					questionResult.setQbOption(newOption);
@@ -2509,30 +2557,37 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    }
 
 		    // store new mark and maxMark if they were changed
-		    if ((assessmentResult.getGrade() != assessmentMark)
-			    || (assessmentResult.getMaximumGrade() != assessmentMaxMark)) {
-
-			// marks can't be below zero
-			assessmentMark = (assessmentMark < 0) ? 0 : assessmentMark;
-			assessmentMaxMark = (assessmentMaxMark < 0) ? 0 : assessmentMaxMark;
-
-			assessmentResult.setGrade(assessmentMark);
-			assessmentResult.setMaximumGrade(assessmentMaxMark);
-			assessmentResultDao.saveObject(assessmentResult);
-
-			// if this is the last finished assessment result - propagade total mark to Gradebook
-			if (lastFinishedAssessmentResult != null
-				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    toolService.updateActivityMark(Double.valueOf(assessmentMark), null,
-				    user.getUserId().intValue(), toolSessionId, false);
-			}
-		    }
-
+		    storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
+			    assessmentMaxMark, user);
 		}
-
 	    }
 	}
+    }
+    
+    /**
+     * Store new mark and maxMark if they were changed
+     */
+    private void storeAssessmentResultMarkAndMaxMark(AssessmentResult assessmentResult, AssessmentResult lastFinishedAssessmentResult,
+	    float newAssessmentMark, int newAssessmentMaxMark, AssessmentUser user) {
+	// store new mark and maxMark if they were changed
+	if ((assessmentResult.getGrade() != newAssessmentMark)
+		|| (assessmentResult.getMaximumGrade() != newAssessmentMaxMark)) {
 
+	    // marks can't be below zero
+	    newAssessmentMark = (newAssessmentMark < 0) ? 0 : newAssessmentMark;
+	    newAssessmentMaxMark = (newAssessmentMaxMark < 0) ? 0 : newAssessmentMaxMark;
+
+	    assessmentResult.setGrade(newAssessmentMark);
+	    assessmentResult.setMaximumGrade(newAssessmentMaxMark);
+	    assessmentResultDao.saveObject(assessmentResult);
+
+	    // if this is the last finished assessment result - propagade total mark to Gradebook
+	    if (lastFinishedAssessmentResult != null
+		    && lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
+		toolService.updateActivityMark(Double.valueOf(newAssessmentMark), null, user.getUserId().intValue(),
+			user.getSession().getSessionId(), false);
+	    }
+	}
     }
 
     @Override

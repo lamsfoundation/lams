@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
+import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -418,7 +419,7 @@ public class LearningController {
 
 	// Return whether option is correct or not
 	ScratchieItem item = scratchieService.getScratchieItemByUid(itemUid);
-	boolean isAnswerCorrect = scratchieService.isItemUnraveledByAnswers(item, List.of(answer));
+	boolean isAnswerCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
 	
 	ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
 	objectNode.put("isAnswerCorrect", isAnswerCorrect);

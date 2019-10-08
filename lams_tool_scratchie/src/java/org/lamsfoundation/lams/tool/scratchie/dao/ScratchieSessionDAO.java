@@ -44,8 +44,15 @@ public interface ScratchieSessionDAO extends DAO {
     void deleteBySessionId(Long toolSessionId);
     
     List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
+    
     Object[] getStatsMarksForLeaders(Long toolContentId);
     
-
+    /**
+     * Returns all session ids where specified qbQuestionUid is used.
+     * 
+     * @param qbQuestionUid
+     * @return
+     */
+    List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid);
 
 }
