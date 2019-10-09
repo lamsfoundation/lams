@@ -284,7 +284,6 @@ public class LearningController {
 		    isWaitingForLeaderToSubmitNotebook);
 	    return "pages/learning/learning";
 	}
-
     }
 
     /**
@@ -489,7 +488,6 @@ public class LearningController {
 	}
 
 	scratchieService.launchTimeLimit(toolSessionId);
-
 	return null;
     }
 
@@ -641,11 +639,8 @@ public class LearningController {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	final Long userId = user.getUserID().longValue();
 
-	String nextActivityUrl = null;
-
 	try {
-	    nextActivityUrl = scratchieService.finishToolSession(toolSessionId, userId);
-
+	    String nextActivityUrl = scratchieService.finishToolSession(toolSessionId, userId);
 	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ScratchieApplicationException e) {
 	    log.error("Failed get next activity url:" + e.getMessage());
@@ -674,7 +669,6 @@ public class LearningController {
     /**
      * Saves burning questions entered by user. It also updates its values in SessionMap.
      */
-
     private void saveBurningQuestions(HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);

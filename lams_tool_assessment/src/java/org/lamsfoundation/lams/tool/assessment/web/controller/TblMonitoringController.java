@@ -86,7 +86,8 @@ public class TblMonitoringController {
 	Set<QuestionDTO> questionDtos = new TreeSet<>();
 	int maxOptionsInQuestion = 0;
 	for (AssessmentQuestion question : questionList) {
-	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()) {
+	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
+		    || QbQuestion.TYPE_VERY_SHORT_ANSWERS == question.getType()) {
 		questionDtos.add(new QuestionDTO(question));
 
 		//calculate maxOptionsInQuestion

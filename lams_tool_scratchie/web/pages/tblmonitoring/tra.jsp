@@ -98,7 +98,7 @@
 									${ALPHABET[j.index]}.
 								</td>
 								<td>
-									<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
+									<c:out value="${optionDto.answer}" escapeXml="false"/>
 								</td>
 							</tr>
 						</c:forEach>

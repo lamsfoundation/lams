@@ -155,11 +155,8 @@ public class MonitoringController {
 	// escape JS sensitive characters in option descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (OptionDTO optionDto : summary.getOptionDtos()) {
-		if (optionDto.getQbOption() != null) {
-		    String optionName = optionDto.getQbOption().getName() == null ? ""
-			    : StringEscapeUtils.escapeJavaScript(optionDto.getQbOption().getName());
-		    optionDto.getQbOption().setName(optionName);
-		}
+		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer());
+		optionDto.setAnswer(escapedAnswer);
 	    }
 	}
 

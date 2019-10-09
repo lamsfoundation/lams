@@ -291,9 +291,9 @@ public class ScratchieServiceImpl
 		if (item.getQbQuestion().getUid().equals(confidenceLevelDto.getQbQuestionUid())) {
 
 		    //find corresponding QbOption
-		    for (OptionDTO option : item.getOptionDtos()) {
-			if (option.getQbOption().getUid().equals(confidenceLevelDto.getQbOptionUid())) {
-			    option.getConfidenceLevelDtos().add(confidenceLevelDto);
+		    for (OptionDTO optionDTO : item.getOptionDtos()) {
+			if (optionDTO.getQbOptionUid().equals(confidenceLevelDto.getQbOptionUid())) {
+			    optionDTO.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }
 
@@ -476,10 +476,8 @@ public class ScratchieServiceImpl
 
 	// calculate mark
 	int mark = 0;
-	if (!items.isEmpty()) {
-	    for (ScratchieItem item : items) {
-		mark += ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
-	    }
+	for (ScratchieItem item : items) {
+	    mark += ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
 	}
 
 	// change mark for all learners in a group
@@ -716,7 +714,7 @@ public class ScratchieServiceImpl
 	    for (OptionDTO optionDto : item.getOptionDtos()) {
 		if (QbQuestion.TYPE_MULTIPLE_CHOICE == qbQuestion.getType()) {
 		    int attemptNumber;
-		    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(optionDto.getQbOption().getUid(),
+		    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(optionDto.getQbOptionUid(),
 			    item.getUid(), sessionId);
 		    if (log == null) {
 			// -1 if there is no log
@@ -770,7 +768,7 @@ public class ScratchieServiceImpl
 		if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()) {
 		    for (ScratchieAnswerVisitLog userLog : userLogs) {
 			if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-				&& userLog.getQbOption().getUid().equals(optionDto.getQbOption().getUid())) {
+				&& userLog.getQbOption().getUid().equals(optionDto.getQbOptionUid())) {
 			    isScratched = true;
 			    break;
 			}
@@ -841,13 +839,13 @@ public class ScratchieServiceImpl
 			if (itemQbQuestionUid.equals(optionDtoIter.getQbQuestionUid())
 				&& optionDtoIter.getAnswer().equals(userLog.getAnswer())) {
 			    optionDto = optionDtoIter;
-			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId()
-				    .equals(leader.getUserId());
+			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId().equals(leader.getUserId());
 			    break;
 			}
 		    }
-		    if (skipAddingUserAnswerToConfidenceLevel)
+		    if (skipAddingUserAnswerToConfidenceLevel) {
 			continue;
+		    }
 
 		    if (optionDto == null) {
 			optionDto = new OptionDTO();
@@ -1024,14 +1022,14 @@ public class ScratchieServiceImpl
 		List<QbOption> options = item.getQbQuestion().getQbOptions();
 		for (QbOption dbOption : options) {
 		    // clone it so it doesn't interfere with values from other sessions
-		    OptionDTO optionDto = new OptionDTO();
-		    optionDto.setQbOption(dbOption);
+		    OptionDTO optionDto = new OptionDTO(dbOption);
 		    int[] attempts = new int[options.size()];
 		    optionDto.setAttempts(attempts);
 		    optionMap.put(dbOption.getUid(), optionDto);
 		}
 
 	    } else {
+		item.getOptionDtos().clear();
 		fillItemWithVsaOptionDtos(item, sessionId, scratchie, sessionAttempts);
 		List<OptionDTO> optionDtos = item.getOptionDtos();
 		for (OptionDTO optionDto : optionDtos) {
@@ -1073,8 +1071,7 @@ public class ScratchieServiceImpl
 	    for (QbOption dbOption : options) {
 
 		// clone it so it doesn't interfere with values from other sessions
-		OptionDTO optionDto = new OptionDTO();
-		optionDto.setQbOption(dbOption);
+		OptionDTO optionDto = new OptionDTO(dbOption);
 		int[] attempts = new int[options.size()];
 		optionDto.setAttempts(attempts);
 		optionMapTotal.put(dbOption.getUid(), optionDto);
@@ -1085,7 +1082,7 @@ public class ScratchieServiceImpl
 		for (OptionDTO optionDto : optionDtos) {
 		    int[] attempts = optionDto.getAttempts();
 
-		    OptionDTO optionTotal = optionMapTotal.get(optionDto.getQbOption().getUid());
+		    OptionDTO optionTotal = optionMapTotal.get(optionDto.getQbOptionUid());
 		    int[] attemptsTotal = optionTotal.getAttempts();
 		    for (int i = 0; i < attempts.length; i++) {
 			attemptsTotal[i] += attempts[i];
@@ -1347,7 +1344,7 @@ public class ScratchieServiceImpl
 	    String correctOptionLetter = "";
 	    int optionCount = 1;
 	    for (OptionDTO optionDto : item.getOptionDtos()) {
-		if (optionDto.getQbOption() != null && optionDto.getQbOption().isCorrect() || optionDto.isCorrect()) {
+		if (optionDto.isCorrect()) {
 		    correctOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 		    break;
 		}
@@ -1559,16 +1556,16 @@ public class ScratchieServiceImpl
 
 		for (OptionDTO optionDto : optionDtos) {
 		    row = new ExcelCell[1 + optionDtos.size()];
-		    String optionTitle;
+		    String answer;
 		    IndexedColors color = null;
-		    optionTitle = removeHtmlMarkup(optionDto.getQbOption().getName());
-		    if (optionDto.getQbOption().isCorrect()) {
-			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
+		    answer = removeHtmlMarkup(optionDto.getAnswer());
+		    if (optionDto.isCorrect()) {
+			answer += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 			color = IndexedColors.GREEN;
 		    }
 		    
 		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(optionTitle, color);
+		    row[columnCount++] = new ExcelCell(answer, color);
 
 		    for (int numberAttempts : optionDto.getAttempts()) {
 			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
@@ -1600,18 +1597,11 @@ public class ScratchieServiceImpl
 		rowList.add(row);
 
 		for (OptionDTO optionDto : optionDtos) {
-		    row = new ExcelCell[1 + optionDtos.size()];
-		    String optionTitle;
-		    if (isMcqItem) {
-			optionTitle = removeHtmlMarkup(optionDto.getQbOption().getName());
-			if (optionDto.getQbOption().isCorrect()) {
-			    optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
-			}
-		    } else {
-			optionTitle = optionDto.getAnswer();
-			if (optionDto.isCorrect()) {
-			    optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
-			}
+		    int rowLength = isMcqItem ? 1 + optionDtos.size() : 1 + optionDto.getAttempts().length;
+		    row = new ExcelCell[rowLength];
+		    String optionTitle = removeHtmlMarkup(optionDto.getAnswer());
+		    if (optionDto.isCorrect()) {
+			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 		    }
 
 		    columnCount = 0;
@@ -1747,8 +1737,8 @@ public class ScratchieServiceImpl
 		    String correctOption = "";
 		    List<OptionDTO> options = itemDto.getOptionDtos();
 		    for (OptionDTO option : options) {
-			if (option.getQbOption() != null && option.getQbOption().isCorrect() || option.isCorrect()) {
-			    correctOption = option.getQbOption() == null ? option.getAnswer() : option.getQbOption().getName();
+			if (option.isCorrect()) {
+			    correctOption = option.getAnswer();
 			    correctOption = removeHtmlMarkup(correctOption);
 			}
 		    }
@@ -1903,7 +1893,6 @@ public class ScratchieServiceImpl
      */
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
-
 	String[] presetMarks = getPresetMarks(scratchie);
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
@@ -1923,18 +1912,24 @@ public class ScratchieServiceImpl
 		int mark = -1;
 		boolean isUnraveledOnFirstAttempt = false;
 		String optionsSequence = "";
+		boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		
+		//populate Scratchie items with VSA answers, entered by learners in Assessment tool
+		if (!isMcqItem && scratchie.isAnswersFetchingEnabledAndVsaQuestionsAvailable()) {
+		    fillItemWithVsaOptionDtos(item, sessionId, scratchie, logs);
+		}
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
 
 		    //create a list of attempts user done for the current item
-		    List<ScratchieAnswerVisitLog> itemLogs = new ArrayList<>();
+		    List<ScratchieAnswerVisitLog> visitLogs = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog log : logs) {
 			if (log.getQbToolQuestion().getUid().equals(item.getUid())) {
-			    itemLogs.add(log);
+			    visitLogs.add(log);
 			}
 		    }
-		    numberOfAttempts = itemLogs.size();
+		    numberOfAttempts = visitLogs.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
 		    mark = (numberOfAttempts == 0) ? -1 : ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, logs, presetMarks);
@@ -1942,12 +1937,23 @@ public class ScratchieServiceImpl
 		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && ScratchieServiceImpl.isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
-		    for (ScratchieAnswerVisitLog itemAttempt : itemLogs) {
-			String sequencialLetter = ScratchieServiceImpl.getSequencialLetter(item,
-				itemAttempt.getQbOption());
+		    for (ScratchieAnswerVisitLog itemAttempt : visitLogs) {
+			String sequencialLetter = "";
+
+			int optionCount = 1;
+			for (OptionDTO optionDto : item.getOptionDtos()) {
+			    boolean isOptionMet = isMcqItem
+				    && optionDto.getQbOptionUid().equals(itemAttempt.getQbOption().getUid())
+				    || !isMcqItem && optionDto.getAnswer().equals(itemAttempt.getAnswer());
+			    if (isOptionMet) {
+				sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
+				break;
+			    }
+			    optionCount++;
+			}
+			
 			optionsSequence += optionsSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
 		    }
-
 		}
 
 		itemDto.setUid(item.getUid());
@@ -1971,12 +1977,11 @@ public class ScratchieServiceImpl
     /**
      * Return specified option's sequential letter (e.g. A,B,C) among other possible options
      */
-    private static String getSequencialLetter(ScratchieItem item, QbOption asnwer) {
+    private static String getSequencialLetter(ScratchieItem item, QbOption qbOption) {
 	String sequencialLetter = "";
-
 	int optionCount = 1;
-	for (OptionDTO option : item.getOptionDtos()) {
-	    if (option.getQbOption().getUid().equals(asnwer.getUid())) {
+	for (OptionDTO optionDto : item.getOptionDtos()) {
+	    if (optionDto.getQbOptionUid() != null && optionDto.getQbOptionUid().equals(qbOption.getUid())) {
 		sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 		break;
 	    }
