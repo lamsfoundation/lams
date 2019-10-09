@@ -78,8 +78,15 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String extUsername = request.getParameter(BasicLTIConstants.USER_ID);
+	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
+	//get user id as "user_id" parameter, or as lis_person_sourcedid (if according option is ON for this LTI server)
+	String lisPersonSourcedid = request.getParameter(BasicLTIConstants.LIS_PERSON_SOURCEDID);
+	String extUsername = extServer.isUseAlternativeUseridParameterName()
+		&& StringUtils.isNotBlank(lisPersonSourcedid) ? lisPersonSourcedid
+			: request.getParameter(BasicLTIConstants.USER_ID);
 	String roles = request.getParameter(BasicLTIConstants.ROLES);
+	
 	// implicit login params
 	String firstName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_GIVEN);
 	String lastName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FAMILY);
@@ -88,8 +95,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
 	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
 	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
-
-	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
+	
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
@@ -100,7 +106,6 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 
 	//verify whether request was correctly signed by OAuth
-	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	String secret = extServer.getServerkey();// retrieve corresponding secret for key from db
 	LtiVerificationResult ltiResult = null;
 	try {
