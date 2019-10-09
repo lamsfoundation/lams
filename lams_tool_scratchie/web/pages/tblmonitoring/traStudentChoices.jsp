@@ -137,9 +137,9 @@
 							<c:forEach var="itemDto" items="${sessionDto.itemDtos}">
 								<td class="text-center">
 									<c:forEach var="optionDto" items="${itemDto.optionDtos}">
-										<c:if test="${optionDto.qbOption.name != ''}">
-											<span class="user-response <c:if test="${optionDto.qbOption.correct}">successful-response</c:if> <c:if test="${!optionDto.qbOption.correct}">wrong-response</c:if>">
-												<c:out value="${optionDto.qbOption.name}"></c:out>
+										<c:if test="${optionDto.answer != ''}">
+											<span class="user-response <c:if test="${optionDto.correct}">successful-response</c:if> <c:if test="${!optionDto.correct}">wrong-response</c:if>">
+												<c:out value="${optionDto.answer}"></c:out>
 											</span>
 										</c:if>
 									</c:forEach>
@@ -188,13 +188,13 @@
 						<tbody>
 						
 							<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${optionDto.qbOption.correct}'>bg-success</c:if></c:set>
+								<c:set var="cssClass"><c:if test='${optionDto.correct}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
+										<c:out value="${optionDto.answer}" escapeXml="false"/>
 									</td>
 								</tr>
 							</c:forEach>

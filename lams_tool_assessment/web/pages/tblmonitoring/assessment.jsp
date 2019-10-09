@@ -9,6 +9,8 @@
 		</c:otherwise>
 	</c:choose>
 </c:set>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+
 <script>
 	$(document).ready(function(){
 		// change attempted and all learners numbers
@@ -170,6 +172,7 @@
 			</c:if>
 			
 			<c:forEach var="question" items="${assessmentDto.questions}" varStatus="i">
+				<c:set var="qbQuestion" value="${question.qbQuestion}"/>
 				<div class="row no-gutter">
 				<div class="col-xs-12 col-md-12 col-lg-12">
 				<div class="panel panel-default">
@@ -179,12 +182,12 @@
 								<span class="float-left space-right">Q${i.index+1})</span>
 							</c:if> 
 							
-							<c:out value="${question.qbQuestion.name}" escapeXml="false"/>
+							<c:out value="${qbQuestion.name}" escapeXml="false"/>
 							
 							<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
 								<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
 									<%-- Allow disclosing correct answers only for multiple choice questions --%>
-									<c:if test="${question.type == 1}">
+									<c:if test="${qbQuestion.type == 1}">
 										<div class="btn btn-default disclose-correct-button"
 											<c:if test="${question.correctAnswersDisclosed}">
 												disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
@@ -207,28 +210,34 @@
 					
 					<div class="panel-body">
 						<div class="table-responsive">	
-							<c:out value="${question.question}" escapeXml="false"/>
+							<c:out value="${qbQuestion.description}" escapeXml="false"/>
 							
 							<table class="table table-striped">
 								<tbody>
 									
 									<c:choose>
-										<c:when test="${question.type == 1}">
-											<c:forEach var="questionOption" items="${question.options}" varStatus="j">
-													
+										<c:when test="${qbQuestion.type == 1 || qbQuestion.type == 3}">
+											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
 												<tr>
 													<td width="5px">
 														${ALPHABET[j.index]}.
 													</td>									
 													<td>
-														<c:out value="${questionOption.name}" escapeXml="false"/>
+														<c:choose>
+															<c:when test="${qbQuestion.type == 1}">
+																<c:out value="${qbOption.name}" escapeXml="false"/>
+															</c:when>
+															<c:otherwise>
+																${fn:replace(qbOption.name, newLineChar, ', ')}
+															</c:otherwise>
+														</c:choose>
 													</td>
-												</tr>
-																		
+												</tr>					
 											</c:forEach>						
 										</c:when>
 										
-										<c:when test="${question.type == 2}">
+										
+										<c:when test="${qbQuestion.type == 2}">
 											<tr style="background: none;">
 												<td style="border-top: none;">
 												</td>
@@ -238,25 +247,25 @@
 												</td>
 											</tr>
 										
-											<c:forEach var="questionOption" items="${question.options}" varStatus="j">
+											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
 												<tr>
 													<td>
 														<span class="pull-left">${ALPHABET[j.index]}.</span>
 																
-														<c:out value="${questionOption.matchingPair}" escapeXml="false"/>
+														<c:out value="${qbOption.matchingPair}" escapeXml="false"/>
 													</td>
 																
 													<td>
-														<c:out value="${questionOption.name}" escapeXml="false"/>
+														<c:out value="${qbOption.name}" escapeXml="false"/>
 													</td>
 												</tr>
 											</c:forEach>
 										</c:when>
 										
-										<c:when test="${(question.type == 3) || (question.type == 4) || (question.type == 6)}">
+										<c:when test="${(qbQuestion.type == 4) || (qbQuestion.type == 6)}">
 										</c:when>
 															
-										<c:when test="${question.type == 5}">
+										<c:when test="${qbQuestion.type == 5}">
 											<tr>
 												<td width="5px">
 													a.
@@ -275,15 +284,15 @@
 											</tr>
 										</c:when>
 															
-										<c:when test="${(question.type == 7) || (question.type == 8)}">
-											<c:forEach var="questionOption" items="${question.options}" varStatus="j">
+										<c:when test="${(qbQuestion.type == 7) || (qbQuestion.type == 8)}">
+											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
 															
 												<tr>
 													<td width="5px">
 														${ALPHABET[j.index]}.
 													</td>
 													<td>
-														<c:out value="${questionOption.name}" escapeXml="false"/>
+														<c:out value="${qbOption.name}" escapeXml="false"/>
 													</td>
 												</tr>
 												

@@ -169,11 +169,8 @@ public class TblMonitorController {
 		    String correctOptionLetter = correctOptionsRow[i].getCellValue().toString();
 
 		    OptionDTO optionDto = new OptionDTO();
-		    QbOption qbOption = new QbOption();
-		    optionDto.setQbOption(qbOption);
-		    qbOption.setName(optionLetter);
-		    qbOption.setCorrect(correctOptionLetter.equals(optionLetter));
-
+		    optionDto.setAnswer(optionLetter);
+		    optionDto.setCorrect(correctOptionLetter.equals(optionLetter));
 		    optionDtos.add(optionDto);
 		}
 

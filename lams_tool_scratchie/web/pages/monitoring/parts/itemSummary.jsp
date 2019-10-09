@@ -63,19 +63,8 @@
 	  				});
 	  				
 	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
-	  	   	        	<c:set var="optionTitle">
-							<c:choose>
-								<c:when test="${item.qbQuestion.type == 1}">
-									${optionDto.qbOption.name}<c:if test='${optionDto.qbOption.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>
-								</c:when>
-								<c:when test="${item.qbQuestion.type == 3}">
-									${optionDto.answer}<c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>
-								</c:when>
-							</c:choose>
-						</c:set>
-	  	   	        
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			option:"${optionTitle}"
+	  	   	     			option:"${optionDto.answer}<c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
 	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)-1}">
 	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>

@@ -14,7 +14,7 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+
 	<!-- ********************  CSS ********************** -->
 	<lams:css />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
@@ -23,12 +23,10 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	<style type="text/css">
-	</style>
 
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
 		//Resolve name collision between jQuery UI and Twitter Bootstrap
@@ -348,7 +346,7 @@
 			var proceed = true;
 			//ask for leave confirmation only if time limit is not expired
 			if (!isTimelimitExpired) {
-				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]").length;
+				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-][class=item-required]:visible").length;
 				proceed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;	
 			}
 			

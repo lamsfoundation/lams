@@ -12,26 +12,26 @@
 	<c:when test="${item.qbQuestion.type == 1}">
 		<table class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-				<tr id="tr${optionDto.qbOption.uid}">
+				<tr id="tr${optionDto.qbOptionUid}">
 					<td style="width: 40px;">
 						<c:choose>
-							<c:when test="${optionDto.scratched && optionDto.qbOption.correct}">
+							<c:when test="${optionDto.scratched && optionDto.correct}">
 								<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
-									 id="image-${item.uid}-${optionDto.qbOption.uid}">
+									 id="image-${item.uid}-${optionDto.qbOptionUid}">
 							</c:when>
-							<c:when test="${optionDto.scratched && !optionDto.qbOption.correct}">
+							<c:when test="${optionDto.scratched && !optionDto.correct}">
 								<img src="<lams:WebAppURL/>includes/images/scratchie-wrong.png" class="scartchie-image"
-									 id="image-${item.uid}-${optionDto.qbOption.uid}">
+									 id="image-${item.uid}-${optionDto.qbOptionUid}">
 							</c:when>
 							<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
 								<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-									 id="image-${item.uid}-${optionDto.qbOption.uid}">
+									 id="image-${item.uid}-${optionDto.qbOptionUid}">
 							</c:when>
 							<c:otherwise>
-								<a href="#nogo" onclick="scratchMcq(${item.uid}, ${optionDto.qbOption.uid}); return false;"
-									id="imageLink-${item.uid}-${optionDto.qbOption.uid}"> <img
+								<a href="#nogo" onclick="scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
+									id="imageLink-${item.uid}-${optionDto.qbOptionUid}"> <img
 									src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image"
-									id="image-${item.uid}-${optionDto.qbOption.uid}" />
+									id="image-${item.uid}-${optionDto.qbOptionUid}" />
 								</a>
 							</c:otherwise>
 						</c:choose> 
@@ -49,7 +49,7 @@
 						<c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
 					>
 						<div class="answer-description">
-							<c:out value="${optionDto.qbOption.name}" escapeXml="false" />
+							<c:out value="${optionDto.answer}" escapeXml="false" />
 						</div>
 						
 						<c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">
@@ -119,7 +119,8 @@
 		</table>
 
 		<c:if test="${!sessionMap.userFinished && !item.unraveled && isUserLeader && (mode != 'teacher') && !showResults}">
-			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;">
+			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;"
+				class="<c:if test='${item.qbQuestion.answerRequired}'>item-required</c:if>">
 				<div>
 					<fmt:message key="label.type.your.group.answer" />
 				</div>

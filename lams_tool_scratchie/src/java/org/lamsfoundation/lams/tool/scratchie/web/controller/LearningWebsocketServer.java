@@ -166,15 +166,10 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			String optionUidOrAnswer;
-			Boolean isCorrectStoredAnswer;
-			if (QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()) {
-			    optionUidOrAnswer = optionDto.getQbOption().getUid().toString();
-			    isCorrectStoredAnswer = optionDto.getQbOption().isCorrect();
-			} else {
-			    optionUidOrAnswer = optionDto.getAnswer();
-			    isCorrectStoredAnswer = optionDto.isCorrect();
-			}
+			String optionUidOrAnswer = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+				? optionDto.getQbOptionUid().toString()
+				: optionDto.getAnswer();
+			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
 
 			Boolean answerCache = itemCache.get(optionUidOrAnswer);
 			// check if the correct answer is stored in cache

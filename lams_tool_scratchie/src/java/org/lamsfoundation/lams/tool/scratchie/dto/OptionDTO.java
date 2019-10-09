@@ -35,6 +35,11 @@ import org.lamsfoundation.lams.util.HashUtil;
  * @author Andrey Balan
  */
 public class OptionDTO implements Comparable<OptionDTO> {
+    private Long qbQuestionUid;
+    private String answer;
+    boolean correct;
+    private boolean mcqType = false;
+    
     private boolean scratched;
     private int attemptOrder;
     private int[] attempts;
@@ -42,31 +47,31 @@ public class OptionDTO implements Comparable<OptionDTO> {
     private List<ConfidenceLevelDTO> confidenceLevelDtos;
     
     //****for MCQ questions***
-    private QbOption qbOption;
+    private Long qbOptionUid;
+    private int displayOrder;
     
     //****for VSA questions***
-    private Long qbQuestionUid;
-    private String answer;
     private int answerHash;
-    boolean correct;
     private Long userId;
 
     public OptionDTO() {
 	//init confidenceLevelDtos list
 	this.confidenceLevelDtos = new LinkedList<>();
     }
+    
+    public OptionDTO(QbOption qbOption) {
+	this();
+	this.qbQuestionUid = qbOption.getQbQuestion().getUid();
+	this.answer = qbOption.getName();
+	this.correct = qbOption.isCorrect();
+	this.mcqType = true;
+	this.qbOptionUid = qbOption.getUid();
+	this.displayOrder = qbOption.getDisplayOrder();
+    }
 
     @Override
     public int compareTo(OptionDTO o) {
-	return qbOption == null ? this.answer.compareTo(o.answer) : this.qbOption.compareTo(o.qbOption);
-    }
-
-    public QbOption getQbOption() {
-	return qbOption;
-    }
-
-    public void setQbOption(QbOption qbOption) {
-	this.qbOption = qbOption;
+	return mcqType ? Integer.compare(this.displayOrder, o.displayOrder) : this.answer.compareTo(o.answer);
     }
     
     public void setQbQuestionUid(Long qbQuestionUid) {
@@ -75,6 +80,22 @@ public class OptionDTO implements Comparable<OptionDTO> {
 
     public Long getQbQuestionUid() {
 	return this.qbQuestionUid;
+    }
+    
+    public void setQbOptionUid(Long qbOptionUid) {
+	this.qbOptionUid = qbOptionUid;
+    }
+
+    public Long getQbOptionUid() {
+	return this.qbOptionUid;
+    }
+    
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
     
     public void setAnswer(String answer) {
@@ -100,6 +121,14 @@ public class OptionDTO implements Comparable<OptionDTO> {
 
     public void setCorrect(boolean correct) {
 	this.correct = correct;
+    }
+    
+    public void setMcqType(boolean mcqType) {
+	this.mcqType = mcqType;
+    }
+
+    public boolean isMcqType() {
+	return mcqType;
     }
     
     public void setUserId(Long userId) {
