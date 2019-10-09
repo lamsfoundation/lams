@@ -115,6 +115,9 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
      */
     @Column(name = "lti_consumer_monitor_roles")
     private String ltiToolConsumerMonitorRoles;
+    
+    @Column(name = "use_alternative_user_id_parameter_name")
+    private Boolean useAlternativeUseridParameterName;
 
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
@@ -332,5 +335,13 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setGradebookOnComplete(Boolean gradebookOnComplete) {
 	this.gradebookOnComplete = gradebookOnComplete;
+    }
+    
+    public Boolean isUseAlternativeUseridParameterName() {
+	return useAlternativeUseridParameterName;
+    }
+
+    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
+	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
     }
 }

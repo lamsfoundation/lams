@@ -92,7 +92,6 @@
 						<form:input path="prefix" size="10" cssClass="form-control"/>
 					</td>
 				</tr>
-						
 				<tr>
 					<td><fmt:message key="sysadmin.disabled" />:</td>
 					<td>
@@ -109,6 +108,12 @@
 					<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
 					<td>
 						<form:input path="ltiToolConsumerMonitorRoles" size="30"/>
+					</td>
+				</tr>
+				<tr>
+					<td><fmt:message key="sysadmin.alternative.user.id.name" />:</td>
+					<td>
+						<form:checkbox path="useAlternativeUseridParameterName" />
 					</td>
 				</tr>
 			</table>

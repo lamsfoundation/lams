@@ -30,6 +30,8 @@ package org.lamsfoundation.lams.admin.web.form;
 public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
+    
+    private Boolean useAlternativeUseridParameterName;
 
     public String getLtiToolConsumerMonitorRoles() {
 	return ltiToolConsumerMonitorRoles;
@@ -37,6 +39,14 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
+    }
+    
+    public Boolean isUseAlternativeUseridParameterName() {
+	return useAlternativeUseridParameterName;
+    }
+
+    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
+	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
     }
 
 }
