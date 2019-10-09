@@ -82,7 +82,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	//get user id as "user_id" parameter, or as lis_person_sourcedid (if according option is ON for this LTI server)
 	String lisPersonSourcedid = request.getParameter(BasicLTIConstants.LIS_PERSON_SOURCEDID);
-	String extUsername = extServer.isUseAlternativeUseridParameterName()
+	String extUsername = extServer.getUseAlternativeUseridParameterName()
 		&& StringUtils.isNotBlank(lisPersonSourcedid) ? lisPersonSourcedid
 			: request.getParameter(BasicLTIConstants.USER_ID);
 	String roles = request.getParameter(BasicLTIConstants.ROLES);

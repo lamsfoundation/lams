@@ -41,7 +41,7 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
     
-    public Boolean isUseAlternativeUseridParameterName() {
+    public Boolean getUseAlternativeUseridParameterName() {
 	return useAlternativeUseridParameterName;
     }
 
