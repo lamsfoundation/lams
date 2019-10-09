@@ -337,7 +337,7 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 	this.gradebookOnComplete = gradebookOnComplete;
     }
     
-    public Boolean isUseAlternativeUseridParameterName() {
+    public Boolean getUseAlternativeUseridParameterName() {
 	return useAlternativeUseridParameterName;
     }
 
