@@ -43,21 +43,18 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
+ * Holds tool sessions
  *
  * @author Ozgur Demirtas
- *
- *         QaSession Value Object The value object that maps to our model database
- *         table: tl_laqa11_session The relevant hibernate mapping resides in:
- *         QaSession.hbm.xml
- *
- *         Holds tool sessions
+ * 
  */
 @Entity
 @Table(name = "tl_laqa11_session")
-public class QaSession implements Serializable, Comparable, Nullable {
+public class QaSession implements Serializable, Comparable {
+
+    private static final long serialVersionUID = -4996580401710962900L;
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
@@ -194,11 +191,6 @@ public class QaSession implements Serializable, Comparable, Nullable {
     public int compareTo(Object o) {
 	QaSession qaSession = (QaSession) o;
 	return (int) (qaSessionId.longValue() - qaSession.qaSessionId.longValue());
-    }
-
-    @Override
-    public boolean isNull() {
-	return false;
     }
 
     public Long getUid() {

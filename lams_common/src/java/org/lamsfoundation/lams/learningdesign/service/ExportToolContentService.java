@@ -115,6 +115,8 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
+import org.lamsfoundation.lams.qb.dao.IQbDAO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
@@ -164,13 +166,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     // export tool content zip file prefix
     public static final String EXPORT_TOOLCONTNET_ZIP_PREFIX = "lams_toolcontent_";
 
-    public static final String EXPORT_LDCONTENT_ZIP_PREFIX = "lams_ldcontent_";
+    public static final String EXPORT_CONTENT_ZIP_PREFIX = "lams_ldcontent_";
 
     public static final String EXPORT_TOOLCONTNET_FOLDER_SUFFIX = "export_toolcontent";
 
     public static final String EXPORT_TOOLCONTNET_ZIP_SUFFIX = ".zip";
 
-    public static final String EXPORT_LDCONTENT_ZIP_SUFFIX = ".zip";
+    public static final String EXPORT_CONTENT_ZIP_SUFFIX = ".zip";
 
     public static final String LEARNING_DESIGN_FILE_NAME = "learning_design.xml";
 
@@ -237,6 +239,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private ILearningDesignDAO learningDesignDAO;
 
     private ILearningLibraryDAO learningLibraryDAO;
+
+    private IQbDAO qbDAO;
 
     /**
      * Class of tool attachment file handler class and relative fields information container.
@@ -421,6 +425,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    // tools from LAMS repository.
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 
+	    Set<String> exportedContentFolders = new HashSet<>();
+
 	    // iterator all activities and export tool.xml and its
 	    // attachments
 	    for (AuthoringActivityDTO activity : activities) {
@@ -466,6 +472,18 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    writeErrorToToolFile(contentDir, activity.getToolContentID(), msg);
 		    toolsErrorMsgs.add(msg);
 		}
+
+		// export content folders for all QB questions which are used by LD's activities
+		List<QbQuestion> activityQbQuestions = qbDAO.getQuestionsByToolContentId(activity.getToolContentID());
+		for (QbQuestion qbQuestion : activityQbQuestions) {
+		    String contentFolderID = qbQuestion.getContentFolderId();
+		    // Do not export the same folder twice
+		    // Some QB question share the same content folder ID
+		    if (!exportedContentFolders.contains(contentFolderID)) {
+			exportContentFolder(contentFolderID, contentDir);
+			exportedContentFolders.add(contentFolderID);
+		    }
+		}
 	    } // end all activities export
 
 	    // skipping unwanted elements; learning design DTO is altered
@@ -493,27 +511,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	    log.debug("Learning design xml export success");
 
-	    try {
-		// create zip file for fckeditor unique content folder
-		String targetContentZipFileName = ExportToolContentService.EXPORT_LDCONTENT_ZIP_PREFIX
-			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
-		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
-			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
-
-		String ldContentDir = ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), true);
-		ldContentDir = FileUtil.getFullPath(secureDir, ldContentDir);
-
-		if (!FileUtil.isEmptyDirectory(ldContentDir, true)) {
-		    log.debug("Create export Learning Design content target zip file. File name is "
-			    + targetContentZipFileName);
-		    ZipFileUtil.createZipFile(targetContentZipFileName, ldContentDir, contentDir);
-		} else {
-		    log.debug("No such directory (or empty directory):" + ldContentDir);
-		}
-
-	    } catch (Exception e) {
-		log.error("Error thrown while creating LD XML", e);
-		throw new ExportToolContentException(e);
+	    // export the LDs content folder, if it was not already exported for one of the questions
+	    String contentFolderID = ldDto.getContentFolderID();
+	    if (!exportedContentFolders.contains(contentFolderID)) {
+		exportContentFolder(contentFolderID, contentDir);
 	    }
 
 	    // zip file name with full path
@@ -530,6 +531,30 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    throw new ExportToolContentException(e);
 	} catch (IOException e) {
 	    log.error("IOException:", e);
+	    throw new ExportToolContentException(e);
+	}
+    }
+
+    private void exportContentFolder(String contentFolderID, String targetDir) throws ExportToolContentException {
+	try {
+	    // create zip file for unique content folder
+	    String zipFileName = ExportToolContentService.EXPORT_CONTENT_ZIP_PREFIX + contentFolderID
+		    + ExportToolContentService.EXPORT_CONTENT_ZIP_SUFFIX;
+	    String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+		    + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR;
+
+	    String contentFolder = ExportToolContentService.getContentDirPath(contentFolderID, true);
+	    contentFolder = FileUtil.getFullPath(secureDir, contentFolder);
+
+	    if (!FileUtil.isEmptyDirectory(contentFolder, true)) {
+		log.debug("Create export content folder target zip file. File name is " + zipFileName);
+		ZipFileUtil.createZipFile(zipFileName, contentFolder, targetDir);
+	    } else {
+		log.debug("No such directory (or empty directory):" + contentFolder);
+	    }
+
+	} catch (Exception e) {
+	    log.error("Error thrown while a ZIP for content folder " + contentFolderID, e);
 	    throw new ExportToolContentException(e);
 	}
     }
@@ -706,6 +731,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    if (rewriteResourcePaths && ldDto.getDescription() != null) {
 		ldDto.setDescription(ldDto.getDescription().replaceAll(oldResourcePath, newResourcePath));
 	    }
+	    Set<String> importedContentFolder = new HashSet<>();
 	    for (AuthoringActivityDTO activity : activities) {
 		learningDesignService.fillLearningLibraryID(activity, activities);
 		// skip non-tool activities
@@ -770,6 +796,20 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			contentManager.importToolContent(newContent.getToolContentId(), importer.getUserId(), toolPath,
 				fromVersion, toVersion);
 		    }
+
+		    // import content folder for each QB question that LD's activities use
+		    List<QbQuestion> activityQbQuestions = qbDAO
+			    .getQuestionsByToolContentId(newContent.getToolContentId());
+		    for (QbQuestion qbQuestion : activityQbQuestions) {
+			String contentFolderID = qbQuestion.getContentFolderId();
+			// Do not import twice
+			// Some activities share the same content folder ID
+			if (!importedContentFolder.contains(contentFolderID)) {
+			    importContentFolder(contentFolderID, learningDesignPath);
+			    importedContentFolder.add(contentFolderID);
+			}
+		    }
+
 		    log.debug("Tool content import success.");
 		} catch (Exception e) {
 		    String error = messageService.getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
@@ -788,23 +828,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		return -1L;
 	    }
 
-	    // begin ckeditor content folder import
-	    try {
-		String contentZipFileName = ExportToolContentService.EXPORT_LDCONTENT_ZIP_PREFIX
-			+ ldDto.getContentFolderID() + ExportToolContentService.EXPORT_LDCONTENT_ZIP_SUFFIX;
-		String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
-			+ FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
-			+ ExportToolContentService.getContentDirPath(ldDto.getContentFolderID(), true);
-		File contentZipFile = new File(FileUtil.getFullPath(learningDesignPath, contentZipFileName));
-
-		// unzip file to target secure dir if exists
-		if (contentZipFile.exists()) {
-		    InputStream is = new FileInputStream(contentZipFile);
-		    ZipFileUtil.expandZipToFolder(is, secureDir);
-		}
-
-	    } catch (Exception e) {
-		throw new ImportToolContentException(e);
+	    // import the LD's content folder, if it was not already imported for one of the QB questions
+	    if (!importedContentFolder.contains(ldDto.getContentFolderID())) {
+		importContentFolder(ldDto.getContentFolderID(), learningDesignPath);
 	    }
 
 	    // if the design was read only (e.g. exported a runtime
@@ -820,7 +846,26 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    log.error("Exception occured during import.", e);
 	    throw new ImportToolContentException(e);
 	}
+    }
 
+    private void importContentFolder(String contentFolderID, String sourceDir) throws ImportToolContentException {
+	try {
+	    String contentZipFileName = ExportToolContentService.EXPORT_CONTENT_ZIP_PREFIX + contentFolderID
+		    + ExportToolContentService.EXPORT_CONTENT_ZIP_SUFFIX;
+	    String secureDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
+		    + FileUtil.LAMS_WWW_DIR + File.separator + FileUtil.LAMS_WWW_SECURE_DIR + File.separator
+		    + ExportToolContentService.getContentDirPath(contentFolderID, true);
+	    File contentZipFile = new File(FileUtil.getFullPath(sourceDir, contentZipFileName));
+
+	    // unzip file to target secure dir if exists
+	    if (contentZipFile.exists()) {
+		InputStream is = new FileInputStream(contentZipFile);
+		ZipFileUtil.expandZipToFolder(is, secureDir);
+	    }
+
+	} catch (Exception e) {
+	    throw new ImportToolContentException(e);
+	}
     }
 
     /**
@@ -2023,6 +2068,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
+    }
+
+    public void setQbDAO(IQbDAO qbDAO) {
+	this.qbDAO = qbDAO;
     }
 
     public ILicenseDAO getLicenseDAO() {

@@ -37,7 +37,7 @@ public class QbQuestion implements Serializable, Cloneable {
     // not all tools can produce/consume all question types
     public static final int TYPE_MULTIPLE_CHOICE = 1;
     public static final int TYPE_MATCHING_PAIRS = 2;
-    public static final int TYPE_SHORT_ANSWER = 3;
+    public static final int TYPE_VERY_SHORT_ANSWERS = 3;
     public static final int TYPE_NUMERICAL = 4;
     public static final int TYPE_TRUE_FALSE = 5;
     public static final int TYPE_ESSAY = 6;
@@ -131,9 +131,13 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "min_words_limit")
     private int minWordsLimit;
 
-    // only for hedging maxMark type of question
+    /** ---- only for hedging type of question ---- */
     @Column(name = "hedging_justification_enabled")
     private boolean hedgingJustificationEnabled;
+    
+    /** ---- only for VSA type of question ---- */
+    @Column(name = "autocomplete_enabled")
+    private boolean autocompleteEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
@@ -172,7 +176,7 @@ public class QbQuestion implements Serializable, Cloneable {
 		    if (((oldQuestion.getType() == QbQuestion.TYPE_ORDERING)
 			    && (oldOption.getDisplayOrder() != newOption.getDisplayOrder()))
 			    //short answer
-			    || ((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
+			    || ((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 				    && !StringUtils.equals(oldOption.getName(), newOption.getName()))
 			    //numbering
 			    || (oldOption.getNumericalOption() != newOption.getNumericalOption())
@@ -237,12 +241,34 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void clearID() {
 	this.uid = null;
-	for (QbOption option : qbOptions) {
-	    option.uid = null;
+	if (qbOptions != null) {
+	    for (QbOption option : qbOptions) {
+		option.uid = null;
+	    }
 	}
-	for (QbQuestionUnit unit : units) {
-	    unit.uid = null;
+	if (units != null) {
+	    for (QbQuestionUnit unit : units) {
+		unit.uid = null;
+	    }
 	}
+    }
+    
+    /**
+     * Check if it's a TBL case, i.e. only two option groups available, one has 0%, second - 100%
+     */
+    public boolean isVsaAndCompatibleWithTbl() {
+	boolean isVsaAndCompatibleWithTbl = false;
+	
+	if (qbOptions.size() == 2) {
+	    float firstGroupMark = qbOptions.get(0).getMaxMark();
+	    float secondGroupMark = qbOptions.get(1).getMaxMark();
+
+	    isVsaAndCompatibleWithTbl = (firstGroupMark == 0 || firstGroupMark == 1)
+		    && (secondGroupMark == 0 || secondGroupMark == 1) && (firstGroupMark != secondGroupMark)
+		    && type == QbQuestion.TYPE_VERY_SHORT_ANSWERS;
+	}
+	
+	return isVsaAndCompatibleWithTbl;
     }
 
     public Long getUid() {
@@ -449,6 +475,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
+    }
+    
+    public boolean isAutocompleteEnabled() {
+	return autocompleteEnabled;
+    }
+
+    public void setAutocompleteEnabled(boolean autocompleteEnabled) {
+	this.autocompleteEnabled = autocompleteEnabled;
     }
 
     public boolean isPrefixAnswersWithLetters() {

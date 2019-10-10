@@ -35,21 +35,21 @@
 	</c:when>
 						
 	<c:when test="${question.type == 3}">
-		responseStr +="${fn:escapeXml(questionResult.answerStringEscaped)}";
+		responseStr +="${fn:escapeXml(questionResult.answerEscaped)}";
 	</c:when>
 						
 	<c:when test="${question.type == 4}">
-		responseStr +="${questionResult.answerStringEscaped}";
+		responseStr +="${questionResult.answerEscaped}";
 	</c:when>
 						
 	<c:when test="${question.type == 5}">
-		<c:if test="${questionResult.answerString != null}">			
+		<c:if test="${questionResult.answer != null}">			
 			responseStr +="${questionResult.answerBoolean}";
 		</c:if>
 	</c:when>
 						
 	<c:when test="${question.type == 6}">
-		responseStr +="${questionResult.answerStringEscaped}";
+		responseStr +="${questionResult.answerEscaped}";
 	</c:when>
 						
 	<c:when test="${question.type == 7}">
@@ -85,7 +85,7 @@
 		</c:forEach>
 							
 	<c:if test="${question.hedgingJustificationEnabled}">
-		responseStr +="${questionResult.answerStringEscaped}";
+		responseStr +="${questionResult.answerEscaped}";
 	</c:if>
 	</c:when>						
 	

@@ -20,8 +20,9 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -148,14 +149,14 @@ public class LearningWebsocketServer {
 
 	    Collection<ScratchieItem> items = LearningWebsocketServer.getScratchieService()
 		    .getItemsWithIndicatedScratches(toolSessionId);
-	    Map<Long, Map<Long, Boolean>> sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
+	    Map<Long, Map<String, Boolean>> sessionCache = LearningWebsocketServer.cache.get(toolSessionId);
 	    for (ScratchieItem item : items) {
 		Long itemUid = item.getUid();
 		// do not init variables below until it's really needed
-		Map<Long, Boolean> itemCache = null;
+		Map<String, Boolean> itemCache = null;
 		ObjectNode itemJSON = null;
-		for (QbOptionDTO answer : item.getOptionDtos()) {
-		    if (answer.isScratched()) {
+		for (OptionDTO optionDto : item.getOptionDtos()) {
+		    if (optionDto.isScratched()) {
 			// answer is scratched, check if it is present in cache
 			if (itemCache == null) {
 			    itemCache = sessionCache.get(itemUid);
@@ -165,17 +166,20 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			Long optionUid = answer.getQbOption().getUid();
-			Boolean answerStoredIsCorrect = answer.getQbOption().isCorrect();
-			Boolean answerCache = itemCache.get(optionUid);
+			String optionUidOrAnswer = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+				? optionDto.getQbOptionUid().toString()
+				: optionDto.getAnswer();
+			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
+
+			Boolean answerCache = itemCache.get(optionUidOrAnswer);
 			// check if the correct answer is stored in cache
-			if ((answerCache == null) || !answerCache.equals(answerStoredIsCorrect)) {
+			if ((answerCache == null) || !answerCache.equals(isCorrectStoredAnswer)) {
 			    // send only updates, nothing Learners are already aware of
-			    itemCache.put(optionUid, answerStoredIsCorrect);
+			    itemCache.put(optionUidOrAnswer, isCorrectStoredAnswer);
 			    if (itemJSON == null) {
 				itemJSON = JsonNodeFactory.instance.objectNode();
 			    }
-			    itemJSON.put(optionUid.toString(), answerStoredIsCorrect);
+			    itemJSON.put(optionUidOrAnswer.toString(), isCorrectStoredAnswer);
 			}
 		    }
 		}
@@ -203,7 +207,7 @@ public class LearningWebsocketServer {
 
     private static final SendWorker sendWorker = new SendWorker();
     // maps toolSessionId -> itemUid -> optionUid -> isCorrect
-    private static final Map<Long, Map<Long, Map<Long, Boolean>>> cache = new ConcurrentHashMap<>();
+    private static final Map<Long, Map<Long, Map<String, Boolean>>> cache = new ConcurrentHashMap<>();
     private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
 
     static {
@@ -223,7 +227,7 @@ public class LearningWebsocketServer {
 	    sessionWebsockets = ConcurrentHashMap.newKeySet();
 	    LearningWebsocketServer.websockets.put(toolSessionId, sessionWebsockets);
 
-	    Map<Long, Map<Long, Boolean>> sessionCache = new TreeMap<>();
+	    Map<Long, Map<String, Boolean>> sessionCache = new TreeMap<>();
 	    LearningWebsocketServer.cache.put(toolSessionId, sessionCache);
 	}
 	sessionWebsockets.add(websocket);

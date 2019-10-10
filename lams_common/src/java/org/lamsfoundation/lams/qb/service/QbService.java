@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -66,6 +67,15 @@ public class QbService implements IQbService {
     @Override
     public List<QbQuestion> getQuestionsByQuestionId(Integer questionId) {
 	return qbDAO.getQuestionsByQuestionId(questionId);
+    }
+
+    @Override
+    public QbQuestion getQuestionByUUID(UUID uuid) {
+	if (uuid == null) {
+	    return null;
+	}
+	List<QbQuestion> result = qbDAO.findByProperty(QbQuestion.class, "uuid", uuid);
+	return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
@@ -603,7 +613,21 @@ public class QbService implements IQbService {
 	    }
 	}
     }
-
+    
+    /**
+     * When exporting a LD, QbQuestion's server-specific detail need not be exported
+     */
+    @Override
+    public void prepareQuestionForExport(QbQuestion qbQuestion) {
+	releaseFromCache(qbQuestion);
+	qbQuestion.clearID();
+	qbQuestion.setQuestionId(null);
+	qbQuestion.setVersion(null);
+	// use plain Java collections instead of Hibernate ones, so XML is more simple
+	qbQuestion.setQbOptions(new ArrayList<>(qbQuestion.getQbOptions()));
+	qbQuestion.setUnits(new ArrayList<>(qbQuestion.getUnits()));
+    }
+    
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }

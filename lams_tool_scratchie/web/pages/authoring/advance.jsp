@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMapID" value="${authoringForm.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="confidenceLevelsActivities" value="${sessionMap.confidenceLevelsActivities}" />
+<c:set var="activitiesProvidingConfidenceLevels" value="${sessionMap.activitiesProvidingConfidenceLevels}" />
+<c:set var="activitiesProvidingVsaAnswers" value="${sessionMap.activitiesProvidingVsaAnswers}" />
 
 <script lang="javascript">
 	$(document).ready(function(){
@@ -10,6 +11,10 @@
 		});
 		<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid == null}">$("#confidence-levels-activity").prop('disabled','disabled'); </c:if>
 		
+		$("#display-activities-providing-vsa-answers").click(function() {
+			$("#activity-providing-vsa-answers").prop("disabled", !$(this).is(':checked'));
+		});
+		<c:if test="${authoringForm.scratchie.activityUiidProvidingVsaAnswers == null}">$("#activity-providing-vsa-answers").prop('disabled','disabled'); </c:if>
 		
 		$("#overwrite-preset-marks").click(function() {
 			$("#preset-marks").prop("disabled", !$(this).is(':checked'));
@@ -66,14 +71,14 @@
 	</div>
 	
 	<div class="checkbox">
-		<c:if test="${confidenceLevelsActivities == null}">
+		<c:if test="${activitiesProvidingConfidenceLevels == null}">
 			<div class="alert-warning" style="margin-bottom: 5px;">
 				<fmt:message key="label.save.learning.design" />
 			</div>
 		</c:if>
 		
 		<c:choose>
-			<c:when test="${fn:length(confidenceLevelsActivities) == 0}">
+			<c:when test="${fn:length(activitiesProvidingConfidenceLevels) == 0}">
 				<fmt:message key="label.no.confidence.levels.activities" />
 			</c:when>
 				
@@ -85,8 +90,31 @@
 				
 					<fmt:message key="label.show.confidence.level" />&nbsp;
 					<form:select path="scratchie.confidenceLevelsActivityUiid" cssClass="form-control input-sm" id="confidence-levels-activity">
-						<c:forEach var="confidenceProvidingActivity" items="${confidenceLevelsActivities}">
+						<c:forEach var="confidenceProvidingActivity" items="${activitiesProvidingConfidenceLevels}">
 							<form:option value="${confidenceProvidingActivity.activityUIID}">${confidenceProvidingActivity.title}</form:option>
+						</c:forEach>
+					</form:select>
+				</label>
+			</c:otherwise>
+		</c:choose>
+	</div>
+	
+	<div class="checkbox">
+		<c:choose>
+			<c:when test="${fn:length(activitiesProvidingVsaAnswers) == 0}">
+				<fmt:message key="label.no.activities.provide.vsa.answers" />
+			</c:when>
+				
+			<c:otherwise>
+				<label for="display-activities-providing-vsa-answers">
+					<input type="checkbox" id="display-activities-providing-vsa-answers"
+							<c:if test="${authoringForm.scratchie.activityUiidProvidingVsaAnswers != null}">checked="true"</c:if>
+					/>
+				
+					<fmt:message key="label.show.vsa.answers" />&nbsp;
+					<form:select path="scratchie.activityUiidProvidingVsaAnswers" cssClass="form-control input-sm" id="activity-providing-vsa-answers">
+						<c:forEach var="activityProvidingVsaAnswers" items="${activitiesProvidingVsaAnswers}">
+							<form:option value="${activityProvidingVsaAnswers.activityUIID}">${activityProvidingVsaAnswers.title}</form:option>
 						</c:forEach>
 					</form:select>
 				</label>

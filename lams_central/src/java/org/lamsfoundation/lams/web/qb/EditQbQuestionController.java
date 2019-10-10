@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.web.qb;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -106,7 +108,7 @@ public class EditQbQuestionController {
      */
     @RequestMapping("/editQuestion")
     public String editQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, IllegalAccessException, InvocationTargetException {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
@@ -116,8 +118,7 @@ public class EditQbQuestionController {
 	//populate question information to its form for editing
 	form.setUid(qbQuestion.getUid());
 	form.setQuestionId(qbQuestion.getQuestionId());
-	//TODO remove hardcoded value, once we transfer contentFolderId from old DB entries
-	form.setContentFolderID(qbQuestion.getContentFolderId() == null ? "temp" : qbQuestion.getContentFolderId());
+	form.setContentFolderID(qbQuestion.getContentFolderId());
 	form.setTitle(qbQuestion.getName());
 	form.setDescription(qbQuestion.getDescription());
 	form.setMaxMark(qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark());
@@ -137,10 +138,12 @@ public class EditQbQuestionController {
 	form.setMaxWordsLimit(qbQuestion.getMaxWordsLimit());
 	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
 	form.setHedgingJustificationEnabled(qbQuestion.isHedgingJustificationEnabled());
+	//TODO check autocomplete is saved and then maybe remove other property copying
+	BeanUtils.copyProperties(form, qbQuestion);
 
 	Integer questionType = qbQuestion.getType();
 	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_ORDERING)
-		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS) || (questionType == QbQuestion.TYPE_SHORT_ANSWER)
+		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS) || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 		|| (questionType == QbQuestion.TYPE_NUMERICAL) || (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
 	    List<QbOption> optionList = qbQuestion.getQbOptions();
 	    request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
@@ -149,7 +152,7 @@ public class EditQbQuestionController {
 	    List<QbQuestionUnit> unitList = qbQuestion.getUnits();
 	    request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
 	}
-	
+
 	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestionUid);
 
 	return findForwardByQuestionType(qbQuestion.getType());
@@ -268,8 +271,8 @@ public class EditQbQuestionController {
 	// without eviction changes would be saved immediately into DB
 	qbService.releaseFromCache(oldQuestion);
 
-	qbQuestion.setName(form.getTitle());
-	qbQuestion.setDescription(form.getDescription());
+	qbQuestion.setName(form.getTitle().strip());
+	qbQuestion.setDescription(form.getDescription().strip());
 
 	if (!form.isAuthoringRestricted()) {
 	    qbQuestion.setMaxMark(form.getMaxMark());
@@ -291,27 +294,35 @@ public class EditQbQuestionController {
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnPartiallyCorrect(form.getFeedbackOnPartiallyCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+	    
 	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setShuffle(form.isShuffle());
-	} else if ((type == QbQuestion.TYPE_SHORT_ANSWER)) {
+	    
+	} else if ((type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
+	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
+	    
 	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
+	    
 	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCorrectAnswer(form.isCorrectAnswer());
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+	    
 	} else if ((type == QbQuestion.TYPE_ESSAY)) {
 	    qbQuestion.setAllowRichEditor(form.isAllowRichEditor());
 	    qbQuestion.setMaxWordsLimit(form.getMaxWordsLimit());
 	    qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
+	    
 	} else if (type == QbQuestion.TYPE_ORDERING) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
+	    
 	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
 	    qbQuestion.setShuffle(form.isShuffle());
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
@@ -322,7 +333,7 @@ public class EditQbQuestionController {
 
 	// set options
 	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE) || (type == QbQuestion.TYPE_ORDERING)
-		|| (type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_SHORT_ANSWER)
+		|| (type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 		|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
 	    Set<QbOption> optionList = getOptionsFromRequest(request, true);
 	    List<QbOption> options = new ArrayList<>();
@@ -429,7 +440,7 @@ public class EditQbQuestionController {
 	    }
 	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
 
-	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_SHORT_ANSWER)) {
+	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
 		if ((name == null) && isForSaving) {
 		    continue;
@@ -497,6 +508,17 @@ public class EditQbQuestionController {
 
 	    optionList.add(option);
 	}
+	
+//	//in case of VSA make sure it has 2 option groups, one of which having 0 maxMark
+//	if (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS && optionList.size() == 1) {
+//	    QbOption option = new QbOption();
+//	    option.setDisplayOrder(1);
+//	    option.setName("");
+//	    option.setMaxMark(0);
+//	    option.setFeedback("");
+//	    optionList.add(option);
+//	}
+	
 	return optionList;
     }
 
@@ -579,8 +601,8 @@ public class EditQbQuestionController {
 	    case QbQuestion.TYPE_MATCHING_PAIRS:
 		forward = "qb/authoring/addmatchingpairs";
 		break;
-	    case QbQuestion.TYPE_SHORT_ANSWER:
-		forward = "qb/authoring/addshortanswer";
+	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
+		forward = "qb/authoring/addVsa";
 		break;
 	    case QbQuestion.TYPE_NUMERICAL:
 		forward = "qb/authoring/addnumerical";

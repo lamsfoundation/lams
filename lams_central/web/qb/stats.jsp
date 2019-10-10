@@ -2,13 +2,14 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-
+<%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="question" value="${stats.question}" />
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>Question statistics</title>
+	<title><fmt:message key="label.qb.stats.title" /></title>
 	
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/defaultHTML_chart.css" rel="stylesheet">
@@ -97,11 +98,10 @@
 		function removeCollectionQuestion(collectionUid) {
 			if (permanentRemove) {
 				if (!permanentRemovePossible) {
-					alert("The question is in one collection only, so it would be permanently removed.\n"
-						  + "It is not possible as the question is used in sequences.");
+					alert('<fmt:message key="error.qb.permanent.remove" />');
 					return;
 				}
-				if (!confirm("The question is in one collection only. Are you sure that you want to remove it permanently?")){
+				if (!confirm('<fmt:message key="label.qb.permanent.remove.confirm" />')){
 					return;
 				}
 			}
@@ -137,10 +137,11 @@
 </lams:head>
 <body class="stripes">
 
-<lams:Page title="Question statistics" type="admin">
+<fmt:message key="label.qb.stats.title" var="label.qb.stats.title" />
+<lams:Page title='${label.qb.stats.title}' type="admin">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Question
+			<fmt:message key="label.qb.stats.question" />
 			
 			<div class="btn-group-xs pull-right">
 				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default thickbox"> 
@@ -156,7 +157,7 @@
 			<div class="question-table">
 				<div class="row">
 					<div class="col-sm-1">
-						Version:
+						<fmt:message key="label.qb.stats.question.version" />:
 					</div>
 					<div class="col-sm-11">
 						<c:out value="${question.version}" />
@@ -164,7 +165,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-1">
-						Title:
+						<fmt:message key="label.qb.stats.question.title" />:
 					</div>
 					<div class="col-sm-11">
 						<c:out value="${question.name}" escapeXml="false" />
@@ -172,7 +173,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-1">
-						Description:
+						<fmt:message key="label.qb.stats.question.description" />:
 					</div>
 					<div class="col-sm-11">
 						<c:out value="${question.description}" escapeXml="false" />
@@ -180,7 +181,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-1">
-						Feedback:
+						<fmt:message key="label.qb.stats.question.feedback" />:
 					</div>
 					<div class="col-sm-11">
 						<c:out value="${question.feedback}" escapeXml="false" />
@@ -188,7 +189,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-1">
-						Mark:
+						<fmt:message key="label.qb.stats.question.mark" />:
 					</div>
 					<div class="col-sm-11">
 						<c:out value="${question.maxMark}" />
@@ -204,13 +205,13 @@
 							#
 						</th>
 						<th>
-							Title
+							<fmt:message key="label.qb.stats.option.title" />
 						</th>
 						<th>
-							Correct?
+							<fmt:message key="label.qb.stats.option.correct" />
 						</th>
 						<th>
-							Average selection<br>(as first choice)
+							<fmt:message key="label.qb.stats.option.average" />
 						</th>
 					</tr>
 					<c:forEach var="option" items="${question.qbOptions}" varStatus="status">
@@ -219,7 +220,15 @@
 								${status.index + 1}
 							</td>
 							<td>
-								<c:out value="${option.name}" escapeXml="false" />
+								<c:choose>
+									<c:when test="${question.type == 3}">
+										${fn:replace(option.name, newLineChar, ', ')}
+									</c:when>
+									<c:otherwise>
+										
+										<c:out value="${option.name}" escapeXml="false" />
+									</c:otherwise>
+								</c:choose>
 							</td>
 							<td>
 								<c:if test="${option.correct}">
@@ -227,7 +236,6 @@
 								</c:if>
 							</td>
 							<td>
-								<%--(${empty stats.answersRaw[option.uid] ? 0 : stats.answersRaw[option.uid]})--%>
 								${stats.answersPercent[option.uid]}%
 							</td>
 						</tr>
@@ -240,7 +248,7 @@
 	<c:if test="${not empty question.qbOptions}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				Average selection chart
+				<fmt:message key="label.qb.stats.chart" />
 			</div>
 			<div id="chartDiv" class="panel-body">
 			</div>
@@ -249,21 +257,21 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Burning questions
+			<fmt:message key="label.qb.stats.burning.questions" />
 		</div>
 		<div class="panel-body">
 			<c:choose>
 				<c:when test="${empty stats.burningQuestions}">
-					This question does not have any burning questions
+					<fmt:message key="label.qb.stats.burning.questions.none" />
 				</c:when>
 				<c:otherwise>
 					<table class="table table-striped qb-stats-table">
 						<tr>
 							<th>
-								Question
+								<fmt:message key="label.qb.stats.question" />
 							</th>
 							<th>
-								Likes
+								<fmt:message key="label.qb.stats.burning.questions.likes" />
 							</th>
 						</tr>
 						<c:forEach var="question" items="${stats.burningQuestions}">
@@ -284,39 +292,39 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Usage in active lessons
+			<fmt:message key="label.qb.stats.usage" />
 		</div>
 		<div class="panel-body">
 			<c:choose>
 				<c:when test="${empty stats.activities}">
-					This question is not used in any lesson
+					<fmt:message key="label.qb.stats.usage.none" />
 				</c:when>
 				<c:otherwise>
 					<table id="usage" class="table table-striped qb-stats-table">
 						<tr>
-							<th>
-								Organisation
+							<th>label.qb.stats.usage.course
+								<fmt:message key="label.qb.stats.usage.course" />
 							</th>
 							<th>
-								Lesson
+								<fmt:message key="label.qb.stats.usage.lesson" />
 							</th>
 							<th>
-								Activity
+								<fmt:message key="label.qb.stats.usage.activity" />
 							</th>
 							<th>
-								Tool type
+								<fmt:message key="label.qb.stats.usage.type" />
 							</th>
 							<th>
-								Test participant count
+								<fmt:message key="label.qb.stats.usage.participant.count" />
 							</th>
 							<th>
-								Difficulty index
+								<fmt:message key="label.qb.stats.usage.difficulty" />
 							</th>
 							<th>
-								Discrimination index
+								<fmt:message key="label.qb.stats.usage.discrimination" />
 							</th>
 							<th>
-								Point biserial
+								<fmt:message key="label.qb.stats.usage.biserial" />
 							</th>
 						</tr>
 						<c:forEach var="activityDTO" items="${stats.activities}">
@@ -371,12 +379,12 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Previous versions
+			<fmt:message key="label.qb.stats.versions" />
 		</div>
 		<div class="panel-body">
 			<c:choose>
 				<c:when test="${empty stats.versions}">
-					This question does not have any previous versions
+					<fmt:message key="label.qb.stats.versions.none" />
 				</c:when>
 				<c:otherwise>
 					<table class="table table-striped qb-stats-table">
@@ -385,10 +393,10 @@
 								#
 							</th>
 							<th>
-								Created date
+								<fmt:message key="label.qb.stats.versions.created" />
 							</th>
 							<th>
-								Created ago
+								<fmt:message key="label.qb.stats.versions.created.ago" />
 							</th>
 						</tr>
 						<c:forEach var="version" items="${stats.versions}">
@@ -412,14 +420,14 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			Collections
+			<fmt:message key="label.qb.stats.collections" />
 		</div>
 		<div class="panel-body">
 			<div class="container-fluid">			
 				<c:if test="${not empty availableCollections and transferAllowed}">
 					<div class="row">
 						<div class="col-xs-12 col-md-2 middle-cell">
-							Transfer questions to
+							<fmt:message key="label.qb.stats.collections.transfer" />
 						</div>
 						<div class="col-xs-12 col-md-6">
 							<select class="form-control" id="targetCollectionSelect">
@@ -431,8 +439,12 @@
 							</select>
 						</div>
 						<div class="col-xs-12 col-md-4">
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">Add</button>
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">Copy</button>
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">
+								<fmt:message key="label.qb.stats.collections.transfer.add" />
+							</button>
+							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">
+								<fmt:message key="label.qb.stats.collections.transfer.copy" />
+							</button>
 						</div>
 					</div>
 				</c:if>
@@ -440,7 +452,7 @@
 				<div class="row">
 					<div class="col-xs-0 col-md-2"></div>
 					<div class="col-xs-12 col-md-8 header-column">
-						Existing collections
+						<fmt:message key="label.qb.stats.collections.existing" />
 					</div>
 					<div class="col-xs-0 col-md-2"></div>
 				</div>
@@ -453,7 +465,9 @@
 						</div>
 						<div class="col-xs-12 col-md-2">
 							<c:if test="${transferAllowed}">
-								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">Remove</button>
+								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">
+									<fmt:message key="label.qb.stats.collections.remove" />
+								</button>
 							</c:if>
 						</div>
 					</div>
@@ -469,19 +483,19 @@
 		<c:otherwise>
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					Learning outcomes
+					<fmt:message key="label.qb.stats.outcomes" />
 				</div>
 				<div class="panel-body">
 					<c:choose>
 						<c:when test="${empty outcomes}">
-							This question does not have any learning outcomes
+							<fmt:message key="label.qb.stats.outcomes.none" />
 						</c:when>
 						<c:otherwise>
 							<div class="container-fluid">			
 								<div class="row">
 									<div class="col-xs-0 col-md-2"></div>
 									<div class="col-xs-12 col-md-8 header-column">
-										Existing outcomes
+										<fmt:message key="label.qb.stats.outcomes.existing" />
 									</div>
 									<div class="col-xs-0 col-md-2"></div>
 								</div>

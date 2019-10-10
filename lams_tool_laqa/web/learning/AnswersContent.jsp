@@ -4,7 +4,7 @@
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" scope="request" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request" />
 <c:set var="mode" value="${sessionMap.mode}" scope="request" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request" />
@@ -226,56 +226,50 @@
 		</c:if>
 
 		<!-- End advanced settings and notices -->
+		<form:hidden path="toolSessionID" id="tool-session-id" />
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="questionIndex" />
+		<form:hidden path="totalQuestionCount" />
 
+		<div class="panel">
+			<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+		</div>
 
-			<form:hidden path="toolSessionID" id="tool-session-id" />
-			<form:hidden path="userID" />
-			<form:hidden path="httpSessionID" />
-			<form:hidden path="questionIndex" />
-			<form:hidden path="totalQuestionCount" />
-
+		<lams:errors/>
 			
-
-			<div class="panel">
-				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-			</div>
-
-			<lams:errors/>
-			
-			<c:choose>
-				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
-
-					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-						<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
-							<p>
-								<fmt:message key="label.feedback.seq" />&nbsp;
-								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
-								<fmt:message key="label.questions.simple" />
-							</p>
-						</c:if>
-					</c:if>
-
-					<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
+		<c:choose>
+			<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
+				<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
+					<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
 						<p>
-							<fmt:message key="label.questions.remaining" />&nbsp;
-							<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+							<fmt:message key="label.feedback.seq" />&nbsp;
+							<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
+							<fmt:message key="label.questions.simple" />
 						</p>
 					</c:if>
+				</c:if>
 
-					<jsp:include page="/learning/SequentialAnswersContent.jsp" />
-				</c:when>
+				<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
+					<p>
+						<fmt:message key="label.questions.remaining" />&nbsp;
+						<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+					</p>
+				</c:if>
 
-				<c:otherwise>
+				<jsp:include page="/learning/SequentialAnswersContent.jsp" />
+			</c:when>
 
-					<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-						<fmt:message key="label.feedback.combined" /> &nbsp <c:out
-							value="${generalLearnerFlowDTO.remainingQuestionCount}" />
-						<fmt:message key="label.questions.simple" />
-					</c:if>
+			<c:otherwise>
+				<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
+					<fmt:message key="label.feedback.combined" /> &nbsp <c:out
+						value="${generalLearnerFlowDTO.remainingQuestionCount}" />
+					<fmt:message key="label.questions.simple" />
+				</c:if>
 
-					<jsp:include page="/learning/CombinedAnswersContent.jsp" />
-				</c:otherwise>
-			</c:choose>
+				<jsp:include page="/learning/CombinedAnswersContent.jsp" />
+			</c:otherwise>
+		</c:choose>
 
 	<div id="footer"></div>
 

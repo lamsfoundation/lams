@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>Collection management</title>
+	<title><fmt:message key="label.qb.collection.management" /></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<lams:css/>
@@ -73,14 +73,14 @@
 				    rowList:[10,20,30,40,50,100],
 				    rowNum: 10,
 				    colNames:[
-				    	"ID",
-				    	"Name",
+				    	'<fmt:message key="label.qb.collection.grid.id" />',
+				    	'<fmt:message key="label.qb.collection.grid.name" />',
 				    	"questionType",
 				    	"questionVersion",
-				    	"Learning Outcomes",
+				    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
 				    	// this column is hidden, so data coming from controller can be the same as for single collection view
-				    	"Used in # of lessons",
-				    	"Stats"
+				    	'usage',
+				    	'<fmt:message key="label.qb.collection.grid.stats" />'
 				    ],
 				    colModel:[
 				    	{name:'id', index:'question_id', sortable:true,  width: 10},
@@ -99,7 +99,7 @@
 					},
 				    loadError: function(xhr,st,err) {
 				    	collectionGrid.clearGridData();
-					   	alert("Error!");
+					   	alert('<fmt:message key="label.qb.collection.grid.error" />');
 				    }
 				}).jqGrid('filterToolbar');
 			});
@@ -125,7 +125,7 @@
 			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
 				if ($(this).data('collectionName').trim().toLowerCase() == lower) {
-					alert('Collection with such name already exists');
+					alert('<fmt:message key="label.qb.collection.name.duplicate.error" />');
 					name = null;
 					return false;
 				}
@@ -147,7 +147,8 @@
 	</script>
 </lams:head>
 <body class="stripes">
-<lams:Page title="Collection management" type="admin">
+<fmt:message key="label.qb.collection.management" var="label.qb.collection.management" />
+<lams:Page title="${label.qb.collection.management}" type="admin">
 	<%-- This option can be switched off in sysadmin --%>
 	<c:if test="${createCollectionAllowed}">
 		<div id="add-collection-div">
@@ -162,12 +163,12 @@
 				<a href="<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}"><c:out value="${collection.name}" />
 					<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
 					<c:if test="${collection.personal}">
-						<span class="grid-collection-private"><i class="fa fa-lock"></i> Private</span>
+						<span class="grid-collection-private"><i class="fa fa-lock"></i> <fmt:message key="label.qb.collection.private" /></span>
 					</c:if>
 				</a>
 				<button class="btn btn-primary btn-xs edit-button"
 						onClick="javascript:document.location.href=`<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}`">
-					Edit
+					<fmt:message key="label.qb.collection.edit" />
 				</button>
 			</c:set>
 				

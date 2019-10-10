@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
@@ -46,8 +45,8 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     @Override
     public QaQueContent getQuestionByDisplayOrder(Integer displayOrder, Long contentUid) {
 	List<QaQueContent> list = getSessionFactory().getCurrentSession()
-		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER)
-		.setParameter("displayOrder", displayOrder).setParameter("uid", contentUid).list();
+		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_DISPLAY_ORDER).setParameter("displayOrder", displayOrder)
+		.setParameter("uid", contentUid).list();
 
 	if (list != null && list.size() > 0) {
 	    QaQueContent qa = list.get(0);
@@ -82,8 +81,8 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<QaQueContent> getAllQuestionEntries(final long contentUid) {
-	List<QaQueContent> list = getSessionFactory().getCurrentSession().createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID)
-		.setParameter("uid", contentUid).list();
+	List<QaQueContent> list = getSessionFactory().getCurrentSession()
+		.createQuery(QaQuestionDAO.LOAD_QUESTION_BY_CONTENT_UID).setParameter("uid", contentUid).list();
 
 	return list;
     }
@@ -94,13 +93,13 @@ public class QaQuestionDAO extends LAMSBaseDAO implements IQaQuestionDAO {
     }
 
     @Override
-    public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) {
-	getSession().saveOrUpdate(qaQuestion);
+    public void saveOrUpdate(Object object) {
+	getSession().saveOrUpdate(object);
     }
 
     @Override
     public void removeQueContent(long qaQueContentId) {
-	QaQueContent qaQuestion = (QaQueContent) getSession().load(QaQueContent.class, new Long(qaQueContentId));
+	QaQueContent qaQuestion = getSession().load(QaQueContent.class, new Long(qaQueContentId));
 	getSession().delete(qaQuestion);
     }
 

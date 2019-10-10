@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
-<c:set var="tool"><lams:WebAppURL/></c:set>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
@@ -21,14 +17,12 @@
 
 	<!-- ********************  CSS ********************** -->
 	<lams:css />
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
 	<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	<style type="text/css">
-
-	</style>
 
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -47,53 +41,200 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
+		var assessmentAnswers = new Map([
+			<c:forEach var="item" items="${sessionMap.itemList}">
+				[${item.uid}, [
+				<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
+					 <c:if test="${not empty optionDto.answer}">"${optionDto.answer}",</c:if>
+				</c:forEach>
+				]],
+			</c:forEach>
+		]);
 
 		$(document).ready(function(){
 			//initialize tooltips showing user names next to confidence levels
 			$('[data-toggle="tooltip"]').tooltip();
+
+			//handler for VSA input fields
+			$('.submit-user-answer-input').keypress(function(event){
+				var keycode = (event.keyCode ? event.keyCode : event.which);
+				if(keycode == '13') {
+					var itemUid = $(this).data("item-uid");
+					scratchVsa(itemUid);
+					return false;
+				}
+			});
+
+			//handler for VSA submit buttons
+			$(".submit-user-answer").on('click', function(){
+				var itemUid = $(this).data("item-uid");
+				scratchVsa(itemUid);
+				return false;
+			});
+
+			//autocomplete for VSA
+			$('.ui-autocomplete-input').each(function(){
+				$(this).autocomplete({
+					'source' : '<c:url value="/learning/vsaAutocomplete.do"/>?itemUid=' + $(this).data("item-uid"),
+					'delay'  : 500,
+					'minLength' : 3
+				});
+			});
 		});
-	
+
+		//scratch image (used by both scratchMcq() and scratchVsa())
 		function scratchImage(itemUid, optionUid, isCorrect) {
 			// first show animation, then put static image
 			var imageSuffix = isCorrect ? 'correct' : 'wrong';
-	    		$('#image-' + itemUid + '-' + optionUid).load(function(){
-	    			var image = $(this).off("load");
-	    			// show static image after animation
-	    			setTimeout(
-	    	    			function(){
-	    					image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
-	    				}, 
-	    				1300
-	    			);
-	    		}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
+			var image = $('#image-' + itemUid + '-' + optionUid);
+
+			//show VSA question image 
+			if (image.css('visibility') != 'visible') {
+				image.css('visibility', 'visible');
+			}
+			
+			image.load(function(){
+	    		var image = $(this).off("load");
+	    		// show static image after animation
+	    		setTimeout(
+	    			function(){
+	    				image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
+	    			}, 
+	    			1300
+	    		);
+	    	}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
 		}
 
-		function scratchItem(itemUid, optionUid){
+		//scratch MCQ answer
+		function scratchMcq(itemUid, optionUid){
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
-		            	if (json == null) {
-		            		return false;
-		            	}
+		            if (json == null) {
+		            	return false;
+		            }
 		            	
-		            	scratchImage(itemUid, optionUid, json.optionCorrect);
+		            scratchImage(itemUid, optionUid, json.optionCorrect);
 		            	
-		            	if (json.optionCorrect) {
-		            		//disable scratching
-		            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
-		            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
-		            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+		            if (json.optionCorrect) {
+		            	//disable scratching
+		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
+		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
+		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
-		            	} else {
-		            		var id = '-' + itemUid + '-' + optionUid;
-		            		$('#imageLink' + id).removeAttr('onclick');
-		            		$('#imageLink' + id).css('cursor','default');
-		            	}
+		            } else {
+		            	var id = '-' + itemUid + '-' + optionUid;
+		            	$('#imageLink' + id).removeAttr('onclick');
+		            	$('#imageLink' + id).css('cursor','default');
+		            }
 	            }
 	       	});
+		}
+
+		//scratch VSA answer
+		function scratchVsa(itemUid) {
+			var input = $("#input-" + itemUid),
+				answer = input.val();
+
+			if (answer == "") {
+				return;
+			}
+
+			//determine if such answer is available in the list
+			var answerRowIndex = -1;
+			assessmentAnswers.get(itemUid).forEach(function(assessmentAnswer, index) {
+				if (assessmentAnswer == answer) {
+					answerRowIndex = index;
+				}
+			});
+
+			var isRecordVsaAnswerRequired = true;
+			if (answerRowIndex != -1) {
+				var isScrathed = $('tr#tr-' + answerRowIndex + ' img[src*="scratchie-correct.png"], tr#tr-' + answerRowIndex + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
+				//highlight already scratched answer
+				if (isScrathed) {
+					var tableRowTohighlight = $("tr#tr-" + answerRowIndex, "#scratches-" + itemUid);
+					$([document.documentElement, document.body]).animate(
+						{
+				        	scrollTop: tableRowTohighlight.offset().top
+				    	}, 
+				    	1000, 
+				    	function() {
+				    		tableRowTohighlight.effect("highlight", 1500);
+				    	}
+				    );
+						
+					isRecordVsaAnswerRequired = false;
+				}
+
+			//if answer is not available in the list, add it to the list
+			} else {
+				paintNewVsaAnswer(itemUid, answer);
+			}
+
+			if (isRecordVsaAnswerRequired) {
+				$.ajax({
+			    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
+			        data: {
+			           	sessionMapID: "${sessionMapID}", 
+			           	itemUid: itemUid,
+			           	answer: answer 
+					},
+			        dataType: 'json',
+			        type: 'post',
+			        success: function (json) {
+				    	if (json == null) {
+				           	return false;
+				        }
+
+				        scratchImage(itemUid, hashCode(answer), json.isAnswerCorrect);
+				            	
+				        if (json.isAnswerCorrect) {
+				           	//disable further answering
+				           	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+					            
+					        //disable submit button
+				           	$("#type-your-answer-" + itemUid).hide();
+				        }
+			        }
+		       	});
+			}
+
+	        //blank input field
+			input.val("");
+		}
+
+		//add new VSA answer to the table (required in case user entered answer not present in the previous answers)
+		function paintNewVsaAnswer(itemUid, answer) {
+			var answerRowIndex = assessmentAnswers.get(itemUid).length;
+			
+			var trElem = 
+				'<tr id="tr-' + answerRowIndex + '">' +
+					'<td style="width: 40px; border: none;">' +
+						'<img src="<lams:WebAppURL/>includes/images/answer-' + answerRowIndex + '.png" class="scartchie-image" id="image-' + itemUid + '-' + hashCode(answer) + '" />' +
+					'</td>' +
+
+					'<td class="answer-with-confidence-level-portrait">' +
+						'<div class="answer-description">' +
+							answer +
+						'</div>' +
+						'<hr class="hr-confidence-level" />' +
+						'<div style="padding-bottom: 10px;">' +
+							'<lams:Portrait userId="${sessionMap.groupLeaderUserId}"/>' +
+						'</div>' +
+					'</td>' +
+				'</tr>';
+			$("table#scratches-" + itemUid).append(trElem);
+			assessmentAnswers.get(itemUid).push(answer);
+		}
+
+		//a direct replacement for Java's String.hashCode() method 
+		function hashCode(str) {
+			return str.split('').reduce((prevHash, currVal) =>
+		    	(((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
 		}
 
 		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
@@ -118,7 +259,7 @@
 				    	
 			        		//store date when user has started activity with time limit
 				        $.ajax({
-				        		async: true,
+				        	async: true,
 				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
 				            data: 'sessionMapID=${sessionMapID}',
 				            type: 'post'
@@ -179,7 +320,6 @@
 
 		//autosave feature
 		<c:if test="${isUserLeader && (mode != 'teacher')}">
-			
 			var autosaveInterval = "60000"; // 60 seconds interval
 			window.setInterval(
 				function(){
@@ -195,8 +335,8 @@
 			                	);
 		                }
 					});
-	        		}, 
-	        		autosaveInterval
+	        	}, 
+	        	autosaveInterval
 	        );
 		</c:if>
 
@@ -206,16 +346,16 @@
 			var proceed = true;
 			//ask for leave confirmation only if time limit is not expired
 			if (!isTimelimitExpired) {
-				var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
+				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-][class=item-required]:visible").length;
 				proceed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;	
 			}
 			
 			if (proceed) {
 				document.getElementById("finishButton").disabled = true;
 
-		        	var myForm = $('#burning-questions');
-		        	myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
-		        	myForm.submit();
+		        var myForm = $('#burning-questions');
+		        myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
+		        myForm.submit();
 			}
 			
 			return false;

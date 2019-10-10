@@ -129,11 +129,11 @@ public class PortraitTag extends BodyTagSupport {
 		bldr.append(CSS_ROUND);
 	    }
 	    String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
-	    bldr.append("\" src='").append(serverURL);
+	    bldr.append("\" src=\"").append(serverURL);
 	    if (!serverURL.endsWith("/")) {
 		bldr.append("/");
 	    }
-	    bldr.append("download?preferDownload=false&uuid=").append(portraitId).append(sizes[1]).append("'></img>");
+	    bldr.append("download?preferDownload=false&uuid=").append(portraitId).append(sizes[1]).append("\"></img>");
 	    return bldr.toString();
 	} else {
 	    return new StringBuilder("<div class=\"").append(getGenericSizeClass()).append(PORTRAIT_VERSION_SUFFIX)

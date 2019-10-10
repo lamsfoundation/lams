@@ -34,10 +34,6 @@ public interface IQaContentDAO {
 
     void saveOrUpdateQa(QaContent qa);
 
-    void saveQa(QaContent qa);
-
-    void updateQa(QaContent qa);
-
     void removeQa(Long qaContentId);
 
     void deleteQa(QaContent qa);

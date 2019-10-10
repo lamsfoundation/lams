@@ -20,70 +20,70 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 	<script type="text/JavaScript">
-	  function submitMethod(actionMethod) {
-		   var form = document.forms.authoringForm;
-		   form.action=actionMethod+".do"; 
-		   form.submit();
-		  }
-		  
-		  function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-		   var form = document.forms.authoringForm;
-		   if (!form.questionIndex) {
-		    form = form[0];
-		   }
-		   form.questionIndex.value=questionIndexValue; 
-		   submitMethod(actionMethod);
-		  }
-		  function doSelectTab(tabId) {
-			selectTab(tabId);
-		  }
+		function submitMethod(actionMethod) {
+			var form = document.forms.authoringForm;
+			form.action=actionMethod+".do"; 
+			form.submit();
+		}
 
-		function refreshThickbox() {
-			tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
-		};
+		function doSelectTab(tabId) {
+			selectTab(tabId);
+		}
+
+        function validateQuestionsNotEmpty() {
+            //remind teacher he forgot to add questions
+            var questionsCount = $("#itemList tr").length;
+			if (questionsCount == 0) {
+				alert("<fmt:message key="label.no.added.questions"/>");
+				return false;
+			}
+			return true;
+        }
 	</script>
 </lams:head>
 
 <body class="stripes">
-<form:form action="submitAllContent.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
-	<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
+<form:form action="submitAllContent.do" modelAttribute="authoringForm" method="POST" id="authoringForm"
+	onsubmit="return validateQuestionsNotEmpty();">
+	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
 	<form:hidden path="mode" value="${mode}" />
+	<form:hidden path="qa.qaContentId" />
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />
-	<form:hidden path="httpSessionID"/>		
+	<form:hidden path="sessionMapID"/>		
 	
-<lams:Page title="${title}" type="navbar">
-	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">
-		<lams:Tab id="1" key="label.basic" />
-		<lams:Tab id="2" key="label.advanced" />
-		<lams:Tab id="3" key="label.conditions" />
-	</lams:Tabs>
-
-	<lams:TabBodyArea>
-		<lams:errors/>
-				
-		<lams:TabBodys>
-			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-			<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
-	    </lams:TabBodys>
-	    
-		<lams:AuthoringButton formID="authoringForm"
-			clearSessionActionUrl="/clearsession.do"
-			toolSignature="<%=QaAppConstants.MY_SIGNATURE%>"
-			accessMode="${mode}"
-			defineLater="${mode == 'teacher'}"
-			cancelButtonLabelKey="label.cancel"
-			saveButtonLabelKey="label.save"
-			toolContentID="${authoringForm.toolContentID}"
-			contentFolderID="${authoringForm.contentFolderID}" />
-	</lams:TabBodyArea>
+	<lams:Page title="${title}" type="navbar">
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">
+			<lams:Tab id="1" key="label.basic" />
+			<lams:Tab id="2" key="label.advanced" />
+			<lams:Tab id="3" key="label.conditions" />
+		</lams:Tabs>
 	
-	<div id="footer"></div>
-	
-</lams:Page>
+		<lams:TabBodyArea>
+			<lams:errors/>
+					
+			<lams:TabBodys>
+				<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+				<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+				<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
+		    </lams:TabBodys>
+		    
+			<lams:AuthoringButton formID="authoringForm"
+				clearSessionActionUrl="/clearsession.do"
+				toolSignature="<%=QaAppConstants.MY_SIGNATURE%>"
+				accessMode="${mode}"
+				defineLater="${mode == 'teacher'}"
+				cancelButtonLabelKey="label.cancel"
+				saveButtonLabelKey="label.save"
+				toolContentID="${authoringForm.toolContentID}"
+				contentFolderID="${authoringForm.contentFolderID}" />
+		</lams:TabBodyArea>
+		
+		<div id="footer"></div>
+		
+	</lams:Page>
 </form:form>
 </body>
 </lams:html>

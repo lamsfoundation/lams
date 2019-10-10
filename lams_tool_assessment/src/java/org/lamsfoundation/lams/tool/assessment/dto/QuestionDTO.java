@@ -61,6 +61,8 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     private int minWordsLimit;
 
     private boolean hedgingJustificationEnabled;
+    
+    private boolean autocompleteEnabled;
 
     private boolean correctAnswersDisclosed;
 
@@ -70,7 +72,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     
     private String titleEscaped;
 
-    private String answerString;
+    private String answer;
 
     private float answerFloat;
 
@@ -137,6 +139,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 	this.maxWordsLimit = qbQuestion.getMaxWordsLimit();
 	this.minWordsLimit = qbQuestion.getMinWordsLimit();
 	this.hedgingJustificationEnabled = qbQuestion.isHedgingJustificationEnabled();
+	this.autocompleteEnabled = qbQuestion.isAutocompleteEnabled();
 
 	optionDtos = new TreeSet<>();
 	for (QbOption option : qbQuestion.getQbOptions()) {
@@ -332,6 +335,14 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
+    
+    public boolean isAutocompleteEnabled() {
+	return autocompleteEnabled;
+    }
+
+    public void setAutocompleteEnabled(boolean autocompleteEnabled) {
+	this.autocompleteEnabled = autocompleteEnabled;
+    }
 
     public boolean isCorrectAnswersDisclosed() {
 	return correctAnswersDisclosed;
@@ -342,12 +353,12 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     }
     // ============= variable properties =============
 
-    public String getAnswerString() {
-	return answerString;
+    public String getAnswer() {
+	return answer;
     }
 
-    public void setAnswerString(String answerString) {
-	this.answerString = answerString;
+    public void setAnswer(String answer) {
+	this.answer = answer;
     }
 
     public float getAnswerFloat() {

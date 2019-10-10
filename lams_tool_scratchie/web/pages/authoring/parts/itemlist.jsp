@@ -39,7 +39,18 @@
 					
 				    <span class='pull-right alert-info btn-xs loffset5 roffset5'>
 				    	v.&nbsp;${item.qbQuestion.version}
-				    </span>		
+				    </span>
+				    
+				   	<span class='pull-right alert-info btn-xs'>
+						<c:choose>
+							<c:when test="${item.qbQuestion.type == 1}">
+								<fmt:message key="label.type.multiple.choice" />
+							</c:when>
+							<c:when test="${item.qbQuestion.type == 3}">
+								<fmt:message key="label.type.short.answer" />
+							</c:when>
+						</c:choose>
+	       			</span>
 				</td>
 				
 				<c:if test="${!isAuthoringRestricted}">

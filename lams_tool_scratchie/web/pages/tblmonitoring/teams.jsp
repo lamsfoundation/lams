@@ -22,10 +22,10 @@
 										${ALPHABET[j.index]}.
 									</td>
 									<td>
-										<c:out value="${optionDto.qbOption.name}" escapeXml="false"/>
+										<c:out value="${optionDto.answer}" escapeXml="false"/>
 										
 										<c:choose>
-											<c:when test="${optionDto.qbOption.correct}">
+											<c:when test="${optionDto.correct}">
 												<i class="fa fa-check-square"></i>
 											</c:when>
 											<c:otherwise>

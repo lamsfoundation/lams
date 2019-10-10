@@ -95,7 +95,7 @@
 				<div class="panel-body">
 				
 					<span class="burning-question-description">
-						<c:out value="${item.description}" escapeXml="false"/> 
+						<c:out value="${item.qbQuestion.description}" escapeXml="false"/> 
 					</span>
 					
 					<div class="table-responsive">

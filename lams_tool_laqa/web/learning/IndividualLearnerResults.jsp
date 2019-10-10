@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 
 <lams:html>
 <lams:head>
@@ -51,26 +50,29 @@
 		</c:if>
 		<!-- End announcements -->
 
-			<form:hidden path="toolSessionID" />
-			<form:hidden path="userID" />
-			<form:hidden path="httpSessionID" />
-			<form:hidden path="totalQuestionCount" />
+		<form:hidden path="toolSessionID" />
+		<form:hidden path="userID" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="totalQuestionCount" />
 
-			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+		<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
 				<div class="row no-gutter">
 					<div class="col-xs-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
-								<strong> <fmt:message key="label.question" /> <c:out value="${questionEntry.key}" escapeXml="false" />:
-								</strong> <br>
-								<c:out value="${questionEntry.value.question}" escapeXml="false" />
+								<strong>
+									<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" /> 
+								</strong> 
+								<br>
+								
+								<c:out value="${questionEntry.value.description}" escapeXml="false" />
 							</div>
+							
 							<div class="panel-body">
 
 								<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 									<c:if test="${answerEntry.key == questionEntry.key}">
-
 										<h5>
 											<fmt:message key="label.learning.yourAnswer" />
 										</h5>
@@ -78,14 +80,11 @@
 										<div class="panel" id="answer${questionEntry.key}">
 											<c:out value="${answerEntry.value}" escapeXml="false" />
 										</div>
-
-
 									</c:if>
 								</c:forEach>
 
+								<!-- Feedback -->
 								<c:if test="${(questionEntry.value.feedback != '') && (questionEntry.value.feedback != null) }">
-									<!-- Feedback -->
-
 									<div class="row no-gutter">
 										<div class="col-xs-12">
 											<div class="panel panel-default voffset5" id="feedback${questionEntry.key}">
@@ -98,70 +97,62 @@
 											</div>
 										</div>
 									</div>
-
-									<!-- End feedback -->
 								</c:if>
 
-
-
 							</div>
-							<!-- End panel body -->
 						</div>
 					</div>
 				</div>
 				<div class="shading-bg">
 					<p></p>
-
-
-
 				</div>
 
-			</c:forEach>
+		</c:forEach>
 
-			<hr class="msg-hr" />
+		<hr class="msg-hr" />
 
-			<div class="voffset10">
-				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<button type="button" name="redoQuestions" class="btn btn-default pull-left"
-						onclick="submitMethod('redoQuestions');">
-						<fmt:message key="label.redo" />
-					</button>
-				</c:if>
+		<div class="voffset10">
+			<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
+				<button type="button" name="redoQuestions" class="btn btn-default pull-left"
+					onclick="submitMethod('redoQuestions');">
+					<fmt:message key="label.redo" />
+				</button>
+			</c:if>
 
-				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-					<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"
-						class="btn btn-default pull-right">
-						<fmt:message key="label.allResponses" />
-					</button>
-				</c:if>
+			<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
+				<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"
+					class="btn btn-default pull-right">
+					<fmt:message key="label.allResponses" />
+				</button>
+			</c:if>
 
-				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
-					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-						<div class="space-bottom-top align-right">
-							<button type="button" id="finishButton" 
-								onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
-								<c:choose>
-									<c:when test="${sessionMap.isLastActivity}">
-										<fmt:message key="button.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="button.endLearning" />
-									</c:otherwise>
-								</c:choose>
+			<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
+				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+					<div class="space-bottom-top align-right">
+						<button type="button" id="finishButton" 
+							onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
+							<c:choose>
+								<c:when test="${sessionMap.isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.endLearning" />
+								</c:otherwise>
+							</c:choose>
 
-							</button>
-						</div>
-					</c:if>
-
-					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
-							class="btn btn-primary pull-right">
-							<fmt:message key="label.continue" />
 						</button>
-					</c:if>
+					</div>
 				</c:if>
 
-			</div>
+				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+					<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
+						class="btn btn-primary pull-right">
+						<fmt:message key="label.continue" />
+					</button>
+				</c:if>
+			</c:if>
+
+		</div>
 
 
 		<div id="footer"></div>

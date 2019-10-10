@@ -7,13 +7,13 @@
 		<c:forEach var="answer" items="${optionList}" varStatus="status">
 			<tr>
 				<td class="text-center" style="width:5%">
-					<input type="hidden" name="optionOrderId${status.index}" id="optionOrderId${status.index}" value="${answer.displayOrder}">
+					<input type="hidden" name="optionDisplayOrder${status.index}" id="optionDisplayOrder${status.index}" value="${answer.displayOrder}">
 					<input type="hidden" name="optionUid${status.index}" id="optionUid${status.index}" value="${answer.uid}">
 					<span class="field-name">&#${status.index + 65};)</span>
 				</td>
 				
 				<td style="background:none;">	
-					<lams:CKEditor id="optionDescription${status.index}" value="${answer.name}" contentFolderID="${contentFolderID}" />					
+					<lams:CKEditor id="optionName${status.index}" value="${answer.name}" contentFolderID="${contentFolderID}" />					
 				</td>
 				
 				<td class="text-right" style="width:15%">

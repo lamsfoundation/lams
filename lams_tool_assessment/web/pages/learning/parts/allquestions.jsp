@@ -35,7 +35,7 @@
 						<%@ include file="matchingpairs.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 3}">
-						<%@ include file="shortanswer.jsp"%>
+						<%@ include file="vsa.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 4}">
 						<%@ include file="numerical.jsp"%>

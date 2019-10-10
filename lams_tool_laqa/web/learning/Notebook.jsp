@@ -23,7 +23,7 @@
 
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="userID" />
-		<form:hidden path="httpSessionID" />
+		<form:hidden path="sessionMapID" />
 		<form:hidden path="totalQuestionCount" />
 
 			<p>

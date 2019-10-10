@@ -95,26 +95,26 @@ label {
 }
 
 /*Style for text input fields. Rule does not apply in case this input has an error*/
-:not(.has-error) > input.borderless-text-input{
+:not(.has-error) > .borderless-text-input{
     border: 0;
     box-shadow: none;
     padding: 0;
 }
 
 /* Remove bold style from title field */
-input.borderless-text-input::-webkit-input-placeholder {
+.borderless-text-input::-webkit-input-placeholder {
     font-weight: normal;
     color:#999;
 }
-input.borderless-text-input::-moz-placeholder {
+.borderless-text-input::-moz-placeholder {
     font-weight: normal;
     color:#999;
 }
-input.borderless-text-input:-ms-input-placeholder {
+.borderless-text-input:-ms-input-placeholder {
     font-weight: normal;
     color:#999;
 }
-input.borderless-text-input:-o-input-placeholder {
+.borderless-text-input:-o-input-placeholder {
     font-weight: normal;
     color:#999;
 }
@@ -137,7 +137,7 @@ input.borderless-text-input:-o-input-placeholder {
    	z-index: 2;
    	visibility:hidden;
 }	
-#assessmentQuestionForm:hover #question-settings-link, #question-settings-link.btn-primary {
+form:hover #question-settings-link, #question-settings-link.btn-primary {
 	visibility:visible;
 }
 
@@ -223,9 +223,9 @@ footer > div {
 	border: 0.02em solid #bdc3c7;
 	background: #e1e1e1;
 	color: #222222;
-	margin-top: -0.02em;
 	padding: 0.08em;
 	opacity:0.8;
+	height: .4em;
 }
 
 .ui-state-default, .ui-widget-content.ui-slider .ui-state-default{

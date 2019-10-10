@@ -42,20 +42,16 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.Nullable;
 
 /**
- *
+ * 
+ * Represents tool users.
+ * 
  * @author Ozgur Demirtas
- *
- *         The value object that maps to our model database table:
- *         tl_laqa11_que_usr The relevant hibernate mapping resides in: QaQueUsr.hbm.xml
- *
- *         Represents tool users.
  */
 @Entity
 @Table(name = "tl_laqa11_que_usr")
-public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
+public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     private static final long serialVersionUID = -6768077344827699440L;
 
@@ -204,11 +200,6 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getQueUsrId()).toHashCode();
-    }
-
-    @Override
-    public boolean isNull() {
-	return false;
     }
 
     /**

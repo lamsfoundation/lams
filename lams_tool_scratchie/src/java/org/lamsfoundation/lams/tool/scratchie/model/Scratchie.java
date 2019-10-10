@@ -24,9 +24,9 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +40,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 /**
  * Scratchie
@@ -83,7 +84,7 @@ public class Scratchie implements Cloneable {
 
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
-    private Set<ScratchieItem> scratchieItems = new HashSet<>();
+    private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "extra_point")
     private boolean extraPoint;
@@ -99,6 +100,10 @@ public class Scratchie implements Cloneable {
 
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
+    
+    
+    @Column(name = "activity_uuid_providing_vsa_answers")
+    private Integer activityUiidProvidingVsaAnswers;
 
     //overwrites default preset marks stored as admin config setting
     @Column(name = "preset_marks")
@@ -132,7 +137,7 @@ public class Scratchie implements Cloneable {
 	    scratchie.setUid(null);
 	    if (scratchieItems != null) {
 		Iterator<ScratchieItem> iter = scratchieItems.iterator();
-		Set<ScratchieItem> set = new HashSet<>();
+		Set<ScratchieItem> set = new TreeSet<>();
 		while (iter.hasNext()) {
 		    ScratchieItem item = iter.next();
 		    ScratchieItem newItem = (ScratchieItem) item.clone();
@@ -377,6 +382,31 @@ public class Scratchie implements Cloneable {
      */
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
+    }
+    
+    public boolean isAnswersFetchingEnabledAndVsaQuestionsAvailable() {
+	//check Scratchie contains VSA questions
+	boolean hasVsaQuestion = false;
+	for (ScratchieItem item : scratchieItems) {
+	    hasVsaQuestion |= QbQuestion.TYPE_VERY_SHORT_ANSWERS == item.getQbQuestion().getType();
+	}
+	
+	return activityUiidProvidingVsaAnswers != null && hasVsaQuestion;
+    }
+    
+    /**
+     * @return which preceding activity should be queried for VSA answers
+     */
+    public Integer getActivityUiidProvidingVsaAnswers() {
+	return activityUiidProvidingVsaAnswers;
+    }
+
+    /**
+     * @param activityUiidProvidingVsaAnswers
+     *            preceding activity that should be queried for VSA answers
+     */
+    public void setActivityUiidProvidingVsaAnswers(Integer activityUiidProvidingVsaAnswers) {
+	this.activityUiidProvidingVsaAnswers = activityUiidProvidingVsaAnswers;
     }
 
     /**

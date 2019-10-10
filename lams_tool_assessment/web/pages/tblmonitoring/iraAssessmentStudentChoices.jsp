@@ -68,13 +68,13 @@
 						</a>
 					</td>
 					
-					<c:forEach var="option" items="${question.options}">
+					<c:forEach var="option" items="${question.optionDtos}">
 						<td class="normal <c:if test='${option.maxMark == 1}'>success</c:if>">
 							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
 						</td>
 					</c:forEach>
 					
-					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.options)}" var="j">
+					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.optionDtos)}" var="j">
 						<td class="normal"></td>
 					</c:forEach>
 				</tr>
@@ -104,7 +104,7 @@
 					<table class="table table-striped table-hover">
 						<tbody>
 						
-							<c:forEach var="option" items="${question.options}" varStatus="j">
+							<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
 								<c:set var="cssClass"><c:if test='${option.maxMark == 1}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">

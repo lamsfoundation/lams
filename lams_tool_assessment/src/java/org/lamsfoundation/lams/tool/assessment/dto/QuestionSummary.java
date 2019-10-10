@@ -50,6 +50,11 @@ public class QuestionSummary {
     private QuestionDTO questionDto;
     private float averageMark;
 
+    //used only for question summary page
+    private List<AssessmentQuestionResult> notAllocatedQuestionResults;
+    private boolean isTbl;
+    
+    //used only for export
     private List<List<AssessmentQuestionResult>> questionResultsPerSession;
     
     public QuestionSummary(AssessmentQuestion question) {
@@ -70,6 +75,22 @@ public class QuestionSummary {
 
     public void setAverageMark(float averageMark) {
 	this.averageMark = averageMark;
+    }
+    
+    public List<AssessmentQuestionResult> getNotAllocatedQuestionResults() {
+	return notAllocatedQuestionResults;
+    }
+
+    public void setNotAllocatedQuestionResults(List<AssessmentQuestionResult> notAllocatedQuestionResults) {
+	this.notAllocatedQuestionResults = notAllocatedQuestionResults;
+    }
+    
+    public boolean isTbl() {
+	return isTbl;
+    }
+
+    public void setTbl(boolean isTbl) {
+	this.isTbl = isTbl;
     }
 
     public List<List<AssessmentQuestionResult>> getQuestionResultsPerSession() {

@@ -80,6 +80,7 @@
 			   		<property name="ratingService"><ref bean="ratingService"/></property>   
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
 			   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
+			   		<property name="qbService"><ref bean="qbService"/></property> 
 			   		<property name="messageService"><ref bean="qaMessageService"/></property>
 				</bean>
 			</property>

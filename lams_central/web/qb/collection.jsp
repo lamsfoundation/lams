@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title>Collection</title>
+	<title><fmt:message key="label.qb.collection" /></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<lams:css/>
@@ -93,7 +93,7 @@
 			collectionGrid.jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-				caption: "Questions",
+				caption: '<fmt:message key="label.qb.collection.grid.title" />',
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?view=single&collectionUid=${collection.uid}",
 			    height: "100%",
@@ -111,13 +111,13 @@
 			    recordpos: "left",
 			    hidegrid: false,
 			    colNames:[
-			    	"ID",
-			    	"Name",
+			    	'<fmt:message key="label.qb.collection.grid.id" />',
+			    	'<fmt:message key="label.qb.collection.grid.name" />',
 			    	"questionType",
 			    	"questionVersion",
-			    	"Learning Outcomes",
-			    	"Used in<br>lessons",
-			    	"Actions",
+			    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
+			    	'<fmt:message key="label.qb.collection.grid.usage" />',
+			    	'<fmt:message key="label.qb.collection.grid.actions" />',
 			    	"hasVersions"
 			    ],
 			    colModel:[
@@ -141,7 +141,7 @@
 			    },
 			    loadError: function(xhr,st,err) {
 			    	collectionGrid.clearGridData();
-				   	alert("Error!");
+				   	alert('<fmt:message key="label.qb.collection.grid.error" />');
 			    },
 				subGrid : true,
 				subGridOptions: {
@@ -166,13 +166,13 @@
 						     cellEdit:false,
 						     pager: false,
 						     colNames: [
-						    	"ID",
-						    	"Name",
+						    	'<fmt:message key="label.qb.collection.grid.id" />',
+						    	'<fmt:message key="label.qb.collection.grid.name" />',
 						    	"questionType",
 						    	"questionVersion",
-						    	"Learning Outcomes",
-						    	"Used in<br>lessons",
-						    	"Actions"
+						    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
+						    	'<fmt:message key="label.qb.collection.grid.usage" />',
+						    	'<fmt:message key="label.qb.collection.grid.actions" />'
 						     ],
 						     colModel: [
 						    	{name:'id', index:'question_id', sortable:false, hidden:true, width: 10},
@@ -186,7 +186,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert("Error!");
+						    	alert('<fmt:message key="label.qb.collection.grid.error" />');
 						     }
 					  	});
 					}
@@ -204,13 +204,13 @@
 					    //close editing area on validation failure
 			            if (!value.trim()) {
 			                $('.editable-open').editableContainer('hide', 'cancel');
-			                return 'Can not be empty!';
+			                return '<fmt:message key="label.qb.collection.name.blank.error" />';
 			            }
 			        },
 				    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
 				    success: function(response, newValue) {
 						if (response.created == 'false') {
-							alert('Collection with such name already exists');
+							alert('<fmt:message key="label.qb.collection.name.duplicate.error" />');
 						}
 				    }
 			    //hide and show pencil on showing and hiding editing widget
@@ -253,7 +253,7 @@
 		// auxiliary formatter for jqGrid's question statistics column
 		function actionsFormatter(cellvalue){
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
-					+ "\", \"_blank\")' title='Show stats'></i>";
+					+ "\", \"_blank\")' title='<fmt:message key='label.qb.collection.action.stats' />'></i>";
 
 			cellhtml += "<a  title='<fmt:message key='label.edit' />' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
 						+ cellvalue + "&oldCollectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true' class='thickbox'>"; 
@@ -312,7 +312,11 @@
 		
 		// remove a collection
 		function removeCollection() {
-			if (confirm('Are you sure you want to remove "${collection.name}" collection?')) {
+			<fmt:message key="label.qb.collection.remove.confirm" var="label.qb.collection.remove.confirm">
+				<fmt:param value="${collection.name}" />
+			</fmt:message>
+			
+			if (confirm('${label.qb.collection.remove.confirm}')) {
 				$.ajax({
 					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
 					'type' : 'POST',
@@ -411,7 +415,7 @@
 	<div>
 		<button class="btn btn-default btn-sm" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
 			<i class="fa fa-angle-double-left"></i>
-			Collection management
+			<fmt:message key="label.qb.collection.management" />
 		</button>
 	</div>
 	
@@ -429,7 +433,7 @@
 			
 			<c:if test="${collection.personal}">
 				<span class="grid-collection-private small">
-					<i class="fa fa-lock"></i> Private collection
+					<i class="fa fa-lock"></i> <fmt:message key="label.qb.collection.private" />
 				</span>
 			</c:if>
 		</div>
@@ -442,14 +446,14 @@
 					<c:if test="${not hasQuestions}">
 						<button class="btn btn-default" onClick="javascript:removeCollection()" title="Remove collection">
 							<i class="fa fa-trash"></i>
-							Remove collection
+							<fmt:message key="label.qb.collection.remove" />
 						</button>
 					</c:if>
 				</div>
 			</c:if>
 		
 			<div class="btn-group btn-group-xs pull-right loffset10" role="group">
-				<a class="btn btn-default btn-xs disabled" aria-disabled="true">XML</a>
+				<a class="btn btn-default btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.xml" /></a>
 			
 				<a class="btn btn-default btn-xs loffset5 thickbox" title="<fmt:message key="label.import.xml" />"
 					href="<c:url value='/xmlQuestions/initImportQuestionsXml.do'/>?collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true" >  
@@ -464,7 +468,7 @@
 			</div>
 			
 			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
-				<a class="btn btn-default btn-xs disabled" aria-disabled="true">QTI</a>
+				<a class="btn btn-default btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.qti" /></a>
 			
 				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" title="<fmt:message key='label.import.qti'/>">
 					<i class="fa fa-upload"></i>
@@ -506,7 +510,7 @@
 		</c:when>
 		<c:otherwise>
 			<div class="alert alert-warning">
-				There are no questions in this collection
+				<fmt:message key="label.qb.collection.questions.none" />
 			</div>
 		</c:otherwise>
 	</c:choose>
@@ -516,7 +520,7 @@
 		and (not empty collection.organisations or not empty availableOrganisations)}">
 		<div class="panel panel-default voffset20">
 			<div class="panel-heading">
-				Share collection with organisations
+				<fmt:message key="label.qb.collection.share.title" />
 			</div>
 			<div class="panel-body">
 				<table class="table table-striped table-condensed table-responsive" style="max-width: 400px;">
@@ -527,11 +531,11 @@
 							<tr  class="info">
 								<td>
 									<c:out value="${organisation.name}" />&nbsp;
-									<span class="label label-primary">Shared</span>
+									<span class="label label-primary"><fmt:message key="label.qb.collection.shared" /></span>
 								</td>
 								<td width="30px;">
 									<button class="btn btn-default btn-xs" onClick="javascript:unshareCollection(${organisation.organisationId})">
-										Unshare
+										<fmt:message key="label.qb.collection.unshare" />
 									</button>
 								</td>
 							</tr>
@@ -545,7 +549,7 @@
 								</td>
 								<td width="30px;" style="text-align: center;">
 									<button class="btn btn-default btn-xs" onClick="javascript:shareCollection(${organisation.organisationId})">
-										Share
+										<fmt:message key="label.qb.collection.share" />
 									</button>
 								</td>
 							</tr>						

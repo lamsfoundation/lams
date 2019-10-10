@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.qb.service;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
@@ -36,6 +37,8 @@ public interface IQbService {
      * @return questions sharing the same questionId
      */
     List<QbQuestion> getQuestionsByQuestionId(Integer questionId);
+
+    QbQuestion getQuestionByUUID(UUID uuid);
 
     /**
      * @param optionUid
@@ -135,4 +138,6 @@ public interface IQbService {
     boolean isQuestionInUserCollection(int qbQuestionId, int userId);
 
     void insertQuestion(QbQuestion qbQuestion);
+    
+    void prepareQuestionForExport(QbQuestion qbQuestion);
 }

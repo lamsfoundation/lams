@@ -27,7 +27,9 @@
 
 	<h4>${content.title}</h4>
 	
-	<p>${questionDTO.question}</p>
+	<p>${questionDTO.name}</p>
+	
+	<p>${questionDTO.description}</p>
 
 	<table class="table table-striped table-bordered table-condensed">
 	<tr>

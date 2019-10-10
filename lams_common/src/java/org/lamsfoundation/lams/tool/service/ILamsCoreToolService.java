@@ -23,10 +23,12 @@
 
 package org.lamsfoundation.lams.tool.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -280,6 +282,16 @@ public interface ILamsCoreToolService {
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession);
+    
+    /**
+     * Returns answers learners left for VSA questions in Assessment activity (together with according confidence
+     * levels, if such option is turned on in Assessment). Currently only Assessment tool is capable of producing VSA
+     * answers.
+     * 
+     * @param toolSession
+     * @return
+     */
+    Collection<VsaAnswerDTO> getVsaAnswersByToolSession(ToolSession toolSession);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which

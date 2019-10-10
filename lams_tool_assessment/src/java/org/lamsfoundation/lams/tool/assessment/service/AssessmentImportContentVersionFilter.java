@@ -79,7 +79,7 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
     public void up20170101To20170315() {
 	this.removeField(AssessmentQuestion.class, "createDate");
 	this.removeField(AssessmentQuestion.class, "createBy");
-	this.removeField(AssessmentQuestion.class, "answerString");
+	this.removeField(AssessmentQuestion.class, "answer");
 	this.removeField(AssessmentQuestion.class, "answerFloat");
 	this.removeField(AssessmentQuestion.class, "answerBoolean");
 	this.removeField(AssessmentQuestion.class, "questionFeedback");
@@ -186,6 +186,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 			"prefixAnswersWithLetters", "false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "caseSensitive", "caseSensitive", "false",
 			false, true);
+		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "autocompleteEnabled",
+			"autocompleteEnabled", "false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "correctAnswer", "correctAnswer", "false",
 			false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "allowRichEditor", "allowRichEditor",

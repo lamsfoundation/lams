@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class AssessmentEscapeUtils {
 	    }
 	}
     }
-    
+
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
@@ -63,7 +62,7 @@ public class AssessmentEscapeUtils {
 	    }
 	}
     }
-    
+
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
@@ -75,12 +74,12 @@ public class AssessmentEscapeUtils {
     }
 
     private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
-	String answerString = questionResult.getAnswerString();
-	if (answerString != null) {
-	    String answerStringEscaped = StringEscapeUtils.escapeJavaScript(answerString);
-	    questionResult.setAnswerStringEscaped(answerStringEscaped);
+	String answer = questionResult.getAnswer();
+	if (answer != null) {
+	    String answerEscaped = StringEscapeUtils.escapeJavaScript(answer);
+	    questionResult.setanswerEscaped(answerEscaped);
 	}
-	
+
 	QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
 	questionResult.setQuestionDto(questionDto);
 
@@ -160,9 +159,9 @@ public class AssessmentEscapeUtils {
 		    break;
 
 		case QbQuestion.TYPE_NUMERICAL:
-		case QbQuestion.TYPE_SHORT_ANSWER:
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		case QbQuestion.TYPE_ESSAY:
-		    responseStr.append(questionResult.getAnswerString());
+		    responseStr.append(questionResult.getAnswer());
 		    break;
 
 		case QbQuestion.TYPE_ORDERING:
@@ -182,7 +181,7 @@ public class AssessmentEscapeUtils {
 		    break;
 
 		case QbQuestion.TYPE_TRUE_FALSE:
-		    if (questionResult.getAnswerString() != null) {
+		    if (questionResult.getAnswer() != null) {
 			responseStr.append(questionResult.getAnswerBoolean());
 		    }
 		    break;
@@ -211,7 +210,7 @@ public class AssessmentEscapeUtils {
 			}
 
 			if (questionResult.getQbQuestion().isHedgingJustificationEnabled()) {
-			    responseStr.append(questionResult.getAnswerString());
+			    responseStr.append(questionResult.getAnswer());
 			    responseStr.append(DELIMITER);
 			}
 		    }
@@ -233,22 +232,19 @@ public class AssessmentEscapeUtils {
 	if (questionResult != null) {
 	    switch (questionResult.getQbQuestion().getType()) {
 		case QbQuestion.TYPE_ESSAY:
-		    String answerString = questionResult.getAnswerString();
-		    return (answerString == null) ? ""
-			    : answerString.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
+		    String answer = questionResult.getAnswer();
+		    return (answer == null) ? ""
+			    : answer.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
 		case QbQuestion.TYPE_MATCHING_PAIRS:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    QbQuestion.TYPE_MATCHING_PAIRS);
+		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS);
 		case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    QbQuestion.TYPE_MULTIPLE_CHOICE);
+		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE);
 		case QbQuestion.TYPE_NUMERICAL:
-		    return questionResult.getAnswerString();
+		    return questionResult.getAnswer();
 		case QbQuestion.TYPE_ORDERING:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    QbQuestion.TYPE_ORDERING);
-		case QbQuestion.TYPE_SHORT_ANSWER:
-		    return questionResult.getAnswerString();
+		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING);
+		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
+		    return questionResult.getAnswer();
 		case QbQuestion.TYPE_TRUE_FALSE:
 		    return questionResult.getAnswerBoolean();
 		case QbQuestion.TYPE_MARK_HEDGING:
