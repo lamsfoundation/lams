@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <script>
 	function exportExcel(){
 		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
@@ -111,7 +112,7 @@
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${option.name}" escapeXml="false"/>
+										<c:out value="${fn:replace(option.name, newLineChar, ', ')}" escapeXml="false"/>
 									</td>
 									<td class="${cssClass}">
 										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
@@ -125,7 +126,7 @@
 			</div> 
 		</div>
 	            
-		<div class="modal-footer">	
+		<div class="modal-footer">
 			<a href="#" data-dismiss="modal" class="btn btn-default">
 				<fmt:message key="label.ok"/>
 			</a>

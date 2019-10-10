@@ -196,6 +196,7 @@ public class TblMonitoringController {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
+	    tblQuestionDto.setTitle(questionDto.getTitle());
 	    tblQuestionDto.setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLabel(questionDto.getType()));
 	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
 

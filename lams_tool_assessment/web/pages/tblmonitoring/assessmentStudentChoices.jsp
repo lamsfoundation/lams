@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <style>
 	.question-title {
 		white-space: nowrap;
@@ -56,10 +57,10 @@
 		<thead>
 			<tr role="row">
 				<th></th>
-				<c:forEach var="questionDto" items="${questionDtos}" varStatus="i">
+				<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 					<th class="text-center">
 						<div class="question-title">
-							${questionDto.question.title}
+							${tblQuestionDto.title}
 						</div>
 					</th>
 				</c:forEach>
@@ -69,18 +70,18 @@
 		
 			<tr role="row">
 				<th><b>Question type</b></th>
-				<c:forEach var="questionDto" items="${questionDtos}" varStatus="i">
+				<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 					<td class="text-center">
-						${questionDto.questionTypeLabel}
+						${tblQuestionDto.questionTypeLabel}
 					</td>
 				</c:forEach>
 			</tr>
 		
 			<tr>
 				<td><b>Correct answer</b></td>
-				<c:forEach var="questionDto" items="${questionDtos}" varStatus="i">
+				<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 					<td class="text-center">
-						${questionDto.correctAnswer}
+						${fn:replace(tblQuestionDto.correctAnswer, newLineChar, ', ')}
 					</td>
 				</c:forEach>
 			</tr>
@@ -95,8 +96,8 @@
 						${session.sessionName}
 					</td>
 					
-					<c:forEach var="questionDto" items="${questionDtos}" varStatus="j">
-						<c:set var="questionResultDto" value="${questionDto.sessionQuestionResults[i.index]}"/>
+					<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="j">
+						<c:set var="questionResultDto" value="${tblQuestionDto.sessionQuestionResults[i.index]}"/>
 						<td class="text-center <c:if test="${questionResultDto.correct}">success</c:if>" >
 							${questionResultDto.answer}
 						</td>
