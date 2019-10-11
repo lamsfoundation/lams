@@ -46,13 +46,14 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
@@ -94,19 +95,11 @@ public class GroupingController {
     /**
      * Perform the grouping for the users who are currently running the lesson. If force is set to true, then we should
      * be in preview mode, and we want to override the chosen grouping to make it group straight away.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/performGrouping")
     public String performGrouping(@ModelAttribute GroupingForm groupingForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-
+	Integer currentUserId = LearningWebUtil.getUserId();
 	boolean forceGroup = WebUtil.readBooleanParam(request, GroupingController.PARAM_FORCE_GROUPING, false);
 
 	// initialize service object
@@ -118,85 +111,74 @@ public class GroupingController {
 	}
 	Long lessonId = learnerProgress.getLesson().getLessonId();
 	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
-		LearningWebUtil.getUserId(), forceGroup);
+		currentUserId, forceGroup);
 
 	groupingForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
 	groupingForm.setTitle(activity.getTitle());
 	groupingForm.setActivityID(activity.getActivityId());
-
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+	
+	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
+	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
+	if (grouping != null) {
+	    for (Group group : grouping.getGroups()) {
+		GroupDTO groupDTO = new GroupDTO(group, true);
+		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
+		
+		//set isUserBelongsToGroup
+		for (UserBasicDTO userDto : groupDTO.getUserList()) {
+		    if (userDto.getUserID().equals(currentUserId)) {
+			groupDTO.setUserBelongsToGroup(true);
+			break;
+		    }
+		}
+		
+		groups.add(groupDTO);
+	    }
+	}
+	request.setAttribute(GroupingController.GROUPS, groups);
+	request.setAttribute(GroupingController.TITLE, activity.getTitle());
+	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+	request.setAttribute(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS,
+		Configuration.getAsBoolean(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS));
+	
+	//Load up the grouping information and forward to the jsp page to display all the groups and members.
 	if (groupingDone) {
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
-	    return viewGrouping(request, learnerProgress);
-	}
+	    request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
+	    ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	    request.setAttribute(GroupingController.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
+
+	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	    //find activity position within Learning Design and store it as request attribute
+	    ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
+	    if (positionDTO != null) {
+		request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	    }
+
+	    return "grouping/show";
+
+	} else
 	// forward to group choosing page
 	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
 	    Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
 	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
 		    groupingId);
 
-	    LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	    prepareGroupData(request);
+	    LearnerChoiceGrouping groupingDb = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
 	    request.setAttribute(GroupingController.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
 	    request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	    request.setAttribute(GroupingController.VIEW_STUDENTS_BEFORE_SELECTION,
-		    grouping.getViewStudentsBeforeSelection());
+		    groupingDb.getViewStudentsBeforeSelection());
 	    return "grouping/choose";
+	    
+	} else {
+	    return "grouping/wait";
 	}
-	return "grouping/wait";
-    }
-
-    /**
-     * Load up the grouping information and forward to the jsp page to display all the groups and members.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-//    @RequestMapping("/viewGroup")
-//    public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
-//	return viewGrouping(request, null);
-//    }
-
-    @RequestMapping("/viewGroup")
-    public String viewGrouping(HttpServletRequest request,
-	    @RequestParam(required = false) LearnerProgress learnerProgress) throws IOException, ServletException {
-	prepareGroupData(request);
-	request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	request.setAttribute(GroupingController.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
-
-	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	//find activity position within Learning Design and store it as request attribute
-	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
-	if (positionDTO != null) {
-	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
-	}
-
-	// make sure the lesson id is always in the request for the progress bar.
-	if (request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null) {
-	    if (learnerProgress == null) {
-		learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-	    }
-	    request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
-	}
-	return "grouping/show";
     }
 
     /**
      * Complete the current tool activity and forward to the url of next activity in the learning design.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/completeActivity")
     public String completeActivity(HttpServletRequest request, HttpServletResponse response)
@@ -212,41 +194,7 @@ public class GroupingController {
     }
 
     /**
-     * Inserts into the request most of the data required by JSP page. This method is common for several pages.
-     *
-     * @param request
-     */
-    @SuppressWarnings("unchecked")
-    @RequestMapping("/prepareGroupData")
-    private void prepareGroupData(HttpServletRequest request) {
-
-	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
-	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-
-	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
-	if (grouping != null) {
-	    for (Group group : grouping.getGroups()) {
-		GroupDTO groupDTO = new GroupDTO(group, true);
-		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
-		groups.add(groupDTO);
-	    }
-	}
-
-	request.setAttribute(GroupingController.GROUPS, groups);
-	request.setAttribute(GroupingController.TITLE, activity.getTitle());
-	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
-    }
-
-    /**
      * Responds to a learner's group choice. Might forward back to group choice page if the chosen group was full.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/learnerChooseGroup")
     public String learnerChooseGroup(@ModelAttribute GroupingForm groupingForm, HttpServletRequest request)
