@@ -1,6 +1,4 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
@@ -312,10 +310,6 @@
 	<footer>
 		<div class="">
 			<p class="text-muted text-center">
-				<fmt:message key="msg.LAMS.version" />&nbsp;<%=Configuration.get(ConfigurationKeys.VERSION)%>
-				<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
-					&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
-				</a>
 				<span class="text-danger text-center" id="timezoneWarning"></span>
 			</p>
 		</div>

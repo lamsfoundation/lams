@@ -247,6 +247,8 @@ public class ConfigurationKeys {
     public static String USER_VALIDATION_REQUIRED_FIRST_LAST_NAME = "UserValidationFirstLastName";
 
     public static String USER_VALIDATION_REQUIRED_EMAIL = "UserValidationEmail";
+    
+    public static String RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS = "RestrictedGroupUserNames";
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";

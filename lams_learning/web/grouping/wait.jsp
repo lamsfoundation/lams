@@ -18,18 +18,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html xhtml="true">
-
 	<lams:head>
 		<title><fmt:message key="label.view.groups.title"/></title>
 		<lams:css/>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>grouping/performGrouping.do?activityID=${groupingForm.activityID}">
-	  </lams:head>
+	</lams:head>
 
 	<body class="stripes">
 		<lams:Page type="learner" title="${groupingForm.title}">

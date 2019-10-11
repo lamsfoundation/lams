@@ -23,42 +23,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.notebook.service.CoreNotebookConstants"%>
-
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="scratchPadSig"><%=CoreNotebookConstants.SCRATCH_PAD_SIG%></c:set>
+<c:set var="scratchJournalSig"><%=CoreNotebookConstants.JOURNAL_SIG%></c:set>
+	
 <lams:html>
-
 <lams:head>
-	<title><fmt:message key="mynotes.title" />
-	</title>
+	<title><fmt:message key="mynotes.title" /></title>
 
 	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript">
+		function doSubmit(signature) {
+			document.getElementById("notebookForm").signature.value = signature;
+			document.getElementById("notebookForm").submit();
+		}
+	</script>
 </lams:head>
-
 <body class="stripes">
-	<c:if test="${param.mode == 'edit'}">
-		<script type="text/javascript">
-			function doSubmit(signature) {
-				document.getElementById("notebookForm").signature.value = signature;
-				document.getElementById("notebookForm").submit();
-			}
-		</script>
-	</c:if>
 	<fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
 	
-	<c:set var="scratchPadSig">
-		<%=CoreNotebookConstants.SCRATCH_PAD_SIG%>
-	</c:set>
-	<c:set var="scratchJournalSig">
-		<%=CoreNotebookConstants.JOURNAL_SIG%>
-	</c:set>
-	
-	<c:set var="title">
+	<c:set var="pageTitle">
 		<c:choose>
 			<c:when test="${mode == 'teacher'}">
 				<fmt:message key="mynotes.journals.title" />
@@ -68,8 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:otherwise>
 		</c:choose>
 	</c:set>
-	
-	<lams:Page type="learner" title="${title}"  hideProgressBar="true">
+	<lams:Page type="learner" title="${pageTitle}"  hideProgressBar="true">
 	
 		<form:form action="updateEntry.do" modelAttribute="notebookForm" id="notebookForm" method="post">
 			<form:hidden path="uid" value="${entry.uid}" />
@@ -77,37 +63,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<form:hidden path="lessonID" value="${entry.externalID}" />
 			<form:hidden path="currentLessonID" value="${empty currentLessonID ? param.currentLessonID : currentLessonID}" />
 			
-			<!-- set title -->
+			<!-- title -->
 			<c:set var="title">
 				<c:choose>
 					<c:when test="${empty entry.title}">
 						<fmt:message key="mynotes.entry.no.title.label" />
 					</c:when>
 					<c:otherwise>
-						<c:out value="${entry.title}" escapeXml="false" />
+						<c:out value="${entry.title}"/>
 					</c:otherwise>
 				</c:choose>
 			</c:set>
-	
-			<!-- title -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
 						<c:choose>
 							<c:when test="${param.mode == 'edit'}">
 								<fmt:message key="mynotes.edit.heading">
-									<fmt:param>
-										<c:out value="${title}" escapeXml="false" />
-									</fmt:param>
+									<fmt:param>${title}</fmt:param>
 								</fmt:message>
 							</c:when>
 							<c:otherwise>
-								<c:out value="${title}" escapeXml="false" />
+								${title}
 							</c:otherwise>
 						</c:choose>
 					</h4>
-	
 				</div>
+				
 				<div class="panel-body">
 					<c:choose>
 						<c:when test="${param.mode == 'edit'}">
@@ -120,12 +102,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<form:textarea path="entry" cssClass="form-control" id="entry" style="width: 100%" rows="10"
 									value="${entry.entry}" />
 							</div>
-							</td>
-							</tr>
 						</c:when>
 						<c:otherwise>
 							<c:set var="entryTxt">
-								<c:out value="${entry.entry}" escapeXml="false" />
+								<c:out value="${entry.entry}"/>
 							</c:set>
 							<div class="panel">
 								<lams:out value="${entryTxt}" />
@@ -134,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<i>
 									<fmt:message key="mynotes.entry.submitted.by">
 										<fmt:param>
-											<lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" />
+											<lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}"/>
 										</fmt:param>
 									</fmt:message>
 								</i>
