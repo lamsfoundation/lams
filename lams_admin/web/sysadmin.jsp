@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+<c:set var="serverVersion"><%=Configuration.get(ConfigurationKeys.VERSION)%></c:set>
 
 <lams:html>
 <lams:head>
@@ -15,23 +17,32 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
-			<c:forEach items="${groupedLinks}" var="links">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="panel-title"><fmt:message key="${links[0]}"/></div>
-					</div>
-					<div class="list-group">
-						<c:set var="linkBeans" value="${links[1]}"/>
-			 			<c:forEach items="${linkBeans}" var="linkBean">
-							<span class="list-group-item">
+		<div class="row"> 
+			<div class="col-xs-12"> 
+				<div class="alert alert-info text-center"> 
+					<img src="/lams/images/svg/lams_logo_black.svg" width="100px"><br> 
+					<fmt:message key="config.version" />&nbsp;${serverVersion}
+				</div> 
+   			</div> 
+  		</div>
+	
+		<c:forEach items="${groupedLinks}" var="links">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="panel-title"><fmt:message key="${links[0]}"/></div>
+				</div>
+				<div class="list-group">
+					<c:set var="linkBeans" value="${links[1]}"/>
+		 			<c:forEach items="${linkBeans}" var="linkBean">
+						<span class="list-group-item">
 							<a href="<c:out value="${linkBean.link}"/>">
-									<fmt:message><c:out value="${linkBean.name}"/></fmt:message>
+								<fmt:message><c:out value="${linkBean.name}"/></fmt:message>
 							</a>
-							</span>
-						</c:forEach>
-			 		</div>
-				</div>		
-			</c:forEach>
+						</span>
+					</c:forEach>
+			 	</div>
+			</div>		
+		</c:forEach>
 	</lams:Page>
 </body>
 </lams:html>

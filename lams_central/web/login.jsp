@@ -146,16 +146,10 @@
 			</div>
 		</div>
 	</div>
-		<!--closes content-->
+	<!--closes content-->
 
-		<!-- starts footer -->
-		<div class="login-footer">
-			  <p class="text-muted text-center">
-					<fmt:message key="msg.LAMS.version" />:  <%=Configuration.get(ConfigurationKeys.VERSION)%>
-					<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
-				</p>
-		</div>
-		<!--closes footer-->
+	<div class="login-footer"></div>
+
 		<!--closes page-->
 		</div> <!--  close login-content -->
 		</body>
@@ -179,7 +173,6 @@
 						<fmt:message key="msg.loading" />
 					</h4>
 				</div>
-
 
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" /> <input type="hidden" name="j_password"
