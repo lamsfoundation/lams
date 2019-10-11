@@ -20,37 +20,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <lams:html>
-
 <lams:head>
-	<title><fmt:message key="mynotes.title" />
-	</title>
+	<title><fmt:message key="mynotes.title" /></title>
 
 	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
-</lams:head>
-
-<body class="stripes">
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>	
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
-	
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+			jQuery("time.timeago").timeago();
+		});
+	</script>
+</lams:head>
+
+<body class="stripes">	
 	<fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
+	
 	<c:set var="title">
 		<fmt:message key="mynotes.title" />
 	</c:set>
-	
 	<lams:Page type="learner" title="${title}" hideProgressBar="true">
 		<c:set var="addnote">
 			<c:url value="/notebook/add.do?lessonID=" />
@@ -58,7 +53,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:set>
 		<div class="pull-right">
 			<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
-					key="mynotes.add.new.current.lesson.button" /></a>
+					key="mynotes.add.new.current.lesson.button" />
+			</a>
 		</div>
 		
 		<div class="lead">
@@ -87,11 +83,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<h4 class="panel-title">
 								<c:choose>
 									<c:when test="${!empty sigToCheck}">
-										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}"
-											escapeXml="false" />
+										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}" />
 									</c:when>
 									<c:otherwise>
-										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}" escapeXml="false" />
+										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}"/>
 									</c:otherwise>
 								</c:choose>
 							</h4>
@@ -116,11 +111,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<h4>
 								<c:choose>
 									<c:when test="${!empty sigToCheck}">
-										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}"
-											escapeXml="false" />
+										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}"/>
 									</c:when>
 									<c:otherwise>
-										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}" escapeXml="false" />
+										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}"/>
 									</c:otherwise>
 								</c:choose>
 							</h4>
@@ -145,7 +139,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<fmt:message key="mynotes.entry.no.title.label" />
 												</c:when>
 												<c:otherwise>
-													<c:out value="${entry.title}" escapeXml="false" />
+													<c:out value="${entry.title}"/>
 												</c:otherwise>
 											</c:choose>
 										</a>
@@ -167,12 +161,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</div>
 			</c:forEach>
 	</lams:Page>
-	
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
-		});
-	</script>
 </body>
 
 </lams:html>

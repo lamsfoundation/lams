@@ -20,30 +20,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <lams:html>
-
 <lams:head>
-	<title><fmt:message key="mynotes.title" />
-	</title>
+	<title><fmt:message key="mynotes.title" /></title>
 
 	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 </lams:head>
 <body class="stripes">
+	<fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
+	
 	<c:set var="title">
 		<fmt:message key="mynotes.journals.title" />
 	</c:set>
-	
-	<fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
 	<lams:Page type="learner" title="${title}" hideProgressBar="true">
 	
 		<h2>
@@ -70,7 +64,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</table>
 	
 		<c:set var="userToCheck" value="${entry.user.userId}" />
-		<h4><lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}" escapeXml="false" /></h4>
+		<h4>
+			<lams:Portrait userId="${entry.user.userId}"/><c:out value="${entry.user.fullName}"/>
+		</h4>
+		
 		<table class="alternative-color" cellspacing="0">
 			<tr>
 				<th scope="col" width="30%" colspan="2"><fmt:message key="mynotes.entry.title.label" /></th>
@@ -90,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<fmt:message key="mynotes.entry.no.title.label" />
 							</c:when>
 							<c:otherwise>
-								<c:out value="${entry.title}" escapeXml="false" />
+								<c:out value="${entry.title}"/>
 							</c:otherwise>
 						</c:choose>
 					</a>
@@ -103,10 +100,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 		</table>
 		<div class="voffset10 pull-right">
-			<a href="#" class="btn btn-default" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button" /></a>
+			<a href="#" class="btn btn-default" id="addNewBtn" onClick="window.close();">
+				<fmt:message key="label.close.button" />
+			</a>
 		</div>
 	</lams:Page>
-
 </body>
-
 </lams:html>
