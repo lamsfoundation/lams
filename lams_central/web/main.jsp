@@ -16,7 +16,7 @@
 	<lams:css suffix="main"/>
 	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="/lams/css/bootstrap-tour.min.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="/lams/css/bootstrap-tourist.min.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
 	<script type="text/javascript" src="${lams}loadVars.jsp"></script>
@@ -30,7 +30,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tour.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-tourist.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.ui.touch-punch.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.slimscroll.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/main.js"></script>

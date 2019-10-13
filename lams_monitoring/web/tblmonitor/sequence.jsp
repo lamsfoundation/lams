@@ -28,7 +28,7 @@
 <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 <script>
