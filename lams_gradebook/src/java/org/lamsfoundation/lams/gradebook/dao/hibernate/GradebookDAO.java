@@ -325,8 +325,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LESSONS_ORDERED_BY_FIELDS;
 	}
 
-	queryString = queryString.replace("{0}",
-		userId == null ? "" : staffOnly ? "Group g," : "Group g, GroupUser ug,");
+	queryString = queryString.replace("{0}", userId == null ? "" : "Group g, GroupUser ug,");
 	queryString = queryString.replace("{1}",
 		userId == null ? "" : staffOnly ? CONDITION_IF_STAFF_PROVIDED : CONDITION_IF_ANY_USER_PROVIDED);
 
