@@ -310,6 +310,9 @@
 	<footer>
 		<div class="">
 			<p class="text-muted text-center">
+				<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
+					&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
+				</a>
 				<span class="text-danger text-center" id="timezoneWarning"></span>
 			</p>
 		</div>

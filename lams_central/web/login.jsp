@@ -148,7 +148,11 @@
 	</div>
 	<!--closes content-->
 
-	<div class="login-footer"></div>
+	<div class="login-footer">
+		<p class="text-muted text-center">
+			<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
+		</p>
+	</div>
 
 		<!--closes page-->
 		</div> <!--  close login-content -->
