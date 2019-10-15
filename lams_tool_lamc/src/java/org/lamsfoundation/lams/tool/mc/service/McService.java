@@ -291,6 +291,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    // set clone's data to current values
 	    qbQuestionClone.setName(questionDTO.getName());
 	    qbQuestionClone.setDescription(questionDTO.getDescription());
+	    qbQuestionClone.setContentFolderId(questionDTO.getContentFolderId());
 	    qbQuestionClone.setMaxMark(Integer.valueOf(currentMark));
 	    qbQuestionClone.setFeedback(currentFeedback);
 

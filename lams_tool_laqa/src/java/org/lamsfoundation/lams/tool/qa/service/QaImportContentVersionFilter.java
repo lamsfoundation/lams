@@ -22,9 +22,21 @@
  */
 package org.lamsfoundation.lams.tool.qa.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.qb.QbUtils;
 import org.lamsfoundation.lams.tool.qa.model.QaContent;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
+import org.lamsfoundation.lams.util.XMLUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Import filter class for different versions of Q&A content.
@@ -85,5 +97,66 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 		"org.lamsfoundation.lams.tool.qa.model.QaSession");
 	this.renameClass("org.lamsfoundation.lams.tool.qa.QaUsrResp",
 		"org.lamsfoundation.lams.tool.qa.model.QaUsrResp");
+    }
+
+    /**
+     * Migration to Question Bank
+     */
+    public void up20190103To20190809(String toolFilePath) throws IOException {
+	// find LD's content folder ID to use it in new QB questions
+	String contentFolderId = null;
+	try {
+	    File ldFile = new File(new File(toolFilePath).getParentFile().getParentFile(), "learning_design.xml");
+	    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+	    Document doc = docBuilder.parse(new FileInputStream(ldFile));
+	    Element ldRoot = doc.getDocumentElement();
+	    contentFolderId = XMLUtil.getChildElementValue(ldRoot, "contentFolderID", null);
+	} catch (Exception e) {
+	    throw new IOException("Error while extracting LD content folder ID for Question Bank migration", e);
+	}
+	final String contentFolderIdFinal = contentFolderId;
+
+	// tell which file to process and what to do with its root element
+	transformXML(toolFilePath, toolRoot -> {
+	    Document document = toolRoot.getOwnerDocument();
+
+	    // first find questions
+	    NodeList qaQuestions = toolRoot.getElementsByTagName("org.lamsfoundation.lams.tool.qa.model.QaQueContent");
+	    if (qaQuestions.getLength() == 0) {
+		return;
+	    }
+
+	    // comparator class got renamed, we need to adjust XML
+	    NodeList comparators = toolRoot.getElementsByTagName("comparator");
+	    for (int comparatorIndex = 0; comparatorIndex < comparators.getLength(); comparatorIndex++) {
+		Element comparator = (Element) comparators.item(comparatorIndex);
+		String classAttribute = comparator.getAttribute("class");
+		if ("org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator".equals(classAttribute)) {
+		    comparator.setAttribute("class", "org.lamsfoundation.lams.tool.qa.util.QaQuestionComparator");
+		}
+	    }
+
+	    // go through each question
+	    for (int qaQuestionIndex = 0; qaQuestionIndex < qaQuestions.getLength(); qaQuestionIndex++) {
+		Element qaQuestion = (Element) qaQuestions.item(qaQuestionIndex);
+		// create an element for QbQuestion
+		Element qbQuestion = document.createElement("qbQuestion");
+		qaQuestion.appendChild(qbQuestion);
+
+		// transform Q&A data into QB structure
+		XMLUtil.addTextElement(qbQuestion, "type", "6");
+		// Question ID will be filled later as it requires QbService
+		XMLUtil.addTextElement(qbQuestion, "version", "1");
+		XMLUtil.addTextElement(qbQuestion, "contentFolderId", contentFolderIdFinal);
+		// get the date from Q&A activity, keep attributes
+		XMLUtil.rewriteTextElement(toolRoot, qbQuestion, "updateDate", "createDate", null, true, false);
+		XMLUtil.rewriteTextElement(qaQuestion, qbQuestion, "question", "name", null, false, true,
+			QbUtils.QB_MIGRATION_CKEDITOR_CLEANER, QbUtils.QB_MIGRATION_TAG_CLEANER);
+		XMLUtil.rewriteTextElement(qaQuestion, qbQuestion, "feedback", "feedback", null, false, true,
+			QbUtils.QB_MIGRATION_TRIMMER);
+		XMLUtil.rewriteTextElement(qaQuestion, qbQuestion, "required", "answerRequired", "false", false, true);
+		XMLUtil.rewriteTextElement(qaQuestion, qbQuestion, "minWordsLimit", "minWordsLimit", "0", false, true);
+	    }
+	});
     }
 }

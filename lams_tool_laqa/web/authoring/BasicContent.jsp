@@ -88,7 +88,7 @@
 
 <div id="add-question-div" class="form-inline form-group pull-right">
 	<c:set var="addItemUrl" >
-		<c:url value='/authoring/newQuestionBox.do'/>?contentFolderID=${authoringForm.contentFolderID}&sessionMapID=${authoringForm.sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
+		<c:url value='/authoring/newQuestionBox.do'/>?sessionMapID=${authoringForm.sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
 	</c:set>
 	
 	<a href="${addItemUrl}" id="addTopic" class="btn btn-default btn-sm thickbox">

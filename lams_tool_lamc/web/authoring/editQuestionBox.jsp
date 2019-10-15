@@ -147,7 +147,8 @@
 	<form:form action="saveQuestion.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST">
 		<form:hidden path="questionIndex" />
 		<input type="hidden" name="qbQuestionUid" value="${questionDto.qbQuestionUid}" />
-
+		<input type="hidden" name="contentFolderId" value="${questionDto.contentFolderId}" />
+		
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
 		<lams:Page title="${title}" type="learner" formID="mcAuthoringForm">
 		
@@ -165,7 +166,7 @@
 			
 				<lams:CKEditor id="description"
 					value="${questionDto.description}"
-					contentFolderID="${sessionMap.contentFolderID}">
+					contentFolderID="${questionDto.contentFolderId}">
 				</lams:CKEditor>
 			</div>
 
