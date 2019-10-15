@@ -214,7 +214,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     public void saveOrUpdateQaContent(QaContent qa) {
 	qaDAO.saveOrUpdateQa(qa);
     }
-    
+
     @Override
     public void releaseFromCache(Object object) {
 	qaQuestionDAO.releaseFromCache(object);
@@ -619,11 +619,28 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		}
 	    }
 
-	    // set back the tool content
+	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {
+		// set back the tool content
 		question.setQaContent(toolContentObj);
+
+		QbQuestion qbQuestion = question.getQbQuestion();
+		qbQuestion.clearID();
+
+		// try to match the question to an existing QB question in DB
+		QbQuestion existingQuestion = qbService.getQuestionByUUID(qbQuestion.getUuid());
+		if (existingQuestion == null) {
+		    // none found, create a new QB question
+		    qbService.insertQuestion(qbQuestion);
+		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		} else {
+		    // found, use the existing one
+		    question.setQbQuestion(existingQuestion);
+		}
 	    }
+
 	    qaDAO.saveOrUpdateQa(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
