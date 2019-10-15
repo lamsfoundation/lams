@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -59,6 +60,8 @@ public class NotebookController {
     private ILearnerFullService learnerService;
     @Autowired
     private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
 
     /**
      * View all notebook entries
@@ -89,16 +92,11 @@ public class NotebookController {
     @RequestMapping("/viewAllJournals")
     public String viewAllJournals(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-
-	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) userManagementService.findById(User.class, userID);
-
-	// lesson service
 	Long lessonID = notebookForm.getLessonID();
 	Lesson lesson = learnerService.getLesson(lessonID);
 
-	if (!hasStaffAccessToJournals(user, lesson)) {
+	if (!securityService.isLessonMonitor(lessonID, userID, "view all journals", false)) {
 	    throw new UserAccessDeniedException(
 		    "User " + userID + " may not retrieve journal entries for lesson " + lessonID);
 	}
@@ -110,25 +108,6 @@ public class NotebookController {
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
 	return "notebook/viewalljournals";
-    }
-
-    // check user has permission to access all the journals for a lesson
-    private boolean hasStaffAccessToJournals(User user, Lesson lesson) {
-	if (lesson == null) {
-	    return false;
-	}
-
-	// lesson owner okay
-	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(user.getUserId())) {
-	    return true;
-	}
-
-	// staff member okay
-	if ((lesson.getLessonClass() != null) && lesson.getLessonClass().isStaffMember(user)) {
-	    return true;
-	}
-
-	return false;
     }
 
     /**
@@ -150,8 +129,7 @@ public class NotebookController {
 
 	if (entry.getUser() != null && !entry.getUser().getUserId().equals(user.getUserId())) {
 	    // wants to look at someone else's entry - check they are a teacher
-	    Lesson lesson = learnerService.getLesson(currentLessonID);
-	    if (!hasStaffAccessToJournals(user, lesson)) {
+	    if (!securityService.isLessonMonitor(currentLessonID, userID, "view notebook entry", false)) {
 		throw new UserAccessDeniedException(
 			"User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
 	    }
