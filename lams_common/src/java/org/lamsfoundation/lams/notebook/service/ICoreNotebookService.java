@@ -36,7 +36,7 @@ public interface ICoreNotebookService {
 
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String title, String entry);
 
-    TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType);
+    TreeMap<Long, List<NotebookEntry>> getEntriesGroupedByLesson(Integer userID);
 
     List<NotebookEntry> getEntry(Long id, Integer idType, String signature, Integer userID);
 
