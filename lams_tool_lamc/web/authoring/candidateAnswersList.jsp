@@ -47,7 +47,7 @@
 					<td width="90%">
 						<lams:CKEditor id="ca${optionIndex}" 
 							value="${optionDto.candidateAnswer}"
-							contentFolderID="${sessionMap.contentFolderID}">
+							contentFolderID="${questionDto.contentFolderId}">
 						</lams:CKEditor>
 					</td>
 					

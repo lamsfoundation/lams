@@ -41,6 +41,7 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
     private Integer displayOrder;
     private String feedback;
     private String mark;
+    private String contentFolderId;
 
     private List<McOptionDTO> optionDtos;
 
@@ -158,6 +159,16 @@ public class McQuestionDTO implements Comparable<McQuestionDTO> {
      */
     public void setMark(String mark) {
 	this.mark = mark;
+    }
+
+    
+    
+    public String getContentFolderId() {
+        return contentFolderId;
+    }
+
+    public void setContentFolderId(String contentFolderId) {
+        this.contentFolderId = contentFolderId;
     }
 
     /**
