@@ -66,7 +66,6 @@ public class NotebookController {
     @RequestMapping("/viewAll")
     public String viewAll(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-
 	// getting requested object according to coming parameters
 	Integer learnerID = LearningWebUtil.getUserId();
 
@@ -77,15 +76,11 @@ public class NotebookController {
 	}
 
 	// get all notebook entries for the learner
-
-	TreeMap<Long, List<NotebookEntry>> entries = coreNotebookService.getEntryByLesson(learnerID,
-		CoreNotebookConstants.SCRATCH_PAD);
-
+	TreeMap<Long, List<NotebookEntry>> entries = coreNotebookService.getEntriesGroupedByLesson(learnerID);
 	request.getSession().setAttribute("entries", entries.values());
 	request.setAttribute("lessonID", lessonID);
 
 	return "notebook/viewall";
-
     }
 
     /**
@@ -109,7 +104,8 @@ public class NotebookController {
 	}
 
 	// List of Journal entries
-	List<NotebookEntry> journals = getJournals(lesson.getLessonId());
+	List<NotebookEntry> journals = coreNotebookService.getEntry(lesson.getLessonId(), CoreNotebookConstants.SCRATCH_PAD,
+		CoreNotebookConstants.JOURNAL_SIG);
 	request.getSession().setAttribute("journals", journals);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
@@ -118,7 +114,6 @@ public class NotebookController {
 
     // check user has permission to access all the journals for a lesson
     private boolean hasStaffAccessToJournals(User user, Lesson lesson) {
-
 	if (lesson == null) {
 	    return false;
 	}
@@ -134,23 +129,6 @@ public class NotebookController {
 	}
 
 	return false;
-    }
-
-    /**
-     *
-     * @param lessonID
-     *            Lesson to get the journals from.
-     * @return List of Journal entries
-     */
-    private List<NotebookEntry> getJournals(Long lessonID) {
-	// initialize service object
-
-	if (lessonID == null) {
-	    return null;
-	}
-
-	return coreNotebookService.getEntry(lessonID, CoreNotebookConstants.SCRATCH_PAD, CoreNotebookConstants.JOURNAL_SIG);
-
     }
 
     /**
@@ -199,9 +177,6 @@ public class NotebookController {
 	return "notebook/addnew";
     }
 
-    /**
-     *
-     */
     @RequestMapping("/processNewEntry")
     public String processNewEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
@@ -218,9 +193,6 @@ public class NotebookController {
 	return skipViewAll ? null : viewAll(notebookForm, request);
     }
 
-    /**
-     *
-     */
     @RequestMapping(path = "/updateEntry")
     public String updateEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
@@ -247,7 +219,6 @@ public class NotebookController {
 	coreNotebookService.updateEntry(entryObj);
 
 	return viewAll(notebookForm, request);
-
     }
 
 }

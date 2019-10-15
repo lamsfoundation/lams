@@ -1157,7 +1157,7 @@ public class MonitoringService implements IMonitoringFullService {
 	lessonDAO.deleteByProperty(ToolSession.class, "lesson.lessonId", lessonId);
 	Map<String, Object> notebookProperties = new TreeMap<>();
 	notebookProperties.put("externalID", lessonId);
-	notebookProperties.put("externalSignature", CoreNotebookConstants.SCRATCH_PAD_SIG);
+	notebookProperties.put("externalIDType", CoreNotebookConstants.SCRATCH_PAD);
 	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
 	lessonDAO.deleteLesson(lesson);
 
