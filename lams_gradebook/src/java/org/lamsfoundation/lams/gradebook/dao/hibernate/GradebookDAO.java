@@ -289,7 +289,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
+		+ "AND lesson.lessonStateId != 7 {1} {2} "
 		+ "ORDER BY CASE WHEN :sortBy='rowName' THEN lesson.lessonName "
 		+ "WHEN :sortBy='startDate' THEN lesson.startDateTime END " + sortOrder;
 
@@ -299,7 +299,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
+		+ "AND lesson.lessonStateId != 7 {1} {2} "
 		+ "GROUP BY lesson ORDER BY AVG(TIMEDIFF(progress.finishDate,progress.startDate)) " + sortOrder;
 
 	//when :sortBy='avgMark'
@@ -308,13 +308,13 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ "WHERE lesson.learningDesign.learningDesignId = ld.learningDesignId AND ld.copyTypeID != 3 "
 		+ "AND lesson.organisation.organisationId = lo.organisationId "
 		+ "AND (lo.organisationId = :orgId OR lo.parentOrganisation.organisationId = :orgId) "
-		+ "AND lesson.lessonStateId != 7 AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') {1} "
-		+ "GROUP BY lesson ORDER BY AVG(IFNULL(gles.mark, -1)) " + sortOrder;
+		+ "AND lesson.lessonStateId != 7 {1} {2} " + "GROUP BY lesson ORDER BY AVG(IFNULL(gles.mark, -1)) "
+		+ sortOrder;
 
-	final String CONDITION_IF_ANY_USER_PROVIDED = "AND lesson.lessonClass.groupingId = g.grouping.groupingId "
-		+ "AND ug.group.groupId = g.groupId AND ug.user.userId = :userId";
+	final String CONDITION_IF_ANY_USER_PROVIDED = " AND lesson.lessonClass.groupingId = g.grouping.groupingId "
+		+ "AND ug.group.groupId = g.groupId AND ug.user.userId = :userId ";
 
-	final String CONDITION_IF_STAFF_PROVIDED = "AND ug.group.groupId = lesson.lessonClass.staffGroup.groupId AND ug.user.userId = :userId";
+	final String CONDITION_IF_STAFF_PROVIDED = " AND ug.group.groupId = lesson.lessonClass.staffGroup.groupId AND ug.user.userId = :userId ";
 
 	String queryString;
 	if (sortBy.equals("avgTimeTaken")) {
@@ -325,8 +325,10 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	    queryString = LOAD_LESSONS_ORDERED_BY_FIELDS;
 	}
 
-	queryString = queryString.replace("{0}", userId == null ? "" : "Group g, GroupUser ug,");
+	queryString = queryString.replace("{0}", userId == null ? "" : " Group g, GroupUser ug, ");
 	queryString = queryString.replace("{1}",
+		searchString == null ? "" : " AND lesson.lessonName LIKE CONCAT('%', :searchString, '%') ");
+	queryString = queryString.replace("{2}",
 		userId == null ? "" : staffOnly ? CONDITION_IF_STAFF_PROVIDED : CONDITION_IF_ANY_USER_PROVIDED);
 
 	Query<Lesson> query = getSession().createQuery(queryString, Lesson.class);
@@ -337,9 +339,10 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	if (!sortBy.equals("avgTimeTaken") && !sortBy.equals("avgMark")) {
 	    query.setParameter("sortBy", sortBy);
 	}
-	// support for custom search from a toolbar
-	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString);
+	if (searchString != null) {
+	    // support for custom search from a toolbar
+	    query.setParameter("searchString", searchString);
+	}
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	return query.list();
