@@ -4,3 +4,6 @@ The following bits were modified by LAMS.
 Which required changes to be done for org.imsglobal.pox.IMSPOXRequest.java
 
 * LDEV-4589: Added a few valid parameter names
+
+* LDEV-4883 Fix HttpClient warning “Invalid expires attribute”
+	org.imsglobal.pox.IMSPOXRequest.java is customized as a result.
