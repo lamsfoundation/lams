@@ -45,7 +45,7 @@
 			<c:forEach var="item" items="${sessionMap.itemList}">
 				[${item.uid}, [
 				<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-					 <c:if test="${not empty optionDto.answer}">"${optionDto.answer}",</c:if>
+					 <c:if test="${!optionDto.mcqType && not empty optionDto.answer}">"<c:out value='${optionDto.answer}' escapeXml='true' />",</c:if>
 				</c:forEach>
 				]],
 			</c:forEach>
@@ -146,7 +146,7 @@
 			//determine if such answer is available in the list
 			var answerRowIndex = -1;
 			assessmentAnswers.get(itemUid).forEach(function(assessmentAnswer, index) {
-				if (assessmentAnswer == answer) {
+				if (assessmentAnswer == xmlEscape(answer)) {//comparing with escaped answer as assessmentAnswers' answers are escaped
 					answerRowIndex = index;
 				}
 			});
@@ -219,7 +219,7 @@
 
 					'<td class="answer-with-confidence-level-portrait">' +
 						'<div class="answer-description">' +
-							answer +
+							xmlEscape(answer) +
 						'</div>' +
 						'<hr class="hr-confidence-level" />' +
 						'<div style="padding-bottom: 10px;">' +
@@ -228,7 +228,15 @@
 					'</td>' +
 				'</tr>';
 			$("table#scratches-" + itemUid).append(trElem);
-			assessmentAnswers.get(itemUid).push(answer);
+			assessmentAnswers.get(itemUid).push(xmlEscape(answer));
+		}
+
+		function xmlEscape(value) {
+			return value.replace(/&/g, '&amp;')
+            	.replace(/</g, '&lt;')
+            	.replace(/>/g, '&gt;')
+            	.replace(/"/g, '&#034;')
+            	.replace(/'/g, '&#039;');
 		}
 
 		//a direct replacement for Java's String.hashCode() method 

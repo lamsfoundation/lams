@@ -139,7 +139,7 @@
 									<c:forEach var="optionDto" items="${itemDto.optionDtos}">
 										<c:if test="${optionDto.answer != ''}">
 											<span class="user-response <c:if test="${optionDto.correct}">successful-response</c:if> <c:if test="${!optionDto.correct}">wrong-response</c:if>">
-												<c:out value="${optionDto.answer}"></c:out>
+												<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
 											</span>
 										</c:if>
 									</c:forEach>
@@ -194,7 +194,7 @@
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${optionDto.answer}" escapeXml="false"/>
+										<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
 									</td>
 								</tr>
 							</c:forEach>

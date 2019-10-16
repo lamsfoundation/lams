@@ -22,7 +22,7 @@
 										${ALPHABET[j.index]}.
 									</td>
 									<td>
-										<c:out value="${optionDto.answer}" escapeXml="false"/>
+										<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
 										
 										<c:choose>
 											<c:when test="${optionDto.correct}">

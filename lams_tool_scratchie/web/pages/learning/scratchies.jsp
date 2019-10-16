@@ -101,7 +101,7 @@
 	
 					<td class="answer-with-confidence-level-portrait">
 						<div class="answer-description">
-							<c:out value="${optionDto.answer}" escapeXml="false" />
+							<c:out value="${optionDto.answer}" escapeXml="true" />
 						</div>
 						
 						<c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">

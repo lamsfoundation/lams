@@ -64,7 +64,7 @@
 	  				
 	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			option:"${optionDto.answer}<c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
+	  	   	     			option:"<c:out value='${optionDto.answer}' escapeXml='${!optionDto.mcqType}' /><c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
 	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)-1}">
 	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>
