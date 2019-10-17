@@ -76,13 +76,13 @@ public class QuestionParser {
      */
     public static Question[] parseQTIPackage(InputStream packageFileStream, Set<String> limitType)
 	    throws SAXParseException, IOException, SAXException, ParserConfigurationException, ZipFileUtilException {
-	List<Question> result = new ArrayList<Question>();
+	List<Question> result = new ArrayList<>();
 
 	// unique folder name
 	String tempPackageName = TEMP_PACKAGE_NAME_PREFIX + System.currentTimeMillis();
 	String tempPackageDirPath = ZipFileUtil.expandZip(packageFileStream, tempPackageName);
 	try {
-	    List<File> resourceFiles = getQTIResourceFiles(tempPackageDirPath);
+	    List<File> resourceFiles = QuestionParser.getQTIResourceFiles(tempPackageDirPath);
 	    if (resourceFiles.isEmpty()) {
 		log.warn("No resource files found in QTI package");
 	    } else {
@@ -128,7 +128,7 @@ public class QuestionParser {
      */
     public static Question[] parseQTIFile(InputStream xmlFileStream, String resourcesFolderPath, Set<String> limitType)
 	    throws ParserConfigurationException, SAXException, IOException {
-	List<Question> result = new ArrayList<Question>();
+	List<Question> result = new ArrayList<>();
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	Document doc = docBuilder.parse(xmlFileStream);
 
@@ -149,8 +149,12 @@ public class QuestionParser {
 	    }
 	    String questionTitle = questionItem.getAttribute("title");
 	    question.setTitle(questionTitle);
+	    String questionLabel = questionItem.getAttribute("label");
+	    if (StringUtils.isNotBlank(questionLabel)) {
+		question.setLabel(questionLabel);
+	    }
 
-	    Map<String, Answer> answerMap = new TreeMap<String, Answer>();
+	    Map<String, Answer> answerMap = new TreeMap<>();
 	    Map<String, Answer> matchAnswerMap = null;
 	    boolean textBasedQuestion = false;
 
@@ -222,7 +226,7 @@ public class QuestionParser {
 			    question.setAnswers(new ArrayList<Answer>());
 
 			    matchAnswerMap = answerMap;
-			    answerMap = new TreeMap<String, Answer>();
+			    answerMap = new TreeMap<>();
 			}
 
 			NodeList responseLidChildrenList = presentationChild.getChildNodes();
@@ -250,7 +254,7 @@ public class QuestionParser {
 	    }
 
 	    // extract score and feedback
-	    Map<String, String> feedbackMap = new TreeMap<String, String>();
+	    Map<String, String> feedbackMap = new TreeMap<>();
 	    if (textBasedQuestion || !answerMap.isEmpty()) {
 		NodeList answerMetadatas = questionItem.getElementsByTagName("respcondition");
 		// if no answers at all, it is Essay type
@@ -367,7 +371,7 @@ public class QuestionParser {
      * Parses query string (send by form submit or extracted otherwise) from questionChoice.jsp form.
      */
     public static Question[] parseQuestionChoiceForm(HttpServletRequest request) throws UnsupportedEncodingException {
-	List<Question> result = new ArrayList<Question>();
+	List<Question> result = new ArrayList<>();
 
 	// to know where to stop searching for question entries (disabled/unchecked form fields are not sent)
 
@@ -380,6 +384,10 @@ public class QuestionParser {
 		String questionTitle = request.getParameter("question" + questionIndex);
 		if (!StringUtils.isBlank(questionTitle)) {
 		    question.setTitle(questionTitle);
+		}
+		String questionLabel = request.getParameter("question" + questionIndex + "label");
+		if (!StringUtils.isBlank(questionLabel)) {
+		    question.setLabel(questionLabel);
 		}
 		String questionText = request.getParameter("question" + questionIndex + "text");
 		if (!StringUtils.isBlank(questionText)) {
@@ -479,12 +487,12 @@ public class QuestionParser {
 	    // find image placeholders
 	    while (imageMatcher.find()) {
 		String imageAttributesStr = imageMatcher.group(1);
-		
-		List<String> imageAttributes = new ArrayList<>(); 
+
+		List<String> imageAttributes = new ArrayList<>();
 		Collections.addAll(imageAttributes, imageAttributesStr.split("\\|"));
 		String fileName = imageAttributes.get(0);
 		imageAttributes.remove(0);
-		
+
 		// if it is plain text or something goes wrong, the placeholder simply gets removed
 		String replacement = "";
 		if (!forcePlainText) {
@@ -529,7 +537,7 @@ public class QuestionParser {
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	Document manifest = docBuilder.parse(inputStream);
 	NodeList resourcesList = manifest.getElementsByTagName("resources");
-	List<File> resourceFiles = new LinkedList<File>();
+	List<File> resourceFiles = new LinkedList<>();
 	if (resourcesList.getLength() > 0) {
 	    Element resources = (Element) resourcesList.item(0);
 	    NodeList resourceList = resources.getElementsByTagName("resource");
@@ -584,7 +592,7 @@ public class QuestionParser {
 		String width = ((Element) questionElement).getAttribute("width");
 		String height = ((Element) questionElement).getAttribute("height");
 		String classAttr = ((Element) questionElement).getAttribute("entityref");
-		
+
 		String fileName = ((Element) questionElement).getAttribute("uri");
 		if (resourcesFolderPath == null) {
 		    log.warn("Image " + fileName + " declaration found but its location is unknown");
@@ -592,7 +600,7 @@ public class QuestionParser {
 		    if (question.getResourcesFolderPath() == null) {
 			question.setResourcesFolderPath(resourcesFolderPath);
 		    }
-		    
+
 		    //add filename and other attributes, separated by ":" character
 		    result.append("[IMAGE: ").append(fileName);
 		    if (StringUtils.isNotBlank(width)) {

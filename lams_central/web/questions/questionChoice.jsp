@@ -182,6 +182,11 @@
 				</c:otherwise>
 			</c:choose>
 			<c:out value='${question.title}' />
+			
+			<input id="question${questionStatus.index}label" name="question${questionStatus.index}label"
+			       value="<c:out value='${question.label}' />"
+			       class="questionAttribute" type="hidden" />
+			       
 			<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
 			       value="<c:out value='${question.text}' />"
 			       class="questionAttribute" type="hidden" disabled="disabled" />
