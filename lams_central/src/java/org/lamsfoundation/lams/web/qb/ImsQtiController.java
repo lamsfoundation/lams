@@ -4,8 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +42,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ImsQtiController {
     private static Logger log = Logger.getLogger(ImsQtiController.class);
 
+    private static final String UUID_LABEL_PREFIX = "lams-qb-uuid-";
+
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -58,7 +63,46 @@ public class ImsQtiController {
 	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
 
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
+	Set<String> collectionUUIDs = null;
+
 	for (Question question : questions) {
+	    // UUID in QTI question label is LAMS custom idea
+	    String label = question.getLabel();
+
+	    // try to match the question to an existing QB question in DB
+	    if (label != null && label.startsWith(UUID_LABEL_PREFIX)) {
+		String uuid = label.substring(UUID_LABEL_PREFIX.length(), label.length());
+
+		QbQuestion qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+		if (qbQuestion != null) {
+		    // found an existing question with same UUID
+		    // now check if it is in the collection already
+		    if (collectionUUIDs == null) {
+			// get UUIDs of collection questions as strings
+			collectionUUIDs = qbService.getCollectionQuestions(collectionUid).stream()
+				.filter(q -> q.getUuid() != null)
+				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+		    }
+
+		    if (collectionUUIDs.contains(uuid)) {
+			if (log.isDebugEnabled()) {
+			    log.debug("Skipping an existing question. Name: " + qbQuestion.getName() + ", uid: "
+				    + qbQuestion.getUid());
+			}
+		    } else {
+			qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
+			collectionUUIDs.add(uuid);
+
+			if (log.isDebugEnabled()) {
+			    log.debug("Added to collection an existing question. Name: " + qbQuestion.getName()
+				    + ", uid: " + qbQuestion.getUid());
+			}
+		    }
+		    continue;
+		}
+
+	    }
+
 	    QbQuestion qbQuestion = new QbQuestion();
 	    qbQuestion.setName(question.getTitle());
 	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
@@ -487,6 +531,10 @@ public class ImsQtiController {
 	    }
 
 	    question.setTitle(qbQuestion.getName());
+	    if (qbQuestion.getUuid() != null) {
+		// UUID in QTI question label is LAMS custom idea
+		question.setLabel(UUID_LABEL_PREFIX + qbQuestion.getUuid());
+	    }
 	    question.setText(qbQuestion.getDescription());
 	    question.setFeedback(qbQuestion.getFeedback());
 	    question.setAnswers(answers);
