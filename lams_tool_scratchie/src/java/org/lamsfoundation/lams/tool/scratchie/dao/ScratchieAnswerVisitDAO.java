@@ -37,7 +37,7 @@ public interface ScratchieAnswerVisitDAO extends DAO {
     /**
      * Get log for VSA question.
      */
-    ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, String answer);
+    ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     int getLogCountTotal(Long sessionId);
     

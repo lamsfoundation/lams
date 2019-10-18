@@ -70,7 +70,7 @@
 	<c:otherwise>
 		<table id="scratches-${item.uid}"  class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-				<tr id="tr-${status.index}">
+				<tr id="tr-${item.uid}-${optionDto.answerHash}">
 				
 					<td style="width: 40px; border: none;">
 						<c:choose>

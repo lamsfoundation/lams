@@ -184,12 +184,6 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<ScratchieItem> getAuthoredItems(Long scratchieUid) {
-	List<ScratchieItem> res = scratchieItemDao.getAuthoringItems(scratchieUid);
-	return res;
-    }
-
-    @Override
     public void createUser(ScratchieUser scratchieUser) {
 	ScratchieUser user = getUserByIDAndSession(scratchieUser.getUserId(),
 		scratchieUser.getSession().getSessionId());
@@ -279,13 +273,6 @@ public class ScratchieServiceImpl
 
 	//populate Scratchie items with confidence levels
 	for (ScratchieItem item : items) {
-
-	    //init options' confidenceLevelDtos list
-//	    for (OptionDTO optionDto : item.getOptionDtos()) {
-//		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<>();
-//		optionDto.setConfidenceLevelDtos(confidenceLevelDtosTemp);
-//	    }
-
 	    //find corresponding QbQuestion
 	    for (ConfidenceLevelDTO confidenceLevelDto : confidenceLevelDtos) {
 		if (item.getQbQuestion().getUid().equals(confidenceLevelDto.getQbQuestionUid())) {
@@ -296,10 +283,8 @@ public class ScratchieServiceImpl
 			    optionDTO.getConfidenceLevelDtos().add(confidenceLevelDto);
 			}
 		    }
-
 		}
 	    }
-
 	}
     }
 
@@ -428,6 +413,11 @@ public class ScratchieServiceImpl
     public void saveOrUpdateScratchieSession(ScratchieSession resSession) {
 	scratchieSessionDao.saveObject(resSession);
     }
+    
+    @Override
+    public ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer) {
+	return scratchieAnswerVisitDao.getLog(sessionId, itemUid, isCaseSensitive, answer);
+    }
 
     @Override
     public void recordItemScratched(Long sessionId, Long itemUid, Long optionUid) {
@@ -445,14 +435,14 @@ public class ScratchieServiceImpl
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
+	    
+	    recalculateMarkForSession(sessionId, false);
 	}
-
-	recalculateMarkForSession(sessionId, false);
     }
     
     @Override
-    public void recordVsaAnswer(Long sessionId, Long itemUid, String answer) {
-	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(sessionId, itemUid, answer);
+    public void recordVsaAnswer(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer) {
+	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(sessionId, itemUid, isCaseSensitive, answer);
 	if (log == null) {
 	    log = new ScratchieAnswerVisitLog();
 	    log.setAnswer(answer);
@@ -461,9 +451,9 @@ public class ScratchieServiceImpl
 	    log.setQbToolQuestion(qbToolQuestion);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	    scratchieAnswerVisitDao.saveObject(log);
-	}
 
-	recalculateMarkForSession(sessionId, false);
+	    recalculateMarkForSession(sessionId, false);
+	}
     }
 
     @Override
@@ -496,7 +486,6 @@ public class ScratchieServiceImpl
 
     @Override
     public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems) {
-
 	// create list of modified questions
 	List<ScratchieItem> modifiedItems = new ArrayList<>();
 	for (ScratchieItem oldItem : oldItems) {
@@ -579,7 +568,6 @@ public class ScratchieServiceImpl
 
     @Override
     public void saveBurningQuestion(Long sessionId, Long itemUid, String question) {
-
 	boolean isGeneralBurningQuestion = itemUid == null;
 
 	ScratchieBurningQuestion burningQuestion = (isGeneralBurningQuestion)
@@ -720,7 +708,7 @@ public class ScratchieServiceImpl
 			// -1 if there is no log
 			attemptNumber = -1;
 		    } else {
-			// adding 1 to start from 1.
+			// adding 1 to start from 1
 			attemptNumber = itemLogs.indexOf(log) + 1;
 		    }
 		    optionDto.setAttemptOrder(attemptNumber);
@@ -730,9 +718,9 @@ public class ScratchieServiceImpl
 		    // -1 if there is no log
 		    int attemptNumber = -1;
 		    for (ScratchieAnswerVisitLog itemLog : itemLogs) {
-			if (itemLog.getQbToolQuestion().getUid().equals(item.getUid()) && itemLog.getAnswer() != null
-				&& itemLog.getAnswer().equals(optionDto.getAnswer())) {
-			    // adding 1 to start from 1.
+			if (itemLog.getQbToolQuestion().getUid().equals(item.getUid())
+				&& isAnswersEqual(item, itemLog.getAnswer(), optionDto.getAnswer())) {
+			    // adding 1 to start from 1
 			    attemptNumber = itemLogs.indexOf(itemLog) + 1;
 			    break;
 			}
@@ -740,8 +728,17 @@ public class ScratchieServiceImpl
 		    optionDto.setAttemptOrder(attemptNumber);
 		}
 	    }
-
 	}
+    }
+    
+    private boolean isAnswersEqual(ScratchieItem item, String answer1, String answer2) {
+	if (answer1 == null || answer2 == null) {
+	    return false;
+	}
+	
+	return item.getQbQuestion().isCaseSensitive()
+		? answer1.equals(answer2)
+		: answer1.equalsIgnoreCase(answer2);
     }
 
     @Override
@@ -752,12 +749,8 @@ public class ScratchieServiceImpl
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	
-	//populate Scratchie items with VSA answers, entered by learners in Assessment tool
-	if (scratchie.isAnswersFetchingEnabledAndVsaQuestionsAvailable()) {
-	    for (ScratchieItem item : items) {
-		fillItemWithVsaOptionDtos(item, toolSessionId, scratchie, userLogs);
-	    }
-	}
+	//populate Scratchie items with VSA answers
+	fillItemsWithVsaAnswers(items, toolSessionId, scratchie, userLogs);
 	
 	//mark scratched options
 	for (ScratchieItem item : items) {
@@ -779,7 +772,7 @@ public class ScratchieServiceImpl
 		    // find according log if it exists
 		    for (ScratchieAnswerVisitLog userLog : userLogs) {
 			if (userLog.getQbToolQuestion().getUid().equals(item.getUid())
-				&& userLog.getAnswer().equals(optionDto.getAnswer())) {
+				&& isAnswersEqual(item, userLog.getAnswer(), optionDto.getAnswer())) {
 			    isScratched = true;
 			    break;
 			}
@@ -795,36 +788,45 @@ public class ScratchieServiceImpl
 	return items;
     }
     
-    private void fillItemWithVsaOptionDtos(ScratchieItem item, Long toolSessionId, Scratchie scratchie,
+    /**
+     * Populate Scratchie item with VSA answers (both from Assessment tool and entered by current learner)
+     */
+    private void fillItemsWithVsaAnswers(Collection<ScratchieItem> items, Long toolSessionId, Scratchie scratchie,
 	    List<ScratchieAnswerVisitLog> userLogs) {
-
-	//populate Scratchie items with VSA answers, entered by learners in Assessment tool
-	if (item.getQbQuestion().getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
-		&& scratchie.isAnswersFetchingEnabledAndVsaQuestionsAvailable()) {
-	    ScratchieSession session = scratchieSessionDao.getSessionBySessionId(toolSessionId);
-	    ScratchieUser leader = session.getGroupLeader();
-	    Collection<VsaAnswerDTO> assessmentAnswers = toolService.getVsaAnswersFromAssessment(
-		    scratchie.getActivityUiidProvidingVsaAnswers(), leader.getUserId().intValue(), toolSessionId);
-
+	ScratchieUser leader = scratchieSessionDao.getSessionBySessionId(toolSessionId).getGroupLeader();
+	Collection<VsaAnswerDTO> assessmentAnswers = scratchie.isAnswersFetchingEnabled()
+		? toolService.getVsaAnswersFromAssessment(scratchie.getActivityUiidProvidingVsaAnswers(),
+			leader.getUserId().intValue(), toolSessionId)
+		: null;
+	
+	for (ScratchieItem item : items) {
 	    Long itemQbQuestionUid = item.getQbQuestion().getUid();
+	    
+	    //process only VSA items
+	    if (item.getQbQuestion().getType() != QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+		continue;
+	    }
 
-	    //find corresponding QbQuestion
-	    for (VsaAnswerDTO assessmentAnswer : assessmentAnswers) {
-		if (itemQbQuestionUid.equals(assessmentAnswer.getQbQuestionUid())) {
-		    OptionDTO optionDto = new OptionDTO();
-		    optionDto.setAnswer(assessmentAnswer.getAnswer());
-		    optionDto.setCorrect(assessmentAnswer.isCorrect());
-		    optionDto.setUserId(assessmentAnswer.getUserId());
-		    optionDto.setQbQuestionUid(assessmentAnswer.getQbQuestionUid());
-		    if (!scratchie.isConfidenceLevelsEnabled()) {
-			//don't show confidence levels
-			for (ConfidenceLevelDTO confidenceLevel : assessmentAnswer.getConfidenceLevels()) {
-			    confidenceLevel.setLevel(-1);
+	    //populate Scratchie items with VSA answers, entered by learners in Assessment tool
+	    if (scratchie.isAnswersFetchingEnabled()) {
+		//find corresponding QbQuestion
+		for (VsaAnswerDTO assessmentAnswer : assessmentAnswers) {
+		    if (itemQbQuestionUid.equals(assessmentAnswer.getQbQuestionUid())) {
+			OptionDTO optionDto = new OptionDTO();
+			optionDto.setAnswer(assessmentAnswer.getAnswer());
+			optionDto.setCorrect(assessmentAnswer.isCorrect());
+			optionDto.setUserId(assessmentAnswer.getUserId());
+			optionDto.setQbQuestionUid(assessmentAnswer.getQbQuestionUid());
+			if (!scratchie.isConfidenceLevelsEnabled()) {
+			    //don't show confidence levels
+			    for (ConfidenceLevelDTO confidenceLevel : assessmentAnswer.getConfidenceLevels()) {
+				confidenceLevel.setLevel(-1);
+			    }
 			}
-		    }
-		    optionDto.getConfidenceLevelDtos().addAll(assessmentAnswer.getConfidenceLevels());
+			optionDto.getConfidenceLevelDtos().addAll(assessmentAnswer.getConfidenceLevels());
 
-		    item.getOptionDtos().add(optionDto);
+			item.getOptionDtos().add(optionDto);
+		    }
 		}
 	    }
 
@@ -837,9 +839,10 @@ public class ScratchieServiceImpl
 		    boolean skipAddingUserAnswerToConfidenceLevel = false;
 		    for (OptionDTO optionDtoIter : item.getOptionDtos()) {
 			if (itemQbQuestionUid.equals(optionDtoIter.getQbQuestionUid())
-				&& optionDtoIter.getAnswer().equals(userLog.getAnswer())) {
+				&& isAnswersEqual(item, optionDtoIter.getAnswer(), userLog.getAnswer())) {
 			    optionDto = optionDtoIter;
-			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId().equals(leader.getUserId());
+			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId()
+				    .equals(leader.getUserId());
 			    break;
 			}
 		    }
@@ -1030,7 +1033,7 @@ public class ScratchieServiceImpl
 
 	    } else {
 		item.getOptionDtos().clear();
-		fillItemWithVsaOptionDtos(item, sessionId, scratchie, sessionAttempts);
+		fillItemsWithVsaAnswers(List.of(item), sessionId, scratchie, sessionAttempts);
 		List<OptionDTO> optionDtos = item.getOptionDtos();
 		for (OptionDTO optionDto : optionDtos) {
 		    int[] attempts = new int[optionDtos.size()];
@@ -1905,7 +1908,9 @@ public class ScratchieServiceImpl
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
 	    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
-
+	    //populate Scratchie items with VSA answers (both from Assessment tool and entered by current learner)
+	    fillItemsWithVsaAnswers(sortedItems, sessionId, scratchie, logs);
+	    
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
 		int numberOfAttempts = 0;
@@ -1913,11 +1918,6 @@ public class ScratchieServiceImpl
 		boolean isUnraveledOnFirstAttempt = false;
 		String optionsSequence = "";
 		boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
-		
-		//populate Scratchie items with VSA answers, entered by learners in Assessment tool
-		if (!isMcqItem && scratchie.isAnswersFetchingEnabledAndVsaQuestionsAvailable()) {
-		    fillItemWithVsaOptionDtos(item, sessionId, scratchie, logs);
-		}
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
@@ -1944,7 +1944,8 @@ public class ScratchieServiceImpl
 			for (OptionDTO optionDto : item.getOptionDtos()) {
 			    boolean isOptionMet = isMcqItem
 				    && optionDto.getQbOptionUid().equals(itemAttempt.getQbOption().getUid())
-				    || !isMcqItem && optionDto.getAnswer().equals(itemAttempt.getAnswer());
+				    || !isMcqItem
+					    && isAnswersEqual(item, optionDto.getAnswer(), itemAttempt.getAnswer());
 			    if (isOptionMet) {
 				sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
 				break;

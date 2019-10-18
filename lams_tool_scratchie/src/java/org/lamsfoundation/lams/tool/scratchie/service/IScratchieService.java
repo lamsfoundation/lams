@@ -33,12 +33,12 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -151,14 +151,6 @@ public interface IScratchieService extends ICommonToolService {
      */
     Scratchie getDefaultContent(Long contentId) throws ScratchieApplicationException;
 
-    /**
-     * Get list of scratchie items by given scratchieUid. These scratchie items must be created by author.
-     *
-     * @param scratchieUid
-     * @return
-     */
-    List getAuthoredItems(Long scratchieUid);
-
     // ********** for user methods *************
     /**
      * Create a new user in database.
@@ -255,6 +247,11 @@ public interface IScratchieService extends ICommonToolService {
      * @param scratchieItemList
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
+    
+    /**
+     * Return log for VSA type item.
+     */
+    ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
@@ -266,7 +263,7 @@ public interface IScratchieService extends ICommonToolService {
      * Leader has left this answer. We will store this answer for all users in his group. It will also
      * update all the marks.
      */
-    void recordVsaAnswer(Long sessionId, Long itemUid, String answer);
+    void recordVsaAnswer(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     /**
      * Recalculate mark for leader and sets it to all members of a group

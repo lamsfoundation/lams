@@ -384,14 +384,8 @@ public class Scratchie implements Cloneable {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
     }
     
-    public boolean isAnswersFetchingEnabledAndVsaQuestionsAvailable() {
-	//check Scratchie contains VSA questions
-	boolean hasVsaQuestion = false;
-	for (ScratchieItem item : scratchieItems) {
-	    hasVsaQuestion |= QbQuestion.TYPE_VERY_SHORT_ANSWERS == item.getQbQuestion().getType();
-	}
-	
-	return activityUiidProvidingVsaAnswers != null && hasVsaQuestion;
+    public boolean isAnswersFetchingEnabled() {
+	return activityUiidProvidingVsaAnswers != null;
     }
     
     /**

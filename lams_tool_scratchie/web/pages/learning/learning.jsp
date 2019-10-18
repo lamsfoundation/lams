@@ -41,16 +41,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
-		var assessmentAnswers = new Map([
-			<c:forEach var="item" items="${sessionMap.itemList}">
-				[${item.uid}, [
-				<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-					 <c:if test="${!optionDto.mcqType && not empty optionDto.answer}">"<c:out value='${optionDto.answer}' escapeXml='true' />",</c:if>
-				</c:forEach>
-				]],
-			</c:forEach>
-		]);
-
 		$(document).ready(function(){
 			//initialize tooltips showing user names next to confidence levels
 			$('[data-toggle="tooltip"]').tooltip();
@@ -143,54 +133,47 @@
 				return;
 			}
 
-			//determine if such answer is available in the list
-			var answerRowIndex = -1;
-			assessmentAnswers.get(itemUid).forEach(function(assessmentAnswer, index) {
-				if (assessmentAnswer == xmlEscape(answer)) {//comparing with escaped answer as assessmentAnswers' answers are escaped
-					answerRowIndex = index;
-				}
-			});
+			$.ajax({
+		    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
+		        data: {
+		           	sessionMapID: "${sessionMapID}", 
+		           	itemUid: itemUid,
+		           	answer: answer 
+				},
+		        dataType: 'json',
+		        type: 'post',
+		        success: function (json) {
+			    	if (json == null) {
+			           	return false;
+			        }
 
-			var isRecordVsaAnswerRequired = true;
-			if (answerRowIndex != -1) {
-				var isScrathed = $('tr#tr-' + answerRowIndex + ' img[src*="scratchie-correct.png"], tr#tr-' + answerRowIndex + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
-				//highlight already scratched answer
-				if (isScrathed) {
-					var tableRowTohighlight = $("tr#tr-" + answerRowIndex, "#scratches-" + itemUid);
-					$([document.documentElement, document.body]).animate(
-						{
-				        	scrollTop: tableRowTohighlight.offset().top
-				    	}, 
-				    	1000, 
-				    	function() {
-				    		tableRowTohighlight.effect("highlight", 1500);
-				    	}
-				    );
-						
-					isRecordVsaAnswerRequired = false;
-				}
+			    	var loggedAnswerHash = json.loggedAnswerHash,
+			    		isAnswerUnique = loggedAnswerHash == -1,
+			    		answerHashToScratch = isAnswerUnique ? hashCode(answer) : loggedAnswerHash
+					    trId = "#tr-" + itemUid + "-" + answerHashToScratch;
 
-			//if answer is not available in the list, add it to the list
-			} else {
-				paintNewVsaAnswer(itemUid, answer);
-			}
+			    	//if answer was not provided yet, add it to the list
+			    	if (isAnswerUnique) {
+						paintNewVsaAnswer(itemUid, answer);
+					}
 
-			if (isRecordVsaAnswerRequired) {
-				$.ajax({
-			    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
-			        data: {
-			           	sessionMapID: "${sessionMapID}", 
-			           	itemUid: itemUid,
-			           	answer: answer 
-					},
-			        dataType: 'json',
-			        type: 'post',
-			        success: function (json) {
-				    	if (json == null) {
-				           	return false;
-				        }
+			    	var isScrathed = $(trId + ' img[src*="scratchie-correct.png"], ' + trId + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
+			    	//highlight already scratched answer
+			    	if (isScrathed) {
+						var tableRowTohighlight = $(trId, "#scratches-" + itemUid);
+						$([document.documentElement, document.body]).animate(
+							{
+						       	scrollTop: tableRowTohighlight.offset().top
+						   	}, 
+						   	1000, 
+						   	function() {
+						   		tableRowTohighlight.effect("highlight", 1500);
+						   	}
+						);
 
-				        scratchImage(itemUid, hashCode(answer), json.isAnswerCorrect);
+			    	//scratch it otherwise
+		        	} else {
+				        scratchImage(itemUid, answerHashToScratch, json.isAnswerCorrect);
 				            	
 				        if (json.isAnswerCorrect) {
 				           	//disable further answering
@@ -199,9 +182,9 @@
 					        //disable submit button
 				           	$("#type-your-answer-" + itemUid).hide();
 				        }
-			        }
-		       	});
-			}
+					}
+		        }
+	       	});
 
 	        //blank input field
 			input.val("");
@@ -209,12 +192,13 @@
 
 		//add new VSA answer to the table (required in case user entered answer not present in the previous answers)
 		function paintNewVsaAnswer(itemUid, answer) {
-			var answerRowIndex = assessmentAnswers.get(itemUid).length;
+			var optionsLength = $("table#scratches-" + itemUid + " tr").length;
+			var idSuffix = '-' + itemUid + '-' + hashCode(answer);
 			
 			var trElem = 
-				'<tr id="tr-' + answerRowIndex + '">' +
+				'<tr id="tr' + idSuffix + '">' +
 					'<td style="width: 40px; border: none;">' +
-						'<img src="<lams:WebAppURL/>includes/images/answer-' + answerRowIndex + '.png" class="scartchie-image" id="image-' + itemUid + '-' + hashCode(answer) + '" />' +
+						'<img src="<lams:WebAppURL/>includes/images/answer-' + optionsLength + '.png" class="scartchie-image" id="image' + idSuffix + '" />' +
 					'</td>' +
 
 					'<td class="answer-with-confidence-level-portrait">' +
@@ -228,7 +212,6 @@
 					'</td>' +
 				'</tr>';
 			$("table#scratches-" + itemUid).append(trElem);
-			assessmentAnswers.get(itemUid).push(xmlEscape(answer));
 		}
 
 		function xmlEscape(value) {
