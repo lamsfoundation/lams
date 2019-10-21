@@ -238,7 +238,8 @@ public class ScratchieServiceImpl
 	    }
 	}
 
-	return presetMarks.split(",");
+	//remove all white spaces and split the settings around matches of ","
+	return presetMarks.replaceAll("\\s+","").split(",");
     }
 
     @Override
