@@ -113,7 +113,6 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -809,8 +808,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    Pattern pattern = Pattern.compile(regex,
 				    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 			    if (pattern.matcher(answer).matches()) {
-				String answerFloatStr = answer.substring(0,
-					answer.length() - unit.getName().length());
+				String answerFloatStr = answer.substring(0, answer.length() - unit.getName().length());
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
@@ -1354,10 +1352,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionSummary.setNotAllocatedQuestionResults(notAllocatedQuestionResults);
 
 	    //check is it a TBL case, i.e. only two option groups available, one has 0%, second - 100%
-	    boolean isCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();  
+	    boolean isCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();
 	    questionSummary.setTbl(isCompatibleWithTbl);
 	}
-	
+
 	return questionSummary;
     }
 
@@ -1366,9 +1364,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Long questionResultUid) {
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	AssessmentQuestionResult questionRes = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(questionResultUid);
+	AssessmentQuestionResult questionRes = assessmentQuestionResultDao
+		.getAssessmentQuestionResultByUid(questionResultUid);
 	String answer = questionRes.getAnswer();
-	
+
 	//adding
 	if (previousOptionUid.equals(-1L)) {
 	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
@@ -1388,7 +1387,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (previousOption.getUid().equals(previousOptionUid)) {
 		    String name = previousOption.getName();
 		    String[] alternatives = name.split("\r\n");
-		    
+
 		    String nameWithoutUserAnswer = "";
 		    for (String alternative : alternatives) {
 			if (!alternative.equals(answer)) {
@@ -1402,11 +1401,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    break;
 		}
 	    }
-	    
+
 	}
 	//reshuffling inside the same container - do nothing
 	else if (targetOptionUid.equals(previousOptionUid)) {
-	    
+
 	}
 	//moving from one to another
 	else {
@@ -1419,12 +1418,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    break;
 		}
 	    }
-	    
+
 	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
 		if (previousOption.getUid().equals(previousOptionUid)) {
 		    String name = previousOption.getName();
 		    String[] alternatives = name.split("\r\n");
-		    
+
 		    String nameWithoutUserAnswer = "";
 		    for (String alternative : alternatives) {
 			if (!alternative.equals(answer)) {
@@ -1441,10 +1440,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 	assessmentResultDao.flush();
-	
+
 	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
 	if (!targetOptionUid.equals(previousOptionUid)) {
-	    
+
 	    // get all finished user results
 	    List<AssessmentResult> assessmentResults = assessmentResultDao
 		    .getAssessmentResultsByQbQuestion(qbQuestion.getUid());
@@ -1486,7 +1485,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
 			assessmentMaxMark, user);
 	    }
-	    
+
 	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
 	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
 	}
@@ -2132,7 +2131,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Long trueKey, Long falseKey) {
 	ExcelCell[] summaryTable;
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    List<QbOption> options = question.getQbQuestion().getQbOptions();
 	    summaryTable = new ExcelCell[options.size() + 1];
@@ -2230,7 +2230,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    total += value;
 	}
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
@@ -2563,12 +2564,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
     }
-    
+
     /**
      * Store new mark and maxMark if they were changed
      */
-    private void storeAssessmentResultMarkAndMaxMark(AssessmentResult assessmentResult, AssessmentResult lastFinishedAssessmentResult,
-	    float newAssessmentMark, int newAssessmentMaxMark, AssessmentUser user) {
+    private void storeAssessmentResultMarkAndMaxMark(AssessmentResult assessmentResult,
+	    AssessmentResult lastFinishedAssessmentResult, float newAssessmentMark, int newAssessmentMaxMark,
+	    AssessmentUser user) {
 	// store new mark and maxMark if they were changed
 	if ((assessmentResult.getGrade() != newAssessmentMark)
 		|| (assessmentResult.getMaximumGrade() != newAssessmentMaxMark)) {
@@ -3114,13 +3116,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	return confidenceLevelDtos;
     }
-    
+
     @Override
     public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
 	if (toolSessionId == null) {
 	    return new ArrayList<>();
 	}
-	
+
 	Map<String, VsaAnswerDTO> uid_answerToVsaAnswerDtoMap = new LinkedHashMap<>();
 
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
@@ -3142,12 +3144,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 		    //uid_answer should be unique in the final list
 		    String uid_answer = qbQuestion.getUid() + "_" + questionResult.getAnswer();
-		    
+
 		    //find VsaAnswerDTO in the map, or create the new one if it doesn't exist
 		    VsaAnswerDTO vsaAnswerDTO;
 		    if (uid_answerToVsaAnswerDtoMap.containsKey(uid_answer)) {
 			vsaAnswerDTO = uid_answerToVsaAnswerDtoMap.get(uid_answer);
-			
+
 		    } else {
 			vsaAnswerDTO = new VsaAnswerDTO();
 			vsaAnswerDTO.setQbQuestionUid(qbQuestion.getUid());
@@ -3155,7 +3157,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			vsaAnswerDTO.setCorrect(questionResult.getMark() > 0);
 			vsaAnswerDTO.setUserId(user.getUserId());
 			uid_answerToVsaAnswerDtoMap.put(uid_answer, vsaAnswerDTO);
-			
+
 			//find and store optionUid
 			for (QbOption option : qbQuestion.getQbOptions()) {
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
@@ -3168,7 +3170,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 			}
 		    }
-		    
+
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(user.getUserId().intValue());
 		    String userName = StringUtils.isBlank(user.getFirstName())
@@ -3178,7 +3180,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 
-		    vsaAnswerDTO.getConfidenceLevels().add(confidenceLevelDto);		    
+		    vsaAnswerDTO.getConfidenceLevels().add(confidenceLevelDto);
 		}
 	    }
 
@@ -3399,34 +3401,37 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (JsonNode questionJSONData : questions) {
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
-	    question.getQbQuestion().setType(type);
-	    question.getQbQuestion().setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
-	    question.getQbQuestion().setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+	    qbQuestion.setType(type);
+	    qbQuestion.setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
+	    qbQuestion.setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+	    question.setQbQuestion(qbQuestion);
 	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
 
-	    question.getQbQuestion().setAllowRichEditor(
+	    qbQuestion.setAllowRichEditor(
 		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    question.getQbQuestion().setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
-	    question.getQbQuestion().setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
-	    question.getQbQuestion().setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
-	    question.getQbQuestion()
-		    .setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
-	    question.getQbQuestion()
+	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
+	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
+	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+	    qbQuestion
 		    .setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
-	    question.getQbQuestion().setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
-	    question.getQbQuestion().setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
-	    question.getQbQuestion().setMultipleAnswersAllowed(
+	    qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+	    qbQuestion.setMultipleAnswersAllowed(
 		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-	    question.getQbQuestion().setIncorrectAnswerNullifiesMark(
+	    qbQuestion.setIncorrectAnswerNullifiesMark(
 		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+	    qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+
+	    assessmentDao.insert(qbQuestion);
+	    question.setToolContentId(toolContentID);
+
 	    // question.setUnits(units); Needed for numerical type question
 
 	    if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
@@ -3441,8 +3446,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
 		for (JsonNode answerData : optionsData) {
 		    QbOption option = new QbOption();
+		    option.setQbQuestion(qbQuestion);
 		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		    option.setMaxMark(answerData.get("maxMark").floatValue());
+		    Double maxMark = JsonUtil.optDouble(answerData, "maxMark");
+		    option.setMaxMark(maxMark == null ? 1 : maxMark.floatValue());
 		    option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
 		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
 		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));

@@ -2041,9 +2041,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
 	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setMaxMark(1);
+	    userManagementService.save(qbQuestion);
+	    
 	    McQueContent question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
 		    mcq);
 
@@ -2053,6 +2056,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
 		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
 		qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
+		qbOption.setQbQuestion(qbQuestion);
 		question.getQbQuestion().getQbOptions().add(qbOption);
 	    }
 	    saveOrUpdateMcQueContent(question);
