@@ -11,11 +11,11 @@
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	<style type="text/css">
-		#confidence-levels-activity {
+		#confidence-levels-activity, #activity-providing-vsa-answers {
 			display: inline-block;
 			width: 200px;
 		}
-		#display-confidence-levels-activities {
+		#display-confidence-levels-activities, #display-activities-providing-vsa-answers {
 			margin-top: 8px;
 		}
 		#question-bank-div {

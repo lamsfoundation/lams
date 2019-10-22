@@ -99,8 +99,12 @@ public class SearchQBController {
 	StringBuilder questionTypesAvailable = new StringBuilder();
 	//by default show MCQ type of questions (except for Q&A tool)
 	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE;
-	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)
-		|| CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+	if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+
+	} else if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
 
 	    //CommonConstants.TOOL_SIGNATURE_SURVEY
 	} else if ("lasurv11".equals(toolSignature)) {
@@ -113,7 +117,7 @@ public class SearchQBController {
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_MATCHING_PAIRS);
 	    questionTypesAvailable.append(",");
-	    questionTypesAvailable.append(QbQuestion.TYPE_SHORT_ANSWER);
+	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_NUMERICAL);
 	    questionTypesAvailable.append(",");
@@ -131,6 +135,8 @@ public class SearchQBController {
 	}
 	request.setAttribute("questionType", questionTypeDefault);
 	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
+	//let jsp know it's Scratchie, so we can disable VSA questions not compatible with TBL
+	request.setAttribute("isScratchie", CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature));
 
 	//prepare data for displaying collections
 	Integer userId = getUserId();
@@ -213,6 +219,11 @@ public class SearchQBController {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	QbQuestion qbQuestion = (QbQuestion) userManagementService.findById(QbQuestion.class, questionUid);
 	request.setAttribute("question", qbQuestion);
+
+	boolean isVsaAndCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();
+	request.setAttribute("isVsaAndCompatibleWithTbl", isVsaAndCompatibleWithTbl);
+	boolean isScratchie = WebUtil.readBooleanParam(request, "isScratchie", false);
+	request.setAttribute("isScratchie", isScratchie);
 
 	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
 	request.setAttribute("otherVersions", otherVersions);

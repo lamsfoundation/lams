@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -34,9 +35,9 @@ import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
-import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 
 /**
  * Tool may contain several questions. Which in turn contain optionDtos.
@@ -51,6 +52,9 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private static final long serialVersionUID = -2824051249870361117L;
 
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
+    
+    @Column(name = "scratchie_uid")
+    private Long scratchieUid;
 
     // ************************ DTO fields ***********************
     @Transient
@@ -58,7 +62,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     @Transient
     private String burningQuestion;
     @Transient
-    private List<QbOptionDTO> optionDtos = null;
+    private List<OptionDTO> optionDtos = null;
 
     @Override
     public Object clone() {
@@ -72,19 +76,21 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	return item;
     }
 
-    public List<QbOptionDTO> getOptionDtos() {
+    public List<OptionDTO> getOptionDtos() {
 	if (optionDtos == null) {
 	    optionDtos = new LinkedList<>();
-	    for (QbOption option : qbQuestion.getQbOptions()) {
-		QbOptionDTO answer = new QbOptionDTO();
-		answer.setQbOption(option);
-		optionDtos.add(answer);
+	    
+	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == this.qbQuestion.getType()) {
+		for (QbOption qbOption : qbQuestion.getQbOptions()) {
+		    OptionDTO optionDTO = new OptionDTO(qbOption);
+		    optionDtos.add(optionDTO);
+		}
 	    }
 	}
 	return optionDtos;
     }
 
-    public void setOptionDtos(List<QbOptionDTO> optionDtos) {
+    public void setOptionDtos(List<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
     }
 

@@ -236,7 +236,8 @@
         $("#question-detail-area").show().load(
   	       	'<c:url value="/searchQB/displayQuestionDetails.do"/>',
   	       	{
-  	       		questionUid: questionUid
+  	       		questionUid: questionUid,
+  	       		isScratchie: ${isScratchie}
   	    	},
   	    	function() {
   	    	}

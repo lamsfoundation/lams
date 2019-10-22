@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <script>
 	function exportExcel(){
 		location.href = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
@@ -68,13 +69,13 @@
 						</a>
 					</td>
 					
-					<c:forEach var="option" items="${question.options}">
+					<c:forEach var="option" items="${question.optionDtos}">
 						<td class="normal <c:if test='${option.maxMark == 1}'>success</c:if>">
 							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
 						</td>
 					</c:forEach>
 					
-					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.options)}" var="j">
+					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.optionDtos)}" var="j">
 						<td class="normal"></td>
 					</c:forEach>
 				</tr>
@@ -104,14 +105,14 @@
 					<table class="table table-striped table-hover">
 						<tbody>
 						
-							<c:forEach var="option" items="${question.options}" varStatus="j">
+							<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
 								<c:set var="cssClass"><c:if test='${option.maxMark == 1}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${option.name}" escapeXml="false"/>
+										<c:out value="${fn:replace(option.name, newLineChar, ', ')}" escapeXml="false"/>
 									</td>
 									<td class="${cssClass}">
 										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
@@ -125,7 +126,7 @@
 			</div> 
 		</div>
 	            
-		<div class="modal-footer">	
+		<div class="modal-footer">
 			<a href="#" data-dismiss="modal" class="btn btn-default">
 				<fmt:message key="label.ok"/>
 			</a>

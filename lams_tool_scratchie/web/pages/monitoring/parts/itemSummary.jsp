@@ -47,31 +47,27 @@
 	  					width: '100%',
 	  					guiStyle: "bootstrap",
 	  					iconSet: 'fontAwesome',
-	  				   	colNames:["<fmt:message key="label.monitoring.summary.answer" />"
-		  			  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
-		  			  	   	 			,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i.index + 1}"
-					  		        </c:forEach>
-	  							],
-	  						    
+	  				   	colNames:[
+		  				   	"<fmt:message key="label.monitoring.summary.answer" />"
+		  			  	   	<c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
+		  			  	   		,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i.index + 1}"
+					  		</c:forEach>
+	  					],
 	  				   	colModel:[
 							{name:'option',index:'option', width:180}
   			  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 			  	   	 			,{name:'choice${i.index}', index:'${i.index}choice', align:"center", sorttype:"int"}
 		  		        	</c:forEach>		
 	  				   	],
-	  				   	
-	  				   	multiselect: false,
-	  				   	//caption: "<fmt:message key="label.monitoring.item.summary.group" /> ${summary.sessionName}"
+	  				   	multiselect: false
 	  				});
 	  				
 	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			option:"${optionDto.qbOption.name}<c:if test='${optionDto.qbOption.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
-	  	   	     			
-	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)}">
+	  	   	     			option:"<c:out value='${optionDto.answer}' escapeXml='${!optionDto.mcqType}' /><c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
+	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)-1}">
 	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>
-	  	   	     			
 	  	   	   	   	    });
 	  		        </c:forEach>			
 	  				
@@ -96,9 +92,7 @@
         		self.parent.tb_remove();
     		}
   		</script>
-		
 	</lams:head>
-	
 	<body class="stripes">
 	
 		<c:set var="title">
@@ -108,9 +102,6 @@
 		</c:set>
 		<lams:Page type="learning" title="${title}">
 		
-			<h4>
-				<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
-			</h4>
 			<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
 			<br>
 			
@@ -132,7 +123,6 @@
 	
 		<div id="footer"></div>
 
-		</lams:Page>
-				
+		</lams:Page>	
 	</body>
 </lams:html>

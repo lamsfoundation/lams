@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.questions;
 
 import java.util.Arrays;
@@ -42,13 +41,14 @@ public class Question {
     public static final String QUESTION_TYPE_MATCHING = "mt";
     public static final String QUESTION_TYPE_FILL_IN_BLANK = "fb";
     public static final String QUESTION_TYPE_MARK_HEDGING = "mh";
-    public static final Set<String> QUESTION_TYPES = new TreeSet<String>(Arrays
+    public static final Set<String> QUESTION_TYPES = new TreeSet<>(Arrays
 	    .asList(new String[] { Question.QUESTION_TYPE_MULTIPLE_CHOICE, Question.QUESTION_TYPE_MULTIPLE_RESPONSE,
 		    Question.QUESTION_TYPE_TRUE_FALSE, Question.QUESTION_TYPE_ESSAY, Question.QUESTION_TYPE_MATCHING,
 		    Question.QUESTION_TYPE_FILL_IN_BLANK, Question.QUESTION_TYPE_MARK_HEDGING }));
 
     private String type;
     private String title;
+    private String label;
     private String text;
     private String feedback;
     private List<Answer> answers;
@@ -66,6 +66,14 @@ public class Question {
 
     public String getTitle() {
 	return title;
+    }
+
+    public String getLabel() {
+	return label;
+    }
+
+    public void setLabel(String label) {
+	this.label = label;
     }
 
     public void setTitle(String title) {

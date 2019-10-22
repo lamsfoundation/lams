@@ -30,7 +30,7 @@ public class ScratchieConstants {
 
     public static final int COMPLETED = 1;
 
-    public static final int INITIAL_OPTIONS_NUMBER = 4;
+    public static final int INITIAL_MCQ_OPTIONS_NUMBER = 4;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -83,21 +83,9 @@ public class ScratchieConstants {
 
     public static final String ATTR_ITEM_DESCRIPTION_PREFIX = "itemDescription";
 
-    public static final String ATTR_OPTION_CORRECT = "optionCorrect";
-
     public static final String ATTR_ITEM_COUNT = "itemCount";
 
     public static final String ATTR_GROUP_USERS = "groupUsers";
-
-    public static final String ATTR_OPTION_LIST = "optionList";
-
-    public static final String ATTR_OPTION_COUNT = "optionCount";
-
-    public static final String ATTR_OPTION_DESCRIPTION_PREFIX = "optionDescription";
-
-    public static final String ATTR_OPTION_ORDER_ID_PREFIX = "optionOrderId";
-
-    public static final String ATTR_OPTION_UID_PREFIX = "optionUid";
 
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
 
@@ -183,7 +171,9 @@ public class ScratchieConstants {
 
     public static final String ATTR_OPTION_UIDS = "optionUids";
     
-    public static final String ATTR_CONFIDENCE_LEVELS_ACTIVITIES = "confidenceLevelsActivities";
+    public static final String ATTR_ACTIVITIES_PROVIDING_CONFIDENCE_LEVELS = "activitiesProvidingConfidenceLevels";
+    
+    public static final String ATTR_ACTIVITIES_PROVIDING_VSA_ANSWERS = "activitiesProvidingVsaAnswers";
 
     public static final String LEARNER_MARK = "learner.mark";
 

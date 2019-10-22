@@ -5,6 +5,12 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="addQuestionHeader.jsp"%>
+		<style>
+			textarea {
+			  resize: none;
+			}
+		</style>
+		
   	    <script>
 			$(document).ready(function(){
 		    	$("#assessmentQuestionForm").validate({
@@ -21,17 +27,17 @@
 		    			},
 		    			hasOptionFilled: {
 		    				required: function(element) {
-		    		        	return $("input[name^=optionName]:filled").length < 1;
+		    		        	return $("textarea[name^=optionName]:filled").length < 1;
 			    		    }			    		    
 	    			    },
-	    			    hasOneHundredMaxMark: {
+	    			    hasOnePositiveMaxMark: {
 		    				required: function(element) {
-		    					var hasOneHundredMaxMark = false;
+		    					var hasOnePositiveMaxMark = false;
 		    					$("input[name^='optionMaxMark']").each(function() {
-		    						hasOneHundredMaxMark = hasOneHundredMaxMark || (eval(this.value) == 1);
+		    						hasOnePositiveMaxMark = hasOnePositiveMaxMark || (eval(this.value) > 0);
 		    					});
-	    			    		return !hasOneHundredMaxMark;
-			    		    }			    		    
+	    			    		return !hasOnePositiveMaxMark;
+			    		    }		    		    
 	    			    }
 		    		},
 		    		messages: {
@@ -45,7 +51,9 @@
 		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
 		    			},
 		    			hasOptionFilled: "<fmt:message key='label.authoring.numerical.error.answer'/>",
-		    			hasOneHundredMaxMark: "<fmt:message key='error.form.validation.hundred.score'/>"
+		    			hasOnePositiveMaxMark: {
+		    				required: "<fmt:message key='error.positive.grade.required'/>"
+		    			}
 		    		},
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();     			    
@@ -69,6 +77,11 @@
 					unhighlight: formValidationUnhighlight
 		  		});
 			});
+
+			function autoGrowTextarea(element) {
+			    element.style.height = "5px";
+			    element.style.height = (element.scrollHeight)+"px";
+			}
   		</script>
 </lams:head>
 <body>
@@ -119,7 +132,7 @@
 						<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
 					</div>
 					<div>
-						<input type="text" name="hasOneHundredMaxMark" id="hasOneHundredMaxMark" class="fake-validation-input">
+						<input type="text" name="hasOnePositiveMaxMark" id="hasOnePositiveMaxMark" class="fake-validation-input">
 					</div>
 				</div>
 				
@@ -138,7 +151,7 @@
 						<label for="answer-required">
 							<fmt:message key="label.authoring.answer.required" />
 						</label>
-					</div>>
+					</div>
 					
 					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row form-inline">
@@ -175,6 +188,17 @@
 								<form:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></form:option>
 							</form:select>
 						</div>
+					</div>
+					
+					
+					<div>
+						<label class="switch">
+							<form:checkbox path="autocompleteEnabled" id="autocomplete-enabled"/>
+							<span class="switch-slider round"></span>
+						</label>
+						<label for="autocomplete-enabled">
+							<fmt:message key="label.autocomplete.as.student" />
+						</label>
 					</div>
 	
 					<div class="voffset5 form-group">

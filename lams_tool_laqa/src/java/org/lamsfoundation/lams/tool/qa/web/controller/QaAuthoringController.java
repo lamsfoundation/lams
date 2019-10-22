@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -87,7 +88,7 @@ public class QaAuthoringController implements QaAppConstants {
 
     @Autowired
     private IQbService qbService;
-    
+
     @Autowired
     private IUserManagementService userManagementService;
 
@@ -158,12 +159,15 @@ public class QaAuthoringController implements QaAppConstants {
 
     /**
      * submits content into the tool database
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     *
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     @RequestMapping("/submitAllContent")
-    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request) throws IOException, ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request)
+	    throws IOException, ServletException, IllegalAccessException, InvocationTargetException,
+	    NoSuchMethodException {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
@@ -176,19 +180,19 @@ public class QaAuthoringController implements QaAppConstants {
 	    qaPO = qa;
 	    qaPO.setCreationDate(new Timestamp(new Date().getTime()));
 	    qaPO.setUpdateDate(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    // copyProperties() below sets qaPO's conditions to empty collection
 	    // but the conditions still exist in Hibernate cache, so we need to evict them now
 	    for (QaCondition condition : qaPO.getConditions()) {
 		qaService.releaseFromCache(condition);
 	    }
-	    
+
 	    qaPO.getQaQueContents().clear();
 	    qaPO.getConditions().clear();
 	    Long uid = qaPO.getUid();
 	    PropertyUtils.copyProperties(qaPO, qa);
-	    
+
 	    // set back UID
 	    qaPO.setUid(uid);
 
@@ -204,7 +208,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	    qaPO.setUpdateDate(new Timestamp(new Date().getTime()));
 	}
-	
+
 	// *******************************Handle user*******************
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	long userId = 0;
@@ -221,7 +225,7 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 	qaPO.setCreatedBy(userId);
 	qaService.saveOrUpdateQaContent(qaPO);
-	
+
 	// ************************* Handle Q&A questions *******************
 	Set<QaQueContent> items = new LinkedHashSet<>();
 	Set<QaQueContent> newItems = getQuestions(sessionMap);
@@ -232,7 +236,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    items.add(question);
 	}
 	qaPO.setQaQueContents(items);
-	
+
 	// ************************* Handle Q&A conditions *******************
 	SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
 	for (QaCondition condition : conditions) {
@@ -246,14 +250,14 @@ public class QaAuthoringController implements QaAppConstants {
 	    }
 	}
 	qaPO.setConditions(conditions);
-	
+
 	//reorder questions so displayOrder numbers come in strictly sequential order (it's required for proper work of learning)
 	int displayOrder = 1;
 	for (QaQueContent question : newItems) {
 	    question.setDisplayOrder(displayOrder++);
 	    qaService.saveOrUpdate(question);
 	}
-	
+
 	qaService.saveOrUpdateQaContent(qaPO);
 
 	// ************************* Handle rating criterias *******************
@@ -262,7 +266,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	
+
 	// remove deleted questions
 	List<QaQueContent> deletedQuestions = getDeletedQuestions(sessionMap);
 	for (QaQueContent deletedQuestion : deletedQuestions) {
@@ -335,6 +339,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    qbQuestion = new QbQuestion();
 	    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
 	    qbQuestion.setQuestionId(form.getQuestionId());
+	    qbQuestion.setContentFolderId(form.getContentFolderID());
 
 	    qaQuestion = new QaQueContent();
 	    int maxSeq = 1;
@@ -345,7 +350,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    qaQuestion.setDisplayOrder(maxSeq);
 	    qaQuestions.add(qaQuestion);
 
-	// edit
+	    // edit
 	} else {
 	    List<QaQueContent> rList = new ArrayList<>(qaQuestions);
 	    qaQuestion = rList.get(itemIdx);
@@ -369,7 +374,8 @@ public class QaAuthoringController implements QaAppConstants {
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
 		// impossible scenario as long as ESSAY question type can't have version
-		throw new RuntimeException("Impossible scenario as long as ESSAY question type can't have new versions");
+		throw new RuntimeException(
+			"Impossible scenario as long as ESSAY question type can't have new versions");
 	    }
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
 		// new question gets created
@@ -403,20 +409,19 @@ public class QaAuthoringController implements QaAppConstants {
 
 	return "authoring/itemlist";
     }
-    
+
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      */
     @RequestMapping("/newQuestionBox")
     private String newQuestionBox(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request,
-	    @RequestParam String sessionMapID, @RequestParam String contentFolderID) {
+	    @RequestParam String sessionMapID) {
 	form.setSessionMapID(sessionMapID);
-	form.setContentFolderID(contentFolderID);
+	String questionContentFolderID = FileUtil.generateUniqueContentFolderID();
+	form.setContentFolderID(questionContentFolderID);
 	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
-	
-	QbUtils.fillFormWithUserCollections(qbService, form, null);
 
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	QbUtils.fillFormWithUserCollections(qbService, form, null);
 	return "authoring/newQuestionBox";
     }
 
@@ -431,7 +436,7 @@ public class QaAuthoringController implements QaAppConstants {
 		.getAttribute(sessionMapID);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
-	
+
 	List<QaQueContent> rList = new ArrayList<>(qaQuestions);
 	QaQueContent qaQuestion = rList.get(questionIndex);
 	QbQuestion qbQuestion = qaQuestion.getQbQuestion();
@@ -446,10 +451,10 @@ public class QaAuthoringController implements QaAppConstants {
 	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
 	form.setFeedback(qbQuestion.getFeedback());
 
-	form.setContentFolderID(contentFolderID);
+	form.setContentFolderID(qbQuestion.getContentFolderId());
 	form.setSessionMapID(sessionMapID);
 	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
-	
+
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/newQuestionBox";
     }
@@ -463,7 +468,7 @@ public class QaAuthoringController implements QaAppConstants {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	int questionIndex = NumberUtils.toInt(request.getParameter("questionIndex"), -1);
 	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
-	
+
 	if (questionIndex != -1) {
 	    List<QaQueContent> rList = new ArrayList<>(qaQuestions);
 	    QaQueContent questionToDelete = rList.remove(questionIndex);
@@ -473,7 +478,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    // add to delList
 	    List<QaQueContent> delList = getDeletedQuestions(sessionMap);
 	    delList.add(questionToDelete);
-	    
+
 	    //take care about conditions
 	    SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
 	    Iterator<QaCondition> conditionIter = conditions.iterator();
@@ -498,8 +503,8 @@ public class QaAuthoringController implements QaAppConstants {
      * moves a question down in the list
      */
     @RequestMapping("/moveQuestionDown")
-    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
-	    HttpServletRequest request) throws IOException, ServletException {
+    public String moveQuestionDown(@ModelAttribute("newQuestionForm") QaAuthoringForm form, HttpServletRequest request)
+	    throws IOException, ServletException {
 	swapQuestions(form, request, "down");
 
 	return "authoring/itemlist";
@@ -509,8 +514,8 @@ public class QaAuthoringController implements QaAppConstants {
      * moves a question up in the list
      */
     @RequestMapping("/moveQuestionUp")
-    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
-	    HttpServletRequest request) throws IOException, ServletException {
+    public String moveQuestionUp(@ModelAttribute("newQuestionForm") QaAuthoringForm form, HttpServletRequest request)
+	    throws IOException, ServletException {
 	swapQuestions(form, request, "up");
 
 	return "authoring/itemlist";
@@ -526,7 +531,7 @@ public class QaAuthoringController implements QaAppConstants {
 	// get current and the target item, and switch their sequence
 	QaQueContent originalQuestion = rList.get(originalQuestionIndex);
 	QaQueContent replacedQuestion = rList.get(replacedQuestionIndex);
-	
+
 	int upSeqId = replacedQuestion.getDisplayOrder();
 	replacedQuestion.setDisplayOrder(originalQuestion.getDisplayOrder());
 	originalQuestion.setDisplayOrder(upSeqId);
@@ -534,7 +539,7 @@ public class QaAuthoringController implements QaAppConstants {
 	// put back list, it will be sorted again
 	questions.clear();
 	questions.addAll(rList);
-	
+
 	return questions;
     }
 
@@ -546,7 +551,7 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 	return false;
     }
-    
+
     /**
      * List current Q&A questions.
      *
@@ -562,7 +567,7 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 	return list;
     }
-    
+
     /**
      * List save deleted scratchie items, which could be persisted or non-persisted items.
      *
@@ -578,14 +583,14 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 	return list;
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(QaAuthoringForm form, HttpServletRequest request) {
 	String sessionMapID = form.getSessionMapID();
 	request.setAttribute(QaAppConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(QbQuestionForm form, HttpServletRequest request) {
 	String sessionMapID = form.getSessionMapID();

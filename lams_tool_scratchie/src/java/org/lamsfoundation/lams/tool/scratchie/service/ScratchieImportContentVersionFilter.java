@@ -33,7 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.qb.QbUtils;
-import org.lamsfoundation.lams.tool.scratchie.dto.QbOptionDTO;
+import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -60,7 +60,7 @@ public class ScratchieImportContentVersionFilter extends ToolContentVersionFilte
 
 	this.removeField(Scratchie.class, "createdBy");
 
-	this.removeField(QbOptionDTO.class, "scratchieItem");
+	this.removeField(OptionDTO.class, "scratchieItem");
 
 	this.addField(ScratchieSession.class, "mark", "0");
 	this.addField(ScratchieSession.class, "scratchingFinished", "0");

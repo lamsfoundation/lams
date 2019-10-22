@@ -33,12 +33,12 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -73,6 +73,17 @@ public interface IScratchieService extends ICommonToolService {
      */
     void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items);
+    
+//    /**
+//     * Populate scratchie items with the VSA answers from the Assessment activity specified in author
+//     *
+//     * @param userId
+//     * @param toolSessionId
+//     * @param confidenceLevelsActivityUiid
+//     * @param items
+//     */
+//    void populateItemsWithVsaAnswers(Long userId, Long toolSessionId, Integer activityUiidProvidingVsaAnswers,
+//	    Collection<ScratchieItem> items);
 
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
@@ -81,8 +92,17 @@ public interface IScratchieService extends ICommonToolService {
      *            toolContentId of the specified activity
      * @return
      */
-    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
-
+    Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
+    
+    /**
+     * Returns all activities that precede specified activity and produce VSA answers (only Assessments at the moment).
+     *
+     * @param toolContentId
+     *            toolContentId of the specified activity
+     * @return
+     */
+    Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId);
+    
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      *
@@ -130,14 +150,6 @@ public interface IScratchieService extends ICommonToolService {
      * @throws ScratchieApplicationException
      */
     Scratchie getDefaultContent(Long contentId) throws ScratchieApplicationException;
-
-    /**
-     * Get list of scratchie items by given scratchieUid. These scratchie items must be created by author.
-     *
-     * @param scratchieUid
-     * @return
-     */
-    List getAuthoredItems(Long scratchieUid);
 
     // ********** for user methods *************
     /**
@@ -228,31 +240,30 @@ public interface IScratchieService extends ICommonToolService {
     void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
 
     /**
-     * Fill in scratchieItems with information about whether they were unraveled; and options with information on their
+     * First, prepares all items and options (incl. getting VSA answers from Assessment for VSA question types). Second,
+     * fills scratchieItems with information whether they were unraveled; and options whether they were
      * scratched.
      *
      * @param scratchieItemList
-     * @param item
-     *            item parameter is optional. In case it's provided - these item collection is used instead of quering
-     *            DB
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
-
+    
     /**
-     * The same as getItemsWithIndicatedScratches(Long toolSessionId), but items are provided as parameter and not
-     * queried from DB.
-     *
-     * @param scratchieItemList
-     * @param item
-     *            this item collection is used instead of quering DB
+     * Return log for VSA type item.
      */
-    Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items);
+    ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
      * update all the marks.
      */
     void recordItemScratched(Long toolSessionId, Long itemUid, Long scratchieItemUid);
+    
+    /**
+     * Leader has left this answer. We will store this answer for all users in his group. It will also
+     * update all the marks.
+     */
+    void recordVsaAnswer(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer);
 
     /**
      * Recalculate mark for leader and sets it to all members of a group

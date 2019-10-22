@@ -41,7 +41,7 @@ public class JsonUtil {
     public static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static JsonNode opt(JsonNode object, String field) {
-	return opt(object, field, null);
+	return JsonUtil.opt(object, field, null);
     }
 
     public static JsonNode opt(JsonNode object, String field, JsonNode defaultValue) {
@@ -57,7 +57,7 @@ public class JsonUtil {
     }
 
     public static Boolean optBoolean(JsonNode object, String field) {
-	return optBoolean(object, field, null);
+	return JsonUtil.optBoolean(object, field, null);
     }
 
     public static Boolean optBoolean(JsonNode object, String field, Boolean defaultValue) {
@@ -65,7 +65,7 @@ public class JsonUtil {
     }
 
     public static Long optLong(JsonNode object, String field) {
-	return optLong(object, field, null);
+	return JsonUtil.optLong(object, field, null);
     }
 
     public static Long optLong(JsonNode object, String field, Long defaultValue) {
@@ -76,12 +76,12 @@ public class JsonUtil {
 	return object.hasNonNull(field) ? (Double) object.get(field).asDouble() : defaultValue;
     }
 
-    public static Integer optDouble(JsonNode object, String field) {
-	return optInt(object, field, null);
+    public static Double optDouble(JsonNode object, String field) {
+	return JsonUtil.optDouble(object, field, null);
     }
 
     public static Integer optInt(JsonNode object, String field) {
-	return optInt(object, field, null);
+	return JsonUtil.optInt(object, field, null);
     }
 
     public static Integer optInt(JsonNode object, String field, Integer defaultValue) {
@@ -89,7 +89,7 @@ public class JsonUtil {
     }
 
     public static String optString(JsonNode object, String field) {
-	return optString(object, field, null);
+	return JsonUtil.optString(object, field, null);
     }
 
     public static String optString(JsonNode object, String field, String defaultValue) {

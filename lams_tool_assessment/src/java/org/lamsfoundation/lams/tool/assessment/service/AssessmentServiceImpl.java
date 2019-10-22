@@ -49,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -103,6 +104,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -121,8 +123,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl
-	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager, IQbToolService {
+public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessmentService, ToolContentManager,
+	ToolSessionManager, ToolRestManager, IQbToolService {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -744,36 +746,41 @@ public class AssessmentServiceImpl
 		}
 	    }
 
-	} else if (questionDto.getType() == QbQuestion.TYPE_SHORT_ANSWER) {
+	} else if (questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 	    //clear previous answer
 	    questionResult.setQbOption(null);
 
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		String[] optionAnswers = optionDto.getName().strip().split("\\r\\n");
+		boolean isAnswerMatchedCurrentOption = false;
+		for (String optionAnswer : optionAnswers) {
+		    optionAnswer = optionAnswer.strip();
 
-		//prepare regex which takes into account only * special character
-		String regexWithOnlyAsteriskSymbolActive = "\\Q";
-		String name = optionDto.getName().trim();
-		for (int i = 0; i < name.length(); i++) {
-		    //everything in between \\Q and \\E are taken literally no matter which characters it contains
-		    if (name.charAt(i) == '*') {
-			regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+		    //prepare regex which takes into account only * special character
+		    String regexWithOnlyAsteriskSymbolActive = "\\Q";
+		    for (int i = 0; i < optionAnswer.length(); i++) {
+			//everything in between \\Q and \\E are taken literally no matter which characters it contains
+			if (optionAnswer.charAt(i) == '*') {
+			    regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+			} else {
+			    regexWithOnlyAsteriskSymbolActive += optionAnswer.charAt(i);
+			}
+		    }
+		    regexWithOnlyAsteriskSymbolActive += "\\E";
+
+		    //check whether answer matches regex
+		    Pattern pattern;
+		    if (questionDto.isCaseSensitive()) {
+			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
 		    } else {
-			regexWithOnlyAsteriskSymbolActive += name.charAt(i);
+			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
+				java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+		    }
+		    if (questionDto.getAnswer() != null && pattern.matcher(questionDto.getAnswer().strip()).matches()) {
+			isAnswerMatchedCurrentOption = true;
+			break;
 		    }
 		}
-		regexWithOnlyAsteriskSymbolActive += "\\E";
-
-		//check whether answer matches regex
-		Pattern pattern;
-		if (questionDto.isCaseSensitive()) {
-		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
-		} else {
-		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
-			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-		}
-		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswer() != null)
-			? pattern.matcher(questionDto.getAnswer().trim()).matches()
-			: false;
 
 		if (isAnswerMatchedCurrentOption) {
 		    mark = optionDto.getMaxMark() * maxMark;
@@ -1315,8 +1322,174 @@ public class AssessmentServiceImpl
     @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = question.getQbQuestion();
+	List<AssessmentQuestionResult> allQuestionResults = assessmentQuestionResultDao
+		.getQuestionResultsByQuestionUid(questionUid);
 
-	return new QuestionSummary(question);
+	QuestionSummary questionSummary = new QuestionSummary(question);
+
+	//prepare extra data for VSA type of questions, so teachers can allocate answers into groups
+	if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	    //find all questionResults that are not allocated into groups yet
+	    List<AssessmentQuestionResult> notAllocatedQuestionResults = new ArrayList<>();
+	    for (AssessmentQuestionResult questionResult : allQuestionResults) {
+		String answer = questionResult.getAnswer();
+
+		boolean isAnswerAllocated = false;
+		for (QbOption option : qbQuestion.getQbOptions()) {
+		    String[] alternatives = option.getName().split("\r\n");
+		    for (String alternative : alternatives) {
+			if (answer != null && alternative.equals(answer)) {
+			    isAnswerAllocated = true;
+			    break;
+			}
+		    }
+		}
+
+		if (!isAnswerAllocated) {
+		    notAllocatedQuestionResults.add(questionResult);
+		}
+	    }
+	    questionSummary.setNotAllocatedQuestionResults(notAllocatedQuestionResults);
+
+	    //check is it a TBL case, i.e. only two option groups available, one has 0%, second - 100%
+	    boolean isCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();
+	    questionSummary.setTbl(isCompatibleWithTbl);
+	}
+
+	return questionSummary;
+    }
+
+    @Override
+    public void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
+	    Long questionResultUid) {
+	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+	AssessmentQuestionResult questionRes = assessmentQuestionResultDao
+		.getAssessmentQuestionResultByUid(questionResultUid);
+	String answer = questionRes.getAnswer();
+
+	//adding
+	if (previousOptionUid.equals(-1L)) {
+	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
+		if (targetOption.getUid().equals(targetOptionUid)) {
+		    String name = targetOption.getName();
+		    name += "\r\n" + answer;
+		    targetOption.setName(name);
+		    assessmentDao.saveObject(targetOption);
+		    break;
+		}
+	    }
+
+	}
+	//removing
+	else if (targetOptionUid.equals(-1L)) {
+	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
+		if (previousOption.getUid().equals(previousOptionUid)) {
+		    String name = previousOption.getName();
+		    String[] alternatives = name.split("\r\n");
+
+		    String nameWithoutUserAnswer = "";
+		    for (String alternative : alternatives) {
+			if (!alternative.equals(answer)) {
+			    nameWithoutUserAnswer += alternative + "\r\n";
+			}
+		    }
+		    if (nameWithoutUserAnswer.length() > 2) {
+			previousOption.setName(nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2));
+			assessmentDao.saveObject(previousOption);
+		    }
+		    break;
+		}
+	    }
+
+	}
+	//reshuffling inside the same container - do nothing
+	else if (targetOptionUid.equals(previousOptionUid)) {
+
+	}
+	//moving from one to another
+	else {
+	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
+		if (targetOption.getUid().equals(targetOptionUid)) {
+		    String name = targetOption.getName();
+		    name += "\r\n" + answer;
+		    targetOption.setName(name);
+		    assessmentDao.saveObject(targetOption);
+		    break;
+		}
+	    }
+
+	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
+		if (previousOption.getUid().equals(previousOptionUid)) {
+		    String name = previousOption.getName();
+		    String[] alternatives = name.split("\r\n");
+
+		    String nameWithoutUserAnswer = "";
+		    for (String alternative : alternatives) {
+			if (!alternative.equals(answer)) {
+			    nameWithoutUserAnswer += alternative + "\r\n";
+			}
+		    }
+		    if (nameWithoutUserAnswer.length() > 2) {
+			nameWithoutUserAnswer = nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2);
+		    }
+		    previousOption.setName(nameWithoutUserAnswer);
+		    assessmentDao.saveObject(previousOption);
+		    break;
+		}
+	    }
+	}
+	assessmentResultDao.flush();
+
+	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
+	if (!targetOptionUid.equals(previousOptionUid)) {
+
+	    // get all finished user results
+	    List<AssessmentResult> assessmentResults = assessmentResultDao
+		    .getAssessmentResultsByQbQuestion(qbQuestion.getUid());
+
+	    //stores userId->lastFinishedAssessmentResult
+	    Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
+	    for (AssessmentResult assessmentResult : assessmentResults) {
+		Long userId = assessmentResult.getUser().getUserId();
+		lastFinishedAssessmentResults.put(userId, assessmentResult);
+	    }
+
+	    for (AssessmentResult assessmentResult : assessmentResults) {
+		AssessmentUser user = assessmentResult.getUser();
+		float assessmentMark = assessmentResult.getGrade();
+		int assessmentMaxMark = assessmentResult.getMaximumGrade();
+
+		for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		    if (questionResult.getQbQuestion().getUid().equals(qbQuestion.getUid())) {
+			Float oldQuestionAnswerMark = questionResult.getMark();
+			int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
+				: questionResult.getMaxMark().intValue();
+
+			//actually recalculate marks
+			QuestionDTO questionDto = new QuestionDTO(assessmentQuestion);
+			questionDto.setMaxMark(oldResultMaxMark);
+			loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
+			calculateAnswerMark(assessmentResult.getAssessment().getUid(), user.getUserId(), questionResult,
+				questionDto);
+			assessmentQuestionResultDao.saveObject(questionResult);
+
+			float newQuestionAnswerMark = questionResult.getMark();
+			assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
+			break;
+		    }
+		}
+
+		// store new mark and maxMark if they were changed
+		AssessmentResult lastFinishedAssessmentResult = lastFinishedAssessmentResults.get(user.getUserId());
+		storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
+			assessmentMaxMark, user);
+	    }
+
+	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
+	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
+	}
     }
 
     @Override
@@ -1599,7 +1772,7 @@ public class AssessmentServiceImpl
 
 		// set up the summary table data for the top of the question area.
 		boolean doSummaryTable = question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
-			|| question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+			|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 			|| question.getType() == QbQuestion.TYPE_NUMERICAL
 			|| question.getType() == QbQuestion.TYPE_TRUE_FALSE;
 		// For MC, Numeric & Short Answer Key is optionUid, Value is number of answers
@@ -1959,7 +2132,8 @@ public class AssessmentServiceImpl
 	    Long trueKey, Long falseKey) {
 	ExcelCell[] summaryTable;
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    List<QbOption> options = question.getQbQuestion().getQbOptions();
 	    summaryTable = new ExcelCell[options.size() + 1];
@@ -2015,7 +2189,7 @@ public class AssessmentServiceImpl
 	    if (!foundOption) {
 		summaryNACount++;
 	    }
-	} else if (question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	} else if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    Long submittedOptionUid = questionResult.getQbOption() == null ? null
 		    : questionResult.getQbOption().getUid();
@@ -2057,7 +2231,8 @@ public class AssessmentServiceImpl
 	    total += value;
 	}
 	int i = 0;
-	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE || question.getType() == QbQuestion.TYPE_SHORT_ANSWER
+	if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE
+		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
@@ -2092,7 +2267,7 @@ public class AssessmentServiceImpl
 		return "Numerical";
 	    case QbQuestion.TYPE_ORDERING:
 		return "Ordering";
-	    case QbQuestion.TYPE_SHORT_ANSWER:
+	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		return "Short Answer";
 	    case QbQuestion.TYPE_TRUE_FALSE:
 		return "True/False";
@@ -2196,7 +2371,7 @@ public class AssessmentServiceImpl
 			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
 				//short answer
-				if (((oldQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER)
+				if (((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 					&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
 					//numbering
 					|| (oldOption.getNumericalOption() != newOption.getNumericalOption())
@@ -2271,7 +2446,7 @@ public class AssessmentServiceImpl
 
 				//update questionResult's qbQuestion with the new one
 				questionResult.setQbToolQuestion(modifiedQuestion);
-				//update questionResult's qbOption
+				//update questionResult's qbOption - it seems to be redundant, as it's done in loadupQuestionResultIntoQuestionDto()
 //				for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
 //				    if (questionResult.getQbOption().getDisplayOrder() == newOption.getDisplayOrder()) {
 //					questionResult.setQbOption(newOption);
@@ -2384,30 +2559,38 @@ public class AssessmentServiceImpl
 		    }
 
 		    // store new mark and maxMark if they were changed
-		    if ((assessmentResult.getGrade() != assessmentMark)
-			    || (assessmentResult.getMaximumGrade() != assessmentMaxMark)) {
-
-			// marks can't be below zero
-			assessmentMark = (assessmentMark < 0) ? 0 : assessmentMark;
-			assessmentMaxMark = (assessmentMaxMark < 0) ? 0 : assessmentMaxMark;
-
-			assessmentResult.setGrade(assessmentMark);
-			assessmentResult.setMaximumGrade(assessmentMaxMark);
-			assessmentResultDao.saveObject(assessmentResult);
-
-			// if this is the last finished assessment result - propagade total mark to Gradebook
-			if (lastFinishedAssessmentResult != null
-				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
-			    toolService.updateActivityMark(Double.valueOf(assessmentMark), null,
-				    user.getUserId().intValue(), toolSessionId, false);
-			}
-		    }
-
+		    storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
+			    assessmentMaxMark, user);
 		}
-
 	    }
 	}
+    }
 
+    /**
+     * Store new mark and maxMark if they were changed
+     */
+    private void storeAssessmentResultMarkAndMaxMark(AssessmentResult assessmentResult,
+	    AssessmentResult lastFinishedAssessmentResult, float newAssessmentMark, int newAssessmentMaxMark,
+	    AssessmentUser user) {
+	// store new mark and maxMark if they were changed
+	if ((assessmentResult.getGrade() != newAssessmentMark)
+		|| (assessmentResult.getMaximumGrade() != newAssessmentMaxMark)) {
+
+	    // marks can't be below zero
+	    newAssessmentMark = (newAssessmentMark < 0) ? 0 : newAssessmentMark;
+	    newAssessmentMaxMark = (newAssessmentMaxMark < 0) ? 0 : newAssessmentMaxMark;
+
+	    assessmentResult.setGrade(newAssessmentMark);
+	    assessmentResult.setMaximumGrade(newAssessmentMaxMark);
+	    assessmentResultDao.saveObject(assessmentResult);
+
+	    // if this is the last finished assessment result - propagade total mark to Gradebook
+	    if (lastFinishedAssessmentResult != null
+		    && lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
+		toolService.updateActivityMark(Double.valueOf(newAssessmentMark), null, user.getUserId().intValue(),
+			user.getSession().getSessionId(), false);
+	    }
+	}
     }
 
     @Override
@@ -2925,7 +3108,7 @@ public class AssessmentServiceImpl
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_MATCHING_PAIRS) {
 
-		} else if (qbQuestion.getType() == QbQuestion.TYPE_SHORT_ANSWER) {
+		} else if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 		    answers.add(questionResult.getAnswer());
 
 		} else if (qbQuestion.getType() == QbQuestion.TYPE_NUMERICAL) {
@@ -2974,6 +3157,78 @@ public class AssessmentServiceImpl
 	}
 
 	return confidenceLevelDtos;
+    }
+
+    @Override
+    public Collection<VsaAnswerDTO> getVsaAnswers(Long toolSessionId) {
+	if (toolSessionId == null) {
+	    return new ArrayList<>();
+	}
+
+	Map<String, VsaAnswerDTO> uid_answerToVsaAnswerDtoMap = new LinkedHashMap<>();
+
+	Assessment assessment = getAssessmentBySessionId(toolSessionId);
+	//in case Assessment is leader aware return all leaders confidences, otherwise - confidences from the users from the same group as requestor
+	List<Object[]> assessmentResultsAndPortraits = assessment.isUseSelectLeaderToolOuput()
+		? assessmentResultDao.getLeadersLastFinishedAssessmentResults(assessment.getContentId())
+		: assessmentResultDao.getLastFinishedAssessmentResultsBySession(toolSessionId);
+
+	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
+	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
+	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
+		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
+	    AssessmentUser user = assessmentResult.getUser();
+
+	    //fill in question's and user answer's hashes
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		QbQuestion qbQuestion = questionResult.getQbQuestion();
+
+		if (qbQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+		    //uid_answer should be unique in the final list
+		    String uid_answer = qbQuestion.getUid() + "_" + questionResult.getAnswer();
+
+		    //find VsaAnswerDTO in the map, or create the new one if it doesn't exist
+		    VsaAnswerDTO vsaAnswerDTO;
+		    if (uid_answerToVsaAnswerDtoMap.containsKey(uid_answer)) {
+			vsaAnswerDTO = uid_answerToVsaAnswerDtoMap.get(uid_answer);
+
+		    } else {
+			vsaAnswerDTO = new VsaAnswerDTO();
+			vsaAnswerDTO.setQbQuestionUid(qbQuestion.getUid());
+			vsaAnswerDTO.setAnswer(questionResult.getAnswer());
+			vsaAnswerDTO.setCorrect(questionResult.getMark() > 0);
+			vsaAnswerDTO.setUserId(user.getUserId());
+			uid_answerToVsaAnswerDtoMap.put(uid_answer, vsaAnswerDTO);
+
+			//find and store optionUid
+			for (QbOption option : qbQuestion.getQbOptions()) {
+			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+				if (optionAnswer.getAnswerBoolean()
+					&& (optionAnswer.getOptionUid().equals(option.getUid()))) {
+				    Long optionUid = option.getUid();
+				    vsaAnswerDTO.setQbOptionUid(optionUid);
+				    break;
+				}
+			    }
+			}
+		    }
+
+		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
+		    confidenceLevelDto.setUserId(user.getUserId().intValue());
+		    String userName = StringUtils.isBlank(user.getFirstName())
+			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+				    : user.getFirstName() + " " + user.getLastName();
+		    confidenceLevelDto.setUserName(userName);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+
+		    vsaAnswerDTO.getConfidenceLevels().add(confidenceLevelDto);
+		}
+	    }
+
+	}
+
+	return uid_answerToVsaAnswerDtoMap.values();
     }
 
     @Override
@@ -3188,34 +3443,37 @@ public class AssessmentServiceImpl
 	for (JsonNode questionJSONData : questions) {
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
-	    question.getQbQuestion().setType(type);
-	    question.getQbQuestion().setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
-	    question.getQbQuestion().setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+
+	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+	    qbQuestion.setType(type);
+	    qbQuestion.setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
+	    qbQuestion.setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+	    question.setQbQuestion(qbQuestion);
 	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
 
-	    question.getQbQuestion().setAllowRichEditor(
+	    qbQuestion.setAllowRichEditor(
 		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    question.getQbQuestion().setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
-	    question.getQbQuestion().setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
-	    question.getQbQuestion().setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
-	    question.getQbQuestion()
-		    .setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
-	    question.getQbQuestion()
+	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
+	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
+	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+	    qbQuestion
 		    .setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
-	    question.getQbQuestion().setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
-	    question.getQbQuestion().setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
-	    question.getQbQuestion().setMultipleAnswersAllowed(
+	    qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+	    qbQuestion.setMultipleAnswersAllowed(
 		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-	    question.getQbQuestion().setIncorrectAnswerNullifiesMark(
+	    qbQuestion.setIncorrectAnswerNullifiesMark(
 		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-	    question.getQbQuestion()
-		    .setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+	    qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+
+	    assessmentDao.insert(qbQuestion);
+	    question.setToolContentId(toolContentID);
+
 	    // question.setUnits(units); Needed for numerical type question
 
 	    if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
@@ -3230,8 +3488,10 @@ public class AssessmentServiceImpl
 		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
 		for (JsonNode answerData : optionsData) {
 		    QbOption option = new QbOption();
+		    option.setQbQuestion(qbQuestion);
 		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		    option.setMaxMark(answerData.get("maxMark").floatValue());
+		    Double maxMark = JsonUtil.optDouble(answerData, "maxMark");
+		    option.setMaxMark(maxMark == null ? 1 : maxMark.floatValue());
 		    option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
 		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
 		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));

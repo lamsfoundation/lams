@@ -81,10 +81,22 @@
 			$('#finishButton').show();
 			return;
 		}
-		
+
+		// only updates come via websockets
 		$.each(input, function(itemUid, options) {
 			$.each(options, function(optionUid, isCorrect){
-				// only updates come via websockets
+				
+				var isVsaItem = !Number.isInteger(optionUid);
+				if (isVsaItem) {
+					var answer = optionUid;
+					optionUid = hashCode(optionUid);
+
+					//check if such image exists, create it otherwise
+					if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
+						paintNewVsaAnswer(eval(itemUid), answer);
+					}
+				}
+				
 				scratchImage(itemUid, optionUid, isCorrect);
 			});
 		});
@@ -93,27 +105,25 @@
 </c:if>
 
 <form id="burning-questions" name="burning-questions" method="post" action="">
-
-<%@ include file="scratchies.jsp"%>
-
-<%-- show general burning question --%>
-<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
-	<div class="form-group burning-question-container">
-		<a data-toggle="collapse" data-target="#burning-question-general" href="#bqg"
-				<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
-			<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
-  			<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
-			<fmt:message key="label.general.burning.question" />
-		</a>
-
-		<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
-			<textarea rows="5" name="generalBurningQuestion" class="form-control"
-				<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
-			>${sessionMap.generalBurningQuestion}</textarea>
+	<%@ include file="scratchies.jsp"%>
+	
+	<%-- show general burning question --%>
+	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
+		<div class="form-group burning-question-container">
+			<a data-toggle="collapse" data-target="#burning-question-general" href="#bqg"
+					<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
+				<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+	  			<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+				<fmt:message key="label.general.burning.question" />
+			</a>
+	
+			<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
+				<textarea rows="5" name="generalBurningQuestion" class="form-control"
+					<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
+				>${sessionMap.generalBurningQuestion}</textarea>
+			</div>
 		</div>
-	</div>
-</c:if>
-
+	</c:if>
 </form>
 
 <c:if test="${mode != 'teacher'}">
@@ -121,15 +131,13 @@
 		<c:choose>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
-				<button nae="finishButton" id="finishButton" onclick="return finish(false);"
-					class="btn btn-default">
+				<button nae="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-default">
 					<fmt:message key="label.continue" />
 				</button>
 			</c:when>
 			<c:otherwise>
 				<input type="hidden" name="method" id="method" value="showResults">
-				<button name="finishButton" id="finishButton" onclick="return finish(false);"
-					class="btn btn-default">
+				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-default">
 					<fmt:message key="label.submit" />
 				</button>
 			</c:otherwise>

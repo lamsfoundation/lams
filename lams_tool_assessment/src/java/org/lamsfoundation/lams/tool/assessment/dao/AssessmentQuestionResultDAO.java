@@ -37,6 +37,8 @@ public interface AssessmentQuestionResultDAO extends DAO {
     List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
 
     AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid);
+    
+    List<AssessmentQuestionResult> getQuestionResultsByQuestionUid(final Long questionUid);
 
     /**
      * Returns question result mark from the last finished assessment result, and null if not available.

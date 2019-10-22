@@ -240,6 +240,7 @@ public class AuthoringUtil {
 	    questionDto.setFeedback(feedback);
 	    String mark = question.getMark() == null ? "1" : question.getMark().toString();
 	    questionDto.setMark(mark);
+	    questionDto.setContentFolderId(question.getQbQuestion().getContentFolderId());
 
 	    // build candidate dtos
 	    List<McOptionDTO> optionDtos = new LinkedList<>();

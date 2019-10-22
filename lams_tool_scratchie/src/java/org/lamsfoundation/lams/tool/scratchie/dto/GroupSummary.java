@@ -38,7 +38,7 @@ public class GroupSummary {
 
     private Collection<ScratchieUser> users;
     private Collection<ScratchieItemDTO> itemDtos;
-    private Collection<QbOptionDTO> optionDtos;
+    private Collection<OptionDTO> optionDtos;
 
     public GroupSummary() {
     }
@@ -114,11 +114,11 @@ public class GroupSummary {
 	this.users = users;
     }
 
-    public Collection<QbOptionDTO> getOptionDtos() {
+    public Collection<OptionDTO> getOptionDtos() {
 	return optionDtos;
     }
 
-    public void setOptionDtos(Collection<QbOptionDTO> optionDtos) {
+    public void setOptionDtos(Collection<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
     }
 }

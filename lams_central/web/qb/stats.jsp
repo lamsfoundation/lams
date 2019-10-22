@@ -2,8 +2,9 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-
+<%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="question" value="${stats.question}" />
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <!DOCTYPE html>
 <lams:html>
@@ -219,7 +220,15 @@
 								${status.index + 1}
 							</td>
 							<td>
-								<c:out value="${option.name}" escapeXml="false" />
+								<c:choose>
+									<c:when test="${question.type == 3}">
+										${fn:replace(option.name, newLineChar, ', ')}
+									</c:when>
+									<c:otherwise>
+										
+										<c:out value="${option.name}" escapeXml="false" />
+									</c:otherwise>
+								</c:choose>
 							</td>
 							<td>
 								<c:if test="${option.correct}">

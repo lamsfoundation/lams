@@ -23,13 +23,14 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
+import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -185,7 +186,16 @@ public interface ILamsToolService {
      *            toolContentId of the specified activity
      * @return
      */
-    Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId);
+    Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
+    
+    /**
+     * Returns all activities that precede specified activity and can provide VSA answers.
+     *
+     * @param toolContentId
+     *            toolContentId of the specified activity
+     * @return
+     */
+    Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId);
 
     /**
      * Returns confidence levels from the specified activity.
@@ -200,6 +210,27 @@ public interface ILamsToolService {
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
 	    Long requestorToolSessionId);
+    
+    /**
+     * Returns VSA answers from the specified activity.
+     *
+     * @param activityUiid
+     *            activityUiid of the activity providing VSA answers
+     * @param requestorUserId
+     *            userId of the requesting user. we need it in order to get tool's sessionId providing VSA answers
+     * @param requestorToolSessionId
+     *            toolSessionId of the activity that calls this method
+     * @return
+     */
+    Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
+	    Integer requestorUserId, Long requestorToolSessionId);
+    
+    /**
+     * Recalculate marks for all Scratchie activities that use specified QbQuestion.
+     * 
+     * @param qbQuestionUid
+     */
+    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);

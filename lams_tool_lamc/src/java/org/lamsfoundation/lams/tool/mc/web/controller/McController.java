@@ -34,15 +34,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
-import org.lamsfoundation.lams.questions.Answer;
-import org.lamsfoundation.lams.questions.Question;
-import org.lamsfoundation.lams.questions.QuestionExporter;
-import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
@@ -53,6 +48,7 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.util.AuthoringUtil;
 import org.lamsfoundation.lams.tool.mc.web.form.McAuthoringForm;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -80,7 +76,7 @@ public class McController {
 
     @Autowired
     private IMcService mcService;
-    
+
     @Autowired
     private IQbService qbService;
 
@@ -143,7 +139,7 @@ public class McController {
 
 	List<McQuestionDTO> listDeletedQuestionDTOs = new ArrayList<>();
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
-	
+
 	boolean isMcContentAttempted = mcContent.getUid() == null ? false
 		: mcService.isMcContentAttempted(mcContent.getUid());
 	sessionMap.put(McAppConstants.ATTR_IS_AUTHORING_RESTRICTED, isMcContentAttempted && mode.isTeacher());
@@ -206,9 +202,10 @@ public class McController {
 		mcService.removeMcQueContent(removeableQuestion);
 	    }
 	}
-	
+
 	// store content
-	mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mode, mcContent, toolContentID, questionDTOs);
+	mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mode, mcContent, toolContentID,
+		questionDTOs);
 
 	// store questions
 	mcContent = mcService.createQuestions(questionDTOs, mcContent);
@@ -262,6 +259,10 @@ public class McController {
 	} else {
 	    // prepare questionDescription for adding new questionDescription page
 	    questionDto = new McQuestionDTO();
+
+	    String contentFolderID = FileUtil.generateUniqueContentFolderID();
+	    questionDto.setContentFolderId(contentFolderID);
+
 	    List<McOptionDTO> newOptions = new ArrayList<>();
 	    McOptionDTO newOption1 = new McOptionDTO();
 	    newOption1.setCorrect("Correct");
@@ -434,7 +435,7 @@ public class McController {
 
 	return tempQuestionDtos;
     }
-    
+
     /**
      * Adds QbQuestion, selected in the questionDescription bank, to the current questionDescription list.
      */
@@ -448,8 +449,8 @@ public class McController {
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
 
 	//get QbQuestion from DB
-	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);	
-	
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
+
 	//find max displayOrder
 	int maxDisplayOrder = 0;
 	for (McQuestionDTO questionDto : questionDtos) {
@@ -458,7 +459,7 @@ public class McController {
 		maxDisplayOrder = displayOrder;
 	    }
 	}
-	
+
 	// build candidate dtos
 	List<McOptionDTO> optionDtos = new LinkedList<>();
 	for (QbOption option : qbQuestion.getQbOptions()) {
@@ -477,7 +478,7 @@ public class McController {
 	questionDto.setMark(qbQuestion.getMaxMark() == null ? "1" : String.valueOf(qbQuestion.getMaxMark()));
 	questionDto.setQbQuestionModified(IQbService.QUESTION_MODIFIED_NONE);
 	questionDtos.add(questionDto);
-	
+
 	return "authoring/itemlist";
     }
 
@@ -509,6 +510,7 @@ public class McController {
 	String name = request.getParameter("name");
 	String description = request.getParameter("description");
 	String feedback = request.getParameter("feedback");
+	String contentFolderId = request.getParameter("contentFolderId");
 	Integer questionIndex = WebUtil.readIntParam(request, "questionIndex", true);
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid", true);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -534,6 +536,7 @@ public class McController {
 		questionDto.setDisplayOrder(maxDisplayOrder + 1);
 		questionDto.setOptionDtos(options);
 		questionDto.setMark(mark);
+		questionDto.setContentFolderId(contentFolderId);
 		questionDto.setQbQuestionModified(IQbService.QUESTION_MODIFIED_ID_BUMP);
 		request.setAttribute("qbQuestionModified", questionDto.getQbQuestionModified());
 
@@ -558,6 +561,7 @@ public class McController {
 		questionDto.setDisplayOrder(questionIndex);
 		questionDto.setOptionDtos(options);
 		questionDto.setMark(mark);
+		questionDto.setContentFolderId(contentFolderId);
 		questionDto.setQbQuestionModified(mcService.isQbQuestionModified(questionDto));
 		request.setAttribute("qbQuestionModified", questionDto.getQbQuestionModified());
 	    }

@@ -68,6 +68,15 @@
 			}
 		);
 	}
+	function initNewItemHref() {
+		var itemTypeDropdown = document.getElementById("item-type");
+		var itemType = itemTypeDropdown.value;
+		
+		var newItemInitHref = "<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}"
+			+ "&questionType=" + itemType 
+			+ "&KeepThis=true&TB_iframe=true&modal=true";
+		$("#item-init-href").attr("href", newItemInitHref);
+	};
 	
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
@@ -90,14 +99,15 @@
 </div>
 
 <c:if test="${!isAuthoringRestricted}">
+	<!-- Dropdown menu for choosing a question type -->
 	<div id="add-question-div" class="form-inline form-group pull-right">
-		<c:set var="addItemUrl" >
-			<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
-		</c:set>
-		<a href="${addItemUrl}" class="btn btn-default btn-sm thickbox">
+		<select id="item-type" class="form-control input-sm">
+			<option selected="selected" value="1"><fmt:message key="label.type.multiple.choice" /></option>
+			<option value="3"><fmt:message key="label.type.short.answer" /></option>
+		</select>
+		
+		<a onclick="initNewItemHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="item-init-href">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.another.scratchie" />"></i>
-			&nbsp;
-			<fmt:message key="label.authoring.basic.add.another.scratchie" />
 		</a>
 	</div>
 	

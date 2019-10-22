@@ -77,7 +77,7 @@ public class QuestionExporter {
 
     private Document doc = null;
     private Integer itemId = null;
-    private Map<String, File> images = new TreeMap<String, File>();
+    private Map<String, File> images = new TreeMap<>();
 
     public QuestionExporter(String title, Question[] questions) {
 	if (StringUtils.isBlank(title)) {
@@ -161,7 +161,7 @@ public class QuestionExporter {
      * Builds QTI XML file containing structured questions & answers content.
      *
      * @return XML file content
-     * @throws IOException 
+     * @throws IOException
      */
     public String exportQTIFile() throws IOException {
 	itemId = 1000;
@@ -213,6 +213,9 @@ public class QuestionExporter {
     private Element exportMultipleChoiceQuestion(Question question) {
 	Element itemElem = doc.createElement("item");
 	itemElem.setAttribute("title", question.getTitle());
+	if (question.getLabel() != null) {
+	    itemElem.setAttribute("label", question.getLabel());
+	}
 	itemId++;
 	itemElem.setAttribute("ident", "QUE_" + itemId);
 
@@ -232,7 +235,7 @@ public class QuestionExporter {
 	responseLidElem.setAttribute("rtiming", "No");
 
 	// question feedback (displayed no matter what answer was choosed)
-	List<Element> feedbackList = new ArrayList<Element>();
+	List<Element> feedbackList = new ArrayList<>();
 	String correctFeedbackLabel = null;
 	String incorrectFeedbackLabel = null;
 	Element overallFeedbackElem = null;
@@ -243,7 +246,7 @@ public class QuestionExporter {
 
 	Element renderChoiceElem = (Element) responseLidElem.appendChild(doc.createElement("render_choice"));
 	short answerId = 0;
-	List<Element> respconditionList = new ArrayList<Element>(question.getAnswers().size());
+	List<Element> respconditionList = new ArrayList<>(question.getAnswers().size());
 
 	// iterate through answers, collecting some info along the way
 	for (Answer answer : question.getAnswers()) {
@@ -349,6 +352,9 @@ public class QuestionExporter {
     private Element exportMatchingPairsQuestion(Question question) {
 	Element itemElem = doc.createElement("item");
 	itemElem.setAttribute("title", question.getTitle());
+	if (question.getLabel() != null) {
+	    itemElem.setAttribute("label", question.getLabel());
+	}
 	itemId++;
 	itemElem.setAttribute("ident", "QUE_" + itemId);
 
@@ -365,8 +371,8 @@ public class QuestionExporter {
 	}
 
 	int answerIndex = 0;
-	List<String> matchAnswerIdents = new ArrayList<String>(question.getAnswers().size());
-	List<Element> respconditionElems = new ArrayList<Element>(question.getAnswers().size());
+	List<String> matchAnswerIdents = new ArrayList<>(question.getAnswers().size());
+	List<Element> respconditionElems = new ArrayList<>(question.getAnswers().size());
 	for (Answer answer : question.getAnswers()) {
 	    itemId++;
 	    String responseLidIdentifier = "QUE_" + itemId + "_RL";
@@ -455,6 +461,9 @@ public class QuestionExporter {
     private Element exportEssayQuestion(Question question) {
 	Element itemElem = doc.createElement("item");
 	itemElem.setAttribute("title", question.getTitle());
+	if (question.getLabel() != null) {
+	    itemElem.setAttribute("label", question.getLabel());
+	}
 	itemId++;
 	itemElem.setAttribute("ident", "QUE_" + itemId);
 
@@ -502,6 +511,9 @@ public class QuestionExporter {
     private Element exportFillInBlankQuestion(Question question) {
 	Element itemElem = doc.createElement("item");
 	itemElem.setAttribute("title", question.getTitle());
+	if (question.getLabel() != null) {
+	    itemElem.setAttribute("label", question.getLabel());
+	}
 	itemId++;
 	itemElem.setAttribute("ident", "QUE_" + itemId);
 
@@ -628,7 +640,7 @@ public class QuestionExporter {
 	    Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
 	    matimageElem.setAttribute("imagtype", imageType);
 	    matimageElem.setAttribute("uri", imageName);
-	    
+
 	    //set image attributes: width, length, and class
 	    Matcher attributesMatcher = IMAGE_ATTRIBUTES_PATTERN.matcher(imageTagMatcher.group(0));
 	    while (attributesMatcher.find()) {
@@ -648,7 +660,7 @@ public class QuestionExporter {
 	    appendTextElement(materialElem, text.substring(index));
 	}
     }
-    
+
     /**
      * Appends mattext element to materialElem. Used in appendMaterialElements(...) method only
      */

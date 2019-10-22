@@ -143,6 +143,7 @@
                 <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="recordItemScratched">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="recordVsaAnswer">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeUserMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyScratchesFromLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

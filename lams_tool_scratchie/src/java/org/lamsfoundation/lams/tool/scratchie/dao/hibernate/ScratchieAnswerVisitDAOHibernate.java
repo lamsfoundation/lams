@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
@@ -32,31 +33,55 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
+    private static final String FIND_BY_SESSION_AND_ITEM = "FROM " + ScratchieAnswerVisitLog.class.getName()
+	    + " AS r WHERE r.sessionId=? AND r.qbToolQuestion.uid = ?  ORDER BY r.accessDate ASC";
 
-    private static final String FIND_BY_SESSION_AND_OPTION = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId = ? and r.qbOption.uid=? and r.qbToolQuestion.uid = ?";
+    private static final String FIND_BY_SESSION = "FROM " + ScratchieAnswerVisitLog.class.getName()
+	    + " AS r WHERE r.sessionId=? ORDER BY r.accessDate ASC";
 
-    private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId=? and r.qbToolQuestion.uid = ?  order by r.accessDate asc";
-
-    private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId=? order by r.accessDate asc";
-
-    private static final String FIND_VIEW_COUNT_BY_SESSION = "select count(*) from "
-	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=?";
+    private static final String FIND_COUNT_BY_SESSION = "SELECT COUNT(*) FROM "
+	    + ScratchieAnswerVisitLog.class.getName() + " AS r WHERE  r.sessionId=?";
+    
+    private static final String FIND_COUNT_BY_SESSION_AND_ITEM = "SELECT COUNT(*) FROM "
+	    + ScratchieAnswerVisitLog.class.getName() + " AS r WHERE  r.sessionId=? AND r.qbToolQuestion.uid = ?";
 
     @Override
     public ScratchieAnswerVisitLog getLog(Long optionUid, Long itemUid, Long sessionId) {
+	final String FIND_BY_SESSION_AND_OPTION = "FROM " + ScratchieAnswerVisitLog.class.getName()
+		+ " AS r WHERE r.sessionId = ? AND r.qbToolQuestion.uid = ? AND r.qbOption.uid=?";
+	
 	List list = doFind(FIND_BY_SESSION_AND_OPTION, new Object[] { sessionId, itemUid, optionUid });
 	if (list == null || list.size() == 0) {
 	    return null;
 	}
 	return (ScratchieAnswerVisitLog) list.get(0);
     }
+    
+    @Override
+    public ScratchieAnswerVisitLog getLog(Long sessionId, Long itemUid, boolean isCaseSensitive, String answer) {
+	final String FIND_BY_SESSION_AND_ANSWER = "FROM " + ScratchieAnswerVisitLog.class.getName()
+		+ " AS r WHERE r.sessionId = :sessionId AND r.qbToolQuestion.uid = :itemUid AND "
+		+ (isCaseSensitive ? "CAST(r.answer AS binary)=CAST(:answer AS binary)" : "r.answer=:answer");
+	
+	Query<ScratchieAnswerVisitLog> q = getSession().createQuery(FIND_BY_SESSION_AND_ANSWER, ScratchieAnswerVisitLog.class);
+	q.setParameter("sessionId", sessionId);
+	q.setParameter("itemUid", itemUid);
+	q.setParameter("answer", answer);
+	return q.uniqueResult();
+    }
 
     @Override
     public int getLogCountTotal(Long sessionId) {
-	List list = doFind(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId });
+	List list = doFind(FIND_COUNT_BY_SESSION, new Object[] { sessionId });
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	return ((Number) list.get(0)).intValue();
+    }
+    
+    @Override
+    public int getLogCountPerItem(Long sessionId, Long itemUid) {
+	List list = doFind(FIND_COUNT_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

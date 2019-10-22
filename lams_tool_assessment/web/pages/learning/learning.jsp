@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="assessment" value="${sessionMap.assessment}" />
+<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
+<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
+<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
+<c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
+<c:set var="result" value="${sessionMap.assessmentResult}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
+<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
+<!-- hasEditRight=${hasEditRight} -->
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="assessment" value="${sessionMap.assessment}" />
-	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
-	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
-	<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-	<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
-	<c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
-	<c:set var="result" value="${sessionMap.assessmentResult}" />
-	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
-	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-		
-	<!-- hasEditRight=${hasEditRight} -->
 	
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
@@ -88,7 +88,15 @@
 			        });
 			    });
 			}
-			
+
+			//autocomplete for VSA
+			$('.ui-autocomplete-input').each(function(){
+				$(this).autocomplete({
+					'source' : '<c:url value="/learning/vsaAutocomplete.do"/>?questionUid=' + $(this).data("question-uid"),
+					'delay'  : 500,
+					'minLength' : 3
+				});
+			});
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
@@ -179,7 +187,7 @@
 		            dataType: 'json',
 		            type: 'post',
 		            success: function (json) {
-		            		$('#countdown').countdown('option', 'until', json.secondsLeft+'S');
+		            	$('#countdown').countdown('option', 'until', json.secondsLeft+'S');
 		            }
 			   });
 			}		
@@ -187,7 +195,6 @@
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
-			
 			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(
 				function(){
@@ -204,14 +211,14 @@
 					$('#answers').ajaxSubmit({
 						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
-			                	$.jGrowl(
-			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
-			                		{ life: 2000, closeTemplate: '' }
-			                	);
+			                $.jGrowl(
+			                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
+			                	{ life: 2000, closeTemplate: '' }
+			                );
 		                }
 					});
-	        		}, 
-	        		autosaveInterval
+	        	}, 
+	        	autosaveInterval
 	        );
 		</c:if>
 		
@@ -231,9 +238,9 @@
 				return;
 			}
 			disableButtons();
-	        	var myForm = $("#answers");
-	        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
-	        	myForm.submit();
+	        var myForm = $("#answers");
+	        myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
+	        myForm.submit();
 		}
 		
 		function submitAll(isTimelimitExpired){
@@ -244,13 +251,12 @@
 				}
 			}
 			disableButtons();
-	        	var myForm = $("#answers");
-	        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
-	        	myForm.submit();
+	        var myForm = $("#answers");
+	        myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
+	        myForm.submit();
 		}
 		
 		function submitSingleMarkHedgingQuestion(singleMarkHedgingQuestionUid, questionIndex){
-			
 			//only if time limit is not expired
 			if ((typeof isTimelimitExpired !== 'undefined') && isTimelimitExpired) {
 				return;
@@ -260,8 +266,8 @@
 			$('#answers').ajaxSubmit({
 				url: "<c:url value='/learning/submitSingleMarkHedgingQuestion.do'/>?sessionMapID=${sessionMapID}&singleMarkHedgingQuestionUid=" + singleMarkHedgingQuestionUid +"&questionIndex="+ questionIndex +"&date=" + new Date().getTime(),
 				target: '#mark-hedging-question-' + singleMarkHedgingQuestionUid,
-            		success: function() {
-                		$('#question-area-' + questionIndex).removeClass('bg-warning');
+            	success: function() {
+                	$('#question-area-' + questionIndex).removeClass('bg-warning');
                 }
 			});
 		}
@@ -286,7 +292,6 @@
 		}
 		
 		function validateAnswers() {
-
 			if (${!hasEditRight}) {
 				return true;
 			}

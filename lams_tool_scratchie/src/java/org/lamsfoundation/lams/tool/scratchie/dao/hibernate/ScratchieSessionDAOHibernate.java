@@ -29,10 +29,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
+import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.springframework.stereotype.Repository;
@@ -109,4 +112,15 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 	}
     }
 
+    @Override
+    public List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid) {
+	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM  " + Scratchie.class.getName()
+		+ " AS scratchie, " + ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName()
+		+ " AS session "
+		+ " WHERE session.scratchie.uid = scratchie.uid AND scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid";
+	
+	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
+	q.setParameter("qbQuestionUid", qbQuestionUid);
+	return q.list();
+    }
 }
