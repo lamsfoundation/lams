@@ -833,7 +833,7 @@ public class LearningController {
 		    if (questionDto.isMultipleAnswersAllowed()) {
 			String answer = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
-			answerBoolean = !StringUtils.isBlank(answer);
+			answerBoolean = StringUtils.isNotBlank(answer);
 		    } else {
 			String optionUidSelectedStr = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
