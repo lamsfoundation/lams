@@ -99,6 +99,25 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
+	
+	//log all incoming request parameters, so we can use them later to debug future issues
+	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            logMessage += paramName + "=";
+ 
+            String[] paramValues = request.getParameterValues(paramName);
+            for (int i = 0; i < paramValues.length; i++) {
+                String paramValue = paramValues[i];
+                if (i>0) {
+                    logMessage += "|";
+                }
+                logMessage += paramValue;
+            }
+            logMessage += ", ";
+        }
+        log.debug(logMessage);
 
 	if ((extUsername == null) || (consumerKey == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
