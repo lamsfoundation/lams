@@ -79,7 +79,7 @@
 			
 			<form:form action="/lams/qb/edit/saveOrUpdateQuestion.do" modelAttribute="assessmentQuestionForm" id="assessmentQuestionForm"
 				method="post" autocomplete="off">
-				<form:checkbox path="authoringRestricted"/>
+				<form:hidden path="authoringRestricted"/>
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="uid" />
 				<form:hidden path="questionId" />
