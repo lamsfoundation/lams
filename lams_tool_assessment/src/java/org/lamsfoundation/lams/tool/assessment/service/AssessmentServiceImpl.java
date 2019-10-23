@@ -841,13 +841,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
-	    TreeSet<OptionDTO> correctOptionSet = new TreeSet<>();
-	    Set<OptionDTO> originalOptions = questionResult.getQuestionDto().getOptionDtos();
-	    correctOptionSet.addAll(originalOptions);
-	    ArrayList<OptionDTO> correctOptionList = new ArrayList<>(correctOptionSet);
+	    
+	    Set<OptionDTO> originalOptions = (new QuestionDTO(questionResult.getQbToolQuestion())).getOptionDtos();
+	    ArrayList<OptionDTO> optionsInCorrectOrder = new ArrayList<>(originalOptions);
+	    
 	    int i = 0;
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		if (optionDto.getUid().equals(correctOptionList.get(i++).getUid())) {
+		if (optionDto.getUid().equals(optionsInCorrectOrder.get(i++).getUid())) {
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
