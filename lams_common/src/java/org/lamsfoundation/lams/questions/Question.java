@@ -56,6 +56,12 @@ public class Question {
     private Map<Integer, Integer> matchMap;
     private String resourcesFolderPath;
 
+    // UUID in QTI question label is LAMS custom idea
+    public String getQbUUID() {
+	return label == null || !label.startsWith(QuestionParser.UUID_LABEL_PREFIX) ? null
+		: label.substring(QuestionParser.UUID_LABEL_PREFIX.length(), label.length());
+    }
+
     public String getType() {
 	return type;
     }

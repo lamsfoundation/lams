@@ -42,8 +42,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ImsQtiController {
     private static Logger log = Logger.getLogger(ImsQtiController.class);
 
-    private static final String UUID_LABEL_PREFIX = "lams-qb-uuid-";
-
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -66,13 +64,11 @@ public class ImsQtiController {
 	Set<String> collectionUUIDs = null;
 
 	for (Question question : questions) {
-	    // UUID in QTI question label is LAMS custom idea
-	    String label = question.getLabel();
+
+	    String uuid = question.getQbUUID();
 
 	    // try to match the question to an existing QB question in DB
-	    if (label != null && label.startsWith(UUID_LABEL_PREFIX)) {
-		String uuid = label.substring(UUID_LABEL_PREFIX.length(), label.length());
-
+	    if (uuid != null) {
 		QbQuestion qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 		if (qbQuestion != null) {
 		    // found an existing question with same UUID
@@ -100,10 +96,10 @@ public class ImsQtiController {
 		    }
 		    continue;
 		}
-
 	    }
 
 	    QbQuestion qbQuestion = new QbQuestion();
+	    qbQuestion.setUuid(uuid);
 	    qbQuestion.setName(question.getTitle());
 	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
 		    question.getResourcesFolderPath()));
@@ -533,7 +529,7 @@ public class ImsQtiController {
 	    question.setTitle(qbQuestion.getName());
 	    if (qbQuestion.getUuid() != null) {
 		// UUID in QTI question label is LAMS custom idea
-		question.setLabel(UUID_LABEL_PREFIX + qbQuestion.getUuid());
+		question.setLabel(QuestionParser.UUID_LABEL_PREFIX + qbQuestion.getUuid());
 	    }
 	    question.setText(qbQuestion.getDescription());
 	    question.setFeedback(qbQuestion.getFeedback());
