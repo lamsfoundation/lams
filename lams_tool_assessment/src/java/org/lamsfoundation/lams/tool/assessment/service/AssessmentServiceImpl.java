@@ -1046,8 +1046,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public int countAttemptsPerOption(Long optionUid) {
-	return assessmentResultDao.countAttemptsPerOption(optionUid);
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
+	return assessmentResultDao.countAttemptsPerOption(toolContentId, optionUid);
     }
 
     @Override

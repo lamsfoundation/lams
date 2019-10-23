@@ -328,7 +328,7 @@ public interface IAssessmentService extends ICommonToolService {
     /**
      * Count how many last finished attempts selected specified option.
      */
-    int countAttemptsPerOption(Long optionUid);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid);
 
     /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It

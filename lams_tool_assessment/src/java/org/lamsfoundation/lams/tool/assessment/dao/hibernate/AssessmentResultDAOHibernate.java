@@ -299,20 +299,18 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
     
     @Override
-    public int countAttemptsPerOption(Long optionUid) {
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
 	String COUNT_ATTEMPTS_BY_OPTION_UID = "SELECT count(*) "
 		+ "FROM tl_laasse10_assessment_result AS result "
+		+ "JOIN tl_laasse10_assessment AS assessment ON result.assessment_uid = assessment.uid "
 		+ "JOIN tl_laasse10_question_result AS questionResult ON result.uid = questionResult.result_uid "
 		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid AND optionAnswer.answer_boolean=1 AND optionAnswer.question_option_uid = :optionUid "
-		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1";
+		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1 && assessment.content_id = :toolContentId";
 
-	NativeQuery<?> query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	NativeQuery<Number> query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	query.setParameter("toolContentId", toolContentId);
 	query.setParameter("optionUid", optionUid);
-	List list = query.list();
-	if (list == null || list.size() == 0) {
-	    return 0;
-	}
-	return ((Number) list.get(0)).intValue();
+	return query.uniqueResult().intValue();
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {
