@@ -2513,6 +2513,8 @@ public class ScratchieServiceImpl
 	    item.setToolContentId(scratchie.getContentId());
 	    scratchieDao.insert(qbQuestion);
 	    item.setQbQuestion(qbQuestion);
+	    // we need to save item now so it gets an ID and it will be recognised in a set
+	    scratchieItemDao.insert(item);
 	    newItems.add(item);
 
 	    // set options
