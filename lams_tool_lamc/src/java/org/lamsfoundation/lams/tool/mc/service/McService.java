@@ -39,6 +39,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -2038,9 +2040,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	createMc(mcq);
 
+	QbCollection collection = qbService.getUserPrivateCollection(userID);
+	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
+		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
+			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	// Questions
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
+	    boolean addToCollection = false;
 	    McQueContent question = null;
 	    QbQuestion qbQuestion = null;
 	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
@@ -2051,6 +2058,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    }
 
 	    if (qbQuestion == null) {
+		addToCollection = collection != null;
+
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
@@ -2067,10 +2076,18 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		    qbOption.setQbQuestion(qbQuestion);
 		    qbQuestion.getQbOptions().add(qbOption);
 		}
+	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
+		addToCollection = true;
 	    }
 
 	    question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 	    saveOrUpdateMcQueContent(question);
+
+	 // all questions need to end up in user's private collection
+	    if (addToCollection) {
+		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		collectionUUIDs.add(uuid);
+	    }
 	}
 
     }

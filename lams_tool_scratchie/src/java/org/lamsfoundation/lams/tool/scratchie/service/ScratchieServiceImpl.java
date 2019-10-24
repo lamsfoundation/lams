@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -43,6 +44,7 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
@@ -2499,8 +2502,14 @@ public class ScratchieServiceImpl
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new LinkedHashSet<>();
 
+	QbCollection collection = qbService.getUserPrivateCollection(userID);
+	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
+		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
+			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (int i = 0; i < questions.size(); i++) {
+	    boolean addToCollection = false;
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
@@ -2516,8 +2525,9 @@ public class ScratchieServiceImpl
 	    }
 
 	    if (qbQuestion == null) {
+		addToCollection = collection != null;
+		
 		qbQuestion = new QbQuestion();
-
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
@@ -2542,12 +2552,20 @@ public class ScratchieServiceImpl
 		}
 
 		qbQuestion.setQbOptions(newOptions);
+	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
+		addToCollection = true;
 	    }
 
 	    item.setQbQuestion(qbQuestion);
 	    // we need to save item now so it gets an ID and it will be recognised in a set
 	    scratchieItemDao.insert(item);
 	    newItems.add(item);
+
+	 // all questions need to end up in user's private collection
+	    if (addToCollection) {
+		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		collectionUUIDs.add(uuid);
+	    }
 	}
 
 	scratchie.setScratchieItems(newItems);

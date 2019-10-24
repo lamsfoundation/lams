@@ -43,6 +43,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
@@ -3397,14 +3399,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setCreatedBy(assessmentUser);
 
 	// **************************** Set the question bank *********************
+	QbCollection collection = qbService.getUserPrivateCollection(userID);
+	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
+		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
+			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 	for (JsonNode questionJSONData : questions) {
+	    boolean addToCollection = false;
+
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
 	    question.setToolContentId(toolContentID);
-		question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
-		
+	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
+
 	    QbQuestion qbQuestion = null;
 	    String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
 
@@ -3414,6 +3422,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	    if (qbQuestion == null) {
+		addToCollection = collection != null;
+
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setType(type);
@@ -3467,12 +3477,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    }
 		    qbQuestion.setQbOptions(optionList);
 		}
+	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
+		addToCollection = true;
 	    }
 
 	    // question.setUnits(units); Needed for numerical type question
 	    question.setQbQuestion(qbQuestion);
 	    checkType(question.getType());
 	    newQuestionSet.add(question);
+
+	    // all questions need to end up in user's private collection
+	    if (addToCollection) {
+		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		collectionUUIDs.add(uuid);
+	    }
 	}
 
 	// **************************** Now set up the references to the questions in the bank *********************
