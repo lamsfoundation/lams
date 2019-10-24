@@ -2053,7 +2053,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
 
 	    // try to match the question to an existing QB question in DB
-	    if (uuid != null) {
+	    if (StringUtils.isNotBlank(uuid)) {
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
@@ -2063,7 +2063,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
+		qbQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 		qbQuestion.setMaxMark(1);
 		userManagementService.save(qbQuestion);
 
@@ -2083,7 +2084,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 	    saveOrUpdateMcQueContent(question);
 
-	 // all questions need to end up in user's private collection
+	    // all questions need to end up in user's private collection
 	    if (addToCollection) {
 		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
 		collectionUUIDs.add(uuid);

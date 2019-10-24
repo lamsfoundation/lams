@@ -2520,13 +2520,13 @@ public class ScratchieServiceImpl
 	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
 
 	    // try to match the question to an existing QB question in DB
-	    if (uuid != null) {
+	    if (StringUtils.isNotBlank(uuid)) {
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
 	    if (qbQuestion == null) {
 		addToCollection = collection != null;
-		
+
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
@@ -2547,7 +2547,7 @@ public class ScratchieServiceImpl
 		    option.setName(optionDescription != null ? optionDescription.replaceAll("[\n\r\f]", "") : "");
 		    option.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
 		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		    option.setQbQuestion(item.getQbQuestion());
+		    option.setQbQuestion(qbQuestion);
 		    newOptions.add(option);
 		}
 
@@ -2561,7 +2561,7 @@ public class ScratchieServiceImpl
 	    scratchieItemDao.insert(item);
 	    newItems.add(item);
 
-	 // all questions need to end up in user's private collection
+	    // all questions need to end up in user's private collection
 	    if (addToCollection) {
 		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
 		collectionUUIDs.add(uuid);

@@ -844,10 +844,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
 	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
-	    
+
 	    Set<OptionDTO> originalOptions = (new QuestionDTO(questionResult.getQbToolQuestion())).getOptionDtos();
 	    ArrayList<OptionDTO> optionsInCorrectOrder = new ArrayList<>(originalOptions);
-	    
+
 	    int i = 0;
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		if (optionDto.getUid().equals(optionsInCorrectOrder.get(i++).getUid())) {
@@ -3417,7 +3417,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
 
 	    // try to match the question to an existing QB question in DB
-	    if (uuid != null) {
+	    if (StringUtils.isNotBlank(uuid)) {
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
@@ -3427,8 +3427,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setType(type);
-		qbQuestion.setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
-		qbQuestion.setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+		qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
+		qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));
 
 		qbQuestion.setAllowRichEditor(
 			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
