@@ -31,6 +31,7 @@
 
 	<div class="panel-body">	
 
+	<input type="hidden" name="${containingDivName}assessment${questionNumber}uuid" value="${question.uuid}"/>
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}type" id="${containingDivName}assessment${questionNumber}type" value="mcq"/>
 	<lams:CKEditor id="${containingDivName}assessment${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 	

@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -2504,38 +2505,49 @@ public class ScratchieServiceImpl
 
 	    ScratchieItem item = new ScratchieItem();
 	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
-	    QbQuestion qbQuestion = new QbQuestion();
-
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
-	    qbQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    item.setToolContentId(scratchie.getContentId());
-	    scratchieDao.insert(qbQuestion);
+
+	    QbQuestion qbQuestion = null;
+	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
+
+	    // try to match the question to an existing QB question in DB
+	    if (uuid != null) {
+		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+	    }
+
+	    if (qbQuestion == null) {
+		qbQuestion = new QbQuestion();
+
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
+		qbQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+		scratchieDao.insert(qbQuestion);
+
+		// set options
+		List<QbOption> newOptions = new LinkedList<>();
+
+		ArrayNode answersData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+		for (int j = 0; j < answersData.size(); j++) {
+		    ObjectNode answerData = (ObjectNode) answersData.get(j);
+		    QbOption option = new QbOption();
+		    // Removes redundant new line characters from options left by CKEditor (otherwise it will break
+		    // Javascript in monitor). Copied from AuthoringAction.
+		    String optionDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
+		    option.setName(optionDescription != null ? optionDescription.replaceAll("[\n\r\f]", "") : "");
+		    option.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
+		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+		    option.setQbQuestion(item.getQbQuestion());
+		    newOptions.add(option);
+		}
+
+		qbQuestion.setQbOptions(newOptions);
+	    }
+
 	    item.setQbQuestion(qbQuestion);
 	    // we need to save item now so it gets an ID and it will be recognised in a set
 	    scratchieItemDao.insert(item);
 	    newItems.add(item);
-
-	    // set options
-	    List<QbOption> newOptions = new LinkedList<>();
-
-	    ArrayNode answersData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
-	    for (int j = 0; j < answersData.size(); j++) {
-		ObjectNode answerData = (ObjectNode) answersData.get(j);
-		QbOption option = new QbOption();
-		// Removes redundant new line characters from options left by CKEditor (otherwise it will break
-		// Javascript in monitor). Copied from AuthoringAction.
-		String optionDescription = JsonUtil.optString(answerData, RestTags.ANSWER_TEXT);
-		option.setName(optionDescription != null ? optionDescription.replaceAll("[\n\r\f]", "") : "");
-		option.setCorrect(JsonUtil.optBoolean(answerData, RestTags.CORRECT));
-		option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		option.setQbQuestion(item.getQbQuestion());
-		newOptions.add(option);
-	    }
-
-	    item.getQbQuestion().setQbOptions(newOptions);
-
 	}
 
 	scratchie.setScratchieItems(newItems);

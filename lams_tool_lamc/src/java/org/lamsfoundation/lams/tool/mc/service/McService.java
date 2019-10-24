@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -2040,25 +2041,35 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	// Questions
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (JsonNode questionData : questions) {
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
-	    qbQuestion.setMaxMark(1);
-	    userManagementService.save(qbQuestion);
-	    
-	    McQueContent question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
-		    mcq);
+	    McQueContent question = null;
+	    QbQuestion qbQuestion = null;
+	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
 
-	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
-	    for (JsonNode optionData : optionsData) {
-		QbOption qbOption = new QbOption();
-		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
-		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
-		qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
-		qbOption.setQbQuestion(qbQuestion);
-		question.getQbQuestion().getQbOptions().add(qbOption);
+	    // try to match the question to an existing QB question in DB
+	    if (uuid != null) {
+		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
+
+	    if (qbQuestion == null) {
+		qbQuestion = new QbQuestion();
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+		qbQuestion.setMaxMark(1);
+		userManagementService.save(qbQuestion);
+
+		ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+		for (JsonNode optionData : optionsData) {
+		    QbOption qbOption = new QbOption();
+		    qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
+		    qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
+		    qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
+		    qbOption.setQbQuestion(qbQuestion);
+		    qbQuestion.getQbOptions().add(qbOption);
+		}
+	    }
+
+	    question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 	    saveOrUpdateMcQueContent(question);
 	}
 

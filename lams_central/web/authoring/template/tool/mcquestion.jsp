@@ -27,7 +27,7 @@
 	</div>
 
 	<div class="panel-body">	
-	
+		<input type="hidden" name="question${questionNumber}uuid" value="${question.uuid}"/>
 		<lams:CKEditor id="question${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 		
 		<table class="table table-condensed table-no-border">

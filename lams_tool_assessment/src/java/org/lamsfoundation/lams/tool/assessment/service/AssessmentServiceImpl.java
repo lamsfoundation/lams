@@ -41,6 +41,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -3401,66 +3402,75 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (JsonNode questionJSONData : questions) {
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
-
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-	    qbQuestion.setType(type);
-	    qbQuestion.setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
-	    qbQuestion.setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
-	    question.setQbQuestion(qbQuestion);
-	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
-
-	    qbQuestion.setAllowRichEditor(
-		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
-	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
-	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
-	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
-	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
-	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
-	    qbQuestion
-		    .setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
-	    qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
-	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
-	    qbQuestion.setMultipleAnswersAllowed(
-		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-	    qbQuestion.setIncorrectAnswerNullifiesMark(
-		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-	    qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
-
-	    assessmentDao.insert(qbQuestion);
 	    question.setToolContentId(toolContentID);
+		question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
+		
+	    QbQuestion qbQuestion = null;
+	    String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
 
-	    // question.setUnits(units); Needed for numerical type question
-
-	    if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		    || (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
-
-		if (!questionJSONData.has(RestTags.ANSWERS)) {
-		    throw new IOException("REST Authoring is missing answers for a question of type " + type + ". Data:"
-			    + toolContentJSON);
-		}
-
-		List<QbOption> optionList = new ArrayList<>();
-		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
-		for (JsonNode answerData : optionsData) {
-		    QbOption option = new QbOption();
-		    option.setQbQuestion(qbQuestion);
-		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-		    Double maxMark = JsonUtil.optDouble(answerData, "maxMark");
-		    option.setMaxMark(maxMark == null ? 1 : maxMark.floatValue());
-		    option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
-		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
-		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));
-		    option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
-		    option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
-		    // option.setQuestion(question); can't find the use for this field yet!
-		    optionList.add(option);
-		}
-		question.getQbQuestion().setQbOptions(optionList);
+	    // try to match the question to an existing QB question in DB
+	    if (uuid != null) {
+		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
+	    if (qbQuestion == null) {
+		qbQuestion = new QbQuestion();
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setType(type);
+		qbQuestion.setName(questionJSONData.get(RestTags.QUESTION_TITLE).asText());
+		qbQuestion.setDescription(questionJSONData.get(RestTags.QUESTION_TEXT).asText());
+
+		qbQuestion.setAllowRichEditor(
+			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+		qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
+		qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+		qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+		qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
+		qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+		qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+		qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+		qbQuestion.setFeedbackOnPartiallyCorrect(
+			JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
+		qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+		qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+		qbQuestion.setMultipleAnswersAllowed(
+			JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+		qbQuestion.setIncorrectAnswerNullifiesMark(
+			JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
+		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+
+		assessmentDao.insert(qbQuestion);
+
+		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
+			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
+
+		    if (!questionJSONData.has(RestTags.ANSWERS)) {
+			throw new IOException("REST Authoring is missing answers for a question of type " + type
+				+ ". Data:" + toolContentJSON);
+		    }
+
+		    List<QbOption> optionList = new ArrayList<>();
+		    ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
+		    for (JsonNode answerData : optionsData) {
+			QbOption option = new QbOption();
+			option.setQbQuestion(qbQuestion);
+			option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+			Double maxMark = JsonUtil.optDouble(answerData, "maxMark");
+			option.setMaxMark(maxMark == null ? 1 : maxMark.floatValue());
+			option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
+			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
+			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
+			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
+			option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
+			// option.setQuestion(question); can't find the use for this field yet!
+			optionList.add(option);
+		    }
+		    qbQuestion.setQbOptions(optionList);
+		}
+	    }
+
+	    // question.setUnits(units); Needed for numerical type question
+	    question.setQbQuestion(qbQuestion);
 	    checkType(question.getType());
 	    newQuestionSet.add(question);
 	}
