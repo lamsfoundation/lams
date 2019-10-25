@@ -64,6 +64,8 @@
 				if (returnURL == '') {
 					form.css('visibility', 'hidden');
 					window.opener.saveQTI(form[0].outerHTML, 'questionForm', callerID);
+					// needs to be called twice for Chrome to close pop up window
+					window.close();
 					window.close();
 				} else {
 					// this code is not really used at the moment, but it's available
@@ -73,6 +75,8 @@
 						data: form.serializeArray(),
 						success: function(response) {
 							window.opener.location.reload();
+							// needs to be called twice for Chrome to close pop up window
+							window.close();
 							window.close();
 						}
 					});
