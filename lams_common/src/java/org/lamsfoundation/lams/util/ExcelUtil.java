@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -61,10 +62,9 @@ public class ExcelUtil {
     private static CellStyle boldStyle;
     
     //other built in formats https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/BuiltinFormats.html
-    private static final String FORMAT_NUMBER = "#.##";
     private static final String FORMAT_PERCENTAGE = "0.00%";
     
-    private static CellStyle numberStyle;
+    private static CellStyle numericStyle;
     private static CellStyle dateStyle;
     private static CellStyle timeStyle;
     private static CellStyle percentageStyle;
@@ -148,8 +148,8 @@ public class ExcelUtil {
 	defaultFont.setFontName(DEFAULT_FONT_NAME);
 
 	//create default style with default font name
-	ExcelUtil.defaultStyle = workbook.createCellStyle();
-	ExcelUtil.defaultStyle.setFont(defaultFont);
+	defaultStyle = workbook.createCellStyle();
+	defaultStyle.setFont(defaultFont);
 
 	//create bold style
 	boldStyle = workbook.createCellStyle();
@@ -180,9 +180,9 @@ public class ExcelUtil {
 	yellowColor.setFont(defaultFont);
 
 	// create number style
-	numberStyle = workbook.createCellStyle();
-	numberStyle.setDataFormat((short)1); // built-in 1 format - "0"
-	
+	numericStyle = workbook.createCellStyle();
+	numericStyle.setDataFormat(workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat(3)));// built-in 3 format - "#,##0"
+
 	// create date style
 	dateStyle = workbook.createCellStyle();
 	dateStyle.setDataFormat((short)14);// built-in 0xe format - "m/d/yy"
@@ -314,115 +314,118 @@ public class ExcelUtil {
     public static void createCell(ExcelCell excelCell, int cellnum, Row row, Workbook workbook) {
 	if (excelCell != null) {
 	    Cell cell = row.createCell(cellnum);
-	    if (excelCell.getCellValue() != null && excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_TIME
-		    && excelCell.getCellValue() instanceof Date) {
-		cell.setCellValue((Date) excelCell.getCellValue());
-		
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof Date) {
-		cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCell.getCellValue()));
-		
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Double) {
-		cell.setCellValue((Double) excelCell.getCellValue());
-		
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
-		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
-		
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Integer) {
-		cell.setCellValue(((Integer) excelCell.getCellValue()).doubleValue());
-		
-	    } else if (excelCell.getCellValue() != null) {
-		cell.setCellValue(excelCell.getCellValue().toString());
+	    Object excelCellValue = excelCell.getCellValue();
+
+	    //cast excelCell's value
+	    if (excelCellValue != null) {
+		if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
+		    cell.setCellValue((Date) excelCellValue);
+
+		} else if (excelCellValue instanceof Date) {
+		    cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCellValue));
+
+		} else if (excelCellValue instanceof java.lang.Double) {
+		    cell.setCellValue((Double) excelCellValue);
+
+		} else if (excelCellValue instanceof java.lang.Long) {
+		    cell.setCellValue(((Long) excelCellValue).doubleValue());
+
+		} else if (excelCellValue instanceof java.lang.Integer) {
+		    cell.setCellValue(((Integer) excelCellValue).doubleValue());
+
+		} else {
+		    cell.setCellValue(excelCellValue.toString());
+		}
 	    }
 
-	    //set default font
-	    cell.setCellStyle(defaultStyle);
-
+	    //figure out cell's style
+	    CellStyle cellStyle = defaultStyle;
+	    if (excelCellValue != null && (excelCellValue instanceof Number)) {
+		cellStyle = numericStyle;
+	    }
 	    if (excelCell.isBold()) {
-		cell.setCellStyle(boldStyle);
+		cellStyle = boldStyle;
 	    }
-	    
-	    boolean isPercentageFormat = excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE;
 	    switch (excelCell.getCellFormat()) {
 		case 0:
 		    //default - do nothing
 		    break;
 		case ExcelCell.CELL_FORMAT_NUMBER:
-		    cell.setCellStyle(numberStyle);
+		    cellStyle = numericStyle;
 		    break;
 		case ExcelCell.CELL_FORMAT_DATE:
-		    cell.setCellStyle(dateStyle);
+		    cellStyle = dateStyle;
 		    break;
 		case ExcelCell.CELL_FORMAT_TIME:
-		    cell.setCellStyle(timeStyle);
+		    cellStyle = timeStyle;
 		    break;
 		case ExcelCell.CELL_FORMAT_PERCENTAGE:
-		    cell.setCellStyle(percentageStyle);
+		    cellStyle = percentageStyle;
 		    break;
 	    }
-
 	    if (excelCell.getColor() != null) {
 		switch (excelCell.getColor()) {
 		    case BLUE:
-			cell.setCellStyle(blueColor);
+			cellStyle = blueColor;
 			break;
 		    case GREEN:
-			cell.setCellStyle(greenColor);
+			cellStyle = greenColor;
 			break;
 		    case RED:
-			cell.setCellStyle(redColor);
+			cellStyle = redColor;
 			break;
 		    case YELLOW:
-			cell.setCellStyle(yellowColor);
+			cellStyle = yellowColor;
 			break;
 		    default:
 			break;
 		}
 	    }
-
 	    if (excelCell.getBorderStyle() != 0) {
-
+		boolean isPercentageFormat = excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE;
+		
 		switch (excelCell.getBorderStyle()) {
 		    case ExcelCell.BORDER_STYLE_LEFT_THIN:
 			if (excelCell.isBold() && isPercentageFormat) {
-			    cell.setCellStyle(borderStyleLeftThinBoldFontPercentage);
+			    cellStyle = borderStyleLeftThinBoldFontPercentage;
 			} else if (excelCell.isBold()) {
-			    cell.setCellStyle(borderStyleLeftThinBoldFont);
+			    cellStyle = borderStyleLeftThinBoldFont;
 			} else if (isPercentageFormat) {
-			    cell.setCellStyle(borderStyleLeftThinPercentage);
+			    cellStyle = borderStyleLeftThinPercentage;
 			} else {
-			    cell.setCellStyle(borderStyleLeftThin);
+			    cellStyle = borderStyleLeftThin;
 			}
 			break;
 		    case ExcelCell.BORDER_STYLE_LEFT_THICK:
 			if (excelCell.isBold()) {
-			    cell.setCellStyle(borderStyleLeftThickBoldFont);
+			    cellStyle = borderStyleLeftThickBoldFont;
 			} else {
-			    cell.setCellStyle(borderStyleLeftThick);
+			    cellStyle = borderStyleLeftThick;
 			}
 			break;
 		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
 			if (excelCell.isBold() && isPercentageFormat ) {
-			    cell.setCellStyle(borderStyleRightThickBoldFontPercentage);
+			    cellStyle = borderStyleRightThickBoldFontPercentage;
 			} else 	if (excelCell.isBold() ) {
-			    cell.setCellStyle(borderStyleRightThickBoldFont);
+			    cellStyle = borderStyleRightThickBoldFont;
 			} else 	if (isPercentageFormat ) {
-			    cell.setCellStyle(borderStyleRightThickPercentage);
+			    cellStyle = borderStyleRightThickPercentage;
 			} else {
-			    cell.setCellStyle(borderStyleRightThick);
+			    cellStyle = borderStyleRightThick;
 			}
 			break;
 		    case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
 			if (excelCell.isBold()) {
-			    cell.setCellStyle(borderStyleBottomThinBoldFont);
+			    cellStyle = borderStyleBottomThinBoldFont;
 			} else {
-			    cell.setCellStyle(borderStyleBottomThin);
+			    cellStyle = borderStyleBottomThin;
 			}
 			break;
 		    default:
 			break;
 		}
-
 	    }
+	    cell.setCellStyle(cellStyle);
 	    
 	    if (excelCell.getAlignment() != 0) {
 		switch (excelCell.getAlignment()) {
@@ -441,7 +444,6 @@ public class ExcelUtil {
 		    default:
 			break;
 		}
-
 	    }
 	}
     }
