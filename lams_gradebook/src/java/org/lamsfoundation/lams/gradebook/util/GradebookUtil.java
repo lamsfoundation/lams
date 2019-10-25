@@ -200,7 +200,7 @@ public class GradebookUtil {
 	}
 
 	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
-	userMarkCell.setIsPercentage(true);
+	userMarkCell.setCellFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
 	return userMarkCell;
     }
 
