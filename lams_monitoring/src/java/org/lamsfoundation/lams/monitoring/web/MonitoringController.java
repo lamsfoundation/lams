@@ -96,6 +96,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -288,16 +289,14 @@ public class MonitoringController {
     }
 
     @RequestMapping("/addLesson")
-    public String addLesson(HttpServletRequest request, HttpServletResponse response)
+    public String addLesson(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam String lessonName, @RequestParam long learningDesignID)
 	    throws IOException, ServletException, ParseException {
-	String lessonName = request.getParameter("lessonName");
 	if (!ValidationUtil.isOrgNameValid(lessonName)) {
 	    throw new IOException("Lesson name contains invalid characters");
 	}
-
-	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-
+	
+	String[] organisationIdsStr = request.getParameterValues(AttributeNames.PARAM_ORGANISATION_ID);
 	boolean introEnable = WebUtil.readBooleanParam(request, "introEnable", false);
 	String introDescription = introEnable ? request.getParameter("introDescription") : null;
 	boolean introImage = introEnable && WebUtil.readBooleanParam(request, "introImage", false);
@@ -333,93 +332,98 @@ public class MonitoringController {
 	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
 	boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
 
-	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	Integer userId = getUserId();
 	User creator = (User) userManagementService.findById(User.class, userId);
 
-	List<User> allUsers = userManagementService.getUsersFromOrganisation(organisationId);
-	List<User> learners = parseUserList(request, "learners", allUsers);
-	String learnerGroupName = organisation.getName() + " learners";
+	for (String organisationIdStr : organisationIdsStr) {
+	    Integer organisationId = Integer.parseInt(organisationIdStr);
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
+		    organisationId);
+	    List<User> organisationUsers = userManagementService.getUsersFromOrganisation(organisationId);
+	    List<User> learners = parseUserList(request, "learners", organisationUsers);
+	    String learnerGroupName = organisation.getName() + " learners";
 
-	List<User> staff = parseUserList(request, "monitors", allUsers);
-	// add the creator as staff, if not already done
-	if (!staff.contains(creator)) {
-	    staff.add(creator);
-	}
-	String staffGroupName = organisation.getName() + " staff";
-
-	// either all users participate in a lesson, or we split them among instances
-	List<User> lessonInstanceLearners = splitNumberLessons == null ? learners
-		: new ArrayList<>((learners.size() / splitNumberLessons) + 1);
-	for (int lessonIndex = 1; lessonIndex <= (splitNumberLessons == null ? 1 : splitNumberLessons); lessonIndex++) {
-	    String lessonInstanceName = lessonName;
-	    String learnerGroupInstanceName = learnerGroupName;
-	    String staffGroupInstanceName = staffGroupName;
-
-	    if (splitNumberLessons != null) {
-		// prepare data for lesson split
-		lessonInstanceName += " " + lessonIndex;
-		learnerGroupInstanceName += " " + lessonIndex;
-		staffGroupInstanceName += " " + lessonIndex;
-		lessonInstanceLearners.clear();
-		for (int learnerIndex = lessonIndex - 1; learnerIndex < learners
-			.size(); learnerIndex += splitNumberLessons) {
-		    lessonInstanceLearners.add(learners.get(learnerIndex));
-		}
+	    List<User> staff = parseUserList(request, "monitors", organisationUsers);
+	    // add the creator as staff, if not already done
+	    if (!staff.contains(creator)) {
+		staff.add(creator);
 	    }
+	    String staffGroupName = organisation.getName() + " staff";
 
-	    if (MonitoringController.log.isDebugEnabled()) {
-		MonitoringController.log.debug("Creating lesson "
-			+ (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ") + "\""
-			+ lessonInstanceName + "\"");
-	    }
+	    // either all users participate in a lesson, or we split them among instances
+	    List<User> lessonInstanceLearners = splitNumberLessons == null ? learners
+		    : new ArrayList<>((learners.size() / splitNumberLessons) + 1);
+	    for (int lessonIndex = 1; lessonIndex <= (splitNumberLessons == null ? 1
+		    : splitNumberLessons); lessonIndex++) {
+		String lessonInstanceName = lessonName;
+		String learnerGroupInstanceName = learnerGroupName;
+		String staffGroupInstanceName = staffGroupName;
 
-	    Lesson lesson = null;
-	    try {
-		lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId, organisationId,
-			userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
-			notificationsEnable, forceRestart, allowRestart, gradebookOnComplete, timeLimitIndividual,
-			precedingLessonId);
-
-		monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
-			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
-	    } catch (SecurityException e) {
-		try {
-		    response.sendError(HttpServletResponse.SC_FORBIDDEN,
-			    "User is not a monitor in the organisation or lesson");
-		} catch (IllegalStateException e1) {
-		    MonitoringController.log
-			    .warn("Tried to tell user that \"User is not a monitor in the organisation or lesson\","
-				    + "but the HTTP response was already written, probably by some other error");
-		}
-		return null;
-	    }
-
-	    if (!startMonitor) {
-		try {
-		    if (schedulingDatetime == null) {
-			monitoringService.startLesson(lesson.getLessonId(), userId);
-		    } else {
-			// if lesson should start in few days, set it here
-			monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+		if (splitNumberLessons != null) {
+		    // prepare data for lesson split
+		    lessonInstanceName += " " + lessonIndex;
+		    learnerGroupInstanceName += " " + lessonIndex;
+		    staffGroupInstanceName += " " + lessonIndex;
+		    lessonInstanceLearners.clear();
+		    for (int learnerIndex = lessonIndex - 1; learnerIndex < learners
+			    .size(); learnerIndex += splitNumberLessons) {
+			lessonInstanceLearners.add(learners.get(learnerIndex));
 		    }
+		}
 
-		    // monitor has given an end date/time for the lesson
-		    if (schedulingEndDatetime != null) {
-			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime, userId);
-			// if lesson should finish in few days, set it here
-		    } else if (timeLimitLesson != null) {
-			monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
-		    }
+		if (log.isDebugEnabled()) {
+		    log.debug("Creating lesson "
+			    + (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ")
+			    + "\"" + lessonInstanceName + "\"");
+		}
 
+		Lesson lesson = null;
+		try {
+		    lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, learningDesignID,
+			    organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable,
+			    enableLiveEdit, notificationsEnable, forceRestart, allowRestart, gradebookOnComplete,
+			    timeLimitIndividual, precedingLessonId);
+
+		    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+			    learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
 		} catch (SecurityException e) {
 		    try {
-			response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+			response.sendError(HttpServletResponse.SC_FORBIDDEN,
+				"User is not a monitor in the organisation or lesson");
 		    } catch (IllegalStateException e1) {
-			MonitoringController.log.warn("Tried to tell user that \"User is not a monitor in the lesson\","
+			log.warn("Tried to tell user that \"User is not a monitor in the organisation or lesson\","
 				+ "but the HTTP response was already written, probably by some other error");
 		    }
 		    return null;
+		}
+
+		if (!startMonitor) {
+		    try {
+			if (schedulingDatetime == null) {
+			    monitoringService.startLesson(lesson.getLessonId(), userId);
+			} else {
+			    // if lesson should start in few days, set it here
+			    monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+			}
+
+			// monitor has given an end date/time for the lesson
+			if (schedulingEndDatetime != null) {
+			    monitoringService.finishLessonOnSchedule(lesson.getLessonId(), schedulingEndDatetime,
+				    userId);
+			    // if lesson should finish in few days, set it here
+			} else if (timeLimitLesson != null) {
+			    monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
+			}
+
+		    } catch (SecurityException e) {
+			try {
+			    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+			} catch (IllegalStateException e1) {
+			    log.warn("Tried to tell user that \"User is not a monitor in the lesson\","
+				    + "but the HTTP response was already written, probably by some other error");
+			}
+			return null;
+		    }
 		}
 	    }
 	}
@@ -653,8 +657,8 @@ public class MonitoringController {
 	    return;
 	}
 
-	if (MonitoringController.log.isDebugEnabled()) {
-	    MonitoringController.log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
+	if (log.isDebugEnabled()) {
+	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
 		    + lessonId + ". " + message);
 	}
 
@@ -853,11 +857,11 @@ public class MonitoringController {
 	}
 
 	if (result) {
-	    MonitoringController.log.info((add ? "Added a " : "Removed a ") + role + " with ID " + userId
-		    + (add ? " to" : " from") + " lesson " + lessonId);
+	    log.info((add ? "Added a " : "Removed a ") + role + " with ID " + userId + (add ? " to" : " from")
+		    + " lesson " + lessonId);
 	} else {
-	    MonitoringController.log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID "
-		    + userId + (add ? " to" : " from") + " lesson " + lessonId);
+	    log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID " + userId
+		    + (add ? " to" : " from") + " lesson " + lessonId);
 	}
     }
 
