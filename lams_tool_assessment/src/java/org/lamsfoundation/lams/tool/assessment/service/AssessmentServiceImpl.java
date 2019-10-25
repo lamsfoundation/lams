@@ -1491,9 +1491,9 @@ public class AssessmentServiceImpl
 			float grade = userDto.getGrade();
 
 			ExcelCell[] userResultRow = new ExcelCell[3];
-			userResultRow[0] = new ExcelCell(userDto.getLogin(), false);
-			userResultRow[1] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
-			userResultRow[2] = new ExcelCell(grade, false);
+			userResultRow[0] = new ExcelCell(userDto.getLogin());
+			userResultRow[1] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName());
+			userResultRow[2] = new ExcelCell(grade);
 			summaryTabLearnerList.add(userResultRow);
 
 			if (grade < minGrade || minGrade == -9999999) {
@@ -1519,15 +1519,15 @@ public class AssessmentServiceImpl
 		    summaryTab.add(EMPTY_ROW);
 		    ExcelCell[] minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.number.learners"), true);
-		    minMaxRow[1] = new ExcelCell(totalNumEntries, false);
+		    minMaxRow[1] = new ExcelCell(totalNumEntries);
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.lowest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double) minGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) minGrade);
 		    summaryTab.add(minMaxRow);
 		    minMaxRow = new ExcelCell[2];
 		    minMaxRow[0] = new ExcelCell(getMessage("label.highest.mark"), true);
-		    minMaxRow[1] = new ExcelCell((double) maxGrade, false);
+		    minMaxRow[1] = new ExcelCell((double) maxGrade);
 		    summaryTab.add(minMaxRow);
 
 		    summaryTab.add(EMPTY_ROW);
@@ -1542,8 +1542,8 @@ public class AssessmentServiceImpl
 		    float totalNumEntriesAsFloat = totalNumEntries;
 		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
 			binSummaryRow = new ExcelCell[3];
-			binSummaryRow[0] = new ExcelCell(entry.getKey(), false);
-			binSummaryRow[1] = new ExcelCell(entry.getValue(), false);
+			binSummaryRow[0] = new ExcelCell(entry.getKey());
+			binSummaryRow[1] = new ExcelCell(entry.getValue());
 			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),
 				false);
 			summaryTab.add(binSummaryRow);
@@ -1577,7 +1577,7 @@ public class AssessmentServiceImpl
 
 	    int count = 0;
 	    // question row title
-	    ExcelCell[] questionTitleRow = showUserNames ? new ExcelCell[10] : new ExcelCell[9];
+	    ExcelCell[] questionTitleRow = showUserNames ? new ExcelCell[11] : new ExcelCell[10];
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true,
@@ -1594,6 +1594,8 @@ public class AssessmentServiceImpl
 	    }
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.date.attempted"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.attempted"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.option.answer"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.taken"), true,
@@ -1604,7 +1606,7 @@ public class AssessmentServiceImpl
 	    int questionNumber = 1;
 
 	    for (AssessmentQuestion question : questions) {
-		int colsNum = showUserNames ? 10 : 9;
+		int colsNum = showUserNames ? 11 : 10;
 
 		ExcelCell[] questionTitle = new ExcelCell[1];
 		questionTitle[0] = new ExcelCell(
@@ -1649,6 +1651,7 @@ public class AssessmentServiceImpl
 				getMessage("label.monitoring.user.summary.user.name"), true);
 		    }
 		    hedgeQuestionTitleRow[count++] = new ExcelCell(getMessage("label.export.date.attempted"), true);
+		    hedgeQuestionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.attempted"), true);
 		    for (AssessmentQuestionOption option : options) {
 			hedgeQuestionTitleRow[count++] = new ExcelCell(
 				option.getOptionString().replaceAll("\\<.*?\\>", ""), true);
@@ -1664,7 +1667,6 @@ public class AssessmentServiceImpl
 		}
 
 		QuestionSummary questionSummary = questionSummaries.get(question.getUid());
-
 		List<List<AssessmentQuestionResult>> allResultsForQuestion = questionSummary
 			.getQuestionResultsPerSession();
 
@@ -1674,60 +1676,66 @@ public class AssessmentServiceImpl
 		int timeTakenTotal = 0;
 		for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {
 		    for (AssessmentQuestionResult questionResult : resultList) {
-
 			ExcelCell[] userResultRow = new ExcelCell[colsNum];
 			count = 0;
 			userResultRow[count++] = new ExcelCell(questionResult.getAssessmentQuestion().getTitle(),
 				false);
 			userResultRow[count++] = new ExcelCell(
-				getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()), false);
+				getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()));
 			userResultRow[count++] = new ExcelCell(
-				Float.valueOf(questionResult.getAssessmentQuestion().getPenaltyFactor()), false);
+				Float.valueOf(questionResult.getAssessmentQuestion().getPenaltyFactor()));
 			Float maxMark = (questionResult.getMaxMark() == null) ? 0
 				: Float.valueOf(questionResult.getMaxMark());
-			userResultRow[count++] = new ExcelCell(maxMark, false);
+			userResultRow[count++] = new ExcelCell(maxMark);
 			if (showUserNames) {
-			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getLoginName(), false);
-			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getFullName(), false);
+			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getLoginName());
+			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getFullName());
 			} else {
-			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getUserId(), false);
+			    userResultRow[count++] = new ExcelCell(questionResult.getUser().getUserId());
 			}
-			userResultRow[count++] = new ExcelCell(questionResult.getFinishDate(), false);
+			
+			//date and time
+			userResultRow[count] = new ExcelCell(questionResult.getFinishDate());
+			userResultRow[count++].setCellFormat(ExcelCell.CELL_FORMAT_DATE);
+			userResultRow[count] = new ExcelCell(questionResult.getFinishDate());
+			userResultRow[count++].setCellFormat(ExcelCell.CELL_FORMAT_TIME);
+			
 			//answer
 			if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-
 			    Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 			    for (AssessmentQuestionOption option : question.getOptions()) {
 				for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 				    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-					userResultRow[count++] = new ExcelCell(optionAnswer.getAnswerInt(), false);
+					userResultRow[count++] = new ExcelCell(optionAnswer.getAnswerInt());
 					break;
 				    }
 				}
 			    }
+			    
 			} else {
 			    userResultRow[count++] = new ExcelCell(
-				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
+				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
 
 			    if (doSummaryTable) {
 				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers,
 					summaryNACount);
 			    }
-
 			}
+			
 			//time taken
 			if (questionResult.getAssessmentResult() != null) {
 			    Date startDate = questionResult.getAssessmentResult().getStartDate();
 			    Date finishDate = questionResult.getFinishDate();
 			    if ((startDate != null) && (finishDate != null)) {
 				Long seconds = (finishDate.getTime() - startDate.getTime()) / 1000;
-				userResultRow[count++] = new ExcelCell(seconds, false);
+				userResultRow[count++] = new ExcelCell(seconds);
 				timeTakenCount++;
 				timeTakenTotal += seconds;
 			    }
 			}
+			
 			//mark
-			userResultRow[count++] = new ExcelCell(questionResult.getMark(), false);
+			userResultRow[count++] = new ExcelCell(questionResult.getMark());
 			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
@@ -1753,26 +1761,26 @@ public class AssessmentServiceImpl
 		    averageRow[7] = new ExcelCell(getMessage("label.export.average"), true);
 
 		    if (timeTakenTotal > 0) {
-			averageRow[8] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount), false);
+			averageRow[8] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount));
 		    }
 		    if (markTotal > 0) {
 			Float averageMark = Float.valueOf(markTotal / markCount);
-			averageRow[9] = new ExcelCell(averageMark, false);
+			averageRow[9] = new ExcelCell(averageMark);
 		    } else {
-			averageRow[9] = new ExcelCell(0.0F, false);
+			averageRow[9] = new ExcelCell(0.0F);
 		    }
 		} else {
 		    averageRow = new ExcelCell[9];
 		    averageRow[6] = new ExcelCell(getMessage("label.export.average"), true);
 
 		    if (timeTakenTotal > 0) {
-			averageRow[7] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount), false);
+			averageRow[7] = new ExcelCell(Long.valueOf(timeTakenTotal / timeTakenCount));
 		    }
 		    if (markTotal > 0) {
 			Float averageMark = Float.valueOf(markTotal / markCount);
-			averageRow[8] = new ExcelCell(averageMark, false);
+			averageRow[8] = new ExcelCell(averageMark);
 		    } else {
-			averageRow[8] = new ExcelCell(0.0F, false);
+			averageRow[8] = new ExcelCell(0.0F);
 		    }
 		}
 
@@ -1845,11 +1853,11 @@ public class AssessmentServiceImpl
 		totalGradesPossible += maxGrade;
 
 		ExcelCell[] questCell = new ExcelCell[5];
-		questCell[0] = new ExcelCell(title, false);
-		questCell[1] = new ExcelCell(questionType, false);
-		questCell[2] = new ExcelCell(penaltyFactor, false);
-		questCell[3] = new ExcelCell(maxGrade, false);
-		questCell[4] = new ExcelCell(averageMark, false);
+		questCell[0] = new ExcelCell(title);
+		questCell[1] = new ExcelCell(questionType);
+		questCell[2] = new ExcelCell(penaltyFactor);
+		questCell[3] = new ExcelCell(maxGrade);
+		questCell[4] = new ExcelCell(averageMark);
 
 		userSummaryTab.add(questCell);
 	    }
@@ -1857,8 +1865,8 @@ public class AssessmentServiceImpl
 	    if (totalGradesPossible.floatValue() > 0) {
 		ExcelCell[] totalCell = new ExcelCell[5];
 		totalCell[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
-		totalCell[3] = new ExcelCell(totalGradesPossible, false);
-		totalCell[4] = new ExcelCell(totalAverage, false);
+		totalCell[3] = new ExcelCell(totalGradesPossible);
+		totalCell[4] = new ExcelCell(totalAverage);
 		userSummaryTab.add(totalCell);
 	    }
 	    userSummaryTab.add(EMPTY_ROW);
@@ -1921,26 +1929,24 @@ public class AssessmentServiceImpl
 
 				    if (showUserNames) {
 					ExcelCell[] userResultRow = new ExcelCell[6];
-					userResultRow[0] = new ExcelCell(assessmentUser.getLoginName(), false);
-					userResultRow[1] = new ExcelCell(assessmentUser.getFullName(), false);
-					userResultRow[2] = new ExcelCell(assessmentResult.getStartDate(), false);
+					userResultRow[0] = new ExcelCell(assessmentUser.getLoginName());
+					userResultRow[1] = new ExcelCell(assessmentUser.getFullName());
+					userResultRow[2] = new ExcelCell(assessmentResult.getStartDate());
 					userResultRow[3] = new ExcelCell(
-						questionResult.getAssessmentQuestion().getTitle(), false);
+						questionResult.getAssessmentQuestion().getTitle());
 					userResultRow[4] = new ExcelCell(
-						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
-						false);
-					userResultRow[5] = new ExcelCell(questionResult.getMark(), false);
+						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
+					userResultRow[5] = new ExcelCell(questionResult.getMark());
 					userSummaryTab.add(userResultRow);
 				    } else {
 					ExcelCell[] userResultRow = new ExcelCell[5];
-					userResultRow[0] = new ExcelCell(assessmentUser.getUserId(), false);
-					userResultRow[1] = new ExcelCell(assessmentResult.getStartDate(), false);
+					userResultRow[0] = new ExcelCell(assessmentUser.getUserId());
+					userResultRow[1] = new ExcelCell(assessmentResult.getStartDate());
 					userResultRow[2] = new ExcelCell(
-						questionResult.getAssessmentQuestion().getTitle(), false);
+						questionResult.getAssessmentQuestion().getTitle());
 					userResultRow[3] = new ExcelCell(
-						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult),
-						false);
-					userResultRow[4] = new ExcelCell(questionResult.getMark(), false);
+						AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
+					userResultRow[4] = new ExcelCell(questionResult.getMark());
 					userSummaryTab.add(userResultRow);
 				    }
 				}
@@ -1950,11 +1956,11 @@ public class AssessmentServiceImpl
 			    if (showUserNames) {
 				userTotalRow = new ExcelCell[6];
 				userTotalRow[4] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
-				userTotalRow[5] = new ExcelCell(assessmentResult.getGrade(), false);
+				userTotalRow[5] = new ExcelCell(assessmentResult.getGrade());
 			    } else {
 				userTotalRow = new ExcelCell[5];
 				userTotalRow[3] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
-				userTotalRow[4] = new ExcelCell(assessmentResult.getGrade(), false);
+				userTotalRow[4] = new ExcelCell(assessmentResult.getGrade());
 			    }
 
 			    userSummaryTab.add(userTotalRow);
@@ -1986,19 +1992,19 @@ public class AssessmentServiceImpl
 		} else {
 		    bldr.append(option.getOptionString().replaceAll("\\<.*?\\>", ""));
 		}
-		summaryTable[i] = new ExcelCell(bldr.toString(), false);
+		summaryTable[i] = new ExcelCell(bldr.toString());
 		i++;
 	    }
 	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false);
+		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"));
 	    } else {
-		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false);
+		summaryTable[i++] = new ExcelCell(getMessage("label.other"));
 	    }
 	} else {
 	    summaryTable = new ExcelCell[3];
-	    summaryTable[0] = new ExcelCell(getMessage("label.authoring.true.false.true"), false);
-	    summaryTable[1] = new ExcelCell(getMessage("label.authoring.true.false.false"), false);
-	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false);
+	    summaryTable[0] = new ExcelCell(getMessage("label.authoring.true.false.true"));
+	    summaryTable[1] = new ExcelCell(getMessage("label.authoring.true.false.false"));
+	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"));
 	    summaryOfAnswers.put(trueKey, 0);
 	    summaryOfAnswers.put(falseKey, 0);
 	}
@@ -2074,18 +2080,18 @@ public class AssessmentServiceImpl
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
+		summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total));
 		if (option.getGrade() > 0) {
 		    summaryTable[i].setColor(IndexedColors.GREEN);
 		}
 		i++;
 	    }
-	    summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total));
 	} else {
 	    summaryTable = new ExcelCell[3];
-	    summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
-	    summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
-	    summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	    summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total));
+	    summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total));
+	    summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount, total));
 	    summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
 	}
 	return summaryTable;
