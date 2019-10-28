@@ -171,12 +171,12 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     }
 
     @Override
-    public boolean isMcContentAttempted(Long mcContentUid) {
-	final String IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT = "select COUNT(*) > 0 FROM " + McUsrAttempt.class.getName()
-		+ " AS attempt WHERE attempt.qbToolQuestion.uid=:mcContentUid";
+    public boolean isMcContentAttempted(long toolContentId) {
+	final String IS_USER_ATTEMPT_EXIST_BY_TOOL_CONTENT = "select COUNT(*) > 0 FROM " + McUsrAttempt.class.getName()
+		+ " AS attempt WHERE attempt.qbToolQuestion.toolContentId=:toolContentId";
 
-	Query<Boolean> q = getSession().createQuery(IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT, Boolean.class);
-	q.setParameter("mcContentUid", mcContentUid);
+	Query<Boolean> q = getSession().createQuery(IS_USER_ATTEMPT_EXIST_BY_TOOL_CONTENT, Boolean.class);
+	q.setParameter("toolContentId", toolContentId);
 	return q.uniqueResult();
     }
 
