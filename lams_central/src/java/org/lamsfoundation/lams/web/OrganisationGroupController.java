@@ -71,6 +71,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -141,7 +142,7 @@ public class OrganisationGroupController {
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
 		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
 	if (lessonGroupsExist || (activityID != null && orgGroupings.isEmpty())) {
-	    return viewGroups(request, response);
+	    return viewGroups(request, response, organisationId);
 	}
 
 	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
@@ -149,9 +150,8 @@ public class OrganisationGroupController {
 	boolean isUsedForBranching = (grouping != null) && grouping.isUsedForBranching();
 	request.setAttribute(PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
-	if (OrganisationGroupController.log.isDebugEnabled()) {
-	    OrganisationGroupController.log
-		    .debug("Displaying course groupings for user " + userId + " and organisation " + organisationId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Displaying course groupings for user " + userId + " and organisation " + organisationId);
 	}
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
@@ -190,9 +190,10 @@ public class OrganisationGroupController {
      */
     @RequestMapping("/viewGroups")
     @SuppressWarnings("unchecked")
-    public String viewGroups(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String viewGroups(HttpServletRequest request, HttpServletResponse response,
+	    @RequestParam(value = "organisationID", required = false) Integer organisationId)
+	    throws Exception {
 	Integer userId = getUserDTO().getUserID();
-	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Lesson lesson = null;
 	if (organisationId == null) {
@@ -211,9 +212,8 @@ public class OrganisationGroupController {
 
 	boolean isGroupSuperuser = userManagementService.isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
 
-	if (OrganisationGroupController.log.isDebugEnabled()) {
-	    OrganisationGroupController.log
-		    .debug("Displaying course groups for user " + userId + " and organisation " + organisationId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Displaying course groups for user " + userId + " and organisation " + organisationId);
 	}
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 	request.setAttribute("canEdit", isGroupSuperuser || (activityId != null));
@@ -242,8 +242,8 @@ public class OrganisationGroupController {
 	Set<Group> lessonGroups = lessonGrouping == null ? null : lessonGrouping.getGroups();
 	if ((activityId != null) && (lessonGrouping != null) && (isExternalGroupsSelected || (orgGroupingId != null))
 		&& isDefaultChosenGrouping(lessonGrouping)) {
-	    if (OrganisationGroupController.log.isDebugEnabled()) {
-		OrganisationGroupController.log.debug("Removing default groups for grouping " + orgGroupingId);
+	    if (log.isDebugEnabled()) {
+		log.debug("Removing default groups for grouping " + orgGroupingId);
 	    }
 
 	    Set<Long> groupIDs = new HashSet<>(lessonGroups.size());
@@ -365,9 +365,8 @@ public class OrganisationGroupController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a manager or admin in the organisation");
 	}
 
-	if (OrganisationGroupController.log.isDebugEnabled()) {
-	    OrganisationGroupController.log
-		    .debug("Saving course groups for user " + userId + " and organisation " + organisationId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Saving course groups for user " + userId + " and organisation " + organisationId);
 	}
 
 	// deserialize grouping
@@ -438,8 +437,8 @@ public class OrganisationGroupController {
 	}
 
 	Long groupingId = WebUtil.readLongParam(request, "groupingId");
-	if (OrganisationGroupController.log.isDebugEnabled()) {
-	    OrganisationGroupController.log.debug(
+	if (log.isDebugEnabled()) {
+	    log.debug(
 		    "Removing grouping " + groupingId + " for user " + userId + " and organisation " + organisationId);
 	}
 	userManagementService.deleteById(OrganisationGrouping.class, groupingId);
