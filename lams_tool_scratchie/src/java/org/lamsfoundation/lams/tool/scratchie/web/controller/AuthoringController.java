@@ -806,9 +806,7 @@ public class AuthoringController {
 	    Integer displayOrder = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i));
 	    option.setDisplayOrder(displayOrder);
 	    option.setName(optionName);
-	    if ((correctOptionIndex != null) && correctOptionIndex.equals(displayOrder) && isMcqQuestion) {
-		option.setCorrect(true);
-	    }
+	    option.setCorrect((correctOptionIndex != null) && correctOptionIndex.equals(displayOrder) && isMcqQuestion);
 
 	    //handle VSA question type
 	    if (!isMcqQuestion) {
