@@ -34,7 +34,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -57,17 +56,17 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Utilities for producing .xlsx files.
  */
 public class ExcelUtil {
-
-    private static CellStyle defaultStyle;
-    private static CellStyle boldStyle;
-    
     //other built in formats https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/BuiltinFormats.html
     private static final String FORMAT_PERCENTAGE = "0.00%";
     
-    private static CellStyle numericStyle;
+    private static CellStyle defaultStyle;
+    private static CellStyle numberStyle;
+    private static CellStyle floatStyle;
     private static CellStyle dateStyle;
     private static CellStyle timeStyle;
     private static CellStyle percentageStyle;
+
+    private static CellStyle boldStyle;
 
     private static CellStyle greenColor;
     private static CellStyle blueColor;
@@ -110,8 +109,8 @@ public class ExcelUtil {
      */
     public static void createExcelXLS(OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
 	    String dateHeader, boolean displaySheetTitle) throws IOException {
-	Workbook workbook = new HSSFWorkbook(); 
-	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+	Workbook workbook = new HSSFWorkbook();
+	ExcelUtil.create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
     }
 
     /**
@@ -138,7 +137,7 @@ public class ExcelUtil {
 	LocaleUtil.setUserTimeZone(userTimeZone);
 	
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
-	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+	ExcelUtil.create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
     }
     
     private static void create(Workbook workbook, OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
@@ -180,9 +179,12 @@ public class ExcelUtil {
 	yellowColor.setFont(defaultFont);
 
 	// create number style
-	numericStyle = workbook.createCellStyle();
-	numericStyle.setDataFormat(workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat(3)));// built-in 3 format - "#,##0"
-
+	floatStyle = workbook.createCellStyle();
+	floatStyle.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+	
+	numberStyle = workbook.createCellStyle();
+	numberStyle.setDataFormat(workbook.createDataFormat().getFormat("0"));
+	
 	// create date style
 	dateStyle = workbook.createCellStyle();
 	dateStyle.setDataFormat((short)14);// built-in 0xe format - "m/d/yy"
@@ -324,6 +326,9 @@ public class ExcelUtil {
 		} else if (excelCellValue instanceof Date) {
 		    cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCellValue));
 
+		} else if (excelCellValue instanceof java.lang.Float) {
+		    cell.setCellValue((Float) excelCellValue);
+		    
 		} else if (excelCellValue instanceof java.lang.Double) {
 		    cell.setCellValue((Double) excelCellValue);
 
@@ -340,8 +345,12 @@ public class ExcelUtil {
 
 	    //figure out cell's style
 	    CellStyle cellStyle = defaultStyle;
-	    if (excelCellValue != null && (excelCellValue instanceof Number)) {
-		cellStyle = numericStyle;
+	    if (excelCellValue != null
+		    && (excelCellValue instanceof java.lang.Integer || excelCellValue instanceof java.lang.Long)) {
+		cellStyle = numberStyle;
+	    } else if (excelCellValue != null
+		    && (excelCellValue instanceof java.lang.Float || excelCellValue instanceof java.lang.Double)) {
+		cellStyle = floatStyle;
 	    }
 	    if (excelCell.isBold()) {
 		cellStyle = boldStyle;
@@ -349,9 +358,6 @@ public class ExcelUtil {
 	    switch (excelCell.getCellFormat()) {
 		case 0:
 		    //default - do nothing
-		    break;
-		case ExcelCell.CELL_FORMAT_NUMBER:
-		    cellStyle = numericStyle;
 		    break;
 		case ExcelCell.CELL_FORMAT_DATE:
 		    cellStyle = dateStyle;
@@ -426,6 +432,12 @@ public class ExcelUtil {
 		}
 	    }
 	    cell.setCellStyle(cellStyle);
+	    if (excelCellValue != null
+		    && (excelCellValue instanceof java.lang.Float || (excelCellValue instanceof java.lang.Double))) {
+		//only float and double will have this style. int will have "General" style
+		//cell.getCellStyle().setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##"));
+//		cell.getCellStyle().setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0"));
+	    }
 	    
 	    if (excelCell.getAlignment() != 0) {
 		switch (excelCell.getAlignment()) {

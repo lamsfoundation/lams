@@ -41,10 +41,9 @@ public class ExcelCell {
     public final static int ALIGN_RIGHT = 4;
     
     public final static int CELL_FORMAT_DEFAULT = 0;
-    public final static int CELL_FORMAT_NUMBER = 1;
-    public final static int CELL_FORMAT_DATE = 2;
-    public final static int CELL_FORMAT_TIME = 3;
-    public final static int CELL_FORMAT_PERCENTAGE = 4;
+    public final static int CELL_FORMAT_DATE = 1;
+    public final static int CELL_FORMAT_TIME = 2;
+    public final static int CELL_FORMAT_PERCENTAGE = 3;
     
     private Object cellValue;
     private int cellFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
