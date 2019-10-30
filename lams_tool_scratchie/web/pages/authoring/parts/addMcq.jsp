@@ -25,7 +25,7 @@
     		function addAnswer(){
 
     			//check maximum number of options
-    			var numberOfAnswers = $("textarea[name^=optionDescription]").length;
+    			var numberOfAnswers = $("textarea[name^=optionName]").length;
     			if (numberOfAnswers >= 10) {
     				alert("<fmt:message key="label.authoring.maximum.answers.warning" />");
     				return;
@@ -130,7 +130,7 @@
     		
     		//in order to be able to use answer's value, copy it from CKEditor to textarea
     		function prepareAnswerEditorsForAjaxSubmit(){
-    			$("textarea[name^=optionDescription]").each(function() {
+    			$("textarea[name^=optionName]").each(function() {
     	    		var ckeditorData = CKEDITOR.instances[this.name].getData();
     	    		//skip out empty values
     	    		this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
@@ -146,7 +146,7 @@
 		    				required: function(element) {
 		    					//check there should be at least one answer filled
 				    			prepareAnswerEditorsForAjaxSubmit();
-		    		        	return $("textarea[name^=optionDescription]:filled").length < 1;
+		    		        	return $("textarea[name^=optionName]:filled").length < 1;
 			    		    }
 	    			    },
 	    			    hasFilledCorrectAnswer: {
@@ -157,8 +157,8 @@
 		    					var hasFilledCorrectAnswer = false;
 		    					$("input[name^=optionCorrect]:checked").each(function() {
 		    						var statusIndex = this.alt;
-		    						var optionDescription = $("textarea[name=optionDescription" + statusIndex + "]");
-		    						hasFilledCorrectAnswer = optionDescription.val() != "";
+		    						var optionName = $("textarea[name=optionName" + statusIndex + "]");
+		    						hasFilledCorrectAnswer = optionName.val() != "";
 		    					});
 		    					
 		    		        	return !hasFilledCorrectAnswer;

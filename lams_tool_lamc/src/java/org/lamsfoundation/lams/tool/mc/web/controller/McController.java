@@ -141,7 +141,7 @@ public class McController {
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	boolean isMcContentAttempted = mcContent.getUid() == null ? false
-		: mcService.isMcContentAttempted(mcContent.getUid());
+		: mcService.isMcContentAttempted(mcContent.getMcContentId());
 	sessionMap.put(McAppConstants.ATTR_IS_AUTHORING_RESTRICTED, isMcContentAttempted && mode.isTeacher());
 
 	return "authoring/AuthoringTabsHolder";

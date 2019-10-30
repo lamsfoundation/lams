@@ -119,7 +119,7 @@ public interface IMcUsrAttemptDAO {
     /**
      * Checks whether anyone has attempted this assessment.
      */
-    boolean isMcContentAttempted(Long mcContentUid);
+    boolean isMcContentAttempted(long toolContentId);
 
     /**
      * Calculate what is the total mark scored by user in this activity. Only responseFinalised is taken into account.
