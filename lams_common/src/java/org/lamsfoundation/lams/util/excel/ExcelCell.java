@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.excel;
 
 import org.apache.poi.ss.usermodel.IndexedColors;
 

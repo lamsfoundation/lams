@@ -48,8 +48,8 @@ import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBStartDateComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

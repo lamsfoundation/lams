@@ -21,12 +21,14 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.excel;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
@@ -49,6 +51,7 @@ import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -138,6 +141,22 @@ public class ExcelUtil {
 	
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
 	ExcelUtil.create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+    }
+
+    /**
+     * Temporary wrapper method.
+     */
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle) throws IOException {
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
+	for (ExcelSheet sheet : sheets) {
+	    List<ExcelCell[]> rowList = new LinkedList<>();
+	    for (ExcelRow row : sheet.getRows()) {
+		rowList.add(row.getCells().toArray(new ExcelCell[] {}));
+	    }
+	    dataToExport.put(sheet.getSheetName(), rowList.toArray(new ExcelCell[][] {}));
+	}
+	ExcelUtil.createExcel(out, dataToExport, dateHeader, displaySheetTitle);
     }
     
     private static void create(Workbook workbook, OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,

@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
 
 public interface IGradebookFullService extends IGradebookService {
 

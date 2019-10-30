@@ -18,8 +18,8 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
-import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
 
 /**
  * Contains methods intended for internal usage by lams_monitoring.

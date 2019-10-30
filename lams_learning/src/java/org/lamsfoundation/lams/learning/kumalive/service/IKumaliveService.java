@@ -30,7 +30,7 @@ import java.util.List;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
