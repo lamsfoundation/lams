@@ -301,7 +301,6 @@ public class GradebookMonitoringController {
 	response.addCookie(fileDownloadTokenCookie);
 
 	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
-
     }
 
     /**
@@ -339,7 +338,6 @@ public class GradebookMonitoringController {
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
-
     }
 
     /**
@@ -381,7 +379,6 @@ public class GradebookMonitoringController {
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, dataToExport, null, false);
-
     }
 
     /**

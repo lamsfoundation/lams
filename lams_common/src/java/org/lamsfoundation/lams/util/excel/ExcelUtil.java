@@ -304,7 +304,7 @@ public class ExcelUtil {
 
 	    //cast excelCell's value
 	    if (excelCellValue != null) {
-		if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
+		if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
 		    cell.setCellValue((Date) excelCellValue);
 
 		} else if (excelCellValue instanceof Date) {
@@ -395,13 +395,13 @@ public class ExcelUtil {
 		    && (excelCellValue instanceof java.lang.Float || excelCellValue instanceof java.lang.Double)) {
 		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, floatFormat);
 		
-	    } else if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_DATE) {
+	    } else if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_DATE) {
 		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dateFormat);
 		
-	    } else if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_TIME) {
+	    } else if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME) {
 		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, timeFormat);
 	    } 
-	    if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE) {
+	    if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE) {
 		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	    }
 	    

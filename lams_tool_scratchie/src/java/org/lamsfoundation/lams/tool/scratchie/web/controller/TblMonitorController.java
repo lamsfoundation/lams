@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,13 +55,16 @@ import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -76,11 +78,10 @@ public class TblMonitorController {
     private IScratchieService scratchieService;
 
     /**
-     * Shows tra page
+     * Shows TRA page
      */
     @RequestMapping("/tra")
     public String tra(HttpServletRequest request) throws IOException, ServletException {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
@@ -92,22 +93,18 @@ public class TblMonitorController {
 	request.setAttribute("items", items);
 
 	if (attemptedLearnersNumber != 0) {
-	    // find first page in excel file
-	    LinkedHashMap<String, ExcelCell[][]> excelDoc = scratchieService.exportExcel(toolContentId);
-	    ExcelCell[][] firstPageData = null;
-	    for (String key : excelDoc.keySet()) {
-		firstPageData = excelDoc.get(key);
-		break;
-	    }
+	    // find the first page in excel file
+	    List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
+	    ExcelSheet firstPageData = sheets.get(0);
 
 	    int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
 	    ArrayList<String[]> groupRows = new ArrayList<>();
 	    for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
-		ExcelCell[] groupRow = firstPageData[5 + groupCount];
+		ExcelRow groupRow = firstPageData.getRow(5 + groupCount);
 
 		String[] groupRow2 = new String[2];
-		groupRow2[0] = (String) groupRow[1].getCellValue();
-		groupRow2[1] = ((String) groupRow[groupRow.length - 1].getCellValue()).replaceAll("%", "");
+		groupRow2[0] = (String) groupRow.getCell(1);
+		groupRow2[1] = String.valueOf((Double) groupRow.getCell(groupRow.getCells().size() - 1) * 100);
 		groupRows.add(groupRow2);
 	    }
 	    request.setAttribute("groupRows", groupRows);
@@ -121,7 +118,6 @@ public class TblMonitorController {
      */
     @RequestMapping("/traStudentChoices")
     public String traStudentChoices(HttpServletRequest request) throws IOException, ServletException {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
@@ -130,43 +126,33 @@ public class TblMonitorController {
 	request.setAttribute("items", items);
 
 	//find second page in excel file
-	LinkedHashMap<String, ExcelCell[][]> excelDoc = scratchieService.exportExcel(toolContentId);
-	ExcelCell[][] secondPageData = null;
-	for (ExcelCell[][] excelPage : excelDoc.values()) {
-	    //check last row string starts with "*" (i.e. the string "*- Denotes the correct answer")
-	    if (excelPage.length > 0) {
-		ExcelCell lastRow = excelPage[excelPage.length - 1][0];
-		if (lastRow != null && ((String) lastRow.getCellValue()).startsWith("*")) {
-		    secondPageData = excelPage;
-		    break;
-		}
-	    }
-	}
+	List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
+	ExcelSheet secondPageData = sheets.get(1);
 
 	//correct answers
-	ExcelCell[] correctAnswersRow = secondPageData[4];
+	ExcelRow correctAnswersRow = secondPageData.getRow(4);
 	request.setAttribute("correctAnswers", correctAnswersRow);
 
 	//prepare data for displaying user answers table
 	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
 	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
 	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
-	    ExcelCell[] groupRow = secondPageData[6 + groupCount];
+	    ExcelRow groupRow = secondPageData.getRows().get(6 + groupCount);
 
 	    GroupSummary groupSummary = new GroupSummary();
-	    String sessionName = groupRow[0].getCellValue().toString();
+	    String sessionName = groupRow.getCell(0).toString();
 	    groupSummary.setSessionName(sessionName);
 
 	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
 	    for (int i = 1; i <= items.size(); i++) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
-		String answersSequence = groupRow[i].getCellValue().toString();
+		String answersSequence = groupRow.getCell(i).toString();
 		String[] answerLetters = answersSequence.split(", ");
 
 		Set<ScratchieAnswer> answers = new LinkedHashSet<>();
 		for (int j = 0; j < answerLetters.length; j++) {
 		    String answerLetter = answerLetters[j];
-		    String correctAnswerLetter = correctAnswersRow[i].getCellValue().toString();
+		    String correctAnswerLetter = correctAnswersRow.getCell(i).toString();
 
 		    ScratchieAnswer answer = new ScratchieAnswer();
 		    answer.setDescription(answerLetter);
@@ -181,10 +167,10 @@ public class TblMonitorController {
 	    groupSummary.setItemDtos(itemDtos);
 
 	    if (!itemDtos.isEmpty()) {
-		int total = (Integer) groupRow[itemDtos.size() + 1].getCellValue();
+		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
 		groupSummary.setMark(total);
 
-		String totalPercentage = groupRow[itemDtos.size() + 2].getCellValue().toString();
+		String totalPercentage = groupRow.getCell(itemDtos.size() + 2).toString();
 		groupSummary.setTotalPercentage(totalPercentage);
 	    }
 
@@ -204,10 +190,11 @@ public class TblMonitorController {
      * @throws IOException
      */
     @RequestMapping("/exportExcel")
-    public String exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @ResponseStatus(HttpStatus.OK)
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = scratchieService.exportExcel(toolContentId);
+	List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
 
 	String fileName = "scratchie_export.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -217,9 +204,7 @@ public class TblMonitorController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, null, false);
-
-	return null;
+	ExcelUtil.createExcel(out, sheets, null, false);
     }
 
     /**

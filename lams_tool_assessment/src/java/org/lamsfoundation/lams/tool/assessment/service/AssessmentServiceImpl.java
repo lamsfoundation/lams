@@ -1433,7 +1433,6 @@ public class AssessmentServiceImpl
     public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
 	    boolean showUserNames) {
 	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
-	final ExcelRow EMPTY_ROW = new ExcelRow();
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	if (showUserNames) {
@@ -1444,11 +1443,10 @@ public class AssessmentServiceImpl
 		for (SessionDTO sessionDTO : sessionDtos) {
 		    Long sessionId = sessionDTO.getSessionId();
 
-		    summarySheet.addRow(EMPTY_ROW);
+		    summarySheet.addEmptyRow();
 
-		    ExcelRow sessionTitleRow = new ExcelRow();
+		    ExcelRow sessionTitleRow = summarySheet.initRow();
 		    sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
-		    summarySheet.addRow(sessionTitleRow);
 
 		    List<AssessmentUserDTO> userDtos = new ArrayList<>();
 		    // in case of UseSelectLeaderToolOuput - display only one user
@@ -1500,58 +1498,51 @@ public class AssessmentServiceImpl
 		    }
 
 		    // Mark Summary Min, Max + Grouped Percentages
-		    summarySheet.addRow(EMPTY_ROW);
-		    ExcelRow minMaxRow = new ExcelRow();
+		    summarySheet.addEmptyRow();
+		    ExcelRow minMaxRow = summarySheet.initRow();
 		    minMaxRow.addCell(getMessage("label.number.learners"), true);
 		    minMaxRow.addCell(totalNumEntries);
-		    summarySheet.addRow(minMaxRow);
-		    minMaxRow = new ExcelRow();
+		    
+		    minMaxRow = summarySheet.initRow();
 		    minMaxRow.addCell(getMessage("label.lowest.mark"), true);
 		    minMaxRow.addCell((double) minGrade);
-		    summarySheet.addRow(minMaxRow);
-		    minMaxRow = new ExcelRow();
+		    
+		    minMaxRow = summarySheet.initRow();
 		    minMaxRow.addCell(getMessage("label.highest.mark"), true);
 		    minMaxRow.addCell((double) maxGrade);
-		    summarySheet.addRow(minMaxRow);
-
-		    summarySheet.addRow(EMPTY_ROW);
-		    ExcelRow binSummaryRow = new ExcelRow();
+		    summarySheet.addEmptyRow();
+		    
+		    ExcelRow binSummaryRow = summarySheet.initRow();
 		    binSummaryRow.addCell(getMessage("label.authoring.basic.list.header.mark"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    binSummaryRow.addCell(getMessage("label.number.learners"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summarySheet.addRow(binSummaryRow);
 		    float totalNumEntriesAsFloat = totalNumEntries;
 		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-			binSummaryRow = new ExcelRow();
+			binSummaryRow = summarySheet.initRow();
 			binSummaryRow.addCell(entry.getKey());
 			binSummaryRow.addCell(entry.getValue());
-			binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100), false);
-			summarySheet.addRow(binSummaryRow);
+			binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
 		    }
-		    summarySheet.addRow(EMPTY_ROW);
-		    summarySheet.addRow(EMPTY_ROW);
-		    
-		    ArrayList<ExcelCell[]> summaryTabLearnerList = new ArrayList<>();
+		    summarySheet.addEmptyRow();
+		    summarySheet.addEmptyRow();
 
-		    ExcelRow summaryTitleRow = new ExcelRow();
+		    ExcelRow summaryTitleRow = summarySheet.initRow();
 		    summaryTitleRow.addCell(getMessage("label.export.user.id"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summarySheet.addRow(summaryTitleRow);
 
 		    for (AssessmentUserDTO userDto : userDtos) {
-			ExcelRow userResultRow = new ExcelRow();
+			ExcelRow userResultRow = summarySheet.initRow();
 			userResultRow.addCell(userDto.getLogin());
 			userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
 			userResultRow.addCell(userDto.getGrade());
-			summarySheet.addRow(userResultRow);
 		    }
-		    summarySheet.addRow(EMPTY_ROW);
+		    summarySheet.addEmptyRow();
 		}
 	    }
 	}
@@ -1562,10 +1553,9 @@ public class AssessmentServiceImpl
 	sheets.add(questionSummarySheet);
 
 	// Create the question summary
-	ExcelRow summaryTitleRow = new ExcelRow();
+	ExcelRow summaryTitleRow = questionSummarySheet.initRow();
 	summaryTitleRow.addCell(getMessage("label.export.question.summary"), true);
-	questionSummarySheet.addRow(summaryTitleRow);
-	questionSummarySheet.addRow(EMPTY_ROW);
+	questionSummarySheet.addEmptyRow();
 
 	Map<Long, QuestionSummary> questionSummaries = getQuestionSummaryForExport(assessment);
 
@@ -1602,10 +1592,9 @@ public class AssessmentServiceImpl
 	    int questionNumber = 1;
 
 	    for (AssessmentQuestion question : questions) {
-		ExcelRow questionTitle = new ExcelRow();
+		ExcelRow questionTitle = questionSummarySheet.initRow();
 		questionTitle.addCell(
 			getMessage("label.monitoring.question.summary.question") + " " + questionNumber++, true);
-		questionSummarySheet.addRow(questionTitle);
 
 		// set up the summary table data for the top of the question area.
 		boolean doSummaryTable = question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
@@ -1670,8 +1659,7 @@ public class AssessmentServiceImpl
 		for (List<AssessmentQuestionResult> resultList : allResultsForQuestion) {
 		    for (AssessmentQuestionResult questionResult : resultList) {
 			ExcelRow userResultRow = new ExcelRow();
-			userResultRow.addCell(questionResult.getAssessmentQuestion().getTitle(),
-				false);
+			userResultRow.addCell(questionResult.getAssessmentQuestion().getTitle());
 			userResultRow.addCell(
 				getQuestionTypeLanguageLabel(questionResult.getAssessmentQuestion().getType()));
 			userResultRow.addCell(
@@ -1688,9 +1676,9 @@ public class AssessmentServiceImpl
 			
 			//date and time
 			ExcelCell dateCell = userResultRow.addCell(questionResult.getFinishDate());
-			dateCell.setCellFormat(ExcelCell.CELL_FORMAT_DATE);
+			dateCell.setDataFormat(ExcelCell.CELL_FORMAT_DATE);
 			ExcelCell timeCell = userResultRow.addCell(questionResult.getFinishDate());
-			timeCell.setCellFormat(ExcelCell.CELL_FORMAT_TIME);
+			timeCell.setDataFormat(ExcelCell.CELL_FORMAT_TIME);
 
 			//answer
 			if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
@@ -1740,25 +1728,21 @@ public class AssessmentServiceImpl
 		if (doSummaryTable) {
 		    questionSummarySheet
 			    .addRow(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
-		    questionSummarySheet.addRow(EMPTY_ROW);
+		    questionSummarySheet.addEmptyRow();
 		}
 		questionSummarySheet.getRows().addAll(questionSummaryTabTemp);
 
 		// Calculating the averages
-		ExcelRow averageRow = new ExcelRow();
-		averageRow.addEmptyCells(7);
-		if (showUserNames) {
-		    averageRow.addEmptyCells(1);
-		}
+		ExcelRow averageRow = questionSummarySheet.initRow();
+		averageRow.addEmptyCells(showUserNames ? 8 : 7);
 		averageRow.addCell(getMessage("label.export.average"), true);
 		if (timeTakenTotal > 0) {
 		    averageRow.addCell(Long.valueOf(timeTakenTotal / timeTakenCount));
 		}
 		Float averageMark = markTotal > 0 ? Float.valueOf(markTotal / markCount) : 0.0F;
 		averageRow.addCell(averageMark);
-		questionSummarySheet.addRow(averageRow);
 
-		questionSummarySheet.addRow(EMPTY_ROW);
+		questionSummarySheet.addEmptyRow();
 	    }
 	}
 
@@ -1769,11 +1753,10 @@ public class AssessmentServiceImpl
 	sheets.add(userSummarySheet);
 
 	// Create the question summary
-	ExcelRow userSummaryTitle = new ExcelRow();
+	ExcelRow userSummaryTitle = userSummarySheet.initRow();
 	userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
-	userSummarySheet.addRow(userSummaryTitle);
 
-	ExcelRow summaryRowTitle = new ExcelRow();
+	ExcelRow summaryRowTitle = userSummarySheet.initRow();
 	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	summaryRowTitle.addCell(getMessage("label.authoring.basic.list.header.type"), true,
@@ -1784,7 +1767,7 @@ public class AssessmentServiceImpl
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.average.mark"), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	userSummarySheet.addRow(summaryRowTitle);
+
 	Float totalGradesPossible = 0F;
 	Float totalAverage = 0F;
 	if (assessment.getQuestionReferences() != null) {
@@ -1821,25 +1804,22 @@ public class AssessmentServiceImpl
 		int maxGrade = questionReference.getDefaultGrade();
 		totalGradesPossible += maxGrade;
 
-		ExcelRow questCellRow = new ExcelRow();
+		ExcelRow questCellRow = userSummarySheet.initRow();
 		questCellRow.addCell(title);
 		questCellRow.addCell(questionType);
 		questCellRow.addCell(penaltyFactor);
 		questCellRow.addCell(maxGrade);
 		questCellRow.addCell(averageMark);
-
-		userSummarySheet.addRow(questCellRow);
 	    }
 
 	    if (totalGradesPossible.floatValue() > 0) {
-		ExcelRow totalCellRow = new ExcelRow();
+		ExcelRow totalCellRow = userSummarySheet.initRow();
 		totalCellRow.addEmptyCells(2);
 		totalCellRow.addCell(getMessage("label.monitoring.summary.total"), true);
 		totalCellRow.addCell(totalGradesPossible);
 		totalCellRow.addCell(totalAverage);
-		userSummarySheet.addRow(totalCellRow);
 	    }
-	    userSummarySheet.addRow(EMPTY_ROW);
+	    userSummarySheet.addEmptyRow();
 	}
 
 	if (sessionDtos != null) {
@@ -1851,23 +1831,17 @@ public class AssessmentServiceImpl
 	    }
 
 	    for (SessionDTO sessionDTO : sessionDtos) {
+		userSummarySheet.addEmptyRow();
 
-		userSummarySheet.addRow(EMPTY_ROW);
-
-		ExcelRow sessionTitle = new ExcelRow();
+		ExcelRow sessionTitle = userSummarySheet.initRow();
 		sessionTitle.addCell(sessionDTO.getSessionName(), true);
-		userSummarySheet.addRow(sessionTitle);
 
 		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
-
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
-
 		if (assessmentUsers != null) {
-
 		    for (AssessmentUser assessmentUser : assessmentUsers) {
-
 			if (showUserNames) {
-			    ExcelRow userTitleRow = new ExcelRow();
+			    ExcelRow userTitleRow = userSummarySheet.initRow();
 			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
 			    userTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"),
 				    true);
@@ -1876,16 +1850,15 @@ public class AssessmentServiceImpl
 				    true);
 			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow.addCell(getMessage("label.export.mark"), true);
-			    userSummarySheet.addRow(userTitleRow);
+
 			} else {
-			    ExcelRow userTitleRow = new ExcelRow();
+			    ExcelRow userTitleRow = userSummarySheet.initRow();
 			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
 			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
 			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"),
 				    true);
 			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow.addCell(getMessage("label.export.mark"), true);
-			    userSummarySheet.addRow(userTitleRow);
 			}
 
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
@@ -1893,7 +1866,7 @@ public class AssessmentServiceImpl
 			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
 			    if (questionResults != null) {
 				for (AssessmentQuestionResult questionResult : questionResults) {
-				    ExcelRow userResultRow = new ExcelRow();
+				    ExcelRow userResultRow = userSummarySheet.initRow();
 				    if (showUserNames) {
 					userResultRow.addCell(assessmentUser.getLoginName());
 					userResultRow.addCell(assessmentUser.getFullName());
@@ -1905,17 +1878,14 @@ public class AssessmentServiceImpl
 				    userResultRow.addCell(
 					    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
 				    userResultRow.addCell(questionResult.getMark());
-				    userSummarySheet.addRow(userResultRow);
 				}
 			    }
 
-			    ExcelRow userTotalRow = new ExcelRow();
+			    ExcelRow userTotalRow = userSummarySheet.initRow();
 			    userTotalRow.addEmptyCells(showUserNames ? 4 : 3);
 			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
 			    userTotalRow.addCell(assessmentResult.getGrade());
-
-			    userSummarySheet.addRow(userTotalRow);
-			    userSummarySheet.addRow(EMPTY_ROW);
+			    userSummarySheet.addEmptyRow();
 			}
 		    }
 		}
@@ -2012,11 +1982,6 @@ public class AssessmentServiceImpl
 	}
 	return summaryNACount;
     }
-
-//    private String valueAsPercentage(Integer value, int total) {
-//	Double percentage = (double) value / total * 100;
-//	return NumberUtil.formatLocalisedNumber(percentage, (Locale) null, 2);
-//    }
 
     private ExcelRow outputSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
 	    Integer summaryNACount, Long trueKey, Long falseKey) {

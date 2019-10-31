@@ -46,7 +46,7 @@ public class ExcelCell {
     public final static int CELL_FORMAT_PERCENTAGE = 3;
     
     private Object cellValue;
-    private int cellFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
+    private int dataFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
     private Boolean isBold = false;
     private IndexedColors color;
     private int borderStyle = 0;
@@ -90,12 +90,12 @@ public class ExcelCell {
 	this.cellValue = cellValue;
     }
     
-    public int getCellFormat() {
-	return cellFormat;
+    public int getDataFormat() {
+	return dataFormat;
     }
 
-    public void setCellFormat(int cellFormat) {
-	this.cellFormat = cellFormat;
+    public void setDataFormat(int cellFormat) {
+	this.dataFormat = cellFormat;
     }
 
     public Boolean isBold() {

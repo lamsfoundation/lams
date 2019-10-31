@@ -100,6 +100,8 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -110,8 +112,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ScratchieServiceImpl
 	implements IScratchieService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(ScratchieServiceImpl.class.getName());
-
-    private static final ExcelCell[] EMPTY_ROW = new ExcelCell[4];
 
     private ScratchieDAO scratchieDao;
 
@@ -1052,47 +1052,46 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportExcel(Long contentId) {
+    public List<ExcelSheet> exportExcel(Long contentId) {
 	Scratchie scratchie = scratchieDao.getByContentId(contentId);
 	Collection<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	int numberOfItems = items.size();
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
 
 	// ======================================================= For Immediate Analysis page
 	// =======================================
+	ExcelSheet immediateAnalysisSheet = new ExcelSheet(getMessage("label.for.immediate.analysis"));
+	sheets.add(immediateAnalysisSheet);
 
-	List<ExcelCell[]> rowList = new LinkedList<>();
+	ExcelRow row = immediateAnalysisSheet.initRow();
+	row.addCell(getMessage("label.quick.analysis"), true);
+	
+	row = immediateAnalysisSheet.initRow();
+	row.addEmptyCell();
+	row.addCell(getMessage("label.in.table.below.we.show"));
+	immediateAnalysisSheet.addEmptyRow();
 
-	ExcelCell[] row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
-	rowList.add(row);
-	row = new ExcelCell[2];
-	row[1] = new ExcelCell(getMessage("label.in.table.below.we.show"), false);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	row = immediateAnalysisSheet.initRow();
+	row.addEmptyCells(2);
+	row.addCell(getMessage("label.questions"));
 
-	row = new ExcelCell[3];
-	row[2] = new ExcelCell(getMessage("label.questions"), false);
-	rowList.add(row);
-
-	row = new ExcelCell[numberOfItems + 4];
-	int columnCount = 1;
-	row[columnCount++] = new ExcelCell(getMessage("label.teams"), true);
+	row = immediateAnalysisSheet.initRow();
+	row.addEmptyCell();
+	row.addCell(getMessage("label.teams"), true);
 	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
-	    row[columnCount++] = new ExcelCell("Q" + (itemCount + 1), true);
+	    row.addCell("Q" + (itemCount + 1), true);
 	}
-	row[columnCount++] = new ExcelCell(getMessage("label.total"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.total") + " %", true);
-	rowList.add(row);
+	row.addCell(getMessage("label.total"), true);
+	row.addCell(getMessage("label.total") + " %", true);
 
 	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
 	for (GroupSummary summary : summaryByTeam) {
 
-	    row = new ExcelCell[numberOfItems + 4];
-	    columnCount = 1;
-	    row[columnCount++] = new ExcelCell(summary.getSessionName(), true);
+	    row = immediateAnalysisSheet.initRow();
+	    row.addEmptyCell();
+	    row.addCell(summary.getSessionName(), true);
 
 	    int numberOfFirstChoiceEvents = 0;
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
@@ -1111,43 +1110,36 @@ public class ScratchieServiceImpl
 		    isFirstChoice = getMessage("label.incorrect");
 		    color = IndexedColors.RED;
 		}
-		row[columnCount++] = new ExcelCell(isFirstChoice, color);
+		row.addCell(isFirstChoice, color);
 	    }
-	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
-	    int percentage = (numberOfItems == 0) ? 0 : (100 * numberOfFirstChoiceEvents) / numberOfItems;
-	    row[columnCount++] = new ExcelCell(percentage + "%", false);
-	    rowList.add(row);
+	    row.addCell(new Integer(numberOfFirstChoiceEvents));
+	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
+	    row.addPercentageCell(percentage);
 	}
-
-	ExcelCell[][] firstPageData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.for.immediate.analysis"), firstPageData);
 
 	// ======================================================= For Report by Team TRA page
 	// =======================================
+	ExcelSheet reportByTeamSheet = new ExcelSheet(getMessage("label.report.by.team.tra"));
+	sheets.add(reportByTeamSheet);
 
-	rowList = new LinkedList<>();
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.quick.analysis"), true);
+	
+	row = reportByTeamSheet.initRow();
+	row.addEmptyCell();
+	row.addCell(getMessage("label.table.below.shows.which.answer.teams.selected.first.try"));
+	reportByTeamSheet.addEmptyRow();
 
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
-	rowList.add(row);
-	row = new ExcelCell[2];
-	row[1] = new ExcelCell(getMessage("label.table.below.shows.which.answer.teams.selected.first.try"), false);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-
-	row = new ExcelCell[numberOfItems + 3];
-	columnCount = 1;
+	row = reportByTeamSheet.initRow();
+	row.addEmptyCell();
 	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
-	    row[columnCount++] = new ExcelCell(getMessage("label.authoring.basic.instruction") + " " + (itemCount + 1),
-		    false);
+	    row.addCell(getMessage("label.authoring.basic.instruction") + " " + (itemCount + 1));
 	}
-	row[columnCount++] = new ExcelCell(getMessage("label.total"), false);
-	row[columnCount++] = new ExcelCell(getMessage("label.total") + " %", false);
-	rowList.add(row);
+	row.addCell(getMessage("label.total"));
+	row.addCell(getMessage("label.total") + " %");
 
-	row = new ExcelCell[numberOfItems + 1];
-	columnCount = 0;
-	row[columnCount++] = new ExcelCell(getMessage("label.correct.answer"), false);
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.correct.answer"));
 	for (ScratchieItem item : items) {
 
 	    // find out the correct answer's sequential letter - A,B,C...
@@ -1160,21 +1152,18 @@ public class ScratchieServiceImpl
 		}
 		answerCount++;
 	    }
-	    row[columnCount++] = new ExcelCell(correctAnswerLetter, false);
+	    row.addCell(correctAnswerLetter);
 	}
-	rowList.add(row);
 
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("monitoring.label.group"), false);
-	rowList.add(row);
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("monitoring.label.group"));
 
 	int groupCount = 1;
-	int[] percentages = new int[summaryByTeam.size()];
+	double[] percentages = new double[summaryByTeam.size()];
 	for (GroupSummary summary : summaryByTeam) {
 
-	    row = new ExcelCell[numberOfItems + 3];
-	    columnCount = 0;
-	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
+	    row = reportByTeamSheet.initRow();
+	    row.addCell(summary.getSessionName());
 
 	    int numberOfFirstChoiceEvents = 0;
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
@@ -1184,12 +1173,12 @@ public class ScratchieServiceImpl
 		    color = IndexedColors.GREEN;
 		    numberOfFirstChoiceEvents++;
 		}
-		row[columnCount++] = new ExcelCell(itemDto.getAnswersSequence(), color);
+		row.addCell(itemDto.getAnswersSequence(), color);
 	    }
-	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
-	    int percentage = (numberOfItems == 0) ? 0 : (100 * numberOfFirstChoiceEvents) / numberOfItems;
-	    row[columnCount++] = new ExcelCell(percentage + "%", false);
-	    rowList.add(row);
+	    row.addCell(new Integer(numberOfFirstChoiceEvents));
+	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
+	    row.addPercentageCell(percentage);
+
 	    percentages[groupCount - 1] = percentage;
 	    groupCount++;
 	}
@@ -1202,76 +1191,65 @@ public class ScratchieServiceImpl
 	    sum += percentages[i];
 	}
 	int percentagesLength = percentages.length == 0 ? 1 : percentages.length;
-	int avgMean = sum / percentagesLength;
-	row = new ExcelCell[numberOfItems + 3];
-	row[0] = new ExcelCell(getMessage("label.avg.mean"), false);
-	row[numberOfItems + 2] = new ExcelCell(avgMean + "%", false);
-	rowList.add(row);
+	double avgMean = (double) sum / percentagesLength;
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.avg.mean"));
+	row.addEmptyCells(numberOfItems + 1);
+	row.addPercentageCell(avgMean);
 
 	// median
-	int median;
+	double median;
 	int middle = percentages.length / 2;
 	if ((percentages.length % 2) == 1) {
 	    median = percentages[middle];
 	} else {
-	    median = (int) ((percentages[middle - 1] + percentages[middle]) / 2.0);
+	    median = (double) ((percentages[middle - 1] + percentages[middle]) / 2.0);
 	}
-	row = new ExcelCell[numberOfItems + 3];
-	row[0] = new ExcelCell(getMessage("label.median"), false);
-	row[numberOfItems + 2] = new ExcelCell(median, false);
-	rowList.add(row);
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.median"));
+	row.addEmptyCells(numberOfItems + 1);
+	row.addCell(median);
 
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.legend"), false);
-	rowList.add(row);
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.legend"));
 
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.denotes.correct.answer"), IndexedColors.GREEN);
-	rowList.add(row);
-
-	ExcelCell[][] secondPageData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.report.by.team.tra"), secondPageData);
+	row = reportByTeamSheet.initRow();
+	row.addCell(getMessage("label.denotes.correct.answer"), IndexedColors.GREEN);
 
 	// ======================================================= Research and Analysis page
 	// =======================================
-
-	// all rows
-	rowList = new LinkedList<>();
+	ExcelSheet researchAndAnalysisSheet = new ExcelSheet(getMessage("label.research.analysis"));
+	sheets.add(researchAndAnalysisSheet);
 
 	// Caption
-	row = new ExcelCell[2];
-	row[0] = new ExcelCell(getMessage("label.scratchie.report"), true);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	row = researchAndAnalysisSheet.initRow();
+	row.addCell(getMessage("label.scratchie.report"), true);
+	researchAndAnalysisSheet.addEmptyRow();
+	researchAndAnalysisSheet.addEmptyRow();
 
 	// Overall Summary by Team --------------------------------------------------
-	row = new ExcelCell[2];
-	row[0] = new ExcelCell(getMessage("label.overall.summary.by.team"), true);
-	rowList.add(row);
+	row = researchAndAnalysisSheet.initRow();
+	row.addCell(getMessage("label.overall.summary.by.team"), true);
 
-	row = new ExcelCell[(numberOfItems * 3) + 1];
-	columnCount = 1;
+	row = researchAndAnalysisSheet.initRow();
+	row.addEmptyCell();
 	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
-	    row[columnCount] = new ExcelCell(getMessage("label.for.question", new Object[] { itemCount + 1 }), false);
-	    columnCount += 3;
+	    row.addCell(getMessage("label.for.question", new Object[] { itemCount + 1 }));
+	    row.addEmptyCells(2);
 	}
-	rowList.add(row);
 
-	row = new ExcelCell[(numberOfItems * 3) + 1];
-	columnCount = 1;
+	row = researchAndAnalysisSheet.initRow();
+	row.addEmptyCell();
 	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
-	    row[columnCount++] = new ExcelCell(getMessage("label.first.choice"), IndexedColors.BLUE);
-	    row[columnCount++] = new ExcelCell(getMessage("label.attempts"), IndexedColors.BLUE);
-	    row[columnCount++] = new ExcelCell(getMessage("label.mark"), IndexedColors.BLUE);
+	    row.addCell(getMessage("label.first.choice"), IndexedColors.BLUE);
+	    row.addCell(getMessage("label.attempts"), IndexedColors.BLUE);
+	    row.addCell(getMessage("label.mark"), IndexedColors.BLUE);
 	}
-	rowList.add(row);
 
 	for (GroupSummary summary : summaryByTeam) {
-	    row = new ExcelCell[(numberOfItems * 3) + 1];
-	    columnCount = 0;
+	    row = researchAndAnalysisSheet.initRow();
 
-	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
+	    row.addCell(summary.getSessionName());
 
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 		int attempts = itemDto.getUserAttempts();
@@ -1288,103 +1266,94 @@ public class ScratchieServiceImpl
 		    isFirstChoice = getMessage("label.incorrect");
 		    color = IndexedColors.RED;
 		}
-		row[columnCount++] = new ExcelCell(isFirstChoice, color);
-		row[columnCount++] = new ExcelCell(new Long(attempts), color);
+		row.addCell(isFirstChoice, color);
+		row.addCell(new Long(attempts), color);
 		Long mark = (itemDto.getUserMark() == -1) ? null : new Long(itemDto.getUserMark());
-		row[columnCount++] = new ExcelCell(mark, false);
+		row.addCell(mark);
 	    }
-	    rowList.add(row);
 	}
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	researchAndAnalysisSheet.addEmptyRow();
+	researchAndAnalysisSheet.addEmptyRow();
+	researchAndAnalysisSheet.addEmptyRow();
 
 	// Overall Summary By Individual Student in each Team----------------------------------------
-	row = new ExcelCell[2];
-	row[0] = new ExcelCell(getMessage("label.overall.summary.by.individual.student"), true);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	row = researchAndAnalysisSheet.initRow();
+	row.addCell(getMessage("label.overall.summary.by.individual.student"), true);
+	researchAndAnalysisSheet.addEmptyRow();
 
-	row = new ExcelCell[4];
-	row[1] = new ExcelCell(getMessage("label.attempts"), false);
-	row[2] = new ExcelCell(getMessage("label.mark"), false);
-	row[3] = new ExcelCell(getMessage("label.group"), false);
-	rowList.add(row);
+	row = researchAndAnalysisSheet.initRow();
+	row.addEmptyCell();
+	row.addCell(getMessage("label.attempts"));
+	row.addCell(getMessage("label.mark"));
+	row.addCell(getMessage("label.group"));
 
 	List<GroupSummary> summaryList = getMonitoringSummary(contentId, false);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
-		row = new ExcelCell[4];
-		row[0] = new ExcelCell(user.getFirstName() + " " + user.getLastName(), false);
-		row[1] = new ExcelCell(new Long(summary.getTotalAttempts()), false);
+		row = researchAndAnalysisSheet.initRow();
+		row.addCell(user.getFirstName() + " " + user.getLastName());
+		row.addCell(new Long(summary.getTotalAttempts()));
 		Long mark = (summary.getTotalAttempts() == 0) ? null : new Long(summary.getMark());
-		row[2] = new ExcelCell(mark, false);
-		row[3] = new ExcelCell(summary.getSessionName(), false);
-		rowList.add(row);
+		row.addCell(mark);
+		row.addCell(summary.getSessionName());
 	    }
 	}
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	researchAndAnalysisSheet.addEmptyRow();
+	researchAndAnalysisSheet.addEmptyRow();
 
 	// Question Reports-----------------------------------------------------------------
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.question.reports"), true);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	row = researchAndAnalysisSheet.initRow();
+	row.addCell(getMessage("label.question.reports"), true);
+	researchAndAnalysisSheet.addEmptyRow();
 
 	SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 
 	for (ScratchieItem item : items) {
 	    List<GroupSummary> itemSummary = getQuestionSummary(contentId, item.getUid());
 
-	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }), true);
-	    rowList.add(row);
+	    row = researchAndAnalysisSheet.initRow();
+	    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }), true);
 
-	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(removeHtmlMarkup(item.getDescription()), true);
-	    rowList.add(row);
-	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    row = researchAndAnalysisSheet.initRow();
+	    row.addCell(removeHtmlMarkup(item.getDescription()), true);
+	    researchAndAnalysisSheet.addEmptyRow();
+	    researchAndAnalysisSheet.addEmptyRow();
 
 	    // show all team summary in case there is more than 1 group
 	    if (summaryList.size() > 1) {
-		row = new ExcelCell[1];
-		row[0] = new ExcelCell(getMessage("label.all.teams.summary"), true);
-		rowList.add(row);
+		row = researchAndAnalysisSheet.initRow();
+		row.addCell(getMessage("label.all.teams.summary"), true);
 
 		GroupSummary allTeamSummary = itemSummary.get(0);
 		Collection<ScratchieAnswer> answers = allTeamSummary.getAnswers();
 
-		row = new ExcelCell[1 + answers.size()];
+		row = researchAndAnalysisSheet.initRow();
+		row.addEmptyCell();
 		for (int i = 0; i < answers.size(); i++) {
-		    row[i + 1] = new ExcelCell((long) i + 1, IndexedColors.YELLOW);
+		    row.addCell((long) i + 1, IndexedColors.YELLOW);
 		}
-		rowList.add(row);
 
 		for (ScratchieAnswer answer : answers) {
-		    row = new ExcelCell[1 + answers.size()];
+		    row = researchAndAnalysisSheet.initRow();
 		    String answerTitle = removeHtmlMarkup(answer.getDescription());
 		    IndexedColors color = null;
 		    if (answer.isCorrect()) {
 			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 			color = IndexedColors.GREEN;
 		    }
-		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(answerTitle, color);
+		    row.addCell(answerTitle, color);
 
 		    for (int numberAttempts : answer.getAttempts()) {
-			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
+			row.addCell(new Long(numberAttempts));
 		    }
-		    rowList.add(row);
 		}
-		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+		researchAndAnalysisSheet.addEmptyRow();
+		researchAndAnalysisSheet.addEmptyRow();
 	    }
 
-	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(getMessage("label.breakdown.by.team"), true);
-	    rowList.add(row);
+	    row = researchAndAnalysisSheet.initRow();
+	    row.addCell(getMessage("label.breakdown.by.team"), true);
+
 	    for (GroupSummary groupSummary : itemSummary) {
 		if (groupSummary.getSessionId().equals(0L)) {
 		    continue;
@@ -1392,42 +1361,38 @@ public class ScratchieServiceImpl
 
 		Collection<ScratchieAnswer> answers = groupSummary.getAnswers();
 
-		row = new ExcelCell[1];
-		row[0] = new ExcelCell(groupSummary.getSessionName(), true);
-		rowList.add(row);
+		row = researchAndAnalysisSheet.initRow();
+		row.addCell(groupSummary.getSessionName(), true);
 
-		row = new ExcelCell[1 + answers.size()];
+		row = researchAndAnalysisSheet.initRow();
+		row.addEmptyCell();
 		for (int i = 0; i < answers.size(); i++) {
-		    row[i + 1] = new ExcelCell(new Long(i + 1), false);
+		    row.addCell(new Long(i + 1));
 		}
-		rowList.add(row);
 
 		for (ScratchieAnswer answer : answers) {
-		    row = new ExcelCell[1 + answers.size()];
+		    row = researchAndAnalysisSheet.initRow();
 		    String answerTitle = removeHtmlMarkup(answer.getDescription());
 		    if (answer.isCorrect()) {
 			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 		    }
-		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(answerTitle, false);
+		    row.addCell(answerTitle);
 
 		    for (int numberAttempts : answer.getAttempts()) {
-			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
+			row.addCell(new Long(numberAttempts));
 		    }
-		    rowList.add(row);
 		}
 
 	    }
-	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    researchAndAnalysisSheet.addEmptyRow();
+	    researchAndAnalysisSheet.addEmptyRow();
 	}
 
 	// Breakdown By Student with Timing----------------------------------------------------
 
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.breakdown.by.student.with.timing"), true);
-	rowList.add(row);
-	rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	row = researchAndAnalysisSheet.initRow();
+	row.addCell(getMessage("label.breakdown.by.student.with.timing"), true);
+	researchAndAnalysisSheet.addEmptyRow();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
@@ -1437,50 +1402,42 @@ public class ScratchieServiceImpl
 
 	    if (groupLeader != null) {
 
-		row = new ExcelCell[5];
-		row[0] = new ExcelCell(groupLeader.getFirstName() + " " + groupLeader.getLastName(), true);
-		row[1] = new ExcelCell(getMessage("label.attempts") + ":", false);
+		row = researchAndAnalysisSheet.initRow();
+		row.addCell(groupLeader.getFirstName() + " " + groupLeader.getLastName(), true);
+		row.addCell(getMessage("label.attempts") + ":");
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId);
-		row[2] = new ExcelCell(attempts, false);
-		row[3] = new ExcelCell(getMessage("label.mark") + ":", false);
-		row[4] = new ExcelCell(new Long(session.getMark()), false);
-		rowList.add(row);
+		row.addCell(attempts);
+		row.addCell(getMessage("label.mark") + ":");
+		row.addCell(new Long(session.getMark()));
 
-		row = new ExcelCell[1];
-		row[0] = new ExcelCell(getMessage("label.team.leader") + session.getSessionName(), false);
-		rowList.add(row);
+		row = researchAndAnalysisSheet.initRow();
+		row.addCell(getMessage("label.team.leader") + session.getSessionName());
 
 		for (ScratchieItem item : items) {
-		    row = new ExcelCell[1];
-		    row[0] = new ExcelCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }),
+		    row = researchAndAnalysisSheet.initRow();
+		    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }),
 			    false);
-		    rowList.add(row);
-		    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
 
 		    int i = 1;
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 			    item.getUid());
 		    for (ScratchieAnswerVisitLog log : logs) {
-			row = new ExcelCell[4];
-			row[0] = new ExcelCell(new Long(i++), false);
+			row = researchAndAnalysisSheet.initRow();
+			row.addCell(new Long(i++));
 			String answerDescr = removeHtmlMarkup(log.getScratchieAnswer().getDescription());
-			row[1] = new ExcelCell(answerDescr, false);
-			row[3] = new ExcelCell(fullDateFormat.format(log.getAccessDate()), false);
-			rowList.add(row);
+			row.addCell(answerDescr);
+			row.addCell(fullDateFormat.format(log.getAccessDate()));
 		    }
-		    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+		    researchAndAnalysisSheet.addEmptyRow();
 		}
 
 	    }
 	}
 
-	ExcelCell[][] thirdPageData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.research.analysis"), thirdPageData);
-
 	// ======================================================= For_XLS_export(SPSS analysis) page
 	// =======================================
-
-	rowList = new LinkedList<>();
+	ExcelSheet spssAnalysisSheet = new ExcelSheet(getMessage("label.spss.analysis"));
+	sheets.add(spssAnalysisSheet);
 
 	// Table header------------------------------------
 
@@ -1491,25 +1448,23 @@ public class ScratchieServiceImpl
 	    }
 	}
 
-	row = new ExcelCell[10 + (maxAnswers * 2)];
-	columnCount = 0;
-	row[columnCount++] = new ExcelCell(getMessage("label.student.name"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.student.username"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.team"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.question.number"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.question"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.correct.answer"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.first.choice.accuracy"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.number.of.attempts"), true);
-	row[columnCount++] = new ExcelCell(getMessage("label.mark.awarded"), true);
+	row = spssAnalysisSheet.initRow();
+	row.addCell(getMessage("label.student.name"), true);
+	row.addCell(getMessage("label.student.username"), true);
+	row.addCell(getMessage("label.team"), true);
+	row.addCell(getMessage("label.question.number"), true);
+	row.addCell(getMessage("label.question"), true);
+	row.addCell(getMessage("label.correct.answer"), true);
+	row.addCell(getMessage("label.first.choice.accuracy"), true);
+	row.addCell(getMessage("label.number.of.attempts"), true);
+	row.addCell(getMessage("label.mark.awarded"), true);
 	for (int i = 0; i < maxAnswers; i++) {
-	    row[columnCount++] = new ExcelCell(getMessage("label." + (i + 1) + ".answer.selected"), true);
+	    row.addCell(getMessage("label." + (i + 1) + ".answer.selected"), true);
 	}
-	row[columnCount++] = new ExcelCell(getMessage("label.date"), true);
+	row.addCell(getMessage("label.date"), true);
 	for (int i = 0; i < maxAnswers; i++) {
-	    row[columnCount++] = new ExcelCell(getMessage("label.time.of.selection." + (i + 1)), true);
+	    row.addCell(getMessage("label.time.of.selection." + (i + 1)), true);
 	}
-	rowList.add(row);
 
 	// Table content------------------------------------
 
@@ -1518,22 +1473,20 @@ public class ScratchieServiceImpl
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 
 	    for (ScratchieUser user : users) {
-
 		int questionCount = 1;
 		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
 
-		    row = new ExcelCell[10 + (maxAnswers * 2)];
-		    columnCount = 0;
+		    row = spssAnalysisSheet.initRow();
 		    // learner name
-		    row[columnCount++] = new ExcelCell(user.getFirstName() + " " + user.getLastName(), false);
+		    row.addCell(user.getFirstName() + " " + user.getLastName());
 		    // username
-		    row[columnCount++] = new ExcelCell(user.getLoginName(), false);
+		    row.addCell(user.getLoginName());
 		    // group name
-		    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
+		    row.addCell(summary.getSessionName());
 		    // question number
-		    row[columnCount++] = new ExcelCell(new Long(questionCount++), false);
+		    row.addCell(new Long(questionCount++));
 		    // question title
-		    row[columnCount++] = new ExcelCell(itemDto.getTitle(), false);
+		    row.addCell(itemDto.getTitle());
 
 		    // correct answer
 		    String correctAnswer = "";
@@ -1543,7 +1496,7 @@ public class ScratchieServiceImpl
 			    correctAnswer = removeHtmlMarkup(answer.getDescription());
 			}
 		    }
-		    row[columnCount++] = new ExcelCell(correctAnswer, false);
+		    row.addCell(correctAnswer);
 
 		    // isFirstChoice
 		    int attempts = itemDto.getUserAttempts();
@@ -1555,12 +1508,12 @@ public class ScratchieServiceImpl
 		    } else {
 			isFirstChoice = getMessage("label.incorrect");
 		    }
-		    row[columnCount++] = new ExcelCell(isFirstChoice, false);
+		    row.addCell(isFirstChoice);
 		    // attempts
-		    row[columnCount++] = new ExcelCell(new Long(attempts), false);
+		    row.addCell(new Long(attempts));
 		    // mark
 		    Object mark = (itemDto.getUserMark() == -1) ? "" : new Long(itemDto.getUserMark());
-		    row[columnCount++] = new ExcelCell(mark, false);
+		    row.addCell(mark);
 
 		    // Answers selected
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
@@ -1571,13 +1524,13 @@ public class ScratchieServiceImpl
 
 		    for (ScratchieAnswerVisitLog log : logs) {
 			String answer = removeHtmlMarkup(log.getScratchieAnswer().getDescription());
-			row[columnCount++] = new ExcelCell(answer, false);
+			row.addCell(answer);
 		    }
 		    for (int i = logs.size(); i < itemDto.getAnswers().size(); i++) {
-			row[columnCount++] = new ExcelCell(getMessage("label.none"), false);
+			row.addCell(getMessage("label.none"));
 		    }
 		    for (int i = answers.size(); i < maxAnswers; i++) {
-			row[columnCount++] = new ExcelCell("", false);
+			row.addCell("");
 		    }
 
 		    // Date
@@ -1587,70 +1540,56 @@ public class ScratchieServiceImpl
 			Date accessDate = logs.iterator().next().getAccessDate();
 			dateStr = dateFormat.format(accessDate);
 		    }
-		    row[columnCount++] = new ExcelCell(dateStr, false);
+		    row.addCell(dateStr);
 
 		    // time of selection
 		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 		    for (ScratchieAnswerVisitLog log : logs) {
 			Date accessDate = log.getAccessDate();
 			String timeStr = timeFormat.format(accessDate);
-			row[columnCount++] = new ExcelCell(timeStr, false);
+			row.addCell(timeStr);
 		    }
 		    for (int i = logs.size(); i < maxAnswers; i++) {
-			row[columnCount++] = new ExcelCell("", false);
+			row.addCell("");
 		    }
-
-		    rowList.add(row);
 		}
-
 	    }
-
 	}
-
-	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
 
 	// ======================================================= Burning questions page
 	// =======================================
-
 	if (scratchie.isBurningQuestionsEnabled()) {
-	    rowList = new LinkedList<>();
+	    ExcelSheet burningQuestionsSheet = new ExcelSheet(getMessage("label.burning.questions"));
+	    sheets.add(burningQuestionsSheet);
 
-	    row = new ExcelCell[1];
-	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
-	    rowList.add(row);
-	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+	    row = burningQuestionsSheet.initRow();
+	    row.addCell(getMessage("label.burning.questions"), true);
+	    burningQuestionsSheet.addEmptyRow();
 
-	    row = new ExcelCell[3];
-	    row[0] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
-	    row[1] = new ExcelCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
-	    row[2] = new ExcelCell(getMessage("label.count"), IndexedColors.BLUE);
-	    rowList.add(row);
+	    row = burningQuestionsSheet.initRow();
+	    row.addCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
+	    row.addCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
+	    row.addCell(getMessage("label.count"), IndexedColors.BLUE);
 
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
-		row = new ExcelCell[1];
-		row[0] = new ExcelCell(item.getTitle(), false);
-		rowList.add(row);
+		row = burningQuestionsSheet.initRow();
+		row.addCell(item.getTitle());
 
 		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
 		for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		    String burningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
-		    row = new ExcelCell[3];
-		    row[0] = new ExcelCell(burningQuestionDto.getSessionName(), false);
-		    row[1] = new ExcelCell(burningQuestion, false);
-		    row[2] = new ExcelCell(burningQuestionDto.getLikeCount(), false);
-		    rowList.add(row);
+		    row = burningQuestionsSheet.initRow();
+		    row.addCell(burningQuestionDto.getSessionName());
+		    row.addCell(burningQuestion);
+		    row.addCell(burningQuestionDto.getLikeCount());
 		}
-		rowList.add(ScratchieServiceImpl.EMPTY_ROW);
+		burningQuestionsSheet.addEmptyRow();
 	    }
-
-	    ExcelCell[][] fifthPageData = rowList.toArray(new ExcelCell[][] {});
-	    dataToExport.put(getMessage("label.burning.questions"), fifthPageData);
 	}
 
-	return dataToExport;
+	return sheets;
     }
 
     @Override
@@ -2260,7 +2199,7 @@ public class ScratchieServiceImpl
 
 	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", true));
 	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
-	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
+	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint"));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));

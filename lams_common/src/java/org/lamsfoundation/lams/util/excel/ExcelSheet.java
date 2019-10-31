@@ -18,6 +18,29 @@ public class ExcelSheet {
 	this.sheetName = sheetName;
     }
     
+    /**
+     * Add empty row.
+     */
+    public void addEmptyRow() {
+	rows.add(new ExcelRow());
+    }
+    
+    /**
+     * Return row at the specified position in rows list.
+     * 
+     * @param index
+     * @return
+     */
+    public ExcelRow getRow(int index) {
+	return rows.get(index);
+    }
+    
+    public ExcelRow initRow() {
+	ExcelRow row = new ExcelRow();
+	rows.add(row);
+	return row;
+    }
+    
     public void addRow(ExcelRow row) {
 	rows.add(row);
     }

@@ -13,6 +13,16 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public class ExcelRow {
     private List<ExcelCell> cells = new ArrayList<>();
     
+    /**
+     * Return cell value at the specified position in cells list.
+     * 
+     * @param index
+     * @return
+     */
+    public Object getCell(int index) {
+	return cells.get(index).getCellValue();
+    }
+    
     public ExcelCell addCell(Object cellValue) {
 	ExcelCell cell = new ExcelCell(cellValue);
 	cells.add(cell);
@@ -21,7 +31,7 @@ public class ExcelRow {
     
     public ExcelCell addPercentageCell(Object cellValue) {
 	ExcelCell cell = new ExcelCell(cellValue);
-	cell.setCellFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
+	cell.setDataFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
 	cells.add(cell);
 	return cell;
     }
@@ -47,6 +57,19 @@ public class ExcelRow {
 	cells.add(cell);
     }
     
+    /**
+     * Add one empty cell
+     */
+    public void addEmptyCell() {
+	ExcelCell cell = new ExcelCell("");
+	cells.add(cell);
+    }
+    
+    /**
+     * Add specified number of empty cell.
+     * 
+     * @param numberEmptyCells
+     */
     public void addEmptyCells(int numberEmptyCells) {
 	for (int i = 0; i < numberEmptyCells; i++) {
 	    ExcelCell cell = new ExcelCell("");
