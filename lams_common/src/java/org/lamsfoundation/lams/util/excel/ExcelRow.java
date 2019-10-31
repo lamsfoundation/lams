@@ -18,6 +18,13 @@ public class ExcelRow {
 	cells.add(cell);
 	return cell;
     }
+    
+    public ExcelCell addPercentageCell(Object cellValue) {
+	ExcelCell cell = new ExcelCell(cellValue);
+	cell.setCellFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
+	cells.add(cell);
+	return cell;
+    }
 
     public ExcelCell addCell(Object cellValue, Boolean isBold) {
 	ExcelCell cell = new ExcelCell(cellValue, isBold);
