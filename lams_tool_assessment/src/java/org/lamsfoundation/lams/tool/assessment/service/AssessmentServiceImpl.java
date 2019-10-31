@@ -1620,10 +1620,10 @@ public class AssessmentServiceImpl
 		Long falseKey = 0L;
 		if (doSummaryTable) {
 		    questionSummarySheet.addRow(startSummaryTable(question, summaryOfAnswers, trueKey, falseKey));
-		    questionSummarySheet
-			    .addRow(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
-		    questionSummarySheet.addRow(EMPTY_ROW);
 		}
+
+		//we need to create questionSummaryTabTemp variable prior to writing it to sheet, in order to fill summaryOfAnswers
+		ArrayList<ExcelRow> questionSummaryTabTemp = new ArrayList<>();
 
 		//add question title row
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
@@ -1654,9 +1654,9 @@ public class AssessmentServiceImpl
 		    }
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.time.taken"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.mark"), true);
-		    questionSummarySheet.addRow(hedgeQuestionTitleRow);
+		    questionSummaryTabTemp.add(hedgeQuestionTitleRow);
 		} else {
-		    questionSummarySheet.addRow(questionTitleRow);
+		    questionSummaryTabTemp.add(questionTitleRow);
 		}
 
 		QuestionSummary questionSummary = questionSummaries.get(question.getUid());
@@ -1727,7 +1727,7 @@ public class AssessmentServiceImpl
 
 			//mark
 			userResultRow.addCell(questionResult.getMark());
-			questionSummarySheet.addRow(userResultRow);
+			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
 			if (questionResult.getMark() != null) {
@@ -1736,6 +1736,13 @@ public class AssessmentServiceImpl
 			}
 		    }
 		}
+
+		if (doSummaryTable) {
+		    questionSummarySheet
+			    .addRow(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
+		    questionSummarySheet.addRow(EMPTY_ROW);
+		}
+		questionSummarySheet.getRows().addAll(questionSummaryTabTemp);
 
 		// Calculating the averages
 		ExcelRow averageRow = new ExcelRow();
@@ -2006,10 +2013,10 @@ public class AssessmentServiceImpl
 	return summaryNACount;
     }
 
-    private String valueAsPercentage(Integer value, int total) {
-	Double percentage = (double) value / total * 100;
-	return NumberUtil.formatLocalisedNumber(percentage, (Locale) null, 2) + "%";
-    }
+//    private String valueAsPercentage(Integer value, int total) {
+//	Double percentage = (double) value / total * 100;
+//	return NumberUtil.formatLocalisedNumber(percentage, (Locale) null, 2);
+//    }
 
     private ExcelRow outputSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
 	    Integer summaryNACount, Long trueKey, Long falseKey) {
@@ -2022,24 +2029,30 @@ public class AssessmentServiceImpl
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		ExcelCell cell = summaryTableRow.addCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total));
+		Double optionPercentage = (double) summaryOfAnswers.get(option.getUid()) / total;
+		ExcelCell optionCell = summaryTableRow.addPercentageCell(optionPercentage);
 		if (option.getGrade() > 0) {
-		    cell.setColor(IndexedColors.GREEN);
+		    optionCell.setColor(IndexedColors.GREEN);
 		}
 	    }
-	    summaryTableRow.addCell(valueAsPercentage(summaryNACount, total));
+	    
 	} else {
-	    summaryTableRow = new ExcelRow();
-	    ExcelCell trueCell = summaryTableRow.addCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total));
-	    ExcelCell falseCell = summaryTableRow.addCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total));
-	    summaryTableRow.addCell(valueAsPercentage(summaryNACount, total));
+	    Double correctPercentage = (double) summaryOfAnswers.get(trueKey) / total;
+	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
+	    
+	    Double wrongPercentage = (double) summaryOfAnswers.get(falseKey) / total;
+	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
 	    
 	    if (question.getCorrectAnswer()) {
-		trueCell.setColor(IndexedColors.GREEN);
+		correctCell.setColor(IndexedColors.GREEN);
 	    } else {
-		falseCell.setColor(IndexedColors.GREEN);
+		wrongCell.setColor(IndexedColors.GREEN);
 	    }
 	}
+
+	Double summaryNAPercentage = (double) summaryNACount / total;
+	summaryTableRow.addPercentageCell(summaryNAPercentage);
+	    
 	return summaryTableRow;
     }
 
