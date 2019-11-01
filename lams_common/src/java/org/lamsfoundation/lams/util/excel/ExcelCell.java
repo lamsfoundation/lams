@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.excel;
 
 import org.apache.poi.ss.usermodel.IndexedColors;
 
@@ -41,13 +41,12 @@ public class ExcelCell {
     public final static int ALIGN_RIGHT = 4;
     
     public final static int CELL_FORMAT_DEFAULT = 0;
-    public final static int CELL_FORMAT_NUMBER = 1;
-    public final static int CELL_FORMAT_DATE = 2;
-    public final static int CELL_FORMAT_TIME = 3;
-    public final static int CELL_FORMAT_PERCENTAGE = 4;
+    public final static int CELL_FORMAT_DATE = 1;
+    public final static int CELL_FORMAT_TIME = 2;
+    public final static int CELL_FORMAT_PERCENTAGE = 3;
     
     private Object cellValue;
-    private int cellFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
+    private int dataFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
     private Boolean isBold = false;
     private IndexedColors color;
     private int borderStyle = 0;
@@ -91,12 +90,12 @@ public class ExcelCell {
 	this.cellValue = cellValue;
     }
     
-    public int getCellFormat() {
-	return cellFormat;
+    public int getDataFormat() {
+	return dataFormat;
     }
 
-    public void setCellFormat(int cellFormat) {
-	this.cellFormat = cellFormat;
+    public void setDataFormat(int cellFormat) {
+	this.dataFormat = cellFormat;
     }
 
     public Boolean isBold() {

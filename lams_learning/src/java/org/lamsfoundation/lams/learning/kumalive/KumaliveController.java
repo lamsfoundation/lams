@@ -21,17 +21,20 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -233,7 +236,7 @@ public class KumaliveController {
     }
 
     @RequestMapping("/exportKumalives")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public void exportKumalives(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	UserDTO userDTO = getUserDTO();
 	Integer currentUserId = userDTO.getUserID();
@@ -264,11 +267,11 @@ public class KumaliveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, warning);
 	}
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = null;
+	List<ExcelSheet> sheets = null;
 	if (kumaliveIds == null) {
-	    dataToExport = kumaliveService.exportKumalives(organisationId);
+	    sheets = kumaliveService.exportKumalives(organisationId);
 	} else {
-	    dataToExport = kumaliveService.exportKumalives(kumaliveIds);
+	    sheets = kumaliveService.exportKumalives(kumaliveIds);
 	}
 	String fileName = "kumalive_report.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -282,7 +285,7 @@ public class KumaliveController {
 	fileDownloadTokenCookie.setPath("/");
 	response.addCookie(fileDownloadTokenCookie);
 
-	ExcelUtil.createExcel(response.getOutputStream(), dataToExport, "Exported on:", true);
+	ExcelUtil.createExcel(response.getOutputStream(), sheets, "Exported on:", true);
     }
 
     @RequestMapping("/saveRubrics")

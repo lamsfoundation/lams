@@ -45,7 +45,8 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.quartz.SchedulerException;
 
 /**
@@ -307,7 +308,7 @@ public interface IScratchieService extends ICommonToolService {
      * @param scratchie
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportExcel(Long contentId);
+    List<ExcelSheet> exportExcel(Long contentId);
 
     /**
      * Create refection entry into notebook tool.

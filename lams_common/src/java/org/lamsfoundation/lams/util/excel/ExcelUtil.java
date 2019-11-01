@@ -21,12 +21,14 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.excel;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
@@ -34,7 +36,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -50,6 +51,7 @@ import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -57,17 +59,16 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Utilities for producing .xlsx files.
  */
 public class ExcelUtil {
-
+    //other built in formats https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/BuiltinFormats.html
+    private static final String FORMAT_PERCENTAGE = "0%";
+    private static short numberFormat;
+    private static short floatFormat;
+    private static short dateFormat;
+    private static short timeFormat;
+    private static short percentageFormat;
+    
     private static CellStyle defaultStyle;
     private static CellStyle boldStyle;
-    
-    //other built in formats https://poi.apache.org/apidocs/dev/org/apache/poi/ss/usermodel/BuiltinFormats.html
-    private static final String FORMAT_PERCENTAGE = "0.00%";
-    
-    private static CellStyle numericStyle;
-    private static CellStyle dateStyle;
-    private static CellStyle timeStyle;
-    private static CellStyle percentageStyle;
 
     private static CellStyle greenColor;
     private static CellStyle blueColor;
@@ -75,17 +76,13 @@ public class ExcelUtil {
     private static CellStyle yellowColor;
 
     private static CellStyle borderStyleLeftThin;
-    private static CellStyle borderStyleLeftThinPercentage;
     private static CellStyle borderStyleLeftThick;
     private static CellStyle borderStyleRightThick;
     private static CellStyle borderStyleLeftThinBoldFont;
-    private static CellStyle borderStyleLeftThinBoldFontPercentage;
     private static CellStyle borderStyleLeftThickBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
     private static CellStyle borderStyleBottomThin;
     private static CellStyle borderStyleBottomThinBoldFont;
-    private static CellStyle borderStyleRightThickPercentage;
-    private static CellStyle borderStyleRightThickBoldFontPercentage;
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
@@ -110,8 +107,8 @@ public class ExcelUtil {
      */
     public static void createExcelXLS(OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
 	    String dateHeader, boolean displaySheetTitle) throws IOException {
-	Workbook workbook = new HSSFWorkbook(); 
-	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+	Workbook workbook = new HSSFWorkbook();
+	ExcelUtil.create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
     }
 
     /**
@@ -138,7 +135,23 @@ public class ExcelUtil {
 	LocaleUtil.setUserTimeZone(userTimeZone);
 	
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
-	create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+	ExcelUtil.create(workbook, out, dataToExport, dateHeader, displaySheetTitle);
+    }
+
+    /**
+     * Temporary wrapper method.
+     */
+    public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
+	    boolean displaySheetTitle) throws IOException {
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
+	for (ExcelSheet sheet : sheets) {
+	    List<ExcelCell[]> rowList = new LinkedList<>();
+	    for (ExcelRow row : sheet.getRows()) {
+		rowList.add(row.getCells().toArray(new ExcelCell[] {}));
+	    }
+	    dataToExport.put(sheet.getSheetName(), rowList.toArray(new ExcelCell[][] {}));
+	}
+	ExcelUtil.createExcel(out, dataToExport, dateHeader, displaySheetTitle);
     }
     
     private static void create(Workbook workbook, OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
@@ -179,22 +192,12 @@ public class ExcelUtil {
 	yellowColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	yellowColor.setFont(defaultFont);
 
-	// create number style
-	numericStyle = workbook.createCellStyle();
-	numericStyle.setDataFormat(workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat(3)));// built-in 3 format - "#,##0"
-
-	// create date style
-	dateStyle = workbook.createCellStyle();
-	dateStyle.setDataFormat((short)14);// built-in 0xe format - "m/d/yy"
-	
-	// create time style
-	timeStyle = workbook.createCellStyle();
-	timeStyle.setDataFormat((short)19);// built-in 0x13 format - "h:mm:ss AM/PM"
-	
-	// create percentage style
-	percentageStyle = workbook.createCellStyle();
-	short percentageDataFormatId = workbook.createDataFormat().getFormat(FORMAT_PERCENTAGE);
-	percentageStyle.setDataFormat(percentageDataFormatId);
+	// create data formats
+	floatFormat = workbook.createDataFormat().getFormat("0.00");
+	numberFormat = workbook.createDataFormat().getFormat("0");
+	dateFormat = (short)14;// built-in 0xe format - "m/d/yy"
+	timeFormat = (short)19;// built-in 0x13 format - "h:mm:ss AM/PM"
+	percentageFormat = workbook.createDataFormat().getFormat(FORMAT_PERCENTAGE);
 
 	//create border style
 	borderStyleLeftThin = workbook.createCellStyle();
@@ -221,23 +224,6 @@ public class ExcelUtil {
 	borderStyleBottomThinBoldFont = workbook.createCellStyle();
 	borderStyleBottomThinBoldFont.setBorderBottom(BorderStyle.THIN);
 	borderStyleBottomThinBoldFont.setFont(boldFont);
-
-	borderStyleLeftThinPercentage = workbook.createCellStyle();
-	borderStyleLeftThinPercentage.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThinPercentage.setFont(defaultFont);
-	borderStyleLeftThinPercentage.setDataFormat(percentageDataFormatId);
-	borderStyleLeftThinBoldFontPercentage = workbook.createCellStyle();
-	borderStyleLeftThinBoldFontPercentage.setBorderLeft(BorderStyle.THIN);
-	borderStyleLeftThinBoldFontPercentage.setFont(boldFont);
-	borderStyleLeftThinBoldFontPercentage.setDataFormat(percentageDataFormatId);
-
-	borderStyleRightThickPercentage = workbook.createCellStyle();
-	borderStyleRightThickPercentage.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThickPercentage.setDataFormat(percentageDataFormatId);
-	borderStyleRightThickBoldFontPercentage = workbook.createCellStyle();
-	borderStyleRightThickBoldFontPercentage.setBorderRight(BorderStyle.THICK);
-	borderStyleRightThickBoldFontPercentage.setFont(boldFont);
-	borderStyleRightThickBoldFontPercentage.setDataFormat(percentageDataFormatId);
 	
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
@@ -318,12 +304,15 @@ public class ExcelUtil {
 
 	    //cast excelCell's value
 	    if (excelCellValue != null) {
-		if (excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
+		if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME && excelCellValue instanceof Date) {
 		    cell.setCellValue((Date) excelCellValue);
 
 		} else if (excelCellValue instanceof Date) {
 		    cell.setCellValue(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT.format(excelCellValue));
 
+		} else if (excelCellValue instanceof java.lang.Float) {
+		    cell.setCellValue((Float) excelCellValue);
+		    
 		} else if (excelCellValue instanceof java.lang.Double) {
 		    cell.setCellValue((Double) excelCellValue);
 
@@ -340,28 +329,8 @@ public class ExcelUtil {
 
 	    //figure out cell's style
 	    CellStyle cellStyle = defaultStyle;
-	    if (excelCellValue != null && (excelCellValue instanceof Number)) {
-		cellStyle = numericStyle;
-	    }
 	    if (excelCell.isBold()) {
 		cellStyle = boldStyle;
-	    }
-	    switch (excelCell.getCellFormat()) {
-		case 0:
-		    //default - do nothing
-		    break;
-		case ExcelCell.CELL_FORMAT_NUMBER:
-		    cellStyle = numericStyle;
-		    break;
-		case ExcelCell.CELL_FORMAT_DATE:
-		    cellStyle = dateStyle;
-		    break;
-		case ExcelCell.CELL_FORMAT_TIME:
-		    cellStyle = timeStyle;
-		    break;
-		case ExcelCell.CELL_FORMAT_PERCENTAGE:
-		    cellStyle = percentageStyle;
-		    break;
 	    }
 	    if (excelCell.getColor() != null) {
 		switch (excelCell.getColor()) {
@@ -382,16 +351,10 @@ public class ExcelUtil {
 		}
 	    }
 	    if (excelCell.getBorderStyle() != 0) {
-		boolean isPercentageFormat = excelCell.getCellFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE;
-		
 		switch (excelCell.getBorderStyle()) {
 		    case ExcelCell.BORDER_STYLE_LEFT_THIN:
-			if (excelCell.isBold() && isPercentageFormat) {
-			    cellStyle = borderStyleLeftThinBoldFontPercentage;
-			} else if (excelCell.isBold()) {
+			if (excelCell.isBold()) {
 			    cellStyle = borderStyleLeftThinBoldFont;
-			} else if (isPercentageFormat) {
-			    cellStyle = borderStyleLeftThinPercentage;
 			} else {
 			    cellStyle = borderStyleLeftThin;
 			}
@@ -404,12 +367,8 @@ public class ExcelUtil {
 			}
 			break;
 		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
-			if (excelCell.isBold() && isPercentageFormat ) {
-			    cellStyle = borderStyleRightThickBoldFontPercentage;
-			} else 	if (excelCell.isBold() ) {
+			if (excelCell.isBold() ) {
 			    cellStyle = borderStyleRightThickBoldFont;
-			} else 	if (isPercentageFormat ) {
-			    cellStyle = borderStyleRightThickPercentage;
 			} else {
 			    cellStyle = borderStyleRightThick;
 			}
@@ -427,6 +386,26 @@ public class ExcelUtil {
 	    }
 	    cell.setCellStyle(cellStyle);
 	    
+	    //set data format
+	    if (excelCellValue != null
+		    && (excelCellValue instanceof java.lang.Integer || excelCellValue instanceof java.lang.Long)) {
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, numberFormat);
+		
+	    } else if (excelCellValue != null
+		    && (excelCellValue instanceof java.lang.Float || excelCellValue instanceof java.lang.Double)) {
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, floatFormat);
+		
+	    } else if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_DATE) {
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, dateFormat);
+		
+	    } else if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_TIME) {
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, timeFormat);
+	    } 
+	    if (excelCell.getDataFormat() == ExcelCell.CELL_FORMAT_PERCENTAGE) {
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	    }
+	    
+	    //set alignment
 	    if (excelCell.getAlignment() != 0) {
 		switch (excelCell.getAlignment()) {
 		    case ExcelCell.ALIGN_GENERAL:

@@ -47,7 +47,8 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
  * @author Andrey Balan
@@ -446,7 +447,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param showUserNames
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
+    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
 	    boolean showUserNames);
 
     /**

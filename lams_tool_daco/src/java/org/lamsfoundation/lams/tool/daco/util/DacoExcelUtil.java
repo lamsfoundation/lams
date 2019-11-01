@@ -27,9 +27,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 
 public class DacoExcelUtil {
 
@@ -56,36 +60,30 @@ public class DacoExcelUtil {
      */
     public static void exportToExcel(OutputStream out, String sheetName, String title, String dateHeader,
 	    String[] columnNames, Object[][] inputData) throws IOException {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	ExcelSheet sheet = new ExcelSheet(title);
+	sheets.add(sheet);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-
-	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
-
-	ExcelCell[] summaryRowTitle = new ExcelCell[columnNames.length];
-	for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {
-	    String columnName = columnNames[columnIndex];
-	    summaryRowTitle[columnIndex] = new ExcelCell(columnName, true);
+	ExcelRow summaryTitleRow = new ExcelRow();
+	for (String columnName : columnNames) {
+	    summaryTitleRow.addCell(columnName, true);
 	}
-	data.add(summaryRowTitle);
+	sheet.addRow(summaryTitleRow);
 
 	if (inputData != null) {
 	    // Print data
 	    for (int rowIndex = 0; rowIndex < inputData.length; rowIndex++) {
-		ExcelCell[] row = new ExcelCell[columnNames.length];
-
+		ExcelRow row = new ExcelRow();
 		for (int columnIndex = 0; columnIndex < inputData[rowIndex].length; columnIndex++) {
-
 		    Object content = inputData[rowIndex][columnIndex];
 		    if (content != null) {
-			row[columnIndex] = new ExcelCell(content, false);
+			row.addCell(content, false);
 		    }
 		}
-		data.add(row);
+		sheet.addRow(row);
 	    }
 	}
 
-	dataToExport.put(title, data.toArray(new ExcelCell[][] {}));
-
-	ExcelUtil.createExcel(out, dataToExport, dateHeader, true);
+	ExcelUtil.createExcel(out, sheets, dateHeader, true);
     }
 }

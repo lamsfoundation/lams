@@ -48,8 +48,8 @@ import org.lamsfoundation.lams.gradebook.dto.comparators.GBRowNameComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBStartDateComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBTimeTakenComparator;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -175,27 +175,6 @@ public class GradebookUtil {
 	    markStr += "%";
 	}
 	return markStr;
-    }
-
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
-	return GradebookUtil.createPercentageCell(mark, markConversionNeeded, false, 0);
-    }
-
-//    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold) {
-//	return createPercentageCell(mark, markConversionNeeded, isBold, 0);
-//    }
-
-    // if markConversionNeeded is true then mark is divided by 100. Otherwise assumes already a percentage.
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold,
-	    int borderStyle) {
-	Double convertedMark = null;
-	if (mark != null) {
-	    convertedMark = markConversionNeeded ? mark / 100.0 : mark;
-	}
-
-	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
-	userMarkCell.setCellFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
-	return userMarkCell;
     }
 
     private static Document getDocument() throws ParserConfigurationException {
