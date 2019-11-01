@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -455,8 +456,7 @@ public class EmailNotificationsController {
 	    }
 	}
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = monitoringService
-		.exportArchivedEmailNotification(emailNotificationUid);
+	List<ExcelSheet> sheets = monitoringService.exportArchivedEmailNotification(emailNotificationUid);
 	String fileName = "email_notification_"
 		+ FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()) + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -464,7 +464,7 @@ public class EmailNotificationsController {
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
-	ExcelUtil.createExcel(response.getOutputStream(), dataToExport,
+	ExcelUtil.createExcel(response.getOutputStream(), sheets,
 		monitoringService.getMessageService().getMessage("export.dateheader"), false);
     }
 

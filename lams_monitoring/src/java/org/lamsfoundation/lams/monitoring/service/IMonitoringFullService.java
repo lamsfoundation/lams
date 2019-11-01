@@ -20,6 +20,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
  * Contains methods intended for internal usage by lams_monitoring.
@@ -325,7 +326,7 @@ public interface IMonitoringFullService extends IMonitoringService {
     /**
      * Exports the given email notification to Excel sheet
      */
-    LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid);
+    List<ExcelSheet> exportArchivedEmailNotification(Long emailNotificationUid);
 
     /**
      * Set a groups name

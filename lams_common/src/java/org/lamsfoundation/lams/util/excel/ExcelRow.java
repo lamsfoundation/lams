@@ -30,6 +30,10 @@ public class ExcelRow {
     }
     
     public ExcelCell addPercentageCell(Object cellValue) {
+	return addPercentageCell(cellValue, false, 0);
+    }
+    
+    public ExcelCell addPercentageCell(Object cellValue, Boolean isBold, int borderStyle) {
 	ExcelCell cell = new ExcelCell(cellValue);
 	cell.setDataFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
 	cells.add(cell);
@@ -52,9 +56,10 @@ public class ExcelRow {
 	cells.add(cell);
     }
 
-    public void addCell(Object cellValue, Boolean isBold, int borderStyle) {
+    public ExcelCell addCell(Object cellValue, Boolean isBold, int borderStyle) {
 	ExcelCell cell = new ExcelCell(cellValue, isBold, borderStyle);
 	cells.add(cell);
+	return cell;
     }
     
     /**
@@ -71,6 +76,10 @@ public class ExcelRow {
      * @param numberEmptyCells
      */
     public void addEmptyCells(int numberEmptyCells) {
+	if (numberEmptyCells < 1) {
+	    return;
+	}
+	
 	for (int i = 0; i < numberEmptyCells; i++) {
 	    ExcelCell cell = new ExcelCell("");
 	    cells.add(cell);

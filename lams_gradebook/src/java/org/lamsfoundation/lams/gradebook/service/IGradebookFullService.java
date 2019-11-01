@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 public interface IGradebookFullService extends IGradebookService {
 
@@ -276,7 +277,7 @@ public interface IGradebookFullService extends IGradebookService {
      * @param lesson
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson);
+    List<ExcelSheet> exportLessonGradebook(Lesson lesson);
 
     /**
      * Get the summary data for course in order to create excel export
@@ -285,7 +286,7 @@ public interface IGradebookFullService extends IGradebookService {
      * @param organisationId
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId);
+    List<ExcelSheet> exportCourseGradebook(Integer userId, Integer organisationId);
 
     /**
      * Get the summary data for selected lessons in order to create excel export
@@ -294,8 +295,8 @@ public interface IGradebookFullService extends IGradebookService {
      * @param organisationId
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
-	    String[] lessonIds, boolean simplified);
+    List<ExcelSheet> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[] lessonIds,
+	    boolean simplified);
 
     /**
      * Get the raw overall marks for a lesson for charting purposes

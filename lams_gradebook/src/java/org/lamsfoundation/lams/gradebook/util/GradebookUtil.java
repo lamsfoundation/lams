@@ -183,27 +183,6 @@ public class GradebookUtil {
 
     }
 
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded) {
-	return GradebookUtil.createPercentageCell(mark, markConversionNeeded, false, 0);
-    }
-
-//    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold) {
-//	return createPercentageCell(mark, markConversionNeeded, isBold, 0);
-//    }
-
-    // if markConversionNeeded is true then mark is divided by 100. Otherwise assumes already a percentage.
-    public static ExcelCell createPercentageCell(Double mark, boolean markConversionNeeded, Boolean isBold,
-	    int borderStyle) {
-	Double convertedMark = null;
-	if (mark != null) {
-	    convertedMark = markConversionNeeded ? mark / 100.0 : mark;
-	}
-
-	ExcelCell userMarkCell = new ExcelCell(convertedMark, isBold, borderStyle);
-	userMarkCell.setDataFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
-	return userMarkCell;
-    }
-
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();

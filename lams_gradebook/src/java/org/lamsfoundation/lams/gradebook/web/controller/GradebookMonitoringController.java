@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -292,7 +293,7 @@ public class GradebookMonitoringController {
 	log.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
 	ServletOutputStream out = response.getOutputStream();
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportLessonGradebook(lesson);
+	List<ExcelSheet> sheets = gradebookService.exportLessonGradebook(lesson);
 
 	// set cookie that will tell JS script that export has been finished
 	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
@@ -300,7 +301,7 @@ public class GradebookMonitoringController {
 	fileDownloadTokenCookie.setPath("/");
 	response.addCookie(fileDownloadTokenCookie);
 
-	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, sheets, gradebookService.getMessage("gradebook.export.dateheader"), true);
     }
 
     /**
@@ -320,8 +321,7 @@ public class GradebookMonitoringController {
 	if (log.isDebugEnabled()) {
 	    log.debug("Exporting to a spreadsheet course: " + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportCourseGradebook(user.getUserID(),
-		organisationID);
+	List<ExcelSheet> sheets = gradebookService.exportCourseGradebook(user.getUserID(), organisationID);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -337,7 +337,7 @@ public class GradebookMonitoringController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, sheets, gradebookService.getMessage("gradebook.export.dateheader"), true);
     }
 
     /**
@@ -361,8 +361,8 @@ public class GradebookMonitoringController {
 	    log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds) + " from course: "
 		    + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService
-		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds, simplified);
+	List<ExcelSheet> sheets = gradebookService.exportSelectedLessonsGradebook(user.getUserID(), organisationID,
+		lessonIds, simplified);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -378,7 +378,7 @@ public class GradebookMonitoringController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, null, false);
+	ExcelUtil.createExcel(out, sheets, null, false);
     }
 
     /**
