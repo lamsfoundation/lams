@@ -397,9 +397,11 @@ var ActivityUtils = {
 			},
 
 			isSupportActivity = activity instanceof SupportActivity,
+			
 			dblclick = activity.url ? function() {
-				// open pop up or dialog if it is a support or completed activity
+				// open pop up or dialog if it is a support or completed activity or it is monitor
 				if (isSupportActivity
+						|| (typeof mode === 'undefined' || mode === 'teacher')
 						|| activity.status == 1
 						|| (!hasContentFrame && activity.status <= 2)) {
 					openActivity(activity.url);
