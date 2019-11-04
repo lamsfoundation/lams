@@ -608,20 +608,21 @@ function closeAddSingleActivityLessonDialog(action) {
 					// disable previous onload handler, set in
 					// showAddSingleActivityLessonDialog()
 					frame.off('load').load(function(){
-						// disable current onload handler as closing the dialog
-						// reloads the iframe
+						// disable current onload handler as closing the dialog reloads the iframe
 						frame.off('load');
 						
-						// call svgGenerator.jsp code to store LD SVG on the
-						// server
+						// call svgGenerator.jsp code to store LD SVG on the server
 						var win = frame[0].contentWindow || frame[0].contentDocument;
-						win.GeneralLib.saveLearningDesignImage();
-						
-						closeDialog(id, true);
+						$(win.document).ready(function(){
+						    // when LD opens, make a callback which save the thumbnail and displays it in current window
+							win.GeneralLib.openLearningDesign(learningDesignID, function(){
+								win.GeneralLib.saveLearningDesignImage();
+								closeDialog(id, true);
+							});
+						});
 					});
 					// load svgGenerator.jsp to render LD SVG
-					frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false&learningDesignID='
-											   + learningDesignID);
+					frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 				}
 			}
 		});
