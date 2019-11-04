@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -206,6 +208,15 @@ public class AuthoringController {
 		.getPrecedingConfidenceLevelsActivities(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_CONFIDENCE_LEVELS_ACTIVITIES, confidenceLevelsActivities);
 
+	String notifyCloseURL = request.getParameter("notifyCloseURL");
+	if (StringUtils.isNotBlank(notifyCloseURL)) {
+	    try {
+		request.setAttribute("notifyCloseURL", URLEncoder.encode(notifyCloseURL, "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		throw new ServletException("Exception while encoding notifyCloseURL: " + notifyCloseURL, e);
+	    }
+	}
+
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
 	return "pages/authoring/start";
     }
@@ -260,7 +271,7 @@ public class AuthoringController {
 
 	    // initialize oldItems' answers
 	    for (ScratchieItem oldItem : oldItems) {
-		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) oldItem.getAnswers()) {
+		for (ScratchieAnswer answer : oldItem.getAnswers()) {
 		}
 	    }
 
