@@ -85,7 +85,7 @@ public class UniversalLoginModule implements LoginModule {
     private char[] credential;
 
     private static String dsJndiName;
-    private static final Map<String, Long> internalAuthenticationTokens = new TreeMap<String, Long>();
+    private static final Map<String, Long> internalAuthenticationTokens = new TreeMap<>();
 
     private static DatabaseAuthenticator databaseAuthenticator;
     private static IThemeService themeService;
@@ -296,19 +296,24 @@ public class UniversalLoginModule implements LoginModule {
 	    return false;
 	}
 
+	boolean isValid = false;
+
 	// check for internal authentication made by LoginRequestServlet or LoginAsAction
 	if (inputPassword.startsWith("#LAMS")) {
 	    if (UniversalLoginModule.log.isDebugEnabled()) {
 		UniversalLoginModule.log.debug("Authenticating internally user: " + userName);
 	    }
-	    Long internalAuthenticationTime = UniversalLoginModule.internalAuthenticationTokens.get(inputPassword);
-	    UniversalLoginModule.internalAuthenticationTokens.remove(inputPassword);
-	    // internal authentication is valid for 10 seconds
-	    return (internalAuthenticationTime != null) && ((System.currentTimeMillis()
-		    - internalAuthenticationTime) < UniversalLoginModule.INTERNAL_AUTHENTICATION_TIMEOUT);
-	}
 
-	boolean isValid = false;
+	    Long internalAuthenticationTime = UniversalLoginModule.internalAuthenticationTokens.get(inputPassword);
+
+	    // internal authentication is valid for 10 seconds
+	    isValid = (internalAuthenticationTime != null) && ((System.currentTimeMillis()
+		    - internalAuthenticationTime) < UniversalLoginModule.INTERNAL_AUTHENTICATION_TIMEOUT);
+	    if (!isValid) {
+		UniversalLoginModule.internalAuthenticationTokens.remove(inputPassword);
+	    }
+	    return isValid;
+	}
 
 	try {
 	    User user = UniversalLoginModule.userManagementService.getUserByLogin(userName);
@@ -419,7 +424,7 @@ public class UniversalLoginModule implements LoginModule {
      */
     private Group[] getRoleSets() throws LoginException {
 	String userName = getUserName();
-	Map<String, Group> setsMap = new HashMap<String, Group>();
+	Map<String, Group> setsMap = new HashMap<>();
 	Connection conn = null;
 	PreparedStatement ps = null;
 	ResultSet rs = null;
@@ -438,7 +443,7 @@ public class UniversalLoginModule implements LoginModule {
 		throw new FailedLoginException("No matching user name found in roles: " + userName);
 	    }
 
-	    ArrayList<String> groupMembers = new ArrayList<String>();
+	    ArrayList<String> groupMembers = new ArrayList<>();
 	    do {
 		String name = rs.getString(1);
 		String groupName = rs.getString(2);

@@ -192,9 +192,8 @@
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null) {
 					    // remove session from mapping
-					    SessionManager.removeSessionByLogin(userDTO.getLogin(), false);
+					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
 					}
-					hs.invalidate();
 				}
 			%>
 			<script type="text/javascript">
