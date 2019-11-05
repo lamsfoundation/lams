@@ -99,7 +99,6 @@ public class SsoHandler implements ServletExtension {
 
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
-
 		/*
 		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
@@ -161,25 +160,20 @@ public class SsoHandler implements ServletExtension {
 
 		// check if user is already logged in
 		HttpSession existingSession = SessionManager.getSessionForLogin(login);
-
+		
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 
 		String oldSessionID = session.getId();
-
+		
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
-
+		
 		// session ID was changed after log in
 		SessionManager.updateSessionID(oldSessionID);
 
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
-
-		    // if user is already logged in on another browser, log him out
-		    if (existingSession != null) {
-			SessionManager.removeSessionByID(existingSession.getId(), true, false);
-		    }
 
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts != null && failedAttempts > 0 && password != null
