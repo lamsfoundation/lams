@@ -303,7 +303,7 @@
 				<i class="fa fa-plus"></i> 
 				<span><fmt:message key="authoring.fla.page.menu.new" /></span>
 			</button>
-			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="newDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>

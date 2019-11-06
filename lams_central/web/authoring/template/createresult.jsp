@@ -25,9 +25,9 @@
 	
 	<lams:Page type="admin" title="${title}">
 
-		<fmt:message key="authoring.template.successful"><fmt:param>${param.learningDesigntitle}</fmt:param></fmt:message>
+		<span id="resultMessage"><fmt:message key="authoring.template.successful"><fmt:param>${param.learningDesigntitle}</fmt:param></fmt:message></span>
 		<div class="voffset10">
-			 <a href="javascript:;" onclick="closeWindow();" class="btn btn-primary pull-right"><fmt:message key="button.close" /></a>
+			 <a href="javascript:;" onclick="closeWindow();" class="btn btn-primary pull-right button-close"><fmt:message key="button.close" /></a>
 		</div>
 
 	</lams:Page>

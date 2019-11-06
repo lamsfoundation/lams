@@ -1399,7 +1399,7 @@ ActivityLib = {
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', dialog).attr('src', activity.authorURL).load(function(){
+					$('iframe', dialog).attr('id','iframeForActivity').attr('src', activity.authorURL).load(function(){
 						// override the close function so it works with the dialog, not window
 						this.contentWindow.closeWindow = function(){
 							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
