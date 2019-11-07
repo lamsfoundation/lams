@@ -1574,30 +1574,44 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	}
 	McContent content = session.getMcContent();
 
-	// copy answers only in case leader aware feature is ON
-	if (content.isUseSelectLeaderToolOuput()) {
+	McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
+	// create user if he hasn't accessed this activity yet
+	if (mcUser == null) {
+	    String userName = user.getLogin();
+	    String fullName = user.getFirstName() + " " + user.getLastName();
+	    mcUser = new McQueUsr(userId, userName, fullName, session);
+	    mcUserDAO.saveMcUser(mcUser);
+	}
+	
+	//finalize the latest result, if it's still active
+	if (!mcUser.isResponseFinalised()) {
 
-	    McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
-	    // create user if he hasn't accessed this activity yet
-	    if (mcUser == null) {
-
-		String userName = user.getLogin();
-		String fullName = user.getFirstName() + " " + user.getLastName();
-		mcUser = new McQueUsr(userId, userName, fullName, session);
-		mcUserDAO.saveMcUser(mcUser);
+	    //calculate total learner mark
+	    int learnerMark = 0;
+	    for (McQueContent question : content.getMcQueContents()) {
+		McUsrAttempt attempt = mcUsrAttemptDAO.getUserAttemptByQuestion(userId, question.getUid());
+		learnerMark += attempt == null ? 0 : attempt.getMark();
 	    }
 
-	    McQueUsr groupLeader = session.getGroupLeader();
-
-	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isResponseFinalised()) {
-
-		// we need to make sure specified user has the same scratches as a leader
-		copyAnswersFromLeader(mcUser, groupLeader);
-	    }
-
+	    Integer numberOfAttempts = mcUser.getNumberOfAttempts() + 1;
+	    mcUser.setNumberOfAttempts(numberOfAttempts);
+	    mcUser.setLastAttemptTotalMark(learnerMark);
+	    mcUser.setResponseFinalised(true);
+	    updateMcQueUsr(mcUser);
 	}
 
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	McQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(mcUser, toolSessionId);
+	if (session.isUserGroupLeader(mcUser)) {
+	    session.getMcQueUsers().forEach(sessionUser -> {
+		//finish non-leader
+		sessionUser.setResponseFinalised(true);
+		updateMcQueUsr(sessionUser);
+
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, groupLeader);
+	    });
+	}
     }
 
     @Override
@@ -1909,7 +1923,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
      *
      * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 

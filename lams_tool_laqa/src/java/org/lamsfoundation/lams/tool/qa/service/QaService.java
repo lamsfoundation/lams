@@ -149,7 +149,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new QaQueUsr(leaderUserId, userName, fullName, qaSession, new TreeSet());
+		    leader = new QaQueUsr(leaderUserId, userName, fullName, qaSession, new TreeSet<>());
 		    qaQueUsrDAO.createUsr(user);
 		}
 
@@ -177,21 +177,21 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    if (response == null) {
 		response = new QaUsrResp(leaderResponse.getAnswer(), leaderResponse.getAnswerAutosaved(),
 			leaderResponse.getAttemptTime(), "", question, user, true);
-		createUserResponse(response);
+		qaUsrRespDAO.createUserResponse(response);
 
 		// if it's been changed by the leader
 	    } else if (leaderResponse.getAttemptTime().compareTo(response.getAttemptTime()) != 0) {
 		response.setAnswer(leaderResponse.getAnswer());
 		response.setAttemptTime(leaderResponse.getAttemptTime());
 		response.setTimezone("");
-		updateUserResponse(response);
+		qaUsrRespDAO.updateUserResponse(response);
 	    }
 	}
     }
 
     @Override
     public void setDefineLater(String strToolContentID, boolean value) {
-	QaContent qaContent = getQaContent(new Long(strToolContentID).longValue());
+	QaContent qaContent = getQaContent(Long.parseLong(strToolContentID));
 
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
@@ -321,7 +321,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    response = isAutosave
 		    ? new QaUsrResp(null, newAnswer, new Date(System.currentTimeMillis()), "", question, user, true)
 		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);
-	    createUserResponse(response);
+	    qaUsrRespDAO.createUserResponse(response);
 
 	    // if answer has changed
 	} else if (!newAnswer.equals(response.getAnswer())) {
@@ -334,13 +334,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	    response.setAttemptTime(new Date(System.currentTimeMillis()));
 	    response.setTimezone("");
-	    updateUserResponse(response);
+	    qaUsrRespDAO.updateUserResponse(response);
 	}
-    }
-
-    @Override
-    public void createUserResponse(QaUsrResp qaUsrResp) {
-	qaUsrRespDAO.createUserResponse(qaUsrResp);
     }
 
     @Override
@@ -746,7 +741,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException {
-
 	if (toolSessionId == null) {
 	    logger.error("toolSessionId is null");
 	    throw new ToolException("toolSessionId is missing");
@@ -761,7 +755,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	if (qaSession == null) {
 	    try {
 		qaSession = new QaSession(toolSessionId, new Date(System.currentTimeMillis()), QaSession.INCOMPLETE,
-			toolSessionName, qaContent, new TreeSet());
+			toolSessionName, qaContent, new TreeSet<>());
 		qaSessionDAO.createSession(qaSession);
 	    } catch (Exception e) {
 		logger.error("Error creating new toolsession in the db");
@@ -800,7 +794,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-
 	if (toolSessionId == null) {
 	    logger.error("toolSessionId is null");
 	    throw new DataMissingException("toolSessionId is missing");
@@ -822,7 +815,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	} catch (DataAccessException e) {
 	    throw new ToolException("Exception occured when user is leaving tool session: " + e);
 	}
-
     }
 
     @Override
@@ -917,30 +909,45 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	}
 	QaContent content = session.getQaContent();
 
-	// copy answers only in case leader aware feature is ON
-	if (content.isUseSelectLeaderToolOuput()) {
-
-	    QaQueUsr qaUser = getUserByIdAndSession(userId, toolSessionId);
-	    // create user if he hasn't accessed this activity yet
-	    if (qaUser == null) {
-
-		String userName = user.getLogin();
-		String fullName = user.getFirstName() + " " + user.getLastName();
-		qaUser = new QaQueUsr(userId, userName, fullName, session, new TreeSet());
-		qaQueUsrDAO.createUsr(qaUser);
-	    }
-
-	    QaQueUsr groupLeader = session.getGroupLeader();
-
-	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isResponseFinalized()) {
-
-		// we need to make sure specified user has the same scratches as a leader
-		copyAnswersFromLeader(qaUser, groupLeader);
-	    }
-
+	QaQueUsr qaUser = getUserByIdAndSession(userId, toolSessionId);
+	// create user if he hasn't accessed this activity yet
+	if (qaUser == null) {
+	    String userName = user.getLogin();
+	    String fullName = user.getFirstName() + " " + user.getLastName();
+	    qaUser = new QaQueUsr(userId, userName, fullName, session, new TreeSet<>());
+	    qaQueUsrDAO.createUsr(qaUser);
 	}
+	
+	//finalize the latest result, if it's still active
+	content.getQaQueContents().forEach(question -> {
+	    
+	    QaUsrResp response = getResponseByUserAndQuestion(userId, question.getUid());
+	    if (response != null && response.getAnswer() == null && response.getAnswerAutosaved() != null) {
+		response.setAnswer(response.getAnswerAutosaved());
+		response.setAnswerAutosaved(null);
+		qaUsrRespDAO.updateUserResponse(response);
+	    }
+	});
 
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(qaUser, toolSessionId);
+	if (isUserGroupLeader(qaUser, toolSessionId)) {
+	    session.getQaQueUsers().forEach(sessionUser -> {
+		//finish users
+		sessionUser.setResponseFinalized(true);
+		sessionUser.setLearnerFinished(true);
+		updateUser(sessionUser);
+
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, groupLeader);
+	    });
+	    
+	} else {
+	    //finish user
+	    qaUser.setResponseFinalized(true);
+	    qaUser.setLearnerFinished(true);
+	    updateUser(qaUser);
+	}
     }
 
     @Override
@@ -1174,6 +1181,32 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
 	}
     }
+    
+    @Override
+    public String finishToolSession(Long toolSessionID, Long userID) {
+	QaQueUsr user = getUserByIdAndSession(userID, toolSessionID);
+	user.setLearnerFinished(true);
+	updateUser(user);
+	
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	QaSession session = user.getQaSession();
+	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
+	if (isUserGroupLeader(user, toolSessionID)) {
+	    session.getQaQueUsers().forEach(sessionUser -> {
+		//finish users
+		sessionUser.setResponseFinalized(true);
+		sessionUser.setLearnerFinished(true);
+		updateUser(user);
+		
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, groupLeader);
+	    });
+	}
+
+	//return nextActivityUrl
+	return leaveToolSession(toolSessionID, userID);
+    }
+    
     // ****************** REST methods *************************
 
     /**

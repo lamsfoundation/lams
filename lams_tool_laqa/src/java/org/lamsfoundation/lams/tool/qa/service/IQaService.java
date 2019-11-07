@@ -126,8 +126,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     void removeQuestion(QaQueContent qaQuestion);
 
-    void createUserResponse(QaUsrResp qaUsrResp);
-
     void updateUserResponse(QaUsrResp resp);
 
     QaUsrResp getResponseById(Long responseId);
@@ -218,6 +216,8 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    
+    String finishToolSession(Long toolSessionID, Long userID);
 
     /**
      * Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer, so the log entry

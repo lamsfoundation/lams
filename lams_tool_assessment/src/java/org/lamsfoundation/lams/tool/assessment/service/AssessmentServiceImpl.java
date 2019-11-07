@@ -208,7 +208,6 @@ public class AssessmentServiceImpl
 
     @Override
     public void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader) {
-
 	if ((user == null) || (leader == null) || user.getUid().equals(leader.getUid())) {
 	    return;
 	}
@@ -216,16 +215,18 @@ public class AssessmentServiceImpl
 
 	AssessmentResult leaderResult = assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid,
 		leader.getUserId());
-	AssessmentResult userResult = assessmentResultDao.getLastAssessmentResult(assessmentUid, user.getUserId());
+	if (leaderResult == null) {
+	    return;
+	}
 	Set<AssessmentQuestionResult> leaderQuestionResults = leaderResult.getQuestionResults();
-	Long toolSessionId = leaderResult.getSessionId();
 
 	// if response doesn't exist create new empty objects which we populate on the next step
+	AssessmentResult userResult = assessmentResultDao.getLastAssessmentResult(assessmentUid, user.getUserId());
 	if (userResult == null) {
 	    userResult = new AssessmentResult();
 	    userResult.setAssessment(leaderResult.getAssessment());
 	    userResult.setUser(user);
-	    userResult.setSessionId(toolSessionId);
+	    userResult.setSessionId(leaderResult.getSessionId());
 
 	    Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
 	    for (AssessmentQuestionResult leaderQuestionResult : leaderQuestionResults) {
@@ -631,35 +632,37 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
+	// store finished date only on user hitting submit all answers button (and not submit mark hedging
 	// question)
-	if (!isAutosave) {
-	    int maximumGrade = 0;
-	    float grade = 0;
+	int maximumGrade = 0;
+	float grade = 0;
 
-	    //sum up user grade and max grade for all questions
-	    for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
-		for (QuestionDTO questionDto : questionsForOnePage) {
-		    // get questionResult from DB instance of AssessmentResult
-		    AssessmentQuestionResult questionResult = null;
-		    for (AssessmentQuestionResult questionResultIter : result.getQuestionResults()) {
-			if (questionDto.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
-			    questionResult = questionResultIter;
-			}
+	//sum up user grade and max grade for all questions
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
+	    for (QuestionDTO questionDto : questionsForOnePage) {
+		// get questionResult from DB instance of AssessmentResult
+		AssessmentQuestionResult questionResult = null;
+		for (AssessmentQuestionResult questionResultIter : result.getQuestionResults()) {
+		    if (questionDto.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
+			questionResult = questionResultIter;
 		    }
-		    calculateAnswerMark(assessment.getUid(), userId, questionResult, questionDto);
-		    questionResult.setFinishDate(new Date());
-		    
-		    grade += questionResult.getMark();
-		    maximumGrade += questionDto.getGrade();
 		}
+		calculateAnswerMark(assessment.getUid(), userId, questionResult, questionDto);
+		if (!isAutosave) {
+		    questionResult.setFinishDate(new Date());
+		}
+
+		grade += questionResult.getMark();
+		maximumGrade += questionDto.getGrade();
 	    }
-	    
-	    result.setMaximumGrade(maximumGrade);
-	    result.setGrade(grade);
-	    result.setFinishDate(new Timestamp(new Date().getTime()));
-	    assessmentResultDao.update(result);
 	}
+
+	result.setMaximumGrade(maximumGrade);
+	result.setGrade(grade);
+	if (!isAutosave) {
+	    result.setFinishDate(new Timestamp(new Date().getTime()));
+	}
+	assessmentResultDao.update(result);
 
 	return true;
     }
@@ -1148,9 +1151,24 @@ public class AssessmentServiceImpl
 
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
+	//mark user as finished
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
 	assessmentUserDao.saveObject(user);
+
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	AssessmentSession session = user.getSession();
+	Assessment assessment = session.getAssessment();
+	if (assessment.isUseSelectLeaderToolOuput() && isUserGroupLeader(user, toolSessionId)) {
+	    session.getAssessmentUsers().forEach(sessionUser -> {
+		//finish non-leader
+		sessionUser.setSessionFinished(true);
+		assessmentUserDao.saveObject(user);
+		
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, session.getGroupLeader());
+	    });
+	}
 
 	String nextUrl = null;
 	try {
@@ -2822,28 +2840,41 @@ public class AssessmentServiceImpl
 	    return;
 	}
 	Assessment assessment = session.getAssessment();
-
-	// copy answers only in case leader aware feature is ON
-	if (assessment.isUseSelectLeaderToolOuput()) {
-
-	    AssessmentUser assessmentUser = getUserByIDAndSession(userId, toolSessionId);
-	    // create user if he hasn't accessed this activity yet
-	    if (assessmentUser == null) {
-		assessmentUser = new AssessmentUser(user.getUserDTO(), session);
-		createUser(assessmentUser);
-	    }
-
-	    AssessmentUser groupLeader = session.getGroupLeader();
-
-	    // check if leader has submitted answers
-	    if ((groupLeader != null) && isLastAttemptFinishedByUser(groupLeader)) {
-
-		// we need to make sure specified user has the same scratches as a leader
-		copyAnswersFromLeader(assessmentUser, groupLeader);
-	    }
-
+	
+	AssessmentUser assessmentUser = getUserByIDAndSession(userId, toolSessionId);
+	// create user if he hasn't accessed this activity yet
+	if (assessmentUser == null) {
+	    assessmentUser = new AssessmentUser(user.getUserDTO(), session);
+	    createUser(assessmentUser);
+	    
+	    setAttemptStarted(assessment, assessmentUser, toolSessionId);
+	}
+	
+	//finalize the latest result, if it's still active
+	AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessment.getUid(), userId);
+	if (lastAssessmentResult != null && lastAssessmentResult.getFinishDate() == null) {
+	    lastAssessmentResult.setFinishDate(new Date());
+	    lastAssessmentResult.getQuestionResults()
+		    .forEach(questionResult -> questionResult.setFinishDate(new Date()));
+	    assessmentResultDao.update(lastAssessmentResult);
 	}
 
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	AssessmentUser groupLeader = checkLeaderSelectToolForSessionLeader(assessmentUser, toolSessionId);
+	if (isUserGroupLeader(assessmentUser, toolSessionId)) {
+	    session.getAssessmentUsers().forEach(sessionUser -> {
+		//finish non-leader
+		sessionUser.setSessionFinished(true);
+		assessmentUserDao.saveObject(user);
+
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, groupLeader);
+	    });
+	    
+	} else {
+	    assessmentUser.setSessionFinished(true);
+	    assessmentUserDao.saveObject(user);
+	}
     }
 
     @Override
