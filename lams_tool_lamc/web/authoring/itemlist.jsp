@@ -11,11 +11,11 @@
 		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
 		<div class="btn-group btn-group-xs pull-right">
 			<c:if test="${!isAuthoringRestricted}">
-				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
+				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" id="importQTI">
 					<fmt:message key="label.authoring.import.qti" />
 				</a>
 			</c:if>
-			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default" id="exportQTI">
 				<fmt:message key="label.authoring.export.qti" />
 			</a>
 		</div>

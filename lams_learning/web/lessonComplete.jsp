@@ -164,7 +164,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<lams:Page type="learner">
 		
-		<div class="lead"><i class="fa fa-lg fa-check-square-o text-success"></i>&nbsp;
+		<div class="lead" id="lessonFinished"><i class="fa fa-lg fa-check-square-o text-success"></i>&nbsp;
 			<fmt:message key="message.lesson.finished">
 				<fmt:param>
 					<strong><c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/></strong>

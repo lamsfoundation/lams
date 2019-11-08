@@ -242,7 +242,7 @@
 			</div>
 			</div>
 			
-			<a href="#" onclick="javascript:createPeerReviewCriteria();" class="btn btn-default voffset10"><fmt:message key="authoring.create.criteria"/></a>
+			<a id="createCriteria" href="#" onclick="javascript:createPeerReviewCriteria();" class="btn btn-default voffset10"><fmt:message key="authoring.create.criteria"/></a>
 	    </div>
 	    </c:if>
 	    
