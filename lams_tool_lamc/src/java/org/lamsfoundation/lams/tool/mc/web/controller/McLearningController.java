@@ -592,7 +592,7 @@ public class McLearningController {
 	}
 	mcGeneralLearnerFlowDTO.setMapFeedbackContent(mapFeedbackContent);
 
-	McQueUsr user = getCurrentUser(toolSessionID);
+	McQueUsr user = getSpecifiedUser(toolSessionID, mcLearningForm.getUserID().intValue());
 
 	Long toolContentUID = mcContent.getUid();
 

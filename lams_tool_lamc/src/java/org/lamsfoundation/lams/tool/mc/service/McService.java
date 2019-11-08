@@ -1589,7 +1589,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    //calculate total learner mark
 	    int learnerMark = 0;
 	    for (McQueContent question : content.getMcQueContents()) {
-		McUsrAttempt attempt = mcUsrAttemptDAO.getUserAttemptByQuestion(userId, question.getUid());
+		McUsrAttempt attempt = mcUsrAttemptDAO.getUserAttemptByQuestion(mcUser.getUid(), question.getUid());
 		learnerMark += attempt == null ? 0 : attempt.getMark();
 	    }
 
