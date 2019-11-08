@@ -21,6 +21,21 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.imsglobal.lti.XMLMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
@@ -31,18 +46,6 @@ import net.oauth.signature.OAuthSignatureMethod;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthException;
 import oauth.signpost.http.HttpParameters;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.imsglobal.lti.XMLMap;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class IMSPOXRequest {
 
@@ -551,7 +554,11 @@ public class IMSPOXRequest {
 
 	public static void sendReplaceResult(String url, String key, String secret, String sourcedid, String score, String resultData, Boolean isUrl) throws IOException, OAuthException, GeneralSecurityException {
 		HttpPost request = buildReplaceResult(url, key, secret, sourcedid, score, resultData, isUrl);
-		DefaultHttpClient client = new DefaultHttpClient();
+		//*LAMS* replaced DefaultHttpClient with HttpClient
+		HttpClient client = HttpClients.custom()
+		        .setDefaultRequestConfig(RequestConfig.custom()
+		            .setCookieSpec(CookieSpecs.STANDARD).build())
+		        .build(); // DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = client.execute(request);
 		if (response.getStatusLine().getStatusCode() >= 400) {
 			throw new HttpResponseException(response.getStatusLine().getStatusCode(),

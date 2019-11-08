@@ -146,16 +146,14 @@
 			</div>
 		</div>
 	</div>
-		<!--closes content-->
+	<!--closes content-->
 
-		<!-- starts footer -->
-		<div class="login-footer">
-			  <p class="text-muted text-center">
-					<fmt:message key="msg.LAMS.version" />:  <%=Configuration.get(ConfigurationKeys.VERSION)%>
-					<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
-				</p>
-		</div>
-		<!--closes footer-->
+	<div class="login-footer">
+		<p class="text-muted text-center">
+			<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
+		</p>
+	</div>
+
 		<!--closes page-->
 		</div> <!--  close login-content -->
 		</body>
@@ -180,7 +178,6 @@
 					</h4>
 				</div>
 
-
 				<form style="display: none" method="POST" action="j_security_check">
 					<input type="hidden" name="j_username" value="${login}" /> <input type="hidden" name="j_password"
 						value="${password}" /> <input type="hidden" name="redirectURL"
@@ -195,9 +192,8 @@
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null) {
 					    // remove session from mapping
-					    SessionManager.removeSessionByLogin(userDTO.getLogin(), false);
+					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
 					}
-					hs.invalidate();
 				}
 			%>
 			<script type="text/javascript">

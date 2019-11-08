@@ -95,7 +95,7 @@ public class SecurityService implements ISecurityService {
 	if (!hasSysadminRole && !(hasOrgRole && securityDAO.isLessonLearner(lessonId, userId))) {
 	    String error = "User " + userId + " is not learner in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
+	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -156,7 +156,7 @@ public class SecurityService implements ISecurityService {
 	if (!hasGroupManagerRole && !(hasMonitorRole && securityDAO.isLessonMonitor(lessonId, userId, true))) {
 	    String error = "User " + userId + " is not monitor in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
+	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -208,7 +208,7 @@ public class SecurityService implements ISecurityService {
 
 	if (!lesson.getUser().getUserId().equals(userId)) {
 	    String error = "User " + userId + " is not owner of lesson " + lessonId + " and can not \"" + action + "\"";
-	    SecurityService.log.error(error);
+	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -270,7 +270,7 @@ public class SecurityService implements ISecurityService {
 		|| securityDAO.isLessonMonitor(lessonId, userId, true)))) {
 	    String error = "User " + userId + " is not participant in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.error(error);
+	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -293,7 +293,7 @@ public class SecurityService implements ISecurityService {
 
 	if (!securityDAO.isSysadmin(userId)) {
 	    String error = "User " + userId + " is not sysadmin and can not \"" + action + "\"";
-	    SecurityService.log.error(error);
+	    SecurityService.log.debug(error);
 	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	    if (escalate) {
 		throw new SecurityException(error);
@@ -359,7 +359,7 @@ public class SecurityService implements ISecurityService {
 
 	String error = "User " + userId + " does not have any of " + Arrays.toString(roles) + " roles in organisation "
 		+ orgId + " and can not \"" + action + "\"";
-	SecurityService.log.error(error);
+	SecurityService.log.debug(error);
 	logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, null, null, error);
 	if (escalate) {
 	    throw new SecurityException(error);

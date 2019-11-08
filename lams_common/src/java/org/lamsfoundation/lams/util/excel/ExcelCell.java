@@ -21,7 +21,7 @@
  */
 
 
-package org.lamsfoundation.lams.util;
+package org.lamsfoundation.lams.util.excel;
 
 import org.apache.poi.ss.usermodel.IndexedColors;
 
@@ -40,14 +40,23 @@ public class ExcelCell {
     public final static int ALIGN_CENTER = 3;
     public final static int ALIGN_RIGHT = 4;
     
+    public final static int CELL_FORMAT_DEFAULT = 0;
+    public final static int CELL_FORMAT_DATE = 1;
+    public final static int CELL_FORMAT_TIME = 2;
+    public final static int CELL_FORMAT_PERCENTAGE = 3;
+    
     private Object cellValue;
-    private Boolean isBold;
-    private Boolean isPercentage = false;
+    private int dataFormat = ExcelCell.CELL_FORMAT_DEFAULT;//default format is 0
+    private Boolean isBold = false;
     private IndexedColors color;
     private int borderStyle = 0;
     private int alignment = 0;
 
     public ExcelCell() {
+    }
+    
+    public ExcelCell(Object cellValue) {
+	this.cellValue = cellValue;
     }
 
     public ExcelCell(Object cellValue, Boolean isBold) {
@@ -80,6 +89,14 @@ public class ExcelCell {
     public void setCellValue(Object cellValue) {
 	this.cellValue = cellValue;
     }
+    
+    public int getDataFormat() {
+	return dataFormat;
+    }
+
+    public void setDataFormat(int cellFormat) {
+	this.dataFormat = cellFormat;
+    }
 
     public Boolean isBold() {
 	return isBold;
@@ -88,15 +105,6 @@ public class ExcelCell {
     public void setIsBold(Boolean isBold) {
 	this.isBold = isBold;
     }
-
-    public Boolean isPercentage() {
- 	return isPercentage;
-     }
-
-     public ExcelCell setIsPercentage(Boolean isPercentage) {
- 	this.isPercentage = isPercentage;
- 	return this;
-     }
 
      public IndexedColors getColor() {
 	return color;

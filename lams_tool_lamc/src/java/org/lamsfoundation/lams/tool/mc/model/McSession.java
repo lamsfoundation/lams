@@ -25,7 +25,9 @@ package org.lamsfoundation.lams.tool.mc.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -83,7 +85,7 @@ public class McSession implements Serializable, Comparable<McSession> {
     private org.lamsfoundation.lams.tool.mc.model.McContent mcContent;
 
     @OneToMany(mappedBy = "mcSession", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<McQueUsr> mcQueUsers;
+    private Set<McQueUsr> mcQueUsers = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "mc_group_leader_uid")
@@ -91,43 +93,43 @@ public class McSession implements Serializable, Comparable<McSession> {
 
     /** full constructor */
     public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus,
-	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, List<McQueUsr> mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStatus = sessionStatus;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new ArrayList<>();
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<>();
     }
 
     public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, String session_name,
-	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, List<McQueUsr> mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionStatus = sessionStatus;
 	this.session_name = session_name;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new ArrayList<>();
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<>();
     }
 
     public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus,
-	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, List<McQueUsr> mcQueUsers) {
+	    org.lamsfoundation.lams.tool.mc.model.McContent mcContent, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionStatus = sessionStatus;
 	this.mcContent = mcContent;
-	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new ArrayList<>();
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<>();
     }
 
     /** default constructor */
     public McSession() {
-	this.mcQueUsers = new ArrayList<>();
+	this.mcQueUsers = new HashSet<>();
     }
 
     /** minimal constructor */
-    public McSession(Long mcSessionId, List<McQueUsr> mcQueUsers) {
+    public McSession(Long mcSessionId, Set<McQueUsr> mcQueUsers) {
 	this.mcSessionId = mcSessionId;
-	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new ArrayList<>();
+	this.mcQueUsers = mcQueUsers != null ? mcQueUsers : new HashSet<>();
     }
 
     public Long getUid() {
@@ -208,7 +210,7 @@ public class McSession implements Serializable, Comparable<McSession> {
      * @return Returns the mcQueUsers.
      */
 
-    public List<McQueUsr> getMcQueUsers() {
+    public Set<McQueUsr> getMcQueUsers() {
 	return this.mcQueUsers;
     }
 
@@ -216,7 +218,7 @@ public class McSession implements Serializable, Comparable<McSession> {
      * @param mcQueUsers
      *            The mcQueUsers to set.
      */
-    public void setMcQueUsers(List<McQueUsr> mcQueUsers) {
+    public void setMcQueUsers(Set<McQueUsr> mcQueUsers) {
 	this.mcQueUsers = mcQueUsers;
     }
 

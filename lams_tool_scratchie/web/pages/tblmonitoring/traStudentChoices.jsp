@@ -105,11 +105,15 @@
 						<fmt:message key="label.correct.answer"/>
 					</b>
 				</th>
-				<c:forEach begin="1" end="${fn:length(correctOptions) - 1}" var="i">
-					<td class="text-center">
-						${correctOptions[i].cellValue}
-					</td>
+				
+				<c:forEach var="correctAnswerCell"  items="${correctOptions}" varStatus="status">
+					<c:if test="${!status.first}">
+						<td class="text-center">
+							${correctAnswerCell.cellValue}
+						</td>
+					</c:if>
 				</c:forEach>
+				
 				<td class="text-center"></td>
 				<td class="text-center"></td>
 			</tr>

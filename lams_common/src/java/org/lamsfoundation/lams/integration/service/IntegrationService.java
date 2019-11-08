@@ -42,7 +42,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.imsglobal.lti.BasicLTIConstants;
+import org.imsglobal.lti.launch.LtiOauthSigner;
+import org.imsglobal.lti.launch.LtiSigner;
+import org.imsglobal.lti.launch.LtiSigningException;
 import org.imsglobal.pox.IMSPOXRequest;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -56,7 +67,8 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
+import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
@@ -78,10 +90,10 @@ import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import oauth.signpost.exception.OAuthException;
-
 /**
  * <p>
  * <a href="IntegrationService.java.html"><i>View Source</i><a>
@@ -231,10 +243,10 @@ public class IntegrationService implements IIntegrationService {
 	}
 	
 	Integer[] roles;
-	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)) {
+	if (StringUtils.equals(method, IntegrationConstants.METHOD_AUTHOR)) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
 	    
-	} else if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+	} else if (StringUtils.equals(method, IntegrationConstants.METHOD_MONITOR)) {
 	    roles = new Integer[] { Role.ROLE_MONITOR };
 	    
 	} else {
@@ -606,18 +618,18 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void createExtServerLessonMap(Long lessonId, ExtServer extServer) {
-	createExtServerLessonMap(lessonId, null, extServer);
-	;
+    public ExtServerLessonMap createExtServerLessonMap(Long lessonId, ExtServer extServer) {
+	return createExtServerLessonMap(lessonId, null, extServer);
     }
 
     @Override
-    public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
+    public ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
 	map.setLessonId(lessonId);
 	map.setResourceLinkId(resourceLinkId);
 	map.setExtServer(extServer);
 	service.save(map);
+	return map;
     }
 
     @Override
@@ -827,7 +839,7 @@ public class IntegrationService implements IIntegrationService {
 		    Integer userId = extUserUseridMap.getUser().getUserId();
 
 		    //add user to organisation if it's not there
-		    updateUserRoles(user, organisation, LoginRequestDispatcher.METHOD_LEARNER);
+		    updateUserRoles(user, organisation, IntegrationConstants.METHOD_LEARNER);
 
 		    //check if user belong to the lesson. and if not - add it
 		    if (!lesson.getLessonClass().getLearnersGroup().hasLearner(user)) {
@@ -856,6 +868,62 @@ public class IntegrationService implements IIntegrationService {
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 	return list == null || list.isEmpty() ? null : list.get(0);
+    }
+    
+    @Override
+    public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
+	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException {
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId + "'.");
+	}
+
+	ExtUserUseridMap userMap = null;
+	if ((firstName == null) && (lastName == null)) {
+	    userMap = getExtUserUseridMap(extServer, username);
+	} else {
+	    final boolean usePrefix = true;
+	    final boolean isUpdateUserDetails = false;
+	    userMap = getImplicitExtUserUseridMap(extServer, username, firstName, lastName, langIsoCode, countryIsoCode,
+		    email, usePrefix, isUpdateUserDetails);
+	}
+
+	// adds user to group
+	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
+	//TODO when merging to newer branch, check and maybe change to the following
+//		getExtCourseClassMap(extServer, userMap, courseId, countryIsoCode, langIsoCode, null,
+//		method);
+
+	return userMap;
+    }
+    
+    @Override
+    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId, String username,
+	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException {
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
+	}
+	
+	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email, extCourseId,
+		countryIsoCode, langIsoCode);
+
+	User user = userMap.getUser();
+	if (user == null) {
+	    String error = "Unable to add user to lesson class as user is missing from the user map";
+	    log.error(error);
+	    throw new UserInfoFetchException(error);
+	}
+
+	if (IntegrationConstants.METHOD_LEARNER.equals(method)) {
+	    lessonService.addLearner(lesssonId, user.getUserId());
+	} else if (IntegrationConstants.METHOD_MONITOR.equals(method)) {
+	    lessonService.addStaffMember(lesssonId, user.getUserId());
+	}
+
+	return userMap;
     }
 
     @Override
@@ -898,7 +966,108 @@ public class IntegrationService implements IIntegrationService {
 	    return (ExtCourseClassMap) list.get(0);
 	}
     }
-    
+
+    @Override
+    public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException {
+	
+	String membershipUrl = extServer.getMembershipUrl();
+	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users 
+	if (StringUtils.isBlank(membershipUrl)) {
+	    return;
+	}
+
+	membershipUrl += membershipUrl.contains("?") ? "&" : "?";
+	membershipUrl += "rlid=" + resourceLinkId;
+    	
+        log.debug("Make a call to remote membershipUrl:" + membershipUrl);
+        HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
+        ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
+
+	LtiSigner ltiSigner = new LtiOauthSigner();
+	try {
+	    HttpRequest httpRequest = ltiSigner.sign(ltiServiceGetRequest, extServer.getServerid(),
+	    	extServer.getServerkey());
+	} catch (LtiSigningException e) {
+	    throw new RuntimeException(e);
+	}
+
+	DefaultHttpClient client = new DefaultHttpClient();
+	HttpResponse response = client.execute(ltiServiceGetRequest);
+	if (response.getStatusLine().getStatusCode() >= 400) {
+	    throw new HttpResponseException(response.getStatusLine().getStatusCode(),
+		    response.getStatusLine().getReasonPhrase());
+	}
+	
+	String responseString = EntityUtils.toString(response.getEntity());
+	log.debug("membershipUrl responded with the following message: " + responseString);
+	JsonNode json = new ObjectMapper().readTree(responseString);
+	
+	//no users provided by membership service
+        if (json == null) {
+            return;
+        }
+            
+        //process users provided by membership service
+	JsonNode memberships = json.get("pageOf").get("membershipSubject").get("membership");
+	for (int i = 0; i < memberships.size(); i++) {
+	    JsonNode membership = memberships.get(i);
+	    log.debug("membership" + i + ": " + membership.toString());
+
+	    JsonNode member = membership.get("member");
+	    String extUserId = member.get("userId").asText();
+	    //to address Moodle version 3.7.1 bug
+	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
+		    : member.get("givenName").asText();
+	    String lastName = member.get("familyName").asText();
+//	    String fullName = member.get("name").asText();
+	    String email = member.get("email").asText();
+	    // Set the user country and lang
+	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
+	    String countryIsoCode = defaultLangCountry[1];
+	    String langIsoCode = defaultLangCountry[0];
+
+	    // check user roles and add user to the lesson
+	    JsonNode jsonRoles = membership.get("role");
+	    log.debug("membership" + i + " roles: " + jsonRoles.toString());
+	    String roles = new String();
+	    for (int j = 0; j < jsonRoles.size(); j++) {
+		String role = jsonRoles.get(j).asText();
+		roles += role + ",";
+	    }
+	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
+		    ? IntegrationConstants.METHOD_MONITOR
+		    : IntegrationConstants.METHOD_LEARNER;
+	    
+	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
+	    ExtUserUseridMap extUser = lessonId == null
+		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
+			    countryIsoCode, langIsoCode)
+		    : addExtUserToCourseAndLesson(extServer, method, lessonId, extUserId, firstName, lastName, email,
+			    courseId, countryIsoCode, langIsoCode);
+
+	    // If a result sourcedid is provided, save it to the user object
+	    JsonNode messages = membership.get("message");
+	    if (messages != null && messages.size() > 0) {
+		for (int k = 0; k < messages.size(); k++) {
+		    JsonNode message = messages.get(k);
+		    String messageType = message.get("message_type").asText();
+		    String tcGradebookId = message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID) == null ? ""
+			    : message.get(BasicLTIConstants.LIS_RESULT_SOURCEDID).asText();
+
+		    if (StringUtils.isNotBlank(messageType) && "basic-lti-launch-request".equals(messageType)) {
+			if (StringUtils.isNotBlank(tcGradebookId)) {
+			    log.debug("Storing user's tcGradebookId:" + tcGradebookId);
+			    extUser.setTcGradebookId(tcGradebookId);
+			    service.save(extUser);
+			}
+			break;
+		    }
+		}
+	    }
+	}
+    }
+   
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------

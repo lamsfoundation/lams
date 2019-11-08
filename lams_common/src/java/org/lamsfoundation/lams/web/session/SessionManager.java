@@ -39,8 +39,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionManager {
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-    // if this attribute is set in session, next call will force the user to log out
-    public static final String LOG_OUT_FLAG = "lamsLogOutFlag";
 
     // singleton
     private static SessionManager sessionManager;
@@ -74,11 +72,6 @@ public class SessionManager {
      */
     public static void startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
-	if (session.getAttribute(LOG_OUT_FLAG) != null) {
-	    // session was flagged for invalidation
-	    session.invalidate();
-	    throw new SecurityException("You were logged out");
-	}
 
 	String sessionId = session.getId();
 	sessionIdMapping.put(sessionId, session);
@@ -91,8 +84,8 @@ public class SessionManager {
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
 		if (session.getCreationTime() > existingSession.getCreationTime()) {
-		    // mark the other session for invalidation
-		    existingSession.setAttribute(LOG_OUT_FLAG, true);
+		    // invalidate the other session
+		    existingSession.invalidate();
 		} else {
 		    // invalidate this session
 		    session.invalidate();
@@ -122,10 +115,12 @@ public class SessionManager {
 	SessionManager.loginMapping.remove(login);
 
 	if (invalidate) {
-	    // only mark for invalidation, not invalidate
-	    // otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
-	    // see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
-	    session.setAttribute(LOG_OUT_FLAG, true);
+	    try {
+		session.invalidate();
+	    } catch (IllegalStateException e) {
+		System.out.println("SessionMananger invalidation exception");
+		// if it was already invalidated, do nothing
+	    }
 	}
     }
 
@@ -136,12 +131,13 @@ public class SessionManager {
 	HttpSession session = SessionManager.getSession(sessionID);
 	if (session != null) {
 	    SessionManager.sessionIdMapping.remove(sessionID);
-
 	    if (invalidate) {
-		// only mark for invalidation, not invalidate
-		// otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
-		// see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
-		session.setAttribute(LOG_OUT_FLAG, true);
+		try {
+		    session.invalidate();
+		} catch (IllegalStateException e) {
+		    System.out.println("SessionMananger invalidation exception");
+		    // if it was already invalidated, do nothing
+		}
 	    }
 	}
 	if (clearLoginMapping) {

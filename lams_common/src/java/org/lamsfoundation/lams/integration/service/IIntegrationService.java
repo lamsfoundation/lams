@@ -23,9 +23,12 @@
 
 package org.lamsfoundation.lams.integration.service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
+import org.imsglobal.lti.launch.LtiSigningException;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServer;
@@ -117,7 +120,7 @@ public interface IIntegrationService {
      * @return
      */
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
-    
+
     ExtServerLessonMap getExtServerLessonMap(Long lessonId);
 
     /**
@@ -187,7 +190,7 @@ public interface IIntegrationService {
      * @param lessonId
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, ExtServer extServer);
+    ExtServerLessonMap createExtServerLessonMap(Long lessonId, ExtServer extServer);
 
     /**
      * Creates new ExtServerLessonMap object. Method is suitable for creating lessons via LTI tool consumers as long as
@@ -198,7 +201,7 @@ public interface IIntegrationService {
      *            resource_link_id parameter sent by LTI tool consumer
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
+    ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
 
     /**
      * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
@@ -223,6 +226,29 @@ public interface IIntegrationService {
     List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
 
     ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
+    
+    /**
+     * Try to get users from ext server using membership service.
+     * 
+     * @param lessonId if supplied, user will be added to the according lesson; and only to the course otherwise
+     */
+    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException;
+    
+    /**
+     * Adds an external user to the course with specified courseId.
+     */
+    ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
+	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException;
+
+    /**
+     * Add an external user to the course with specified courseId and then adds it the the lesson with specified
+     * lessonId. (This method makes internal call to addExtUserToCourse()).
+     */
+    ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lessonId, String username, String firstName,
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Creates an external org and normal org. It does not set roles for the creator.

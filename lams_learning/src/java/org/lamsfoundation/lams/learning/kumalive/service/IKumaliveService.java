@@ -30,7 +30,8 @@ import java.util.List;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
 import org.lamsfoundation.lams.learning.kumalive.model.KumalivePoll;
 import org.lamsfoundation.lams.learning.kumalive.model.KumaliveRubric;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,9 +58,9 @@ public interface IKumaliveService {
 
     ObjectNode getReportUserData(Long kumaliveId, Integer userId);
 
-    LinkedHashMap<String, ExcelCell[][]> exportKumalives(List<Long> kumaliveIds);
+    List<ExcelSheet> exportKumalives(List<Long> kumaliveIds);
 
-    LinkedHashMap<String, ExcelCell[][]> exportKumalives(Integer organisationId);
+    List<ExcelSheet> exportKumalives(Integer organisationId);
 
     KumalivePoll getPollByKumaliveId(Long kumaliveId);
 

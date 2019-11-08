@@ -1408,10 +1408,16 @@ ActivityLib = {
 					PropertyLib.validateConditionMappings(activity);
 				},
 				'open' : function() {
+					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', this).attr('src', activity.authorURL).load(function(){
+					$('iframe', dialog).attr('id','iframeForActivity').attr('src', activity.authorURL).load(function(){
 						// override the close function so it works with the dialog, not window
-						this.contentWindow.closeWindow = ActivityLib.closeActivityAuthoring;
+						this.contentWindow.closeWindow = function(){
+							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
+							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
+								$('iframe', this).attr('src', null);
+							}).modal('hide');
+						}
 					});
 				}
 			}, true);

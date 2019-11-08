@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +43,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -186,6 +188,14 @@ public class AuthoringController {
 	Set<ToolActivity> activitiesProvidingVsaAnswers = scratchieService.getActivitiesProvidingVsaAnswers(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_ACTIVITIES_PROVIDING_VSA_ANSWERS, activitiesProvidingVsaAnswers);
 
+	String notifyCloseURL = request.getParameter("notifyCloseURL");
+	if (StringUtils.isNotBlank(notifyCloseURL)) {
+	    try {
+		request.setAttribute("notifyCloseURL", URLEncoder.encode(notifyCloseURL, "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		throw new ServletException("Exception while encoding notifyCloseURL: " + notifyCloseURL, e);
+	    }
+	}
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
 	return "pages/authoring/start";

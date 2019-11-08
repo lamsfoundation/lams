@@ -64,10 +64,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -81,10 +82,12 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -427,7 +430,8 @@ public class EmailNotificationsController {
      * Exports the given archived email notification to excel.
      */
     @RequestMapping("exportArchivedNotification")
-    public String exportArchivedNotification(HttpServletRequest request, HttpServletResponse response)
+    @ResponseStatus(HttpStatus.OK)
+    public void exportArchivedNotification(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException {
 
 	Long emailNotificationUid = WebUtil.readLongParam(request, "emailNotificationUid");
@@ -442,18 +446,17 @@ public class EmailNotificationsController {
 	    if (!securityService.isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "export archived lesson email notification", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
-		return null;
+		return;
 	    }
 	} else {
 	    if (!securityService.isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "export archived course email notification", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
-		return null;
+		return;
 	    }
 	}
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = monitoringService
-		.exportArchivedEmailNotification(emailNotificationUid);
+	List<ExcelSheet> sheets = monitoringService.exportArchivedEmailNotification(emailNotificationUid);
 	String fileName = "email_notification_"
 		+ FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()) + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -461,10 +464,8 @@ public class EmailNotificationsController {
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 
-	ExcelUtil.createExcel(response.getOutputStream(), dataToExport,
+	ExcelUtil.createExcel(response.getOutputStream(), sheets,
 		monitoringService.getMessageService().getMessage("export.dateheader"), false);
-	return null;
-
     }
 
     /**

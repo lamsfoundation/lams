@@ -386,12 +386,19 @@ function addLesson(){
 	
 	// copy CKEditor contents to textarea for submit
 	$('#introDescription').val(CKEDITOR.instances['introDescription'].getData());
+	
+	//handle multiple lessons feature
+	if ($(".multiple-lessons:checked").length) {
+		//don't send main organisation's id to the server in case other multiple lessons are chosen
+		$("#organisation-id").prop("disabled", true);
+	}
 
 	submitInProgress = true;
 	$('#lessonForm').ajaxSubmit({
 		'success' : function(){
 			window.parent.closeDialog('dialogAddLesson', true);
-	}});
+		}
+	});
 }
 
 function previewLesson(){

@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 
 /** Grouping object, suitable for sending to Authoring */
@@ -54,28 +55,21 @@ public class GroupDTO {
     private String groupName;
     private int orderID;
     //list of org.lamsfoundation.lams.usermanagement.dto.UserDTO
-    private List userList;
+    private List<UserBasicDTO> userList;
     private Integer groupUIID;
+    private boolean userBelongsToGroup = false;
 
     public GroupDTO() {
-
     }
-
-    /**
-     * Get the DTO for this group. Does not include the GroupBranchActivities as they will
-     * be in a separate array for Authoring.
-     *
-     * @param group
-     */
-    @SuppressWarnings("unchecked")
+    
     public GroupDTO(Group group, boolean setupUserList) {
 	groupID = group.getGroupId();
 	groupName = group.getGroupName();
 	orderID = group.getOrderId();
 	groupUIID = group.getGroupUIID();
-	userList = new ArrayList();
+	userList = new ArrayList<>();
 	if (setupUserList && group.getUsers() != null) {
-	    Iterator iter = group.getUsers().iterator();
+	    Iterator<User> iter = group.getUsers().iterator();
 	    while (iter.hasNext()) {
 		userList.add(((User) iter.next()).getUserBasicDTO());
 	    }
@@ -114,11 +108,19 @@ public class GroupDTO {
 	this.groupUIID = groupUIID;
     }
 
-    public List getUserList() {
+    public List<UserBasicDTO> getUserList() {
 	return userList;
     }
 
-    public void setUserList(List userList) {
+    public void setUserList(List<UserBasicDTO> userList) {
 	this.userList = userList;
+    }
+    
+    public boolean isUserBelongsToGroup() {
+	return userBelongsToGroup;
+    }
+
+    public void setUserBelongsToGroup(boolean userBelongsToGroup) {
+	this.userBelongsToGroup = userBelongsToGroup;
     }
 }

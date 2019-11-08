@@ -596,6 +596,7 @@ public class QuestionExporter {
      */
     private void appendMaterialElements(Element materialElem, String text) {
 	int index = 0;
+	text = text.replace("%20", " ");
 	// looks for images stored in LAMS WWW secure folder
 	Matcher imageTagMatcher = QuestionExporter.IMAGE_PATTERN.matcher(text);
 

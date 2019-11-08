@@ -53,6 +53,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.util.CellUtil;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -105,10 +106,10 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -616,7 +617,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
@@ -921,7 +922,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 
 	    for (McQueUsr user : sessionUsers) {
 
@@ -996,7 +997,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException {
-
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
 	for (McQueContent question : questions) {
@@ -1021,6 +1021,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
 	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
 	greenColor.setFont(whiteFont);
+
+	short percentageFormat = wb.createDataFormat().getFormat("0%");
 
 	// ======================================================= Report by questionDescription IRA page
 	// =======================================
@@ -1055,15 +1057,17 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = getAttemptsCountPerOption(option.getUid(), question.getUid());
 		cell = row.createCell(count++);
-		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
-		cell.setCellValue(percentage + "%");
+		int percentage = optionAttemptCount / totalNumberOfUsers;
+		cell.setCellValue(percentage);
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 		totalPercentage += percentage;
 		if (option.isCorrect()) {
 		    cell.setCellStyle(greenColor);
 		}
 	    }
 	    cell = row.createCell(maxOptionsInQuestion + 1);
-	    cell.setCellValue((100 - totalPercentage) + "%");
+	    cell.setCellValue((1 - totalPercentage));
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	rowCount++;
@@ -1155,10 +1159,11 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		cell = row.createCell(count++);
 		cell.setCellValue(new Long(userMark.getTotalMark()));
 
-		int totalPercents = (numberOfCorrectlyAnsweredByUser * 100) / questions.size();
+		int totalPercents = numberOfCorrectlyAnsweredByUser / questions.size();
 		totalPercentList.add(totalPercents);
 		cell = row.createCell(count++);
-		cell.setCellValue(totalPercents + "%");
+		cell.setCellValue(totalPercents);
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	    }
 
 	    rowCount++;
@@ -1171,7 +1176,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	cell.setCellValue(messageService.getMessage("label.ave"));
 	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
 	    cell = row.createCell(count++);
-	    cell.setCellValue(((numberOfCorrectAnswers * 100) / totalPercentList.size()) + "%");
+	    cell.setCellValue(numberOfCorrectAnswers / totalPercentList.size());
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	// class mean
@@ -1187,7 +1193,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (totalPercents.length != 0) {
 	    int classMean = sum / totalPercents.length;
 	    cell = row.createCell(questions.size() + 3);
-	    cell.setCellValue(classMean + "%");
+	    cell.setCellValue(classMean);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	// median
@@ -1203,7 +1210,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		median = (int) ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
 	    }
 	    cell = row.createCell(questions.size() + 3);
-	    cell.setCellValue(median + "%");
+	    cell.setCellValue(median);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	row = sheet.createRow(rowCount++);
@@ -1297,7 +1305,6 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) {
-
 	if (fromContentId == null) {
 	    logger.warn("fromContentId is null.");
 	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
@@ -1515,7 +1522,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
-			McSession.INCOMPLETE, toolSessionName, mcContent, new ArrayList<McQueUsr>());
+			McSession.INCOMPLETE, toolSessionName, mcContent, new HashSet<McQueUsr>());
 
 		mcSessionDAO.saveMcSession(mcSession);
 

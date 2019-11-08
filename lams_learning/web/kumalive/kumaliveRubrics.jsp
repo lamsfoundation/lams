@@ -85,11 +85,10 @@
 			}
 			
 			var data = {
-				'method' : 'saveRubrics',
 				'organisationID' : ${param.organisationID},
 				'rubrics' : JSON.stringify(rubrics)
 			};
-			$.post('<lams:LAMSURL/>learning/kumalive.do', data, function(){
+			$.post('<lams:LAMSURL/>learning/kumalive/saveRubrics.do', data, function(){
 				window.parent.closeDialog('dialogKumaliveRubrics${param.organisationID}');
 			});
 		}
