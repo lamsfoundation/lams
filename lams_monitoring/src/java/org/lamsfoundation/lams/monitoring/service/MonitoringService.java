@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -114,7 +113,6 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -126,6 +124,9 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * <p>
@@ -1306,10 +1307,34 @@ public class MonitoringService implements IMonitoringFullService {
 	} else {
 	    securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
 	}
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
+	Lesson lesson = lessonDAO.getLesson(Long.valueOf(lessonId));
 	User learner = (User) baseDAO.find(User.class, learnerId);
 
 	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+
+	// trigger autosave on current activity so learner's progress is not lost
+	Activity currentActivity = learnerProgress == null ? null : learnerProgress.getCurrentActivity();
+	if (!removeLearnerContent && currentActivity != null) {
+	    ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	    // command websocket on Page.tag understands this message
+	    jsonCommand.put("message", "autosave");
+	    learnerService.createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
+	    // manually trigger sending of messages
+	    boolean sentAnything = learnerService.triggerCommandCheckAndSend();
+
+	    // if the learner does not have lesson window open, probably nothing was sent
+	    if (sentAnything) {
+		try {
+		    // allow autosave to finish
+		    // a primitive, but way more simple solution than synchronous call to websocket and processing reply
+		    Thread.sleep(2000);
+		} catch (InterruptedException e) {
+		    log.warn(
+			    "Monitoring service thread interrupted while giving Command Websocket Server time to send autosave message");
+		}
+	    }
+	}
+
 	Activity stopActivity = null;
 
 	if (activityId != null) {
@@ -1349,7 +1374,6 @@ public class MonitoringService implements IMonitoringFullService {
 	    baseDAO.insert(learnerProgress);
 	}
 
-	Activity currentActivity = learnerProgress.getCurrentActivity();
 	Activity stopPreviousActivity = null;
 	if (stopActivity != null) {
 	    Activity firstActivity = lesson.getLearningDesign().getFirstActivity();
@@ -1926,7 +1950,7 @@ public class MonitoringService implements IMonitoringFullService {
 	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
 		emailNotificationUid);
 
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet sheet = new ExcelSheet(messageService.getMessage("email.notifications.archived.export.sheet.name"));
 	sheets.add(sheet);
 

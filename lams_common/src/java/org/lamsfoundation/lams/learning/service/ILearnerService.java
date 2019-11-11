@@ -36,12 +36,11 @@ import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * All Learner service methods that are available within the core. 
+ * All Learner service methods that are available within the core.
  */
 public interface ILearnerService {
 
@@ -73,7 +72,7 @@ public interface ILearnerService {
      * @throws LamsToolServiceException
      */
     void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress);
-    
+
     /**
      * Marks an tool session as complete and calculates the next activity against the learning design. This method is
      * for tools to redirect the client on complete.
@@ -167,7 +166,7 @@ public interface ILearnerService {
      * will return null.
      */
     Lesson getLessonByActivity(Activity activity);
-    
+
     boolean isKumaliveDisabledForOrganisation(Integer organisationId);
 
     ActivityPositionDTO getActivityPositionByToolSessionId(Long toolSessionId);
@@ -175,4 +174,6 @@ public interface ILearnerService {
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
 
     void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand);
+
+    boolean triggerCommandCheckAndSend();
 }

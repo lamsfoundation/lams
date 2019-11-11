@@ -39,7 +39,7 @@ public class CommandWebsocketServer {
      */
     private static class SendWorker extends Thread {
 	private boolean stopFlag = false;
-	// how ofter the thread runs
+	// how often the thread runs
 	private static final long CHECK_INTERVAL = 5000;
 	// mapping lessonId -> timestamp when the check was last performed, so the thread does not run too often
 	private final Map<Long, Long> lastSendTimes = new TreeMap<>();
@@ -50,31 +50,7 @@ public class CommandWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
-		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets
-			    .entrySet().iterator();
-
-		    Entry<Long, Map<String, Session>> entry = null;
-		    // go through lessons and update registered learners with messages
-		    do {
-			entry = entryIterator.hasNext() ? entryIterator.next() : null;
-			if (entry != null) {
-			    Long lessonId = entry.getKey();
-			    Long lastSendTime = lastSendTimes.get(lessonId);
-			    if ((lastSendTime == null)
-				    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
-				send(lessonId);
-			    }
-
-			    // if all learners left the lesson, remove the obsolete mapping
-			    Map<String, Session> lessonWebsockets = entry.getValue();
-			    if (lessonWebsockets.isEmpty()) {
-				entryIterator.remove();
-				lastSendTimes.remove(lessonId);
-			    }
-			}
-		    } while (entry != null);
-
+		    checkAndSend();
 		    Thread.sleep(SendWorker.CHECK_INTERVAL);
 		} catch (IllegalStateException e) {
 		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
@@ -93,10 +69,41 @@ public class CommandWebsocketServer {
 	    }
 	}
 
+	public boolean checkAndSend() throws IOException {
+	    boolean sentAnything = false;
+
+	    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets.entrySet()
+		    .iterator();
+
+	    Entry<Long, Map<String, Session>> entry = null;
+	    // go through lessons and update registered learners with messages
+	    do {
+		entry = entryIterator.hasNext() ? entryIterator.next() : null;
+		if (entry != null) {
+		    Long lessonId = entry.getKey();
+		    Long lastSendTime = lastSendTimes.get(lessonId);
+		    if ((lastSendTime == null)
+			    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
+			sentAnything |= send(lessonId);
+		    }
+
+		    // if all learners left the lesson, remove the obsolete mapping
+		    Map<String, Session> lessonWebsockets = entry.getValue();
+		    if (lessonWebsockets.isEmpty()) {
+			entryIterator.remove();
+			lastSendTimes.remove(lessonId);
+		    }
+		}
+	    } while (entry != null);
+
+	    return sentAnything;
+	}
+
 	/**
 	 * Feeds opened websockets with commands.
 	 */
-	private void send(Long lessonId) throws IOException {
+	private boolean send(Long lessonId) throws IOException {
+	    boolean sentAnything = false;
 	    Long lastSendTime = lastSendTimes.get(lessonId);
 	    if (lastSendTime == null) {
 		lastSendTime = System.currentTimeMillis() - CHECK_INTERVAL;
@@ -110,8 +117,10 @@ public class CommandWebsocketServer {
 		Session websocket = lessonWebsockets.get(command.getUserName());
 		if (websocket != null && websocket.isOpen()) {
 		    websocket.getBasicRemote().sendText(command.getCommandText());
+		    sentAnything = true;
 		}
 	    }
+	    return sentAnything;
 	}
     }
 
@@ -158,6 +167,24 @@ public class CommandWebsocketServer {
 	}
 
 	lessonWebsockets.remove(login);
+    }
+
+    /**
+     * Manually trigger sending all waiting commands.
+     * This methods has to be run in a transactional environment,
+     * for example is a service method!
+     * Otherwise manually open and close Hibernate session,
+     * same as in {@link SendWorker#run()}
+     */
+    public static boolean triggerCheckAndSend() {
+	try {
+	    return CommandWebsocketServer.sendWorker.checkAndSend();
+	} catch (Exception e) {
+	    CommandWebsocketServer.log.error("Error in Command Websocket Server", e);
+	}
+	// it is safer to assume that something was sent,
+	// so the calling method can act accordingly
+	return true;
     }
 
     private static ILearnerFullService getLearnerService() {

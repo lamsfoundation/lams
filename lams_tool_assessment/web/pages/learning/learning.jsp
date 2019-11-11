@@ -188,7 +188,7 @@
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
 		
-			function autosave(){
+			function learnerAutosave(){
 				if (isWaitingForConfirmation) return;
 				
 				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
@@ -211,7 +211,7 @@
 			}
 			
 			var autosaveInterval = "30000"; // 30 seconds interval
-			window.setInterval(autosave, autosaveInterval);
+			window.setInterval(learnerAutosave, autosaveInterval);
 		</c:if>
 		
 		//check if we came back due to failed answers' validation (missing required question's answer or min words limit not reached)
