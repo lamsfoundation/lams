@@ -187,32 +187,31 @@
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
+		
+			function autosave(){
+				if (isWaitingForConfirmation) return;
+				
+				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
+				$("textarea[id^='question']").each(function()  {
+					var ckeditorData = CKEDITOR.instances[this.name].getData();
+					//skip out empty values
+					this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;						
+				});
+				
+				//ajax form submit
+				$('#answers').ajaxSubmit({
+					url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
+	                success: function() {
+		                	$.jGrowl(
+		                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
+		                		{ life: 2000, closeTemplate: '' }
+		                	);
+	                }
+				});
+			}
 			
 			var autosaveInterval = "30000"; // 30 seconds interval
-			window.setInterval(
-				function(){
-					if (isWaitingForConfirmation) return;
-					
-					//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
-					$("textarea[id^='question']").each(function()  {
-						var ckeditorData = CKEDITOR.instances[this.name].getData();
-						//skip out empty values
-						this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;						
-					});
-					
-					//ajax form submit
-					$('#answers').ajaxSubmit({
-						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
-		                success: function() {
-			                	$.jGrowl(
-			                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
-			                		{ life: 2000, closeTemplate: '' }
-			                	);
-		                }
-					});
-	        		}, 
-	        		autosaveInterval
-	        );
+			window.setInterval(autosave, autosaveInterval);
 		</c:if>
 		
 		//check if we came back due to failed answers' validation (missing required question's answer or min words limit not reached)
