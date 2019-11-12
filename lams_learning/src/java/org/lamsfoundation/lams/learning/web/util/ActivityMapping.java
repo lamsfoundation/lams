@@ -99,8 +99,8 @@ public class ActivityMapping implements Serializable {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames,
-	    HttpServletRequest request, ILearnerFullService learnerService) throws UnsupportedEncodingException {
+    public String getProgressForward(LearnerProgress progress, boolean redirect, boolean displayParallelFrames)
+	    throws UnsupportedEncodingException {
 	String forward = null;
 
 	if (progress.isComplete()) {

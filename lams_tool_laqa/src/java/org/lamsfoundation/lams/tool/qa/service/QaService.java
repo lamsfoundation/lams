@@ -119,12 +119,11 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private Random generator = new Random();
 
     @Override
-    public boolean isUserGroupLeader(QaQueUsr user, Long toolSessionId) {
-
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	QaSession session = this.getSessionById(toolSessionId);
 	QaQueUsr groupLeader = session.getGroupLeader();
 
-	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	boolean isUserLeader = (groupLeader != null) && userId.equals(groupLeader.getQueUsrId());
 	return isUserLeader;
     }
 
@@ -931,7 +930,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
 	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(qaUser, toolSessionId);
-	if (isUserGroupLeader(qaUser, toolSessionId)) {
+	if (isUserGroupLeader(userId, toolSessionId)) {
 	    session.getQaQueUsers().forEach(sessionUser -> {
 		//finish users
 		sessionUser.setResponseFinalized(true);
@@ -1191,7 +1190,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
 	QaSession session = user.getQaSession();
 	QaQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(user, toolSessionID);
-	if (isUserGroupLeader(user, toolSessionID)) {
+	if (isUserGroupLeader(userID, toolSessionID)) {
 	    session.getQaQueUsers().forEach(sessionUser -> {
 		//finish users
 		sessionUser.setResponseFinalized(true);

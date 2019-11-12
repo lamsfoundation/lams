@@ -140,9 +140,7 @@ public class GateController {
 	}
 
 	// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-	return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
-		learner.getUserId(), learnerService, true);
-
+	return learnerService.completeActivity(activityMapping, learnerProgress, activity, learner.getUserId(), true);
     }
 
     // ---------------------------------------------------------------------

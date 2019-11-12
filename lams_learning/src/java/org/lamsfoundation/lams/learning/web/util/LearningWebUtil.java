@@ -117,46 +117,6 @@ public class LearningWebUtil {
 	return activity;
     }
 
-    /**
-     * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
-     * Grouping actions. Calls the learningService to actually complete the activity and progress.
-     *
-     * @param redirect
-     *            Should this call redirect to the next screen (true) or use a forward (false)
-     * @param windowName
-     *            Name of the window that triggered this code. Normally LearnerActivity (the popup window) or lWindow
-     *            (normal learner window)
-     * @throws UnsupportedEncodingException
-     * @throws InterruptedException
-     *
-     */
-    public static String completeActivity(HttpServletRequest request, HttpServletResponse response,
-	    ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity, Integer learnerId,
-	    ILearnerFullService learnerService, boolean redirect)
-	    throws LearnerServiceException, UnsupportedEncodingException {
-
-	Lesson lesson = progress.getLesson();
-
-	if (currentActivity == null) {
-	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
-	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
-
-	    // recalculate activity mark and pass it to gradebook
-	    learnerService.updateGradebookMark(currentActivity, progress);
-
-	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
-	} else {
-	    learnerService.completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
-	}
-
-	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
-		&& progress.getCompletedActivities().containsKey(currentActivity.getParentActivity())))) {
-	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
-	}
-
-	return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
-    }
-
     public static ActivityURL getActivityURL(ActivityMapping activityMapping, LearnerProgress learnerProgress,
 	    Activity activity, boolean defaultURL, boolean isFloating) {
 	ActivityURL activityURL = new ActivityURL();

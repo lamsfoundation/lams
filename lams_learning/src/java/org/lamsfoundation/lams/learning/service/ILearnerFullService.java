@@ -1,10 +1,15 @@
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.lamsfoundation.lams.learning.command.model.Command;
+import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -59,14 +64,17 @@ public interface ILearnerFullService extends ILearnerService {
      * @return LearnerProgress
      */
     LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity, Boolean clearCompletedFlag);
-
+    
     /**
-     * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
+     * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
+     * Grouping actions. Calls the completeActivity(Integer, Activity, Long) to actually complete the activity and
+     * progress.
      *
-     * @param toolActivity
-     * @param progress
+     * @param redirect
+     *            Should this call redirect to the next screen (true) or use a forward (false)
      */
-    void updateGradebookMark(Activity activity, LearnerProgress progress);
+    String completeActivity(ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity,
+	    Integer learnerId, boolean redirect) throws UnsupportedEncodingException;
 
     /**
      * Perform grouping for the learners who have started the lesson, based on the grouping activity.

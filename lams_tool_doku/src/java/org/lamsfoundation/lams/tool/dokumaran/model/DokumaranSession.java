@@ -150,8 +150,6 @@ public class DokumaranSession {
 	this.sessionName = sessionName;
     }
 
-    /**
-    */
     public DokumaranUser getGroupLeader() {
 	return this.groupLeader;
     }

@@ -301,6 +301,14 @@ public class ScratchieServiceImpl
     public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
 	return toolService.getPrecedingConfidenceLevelsActivities(toolContentId);
     }
+    
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
+	ScratchieUser groupLeader = session.getGroupLeader();
+
+	return (groupLeader != null) && userId.equals(groupLeader.getUserId());
+    }
 
     @Override
     public ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId) {

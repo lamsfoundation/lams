@@ -1563,6 +1563,14 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	return confidenceLevelDtos;
     }
+    
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	McSession session = getMcSessionById(toolSessionId);
+	McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
+	
+	return (session != null) && (mcUser != null) && session.isUserGroupLeader(mcUser);
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {

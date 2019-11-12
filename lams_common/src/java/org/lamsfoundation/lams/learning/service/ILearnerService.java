@@ -121,6 +121,12 @@ public interface ILearnerService {
      * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
      * in the learning design. It is currently triggered by various progress engine related action classes, which then
      * calculate the url to go to next, based on the ActivityMapping class.
+     *
+     * @param learnerId
+     *            the learner who are running this activity in the design.
+     * @param activity
+     *            the activity is being run.
+     * @return the updated learner progress
      */
     void completeActivity(Integer learnerId, Activity activity, Long progressID);
 

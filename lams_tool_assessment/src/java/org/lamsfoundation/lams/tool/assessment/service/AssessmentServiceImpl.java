@@ -165,12 +165,11 @@ public class AssessmentServiceImpl
     // Service method
     // *******************************************************************************
     @Override
-    public boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId) {
-
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	AssessmentSession session = getSessionBySessionId(toolSessionId);
-	AssessmentUser groupLeader = session.getGroupLeader();
+	AssessmentUser groupLeader = session == null ? null : session.getGroupLeader();
 
-	return (groupLeader != null) && user.getUserId().equals(groupLeader.getUserId());
+	return (groupLeader != null) && userId.equals(groupLeader.getUserId());
     }
 
     @Override
@@ -1159,7 +1158,7 @@ public class AssessmentServiceImpl
 	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
 	AssessmentSession session = user.getSession();
 	Assessment assessment = session.getAssessment();
-	if (assessment.isUseSelectLeaderToolOuput() && isUserGroupLeader(user, toolSessionId)) {
+	if (assessment.isUseSelectLeaderToolOuput() && isUserGroupLeader(userId, toolSessionId)) {
 	    session.getAssessmentUsers().forEach(sessionUser -> {
 		//finish non-leader
 		sessionUser.setSessionFinished(true);
@@ -2861,7 +2860,7 @@ public class AssessmentServiceImpl
 
 	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
 	AssessmentUser groupLeader = checkLeaderSelectToolForSessionLeader(assessmentUser, toolSessionId);
-	if (isUserGroupLeader(assessmentUser, toolSessionId)) {
+	if (isUserGroupLeader(userId, toolSessionId)) {
 	    session.getAssessmentUsers().forEach(sessionUser -> {
 		//finish non-leader
 		sessionUser.setSessionFinished(true);

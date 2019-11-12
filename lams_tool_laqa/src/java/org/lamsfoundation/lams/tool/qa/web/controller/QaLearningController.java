@@ -204,7 +204,7 @@ public class QaLearningController implements QaAppConstants {
 		|| (mode != null) && mode.equals(ToolAccessMode.TEACHER.toString()));
 
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = qaService.isUserGroupLeader(user, new Long(toolSessionID));
+	boolean isUserLeader = qaService.isUserGroupLeader(user.getQueUsrId(), new Long(toolSessionID));
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);

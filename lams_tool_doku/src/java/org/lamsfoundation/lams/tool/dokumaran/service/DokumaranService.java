@@ -1041,6 +1041,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
+    
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
+	DokumaranUser groupLeader = session == null ? null : session.getGroupLeader();
+
+	return (groupLeader != null) && userId.equals(groupLeader.getUserId());
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {

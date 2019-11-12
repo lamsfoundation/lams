@@ -55,7 +55,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(QaQueUsr user, Long toolSessionId);
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.

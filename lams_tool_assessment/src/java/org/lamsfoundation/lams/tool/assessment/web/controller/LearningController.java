@@ -187,7 +187,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user, toolSessionId);
+	boolean isUserLeader = service.isUserGroupLeader(user.getUserId(), toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());

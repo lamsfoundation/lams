@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -288,7 +289,7 @@ public class LearnerService implements ILearnerFullService {
 	Lesson lesson = getLesson(lessonID);
 
 	if ((lesson == null) || !lesson.isLessonStarted()) {
-	    LearnerService.log.error("joinLesson: Learner " + learner.getLogin() + " joining lesson " + lesson
+	    log.error("joinLesson: Learner " + learner.getLogin() + " joining lesson " + lesson
 		    + " but lesson has not started");
 	    throw new LearnerServiceException("Cannot join lesson as lesson has not started");
 	}
@@ -305,7 +306,7 @@ public class LearnerService implements ILearnerFullService {
 	    try {
 		progressEngine.setUpStartPoint(learnerProgress);
 	    } catch (ProgressException e) {
-		LearnerService.log.error("error occurred in 'setUpStartPoint':" + e.getMessage());
+		log.error("error occurred in 'setUpStartPoint':" + e.getMessage());
 		throw new LearnerServiceException(e.getMessage());
 	    }
 	    // Use TimeStamp rather than Date directly to keep consistent with Hibnerate persiste object.
@@ -332,7 +333,7 @@ public class LearnerService implements ILearnerFullService {
 		try {
 		    progressEngine.setUpStartPoint(learnerProgress);
 		} catch (ProgressException e) {
-		    LearnerService.log.error("error occurred in 'setUpStartPoint':" + e.getMessage());
+		    log.error("error occurred in 'setUpStartPoint':" + e.getMessage());
 		    throw new LearnerServiceException(e.getMessage());
 		}
 	    }
@@ -373,10 +374,10 @@ public class LearnerService implements ILearnerFullService {
 		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity, lesson);
 	    }
 	} catch (RequiredGroupMissingException e) {
-	    LearnerService.log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
+	    log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
 	    throw e;
 	} catch (ToolException e) {
-	    LearnerService.log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
+	    log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
 	    throw new LearnerServiceException(e.getMessage());
 	}
     }
@@ -592,31 +593,44 @@ public class LearnerService implements ILearnerFullService {
 
 	}
 
-	if (LearnerService.log.isDebugEnabled()) {
-	    LearnerService.log.debug("CompleteToolSession() for tool session id " + toolSessionId + " learnerId "
+	if (log.isDebugEnabled()) {
+	    log.debug("CompleteToolSession() for tool session id " + toolSessionId + " learnerId "
 		    + learnerId + " url is " + returnURL);
 	}
 
 	return returnURL;
-
     }
 
-    /**
-     * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
-     * in the learning design. It is currently triggered by various progress engine related action classes, which then
-     * calculate the url to go to next, based on the ActivityMapping class.
-     *
-     * @param learnerId
-     *            the learner who are running this activity in the design.
-     * @param activity
-     *            the activity is being run.
-     * @return the updated learner progress
-     */
+    @Override
+    public String completeActivity(ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity,
+	    Integer learnerId, boolean redirect) throws UnsupportedEncodingException {
+	Lesson lesson = progress.getLesson();
+
+	if (currentActivity == null) {
+	    progress = joinLesson(learnerId, lesson.getLessonId());
+	    
+	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
+	    // recalculate activity mark and pass it to gradebook
+	    updateGradebookMark(currentActivity, progress);
+	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
+	    
+	} else {
+	    completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
+	}
+
+	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
+		&& progress.getCompletedActivities().containsKey(currentActivity.getParentActivity())))) {
+	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
+	}
+
+	boolean displayParallelFrames = false;
+	return actionMappings.getProgressForward(progress, redirect, displayParallelFrames);
+    }
+
     @Override
     public void completeActivity(Integer learnerId, Activity activity, Long progressID) {
-	if (LearnerService.log.isDebugEnabled()) {
-	    LearnerService.log
-		    .debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
 	}
 	LearnerProgress progress = learnerProgressDAO.getLearnerProgress(progressID);
 	if (progress.getCompletedActivities().keySet().contains(activity)) {
@@ -637,7 +651,7 @@ public class LearnerService implements ILearnerFullService {
 	    try {
 		progressEngine.setUpStartPoint(progress);
 	    } catch (ProgressException e) {
-		LearnerService.log.error("error occurred in 'setUpStartPoint':" + e.getMessage(), e);
+		log.error("error occurred in 'setUpStartPoint':" + e.getMessage(), e);
 		throw new LearnerServiceException(e);
 	    }
 
@@ -656,16 +670,39 @@ public class LearnerService implements ILearnerFullService {
 				activity.getTitle(), activity.getActivityId() }));
     }
 
-    @Override
-    public void updateGradebookMark(Activity activity, LearnerProgress progress) {
+    /**
+     * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
+     *
+     * @param toolActivity
+     * @param progress
+     */
+    private void updateGradebookMark(Activity activity, LearnerProgress progress) {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
-	gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);
+	
+	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
+		|| (((ToolActivity) activity).getEvaluation() == null)) {
+	    return;
+	}
+	ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
+	if (toolSession == null) {
+	    return;
+	}
+	
+	//in case this is a leader - update marks for all users in the group, otherwise update marks only for the specified user
+	List<User> learnersRequiringMarkUpdate = new ArrayList<>();
+	if (lamsCoreToolService.isUserLeaderInActivity(toolSession, learner)) {
+	    learnersRequiringMarkUpdate.addAll(toolSession.getLearners());
+	    
+	} else {
+	    learnersRequiringMarkUpdate.add(learner);
+	}
+	
+	for (User learnerRequiringMarksUpdate : learnersRequiringMarkUpdate) {
+	    gradebookService.updateGradebookUserActivityMark(lesson, activity, learnerRequiringMarksUpdate);
+	}
     }
 
-    /**
-     * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActivity(java.lang.Long)
-     */
     @Override
     public Activity getActivity(Long activityId) {
 	return activityDAO.getActivityByActivityId(activityId);
@@ -707,7 +744,7 @@ public class LearnerService implements ILearnerFullService {
 	    } else {
 		String error = "Grouping activity " + groupingActivity + " learner " + learnerId
 			+ " does not exist. Cannot perform grouping.";
-		LearnerService.log.error(error);
+		log.error(error);
 		throw new LearnerServiceException(error);
 	    }
 	} catch (LessonServiceException e) {
@@ -807,7 +844,7 @@ public class LearnerService implements ILearnerFullService {
 	}
 
 	String error = "Gate activity " + gateActivityId + " does not exist. Cannot knock on gate.";
-	LearnerService.log.error(error);
+	log.error(error);
 	throw new LearnerServiceException(error);
     }
 
@@ -896,7 +933,7 @@ public class LearnerService implements ILearnerFullService {
     public Lesson getLessonByActivity(Activity activity) {
 	Lesson lesson = lessonDAO.getLessonForActivity(activity.getActivityId());
 	if (lesson == null) {
-	    LearnerService.log.warn(
+	    log.warn(
 		    "Tried to get lesson id for a non-lesson based activity. An error is likely to be thrown soon. Activity was "
 			    + activity);
 	}
@@ -934,7 +971,7 @@ public class LearnerService implements ILearnerFullService {
 	User learner = (User) userManagementService.findById(User.class, learnerId);
 	if (learner == null) {
 	    String error = "determineBranch: learner " + learnerId + " does not exist. Cannot determine branch.";
-	    LearnerService.log.error(error);
+	    log.error(error);
 	    throw new LearnerServiceException(error);
 	}
 
@@ -950,7 +987,7 @@ public class LearnerService implements ILearnerFullService {
 	    }
 	} catch (LessonServiceException e) {
 	    String message = "determineBranch failed due to " + e.getMessage();
-	    LearnerService.log.error(message, e);
+	    log.error(message, e);
 	    throw new LearnerServiceException("determineBranch failed due to " + e.getMessage(), e);
 	}
     }
@@ -1002,7 +1039,7 @@ public class LearnerService implements ILearnerFullService {
 		if (toolOutput == null) {
 		    toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession, learner.getUserId());
 		    if (toolOutput == null) {
-			LearnerService.log.warn("Condition " + condition + " refers to a tool output " + conditionName
+			log.warn("Condition " + condition + " refers to a tool output " + conditionName
 				+ " but tool doesn't return any tool output for that name. Skipping this condition.");
 		    } else {
 			toolOutputMap.put(conditionName, toolOutput);
@@ -1017,8 +1054,8 @@ public class LearnerService implements ILearnerFullService {
 
 	// If no conditions match, use the branch that is the "default" branch for this branching activity.
 	if (matchedBranch != null) {
-	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log.debug("Found branch " + matchedBranch.getActivityId() + ":"
+	    if (log.isDebugEnabled()) {
+		log.debug("Found branch " + matchedBranch.getActivityId() + ":"
 			+ matchedBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
 			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
@@ -1026,8 +1063,8 @@ public class LearnerService implements ILearnerFullService {
 	    return matchedBranch;
 
 	} else if (defaultBranch != null) {
-	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log.debug("Using default branch " + defaultBranch.getActivityId() + ":"
+	    if (log.isDebugEnabled()) {
+		log.debug("Using default branch " + defaultBranch.getActivityId() + ":"
 			+ defaultBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
 			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
@@ -1036,8 +1073,8 @@ public class LearnerService implements ILearnerFullService {
 	    return (SequenceActivity) activityDAO.getActivityByActivityId(defaultBranch.getActivityId(),
 		    SequenceActivity.class);
 	} else {
-	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log.debug(
+	    if (log.isDebugEnabled()) {
+		log.debug(
 			"No branches match and no default branch exists. Uable to allocate learner to a branch for the branching activity"
 				+ branchingActivity.getActivityId() + ":" + branchingActivity.getTitle()
 				+ " for learner " + learner.getUserId() + ":" + learner.getLogin());
@@ -1069,8 +1106,8 @@ public class LearnerService implements ILearnerFullService {
 	    }
 
 	    if (sequenceActivity != null) {
-		if (LearnerService.log.isDebugEnabled()) {
-		    LearnerService.log.debug("Found branch " + sequenceActivity.getActivityId() + ":"
+		if (log.isDebugEnabled()) {
+		    log.debug("Found branch " + sequenceActivity.getActivityId() + ":"
 			    + sequenceActivity.getTitle() + " for branching activity "
 			    + branchingActivity.getActivityId() + ":" + branchingActivity.getTitle() + " for learner "
 			    + learner.getUserId() + ":" + learner.getLogin());
@@ -1116,7 +1153,7 @@ public class LearnerService implements ILearnerFullService {
 			toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession,
 				learner.getUserId());
 			if (toolOutput == null) {
-			    LearnerService.log.warn("Condition " + condition + " refers to a tool output "
+			    log.warn("Condition " + condition + " refers to a tool output "
 				    + conditionName
 				    + " but tool doesn't return any tool output for that name. Skipping this condition.");
 			} else {
@@ -1154,7 +1191,7 @@ public class LearnerService implements ILearnerFullService {
 	User learner = (User) userManagementService.findById(User.class, learnerId);
 	if (learner == null) {
 	    String error = "selectBranch: learner " + learnerId + " does not exist. Cannot determine branch.";
-	    LearnerService.log.error(error);
+	    log.error(error);
 	    throw new LearnerServiceException(error);
 	}
 
@@ -1166,7 +1203,7 @@ public class LearnerService implements ILearnerFullService {
 		    || !selectedBranch.getParentActivity().equals(branchingActivity)) {
 		String error = "selectBranch: activity " + selectedBranch
 			+ " is not a branch within the branching activity " + branchingActivity + ". Unable to branch.";
-		LearnerService.log.error(error);
+		log.error(error);
 		throw new LearnerServiceException(error);
 	    }
 
@@ -1192,7 +1229,7 @@ public class LearnerService implements ILearnerFullService {
 				+ " for the branch " + selectedBranch + " for the lesson " + lesson.getLessonName()
 				+ " preview is " + lesson.isPreviewLesson()
 				+ ". This will only work if preview is true.";
-			LearnerService.log.error(error);
+			log.error(error);
 			throw new LearnerServiceException(error);
 		    }
 		}
@@ -1212,14 +1249,14 @@ public class LearnerService implements ILearnerFullService {
 		    String error = "selectBranch: learner " + learnerId + " cannot be added to the group " + group
 			    + " for the branch " + selectedBranch + " for the lesson " + lesson.getLessonName()
 			    + " preview is " + lesson.isPreviewLesson() + ". This will only work if preview is true.";
-		    LearnerService.log.error(error);
+		    log.error(error);
 		    throw new LearnerServiceException(error);
 		}
 	    }
 	    groupingDAO.update(grouping);
 
-	    if (LearnerService.log.isDebugEnabled()) {
-		LearnerService.log.debug("Found branch " + selectedBranch.getActivityId() + ":"
+	    if (log.isDebugEnabled()) {
+		log.debug("Found branch " + selectedBranch.getActivityId() + ":"
 			+ selectedBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
 			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
@@ -1229,7 +1266,7 @@ public class LearnerService implements ILearnerFullService {
 
 	} else {
 	    String error = "selectBranch: Unable to find branch for branch id " + branchId;
-	    LearnerService.log.error(error);
+	    log.error(error);
 	    throw new LearnerServiceException(error);
 	}
 

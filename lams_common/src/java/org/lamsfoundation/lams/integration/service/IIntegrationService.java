@@ -204,7 +204,7 @@ public interface IIntegrationService {
     ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
 
     /**
-     * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
+     * Checks whether the lesson was created from extServer (not an LTI consumer one) and returns lessonFinishCallbackUrl if it's not blank.
      *
      * @param user
      * @param lesson
@@ -212,6 +212,14 @@ public interface IIntegrationService {
      * @throws UnsupportedEncodingException
      */
     String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    
+    /**
+     * Check whether specified lesson was created using LTI consumer, and if so - push user mark to that server
+     * 
+     * @param user
+     * @param lesson
+     */
+    void pushMarkToLtiConsumer(User user, Lesson lesson, Double mark);
 
     /**
      * Checks whether lesson was created using integrations and whether according integrated server has ExtGroupsUrl
