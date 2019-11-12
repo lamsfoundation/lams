@@ -43,6 +43,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  * All Learner service methods that are available within the core.
  */
 public interface ILearnerService {
+    // how often Command Websocket Server checks for new commands
+    public static final long COMMAND_WEBSOCKET_CHECK_INTERVAL = 5000;
 
     /**
      * Gets the lesson object for the given key.
@@ -180,6 +182,4 @@ public interface ILearnerService {
     void createCommandForLearner(Long lessonId, String userName, String jsonCommand);
 
     void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand);
-
-    boolean triggerCommandCheckAndSend();
 }

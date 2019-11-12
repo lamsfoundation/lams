@@ -39,7 +39,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.command.CommandWebsocketServer;
 import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
 import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.kumalive.model.Kumalive;
@@ -1404,6 +1403,7 @@ public class LearnerService implements ILearnerFullService {
     public void createCommandForLearner(Long lessonId, String userName, String jsonCommand) {
 	Command command = new Command(lessonId, userName, jsonCommand);
 	commandDAO.insert(command);
+	commandDAO.flush();
     }
 
     /**
@@ -1640,13 +1640,7 @@ public class LearnerService implements ILearnerFullService {
     }
 
     @Override
-    public boolean triggerCommandCheckAndSend() {
-	return CommandWebsocketServer.triggerCheckAndSend();
-    }
-
-    @Override
     public IActivityDAO getActivityDAO() {
 	return activityDAO;
     }
-
 }

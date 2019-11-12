@@ -1319,19 +1319,13 @@ public class MonitoringService implements IMonitoringFullService {
 	    // command websocket on Page.tag understands this message
 	    jsonCommand.put("message", "autosave");
 	    learnerService.createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
-	    // manually trigger sending of messages
-	    boolean sentAnything = learnerService.triggerCommandCheckAndSend();
 
-	    // if the learner does not have lesson window open, probably nothing was sent
-	    if (sentAnything) {
-		try {
-		    // allow autosave to finish
-		    // a primitive, but way more simple solution than synchronous call to websocket and processing reply
-		    Thread.sleep(2000);
-		} catch (InterruptedException e) {
-		    log.warn(
-			    "Monitoring service thread interrupted while giving Command Websocket Server time to send autosave message");
-		}
+	    try {
+		// make sure that Command Websocket server picked up the command
+		// and then some more so autosave completes
+		Thread.sleep(ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL + 2000);
+	    } catch (InterruptedException e) {
+		log.warn("Monitoring service thread interrupted while giving time for learner to autosave");
 	    }
 	}
 
