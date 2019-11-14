@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -479,11 +480,18 @@ public class LamsToolService implements ILamsToolService {
 
 	Activity confidenceLevelActivity = activityDAO.getActivityByUIID(confidenceLevelActivityUiid,
 		requestorSession.getToolActivity().getLearningDesign());
+	if (confidenceLevelActivity == null) {
+	    log.debug("No confidence Levels providing activity found for activityUid " + confidenceLevelActivityUiid);
+	    return new ArrayList<>();
+	}
 	ToolSession confidenceLevelSession = toolSessionDAO.getToolSessionByLearner(user, confidenceLevelActivity);
+	if (confidenceLevelSession == null) {
+	    log.debug("No session found for user " + user.getUserId() + " in activity " + confidenceLevelActivityUiid);
+	    return new ArrayList<>();
+	}
 
 	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService
 		.getConfidenceLevelsByToolSession(confidenceLevelSession);
-
 	return confidenceLevelDtos;
     }
     
