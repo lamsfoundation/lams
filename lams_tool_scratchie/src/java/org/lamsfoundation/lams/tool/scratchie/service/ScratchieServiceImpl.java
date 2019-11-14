@@ -1141,11 +1141,10 @@ public class ScratchieServiceImpl
 
 	// handle general burning question
 	BurningQuestionItemDTO generalBurningQuestionItemDto = new BurningQuestionItemDTO();
-	ScratchieItem generalDummyItem = new ScratchieItem();
+	ScratchieItem generalDummyItem = new ScratchieItem();//generalDummyItem's uid will be set to 0 in jsp
 	generalDummyItem.setQbQuestion(new QbQuestion());
 	releaseFromCache(generalDummyItem);
 	releaseFromCache(generalDummyItem.getQbQuestion());
-	// generalDummyItem.setUid(0L);
 	final String generalQuestionMessage = messageService.getMessage("label.general.burning.question");
 	generalDummyItem.getQbQuestion().setName(generalQuestionMessage);
 	generalBurningQuestionItemDto.setScratchieItem(generalDummyItem);
