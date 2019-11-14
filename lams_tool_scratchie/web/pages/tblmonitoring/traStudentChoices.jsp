@@ -106,7 +106,7 @@
 					</b>
 				</th>
 				
-				<c:forEach var="correctAnswerCell"  items="${correctOptions}" varStatus="status">
+				<c:forEach var="correctAnswerCell"  items="${correctAnswers.cells}" varStatus="status">
 					<c:if test="${!status.first}">
 						<td class="text-center">
 							${correctAnswerCell.cellValue}

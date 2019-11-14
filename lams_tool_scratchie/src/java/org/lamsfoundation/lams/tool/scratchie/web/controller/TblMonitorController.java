@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
@@ -168,8 +169,9 @@ public class TblMonitorController {
 		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
 		groupSummary.setMark(total);
 
-		String totalPercentage = groupRow.getCell(itemDtos.size() + 2).toString();
-		groupSummary.setTotalPercentage(totalPercentage);
+		String totalPercentageStr = groupRow.getCell(itemDtos.size() + 2).toString();
+		int totalPercentage = NumberUtils.isNumber(totalPercentageStr) ? (int) (Double.parseDouble(totalPercentageStr)*100) : 0;
+		groupSummary.setTotalPercentage(totalPercentage + "%");
 	    }
 
 	    sessionDtos.add(groupSummary);
