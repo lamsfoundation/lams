@@ -166,7 +166,8 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			String optionUidOrAnswer = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType();
+			String optionUidOrAnswer = isMCQItem
 				? optionDto.getQbOptionUid().toString()
 				: optionDto.getAnswer();
 			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
@@ -179,7 +180,10 @@ public class LearningWebsocketServer {
 			    if (itemJSON == null) {
 				itemJSON = JsonNodeFactory.instance.objectNode();
 			    }
-			    itemJSON.put(optionUidOrAnswer.toString(), isCorrectStoredAnswer);
+			    ObjectNode optionPropertiesJSON = JsonNodeFactory.instance.objectNode();
+			    optionPropertiesJSON.put("isCorrect", isCorrectStoredAnswer);
+			    optionPropertiesJSON.put("isVSA", !isMCQItem);
+			    itemJSON.set(optionUidOrAnswer, optionPropertiesJSON);
 			}
 		    }
 		}

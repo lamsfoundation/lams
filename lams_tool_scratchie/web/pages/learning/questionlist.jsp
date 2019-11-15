@@ -84,10 +84,9 @@
 
 		// only updates come via websockets
 		$.each(input, function(itemUid, options) {
-			$.each(options, function(optionUid, isCorrect){
+			$.each(options, function(optionUid, optionProperties){
 				
-				var isVsaItem = !Number.isInteger(optionUid);
-				if (isVsaItem) {
+				if (optionProperties.isVSA) {
 					var answer = optionUid;
 					optionUid = hashCode(optionUid);
 
@@ -97,7 +96,7 @@
 					}
 				}
 				
-				scratchImage(itemUid, optionUid, isCorrect);
+				scratchImage(itemUid, optionUid, optionProperties.isCorrect);
 			});
 		});
 	};
