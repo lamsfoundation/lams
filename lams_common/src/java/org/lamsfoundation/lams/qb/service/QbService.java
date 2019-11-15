@@ -582,6 +582,9 @@ public class QbService implements IQbService {
 	if (qbQuestion.getQuestionId() == null) {
 	    qbQuestion.setQuestionId(generateNextQuestionId());
 	}
+	if (qbQuestion.getVersion() == null) {
+	    qbQuestion.setVersion(1);
+	}
 
 	Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
 		: new ArrayList<>(qbQuestion.getQbOptions());
