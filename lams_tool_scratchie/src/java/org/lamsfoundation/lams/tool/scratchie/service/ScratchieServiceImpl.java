@@ -2231,7 +2231,7 @@ public class ScratchieServiceImpl
 
 	scratchie.setBurningQuestionsEnabled(JsonUtil.optBoolean(toolContentJSON, "burningQuestionsEnabled", true));
 	scratchie.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
-	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint"));
+	scratchie.setExtraPoint(JsonUtil.optBoolean(toolContentJSON, "extraPoint", false));
 	scratchie.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));

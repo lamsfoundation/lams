@@ -4,7 +4,7 @@
 <html>
 	<body class="stripes">
 	
-		<form:form action="/lams/tool/lascrt11/authoring/init.do?mode=${mode}" method="post" modelAttribute="authoringForm" id="startForm">
+		<form:form action="/lams/tool/lascrt11/authoring/init.do?mode=${mode}&notifyCloseURL=${notifyCloseURL}" method="post" modelAttribute="authoringForm" id="startForm">
 			<form:hidden path="scratchie.contentId"/>
 			<form:hidden path="sessionMapID"/>
 		</form:form>
