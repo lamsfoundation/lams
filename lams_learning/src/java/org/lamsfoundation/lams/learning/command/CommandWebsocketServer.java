@@ -73,8 +73,6 @@ public class CommandWebsocketServer {
 			    }
 			}
 		    } while (entry != null);
-
-		    Thread.sleep(ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL);
 		} catch (IllegalStateException e) {
 		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
