@@ -154,6 +154,11 @@ public class LeaderselectionService
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
+    
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	return false;
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {

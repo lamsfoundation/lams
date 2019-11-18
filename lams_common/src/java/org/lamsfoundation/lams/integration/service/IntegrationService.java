@@ -102,10 +102,8 @@ import oauth.signpost.exception.OAuthException;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class IntegrationService implements IIntegrationService {
-
     private static Logger log = Logger.getLogger(IntegrationService.class);
 
-    private IGradebookService gradebookService;
     private IUserManagementService service;
     private ILessonService lessonService;
     private ILamsCoreToolService toolService;
@@ -634,88 +632,95 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
+	if (lesson == null) {
+	    return null;
+	}
+	
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://server.com/lams--bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
 	String lessonFinishCallbackUrl = null;
 
-	if (lesson != null) {
-	    Long lessonId = lesson.getLessonId();
-	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
-	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	    if (extServerLesson != null
-		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
-		ExtServer server = extServerLesson.getExtServer();
+	Long lessonId = lesson.getLessonId();
+	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	ExtUserUseridMap extUser = extServerLesson == null ? null
+		: getExtUserUseridMapByUserId(server, user.getUserId());
 
-		ExtUserUseridMap extUser = getExtUserUseridMapByUserId(server, user.getUserId());
-		if (extUser != null) {
-		    String extUsername = extUser.getExtUsername();
+	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
+	if (extServerLesson != null && extUser != null
+		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
 
-		    //return URL in case of integration server
-		    if (server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)) {
-			// construct real lessonFinishCallbackUrl
-			lessonFinishCallbackUrl = server.getLessonFinishUrl();
-			String timestamp = Long.toString(new Date().getTime());
-			String hash = hash(server, extUsername, timestamp);
-			String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
+	    // construct real lessonFinishCallbackUrl
+	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
+	    String timestamp = Long.toString(new Date().getTime());
+	    String extUsername = extUser.getExtUsername();
+	    String hash = hash(server, extUsername, timestamp);
+	    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
 
-			// set the values for the parameters
-			lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
-				.replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
-				.replaceAll("%hash%", hash);
-			log.debug(lessonFinishCallbackUrl);
-
-			// in case of LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
-		    } else {
-
-			// calculate lesson's MaxPossibleMark
-			Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
-			GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId,
-				user.getUserId());
-			Double userTotalMark = (gradebookUserLesson == null) || (gradebookUserLesson.getMark() == null)
-				? null
-				: gradebookUserLesson.getMark();
-
-			final String lessonFinishUrl = server.getLessonFinishUrl();
-			if (userTotalMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
-
-			    Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userTotalMark / lessonMaxPossibleMark;
-			    final String scoreStr = (userTotalMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
-				    : score.toString();
-
-			    final String serverKey = server.getServerid();
-			    final String serverSecret = server.getServerkey();
-			    final String tcGradebookId = extUser.getTcGradebookId();
-			    final ExtUserUseridMap extUserFinal = extUser;
-
-			    Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-				    //send Request directly
-				    try {
-					IMSPOXRequest.sendReplaceResult(lessonFinishUrl, serverKey, serverSecret,
-						tcGradebookId, scoreStr);
-				    } catch (IOException e) {
-					throw new RuntimeException(e);
-				    } catch (OAuthException e) {
-					throw new RuntimeException(e);
-				    } catch (GeneralSecurityException e) {
-					throw new RuntimeException(e);
-				    }
-				    log.debug("Score (" + scoreStr + ") posted to Tool Consumer (serverKey:" + serverKey
-					    + "). extUsername:" + extUserFinal.getExtUsername());
-				}
-			    }, "LAMS_sendScoresLTI_thread");
-			    preaddLearnersMonitorsThread.start();
-
-			}
-		    }
-
-		}
-	    }
+	    // set the values for the parameters
+	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
+		    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
+		    .replaceAll("%hash%", hash);
+	    log.debug(lessonFinishCallbackUrl);
 	}
+	// in case of LTI Tool Consumer - pushMarkToIntegratedServer() method will be invoked from GradebookService on mark update
 
 	return lessonFinishCallbackUrl;
+    }
+    
+    @Override
+    public void pushMarkToLtiConsumer(User user, Lesson lesson, Double userMark) {
+	if (lesson == null) {
+	    return;
+	}
+	Long lessonId = lesson.getLessonId();
+	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	ExtUserUseridMap extUser = extServerLesson == null ? null
+		: getExtUserUseridMapByUserId(server, user.getUserId());
+	
+	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
+	if (extServerLesson != null && extUser != null
+		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+
+	    // calculate lesson's MaxPossibleMark
+	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
+
+	    final String lessonFinishUrl = server.getLessonFinishUrl();
+	    if (userMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
+		Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
+		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
+			: score.toString();
+
+		final String serverKey = server.getServerid();
+		final String serverSecret = server.getServerkey();
+		final String tcGradebookId = extUser.getTcGradebookId();
+		final ExtUserUseridMap extUserFinal = extUser;
+
+		Thread sendMarkToLtiConsumerThread = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+			//send Request directly
+			try {
+			    IMSPOXRequest.sendReplaceResult(lessonFinishUrl, serverKey, serverSecret, tcGradebookId,
+				    scoreStr);
+			} catch (IOException e) {
+			    throw new RuntimeException(e);
+			} catch (OAuthException e) {
+			    throw new RuntimeException(e);
+			} catch (GeneralSecurityException e) {
+			    throw new RuntimeException(e);
+			}
+			log.debug("Score (" + scoreStr + ") posted to Tool Consumer (serverKey:" + serverKey
+				+ "). extUsername:" + extUserFinal.getExtUsername());
+		    }
+		}, "LAMS_sendScoresLTI_thread");
+		sendMarkToLtiConsumerThread.start();
+	    }
+	}
     }
 
     @Override
@@ -1078,10 +1083,6 @@ public class IntegrationService implements IIntegrationService {
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setToolService(ILamsCoreToolService toolService) {

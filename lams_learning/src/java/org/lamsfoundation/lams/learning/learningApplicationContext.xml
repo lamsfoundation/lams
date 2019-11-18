@@ -72,6 +72,7 @@
 				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>				
 				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="createCommand*">PROPAGATION_REQUIRES_NEW</prop>
 				<prop key="learner*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>

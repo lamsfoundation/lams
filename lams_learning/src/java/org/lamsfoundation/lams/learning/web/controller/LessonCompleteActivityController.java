@@ -75,7 +75,7 @@ public class LessonCompleteActivityController {
 	    request.setAttribute(RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
 	}
 
-	//checks for lessonFinishUrl parameter
+	//let non-LTI integrations server know to come and pick up updated marks (it will happen at lessoncomplete.jsp page)
 	String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(learnerProgress.getUser(),
 		lesson);
 	if (lessonFinishCallbackUrl != null) {

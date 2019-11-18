@@ -280,6 +280,14 @@ public interface ILamsCoreToolService {
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession);
+    
+    /**
+     * Returns true in case this tool is leader-aware and specified user is a leader in his group, false otherwise.
+     * 
+     * @param toolSession
+     * @param learner
+     */
+    boolean isUserLeaderInActivity(ToolSession toolSession, User user);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which

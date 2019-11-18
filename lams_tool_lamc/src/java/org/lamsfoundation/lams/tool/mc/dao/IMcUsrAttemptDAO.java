@@ -99,7 +99,7 @@ public interface IMcUsrAttemptDAO {
     /**
      * Get the highest attempt order for a user for a particular question
      */
-    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
+    McUsrAttempt getUserAttemptByQuestion(Long userUid, Long mcQueContentId);
 
     /**
      * Get the highest attempt order for a all users in a session for a particular question
