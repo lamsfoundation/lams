@@ -68,10 +68,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -82,7 +85,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Controller
 @RequestMapping("/learning")
 public class LearningController {
-
     private static Logger log = Logger.getLogger(LearningController.class);
 
     @Autowired
@@ -92,32 +94,30 @@ public class LearningController {
      * Read scratchie data from database and put them into HttpSession.
      */
     @RequestMapping("/start")
-    private String start(HttpServletRequest request, HttpServletResponse response)
+    private String start(HttpServletRequest request, HttpServletResponse response, @RequestParam Long toolSessionID)
 	    throws ScratchieApplicationException {
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	final Long toolSessionId = new Long(request.getParameter(ScratchieConstants.PARAM_TOOL_SESSION_ID));
-	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
+	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionID);
 	// get back the scratchie and item list and display them on page
-	final Scratchie scratchie = scratchieService.getScratchieBySessionId(toolSessionId);
+	final Scratchie scratchie = scratchieService.getScratchieBySessionId(toolSessionID);
 	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
 
 	final ScratchieUser user;
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // scratchieUser may be null if the user was force completed.
-	    user = getSpecifiedUser(toolSessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	    user = getSpecifiedUser(toolSessionID, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    user = getCurrentUser(toolSessionId);
+	    user = getCurrentUser(toolSessionID);
 	}
 
-	ScratchieUser groupLeader = scratchieService.checkLeaderSelectToolForSessionLeader(user, toolSessionId);
+	ScratchieUser groupLeader = scratchieService.checkLeaderSelectToolForSessionLeader(user, toolSessionID);
 
 	// forwards to the leaderSelection page
 	if (groupLeader == null) {
 
 	    // get group users and store it to request as DTO objects
-	    List<ScratchieUser> groupUsers = scratchieService.getUsersBySession(toolSessionId);
+	    List<ScratchieUser> groupUsers = scratchieService.getUsersBySession(toolSessionID);
 	    List<User> groupUserDtos = new ArrayList<>();
 	    for (ScratchieUser groupUser : groupUsers) {
 		User groupUserDto = new User();
@@ -126,7 +126,7 @@ public class LearningController {
 		groupUserDtos.add(groupUserDto);
 	    }
 	    request.setAttribute(ScratchieConstants.ATTR_GROUP_USERS, groupUserDtos);
-	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
+	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionID);
 	    request.setAttribute(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	    return "pages/learning/waitforleader";
@@ -140,7 +140,7 @@ public class LearningController {
 	// get notebook entry
 	NotebookEntry notebookEntry = null;
 	if (isReflectOnActivity && (groupLeader != null)) {
-	    notebookEntry = scratchieService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+	    notebookEntry = scratchieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
 	String entryText = (notebookEntry == null) ? null : notebookEntry.getEntry();
@@ -157,7 +157,7 @@ public class LearningController {
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = (user != null) && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED, scratchie.isBurningQuestionsEnabled());
 	// reflection information
@@ -180,7 +180,7 @@ public class LearningController {
 	    return "pages/learning/definelater";
 	}
 
-	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, scratchieService.isLastActivity(toolSessionId));
+	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, scratchieService.isLastActivity(toolSessionID));
 
 	// check if there is submission deadline
 	Date submissionDeadline = scratchie.getSubmissionDeadline();
@@ -200,7 +200,7 @@ public class LearningController {
 	    }
 	}
 
-	storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, mode.isTeacher());
+	storeItemsToSessionMap(toolSessionID, scratchie, sessionMap, mode.isTeacher());
 
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	// calculate max score
@@ -348,7 +348,8 @@ public class LearningController {
      * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not.
      */
     @RequestMapping("/recordItemScratched")
-    private String recordItemScratched(HttpServletRequest request, HttpServletResponse response)
+    @ResponseStatus(HttpStatus.OK)
+    private void recordItemScratched(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ScratchieApplicationException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -361,19 +362,19 @@ public class LearningController {
 	ScratchieUser leader = getCurrentUser(toolSessionId);
 	// only leader is allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
+	    return;
 	}
 
 	// check answer is belong to current session
 	Set<Long> answerUids = (Set<Long>) sessionMap.get(ScratchieConstants.ATTR_ANSWER_UIDS);
 	if (!answerUids.contains(answerUid)) {
-	    return null;
+	    return;
 	}
 
 	// Return whether scratchie answer is correct or not
 	ScratchieAnswer answer = scratchieService.getScratchieAnswerByUid(answerUid);
 	if (answer == null) {
-	    return null;
+	    return;
 	}
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
@@ -390,15 +391,14 @@ public class LearningController {
 	    }
 	}, "LAMS_recordItemScratched_thread");
 	recordItemScratchedThread.start();
-
-	return null;
     }
 
     /**
      * Stores date when user has started activity with time limit.
      */
     @RequestMapping("/launchTimeLimit")
-    private String launchTimeLimit(HttpServletRequest request)
+    @ResponseStatus(HttpStatus.OK)
+    private void launchTimeLimit(HttpServletRequest request)
 	    throws ScratchieApplicationException, SchedulerException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -409,12 +409,10 @@ public class LearningController {
 	ScratchieUser leader = getCurrentUser(toolSessionId);
 	// only leader is allowed to launch time limit
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
+	    return;
 	}
 
 	scratchieService.launchTimeLimit(toolSessionId);
-
-	return null;
     }
 
     /**
@@ -495,23 +493,23 @@ public class LearningController {
      * Saves newly entered burning question. Used by jqGrid cellediting feature.
      */
     @RequestMapping("/editBurningQuestion")
-    private String editBurningQuestion(HttpServletRequest request) {
-
-	if (!StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_ITEM_UID))
-		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
-
-	    Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID) == 0 ? null
-		    : WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
-	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
-	    String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX);
-	    scratchieService.saveBurningQuestion(sessionId, itemUid, question);
+    @ResponseStatus(HttpStatus.OK)
+    private void editBurningQuestion(HttpServletRequest request) {
+	if (StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_ITEM_UID))
+		|| StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
+	    return;
 	}
 
-	return null;
+	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID) == 0 ? null
+		: WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
+	Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
+	String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX);
+	scratchieService.saveBurningQuestion(sessionId, itemUid, question);
     }
 
     @RequestMapping("/like")
-    private String like(HttpServletRequest request, HttpServletResponse response)
+    @ResponseStatus(HttpStatus.OK)
+    private void like(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, ScratchieApplicationException {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -525,7 +523,7 @@ public class LearningController {
 	ScratchieUser leader = this.getCurrentUser(sessionId);
 	// only leader is allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
+	    return;
 	}
 
 	boolean added = scratchieService.addLike(burningQuestionUid, sessionId);
@@ -534,11 +532,11 @@ public class LearningController {
 	ObjectNode.put("added", added);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(ObjectNode);
-	return null;
     }
 
     @RequestMapping("/removeLike")
-    private String removeLike(HttpServletRequest request, HttpServletResponse response)
+    @ResponseStatus(HttpStatus.OK)
+    private void removeLike(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, ScratchieApplicationException {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
@@ -552,7 +550,7 @@ public class LearningController {
 	ScratchieUser leader = this.getCurrentUser(sessionId);
 	// only leader is allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
-	    return null;
+	    return;
 	}
 
 	scratchieService.removeLike(burningQuestionUid, sessionId);
@@ -561,7 +559,6 @@ public class LearningController {
 	ObjectNode.put("added", true);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(ObjectNode);
-	return null;
     }
 
     /**
@@ -594,7 +591,7 @@ public class LearningController {
      * Autosaves burning questions. Only leaders can perform it.
      */
     @RequestMapping("/autosaveBurningQuestions")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     private void autosaveBurningQuestions(HttpServletRequest request) throws ScratchieApplicationException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -613,7 +610,6 @@ public class LearningController {
     /**
      * Saves burning questions entered by user. It also updates its values in SessionMap.
      */
-
     private void saveBurningQuestions(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);

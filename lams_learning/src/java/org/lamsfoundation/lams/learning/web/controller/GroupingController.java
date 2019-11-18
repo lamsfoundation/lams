@@ -207,8 +207,7 @@ public class GroupingController {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
-	return LearningWebUtil.completeActivity(request, response, activityMapping, progress, groupingActivity,
-		learnerId, learnerService, true);
+	return learnerService.completeActivity(activityMapping, progress, groupingActivity, learnerId, true);
     }
 
     /**

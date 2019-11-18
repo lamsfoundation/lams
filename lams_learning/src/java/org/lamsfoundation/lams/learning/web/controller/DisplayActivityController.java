@@ -80,8 +80,7 @@ public class DisplayActivityController {
 	boolean displayParallelFrames = WebUtil.readBooleanParam(request,
 		DisplayActivityController.PARAM_INITIAL_DISPLAY, true);
 
-	String forward = activityMapping.getProgressForward(learnerProgress, false, displayParallelFrames, request,
-		learnerService);
+	String forward = activityMapping.getProgressForward(learnerProgress, false, displayParallelFrames);
 	if (log.isDebugEnabled()) {
 	    log.debug(forward);
 	}

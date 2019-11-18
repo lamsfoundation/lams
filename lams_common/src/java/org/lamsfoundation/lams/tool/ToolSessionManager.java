@@ -164,6 +164,8 @@ public interface ToolSessionManager {
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId);
+    
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which

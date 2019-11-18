@@ -538,6 +538,14 @@ public class SubmitFilesService
     }
 
     @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
+	SubmitUser groupLeader = session.getGroupLeader();
+
+	return (groupLeader != null) && userId.equals(groupLeader.getUserID().longValue());
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	// no actions required
     }
@@ -1384,15 +1392,6 @@ public class SubmitFilesService
 	// At checkLeaderSelectToolForSessionLeader() the user is added to session.
 	// Sometimes session save is earlier that user save in another thread, leading to an exception.
 	submitUserDAO.insertOrUpdate(user);
-    }
-
-    @Override
-    public boolean isUserGroupLeader(SubmitUser user, Long toolSessionId) {
-
-	SubmitFilesSession session = submitFilesSessionDAO.getSessionByID(toolSessionId);
-	SubmitUser groupLeader = session.getGroupLeader();
-
-	return (groupLeader != null) && user.getUserID().equals(groupLeader.getUserID());
     }
 
 }

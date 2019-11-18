@@ -55,7 +55,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(QaQueUsr user, Long toolSessionId);
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -125,8 +125,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     void createQuestion(QaQueContent qaQuestion);
 
     void removeQuestion(QaQueContent qaQuestion);
-
-    void createUserResponse(QaUsrResp qaUsrResp);
 
     void updateUserResponse(QaUsrResp resp);
 
@@ -218,6 +216,8 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    
+    String finishToolSession(Long toolSessionID, Long userID);
 
     /**
      * Get the LAMS audit service. Needed as the web layer controls the staff updating of an answer, so the log entry

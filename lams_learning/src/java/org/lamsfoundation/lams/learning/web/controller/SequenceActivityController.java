@@ -73,7 +73,6 @@ public class SequenceActivityController {
 	    return "error";
 	}
 
-	String forward = null;
 	SequenceActivity sequenceActivity = (SequenceActivity) activity;
 
 	Activity firstIncompletedActivity = null;
@@ -93,8 +92,7 @@ public class SequenceActivityController {
 
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.
-	    return LearningWebUtil.completeActivity(request, response, activityMapping, learnerProgress, activity,
-		    learnerId, learnerService, true);
+	    return learnerService.completeActivity(activityMapping, learnerProgress, activity, learnerId, true);
 	}
     }
 }

@@ -18,6 +18,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -39,8 +40,6 @@ public class CommandWebsocketServer {
      */
     private static class SendWorker extends Thread {
 	private boolean stopFlag = false;
-	// how ofter the thread runs
-	private static final long CHECK_INTERVAL = 5000;
 	// mapping lessonId -> timestamp when the check was last performed, so the thread does not run too often
 	private final Map<Long, Long> lastSendTimes = new TreeMap<>();
 
@@ -50,7 +49,7 @@ public class CommandWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
+
 		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets
 			    .entrySet().iterator();
 
@@ -61,8 +60,8 @@ public class CommandWebsocketServer {
 			if (entry != null) {
 			    Long lessonId = entry.getKey();
 			    Long lastSendTime = lastSendTimes.get(lessonId);
-			    if ((lastSendTime == null)
-				    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
+			    if ((lastSendTime == null) || ((System.currentTimeMillis()
+				    - lastSendTime) >= ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL)) {
 				send(lessonId);
 			    }
 
@@ -74,8 +73,6 @@ public class CommandWebsocketServer {
 			    }
 			}
 		    } while (entry != null);
-
-		    Thread.sleep(SendWorker.CHECK_INTERVAL);
 		} catch (IllegalStateException e) {
 		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
@@ -84,7 +81,7 @@ public class CommandWebsocketServer {
 		} finally {
 		    try {
 			HibernateSessionManager.closeSession();
-			Thread.sleep(SendWorker.CHECK_INTERVAL);
+			Thread.sleep(ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL);
 		    } catch (IllegalStateException | InterruptedException e) {
 			stopFlag = true;
 			log.warn("Stopping Command Websocket worker thread");
@@ -99,7 +96,7 @@ public class CommandWebsocketServer {
 	private void send(Long lessonId) throws IOException {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
 	    if (lastSendTime == null) {
-		lastSendTime = System.currentTimeMillis() - CHECK_INTERVAL;
+		lastSendTime = System.currentTimeMillis() - ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL;
 	    }
 	    lastSendTimes.put(lessonId, System.currentTimeMillis());
 

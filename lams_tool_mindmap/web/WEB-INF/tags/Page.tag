@@ -207,7 +207,17 @@
 					// read JSON object
 					var command = JSON.parse(e.data);
 					if (command.message) {
-						alert(command.message);
+						// some tools implement autosave feature
+						// if it is such a tool, trigger it
+						if (command.message === 'autosave') {
+							// the name of this function is same in all tools
+							if (typeof learnerAutosave == 'function') {
+								learnerAutosave();
+							}
+						} else {
+							alert(command.message);
+						}
+						
 					}
 					// if learner's currently displayed page has hookTrigger same as in the JSON
 					// then a function also defined on that page will run

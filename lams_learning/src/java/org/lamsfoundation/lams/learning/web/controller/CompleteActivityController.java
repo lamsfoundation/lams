@@ -88,7 +88,7 @@ public class CompleteActivityController {
 	    return null;
 	}
 
-	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
+	// if user has already completed the lesson - we need to let non-LTI integrations server know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
 	if (progress.isComplete()) {
 	    String lessonFinishCallbackUrl = integrationService.getLessonFinishCallbackUrl(progress.getUser(),
@@ -101,14 +101,11 @@ public class CompleteActivityController {
 	    }
 	}
 
-	String forward = null;
 	// Set activity as complete
 	try {
-	    forward = LearningWebUtil.completeActivity(request, response, activityMapping, progress, activity, learnerId,
-		    learnerService, false);
+	    return learnerService.completeActivity(activityMapping, progress, activity, learnerId, false);
 	} catch (LearnerServiceException e) {
 	    return "error";
 	}
-	return forward;
     }
 }

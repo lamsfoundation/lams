@@ -59,7 +59,7 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="createToolSession">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="createToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyTool*">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyToolToDeleteContent">PROPAGATION_REQUIRES_NEW</prop>
 			    <prop key="update*">PROPAGATION_REQUIRED</prop>
