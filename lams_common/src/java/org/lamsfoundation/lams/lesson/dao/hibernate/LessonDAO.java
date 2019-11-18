@@ -269,7 +269,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     }
 
     /**
-     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id. 
+     * Get the lesson and activity ids that apply to the tool activity associated with this tool content id.
      * Returns an array of two longs.
      */
     @Override
@@ -277,8 +277,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	Query query = getSession().createQuery(LessonDAO.FIND_LESSON_ACTIVITY_IDS_BY_TOOL_CONTENT_ID);
 	query.setLong("toolContentId", toolContentId);
 	List list = query.list();
-	
-	Long[] longArray = {null, null};
+
+	Long[] longArray = { null, null };
 	if (list.size() > 0) {
 	    Object[] objectArray = (Object[]) list.get(0);
 	    longArray = Arrays.copyOf(objectArray, objectArray.length, Long[].class);
@@ -388,10 +388,10 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	List<Object[]> resultQuery = query.list();
 
 	// this map keeps the insertion order
-	Map<User, Boolean> result = new LinkedHashMap<User, Boolean>();
+	Map<User, Boolean> result = new LinkedHashMap<>();
 	// make the result easier to process
 	for (Object[] entry : resultQuery) {
-	    result.put((User) entry[0], ((Integer) entry[1]).equals(1));
+	    result.put((User) entry[0], ((Number) entry[1]).intValue() == 1);
 	}
 	return result;
     }
@@ -419,7 +419,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getOrganisationLessons(Integer organisationId) {
-	Query<Long> query = getSession().createQuery(FIND_LESSON_IDS_BY_ORG_ID).setParameter("organisationId", organisationId);
+	Query<Long> query = getSession().createQuery(FIND_LESSON_IDS_BY_ORG_ID).setParameter("organisationId",
+		organisationId);
 	return query.list();
     }
 
