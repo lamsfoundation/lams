@@ -120,9 +120,9 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
+    public McUsrAttempt getUserAttemptByQuestion(final Long userUid, final Long mcQueContentId) {
 	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", queUsrUid)
+		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", userUid)
 		.setParameter("mcQueContentId", mcQueContentId).list();
 	if (userAttemptList.size() > 1) {
 	    throw new RuntimeException("There are more than 1 latest questionDescription attempt");

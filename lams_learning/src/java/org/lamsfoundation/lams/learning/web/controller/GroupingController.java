@@ -85,7 +85,6 @@ public class GroupingController {
     // ---------------------------------------------------------------------
     public static final String GROUPS = "groups";
     public static final String FINISHED_BUTTON = "finishedButton";
-    public static final String LOCAL_FILES = "localFiles";
     public static final String TITLE = "title";
     public static final String MAX_LEARNERS_PER_GROUP = "maxLearnersPerGroup";
     public static final String VIEW_STUDENTS_BEFORE_SELECTION = "viewStudentsBeforeSelection";
@@ -120,34 +119,11 @@ public class GroupingController {
 	groupingForm.setActivityID(activity.getActivityId());
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	
-	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
-	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
-	if (grouping != null) {
-	    for (Group group : grouping.getGroups()) {
-		GroupDTO groupDTO = new GroupDTO(group, true);
-		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
-		
-		//set isUserBelongsToGroup
-		for (UserBasicDTO userDto : groupDTO.getUserList()) {
-		    if (userDto.getUserID().equals(currentUserId)) {
-			groupDTO.setUserBelongsToGroup(true);
-			break;
-		    }
-		}
-		
-		groups.add(groupDTO);
-	    }
-	}
-	request.setAttribute(GroupingController.GROUPS, groups);
-	request.setAttribute(GroupingController.TITLE, activity.getTitle());
-	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
-	request.setAttribute(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS,
-		Configuration.getAsBoolean(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS));
+	prepareDataForShowPage(currentUserId, request);
 	
 	//Load up the grouping information and forward to the jsp page to display all the groups and members.
 	if (groupingDone) {
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
-	    request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	    ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, new Boolean((mode == null) || !mode.isTeacher()));
 
@@ -168,7 +144,6 @@ public class GroupingController {
 
 	    LearnerChoiceGrouping groupingDb = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
 	    request.setAttribute(GroupingController.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
-	    request.setAttribute(GroupingController.LOCAL_FILES, Boolean.FALSE);
 	    request.setAttribute(GroupingController.VIEW_STUDENTS_BEFORE_SELECTION,
 		    groupingDb.getViewStudentsBeforeSelection());
 	    return "grouping/choose";
@@ -176,6 +151,49 @@ public class GroupingController {
 	} else {
 	    return "grouping/wait";
 	}
+    }
+    
+    /**
+     * Load up the grouping information and forward to the jsp page to display all the groups and members. This method is used only to show show.jsp page to the teacher.
+     */
+    @RequestMapping("/viewGrouping")
+    public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
+	int userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
+	prepareDataForShowPage(userId, request);
+	
+	request.setAttribute(GroupingController.FINISHED_BUTTON, false);
+	return "grouping/show";
+    }
+    
+    /**
+     * Common method for performGrouping(GroupingForm, HttpServletRequest) and viewGrouping(HttpServletRequest)
+     */
+    private void prepareDataForShowPage(Integer userId, HttpServletRequest request) {
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	SortedSet<GroupDTO> groups = new TreeSet<>(GroupDTO.GROUP_NAME_COMPARATOR);
+	Grouping grouping = ((GroupingActivity) activity).getCreateGrouping();
+	if (grouping != null) {
+	    for (Group group : grouping.getGroups()) {
+		GroupDTO groupDTO = new GroupDTO(group, true);
+		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
+
+		//set isUserBelongsToGroup
+		for (UserBasicDTO userDto : groupDTO.getUserList()) {
+		    if (userDto.getUserID().equals(userId)) {
+			groupDTO.setUserBelongsToGroup(true);
+			break;
+		    }
+		}
+
+		groups.add(groupDTO);
+	    }
+	}
+	request.setAttribute(GroupingController.GROUPS, groups);
+	request.setAttribute(GroupingController.TITLE, activity.getTitle());
+	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
+	request.setAttribute(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS,
+		Configuration.getAsBoolean(ConfigurationKeys.RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS));
     }
 
     /**
@@ -191,7 +209,7 @@ public class GroupingController {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// so manually resume the progress. The completeActivity code can cope with a missing activity.
-	return learnerService.completeActivity(progress, groupingActivity, learnerId, true);
+	return learnerService.completeActivity(activityMapping, progress, groupingActivity, learnerId, true);
     }
 
     /**

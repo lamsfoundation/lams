@@ -6,7 +6,6 @@
            				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
            				   
 	<bean id="integrationServiceTarget" class="org.lamsfoundation.lams.integration.service.IntegrationService">
-		<property name="gradebookService"><ref bean="gradebookService"/></property>
 		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="service"><ref bean="userManagementService"/></property>
 		<property name="toolService"><ref bean="lamsCoreToolServiceTarget"/></property>

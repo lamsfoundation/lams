@@ -302,6 +302,14 @@ public class ScratchieServiceImpl
     }
 
     @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
+	ScratchieUser groupLeader = session.getGroupLeader();
+
+	return (groupLeader != null) && userId.equals(groupLeader.getUserId());
+    }
+
+    @Override
     public ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId) {
 	if ((user == null) || (toolSessionId == null)) {
 	    return null;
@@ -379,7 +387,7 @@ public class ScratchieServiceImpl
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 
-	    toolService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(),
+	    toolService.updateActivityMark(newMark.doubleValue(), null, user.getUserId().intValue(),
 		    user.getSession().getSessionId(), false);
 
 	    // record mark change with audit service
@@ -481,7 +489,7 @@ public class ScratchieServiceImpl
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		toolService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(),
+		toolService.updateActivityMark(Double.valueOf(mark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -613,6 +621,19 @@ public class ScratchieServiceImpl
 	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	    user.setSessionFinished(true);
 	    scratchieUserDao.saveObject(user);
+
+	    //if this is a leader finishes, complete all non-leaders as well
+	    boolean isUserGroupLeader = user.getSession().isUserGroupLeader(user.getUid());
+	    if (isUserGroupLeader) {
+		getUsersBySession(toolSessionId).forEach(sessionUser -> {
+		    //finish non-leader
+		    sessionUser.setSessionFinished(true);
+		    scratchieUserDao.saveObject(user);
+
+		    // as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
+		    // need to copyAnswersFromLeader()
+		});
+	    }
 
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);
 	} catch (DataMissingException e) {
@@ -1306,7 +1327,7 @@ public class ScratchieServiceImpl
 		}
 		row.addCell(isFirstChoice, color);
 	    }
-	    row.addCell(new Integer(numberOfFirstChoiceEvents));
+	    row.addCell(Integer.valueOf(numberOfFirstChoiceEvents));
 	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
 	    row.addPercentageCell(percentage);
 	}
@@ -1369,7 +1390,7 @@ public class ScratchieServiceImpl
 		}
 		row.addCell(itemDto.getOptionsSequence(), color);
 	    }
-	    row.addCell(new Integer(numberOfFirstChoiceEvents));
+	    row.addCell(Integer.valueOf(numberOfFirstChoiceEvents));
 	    double percentage = (numberOfItems == 0) ? 0 : (double) numberOfFirstChoiceEvents / numberOfItems;
 	    row.addPercentageCell(percentage);
 
@@ -1461,8 +1482,8 @@ public class ScratchieServiceImpl
 		    color = IndexedColors.RED;
 		}
 		row.addCell(isFirstChoice, color);
-		row.addCell(new Long(attempts), color);
-		Long mark = (itemDto.getUserMark() == -1) ? null : new Long(itemDto.getUserMark());
+		row.addCell(Integer.valueOf(attempts), color);
+		Long mark = (itemDto.getUserMark() == -1) ? null : Long.valueOf(itemDto.getUserMark());
 		row.addCell(mark);
 	    }
 	}
@@ -1486,8 +1507,8 @@ public class ScratchieServiceImpl
 	    for (ScratchieUser user : summary.getUsers()) {
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(user.getFirstName() + " " + user.getLastName());
-		row.addCell(new Long(summary.getTotalAttempts()));
-		Long mark = (summary.getTotalAttempts() == 0) ? null : new Long(summary.getMark());
+		row.addCell(Long.valueOf(summary.getTotalAttempts()));
+		Long mark = (summary.getTotalAttempts() == 0) ? null : Long.valueOf(summary.getMark());
 		row.addCell(mark);
 		row.addCell(summary.getSessionName());
 	    }
@@ -1539,7 +1560,7 @@ public class ScratchieServiceImpl
 		    row.addCell(answerTitle, color);
 
 		    for (int numberAttempts : optionDto.getAttempts()) {
-			row.addCell(new Long(numberAttempts));
+			row.addCell(Integer.valueOf(numberAttempts));
 		    }
 		}
 		researchAndAnalysisSheet.addEmptyRow();
@@ -1562,7 +1583,7 @@ public class ScratchieServiceImpl
 		row = researchAndAnalysisSheet.initRow();
 		row.addEmptyCell();
 		for (int i = 0; i < optionDtos.size(); i++) {
-		    row.addCell(new Long(i + 1));
+		    row.addCell(Integer.valueOf(i + 1));
 		}
 
 		for (OptionDTO optionDto : optionDtos) {
@@ -1575,7 +1596,7 @@ public class ScratchieServiceImpl
 		    row.addCell(optionTitle);
 
 		    for (int numberAttempts : optionDto.getAttempts()) {
-			row.addCell(new Long(numberAttempts));
+			row.addCell(Integer.valueOf(numberAttempts));
 		    }
 		}
 
@@ -1604,7 +1625,7 @@ public class ScratchieServiceImpl
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 		row.addCell(attempts);
 		row.addCell(getMessage("label.mark") + ":");
-		row.addCell(new Long(session.getMark()));
+		row.addCell(Long.valueOf(session.getMark()));
 
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(getMessage("label.team.leader") + session.getSessionName());
@@ -1619,7 +1640,7 @@ public class ScratchieServiceImpl
 			    item.getUid());
 		    for (ScratchieAnswerVisitLog log : logs) {
 			row = researchAndAnalysisSheet.initRow();
-			row.addCell(new Long(i++));
+			row.addCell(Integer.valueOf(i++));
 			String answerDescr = removeHtmlMarkup(log.getQbOption().getName());
 			row.addCell(answerDescr);
 			row.addCell(fullDateFormat.format(log.getAccessDate()));
@@ -1682,7 +1703,7 @@ public class ScratchieServiceImpl
 		    // group name
 		    row.addCell(summary.getSessionName());
 		    // question number
-		    row.addCell(new Long(questionCount++));
+		    row.addCell(Integer.valueOf(questionCount++));
 		    // question title
 		    row.addCell(itemDto.getTitle());
 
@@ -1709,9 +1730,9 @@ public class ScratchieServiceImpl
 		    }
 		    row.addCell(isFirstChoice);
 		    // attempts
-		    row.addCell(new Long(attempts));
+		    row.addCell(Integer.valueOf(attempts));
 		    // mark
-		    Object mark = (itemDto.getUserMark() == -1) ? "" : new Long(itemDto.getUserMark());
+		    Object mark = (itemDto.getUserMark() == -1) ? "" : Long.valueOf(itemDto.getUserMark());
 		    row.addCell(mark);
 
 		    // options selected
@@ -2305,8 +2326,6 @@ public class ScratchieServiceImpl
 	    return;
 	}
 
-	// as long as leader aware feature is always ON - copy answers from leader to non-leader user
-
 	ScratchieUser scratchieUser = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	// create user if he hasn't accessed this activity yet
 	if (scratchieUser == null) {
@@ -2314,8 +2333,24 @@ public class ScratchieServiceImpl
 	    createUser(scratchieUser);
 	}
 
-	// as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
-	// need to copyAnswersFromLeader()
+	checkLeaderSelectToolForSessionLeader(scratchieUser, toolSessionId);
+	//if this is a leader finishes, complete all non-leaders as well
+	boolean isUserGroupLeader = session.isUserGroupLeader(scratchieUser.getUid());
+	if (isUserGroupLeader) {
+	    getUsersBySession(toolSessionId).forEach(sessionUser -> {
+		//finish users
+		sessionUser.setSessionFinished(true);
+		scratchieUserDao.saveObject(user);
+
+		// as long as there is no individual results in Scratchie tool (but rather one for entire group) there is no
+		// need to copyAnswersFromLeader()
+	    });
+
+	} else {
+	    //finish user
+	    scratchieUser.setSessionFinished(true);
+	    scratchieUserDao.saveObject(scratchieUser);
+	}
     }
 
     /* =================================================================================== */

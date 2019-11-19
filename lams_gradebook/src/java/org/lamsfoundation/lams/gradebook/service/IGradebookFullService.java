@@ -242,17 +242,6 @@ public interface IGradebookFullService extends IGradebookService {
     Double getAverageMarkForLesson(Long lessonID);
 
     /**
-     * Method for updating an activity mark that tools can call
-     *
-     * @param mark
-     * @param feedback
-     * @param userID
-     * @param toolSessionID
-     */
-    void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
-	    Boolean markedInGradebook);
-
-    /**
      * Get an activity from the db by id
      *
      * @param activityID

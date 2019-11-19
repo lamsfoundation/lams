@@ -43,8 +43,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
     
-    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT (r.finishDate IS NOT NULL) FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
+    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT COUNT(*) > 0 FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1 AND r.finishDate != null";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";

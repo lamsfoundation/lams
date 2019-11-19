@@ -87,4 +87,17 @@ public class LearningWebUtil {
 
 	return learnerProgress;
     }
+
+    /**
+     * Get the activity from request. We assume there is a parameter coming in. Then the activity id parameter is used
+     * to retrieve from database.
+     *
+     * @param request
+     * @return
+     */
+    public static Activity getActivityFromRequest(HttpServletRequest request, ILearnerFullService learnerService) {
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(activityId);
+	return activity;
+    }
 }

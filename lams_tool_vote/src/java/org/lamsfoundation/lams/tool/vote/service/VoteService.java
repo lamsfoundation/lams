@@ -133,11 +133,10 @@ public class VoteService
     }
 
     @Override
-    public boolean isUserGroupLeader(VoteQueUsr user, Long toolSessionId) {
-
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	VoteSession session = getSessionBySessionId(toolSessionId);
 	VoteQueUsr groupLeader = session.getGroupLeader();
-	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	boolean isUserLeader = (groupLeader != null) && userId.equals(groupLeader.getQueUsrId());
 	return isUserLeader;
     }
 

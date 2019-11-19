@@ -37,8 +37,9 @@
         //autoSaveAnswers if hasEditRight
         if (${hasEditRight}) {
           var interval = "30000"; // = 30 seconds
-          window.setInterval(
-            function(){
+          window.setInterval(learnerAutosave, interval);
+          
+          function learnerAutosave(){
               //ajax form submit
               $('#mcLearningForm').ajaxSubmit({
                 url: "<c:url value='/learning/autoSaveAnswers.do?date='/>" + new Date().getTime(),
@@ -46,8 +47,7 @@
                   $.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
                 }
               });
-            }, interval
-          );
+          }
         }
 
         function submitNextQuestionSelected() {

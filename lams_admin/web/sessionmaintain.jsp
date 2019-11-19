@@ -18,6 +18,8 @@
 		<p>
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
 		</p>
+		
+		<div class="alert alert-info">${fn:length(sessions)}&nbsp;<fmt:message key="sysadmin.maintain.session.count" /></div>
 
 		<table class="table table-striped">
 			<tr>

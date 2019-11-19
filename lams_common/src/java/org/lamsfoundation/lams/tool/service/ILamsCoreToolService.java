@@ -168,7 +168,7 @@ public interface ILamsCoreToolService {
 
     /**
      * Ask an activity to delete content entered by the given user, if exists.
-     * 
+     *
      * @return whether the activity should be persisted afterwards
      */
     boolean removeLearnerContent(Activity activity, User learner) throws ToolException;
@@ -224,18 +224,17 @@ public interface ILamsCoreToolService {
      * @throws ToolException
      */
     ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId) throws ToolException;
-    
+
     /**
      * Returns tool outputs for the entire activity. Note, some tools don't support this functionality and will always
      * return empty list.
-     * 
+     *
      * @param conditionName
      * @param toolActivity
      * @return
      * @throws ToolException
      */
-    List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity)
-	    throws ToolException;
+    List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity) throws ToolException;
 
     /**
      * Ask a tool for a set of ToolOutputs, based on the given toolSessionId.
@@ -274,24 +273,33 @@ public interface ILamsCoreToolService {
      */
     SortedMap<String, ToolOutput> getOutputFromTool(List<String> names, ToolSession toolSession, Integer learnerId)
 	    throws ToolException;
-    
+
     /**
-     * Returns confidence levels indicated by learners when answering questions. By now this feature is supported only by Assessment and MCQ tools.
-     * 
+     * Returns confidence levels indicated by learners when answering questions. By now this feature is supported only
+     * by Assessment and MCQ tools.
+     *
      * @param toolSession
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByToolSession(ToolSession toolSession);
-    
+
     /**
      * Returns answers learners left for VSA questions in Assessment activity (together with according confidence
      * levels, if such option is turned on in Assessment). Currently only Assessment tool is capable of producing VSA
      * answers.
-     * 
+     *
      * @param toolSession
      * @return
      */
     Collection<VsaAnswerDTO> getVsaAnswersByToolSession(ToolSession toolSession);
+
+    /**
+     * Returns true in case this tool is leader-aware and specified user is a leader in his group, false otherwise.
+     *
+     * @param toolSession
+     * @param learner
+     */
+    boolean isUserLeaderInActivity(ToolSession toolSession, User user);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which
@@ -314,7 +322,7 @@ public interface ILamsCoreToolService {
 
     /**
      * Calculates lesson's maximum possible mark by adding up all activities max marks.
-     * 
+     *
      * @param lesson
      * @return
      */
@@ -441,7 +449,6 @@ public interface ILamsCoreToolService {
     String setupToolURLWithToolContent(ToolActivity activity, String toolURL);
 
     Object findToolService(Tool tool) throws NoSuchBeanDefinitionException;
-    
-    ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity) 
-	    throws LamsToolServiceException;
+
+    ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity) throws LamsToolServiceException;
 }

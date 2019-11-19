@@ -250,7 +250,7 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	sessionMap.put(SbmtConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner, toolSessionID);
+	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner.getUserID().longValue(), toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	boolean hasEditRight = !content.isUseSelectLeaderToolOuput()

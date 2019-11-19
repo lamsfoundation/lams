@@ -780,7 +780,7 @@ public class LearningController implements VoteAppConstants {
 	    voteLearningForm.setGroupLeaderName(groupLeader.getFullname());
 	    voteLearningForm.setGroupLeaderUserId(
 		    groupLeader.getQueUsrId() != null ? groupLeader.getQueUsrId().toString() : "");
-	    boolean isUserLeader = voteService.isUserGroupLeader(user, new Long(toolSessionID));
+	    boolean isUserLeader = voteService.isUserGroupLeader(user.getQueUsrId(), new Long(toolSessionID));
 	    voteLearningForm.setIsUserLeader(isUserLeader);
 	}
 

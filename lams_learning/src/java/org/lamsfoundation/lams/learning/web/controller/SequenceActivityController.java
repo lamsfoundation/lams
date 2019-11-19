@@ -96,7 +96,7 @@ public class SequenceActivityController {
 
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.
-	    return learnerService.completeActivity(learnerProgress, activity, learnerId, true);
+	    return learnerService.completeActivity(activityMapping, learnerProgress, activity, learnerId, true);
 	}
     }
 }

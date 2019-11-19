@@ -71,12 +71,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -194,7 +196,7 @@ public class QaLearningController implements QaAppConstants {
 		|| (mode != null) && mode.equals(ToolAccessMode.TEACHER.toString()));
 
 	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = qaService.isUserGroupLeader(user, new Long(toolSessionID));
+	boolean isUserLeader = qaService.isUserGroupLeader(user.getQueUsrId(), new Long(toolSessionID));
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -392,10 +394,6 @@ public class QaLearningController implements QaAppConstants {
 
     /**
      * validates the learning mode parameters
-     *
-     * @param request
-     * @param mapping
-     * @return ActionForward
      */
     protected void validateParameters(HttpServletRequest request,
 	    @ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm) {
@@ -443,14 +441,6 @@ public class QaLearningController implements QaAppConstants {
 
     /**
      * submits users responses
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/submitAnswersContent")
     public String submitAnswersContent(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
@@ -578,17 +568,9 @@ public class QaLearningController implements QaAppConstants {
 
     /**
      * auto saves responses
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/autoSaveAnswers")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public void autoSaveAnswers(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -627,14 +609,6 @@ public class QaLearningController implements QaAppConstants {
 
     /**
      * enables retaking the activity
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/redoQuestions")
     public String redoQuestions(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
@@ -684,8 +658,6 @@ public class QaLearningController implements QaAppConstants {
      * answers screen, otherwise goes straight to the reflection screen (if any).
      *
      * @return Learner Report for a session
-     * @throws IOException
-     * @throws ServletException
      */
     @RequestMapping("/storeAllResults")
     public String storeAllResults(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
@@ -864,12 +836,6 @@ public class QaLearningController implements QaAppConstants {
     /**
      * Get the answer from the form and copy into DTO. Set up the next question. If the current question is required and
      * the answer is blank, then just persist the error and don't change questions.
-     *
-     * @param form
-     * @param request
-     * @param generalLearnerFlowDTO
-     * @param getNextQuestion
-     * @return
      */
     private Object[] storeSequentialAnswer(QaLearningForm qaLearningForm, HttpServletRequest request,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion) {
@@ -1031,7 +997,6 @@ public class QaLearningController implements QaAppConstants {
     public String endLearning(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, ToolException {
-
 	LearningUtil.saveFormRequestData(request, qaLearningForm);
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -1040,12 +1005,6 @@ public class QaLearningController implements QaAppConstants {
 	String userID = request.getParameter("userID");
 	qaLearningForm.setUserID(userID);
 
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
-
-	QaQueUsr qaQueUsr = qaService.getUserByIdAndSession(new Long(userID), qaSession.getQaSessionId());
-	qaQueUsr.setLearnerFinished(true);
-	qaService.updateUser(qaQueUsr);
-
 	/*
 	 * The learner is done with the tool session. The tool needs to clean-up.
 	 */
@@ -1053,31 +1012,15 @@ public class QaLearningController implements QaAppConstants {
 	/* get back login user DTO */
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
-	qaSession.setSession_status(QaAppConstants.COMPLETED);
-	qaService.updateSession(qaSession);
-
 	String sessionMapID = qaLearningForm.getSessionMapID();
 	// request.getSession().removeAttribute(sessionMapID);
 	qaLearningForm.setSessionMapID(sessionMapID);
-
-	String nextActivityUrl = qaService.leaveToolSession(new Long(toolSessionID),
-		new Long(user.getUserID().longValue()));
+	String nextActivityUrl = qaService.finishToolSession(Long.valueOf(toolSessionID), user.getUserID().longValue());
 	response.sendRedirect(nextActivityUrl);
 
 	return null;
     }
 
-    /**
-     *
-     * @param qaLearningForm
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
-     */
     @RequestMapping("/submitReflection")
     public String submitReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request, HttpServletResponse response)
@@ -1118,15 +1061,6 @@ public class QaLearningController implements QaAppConstants {
 	return endLearning(qaLearningForm, request, response);
     }
 
-    /**
-     *
-     * @param qaLearningForm
-     * @param request
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
-     */
     @RequestMapping("/forwardtoReflection")
     public String forwardtoReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
 	    HttpServletRequest request) throws IOException, ServletException, ToolException {

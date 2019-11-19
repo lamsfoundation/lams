@@ -120,26 +120,26 @@
 		if (${hasEditRight}) {
 				
 			var interval = "30000"; // = 30 seconds
-			window.setInterval(
-				function(){
-					//fire onchange event for textareas/ckeditors
-					if (${generalLearnerFlowDTO.allowRichEditor}) {
-					    for ( instance in CKEDITOR.instances ) {
-					        CKEDITOR.instances[instance].updateElement();
-					    }
-					} else {
-						$("textarea[name$=__textarea]").change();
-					}
-					
-					//ajax form submit
-					$('#qaLearningForm').ajaxSubmit({
-						url: '<c:url value="autoSaveAnswers.do?date=" />' + new Date().getTime(),
-			               success: function() {
-			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
-			               }
-					});
-		       	}, interval
-		   );
+			window.setInterval(learnerAutosave, interval);
+			
+			function learnerAutosave(){
+				//fire onchange event for textareas/ckeditors
+				if (${generalLearnerFlowDTO.allowRichEditor}) {
+				    for ( instance in CKEDITOR.instances ) {
+				        CKEDITOR.instances[instance].updateElement();
+				    }
+				} else {
+					$("textarea[name$=__textarea]").change();
+				}
+				
+				//ajax form submit
+				$('#qaLearningForm').ajaxSubmit({
+					url: '<c:url value="autoSaveAnswers.do?date=" />' + new Date().getTime(),
+		               success: function() {
+		               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
+		               }
+				});
+			}
 		}
 
 		//min words counter

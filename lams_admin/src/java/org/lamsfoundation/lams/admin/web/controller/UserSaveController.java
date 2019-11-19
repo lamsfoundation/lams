@@ -251,21 +251,17 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 1)) {
-		return "forward:/usersearch.do";
+		return "redirect:/usersearch.do";
 	    }
 	    if (!edit && !canEditRole) {
 		// Course Admin created new learner
 		userManagementService.setRolesForUserOrganisation(user, orgId,
 			Arrays.asList(Role.ROLE_LEARNER.toString()));
-		request.setAttribute("org", orgId);
-		return "forward:/usermanage.do";
+		return "redirect:/usermanage.do?org=" + orgId;
 	    } else if (edit) {
-		request.setAttribute("org", orgId);
-		return "forward:/usermanage.do";
+		return "redirect:/usermanage.do?org=" + orgId;
 	    } else {
-		request.setAttribute("orgId", orgId);
-		request.setAttribute("userId", user.getUserId());
-		return "forward:/userroles.do";
+		return "redirect:/userroles.do?orgId=" + orgId + "&userId=" + user.getUserId();
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);

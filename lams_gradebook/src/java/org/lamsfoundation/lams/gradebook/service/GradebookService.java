@@ -49,8 +49,8 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.model.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.model.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
-import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -131,12 +131,11 @@ public class GradebookService implements IGradebookFullService {
     private ILessonDAO lessonDAO;
     private ILessonService lessonService;
     private IUserManagementService userService;
-    private IBaseDAO baseDAO;
     private IActivityDAO activityDAO;
     private MessageService messageService;
     private ILogEventService logEventService;
     private static ILearnerService learnerService;
-
+    private IIntegrationService integrationService;
     private IOutcomeService outcomeService;
 
     @Override
@@ -727,7 +726,6 @@ public class GradebookService implements IGradebookFullService {
 		    }
 		}
 	    }
-
 	} catch (ToolException e) {
 	    logger.debug(
 		    "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
@@ -737,20 +735,6 @@ public class GradebookService implements IGradebookFullService {
     @Override
     public void updateGradebookUserActivityMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired) {
-
-	GradebookUserActivity gradebookUserActivity = gradebookDAO
-		.getGradebookUserDataForActivity(activity.getActivityId(), learner.getUserId());
-
-	GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
-		learner.getUserId());
-
-	updateUserActivityGradebookMark(lesson, learner, activity, mark, markedInGradebook, isAuditLogRequired,
-		gradebookUserActivity, gradebookUserLesson);
-    }
-
-    private void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
-	    Boolean markedInGradebook, boolean isAuditLogRequired) {
-
 	GradebookUserActivity gradebookUserActivity = gradebookDAO
 		.getGradebookUserDataForActivity(activity.getActivityId(), learner.getUserId());
 
@@ -788,6 +772,9 @@ public class GradebookService implements IGradebookFullService {
 	return evaluations;
     }
 
+    /*
+     * TODO Method is not in use. Remove it?
+     * 
     private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
 	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
 
@@ -815,7 +802,7 @@ public class GradebookService implements IGradebookFullService {
 
 		    // Only set the mark if it hasnt previously been set by a teacher
 		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
-			updateUserActivityGradebookMark(lesson, learner, toolActivity, outputDouble, false, false);
+			updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
 		    }
 		}
 	    }
@@ -825,6 +812,7 @@ public class GradebookService implements IGradebookFullService {
 		    "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
 	}
     }
+    */
 
     /**
      * It's the same method as above, it only also accepts gradebookUserActivity and gradebookUserLesson as parameters.
@@ -869,6 +857,13 @@ public class GradebookService implements IGradebookFullService {
 		String message = messageService.getMessage("audit.activity.change.mark", args);
 		logEventService.logEvent(LogEvent.TYPE_MARK_UPDATED, monitorUser.getUserID(), learner.getUserId(),
 			lesson.getLessonId(), activity.getActivityId(), message);
+	    }
+
+	    //propagade mark to integration server, if the lesson has been finished by the learner
+	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(learner.getUserId(),
+		    lesson.getLessonId());
+	    if (learnerProgress != null && learnerProgress.isComplete()) {
+		integrationService.pushMarkToLtiConsumer(learner, lesson, gradebookUserLesson.getMark());
 	    }
 	}
     }
@@ -941,7 +936,6 @@ public class GradebookService implements IGradebookFullService {
 	Integer orgId = organisation.getOrganisationId();
 
 	if (organisation != null) {
-
 	    List<Lesson> lessons = (view == GBGridView.MON_COURSE || view == GBGridView.LIST
 		    || view == GBGridView.MON_USER)
 			    ? gradebookDAO.getLessonsByGroupAndUser(isGroupManager ? null : viewer.getUserId(), true,
@@ -1035,12 +1029,8 @@ public class GradebookService implements IGradebookFullService {
 		    } else {
 			lessonRow.setSubGroup("");
 		    }
-
 		}
 	    }
-
-	} else {
-	    logger.error("Request for gradebook grid with a null organisation");
 	}
 
 	return lessonRows;
@@ -1897,7 +1887,9 @@ public class GradebookService implements IGradebookFullService {
 	}
     }
 
-    @Override
+    /*
+     * TODO Method is not in use. Remove it?
+     * 
     public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
 	    Boolean markedInGradebook) {
 	ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
@@ -1909,12 +1901,13 @@ public class GradebookService implements IGradebookFullService {
 	    // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
 	    // mark and feedback
 	    if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
-		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
+		updateGradebookUserActivityMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
 			false);
 		updateUserActivityGradebookFeedback(activity, learner, feedback);
 	    }
 	}
     }
+    */
 
     @Override
     public void removeActivityMark(Integer userID, Long toolSessionID) {
@@ -1963,7 +1956,7 @@ public class GradebookService implements IGradebookFullService {
 	    logger.debug(
 		    "Removing activity and lesson entries for learner ID " + learnerId + " and lesson ID " + lessonId);
 	}
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, learnerId);
 	for (ToolActivity activity : activities) {
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), learnerId);
@@ -1983,7 +1976,7 @@ public class GradebookService implements IGradebookFullService {
 	    logger.debug("Archiving activity and lesson entries for learner ID " + learnerId + " and lesson ID "
 		    + lessonId + " with archive date " + archiveDate);
 	}
-	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson lesson = lessonService.getLesson(lessonId);
 	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, learnerId);
 	for (ToolActivity activity : activities) {
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), learnerId);
@@ -2553,16 +2546,8 @@ public class GradebookService implements IGradebookFullService {
 	this.logEventService = logEventService;
     }
 
-    public ILamsCoreToolService getToolService() {
-	return toolService;
-    }
-
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
-    }
-
-    public IGradebookDAO getGradebookDAO() {
-	return gradebookDAO;
     }
 
     public void setGradebookDAO(IGradebookDAO gradebookDAO) {
@@ -2577,32 +2562,12 @@ public class GradebookService implements IGradebookFullService {
 	this.lessonDAO = lessonDAO;
     }
 
-    public ILessonService getLessonService() {
-	return lessonService;
-    }
-
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
 
-    public IUserManagementService getUserService() {
-	return userService;
-    }
-
     public void setUserService(IUserManagementService userService) {
 	this.userService = userService;
-    }
-
-    public IBaseDAO getBaseDAO() {
-	return baseDAO;
-    }
-
-    public void setBaseDAO(IBaseDAO baseDAO) {
-	this.baseDAO = baseDAO;
-    }
-
-    public IActivityDAO getActivityDAO() {
-	return activityDAO;
     }
 
     public void setActivityDAO(IActivityDAO activityDAO) {
@@ -2619,5 +2584,9 @@ public class GradebookService implements IGradebookFullService {
 
     public void setOutcomeService(IOutcomeService outcomeService) {
 	this.outcomeService = outcomeService;
+    }
+    
+    public void setIntegrationService(IIntegrationService integrationService) {
+	this.integrationService = integrationService;
     }
 }
