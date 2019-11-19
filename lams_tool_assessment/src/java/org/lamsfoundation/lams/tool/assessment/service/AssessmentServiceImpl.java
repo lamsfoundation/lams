@@ -3384,9 +3384,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			QbOption option = new QbOption();
 			option.setQbQuestion(qbQuestion);
 			option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-			Double maxMark = JsonUtil.optDouble(answerData, "maxMark");
-			option.setMaxMark(maxMark == null ? 1 : maxMark.floatValue());
-			option.setCorrect(JsonUtil.optBoolean(answerData, "correct", false));
+			Double grade = JsonUtil.optDouble(answerData, "grade");
+			option.setMaxMark(grade == null ? 0 : grade.floatValue());
 			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
 			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
 			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
