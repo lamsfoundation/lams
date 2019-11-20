@@ -88,6 +88,7 @@ public class QbStatsController {
 
 	    model.addAttribute("transferAllowed",
 		    Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW));
+	    model.addAttribute("mergeAllowed", Configuration.getAsBoolean(ConfigurationKeys.QB_MERGE_ENABLE));
 
 	} else {
 	    List<OutcomeMapping> outcomeMappings = outcomeService.getOutcomeMappings(null, null, null, qbQuestionId);
