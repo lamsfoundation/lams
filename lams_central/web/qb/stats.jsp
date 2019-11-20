@@ -54,6 +54,10 @@
 		a {
 			cursor: pointer;
 		}
+		
+		.alert ul {
+			margin-left: 10px;
+		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -91,7 +95,7 @@
 				},
 				'cache' : false
 			}).done(function(){
-				document.location.reload();
+				document.location.href = '<lams:LAMSURL />qb/stats/show.do?qbQuestionUid=${question.uid}';
 			});
 		}
 		
@@ -118,7 +122,7 @@
 				if (permanentRemove) {
 					document.location.href = '<lams:LAMSURL />qb/collection/show.do';
 				} else {
-					document.location.reload();
+					document.location.href = '<lams:LAMSURL />qb/stats/show.do?qbQuestionUid=${question.uid}';
 				}
 			});
 		}
@@ -140,6 +144,12 @@
 <fmt:message key="label.qb.stats.title" var="label.qb.stats.title" />
 <lams:Page title='${label.qb.stats.title}' type="admin">
 	<div class="panel panel-default">
+	    <c:if test="${not empty mergeSourceQbQuestionUid}">
+ 			<div class="alert alert-success">
+ 	        	Question with UID ${mergeSourceQbQuestionUid} was merged with this question.<br />
+ 	            Number of migrated learner answers: ${mergeResult} 
+ 	        </div>
+ 	    </c:if>
 		<div class="panel-heading">
 			<fmt:message key="label.qb.stats.question" />
 			
@@ -157,6 +167,14 @@
 			<div class="question-table">
 				<div class="row">
 					<div class="col-sm-1">
+					 	UID:
+ 		            </div>
+ 		           <div class="col-sm-11">
+ 		              <c:out value="${question.uid}" />
+ 		           </div>
+ 		        </div>
+ 	            <div class="row">
+ 		        	<div class="col-sm-1">
 						<fmt:message key="label.qb.stats.question.version" />:
 					</div>
 					<div class="col-sm-11">
@@ -366,7 +384,6 @@
 										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
 										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
 										<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
-										
 									</c:otherwise>
 								</c:choose>
 							</tr>
@@ -478,7 +495,7 @@
 	
 	<c:choose>
 		<c:when test="${managementAllowed}">
-			<lams:OutcomeAuthor qbQuestionId="${question.questionId}" />
+			<lams:OutcomeAuthor inPanel="true" qbQuestionId="${question.questionId}" />
 		</c:when>
 		<c:otherwise>
 			<div class="panel panel-default">
@@ -517,6 +534,53 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+	
+	<c:if test="${managementAllowed}">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Merge this question with...
+			</div>
+			<div class="panel-body">
+				<c:if test="${not empty mergeErrors}">
+					<div class="row">
+						<div class="col-xs-0 col-md-2"></div>
+						<div class="col-xs-12 col-md-8 alert alert-danger">
+							<ul>
+								<c:forEach var="error" items="${mergeErrors}">
+									<li><c:out value="${error}" /></li>
+								</c:forEach>
+							</ul>
+						</div>
+						<div class="col-xs-0 col-md-2"></div>
+					</div>
+				</c:if>
+
+				<div class="row">
+					<form action="merge.do" method="post">
+						<input type="hidden" name="sourceQbQuestionUid" value="${question.uid}" />
+						<div class="col-xs-0 col-md-2">
+							Question UID
+						</div>
+						<div class="col-xs-12 col-md-8 middle-cell">
+							<input type="text" name="targetQbQuestionUid" class="form-control" /> 
+						</div>
+						<div class="col-xs-0 col-md-2">
+							<button type="submit" class="btn btn-default">Merge now</button>
+						</div>
+					</form>
+				</div>
+				
+				<div class="row">
+					<div class="col-xs-0 col-md-2"></div>
+					<div class="col-xs-12 col-md-8">
+						This will merge this question with the question UID you entered above.
+						Before you do this, make sure you know what are you doing as once merging is performed this cannot be undone. 
+					</div>
+					<div class="col-xs-0 col-md-2"></div>
+				</div>
+			</div>
+		</div>
+	</c:if>
 </lams:Page>
 
 <!-- For exporting QTI packages -->

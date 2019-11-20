@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.web.qb;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.outcome.service.OutcomeService;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -99,6 +101,41 @@ public class QbStatsController {
 	}
 
 	return "qb/stats";
+    }
+
+    @RequestMapping("/merge")
+    public String mergeQuestions(@RequestParam long sourceQbQuestionUid, @RequestParam long targetQbQuestionUid,
+	    Model model) throws Exception {
+	QbQuestion sourceQuestion = qbService.getQuestionByUid(sourceQbQuestionUid);
+	QbQuestion targetQuestion = qbService.getQuestionByUid(targetQbQuestionUid);
+	List<String> mergeErrors = new LinkedList<>();
+
+	if (sourceQuestion == null) {
+	    // TODO rewrite it to i18n keys
+	    mergeErrors.add("Source question does not exist");
+	}
+	if (targetQuestion == null) {
+	    mergeErrors.add("Target question does not exist");
+	}
+
+	if (mergeErrors.isEmpty()) {
+	    if (!sourceQuestion.getType().equals(targetQuestion.getType())) {
+		mergeErrors.add("Source question type is different to target question type");
+	    }
+
+	    if (sourceQuestion.getQbOptions().size() != targetQuestion.getQbOptions().size()) {
+		mergeErrors.add("Number of options in source and target questions does not match");
+	    }
+	}
+	if (mergeErrors.isEmpty()) {
+	    int answersChanged = qbService.mergeQuestions(sourceQbQuestionUid, targetQbQuestionUid);
+	    model.addAttribute("mergeSourceQbQuestionUid", sourceQbQuestionUid);
+	    model.addAttribute("mergeResult", answersChanged);
+	    return showStats(targetQbQuestionUid, model);
+	}
+
+	model.addAttribute("mergeErrors", mergeErrors);
+	return showStats(sourceQbQuestionUid, model);
     }
 
     private Integer getUserId() {

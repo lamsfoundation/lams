@@ -578,6 +578,7 @@ public class QbService implements IQbService {
      * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
      * New QbQuestions need to be saved step by step.
      */
+    @Override
     public void insertQuestion(QbQuestion qbQuestion) {
 	if (qbQuestion.getQuestionId() == null) {
 	    qbQuestion.setQuestionId(generateNextQuestionId());
@@ -616,7 +617,7 @@ public class QbService implements IQbService {
 	    }
 	}
     }
-    
+
     /**
      * When exporting a LD, QbQuestion's server-specific detail need not be exported
      */
@@ -630,7 +631,32 @@ public class QbService implements IQbService {
 	qbQuestion.setQbOptions(new ArrayList<>(qbQuestion.getQbOptions()));
 	qbQuestion.setUnits(new ArrayList<>(qbQuestion.getUnits()));
     }
-    
+
+    @Override
+    public int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid) {
+	QbQuestion sourceQuestion = getQuestionByUid(sourceQbQuestionUid);
+	QbQuestion targetQuestion = getQuestionByUid(targetQbQuestionUid);
+
+	if (sourceQuestion == null) {
+	    throw new InvalidParameterException("Source question does not exist");
+	}
+	if (targetQuestion == null) {
+	    throw new InvalidParameterException("Target question does not exist");
+	}
+
+	if (!sourceQuestion.getType().equals(targetQuestion.getType())) {
+	    throw new InvalidParameterException("Source question type is different to target question type");
+	}
+
+	if (sourceQuestion.getQbOptions().size() != targetQuestion.getQbOptions().size()) {
+	    throw new InvalidParameterException("Number of options in source and target questions does not match");
+	}
+
+	int answersChanged = qbDAO.mergeQuestions(sourceQbQuestionUid, targetQbQuestionUid);
+	qbDAO.deleteById(QbQuestion.class, sourceQbQuestionUid);
+	return answersChanged;
+    }
+
     public void setQbDAO(IQbDAO qbDAO) {
 	this.qbDAO = qbDAO;
     }

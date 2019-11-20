@@ -138,6 +138,8 @@ public interface IQbService {
     boolean isQuestionInUserCollection(int qbQuestionId, int userId);
 
     void insertQuestion(QbQuestion qbQuestion);
-    
+
     void prepareQuestionForExport(QbQuestion qbQuestion);
+
+    int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid);
 }
