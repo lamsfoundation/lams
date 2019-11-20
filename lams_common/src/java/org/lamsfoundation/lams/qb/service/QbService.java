@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -25,6 +27,8 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.dto.QbStatsDTO;
@@ -36,10 +40,13 @@ import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -55,6 +62,8 @@ public class QbService implements IQbService {
     private ILamsCoreToolService lamsCoreToolService;
 
     private IUserManagementService userManagementService;
+
+    private ILogEventService logEventService;
 
     public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = Comparator
 	    .comparing(QbCollection::getName);
@@ -654,7 +663,17 @@ public class QbService implements IQbService {
 
 	int answersChanged = qbDAO.mergeQuestions(sourceQbQuestionUid, targetQbQuestionUid);
 	qbDAO.deleteById(QbQuestion.class, sourceQbQuestionUid);
+
+	logEventService.logEvent(LogEvent.TYPE_QUESTIONS_MERGED, QbService.getUserId(), null, null, null,
+		new StringBuilder("Question UID ").append(sourceQbQuestionUid).append(" merged into question UID ")
+			.append(targetQbQuestionUid).toString());
 	return answersChanged;
+    }
+
+    private static Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
     }
 
     public void setQbDAO(IQbDAO qbDAO) {
@@ -671,5 +690,9 @@ public class QbService implements IQbService {
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
     }
 }
