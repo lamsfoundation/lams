@@ -535,7 +535,7 @@
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${managementAllowed}">
+	<c:if test="${managementAllowed and mergeAllowed}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				Merge this question with...

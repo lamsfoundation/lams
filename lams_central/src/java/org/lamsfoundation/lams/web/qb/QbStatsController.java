@@ -106,6 +106,10 @@ public class QbStatsController {
     @RequestMapping("/merge")
     public String mergeQuestions(@RequestParam long sourceQbQuestionUid, @RequestParam long targetQbQuestionUid,
 	    Model model) throws Exception {
+	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_MERGE_ENABLE)) {
+	    throw new SecurityException("Question merging is disabled");
+	}
+
 	QbQuestion sourceQuestion = qbService.getQuestionByUid(sourceQbQuestionUid);
 	QbQuestion targetQuestion = qbService.getQuestionByUid(targetQbQuestionUid);
 	List<String> mergeErrors = new LinkedList<>();
