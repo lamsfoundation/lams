@@ -372,11 +372,12 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	return readDatabaseData(startForm, request);
     }
-    
+
     /**
      * Common method for "start" and "defineLater"
      */
-    private String readDatabaseData(SurveyForm startForm, HttpServletRequest request) throws SurveyApplicationException {
+    private String readDatabaseData(SurveyForm startForm, HttpServletRequest request)
+	    throws SurveyApplicationException {
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
@@ -707,6 +708,9 @@ public class AuthoringController {
      * @param request
      */
     private void populateItemToForm(int itemIdx, SurveyQuestion item, QuestionForm form, HttpServletRequest request) {
+	// fetch question from DB rather than from HTTP session so we can lazy load its options
+	item = surveyService.getQuestion(item.getUid());
+
 	if (itemIdx >= 0) {
 	    form.setItemIndex(new Integer(itemIdx).toString());
 	}

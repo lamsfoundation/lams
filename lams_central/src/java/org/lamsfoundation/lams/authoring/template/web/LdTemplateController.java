@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
@@ -465,8 +466,14 @@ public abstract class LdTemplateController {
 	    Integer useNumGroups = (numGroups != null && numGroups > 0) ? numGroups : 2;
 	    for (int orderId = 0, groupNum = 1; orderId < useNumGroups; orderId++, groupNum++) {
 		ObjectNode group = JsonNodeFactory.instance.objectNode();
-		group.put(AuthoringJsonTags.GROUP_NAME, TextUtil.getText(appBundle, formatter,
-			"authoring.label.group.name", new String[] { groupNumberFormatter.format(groupNum) }));
+		String groupName = TextUtil.getText(appBundle, formatter, "authoring.label.group.name",
+			new String[] { groupNumberFormatter.format(groupNum) });
+		if (StringUtils.isBlank(groupName)) {
+		    // fallback if proper group name was not found
+		    groupName = "Group " + groupNum;
+		}
+		group.put(AuthoringJsonTags.GROUP_NAME, groupName);
+
 		group.put(AuthoringJsonTags.ORDER_ID, orderId);
 		group.put(AuthoringJsonTags.GROUP_UIID, uiid.incrementAndGet());
 		groups.add(group);
