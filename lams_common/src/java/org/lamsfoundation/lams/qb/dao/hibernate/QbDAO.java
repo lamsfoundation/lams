@@ -105,8 +105,13 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String MERGE_QUESTION_ANSWERS = "UPDATE lams_qb_tool_answer AS tas "
 	    + "JOIN lams_qb_option AS os ON os.qb_question_uid = :sourceQbQuestionUid AND tas.qb_option_uid = os.uid "
 	    + "JOIN lams_qb_option AS ot ON ot.qb_question_uid = :targetQbQuestionUid AND os.display_order = ot.display_order "
-	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON aa.question_option_uid = os.uid "
-	    + "SET tas.qb_option_uid       = ot.uid, " + "    aa.question_option_uid  = ot.uid";
+	    + "SET tas.qb_option_uid = ot.uid";
+
+    private static final String MERGE_ASSESSMENT_ANSWERS = "UPDATE lams_qb_option AS os "
+	    + "JOIN lams_qb_option AS ot ON os.qb_question_uid = :sourceQbQuestionUid AND ot.qb_question_uid = :targetQbQuestionUid "
+	    + "AND os.display_order = ot.display_order "
+	    + "JOIN tl_laasse10_option_answer AS aa ON aa.question_option_uid = os.uid "
+	    + "SET aa.question_option_uid = ot.uid";
 
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
@@ -415,6 +420,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     @Override
     public int mergeQuestions(long sourceQbQUestionUid, long targetQbQuestionUid) {
 	int result = getSession().createNativeQuery(MERGE_QUESTION_ANSWERS)
+		.setParameter("sourceQbQuestionUid", sourceQbQUestionUid)
+		.setParameter("targetQbQuestionUid", targetQbQuestionUid).executeUpdate();
+
+	result += getSession().createNativeQuery(MERGE_ASSESSMENT_ANSWERS)
 		.setParameter("sourceQbQuestionUid", sourceQbQUestionUid)
 		.setParameter("targetQbQuestionUid", targetQbQuestionUid).executeUpdate();
 
