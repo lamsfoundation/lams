@@ -104,7 +104,7 @@ UPDATE tl_lamc11_options_content SET `mc_que_option_text` = TRIM(REPLACE(REPLACE
 CREATE TABLE tmp_question (question_uid BIGINT PRIMARY KEY,
                            content MEDIUMTEXT)
     AS SELECT q.uid AS question_uid,
-              REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(question, mc_que_option_text ORDER BY displayOrder))
+              REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(question, mc_que_option_text ORDER BY displayOrder), true)
                                         COLLATE utf8mb4_0900_ai_ci, 
                                 ' ', ''),
                        '\t', ''), 
@@ -129,7 +129,7 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
                                
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
     SELECT NULL, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(mcq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(mcq.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
         mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
     FROM (SELECT uid,
                  question AS question,
@@ -219,7 +219,7 @@ UPDATE tl_lascrt11_scratchie_answer SET `description` = TRIM(REPLACE(REPLACE(REP
 -- if this column is not *exactly* as in an other row, it means it should be a separate question in QB
 INSERT INTO tmp_question
     SELECT q.uid,
-             REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.description ORDER BY o.order_id))
+             REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.description ORDER BY o.order_id), true)
                                      COLLATE utf8mb4_0900_ai_ci,
                              ' ', ''),
                      '\t', ''),
@@ -233,7 +233,7 @@ INSERT INTO tmp_question
 CREATE TABLE tmp_qb_question (question_uid BIGINT PRIMARY KEY,
                               content MEDIUMTEXT)
     AS SELECT q.uid AS question_uid,
-              REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order))
+              REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order), true)
                                         COLLATE utf8mb4_0900_ai_ci, 
                                 ' ', ''),
                        '\t', ''), 
@@ -270,7 +270,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id)
     SELECT NULL, 1, @question_id:=@question_id + 1, 1, sq.create_date, 
-    TRIM(REPLACE(REPLACE(strip_tags(sq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')),
+    TRIM(REPLACE(REPLACE(strip_tags(sq.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')),
     TRIM(sq.description), NULL, NULL, q.target_uid
     FROM (SELECT uid,
                  title AS question,
@@ -423,7 +423,7 @@ EXECUTE stmt;
 
 INSERT INTO tmp_question
     SELECT q.uid,
-           REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id))
+           REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.question, o.option_string ORDER BY o.sequence_id), true)
                                     COLLATE utf8mb4_0900_ai_ci, 
                             ' ', ''),
                    '\t', ''), 
@@ -437,7 +437,7 @@ INSERT INTO tmp_question
 -- create a similar mapping for existing questions in QB
 INSERT INTO tmp_qb_question
     SELECT q.uid AS question_uid,
-           REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order))
+           REPLACE(REPLACE(REPLACE(strip_tags(GROUP_CONCAT(q.description, o.name ORDER BY o.display_order), true)
                                     COLLATE utf8mb4_0900_ai_ci, 
                             ' ', ''),
                    '\t', ''), 
@@ -501,7 +501,7 @@ INSERT INTO tmp_question
                                                                    o.option_float,
                                                                    o.correct),
                                                          '')
-                                            ORDER BY o.sequence_id))
+                                            ORDER BY o.sequence_id), true)
                                     COLLATE utf8mb4_0900_ai_ci,
                           ' ', ''),
                   '\t', ''),
@@ -525,7 +525,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
     
 -- fill Question Bank question table with unique questions, with manually incremented question ID
 INSERT INTO lams_qb_question SELECT NULL, NULL, aq.question_type, @question_id:=@question_id + 1, 1, IFNULL(assessment.create_date, NOW()), NULL,
-                TRIM(REPLACE(REPLACE(strip_tags(aq.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', ' ')),
+                TRIM(REPLACE(REPLACE(strip_tags(aq.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', ' ')),
                 TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
                 aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
                 aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
@@ -719,7 +719,7 @@ UPDATE tl_laqa11_usr_resp SET `answer` = TRIM(REPLACE(REPLACE(REPLACE(answer, '>
 
 INSERT INTO tmp_question
     SELECT q.uid AS question_uid,
-              REPLACE(REPLACE(REPLACE(strip_tags(question) COLLATE utf8mb4_0900_ai_ci, 
+              REPLACE(REPLACE(REPLACE(strip_tags(question, true) COLLATE utf8mb4_0900_ai_ci, 
                                 ' ', ''),
                        '\t', ''), 
               '&nbsp;', '') AS content          
@@ -740,7 +740,7 @@ INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date,
 		name,
 		description, max_mark, feedback, answer_required, min_words_limit, tmp_question_id) 
     SELECT NULL, 6, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
         qa.question, 1, qa.feedback, qa.answer_required, qa.min_words_limit, q.target_uid
     FROM (SELECT uid,
                  question AS question,
