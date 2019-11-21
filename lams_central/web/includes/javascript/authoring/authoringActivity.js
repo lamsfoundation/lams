@@ -1640,46 +1640,6 @@ ActivityLib = {
 			}
 		}
 		
-		// redraw means that the transition will be drawn again in just a moment
-		// so do not do any structural changes
-		if (!redraw){
-			// remove grouping or input references if chain was broken by the removed transition
-			$.each(layout.activities, function(){
-				var coreActivity =  this.branchingActivity || this;
-				if (coreActivity.grouping || coreActivity.input) {
-					var candidate = this.branchingActivity ? coreActivity.start : this,
-						groupingFound = false,
-						inputFound = false;
-					do {
-						if (candidate.transitions && candidate.transitions.to.length > 0) {
-							candidate = candidate.transitions.to[0].fromActivity;
-						} else if (candidate.branchingActivity && !candidate.isStart) {
-							candidate = candidate.branchingActivity.start;
-						}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-							candidate = candidate.parentActivity;
-						} else {
-							candidate = null;
-						}
-						
-						if (coreActivity.grouping == candidate) {
-							groupingFound = true;
-						}
-						if (coreActivity.input == candidate) {
-							inputFound = true;
-						}
-					} while (candidate != null);
-					
-					if (!groupingFound) {
-						coreActivity.grouping = null;
-						this.draw();
-					}
-					if (!inputFound) {
-						coreActivity.input = null;
-					}
-				}
-			});
-		}
-		
 		transition.items.remove();
 		GeneralLib.setModified(true);
 	},

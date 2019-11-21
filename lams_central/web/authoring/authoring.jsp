@@ -140,6 +140,10 @@
 				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.weights.none" var="WEIGHTS_NONE_FOUND_ERROR_VAR"/>
 				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.grouping.detached.error" var="GROUPING_DETACHED_ERROR_VAR"/>
+				GROUPING_DETACHED_ERROR : decoderDiv.html('<c:out value="${GROUPING_DETACHED_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.input.detached.error" var="INPUT_DETACHED_ERROR_VAR"/>
+				INPUT_DETACHED_ERROR : decoderDiv.html('<c:out value="${INPUT_DETACHED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
 				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
 				<fmt:message key="authoring.fla.page.menu.apply.changes" var="LIVE_EDIT_SAVE_VAR"/>
