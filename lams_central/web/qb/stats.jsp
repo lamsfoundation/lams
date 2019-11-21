@@ -320,7 +320,7 @@
 				<c:otherwise>
 					<table id="usage" class="table table-striped qb-stats-table">
 						<tr>
-							<th>label.qb.stats.usage.course
+							<th>
 								<fmt:message key="label.qb.stats.usage.course" />
 							</th>
 							<th>
