@@ -1461,32 +1461,13 @@ PropertyLib = {
 			groupingDropdown = $('.propertiesContentFieldGrouping', activity.propertiesContent).empty().append(emptyOption),
 			groupings = [];
 		
-		if (activity.parentActivity && activity.parentActivity instanceof ActivityDefs.FloatingActivity) {
-			// Support activities can use any grouping on canvas
-			$.each(layout.activities, function(){
-				if (this instanceof ActivityDefs.GroupingActivity) {
-					groupings.push(this);
-				}
-			});
-		} else {
-			// normal activities can use only preceeding groupings
-			var candidate = activity.branchingActivity ? activity.branchingActivity.start : activity;
-			do {
-				if (candidate.transitions && candidate.transitions.to.length > 0) {
-					candidate = candidate.transitions.to[0].fromActivity;
-				} else if (candidate.branchingActivity && !candidate.isStart) {
-					candidate = candidate.branchingActivity.start;
-				}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-					candidate = candidate.parentActivity;
-				} else {
-					candidate = null;
-				}
-				
-				if (candidate instanceof ActivityDefs.GroupingActivity) {
-					groupings.push(candidate);
-				}
-			} while (candidate != null);
-		}
+		// every activity has access to any grouping
+		// if it is correct, it will be validated before LD save
+		$.each(layout.activities, function(){
+			if (this instanceof ActivityDefs.GroupingActivity) {
+				groupings.push(this);
+			}
+		});
 
 		// fill dropdown menu
 		$.each(groupings, function(){
