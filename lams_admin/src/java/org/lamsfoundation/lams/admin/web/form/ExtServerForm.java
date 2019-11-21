@@ -31,6 +31,8 @@ public class ExtServerForm extends ExtServerCommonForm {
 
     private String extGroupsUrl;
     
+    private String logoutUrl;
+    
     private boolean timeToLiveLoginRequestEnabled = true;
 
     private Integer timeToLiveLoginRequest = 80;
@@ -49,6 +51,14 @@ public class ExtServerForm extends ExtServerCommonForm {
 
     public void setExtGroupsUrl(String extGroupsUrl) {
 	this.extGroupsUrl = extGroupsUrl;
+    }
+    
+    public String getLogoutUrl() {
+        return logoutUrl;
+    }
+
+    public void setLogoutUrl(String logoutUrl) {
+        this.logoutUrl = logoutUrl;
     }
 
     public boolean isTimeToLiveLoginRequestEnabled() {

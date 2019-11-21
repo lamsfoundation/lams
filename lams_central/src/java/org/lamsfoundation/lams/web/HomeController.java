@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
@@ -303,7 +304,7 @@ public class HomeController {
 	    }
 	}
 	req.setAttribute("availablePrecedingLessons", availableLessons);
-	
+
 	// find subgroups which can be set as multiple lessons start
 	req.setAttribute("subgroups", organisation.getChildOrganisations());
 
@@ -361,8 +362,10 @@ public class HomeController {
     @RequestMapping("/logout")
     public String logout(HttpServletRequest req) throws IOException, ServletException {
 	UserDTO userDTO = getUser();
+	HttpSession session = req.getSession();
+	String logoutURL = (String) session.getAttribute("integratedLogoutURL");
 
-	req.getSession().invalidate();
+	session.invalidate();
 
 	if (userDTO != null) {
 	    String message = new StringBuilder("User ").append(userDTO.getLogin()).append(" (")
@@ -371,7 +374,7 @@ public class HomeController {
 		    message);
 	}
 
-	return "redirect:/index.do";
+	return "redirect:" + (StringUtils.isBlank(logoutURL) ? "/index.do" : logoutURL);
     }
 
     private String displayMessage(HttpServletRequest req, String messageKey) {
