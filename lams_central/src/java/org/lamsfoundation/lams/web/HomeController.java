@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
@@ -355,10 +356,10 @@ public class HomeController {
     }
 
     @RequestMapping("/logout")
-    public String logout(HttpServletRequest req) throws IOException, ServletException {
-
-	req.getSession().invalidate();
-	return "redirect:/index.do";
+    public String logout(HttpSession session) throws IOException, ServletException {
+	String logoutURL = (String) session.getAttribute("integratedLogoutURL");
+	session.invalidate();
+	return "redirect:" + (StringUtils.isBlank(logoutURL) ? "/index.do" : logoutURL);
     }
 
     private String displayMessage(HttpServletRequest req, String messageKey) {

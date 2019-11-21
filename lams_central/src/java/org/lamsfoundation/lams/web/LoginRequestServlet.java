@@ -220,6 +220,9 @@ public class LoginRequestServlet extends HttpServlet {
 	    hses.setAttribute("login", login);
 	    String token = "#LAMS" + RandomPasswordGenerator.nextPassword(10);
 	    hses.setAttribute("password", token);
+	    // if there is logout URL at the integrated server, put it into session right now
+	    // if authentication fails, it will be cleared
+	    hses.setAttribute("integratedLogoutURL", extServer.getLogoutUrl());
 	    // notify the login module that the user has been authenticated correctly
 	    UniversalLoginModule.setAuthenticationToken(token);
 

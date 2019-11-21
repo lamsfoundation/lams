@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.admin.web.form;
 
 /**
  * Superclass for ExtServerForm and LtiConsumerForm, holding LTI consumers' and ExtServers' shared properties.
- * 
+ *
  * @author Andrey Balan
  */
 public abstract class ExtServerCommonForm {
@@ -20,7 +20,7 @@ public abstract class ExtServerCommonForm {
     private String prefix;
 
     private String lessonFinishUrl;
-    
+
     private boolean disabled = false;
 
     private Boolean learnerPresenceAvailable;
@@ -168,4 +168,3 @@ public abstract class ExtServerCommonForm {
 	this.gradebookOnComplete = gradebookOnComplete;
     }
 }
-

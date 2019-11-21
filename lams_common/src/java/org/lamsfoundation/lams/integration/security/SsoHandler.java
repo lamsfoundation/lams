@@ -184,6 +184,9 @@ public class SsoHandler implements ServletExtension {
 		    }
 
 		} else {
+		    // clear after failed authentication, if it was set in LoginRequestServlet
+		    session.removeAttribute("integratedLogoutURL");
+		    
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts == null) {
 			failedAttempts = 1;

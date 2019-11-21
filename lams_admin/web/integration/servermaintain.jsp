@@ -120,7 +120,11 @@
 		<div class="form-group">
 		    <label for="extGroupsUrl"><fmt:message key="sysadmin.extGroupsUrl" /></label>
 		    <form:input path="extGroupsUrl" size="70" cssClass="form-control"/>
-		</div> 
+		</div>
+		<div class="form-group">
+		    <label for="logoutUrl"><fmt:message key="sysadmin.logoutUrl" /></label>
+		    <form:input path="logoutUrl" size="70" cssClass="form-control"/>
+		</div>
 		
 		<%@ include file="extLessonForm.jsp"%>
 
