@@ -117,6 +117,9 @@ public class Assessment implements Cloneable {
     @Column(name = "enable_confidence_levels")
     private boolean enableConfidenceLevels;
 
+    @Column(name = "confidence_levels_type")
+    private Integer confidenceLevelsType;
+
     @Column(name = "allow_history_responses")
     private boolean allowHistoryResponses;
 
@@ -543,6 +546,14 @@ public class Assessment implements Cloneable {
 
     public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
 	this.enableConfidenceLevels = enableConfidenceLevels;
+    }
+    
+    public Integer getConfidenceLevelsType() {
+	return confidenceLevelsType;
+    }
+
+    public void setConfidenceLevelsType(Integer confidenceLevelsType) {
+	this.confidenceLevelsType = confidenceLevelsType;
     }
 
     public boolean isAllowHistoryResponses() {

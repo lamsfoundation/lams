@@ -28,6 +28,11 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+	<style>
+		.slider.slider-horizontal {
+			margin-left: 40px;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>

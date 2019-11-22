@@ -297,4 +297,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	    }
 	});
     }
+    
+    public void up20191016To20191120() {
+	this.addField(Assessment.class, "confidenceLevelsType", "1");
+    }
 }

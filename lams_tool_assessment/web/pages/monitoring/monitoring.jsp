@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.assessment.AssessmentConstants"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
+<c:set var="assessment" value="${sessionMap.assessment}"/>
 
 <lams:html>
 	<lams:head>
@@ -31,6 +32,15 @@
 				messageNotification: '<fmt:message key="monitor.summary.notification" />',
 				messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 				messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+			},
+			confidenceLevelsSettings = {
+				type: "${assessment.confidenceLevelsType}",
+				LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
+				LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
+				LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
+				LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
+				LABEL_SURE : '<fmt:message key="label.sure" />',
+				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
 			};
 		</script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>

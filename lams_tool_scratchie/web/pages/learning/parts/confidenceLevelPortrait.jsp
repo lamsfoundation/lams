@@ -1,4 +1,50 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="confidenceLevelString">
+<c:choose>
+	<c:when test="${confidenceLevelDto.type == 1 && confidenceLevelDto.level == -1}">
+	</c:when>
+	
+	<c:when test="${confidenceLevelDto.type == 1}">
+		${confidenceLevelDto.level}<c:if test="${confidenceLevelDto.level != 0}">0</c:if>% 
+	</c:when>
+	
+	<c:when test="${confidenceLevelDto.type == 2}">
+		<c:choose>
+			<c:when test="${confidenceLevelDto.level == 0}">
+				<fmt:message key="label.not.confident" /> 
+			</c:when>
+			
+			<c:when test="${confidenceLevelDto.level == 5}">
+				<fmt:message key="label.confident" />
+			</c:when>
+			
+			<c:when test="${confidenceLevelDto.level == 10}">
+				<fmt:message key="label.very.confident" />
+			</c:when>
+		</c:choose>
+	</c:when>
+	
+	<c:when test="${confidenceLevelDto.type == 3}">
+		<c:choose>
+			<c:when test="${confidenceLevelDto.level == 0}">
+				<fmt:message key="label.not.sure" /> 
+			</c:when>
+			
+			<c:when test="${confidenceLevelDto.level == 5}">
+				<fmt:message key="label.sure" />
+			</c:when>
+			
+			<c:when test="${confidenceLevelDto.level == 10}">
+				<fmt:message key="label.very.sure" />
+			</c:when>
+		</c:choose>
+	</c:when>
+	
+	<c:otherwise>
+		no type set 
+	</c:otherwise>
+</c:choose>
+</c:set>
 
 <div class="c100 p${confidenceLevelDto.level}0 small" data-toggle="tooltip" data-placement="top" title="${confidenceLevelDto.userName}">
 	<span>
@@ -18,8 +64,6 @@
 	</div>
 							
 	<div class="confidence-level-percentage">
-		<c:if test="${confidenceLevelDto.level != -1}">
-			${confidenceLevelDto.level}<c:if test="${confidenceLevelDto.level != 0}">0</c:if>%
-		</c:if>
+		${confidenceLevelString}
 	</div>
 </div>
