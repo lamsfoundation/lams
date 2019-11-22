@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.web.session;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.time.FastDateFormat;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionManager {
@@ -212,14 +215,18 @@ public class SessionManager {
     /**
      * Lists all logins with their assigned sessions
      */
-    public static Map<String, List<String>> getLoginToSessionIDMappings() {
-	Map<String, List<String>> result = new TreeMap<>();
+    public static Map<String, List<Object>> getLoginToSessionIDMappings() {
+	FastDateFormat sessionCreatedDateFormatter = FastDateFormat.getInstance(DateUtil.PRETTY_FORMAT);
+
+	Map<String, List<Object>> result = new TreeMap<>();
 	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
 	    HttpSession session = entry.getValue();
 	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    List<String> sessionInfo = new LinkedList<>();
+	    List<Object> sessionInfo = new LinkedList<>();
 	    sessionInfo.add(user.getFirstName());
 	    sessionInfo.add(user.getLastName());
+	    sessionInfo.add(new Date(session.getLastAccessedTime()));
+	    sessionInfo.add(sessionCreatedDateFormatter.format(new Date(session.getCreationTime())));
 	    sessionInfo.add(session.getId());
 	    result.put(entry.getKey(), sessionInfo);
 	}
