@@ -129,7 +129,7 @@ SET @question_id = (SELECT IF(MAX(question_id) IS NULL, 0, MAX(question_id)) FRO
                                
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, name, description, max_mark, feedback, tmp_question_id) 
     SELECT NULL, 1, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(mcq.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(mcq.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 200),
         mcq.question, IFNULL(mcq.max_mark, 1), mcq.feedback, q.target_uid
     FROM (SELECT uid,
                  question AS question,
@@ -740,7 +740,7 @@ INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date,
 		name,
 		description, max_mark, feedback, answer_required, min_words_limit, tmp_question_id) 
     SELECT NULL, 6, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
-        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 80),
+        SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 200),
         qa.question, 1, qa.feedback, qa.answer_required, qa.min_words_limit, q.target_uid
     FROM (SELECT uid,
                  question AS question,
