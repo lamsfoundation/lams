@@ -1,6 +1,11 @@
 package org.lamsfoundation.lams.confidencelevel;
 
 public class ConfidenceLevelDTO {
+    
+    // confidence levels can be of different types:
+    public static final int CONFIDENCE_LEVELS_TYPE_0_TO_100 = 1;
+    public static final int CONFIDENCE_LEVELS_TYPE_CONFIDENT = 2;
+    public static final int CONFIDENCE_LEVELS_TYPE_SURE = 3;
 
     private Integer userId;
     
@@ -9,6 +14,9 @@ public class ConfidenceLevelDTO {
     private Long portraitUuid;
 
     private int level;
+    
+    //confidenceLevel's type: 1)0 to 100, 2)Confident or 3)Sure
+    private int type;
     
     private Long qbQuestionUid;
     
@@ -52,6 +60,14 @@ public class ConfidenceLevelDTO {
 
     public int getLevel() {
 	return this.level;
+    }
+    
+    public Integer getType() {
+	return type;
+    }
+
+    public void setType(Integer type) {
+	this.type = type;
     }
     
     /**

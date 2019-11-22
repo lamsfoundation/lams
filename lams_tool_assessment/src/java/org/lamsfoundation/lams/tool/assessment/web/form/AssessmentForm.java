@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.assessment.web.form;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 
 /**
@@ -34,10 +33,6 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
  * @author Andrey Balan
  */
 public class AssessmentForm {
-
-    private static Logger logger = Logger.getLogger(AssessmentForm.class.getName());
-
-    // Forum fields
     private String sessionMapID;
     private String contentFolderID;
     private int currentTab;

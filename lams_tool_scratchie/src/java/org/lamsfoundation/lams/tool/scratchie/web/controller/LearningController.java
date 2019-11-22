@@ -384,6 +384,8 @@ public class LearningController {
 
 	ObjectNode ObjectNode = JsonNodeFactory.instance.objectNode();
 	ObjectNode.put(QbConstants.ATTR_OPTION_CORRECT, option.isCorrect());
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(ObjectNode);
 
 	// create a new thread to record item scratched (in order to do this task in parallel not to slow down sending
 	// response back)

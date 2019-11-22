@@ -3037,6 +3037,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
 		    confidenceLevelDto.setQbOptionUid(optionUid);
 
@@ -3121,6 +3122,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(portraitUuid);
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
+		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 
 		    vsaAnswerDTO.getConfidenceLevels().add(confidenceLevelDto);
 		}

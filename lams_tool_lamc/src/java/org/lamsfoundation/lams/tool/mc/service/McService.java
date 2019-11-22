@@ -1653,6 +1653,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    confidenceLevelDto.setUserName(userName);
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
+	    confidenceLevelDto.setType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
 	    QbQuestion qbQuestion = userAttempt.getMcQueContent().getQbQuestion();
 	    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
 	    confidenceLevelDto.setQbOptionUid(userAttempt.getQbOption().getUid());
