@@ -30,7 +30,6 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
@@ -42,8 +41,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
@@ -124,7 +121,7 @@ public class PasswordChangeController {
 			String[] args = new String[1];
 			args[0] = user.getLogin() + " (" + user.getUserId() + ")";
 			String message = messageService.getMessage("audit.user.password.change", args);
-			logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, user.getUserId(), user.getUserId(), null, null,
+			logEventService.logEvent(LogEvent.TYPE_PASSWORD_CHANGE, user.getUserId(), user.getUserId(), null, null,
 				message);
 		    }
 		}
