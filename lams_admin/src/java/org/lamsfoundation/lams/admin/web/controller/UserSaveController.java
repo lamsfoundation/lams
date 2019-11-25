@@ -293,6 +293,8 @@ public class UserSaveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
 	    return null;
 	}
+	
+	User sysadmin = (User) userManagementService.findById(User.class, loggeduserId);
 
 	String password = WebUtil.readStrParam(request, "password");
 	String password2 = WebUtil.readStrParam(request, "password2");
@@ -316,6 +318,7 @@ public class UserSaveController {
 	    String passwordHash = HashUtil.sha256(password, salt);
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
+	    userManagementService.logPasswordChanged(user, sysadmin);
 	    userManagementService.saveUser(user);
 	    return "forward:/user/edit.do";
 	}

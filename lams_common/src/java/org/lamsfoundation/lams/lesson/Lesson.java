@@ -215,51 +215,51 @@ public class Lesson implements Serializable {
     private Set<GradebookUserLesson> gradebookUserLessons = new HashSet<GradebookUserLesson>();
 
     @Column(name = "enable_lesson_intro")
-    private Boolean enableLessonIntro;
+    private boolean enableLessonIntro = false;
 
     @Column(name = "description")
     private String lessonDescription;
 
     @Column(name = "display_design_image")
-    private Boolean displayDesignImage;
+    private boolean displayDesignImage = false;
 
     @Column(name = "locked_for_edit")
-    private Boolean lockedForEdit;
+    private boolean lockedForEdit = false;
 
     @Column(name = "learner_presence_avail")
-    private Boolean learnerPresenceAvailable;
+    private boolean learnerPresenceAvailable = false;
 
     @Column(name = "learner_im_avail")
-    private Boolean learnerImAvailable;
+    private boolean learnerImAvailable = false;
 
     @Column(name = "live_edit_enabled")
-    private Boolean liveEditEnabled;
+    private boolean liveEditEnabled = false;
 
     @Column(name = "enable_lesson_notifications")
-    private Boolean enableLessonNotifications;
+    private boolean enableLessonNotifications = false;
 
     @Column(name = "marks_released")
-    private Boolean marksReleased;
+    private boolean marksReleased = false;
 
     /**
      * Should Learner start the lesson from the beginning each time he enters it.
      * Content is not removed, LessonProgress is deleted, not archived.
      */
     @Column(name = "force_restart")
-    private Boolean forceLearnerRestart;
+    private boolean forceLearnerRestart = false;
 
     /**
      * Should Learners be allowed to restart the lesson after finishing it.
      * Content is not removed, LessonProgress is archived and then deleted.
      */
     @Column(name = "allow_restart")
-    private Boolean allowLearnerRestart;
+    private boolean allowLearnerRestart = false;
 
     /**
      * Should learners be displayed activity gradebook on lesson complete.
      */
     @Column(name = "gradebook_on_complete")
-    private Boolean gradebookOnComplete;
+    private boolean gradebookOnComplete = false;
 
     /**
      * For lesson conditional release
@@ -495,62 +495,6 @@ public class Lesson implements Serializable {
 	this.previousLessonStateId = previousLessonStateId;
     }
 
-    public Boolean isEnableLessonIntro() {
-	return enableLessonIntro;
-    }
-
-    public void setEnableLessonIntro(Boolean enableLessonIntro) {
-	this.enableLessonIntro = enableLessonIntro;
-    }
-
-    public Boolean isDisplayDesignImage() {
-	return displayDesignImage;
-    }
-
-    public void setDisplayDesignImage(Boolean displayDesignImage) {
-	this.displayDesignImage = displayDesignImage;
-    }
-
-    public Boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
-	this.learnerPresenceAvailable = learnerPresenceAvailable;
-    }
-
-    public Boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
-    public void setLearnerImAvailable(Boolean learnerImAvailable) {
-	this.learnerImAvailable = learnerImAvailable;
-    }
-
-    public Boolean getLiveEditEnabled() {
-	return liveEditEnabled;
-    }
-
-    public void setLiveEditEnabled(Boolean liveEditEnabled) {
-	this.liveEditEnabled = liveEditEnabled;
-    }
-
-    public Boolean getEnableLessonNotifications() {
-	return enableLessonNotifications;
-    }
-
-    public void setEnableLessonNotifications(Boolean enableLessonNotifications) {
-	this.enableLessonNotifications = enableLessonNotifications;
-    }
-
-    public Boolean getLockedForEdit() {
-	return lockedForEdit;
-    }
-
-    public void setLockedForEdit(Boolean lockedForEdit) {
-	this.lockedForEdit = lockedForEdit;
-    }
-
     public LearningDesign getLearningDesign() {
 	return this.learningDesign;
     }
@@ -654,38 +598,6 @@ public class Lesson implements Serializable {
 	this.gradebookUserLessons = gradebookUserLessons;
     }
 
-    public Boolean getMarksReleased() {
-	return marksReleased;
-    }
-
-    public void setMarksReleased(Boolean marksReleased) {
-	this.marksReleased = marksReleased;
-    }
-
-    public Boolean getForceLearnerRestart() {
-	return forceLearnerRestart;
-    }
-
-    public void setForceLearnerRestart(Boolean forceLearnerRestart) {
-	this.forceLearnerRestart = forceLearnerRestart;
-    }
-
-    public Boolean getAllowLearnerRestart() {
-	return allowLearnerRestart;
-    }
-
-    public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
-	this.allowLearnerRestart = allowLearnerRestart;
-    }
-
-    public Boolean getGradebookOnComplete() {
-	return gradebookOnComplete;
-    }
-
-    public void setGradebookOnComplete(Boolean gradebookOnComplete) {
-	this.gradebookOnComplete = gradebookOnComplete;
-    }
-
     public Set<Lesson> getPrecedingLessons() {
 	return precedingLessons;
     }
@@ -700,5 +612,93 @@ public class Lesson implements Serializable {
 
     public void setSucceedingLessons(Set<Lesson> succeedingLessons) {
 	this.succeedingLessons = succeedingLessons;
+    }
+
+    public boolean isEnableLessonIntro() {
+        return enableLessonIntro;
+    }
+
+    public void setEnableLessonIntro(boolean enableLessonIntro) {
+        this.enableLessonIntro = enableLessonIntro;
+    }
+
+    public boolean isDisplayDesignImage() {
+        return displayDesignImage;
+    }
+
+    public void setDisplayDesignImage(boolean displayDesignImage) {
+        this.displayDesignImage = displayDesignImage;
+    }
+
+    public boolean getLockedForEdit() {
+        return lockedForEdit;
+    }
+
+    public void setLockedForEdit(boolean lockedForEdit) {
+        this.lockedForEdit = lockedForEdit;
+    }
+
+    public boolean getLearnerPresenceAvailable() {
+        return learnerPresenceAvailable;
+    }
+
+    public void setLearnerPresenceAvailable(boolean learnerPresenceAvailable) {
+        this.learnerPresenceAvailable = learnerPresenceAvailable;
+    }
+
+    public boolean getLearnerImAvailable() {
+        return learnerImAvailable;
+    }
+
+    public void setLearnerImAvailable(boolean learnerImAvailable) {
+        this.learnerImAvailable = learnerImAvailable;
+    }
+
+    public boolean getLiveEditEnabled() {
+        return liveEditEnabled;
+    }
+
+    public void setLiveEditEnabled(boolean liveEditEnabled) {
+        this.liveEditEnabled = liveEditEnabled;
+    }
+
+    public boolean getEnableLessonNotifications() {
+        return enableLessonNotifications;
+    }
+
+    public void setEnableLessonNotifications(boolean enableLessonNotifications) {
+        this.enableLessonNotifications = enableLessonNotifications;
+    }
+
+    public boolean getMarksReleased() {
+        return marksReleased;
+    }
+
+    public void setMarksReleased(boolean marksReleased) {
+        this.marksReleased = marksReleased;
+    }
+
+    public boolean getForceLearnerRestart() {
+        return forceLearnerRestart;
+    }
+
+    public void setForceLearnerRestart(boolean forceLearnerRestart) {
+        this.forceLearnerRestart = forceLearnerRestart;
+    }
+
+    public boolean getAllowLearnerRestart() {
+        return allowLearnerRestart;
+    }
+
+    public void setAllowLearnerRestart(boolean allowLearnerRestart) {
+        this.allowLearnerRestart = allowLearnerRestart;
+    }
+
+    public boolean getGradebookOnComplete() {
+        return gradebookOnComplete;
+    }
+
+    public void setGradebookOnComplete(boolean gradebookOnComplete) {
+        this.gradebookOnComplete = gradebookOnComplete;
     }
 }

@@ -37,7 +37,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
@@ -234,8 +233,7 @@ public class GradebookService implements IGradebookFullService {
     @Override
     public List<GradebookGridRowDTO> getGBActivityArchiveRowsForLearner(Long activityId, Integer userId,
 	    TimeZone userTimezone) {
-	logger
-		.debug("Getting archive gradebook user data for activity: " + activityId + ". For user: " + userId);
+	logger.debug("Getting archive gradebook user data for activity: " + activityId + ". For user: " + userId);
 
 	Activity activity = getActivityById(activityId);
 	Lesson lesson = activity.getLearningDesign().getLessons().iterator().next();
@@ -278,8 +276,7 @@ public class GradebookService implements IGradebookFullService {
 
     @Override
     public List<GradebookGridRowDTO> getGBLessonComplete(Long lessonId, Integer userId) {
-	logger
-		.debug("Getting lesson complete gradebook user data for lesson: " + lessonId + ". For user: " + userId);
+	logger.debug("Getting lesson complete gradebook user data for lesson: " + lessonId + ". For user: " + userId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 	User learner = (User) userService.findById(User.class, userId);
@@ -775,44 +772,44 @@ public class GradebookService implements IGradebookFullService {
     /*
      * TODO Method is not in use. Remove it?
      * 
-    private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
-	ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
-
-	if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
-		|| (activity == null) || !(activity instanceof ToolActivity)
-		|| (((ToolActivity) activity).getEvaluation() == null)) {
-	    return;
-	}
-	ToolActivity toolActivity = (ToolActivity) activity;
-
-	// Getting the first activity evaluation
-	ActivityEvaluation eval = toolActivity.getEvaluation();
-
-	try {
-	    ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
-		    learner.getUserId());
-
-	    if (toolOutput != null) {
-		ToolOutputValue outputVal = toolOutput.getValue();
-		if (outputVal != null) {
-		    Double outputDouble = outputVal.getDouble();
-
-		    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(toolActivity.getActivityId(),
-			    learner.getUserId());
-
-		    // Only set the mark if it hasnt previously been set by a teacher
-		    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
-			updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
-		    }
-		}
-	    }
-
-	} catch (ToolException e) {
-	    logger.debug(
-		    "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
-	}
-    }
-    */
+     * private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
+     * ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
+     * 
+     * if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
+     * || (activity == null) || !(activity instanceof ToolActivity)
+     * || (((ToolActivity) activity).getEvaluation() == null)) {
+     * return;
+     * }
+     * ToolActivity toolActivity = (ToolActivity) activity;
+     * 
+     * // Getting the first activity evaluation
+     * ActivityEvaluation eval = toolActivity.getEvaluation();
+     * 
+     * try {
+     * ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
+     * learner.getUserId());
+     * 
+     * if (toolOutput != null) {
+     * ToolOutputValue outputVal = toolOutput.getValue();
+     * if (outputVal != null) {
+     * Double outputDouble = outputVal.getDouble();
+     * 
+     * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(toolActivity.getActivityId(),
+     * learner.getUserId());
+     * 
+     * // Only set the mark if it hasnt previously been set by a teacher
+     * if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
+     * updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
+     * }
+     * }
+     * }
+     * 
+     * } catch (ToolException e) {
+     * logger.debug(
+     * "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
+     * }
+     * }
+     */
 
     /**
      * It's the same method as above, it only also accepts gradebookUserActivity and gradebookUserLesson as parameters.
@@ -916,7 +913,7 @@ public class GradebookService implements IGradebookFullService {
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 
-	boolean isMarksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
+	boolean isMarksReleased = lesson.getMarksReleased();
 	lesson.setMarksReleased(!isMarksReleased);
 	userService.save(lesson);
 
@@ -948,7 +945,7 @@ public class GradebookService implements IGradebookFullService {
 
 		    // For My Grades gradebook page: don't include lesson in list if the user doesn't have permission.
 		    if (view == GBGridView.LRN_COURSE) {
-			boolean marksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
+			boolean marksReleased = lesson.getMarksReleased();
 			boolean hasLearnerPermission = lesson.getAllLearners().contains(user);
 			if (!hasLearnerPermission || !marksReleased) {
 			    continue;
@@ -1122,10 +1119,10 @@ public class GradebookService implements IGradebookFullService {
     public List<ExcelSheet> exportLessonGradebook(Lesson lesson) {
 	boolean isWeighted = toolService.isWeightedMarks(lesson.getLearningDesign());
 
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------------- process summary excel page --------------------------------
-	
+
 	ExcelSheet summarySheet = new ExcelSheet(getMessage("gradebook.export.lesson.summary"));
 	sheets.add(summarySheet);
 
@@ -1141,8 +1138,7 @@ public class GradebookService implements IGradebookFullService {
 
 	ExcelRow lessonMedianTimeTaken = summarySheet.initRow();
 	lessonMedianTimeTaken.addCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
-	lessonMedianTimeTaken.addCell(gradebookDAO.getMedianTimeTakenLesson(lesson.getLessonId()) / 1000,
-		false);
+	lessonMedianTimeTaken.addCell(gradebookDAO.getMedianTimeTakenLesson(lesson.getLessonId()) / 1000, false);
 	summarySheet.addEmptyRow();
 
 	// Adding the activity average data to the summary
@@ -1197,11 +1193,11 @@ public class GradebookService implements IGradebookFullService {
 	    userDataRow.addCell(userRow.getLogin());
 	    userDataRow.addCell(getProgressMessage(userRow));
 	    userDataRow.addCell(userRow.getTimeTakenSeconds());
-		if (isWeighted) {
-		    userDataRow.addPercentageCell(userRow.getMark() / 100.0);
-		} else {
-		    userDataRow.addCell(userRow.getMark());
-		}
+	    if (isWeighted) {
+		userDataRow.addPercentageCell(userRow.getMark() / 100.0);
+	    } else {
+		userDataRow.addCell(userRow.getMark());
+	    }
 	}
 	summarySheet.addEmptyRow();
 
@@ -1228,7 +1224,7 @@ public class GradebookService implements IGradebookFullService {
 	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
 	    headerRow.addCell(activity.getTitle(), true); // this one works
 	}
-	
+
 	headerRow = summarySheet.initRow();
 	headerRow.addCell(getMessage("gradebook.export.last.name"), true);
 	headerRow.addCell(getMessage("gradebook.export.first.name"), true);
@@ -1258,11 +1254,11 @@ public class GradebookService implements IGradebookFullService {
 		}
 		userDataRow.addCell(userActivityMark);
 	    }
-		if (isWeighted) {
-		    userDataRow.addPercentageCell(userRow.getMark() / 100.0);
-		} else {
-		    userDataRow.addCell(userRow.getMark());
-		}
+	    if (isWeighted) {
+		userDataRow.addPercentageCell(userRow.getMark() / 100.0);
+	    } else {
+		userDataRow.addCell(userRow.getMark());
+	    }
 	}
 
 	// -------------------- process activity excel page --------------------------------
@@ -1309,12 +1305,12 @@ public class GradebookService implements IGradebookFullService {
 
 	ExcelSheet learnerViewSheet = new ExcelSheet(getMessage("gradebook.export.learner.view"));
 	sheets.add(learnerViewSheet);
-	    
+
 	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
-	    
+
 	for (User learner : learners) {
 
 	    userTitleRow = learnerViewSheet.initRow();
@@ -1418,8 +1414,7 @@ public class GradebookService implements IGradebookFullService {
 				: FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(finishDate));
 			Long duration = getActivityDuration(learnerProgress, activity);
 			activityDataRow.addCell(duration == null ? "" : duration / 1000);
-			activityDataRow.addCell(activityArchive == null ? "" : activityArchive.getMark(),
-				false);
+			activityDataRow.addCell(activityArchive == null ? "" : activityArchive.getMark(), false);
 		    }
 		    attemptOrder--;
 		}
@@ -1433,7 +1428,7 @@ public class GradebookService implements IGradebookFullService {
     @Override
     @SuppressWarnings("unchecked")
     public List<ExcelSheet> exportCourseGradebook(Integer userId, Integer organisationId) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// The entire data list
 	ExcelSheet sheet = new ExcelSheet(getMessage("gradebook.exportcourse.course.summary"));
@@ -1584,9 +1579,9 @@ public class GradebookService implements IGradebookFullService {
     }
 
     @Override
-    public List<ExcelSheet> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
-	    String[] lessonIds, boolean simplified) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+    public List<ExcelSheet> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[] lessonIds,
+	    boolean simplified) {
+	List<ExcelSheet> sheets = new LinkedList<>();
 	ExcelSheet sheet = new ExcelSheet(getMessage("gradebook.exportcourse.course.summary"));
 	sheets.add(sheet);
 
@@ -1655,12 +1650,10 @@ public class GradebookService implements IGradebookFullService {
 	    if (simplified) {
 		lessonsNames.addEmptyCells(3);
 		for (Lesson lesson : selectedLessons) {
-		    lessonsNames.addCell(lesson.getLessonName(), true)
-			    .setAlignment(ExcelCell.ALIGN_CENTER);
+		    lessonsNames.addCell(lesson.getLessonName(), true).setAlignment(ExcelCell.ALIGN_CENTER);
 		}
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_LEFT_THICK);
-		lessonsNames.addCell(getMessage("label.overall.totals"), true)
-			.setAlignment(ExcelCell.ALIGN_CENTER);
+		lessonsNames.addCell(getMessage("label.overall.totals"), true).setAlignment(ExcelCell.ALIGN_CENTER);
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
 	    } else {
 		lessonsNames.addEmptyCells(4);
@@ -1697,8 +1690,7 @@ public class GradebookService implements IGradebookFullService {
 		headerRow.addCell(getMessage("label.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THICK)
 			.setAlignment(ExcelCell.ALIGN_CENTER);
 		headerRow.addCell(getMessage("label.max")).setAlignment(ExcelCell.ALIGN_CENTER);
-		headerRow.addCell("%", false, ExcelCell.BORDER_STYLE_RIGHT_THICK)
-			.setAlignment(ExcelCell.ALIGN_CENTER);
+		headerRow.addCell("%", false, ExcelCell.BORDER_STYLE_RIGHT_THICK).setAlignment(ExcelCell.ALIGN_CENTER);
 	    } else {
 		//create Selected Lessons Header Full
 		for (Lesson lesson : selectedLessons) {
@@ -1719,7 +1711,7 @@ public class GradebookService implements IGradebookFullService {
 		    headerRow.addCell(getMessage("label.max.mark"));
 		    headerRow.addCell("%", ExcelCell.BORDER_STYLE_RIGHT_THICK);
 		}
-		
+
 		headerRow.addEmptyCells(2);
 		headerRow.addCell(getMessage("label.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 		headerRow.addCell(getMessage("label.max"), true);
@@ -1890,24 +1882,24 @@ public class GradebookService implements IGradebookFullService {
     /*
      * TODO Method is not in use. Remove it?
      * 
-    public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
-	    Boolean markedInGradebook) {
-	ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
-	User learner = (User) userService.findById(User.class, userID);
-	if ((learner != null) && (toolSession != null)) {
-	    ToolActivity activity = toolSession.getToolActivity();
-	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
-
-	    // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
-	    // mark and feedback
-	    if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
-		updateGradebookUserActivityMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
-			false);
-		updateUserActivityGradebookFeedback(activity, learner, feedback);
-	    }
-	}
-    }
-    */
+     * public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
+     * Boolean markedInGradebook) {
+     * ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
+     * User learner = (User) userService.findById(User.class, userID);
+     * if ((learner != null) && (toolSession != null)) {
+     * ToolActivity activity = toolSession.getToolActivity();
+     * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
+     * 
+     * // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
+     * // mark and feedback
+     * if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
+     * updateGradebookUserActivityMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook,
+     * false);
+     * updateUserActivityGradebookFeedback(activity, learner, feedback);
+     * }
+     * }
+     * }
+     */
 
     @Override
     public void removeActivityMark(Integer userID, Long toolSessionID) {
@@ -2585,7 +2577,7 @@ public class GradebookService implements IGradebookFullService {
     public void setOutcomeService(IOutcomeService outcomeService) {
 	this.outcomeService = outcomeService;
     }
-    
+
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
     }

@@ -27,6 +27,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.hibernate.PessimisticLockException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.util.ITransactionRetryService;
@@ -69,13 +70,8 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 		exception = e;
 		TransactionRetryInterceptor.log.error("Schema error", exception);
 		processException(e, invocation, attempt);
-	    } catch (CannotAcquireLockException e) {
-		exception = e;
-		processException(e, invocation, attempt);
-	    } catch (LockAcquisitionException e) {
-		exception = e;
-		processException(e, invocation, attempt);
-	    } catch (UnexpectedRollbackException e) {
+	    } catch (CannotAcquireLockException | LockAcquisitionException | UnexpectedRollbackException
+		    | PessimisticLockException e) {
 		exception = e;
 		processException(e, invocation, attempt);
 	    }
@@ -84,8 +80,11 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
     }
 
     private void processException(Exception e, MethodInvocation invocation, MutableInt attempt) {
-	StringBuilder message = new StringBuilder("When invoking method \"").append(invocation.getMethod().getName())
-		.append("\" caught \"").append(e.getMessage()).append("\". Attempt #").append(attempt);
+
+	StringBuilder message = new StringBuilder("When invoking method ")
+		.append(invocation.getMethod().getDeclaringClass().getName()).append("#")
+		.append(invocation.getMethod().getName()).append(" caught \"").append(e.getMessage())
+		.append("\". Attempt #").append(attempt);
 
 	attempt.increment();
 	if (attempt.intValue() <= TransactionRetryInterceptor.MAX_ATTEMPTS) {
