@@ -31,7 +31,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +54,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.form.QbQuestionForm;
 import org.lamsfoundation.lams.qb.model.QbCollection;
-import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -585,10 +583,20 @@ public class AuthoringController {
 	    @RequestParam Long qbQuestionUid) {	
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	
+	//check whether this question is a duplicate
+	for (QuestionReference reference : references) {
+	    if (!reference.isRandomQuestion()
+		    && qbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
+		//let jsp know it's a duplicate
+		return "forward:/authoring/showDuplicateQuestionError.do";
+	    }
+	}
 	
 	//create new ScratchieItem and assign imported qbQuestion to it
 	AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	assessmentQuestion.setQbQuestion(qbQuestion);
 	assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
 		
@@ -598,8 +606,7 @@ public class AuthoringController {
 	
 	// set SequenceId
 	int maxSeq = 1;
-	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
-	if ((references != null) && (references.size() > 0)) {
+	if (!references.isEmpty()) {
 	    QuestionReference last = references.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
@@ -614,6 +621,18 @@ public class AuthoringController {
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/questionlist";
+    }
+    
+    /**
+     * Shows "This question has already been added" error message in a browser.
+     */
+    @RequestMapping("/showDuplicateQuestionError")
+    @ResponseBody
+    public String showDuplicateQuestionError(HttpServletResponse response) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDuplicated", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**

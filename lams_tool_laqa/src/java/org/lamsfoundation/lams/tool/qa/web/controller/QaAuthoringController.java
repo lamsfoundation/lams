@@ -37,6 +37,7 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -71,6 +72,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -296,6 +301,14 @@ public class QaAuthoringController implements QaAppConstants {
 	    @RequestParam String sessionMapID, @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	SortedSet<QaQueContent> qaQuestions = getQuestions(sessionMap);
+	
+	//check whether this QB question is a duplicate
+	for (QaQueContent qaQuestion : qaQuestions) {
+	    if (qbQuestionUid.equals(qaQuestion.getQbQuestion().getUid())) {
+		//let jsp know it's a duplicate
+		return "forward:/authoring/showDuplicateQuestionError.do";
+	    }
+	}
 
 	//get QbQuestion from DB
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
@@ -312,6 +325,18 @@ public class QaAuthoringController implements QaAppConstants {
 	qaQuestions.add(item);
 
 	return "authoring/itemlist";
+    }
+    
+    /**
+     * Shows "This question has already been added" error message in a browser.
+     */
+    @RequestMapping("/showDuplicateQuestionError")
+    @ResponseBody
+    public String showDuplicateQuestionError(HttpServletResponse response) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDuplicated", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**

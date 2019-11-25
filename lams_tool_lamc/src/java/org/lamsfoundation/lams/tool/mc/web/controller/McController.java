@@ -62,6 +62,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Action class that controls the logic of tool behavior.
@@ -447,6 +451,14 @@ public class McController {
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
+	
+	//check whether this QB question is a duplicate
+	for (McQuestionDTO questionDto : questionDtos) {
+	    if (qbQuestionUid.equals(questionDto.getQbQuestionUid())) {
+		//let jsp know it's a duplicate
+		return "forward:/authoring/showDuplicateQuestionError.do";
+	    }
+	}
 
 	//get QbQuestion from DB
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
@@ -480,6 +492,18 @@ public class McController {
 	questionDtos.add(questionDto);
 
 	return "authoring/itemlist";
+    }
+    
+    /**
+     * Shows "This question has already been added" error message in a browser.
+     */
+    @RequestMapping("/showDuplicateQuestionError")
+    @ResponseBody
+    public String showDuplicateQuestionError(HttpServletResponse response) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDuplicated", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     @SuppressWarnings("unchecked")
