@@ -1144,8 +1144,8 @@ ActivityLib = {
 	 * It is run from authoringConfirm.jsp
 	 * It closes the dialog with activity authoring 
 	 */
-	closeActivityAuthoring : function(){
-		$("#dialogActivity").off('hide.bs.modal').on('hide.bs.modal', function(){
+	closeActivityAuthoring : function(dialogID){
+		$("#" + dialogID).off('hide.bs.modal').on('hide.bs.modal', function(){
 			$('iframe', this).attr('src', null);
 		}).modal('hide');
 	},
@@ -1387,7 +1387,8 @@ ActivityLib = {
 		}
 		
 		if (activity.authorURL) {
-			showDialog("dialogActivity", {
+			var dialogID = "dialogActivity" + activity.toolContentID;
+			showDialog(dialogID, {
 				'height' : Math.max(300, $(window).height() - 30),
 				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
 				'draggable' : true,
@@ -1410,13 +1411,11 @@ ActivityLib = {
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', dialog).attr('id','iframeForActivity').attr('src', activity.authorURL).load(function(){
+					$('iframe', dialog).attr('id', dialogID).attr('src', activity.authorURL).load(function(){
 						// override the close function so it works with the dialog, not window
 						this.contentWindow.closeWindow = function(){
 							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
-							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
-								$('iframe', this).attr('src', null);
-							}).modal('hide');
+							ActivityLib.closeActivityAuthoring(dialogID);
 						}
 					});
 				}

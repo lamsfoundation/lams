@@ -13,7 +13,7 @@
 	<script type="text/javascript">
 		function closeWindow() {
 			if (window.parent.ActivityLib) {
-				window.parent.ActivityLib.closeActivityAuthoring();
+				window.parent.ActivityLib.closeActivityAuthoring(window.frameElement.id);
 				return;
 			}
 
