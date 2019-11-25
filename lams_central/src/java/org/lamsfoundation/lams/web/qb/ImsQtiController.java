@@ -151,19 +151,12 @@ public class ImsQtiController {
 			option.setFeedback(answer.getFeedback());
 			option.setQbQuestion(qbQuestion);
 
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full mark
-			    if (!isMultipleChoice && !isMarkHedgingType || correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-				// 100% goes to the correct answer
-				option.setMaxMark(1);
-				correctAnswer = answerText;
-			    } else {
-				log.warn("Choosing only first correct answer, despite another one was found: "
-					+ answerText);
-				option.setMaxMark(0);
-			    }
+			if ((answer.getScore() != null) && (answer.getScore() > 0) && (correctAnswer == null)) {
+			    // whatever the correct answer holds, it becomes the question score
+			    questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
+			    // 100% goes to the correct answer
+			    option.setMaxMark(1);
+			    correctAnswer = answerText;
 			} else {
 			    option.setMaxMark(0);
 			}
@@ -199,20 +192,20 @@ public class ImsQtiController {
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
 			String answerText = answer.getText();
-			QbOption assessmentAnswer = new QbOption();
-			assessmentAnswer.setName(answerText);
-			assessmentAnswer.setDisplayOrder(orderId++);
-			assessmentAnswer.setFeedback(answer.getFeedback());
-			assessmentAnswer.setQbQuestion(qbQuestion);
+			QbOption qbOption = new QbOption();
+			qbOption.setName(answerText);
+			qbOption.setDisplayOrder(orderId++);
+			qbOption.setFeedback(answer.getFeedback());
+			qbOption.setQbQuestion(qbQuestion);
 
 			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
 			    // set the factor of score for correct answers
-			    assessmentAnswer.setMaxMark(answer.getScore() / totalScore);
+			    qbOption.setMaxMark(answer.getScore() / totalScore);
 			} else {
-			    assessmentAnswer.setMaxMark(0);
+			    qbOption.setMaxMark(0);
 			}
 
-			optionList.add(assessmentAnswer);
+			optionList.add(qbOption);
 		    }
 
 		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
@@ -425,11 +418,11 @@ public class ImsQtiController {
 		    } else {
 			question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 
-			for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
+			for (QbOption qbOption : qbQuestion.getQbOptions()) {
 			    Answer answer = new Answer();
-			    boolean isCorrectAnswer = assessmentAnswer.getMaxMark() == 1F;
+			    boolean isCorrectAnswer = qbOption.getMaxMark() == 1F;
 
-			    answer.setText(assessmentAnswer.getName());
+			    answer.setText(qbOption.getName());
 			    answer.setScore(
 				    isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
 			    answer.setFeedback(isCorrectAnswer ? qbQuestion.getFeedbackOnCorrect()
@@ -443,15 +436,13 @@ public class ImsQtiController {
 		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		    question.setType(Question.QUESTION_TYPE_FILL_IN_BLANK);
 
-		    for (QbOption assessmentAnswer : qbQuestion.getQbOptions()) {
-			// only answer which has more than 0% is considered a correct one
-			if (assessmentAnswer.getMaxMark() > 0) {
-			    Answer answer = new Answer();
-			    answer.setText(assessmentAnswer.getName());
-			    answer.setScore(Integer.valueOf(qbQuestion.getMaxMark()).floatValue());
+		    for (QbOption qbOption : qbQuestion.getQbOptions()) {
+			Answer answer = new Answer();
+			answer.setText(qbOption.getName());
+			boolean isCorrectAnswer = qbOption.getMaxMark() == 1F;
+			answer.setScore(isCorrectAnswer ? Integer.valueOf(qbQuestion.getMaxMark()).floatValue() : 0);
 
-			    answers.add(answer);
-			}
+			answers.add(answer);
 		    }
 		    break;
 
