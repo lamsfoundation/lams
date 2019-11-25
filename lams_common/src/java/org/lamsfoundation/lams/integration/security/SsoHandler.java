@@ -159,9 +159,6 @@ public class SsoHandler implements ServletExtension {
 
 		}
 
-		// check if user is already logged in
-		HttpSession existingSession = SessionManager.getSessionForLogin(login);
-
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 
@@ -188,15 +185,12 @@ public class SsoHandler implements ServletExtension {
 		} else {
 		    // clear after failed authentication, if it was set in LoginRequestServlet
 		    session.removeAttribute("integratedLogoutURL");
-		    
+
 		    Integer failedAttempts = user.getFailedAttempts();
-		    if (failedAttempts == null) {
-			failedAttempts = 1;
-		    } else {
-			failedAttempts++;
-		    }
-		    user.setFailedAttempts(failedAttempts);
 		    Integer failedAttemptsConfig = Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS);
+		    // do not allow more failed attempts than limit in config as we may overflow failedAttempts column in DB
+		    failedAttempts = failedAttempts == null ? 1 : Math.min(failedAttempts + 1, failedAttemptsConfig);
+		    user.setFailedAttempts(failedAttempts);
 
 		    if (failedAttempts >= failedAttemptsConfig) {
 			Integer lockOutTimeConfig = Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME);

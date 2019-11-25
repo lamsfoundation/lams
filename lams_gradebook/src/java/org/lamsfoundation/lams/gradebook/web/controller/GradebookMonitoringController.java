@@ -104,7 +104,7 @@ public class GradebookMonitoringController {
 	    }
 
 	    Lesson lesson = lessonService.getLesson(lessonId);
-	    boolean marksReleased = (lesson.getMarksReleased() != null) && lesson.getMarksReleased();
+	    boolean marksReleased = lesson.getMarksReleased();
 	    LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
 	    request.setAttribute("marksReleased", marksReleased);
