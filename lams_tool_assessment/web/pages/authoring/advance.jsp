@@ -19,8 +19,8 @@
 			$('#display-summary-area').toggle('slow');
 			$('#allowQuestionFeedback').prop("checked", false);
 			$('#allowDiscloseAnswers').prop("checked", false);
-			$('#allowRightAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
-			$('#allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().removeClass('text-muted');
 			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
 		});
 
@@ -30,6 +30,7 @@
 			} else {
 				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', false);
 			}
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().toggleClass('text-muted');
 		});
 		
 		$("#useSelectLeaderToolOuput").change(function() {
@@ -52,6 +53,7 @@
 		<c:if test="${assessmentForm.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
 		<c:if test="${assessmentForm.assessment.allowDiscloseAnswers}">
 			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().addClass('text-muted');
 		</c:if>
 		<c:if test="${!assessmentForm.assessment.enableConfidenceLevels}">
 			$('#confidence-levels-type-area').css('display', 'none');
