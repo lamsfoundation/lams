@@ -260,7 +260,7 @@ public class LearningController {
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
 	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm,
-		isLargeFilesAllowed);
+		isLargeFilesAllowed, messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
@@ -300,7 +300,7 @@ public class LearningController {
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
 	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleForm,
-		isLargeFilesAllowed);
+		isLargeFilesAllowed, messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
