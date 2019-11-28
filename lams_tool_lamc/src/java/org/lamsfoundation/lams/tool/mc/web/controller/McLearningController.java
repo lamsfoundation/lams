@@ -89,7 +89,7 @@ public class McLearningController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/displayMc")
     public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,

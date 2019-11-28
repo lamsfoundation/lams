@@ -68,7 +68,7 @@ public class MonitoringController {
 
     @Autowired
     @Qualifier("laimagMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request) {

@@ -87,7 +87,7 @@ public class AuthoringController {
 
     @Autowired
     @Qualifier("laimagMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
@@ -119,11 +119,12 @@ public class AuthoringController {
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	return readDatabaseData(imageGalleryForm, request);
     }
-    
+
     /**
      * Common method for "start" and "defineLater"
      */
-    private String readDatabaseData(ImageGalleryForm imageGalleryForm, HttpServletRequest request) throws ServletException {
+    private String readDatabaseData(ImageGalleryForm imageGalleryForm, HttpServletRequest request)
+	    throws ServletException {
 	// save toolContentID into HTTPSession
 	Long contentId = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_TOOL_CONTENT_ID);
 
@@ -145,7 +146,7 @@ public class AuthoringController {
 	    if (imageGallery == null) {
 		imageGallery = igService.getDefaultContent(contentId);
 		if (imageGallery.getImageGalleryItems() != null) {
-		    items = new ArrayList<ImageGalleryItem>(imageGallery.getImageGalleryItems());
+		    items = new ArrayList<>(imageGallery.getImageGalleryItems());
 		} else {
 		    items = null;
 		}
@@ -267,8 +268,7 @@ public class AuthoringController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndContent(user.getUserID().longValue(),
-		contentId);
+	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndContent(user.getUserID().longValue(), contentId);
 	if (imageGalleryUser == null) {
 	    imageGalleryUser = new ImageGalleryUser(user, imageGalleryPO);
 	}
@@ -398,7 +398,8 @@ public class AuthoringController {
     public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm, true);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm, true,
+		messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
@@ -406,12 +407,12 @@ public class AuthoringController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", "error.upload.failed");
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    ;
 	    return "pages/authoring/parts/addimage";
 	}
 
@@ -492,7 +493,8 @@ public class AuthoringController {
     public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleImagesForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleImagesForm, true);
+	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleImagesForm, true,
+		messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
@@ -500,7 +502,8 @@ public class AuthoringController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
