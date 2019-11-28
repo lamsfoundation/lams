@@ -407,12 +407,12 @@ public class AuthoringController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", "error.upload.failed");
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    ;
 	    return "pages/authoring/parts/addimage";
 	}
 
@@ -502,7 +502,8 @@ public class AuthoringController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
