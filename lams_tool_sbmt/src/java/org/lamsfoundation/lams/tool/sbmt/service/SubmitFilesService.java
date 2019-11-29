@@ -1318,6 +1318,7 @@ public class SubmitFilesService
 	content.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	content.setLimitUploadNumber(JsonUtil.optInt(toolContentJSON, "limitUploadNumber", 0));
+	content.setMinLimitUploadNumber(JsonUtil.optInt(toolContentJSON, "minLimitUploadNumber", 0));
 	// submissionDeadline is set in monitoring
 
 	SubmitUser user = getContentUser(toolContentID, userID);

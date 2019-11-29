@@ -14,48 +14,50 @@
 <lams:head>
 	<title><fmt:message key="tool.display.name" /></title>
 	<%@ include file="/common/header.jsp"%>
+	
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
 		});
 
-		function submitCount(tUrl) {
-			var lockOnFinished = <c:out value="${sessionMap.lockOnFinish}"/>;
-			var uploadFileNum = <c:choose><c:when test="${empty learner.filesUploaded}">0</c:when><c:otherwise>1</c:otherwise></c:choose>;
-			if (lockOnFinished && uploadFileNum == 0) {
-				if (confirm("<fmt:message key='learner.finish.without.upload'/>"))
-					location.href = tUrl;
-				else
-					return false;
-				//			}else{
-				//				if(confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
-				//					location.href= tUrl;
-				//				else
-				//					return false;
-				//			}
-			} else if (uploadFileNum == 0) {
-				if (confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
-					disableButtons();
-					location.href = tUrl;
-				} else {
-					return false;
-				}
-			} else {
-				disableButtons();
-				location.href = tUrl;
-			}
-		}
 		function finish() {
 			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
-			return submitCount(finishUrl);
+			return validateFinish(finishUrl);
 		}
 		function notebook() {
 			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
-			return submitCount(continueUrl);
+			return validateFinish(continueUrl);
 		}
-		function validate() {
+		function validateFinish(tUrl) {
+			var uploadedFilesNumber = <c:choose><c:when test="${empty learner.filesUploaded}">0</c:when><c:otherwise>1</c:otherwise></c:choose>;
+
+			//enforce min files upload limit
+			<c:if test="${sessionMap.minLimitUploadNumber != null}">
+				if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
+					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+					return false;
+				}
+			</c:if>
+
+			//let user confirm zero files upload
+			if (uploadedFilesNumber == 0) {
+				if (${sessionMap.lockOnFinish}) {
+					if (!confirm("<fmt:message key='learner.finish.without.upload'/>")) {
+						return false;
+					}
+				} else {
+					if (!confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
+						return false;
+					}
+				}
+			}
+
+			disableButtons();
+			location.href = tUrl;
+		}
+		
+		function validateFileUpload() {
 			var valid = true;
 
 			// check description
@@ -87,6 +89,7 @@
 			}
 			return valid;
 		}
+		
 		function disableButtons() {
 			// do not disable the file button or the file will be missing on the upload.
 			$('.btn-disable-on-submit').prop('disabled', true);
@@ -104,24 +107,21 @@
 			msg = msg.replace('{0}', filename);
 			var answer = confirm(msg);
 			if (answer) {	
-				 $.ajax({
-					 	url: '<c:url value="/learning/deleteLearnerFile.do"/>',
-			            data: 'detailId=' + detailId,
-			            success: function () {
-			            	document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
-			            },
-			            error: function(error){
-			                alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
-			                alert("responseText: "+xhr.responseText);
-			            }
-			       	});
+				$.ajax({
+					url: '<c:url value="/learning/deleteLearnerFile.do"/>',
+			        data: 'detailId=' + detailId,
+			        success: function () {
+			          	document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
+			        },
+			        error: function(error){
+			         	alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+			            alert("responseText: "+xhr.responseText);
+			        }
+			    });
 			}
 		}
-
 	</script>
-
 </lams:head>
-
 <body class="stripes">
 
 	<lams:Page type="learner" title="${sessionMap.title}" formID="learnerForm">
@@ -130,6 +130,7 @@
 		</div>
 
 		<!-- notices and announcements -->
+		
 		<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
 			<c:if test="${sessionMap.lockOnFinish}">
 				<!--  Lock when finished -->
@@ -155,23 +156,25 @@
 				</lams:Alert>
 			</c:if>
 
-			<c:if test="${sessionMap.limitUpload}">
-				<c:choose>
-					<c:when test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
-						<lams:Alert id="limitUploads" close="true" type="info">
-							<fmt:message key="message.left.upload.limit">
-								<fmt:param value="${learner.limitUploadLeft}" />
-							</fmt:message>
-						</lams:Alert>
-					</c:when>
-				</c:choose>
+			<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
+				<c:if test="${sessionMap.isMaxLimitUploadEnabled}">
+					<lams:Alert id="limitUploads" close="true" type="info">
+						<fmt:message key="message.left.upload.limit">
+							<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
+						</fmt:message>
+					</lams:Alert>
+				</c:if>
+				
+				<c:if test="${sessionMap.minLimitUploadNumber != null}">
+					<lams:Alert id="minLimitUploadNumber" close="true" type="info">
+						<fmt:message key="label.should.upload.another">
+							<fmt:param value="${sessionMap.minLimitUploadNumber}" />
+						</fmt:message>
+					</lams:Alert>
+				</c:if>
 			</c:if>
-
 		</c:if>
-		<!-- End notices and announcements -->
-
 		<lams:errors/>
-
 
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<c:choose>
@@ -182,158 +185,141 @@
 			</c:when>
 
 			<c:otherwise>
-			
-			<table class="table table-condensed">
-				<tr>
-					<th class="active">
-						<fmt:message key="monitoring.user.submittedFiles" />
-					</th>
-					<th colspan="2" class="active">
-						<c:out value="${fn:length(learner.filesUploaded)}" />
-					</th>
-				<tr>
-				<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
-					<tr class="active">
-						<!--First Row displaying the name of the File -->
-						<td colspan="${file.currentLearner ? 2 : 3}">
-							<c:out value="${status.count}" />) <c:out value="${file.filePath}" />
-							<c:if test="${file.currentLearner}">
-								<c:set var="downloadURL">
-									<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
-								</c:set>
+				<div class="voffset10">
+					<fmt:message key="monitoring.user.submittedFiles" />: <c:out value="${fn:length(learner.filesUploaded)}" />
+				</div>
+				
+				<table class="table table-condensed voffset20">
+					<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
+					
+						<!--The name of the File -->
+						<tr class="active">
+							<td colspan="${file.currentLearner ? 2 : 3}">
+								<c:out value="${status.count}" />) <c:out value="${file.filePath}" />
+								
+								<c:if test="${file.currentLearner}">
+									<c:set var="downloadURL">
+										<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+									</c:set>
+									</td>
+									
+									<td>
+										<c:if test="${empty file.marks && hasEditRight}">
+										 	<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-default btn-disable-on-submit pull-right">
+							                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
+						                 	</a>
+						                 </c:if>
+					                 
+										<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
+											<i class="fa fa-download" ></i>
+										</a>
+									</td>
+								</c:if>
+							</td>
+						</tr>
+						
+						<!--The description of the File -->
+						<tr>
+							<td colspan="3">
+								<lams:out value="${file.fileDescription}" escapeHtml="true" />
+								
+								<div class="text-muted voffset10">
+									<fmt:message key="label.learner.time" />&nbsp;
+									<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
+								</div>
+							</td>
+						</tr>
+	
+						<!--Comments -->
+						<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
+							<tr>
+								<td colspan="3">
+									<fmt:message key="label.learner.comments" />:
+									<c:out value="${file.comments}" escapeXml="false" />
+								</td>
+							</tr>
+						</c:if>
+		
+						<!--Marks-->
+						<c:if test="${sessionMap.isMarksReleased and not empty file.marks}">
+							<tr>
+								<td colspan="3">
+									<fmt:message key="label.learner.marks" />:
+									<c:out value="${file.marks}" escapeXml="true" />
+								</td>
+							</tr>
+						</c:if>
+						
+						<!--Marked file-->
+						<c:if  test="${sessionMap.isMarksReleased and not empty file.markFileUUID}">	
+							<tr>
+								<td><fmt:message key="label.monitor.mark.markedFile" /></td>
+								<td>
+									<c:out value="${file.markFileName}" />
 								</td>
 								<td>
-								<c:if test="${empty file.marks && hasEditRight}">
-								 <a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-default btn-disable-on-submit pull-right">
-					                      <i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
-				                 </a>
-				                 </c:if>
-									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
-										<i class="fa fa-download" ></i>
+									<c:set var="markFileDownloadURL">
+										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
+									</c:set>
+									<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default btn-disable-on-submit pull-right">
+										<i class="fa fa-download"></i>
 									</a>
 								</td>
-							   </c:if>
-						</td>
-					</tr>
-					<tr>
-						<!--Second Row displaying the description of the File -->
-						<td style="vertical-align:top"><fmt:message key="label.learner.fileDescription" /></td>
-						<td colspan="2"><lams:out value="${file.fileDescription}" escapeHtml="true" /></td>
-					</tr>
-
-					<tr>
-						<!--Third row displaying the date of submission of the File -->
-						<td><fmt:message key="label.learner.time" /></td>
-						<td colspan="2">
-							<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
-						</td>
-					</tr>
-
-				<!--Fourth row displaying the comments -->
-				<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
-					<tr>
-						<td style="vertical-align:top"><fmt:message key="label.learner.comments" /></td>
-						<td colspan="2">
-							<c:out value="${file.comments}" escapeXml="false" />
-						</td>
-					</tr>
-				</c:if>
-
-				<!--Fifth row displaying the marks-->
-				<c:if test="${sessionMap.isMarksReleased and not empty file.marks}">
-					<tr>
-						<td><fmt:message key="label.learner.marks" /></td>
-						<td>
-							<c:out value="${file.marks}" escapeXml="true" />
-						</td>
-					</tr>
-				</c:if>
-				<!--Sixth row displaying the marked file-->
-				<c:if  test="${sessionMap.isMarksReleased and not empty file.markFileUUID}">	
-					<tr>
-						<td><fmt:message key="label.monitor.mark.markedFile" /></td>
-						<td>
-							<c:out value="${file.markFileName}" />
-						</td>
-						<td>
-							<c:set var="markFileDownloadURL">
-								<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
-							</c:set>
-							<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default btn-disable-on-submit pull-right">
-								<i class="fa fa-download"></i>
-							</a>
-						</td>
-					</tr>
-				</c:if>	
-					<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</c:forEach>
-			</table>
-
+							</tr>
+						</c:if>	
+					</c:forEach>
+				</table>
 			</c:otherwise>
 		</c:choose>
 
 		<hr width="100%"/>
-		<!-- Form -->
 
-		<c:if test="${sessionMap.mode != 'teacher'}">
-			<!-- dont display form if teacher -->
+		<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
+		<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
+			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
+				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
 
-			<!-- now check if the user is (finished + lockedWhenFinished) or no more files allowed -->
-			<c:set var="displayForm" value="${sessionMap.finishLock || sessionMap.arriveLimit}" />
-
-			<c:if test="${!displayForm && hasEditRight}">
-
-				<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
-					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-
-					<!-- Hidden fields -->
-					<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
-
-					<!--File path row -->
-					<div class="panel panel-default">
-						<div class="panel-heading panel-title">
-							<fmt:message key="label.learner.upload" />
+				<!--File path row -->
+				<div class="panel panel-default">
+					<div class="panel-heading panel-title">
+						<fmt:message key="label.learner.upload" />
+					</div>
+					
+					<div class="panel-body">
+						<div class="form-group">
+							<label for="file"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
+							<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.learner.filePath"
+								uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 						</div>
-						<div class="panel-body">
-
-							<div class="form-group">
-								<label for="file"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
-								<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.learner.filePath"
-									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-							</div>
-							<div class="form-group">
-								<!--File Description row -->
-								<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
-									style="color: red">*</span></label>
-								<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
-								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
-							</div>
-							<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
-							<div class="form-group">
-								<c:if test="${hasEditRight}">											
-									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
-										class="btn btn-sm btn-default btn-primary btn-disable-on-submit">
-										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
-									</button>
-								</c:if>
-							</div>
+						
+						<!--File Description -->
+						<div class="form-group">	
+							<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
+								style="color: red">*</span></label>
+							<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
+							<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
+						</div>
+						
+						<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
+						<div class="form-group">
+							<c:if test="${hasEditRight}">
+								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
+									class="btn btn-sm btn-default btn-primary btn-disable-on-submit pull-right">
+									<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
+								</button>
+							</c:if>
 						</div>
 					</div>
-				</form:form>
+				</div>
+			</form:form>
 				
-				<lams:WaitingSpinner id="attachmentArea_Busy"/>
-			</c:if>
+			<lams:WaitingSpinner id="attachmentArea_Busy"/>
 		</c:if>
-		<!-- end form -->
-
-
+		
+		<!-- reflection -->
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<!-- reflection -->
 			<div class="panel panel-default">
 				<div class="panel-heading panel-title">
 					<fmt:message key="title.reflection" />
@@ -367,31 +353,31 @@
 					</c:if>
 				</div>
 			</div>
-			<!-- end reflection -->
 		</c:if>
+		
+		<!-- submit buttons -->
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
-		<c:choose>
-			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<button id="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
-					<fmt:message key="label.continue" />
+			<c:choose>
+				<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
+					<button id="notebookButton" onclick="javascript:notebook();" class="btn btn-primary btn-disable-on-submit pull-right">
+						<fmt:message key="label.continue" />
 					</button>
-			</c:when>
-			<c:otherwise>
-				<button type="submit" onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
-					<c:choose>
-						<c:when test="${isLastActivity}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</button>
-			</c:otherwise>
-		</c:choose>
+				</c:when>
+				<c:otherwise>
+					<button type="submit" onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</button>
+				</c:otherwise>
+			</c:choose>
 		</c:if>
-
 
 		<div id="footer"></div>
 	</lams:Page>

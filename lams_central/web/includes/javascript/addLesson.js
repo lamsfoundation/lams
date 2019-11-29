@@ -490,21 +490,29 @@ function loadLearningDesignSVG(ldId) {
 			}
 
 			generatingLearningDesign = true;
+			
 			// iframe just to load Authoring for a single purpose, generate the SVG
-			$('<iframe />').appendTo('body').css('visibility', 'hidden').load(function(){
+			var frame = $('<iframe />').appendTo('body').css('visibility', 'hidden');
+			frame.load(function(){
+				// disable current onload handler as closing the dialog reloads the iframe
+				frame.off('load');
+				
 				// call svgGenerator.jsp code to store LD SVG on the server
-				var frame = $(this),
-					win = frame[0].contentWindow || frame[0].contentDocument;
-			    // when LD opens, make a callback which save the thumbnail and displays it in current window
-				win.GeneralLib.openLearningDesign(ldId, function(){
-					result = win.GeneralLib.saveLearningDesignImage();
-					frame.remove();
-					if (result) {
-						// load the image again
-						loadLearningDesignSVG(ldId);
-					}
+				var win = frame[0].contentWindow || frame[0].contentDocument;
+				$(win.document).ready(function(){
+				    // when LD opens, make a callback which save the thumbnail and displays it in current window
+					win.GeneralLib.openLearningDesign(ldId, function(){
+						result = win.GeneralLib.saveLearningDesignImage();
+						frame.remove();
+						if (result) {
+							// load the image again
+							loadLearningDesignSVG(ldId);
+						}
+					});
 				});
-			}).attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
+			});
+			// load svgGenerator.jsp to render LD SVG
+			frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 		}
 	});
 	

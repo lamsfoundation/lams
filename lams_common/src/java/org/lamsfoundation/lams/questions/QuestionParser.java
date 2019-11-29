@@ -69,7 +69,7 @@ public class QuestionParser {
 
     // can be anything
     private static final String TEMP_PACKAGE_NAME_PREFIX = "QTI_PACKAGE_";
-    private static final Pattern IMAGE_PATTERN = Pattern.compile("\\[IMAGE: (.*)\\]");
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("\\[IMAGE: ([^\\]]+)\\]");
 
     /**
      * Extracts questions from IMS QTI zip file.

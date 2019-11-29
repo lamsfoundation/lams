@@ -71,7 +71,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -92,7 +91,7 @@ public class McMonitoringController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/monitoring")
     public String execute(HttpServletRequest request) {
