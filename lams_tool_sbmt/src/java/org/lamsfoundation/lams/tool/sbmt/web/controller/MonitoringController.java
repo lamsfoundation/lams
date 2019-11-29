@@ -46,7 +46,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
-import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
@@ -134,19 +133,18 @@ public class MonitoringController {
 	statistic(request, contentID);
 
 	// instruction
-	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+	SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
 	// if this content does not exist, then reset the contentID to current value to keep it on HTML page.
-	persistContent.setContentID(contentID);
+	content.setContentID(contentID);
 
-	AuthoringDTO authorDto = new AuthoringDTO(persistContent);
-	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
-	request.setAttribute(SbmtConstants.CONTENT_IN_USE, persistContent.isContentInUse());
+	request.setAttribute(SbmtConstants.ATTR_CONTENT, content);
+	request.setAttribute(SbmtConstants.CONTENT_IN_USE, content.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
-	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
+	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 
 	// set SubmissionDeadline, if any
-	if (persistContent.getSubmissionDeadline() != null) {
-	    Date submissionDeadline = persistContent.getSubmissionDeadline();
+	if (content.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = content.getSubmissionDeadline();
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
