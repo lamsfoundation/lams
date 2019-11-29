@@ -11,16 +11,16 @@
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.SbmtConstants"%>
 <lams:html>
 <lams:head>
-	
 	<lams:headItems />
 	<title><fmt:message key="activity.title" /></title>
-	
+	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL />css/bootstrap-slider.css" />
+
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javascript">
         function doSelectTab(tabId) {
 	    	selectTab(tabId);
         } 
     </script>
-
 </lams:head>
 <body class="stripes">
 <form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">

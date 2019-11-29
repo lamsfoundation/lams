@@ -178,8 +178,9 @@ public class AuthoringController {
 	content.setReflectInstructions(authoringForm.getReflectInstructions());
 	content.setReflectOnActivity(authoringForm.isReflectOnActivity());
 	content.setLimitUpload(authoringForm.isLimitUpload());
-	content.setUseSelectLeaderToolOuput(authoringForm.isUseSelectLeaderToolOuput());
 	content.setLimitUploadNumber(authoringForm.getLimitUploadNumber());
+	content.setMinLimitUploadNumber(authoringForm.getMinLimitUploadNumber());
+	content.setUseSelectLeaderToolOuput(authoringForm.isUseSelectLeaderToolOuput());
 	content.setNotifyLearnersOnMarkRelease(authoringForm.isNotifyLearnersOnMarkRelease());
 	content.setNotifyTeachersOnFileSubmit(authoringForm.isNotifyTeachersOnFileSubmit());
 	return content;

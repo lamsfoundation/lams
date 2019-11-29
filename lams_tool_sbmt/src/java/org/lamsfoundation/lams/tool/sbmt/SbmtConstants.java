@@ -31,7 +31,7 @@ public interface SbmtConstants {
 
     public static final String DEFAULT_TITLE = "Submit Files Title";
 
-    public static final String AUTHORING_DTO = "authoring";
+    public static final String ATTR_CONTENT = "content";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "sbmtToolContentHandler";
 
@@ -77,11 +77,13 @@ public interface SbmtConstants {
     
     public static final String ATTR_GROUP_LEADER = "groupLeader";
 
-    public static final String ATTR_LIMIT_UPLOAD = "limitUpload";
+    public static final String ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED = "isMaxLimitUploadEnabled";
 
-    public static final String ATTR_LIMIT_UPLOAD_NUMBER = "limitUploadNumber";
+    public static final String ATTR_MAX_LIMIT_UPLOAD_NUMBER = "maxLimitUploadNumber";
+    
+    public static final String ATTR_MIN_LIMIT_UPLOAD_NUMBER = "minLimitUploadNumber";
 
-    public static final String ATTR_ARRIVE_LIMIT = "arriveLimit";
+    public static final String ATTR_MAX_LIMIT_REACHED = "maxLimitReached";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 

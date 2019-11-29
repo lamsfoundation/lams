@@ -13,7 +13,7 @@
 			<fmt:message key="label.authoring.basic.title" />
 		</td>
 		<td>
-			<c:out value="${authoring.title}" escapeXml="true" />
+			<c:out value="${content.title}" escapeXml="true" />
 		</td>
 	</tr>
 
@@ -22,7 +22,7 @@
 			<fmt:message key="label.authoring.basic.instruction" />
 		</td>
 		<td>
-			<c:out value="${authoring.instruction}" escapeXml="false" />
+			<c:out value="${content.instruction}" escapeXml="false" />
 		</td>
 	</tr>
 </table>

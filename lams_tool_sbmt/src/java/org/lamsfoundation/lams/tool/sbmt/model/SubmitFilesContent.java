@@ -83,8 +83,12 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     @Column(name = "limit_upload")
     private boolean limitUpload;
 
+    //max limitUploadNumber
     @Column(name = "limit_upload_number")
     private int limitUploadNumber;
+    
+    @Column(name = "min_limit_upload_number")
+    private Integer minLimitUploadNumber;
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;
@@ -262,6 +266,14 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     public void setLimitUploadNumber(int limitUploadNumber) {
 	this.limitUploadNumber = limitUploadNumber;
+    }
+    
+    public Integer getMinLimitUploadNumber() {
+	return minLimitUploadNumber;
+    }
+
+    public void setMinLimitUploadNumber(Integer minLimitUploadNumber) {
+	this.minLimitUploadNumber = minLimitUploadNumber;
     }
 
     public Date getCreated() {
