@@ -33,9 +33,7 @@ public class AdminForm {
 
     @Autowired
     @Qualifier("laimagMessageService")
-    private static MessageService messageService;
-
-    private static final long serialVersionUID = 414425664356226L;
+    private MessageService messageService;
 
     private String mediumImageDimensions;
 

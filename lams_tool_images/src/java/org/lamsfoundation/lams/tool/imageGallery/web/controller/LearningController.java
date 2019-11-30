@@ -260,7 +260,7 @@ public class LearningController {
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
 	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm,
-		isLargeFilesAllowed);
+		isLargeFilesAllowed, messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
@@ -268,7 +268,8 @@ public class LearningController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
@@ -300,7 +301,7 @@ public class LearningController {
 	//validate form
 	boolean isLargeFilesAllowed = mode.isTeacher();
 	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleForm,
-		isLargeFilesAllowed);
+		isLargeFilesAllowed, messageService);
 
 	try {
 	    if (errorMap.isEmpty()) {
@@ -308,7 +309,8 @@ public class LearningController {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed"));
+	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errorMap.isEmpty()) {
@@ -420,8 +422,7 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndSession(user.getUserID().longValue(),
-		sessionId);
+	ImageGalleryUser imageGalleryUser = igService.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 
 	// persist ImageGalleryItem changes in DB
 	boolean formVote = imageRatingForm.getVote();
@@ -508,8 +509,7 @@ public class LearningController {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(user.getUserID().longValue(),
-		sessionId);
+	ImageGalleryUser imageGalleryUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 
 	if (imageGalleryUser == null) {
 	    ImageGallerySession session = service.getImageGallerySessionBySessionId(sessionId);

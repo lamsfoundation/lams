@@ -8,23 +8,17 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImageGalleryUtils {
 
-    @Autowired
-    @Qualifier("laimagMessageService")
-    private static MessageService messageService;
-
     /**
      * Validate imageGallery item.
      */
     public static MultiValueMap<String, String> validateImageGalleryItem(ImageGalleryItemForm itemForm,
-	    boolean largeFile) {
+	    boolean largeFile, MessageService messageService) {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
@@ -51,7 +45,7 @@ public class ImageGalleryUtils {
      * Validate imageGallery item.
      */
     public static MultiValueMap<String, String> validateMultipleImages(MultipleImagesForm multipleForm,
-	    boolean largeFile) {
+	    boolean largeFile, MessageService messageService) {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
