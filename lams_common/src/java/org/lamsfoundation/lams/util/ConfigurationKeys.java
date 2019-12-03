@@ -118,6 +118,8 @@ public class ConfigurationKeys {
     
     public static String ALLOW_KUMALIVE = "AllowKumalive";
     
+    public static String ENABLE_COLLAPSING_SUBCOURSES = "EnableCollapsingSubcourses";
+    
     public static String DISPLAY_PORTRAIT = "DisplayPortrait";
     
     public static String ENABLE_PORTRAIT_EDITING = "EnablePortraitEditing";

@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IFavoriteOrganisationDAO;
@@ -305,6 +306,11 @@ public class UserManagementService implements IUserManagementService {
 	}
 	return true;
     }
+    
+    @Override
+    public Organisation getOrganisationById(Integer organisationId) {
+	return (Organisation) findById(Organisation.class, organisationId);
+    }
 
     @Override
     public List getOrganisationsByTypeAndStatus(Integer typeId, Integer stateId) {
@@ -328,7 +334,8 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List getUserOrganisationRoles(Integer orgId, String login) {
+    @SuppressWarnings("unchecked")
+    public List<UserOrganisationRole> getUserOrganisationRoles(Integer orgId, String login) {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("userOrganisation.organisation.organisationId", orgId);
 	properties.put("userOrganisation.user.login", login);
@@ -363,6 +370,20 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("organisation.organisationState.organisationStateId", stateId);
 	properties.put("organisation.parentOrganisation.organisationId", parentOrgId);
 	return baseDAO.findByProperties(UserOrganisation.class, properties);
+    }
+    
+    @Override
+    public UserOrganisationCollapsed getUserOrganisationCollapsed(Integer userId, Integer orgId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("user.userId", userId);
+	properties.put("organisation.organisationId", orgId);
+	List<UserOrganisationCollapsed> results = baseDAO.findByProperties(UserOrganisationCollapsed.class, properties);
+	return results.isEmpty() ? null : (UserOrganisationCollapsed) results.get(0);
+    }
+    
+    @Override
+    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId) {
+	return organisationDAO.getChildOrganisationsCollapsedByUser(parentOrganisationId, userId);
     }
 
     @Override
