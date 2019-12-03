@@ -49,15 +49,16 @@ import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
-import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author jliew
@@ -77,11 +78,8 @@ public class DisplayGroupController {
     private ILearnerService learnerService;
 
     @RequestMapping("")
-    @SuppressWarnings({ "unchecked" })
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
-
+    public String execute(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer orgId)
+	    throws Exception {
 	Organisation org = null;
 	if (orgId != null) {
 	    org = (Organisation) userManagementService.findById(Organisation.class, orgId);
@@ -228,22 +226,29 @@ public class DisplayGroupController {
     @SuppressWarnings("unchecked")
     private IndexOrgBean populateContentsOrgBean(IndexOrgBean orgBean, Organisation org, List<Integer> roles,
 	    String username, boolean isSysAdmin) throws SQLException, NamingException {
+	Integer userId = getUser(username).getUserId();
+	
 	// set lesson beans
-	Map<Long, IndexLessonBean> map = populateLessonBeans(getUser(username).getUserId(), org.getOrganisationId(),
+	Map<Long, IndexLessonBean> map = populateLessonBeans(userId, org.getOrganisationId(),
 		roles);
 	List<IndexLessonBean> lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
 	orgBean.setLessons(lessonBeans);
 
 	// create subgroup beans
 	if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
-	    Set<Organisation> children = org.getChildOrganisations();
+	    Set<Organisation> childOrganisations = org.getChildOrganisations();
+	    boolean isCollapsingSubcoursesEnabled = Configuration
+		    .getAsBoolean(ConfigurationKeys.ENABLE_COLLAPSING_SUBCOURSES);
+	    List<UserOrganisationCollapsed> userOrganisationsCollapsed = isCollapsingSubcoursesEnabled
+		    ? userManagementService.getChildOrganisationsCollapsedByUser(org.getOrganisationId(), userId)
+		    : null;
 
 	    List<IndexOrgBean> childOrgBeans = new ArrayList<>();
-	    for (Organisation organisation : children) {
-		if (OrganisationState.ACTIVE.equals(organisation.getOrganisationState().getOrganisationStateId())) {
+	    for (Organisation childOrganisation : childOrganisations) {
+		if (OrganisationState.ACTIVE.equals(childOrganisation.getOrganisationState().getOrganisationStateId())) {
 		    List<Integer> classRoles = new ArrayList<>();
 		    List<UserOrganisationRole> userOrganisationRoles = userManagementService
-			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
+			    .getUserOrganisationRoles(childOrganisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
 		    if (((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) && !isSysAdmin
 			    && !roles.contains(Role.ROLE_GROUP_MANAGER)) {
@@ -256,7 +261,19 @@ public class DisplayGroupController {
 		    if (roles.contains(Role.ROLE_GROUP_MANAGER)) {
 			classRoles.add(Role.ROLE_GROUP_MANAGER);
 		    }
-		    IndexOrgBean childOrgBean = createOrgBean(organisation, classRoles, username, isSysAdmin);
+		    IndexOrgBean childOrgBean = createOrgBean(childOrganisation, classRoles, username, isSysAdmin);
+		    
+		    //check whether organisation was collapsed by the user
+		    if (isCollapsingSubcoursesEnabled) {
+			for (UserOrganisationCollapsed userOrganisationCollapsed : userOrganisationsCollapsed) {
+			    if (userOrganisationCollapsed.getOrganisation().getOrganisationId()
+				    .equals(childOrganisation.getOrganisationId())) {
+				childOrgBean.setCollapsed(userOrganisationCollapsed.getCollapsed());
+				break;
+			    }
+			}
+		    }
+		    
 		    childOrgBeans.add(childOrgBean);
 		}
 	    }

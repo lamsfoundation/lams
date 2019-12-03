@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.springframework.stereotype.Repository;
@@ -97,7 +98,21 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	return orgDtos;
     }
     
-    @SuppressWarnings("unchecked")
+    @Override
+    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId) {
+	final String GET_USER_ORGANISATION_COLLAPSED_BY_USER_AND_PARENT_ORGANISATION = "SELECT uoc FROM UserOrganisationCollapsed uoc "
+		    + " WHERE uoc.organisation.organisationType.organisationTypeId = " + OrganisationType.CLASS_TYPE
+		    + " AND uoc.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+		    + " AND uoc.organisation.parentOrganisation.organisationId = :organisationId "
+		    + " AND uoc.user.userId = :userId ";
+	
+	Query<UserOrganisationCollapsed> query = getSession().createQuery(
+		GET_USER_ORGANISATION_COLLAPSED_BY_USER_AND_PARENT_ORGANISATION, UserOrganisationCollapsed.class);
+	query.setInteger("organisationId", parentOrganisationId);
+	query.setInteger("userId", userId);
+	return query.list();
+    }
+    
     @Override
     public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
 
