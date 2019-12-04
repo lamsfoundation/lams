@@ -42,6 +42,10 @@
 		div#errorArea {
 			display: none;
 		}
+		
+		#collectionSelect {
+			float: right;
+		}
 	</style>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
@@ -156,6 +160,20 @@
 			       
 	<form id="questionForm" method="POST">
 		<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
+		
+		<c:if test="${not empty collections}">
+			<!-- Choose a collection where questions should be imported to -->
+			<label id="collectionSelect">
+				<fmt:message key="label.questions.choice.collection" />&nbsp;
+				<select name="collectionUid">
+					<c:forEach items="${collections}" var="collection">
+						<option value="${collection.uid}" ${empty collection.userId ? "selected" : ""}>
+							<c:out value="${collection.name}" />
+						</option>
+					</c:forEach>
+				</select>
+			</label>
+		</c:if>
 		
 		<c:forEach var="question" items="${questions}" varStatus="questionStatus">
 			<%-- Question itself --%>

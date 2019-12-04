@@ -34,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -440,6 +441,19 @@ public class McController {
 	return tempQuestionDtos;
     }
 
+    @RequestMapping(value = "/importQbQuestions", method = RequestMethod.POST)
+    private String importQbQuestions(HttpServletRequest request, @RequestParam String sessionMapId,
+	    @RequestParam String qbQuestionUids) {
+	// get a list of QB question UIDs and add each of them to the activity
+	// this happens on QTI import
+	for (String qbQuestionUid : qbQuestionUids.split(",")) {
+	    if (StringUtils.isNotBlank(qbQuestionUid)) {
+		importQbQuestion(request, sessionMapId, Long.valueOf(qbQuestionUid));
+	    }
+	}
+	return "authoring/itemlist";
+    }
+
     /**
      * Adds QbQuestion, selected in the questionDescription bank, to the current questionDescription list.
      */
@@ -451,7 +465,7 @@ public class McController {
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	
+
 	//check whether this QB question is a duplicate
 	for (McQuestionDTO questionDto : questionDtos) {
 	    if (qbQuestionUid.equals(questionDto.getQbQuestionUid())) {
@@ -493,7 +507,7 @@ public class McController {
 
 	return "authoring/itemlist";
     }
-    
+
     /**
      * Shows "This question has already been added" error message in a browser.
      */

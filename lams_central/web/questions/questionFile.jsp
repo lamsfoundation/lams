@@ -64,6 +64,7 @@ div#errorArea {
 				<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 
 				<input type="hidden" name="callerID" value="${empty param.callerID ? callerID : param.callerID}" /> 
 				<input type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" /> 
+				<input type="hidden" name="collectionChoice" value="${empty param.collectionChoice ? collectionChoice : param.collectionChoice}" /> 
 				<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 				<lams:WaitingSpinner id="itemAttachment_Busy"/>
 				<div class="pull-right voffset5" id="buttonsDiv">

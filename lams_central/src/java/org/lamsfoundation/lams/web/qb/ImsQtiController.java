@@ -55,13 +55,14 @@ public class ImsQtiController {
     /**
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
-    @RequestMapping("/saveQTI")
+    @RequestMapping(path = "/saveQTI", produces = "text/plain")
     @ResponseBody
-    public void saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
-	    @RequestParam String contentFolderID) throws UnsupportedEncodingException {
+    public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
+	    @RequestParam(defaultValue = "") String contentFolderID) throws UnsupportedEncodingException {
 
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	Set<String> collectionUUIDs = null;
+	StringBuilder qbQuestionUidsString = new StringBuilder();
 
 	for (Question question : questions) {
 
@@ -335,10 +336,20 @@ public class ImsQtiController {
 
 	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 
+	    qbQuestionUidsString.append(qbQuestion.getQuestionId()).append(',');
+
 	    if (log.isDebugEnabled()) {
 		log.debug("Imported QTI question. Name: " + qbQuestion.getName() + ", uid: " + qbQuestion.getUid());
 	    }
 	}
+
+	String qbQuestionUids = null;
+	if (qbQuestionUidsString.length() > 0 && qbQuestionUidsString.charAt(qbQuestionUidsString.length() - 1) == ',') {
+	    qbQuestionUids = qbQuestionUidsString.substring(0, qbQuestionUidsString.length() - 1);
+	} else {
+	    qbQuestionUids = qbQuestionUidsString.toString();
+	}
+	return qbQuestionUids;
     }
 
     /**
