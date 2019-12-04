@@ -441,11 +441,13 @@ public class McController {
 	return tempQuestionDtos;
     }
 
+    /**
+     * Adds multiple QbQuestions, imported from QTI
+     */
     @RequestMapping(value = "/importQbQuestions", method = RequestMethod.POST)
     private String importQbQuestions(HttpServletRequest request, @RequestParam String sessionMapId,
 	    @RequestParam String qbQuestionUids) {
 	// get a list of QB question UIDs and add each of them to the activity
-	// this happens on QTI import
 	for (String qbQuestionUid : qbQuestionUids.split(",")) {
 	    if (StringUtils.isNotBlank(qbQuestionUid)) {
 		importQbQuestion(request, sessionMapId, Long.valueOf(qbQuestionUid));

@@ -81,6 +81,7 @@
 					success: function(response) {
 						// question list gets refreshed
 						$('#itemArea').html(response);
+						refreshThickbox();
 					}
 				});
 			}

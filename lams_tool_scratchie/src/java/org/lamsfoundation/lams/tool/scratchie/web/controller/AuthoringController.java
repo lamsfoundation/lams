@@ -381,6 +381,23 @@ public class AuthoringController {
     }
 
     /**
+     * Adds multiple QbQuestions, imported from QTI
+     */
+    @RequestMapping(value = "/importQbQuestions", method = RequestMethod.POST)
+    private String importQbQuestions(HttpServletRequest request, @RequestParam String sessionMapID,
+	    @RequestParam String qbQuestionUids) {
+	// get a list of QB question UIDs and add each of them to the activity
+	for (String qbQuestionUid : qbQuestionUids.split(",")) {
+	    if (StringUtils.isNotBlank(qbQuestionUid)) {
+		importQbQuestion(request, sessionMapID, Long.valueOf(qbQuestionUid));
+	    }
+	}
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return "pages/authoring/parts/itemlist";
+    }
+
+    /**
      * QB callback handler which adds selected QbQuestion into question list.
      */
     @SuppressWarnings("unchecked")
@@ -390,7 +407,7 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	
+
 	//check whether this QB question is a duplicate
 	for (ScratchieItem item : itemList) {
 	    if (qbQuestionUid.equals(item.getQbQuestion().getUid())) {
@@ -417,7 +434,7 @@ public class AuthoringController {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
     }
-    
+
     /**
      * Shows "This question has already been added" error message in a browser.
      */
