@@ -81,6 +81,41 @@
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	}
+	
+    function importQTI(){
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true',
+    			    'QuestionFile','width=500,height=240,scrollbars=yes');
+    }
+  	
+  	// this method is called by QTI questionChoice.jsp 
+    function saveQTI(formHTML, formName) {
+    	var form = $($.parseHTML(formHTML));
+    	// first, save questions in the QB
+		$.ajax({
+			type: "POST",
+			url: '<lams:LAMSURL />imsqti/saveQTI.do',
+			data: form.serializeArray(),
+			dataType: 'text',
+			// the response is a comma-delimited list of QB question UIDs, for example 4,5,65 
+			success: function(qbQuestionUids) {
+				$.ajax({
+					type: "POST",
+					url: '<lams:WebAppURL />authoring/importQbQuestions.do',
+					data: {
+						// send QB question uids to MCQ authoring controller
+						'qbQuestionUids' : qbQuestionUids,
+						'sessionMapID'   : '${sessionMapID}'
+					},
+					dataType: 'html',
+					success: function(response) {
+						// question list gets refreshed
+						$(itemTargetDiv).html(response);
+						refreshThickbox();
+					}
+				});
+			}
+		});
+    }
 </script>
 
 <!-- Basic Tab Content -->
