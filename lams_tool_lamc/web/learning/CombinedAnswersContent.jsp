@@ -14,8 +14,10 @@
                 	${answerDto.displayOrder})
                 </td>
                 <td width="100%" style="padding-left: 5px">
-                	<c:out value="${answerDto.questionName}" escapeXml="false" />
-                	<br>
+                	<c:if test="${not sessionMap.hideTitles}">
+	                	<c:out value="${answerDto.questionName}" escapeXml="false" />
+	                	<br>
+                	</c:if>
                 	<c:out value="${answerDto.questionDescription}" escapeXml="false" />
                 </td>
               </tr>
