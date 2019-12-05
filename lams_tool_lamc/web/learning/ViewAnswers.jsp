@@ -107,8 +107,10 @@
 										${status.count})
 									</td>
 									<td width="100%" style="padding: 5px">
-										<c:out value="${question.name}" escapeXml="false" />
-										<br>
+										<c:if test="${not sessionMap.hideTitles}">
+											<c:out value="${question.name}" escapeXml="false" />
+											<br>
+										</c:if>
 										<c:out value="${question.description}" escapeXml="false" />
 									</td>
 								</tr>

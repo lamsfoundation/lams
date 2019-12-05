@@ -209,5 +209,8 @@ public class AssessmentConstants {
 
     public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 
-    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
+    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";  
+    
+    // configuration keys
+    public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
 }

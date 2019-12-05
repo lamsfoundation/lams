@@ -42,6 +42,9 @@
 	<table id="itemTable" class="table table-striped table-condensed">
 		<tr>
 			<th>
+				#
+			</th>
+			<th>
 				<fmt:message key="label.questions" />
 			</th>
 
@@ -58,6 +61,9 @@
 			<c:set var="queIndex" scope="request" value="${status.index + 1}" />
 
 			<tr>
+				<td>
+					${queIndex})
+				</td>
 				<td>
 					<div style="overflow: auto;">
 						<c:out value="${questionDto.name}" escapeXml="false" />

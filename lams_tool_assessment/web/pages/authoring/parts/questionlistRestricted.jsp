@@ -5,6 +5,9 @@
 	<table class="table table-condensed" id="referencesTable">
 		<tr>
 			<th>
+				#
+			</th>
+			<th>
 				<fmt:message key="label.authoring.basic.list.header.question" />
 			</th>
 			<th colspan="3">
@@ -15,6 +18,9 @@
 		<c:forEach var="questionReference" items="${sessionMap.questionReferences}" varStatus="status">
 			<c:set var="question" value="${questionReference.question}" />
 			<tr>
+				<td>
+					${status.count})
+				</td>
 				<td>
 					<input type="hidden" name="sequenceId${questionReference.sequenceId}" value="${status.index}" class="reference-sequence-id">
 				

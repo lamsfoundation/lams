@@ -20,35 +20,10 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.tool.scratchie.web.form;
+package org.lamsfoundation.lams.tool.mc.web.form;
 
-/**
- *
- */
-public class AdminForm {
-    private static final long serialVersionUID = 414425664356226L;
-
-    private boolean enabledExtraPointOption;
-
-    private String presetMarks;
-
+public class McAdminForm {
     private boolean hideTitles;
-
-    public boolean isEnabledExtraPointOption() {
-	return enabledExtraPointOption;
-    }
-
-    public void setEnabledExtraPointOption(boolean isEnabledExtraPointOption) {
-	this.enabledExtraPointOption = isEnabledExtraPointOption;
-    }
-
-    public String getPresetMarks() {
-	return presetMarks;
-    }
-
-    public void setPresetMarks(String presetMarks) {
-	this.presetMarks = presetMarks;
-    }
 
     public boolean isHideTitles() {
 	return hideTitles;

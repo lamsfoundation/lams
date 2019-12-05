@@ -77,6 +77,7 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentConfigDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
@@ -142,6 +143,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private AssessmentQuestionResultDAO assessmentQuestionResultDao;
 
     private AssessmentResultDAO assessmentResultDao;
+
+    private AssessmentConfigDAO assessmentConfigDao;
 
     // tool service
     private IToolContentHandler assessmentToolContentHandler;
@@ -1929,6 +1932,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
 
 	ExcelRow summaryRowTitle = userSummarySheet.initRow();
+	summaryRowTitle.addCell("#", true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	summaryRowTitle.addCell(getMessage("label.authoring.basic.list.header.type"), true,
@@ -1942,6 +1946,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	Float totalGradesPossible = 0F;
 	Float totalAverage = 0F;
+	int questionIndex = 1;
 	if (assessment.getQuestionReferences() != null) {
 	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
@@ -1977,6 +1982,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		totalGradesPossible += maxGrade;
 
 		ExcelRow questCellRow = userSummarySheet.initRow();
+		questCellRow.addCell(questionIndex++);
 		questCellRow.addCell(title);
 		questCellRow.addCell(questionType);
 		questCellRow.addCell(penaltyFactor);
@@ -2717,6 +2723,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     public void setAssessmentResultDao(AssessmentResultDAO assessmentResultDao) {
 	this.assessmentResultDao = assessmentResultDao;
+    }
+
+    public void setAssessmentConfigDao(AssessmentConfigDAO assessmentConfigDao) {
+	this.assessmentConfigDao = assessmentConfigDao;
     }
 
     // *******************************************************************************
@@ -3510,5 +3520,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
 	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
+    }
+
+    @Override
+    public void setConfigValue(String key, String value) {
+	assessmentConfigDao.setConfigValue(key, value);
+    }
+
+    @Override
+    public String getConfigValue(String key) {
+	return assessmentConfigDao.getConfigValue(key);
     }
 }
