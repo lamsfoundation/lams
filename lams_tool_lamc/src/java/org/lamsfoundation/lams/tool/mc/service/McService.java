@@ -79,6 +79,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.dao.IMcConfigDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
@@ -134,6 +135,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
     private IMcSessionDAO mcSessionDAO;
     private IMcUserDAO mcUserDAO;
     private IMcUsrAttemptDAO mcUsrAttemptDAO;
+    private IMcConfigDAO mcConfigDAO;
     private MCOutputFactory mcOutputFactory;
 
     private ILogEventService logEventService;
@@ -1663,12 +1665,12 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 
 	return confidenceLevelDtos;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	McSession session = getMcSessionById(toolSessionId);
 	McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
-	
+
 	return (session != null) && (mcUser != null) && session.isUserGroupLeader(mcUser);
     }
 
@@ -1690,7 +1692,7 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	    mcUser = new McQueUsr(userId, userName, fullName, session);
 	    mcUserDAO.saveMcUser(mcUser);
 	}
-	
+
 	//finalize the latest result, if it's still active
 	if (!mcUser.isResponseFinalised()) {
 
@@ -1806,6 +1808,10 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
      */
     public void setMcUsrAttemptDAO(IMcUsrAttemptDAO mcUsrAttemptDAO) {
 	this.mcUsrAttemptDAO = mcUsrAttemptDAO;
+    }
+
+    public void setMcConfigDAO(IMcConfigDAO mcConfigDAO) {
+	this.mcConfigDAO = mcConfigDAO;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
@@ -2178,6 +2184,16 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 	// run check again, this time with modified options
 	return !baseLine.equals(modifiedQuestion) ? IQbService.QUESTION_MODIFIED_VERSION_BUMP
 		: IQbService.QUESTION_MODIFIED_NONE;
+    }
+
+    @Override
+    public void setConfigValue(String key, String value) {
+	mcConfigDAO.setConfigValue(key, value);
+    }
+
+    @Override
+    public String getConfigValue(String key) {
+	return mcConfigDAO.getConfigValue(key);
     }
 
     private void releaseQbQuestionFromCache(QbQuestion qbQuestion) {

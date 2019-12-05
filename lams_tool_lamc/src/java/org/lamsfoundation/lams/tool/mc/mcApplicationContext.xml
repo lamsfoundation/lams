@@ -43,6 +43,10 @@
 	<bean id="mcUsrAttemptDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McUsrAttemptDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
+	
+	<bean id="mcConfigDAO" class="org.lamsfoundation.lams.tool.mc.dao.hibernate.McConfigDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
 
 	<bean id="mcToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
 		<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -80,6 +84,7 @@
 					<property name="mcQueContentDAO"><ref bean="mcQueContentDAO"/></property>
 					<property name="mcOptionsContentDAO"><ref bean="mcOptionsContentDAO"/></property>								
 					<property name="mcUsrAttemptDAO"><ref bean="mcUsrAttemptDAO"/></property>	
+					<property name="mcConfigDAO"><ref bean="mcConfigDAO"/></property>
 					<property name="toolService"><ref bean="lamsToolService"/></property>	
 					<property name="mcToolContentHandler"><ref bean="mcToolContentHandler"/></property>		
 					<property name="logEventService"><ref bean="logEventService"/></property>					

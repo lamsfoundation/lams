@@ -275,4 +275,8 @@ public interface IMcService extends ICommonToolService {
      * Returns one of statuses from IQbService.QUESTION_MODIFIED_*
      */
     int isQbQuestionModified(McQuestionDTO questionDTO);
+
+    void setConfigValue(String key, String value);
+
+    String getConfigValue(String key);
 }
