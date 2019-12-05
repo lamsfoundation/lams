@@ -2,10 +2,8 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<c:forEach var="questionEntry"
-	items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-	<c:forEach var="answerEntry"
-		items="${generalLearnerFlowDTO.mapAnswers}">
+<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+	<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
 
 		<c:if test="${questionEntry.key == answerEntry.key}">
 			<div class="row no-gutter">
@@ -13,13 +11,16 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<div class="panel-title">
-								<strong> <fmt:message key="label.question" /> <c:out
-										value="${questionEntry.key}" /> 
+								<strong> 
+									<fmt:message key="label.question" /> 
+									<c:out value="${questionEntry.key}" /> 
 								</strong>
 							</div>
 						</div>
 						<div class="panel-body">
-							<div class="panel"><c:out value="${questionEntry.value.question}" escapeXml="false" /></div>
+							<div class="panel">
+								<c:out value="${questionEntry.value.question}" escapeXml="false" />
+							</div>
 						
 							<div class="answer-req">
 								<fmt:message key="label.learning.yourAnswer" /> 
@@ -39,7 +40,6 @@
 
 							<c:choose>
 								<c:when test="${hasEditRight}">
-
 									<div data-sequence-id="${questionEntry.key}"
 										data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
 										data-min-words-limit="${questionEntry.value.minWordsLimit}"
@@ -60,7 +60,6 @@
 											</c:otherwise>
 										</c:choose>
 									</div>
-
 								</c:when>
 
 								<c:otherwise>
@@ -89,11 +88,3 @@
 		</button>
 	</div>
 </c:if>
-
-
-<script type="text/javascript">
-	window.onload = function() {
-		document.getElementById("answer1").focus();
-	}
-</script>
-
