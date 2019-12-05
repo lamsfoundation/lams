@@ -52,7 +52,12 @@
         </property>
     </bean>
 
-
+   <bean id="laasseAssessmentConfigDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentConfigDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
     <!-- Managers -->
 	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
 	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -79,6 +84,9 @@
         </property>
         <property name="assessmentSessionDao">
             <ref bean="laasseAssessmentSessionDao"/>
+        </property>
+        <property name="assessmentConfigDao">
+            <ref bean="laasseAssessmentConfigDao"/>
         </property>
         <property name="assessmentToolContentHandler">
             <ref bean="laasseAssessmentToolContentHandler"/>

@@ -387,12 +387,12 @@
 	<div class="form-inline form-group voffset5">
 		<select id="questionUid" class="form-control input-sm">
 			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    		<c:forEach var="question" items="${sessionMap.questionList}">
+    		<c:forEach var="question" items="${sessionMap.questionList}" varStatus="questionCount">
 				<option value="${question.uid}"
 						isMultipleChoice="${question.type == 1}"
 						correctDisclosed="${question.correctAnswersDisclosed}"
 						groupsDisclosed="${question.groupsAnswersDisclosed}">
-					<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
+					${questionCount.count})&nbsp;<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 				</option>
 				<c:set var="allCorrectDisclosed"
 					   value="${allCorrectDisclosed && (question.type != 1 || question.correctAnswersDisclosed)}" />
