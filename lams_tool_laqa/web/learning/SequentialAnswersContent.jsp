@@ -58,14 +58,11 @@
 	</c:if>
 </c:forEach>
 
-
 <div class="">
 	<!--question content ends here-->
 	<c:choose>
-		<c:when
-			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
+		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }">
-
 			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>
@@ -78,11 +75,9 @@
 					<fmt:message key="button.done" />
 				</button>
 			</div>
-
 		</c:when>
 
-		<c:when
-			test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
+		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount == 1) }">
 			<div align="right-buttons">
 				<button id="btnDone" type="button" onclick="javascript:submitMethod('submitAnswersContent');"
@@ -90,13 +85,10 @@
 					<fmt:message key="button.done" />
 				</button>
 			</div>
-
 		</c:when>
 
-		<c:when
-			test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
+		<c:when test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}">
-
 			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>&nbsp;
@@ -107,7 +99,6 @@
 				<fmt:message key="button.getNextQuestion" />
 				&nbsp; <i class="fa fa-arrow-right"></i>
 			</button>
-
 		</c:when>
 
 		<c:otherwise>
@@ -121,10 +112,3 @@
 
 </div>
 <!-- End pane body -->
-
-
-<script type="text/javascript">
-	window.onload = function() {
-		document.getElementById("answer").focus();
-	}
-</script>
