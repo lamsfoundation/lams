@@ -93,7 +93,7 @@
 			<c:forEach var="activityDTO" items="${qbStats}" varStatus="i">
 				<tr>
 					<td>
-						${i.index + 1}
+						${i.count}
 					</td>
 					<td>
 						<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			

@@ -39,6 +39,9 @@
 	<table class="table table-condensed table-striped">
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<tr>
+				<td style="width:5%">
+					${status.count})
+				</td>
 				<td style="padding-top:15px; padding-bottom:15px;">
 					<c:out value="${item.qbQuestion.name}" escapeXml="true"/>
 					

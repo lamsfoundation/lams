@@ -1776,8 +1776,7 @@ public class ScratchieServiceImpl
 	    }
 	}
 
-	// ======================================================= Burning questions page
-	// =======================================
+	// =========================  Burning questions page ======================================
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    ExcelSheet burningQuestionsSheet = new ExcelSheet(getMessage("label.burning.questions"));
 	    sheets.add(burningQuestionsSheet);
@@ -1787,15 +1786,23 @@ public class ScratchieServiceImpl
 	    burningQuestionsSheet.addEmptyRow();
 
 	    row = burningQuestionsSheet.initRow();
+	    row.addCell("#", IndexedColors.BLUE);
 	    row.addCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
 	    row.addCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
 	    row.addCell(getMessage("label.count"), IndexedColors.BLUE);
 
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
+	    int index = 1;
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 
 		row = burningQuestionsSheet.initRow();
+		if (index < burningQuestionItemDtos.size()) {
+		    row.addCell(index++);
+		} else {
+		    row.addEmptyCell();
+		}
+
 		row.addCell(item.getQbQuestion().getName());
 
 		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
