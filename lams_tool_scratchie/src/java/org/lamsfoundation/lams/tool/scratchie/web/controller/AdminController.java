@@ -38,7 +38,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author Andrey Balan
@@ -61,12 +60,17 @@ public class AdminController {
 	ScratchieConfigItem isEnabledExtraPointOption = scratchieService
 		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
 	if (isEnabledExtraPointOption != null) {
-	    scratchieAdminForm.setEnabledExtraPointOption(new Boolean(isEnabledExtraPointOption.getConfigValue()));
+	    scratchieAdminForm.setEnabledExtraPointOption(Boolean.valueOf(isEnabledExtraPointOption.getConfigValue()));
 	}
 
 	ScratchieConfigItem presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
 	if (presetMarks != null) {
 	    scratchieAdminForm.setPresetMarks(presetMarks.getConfigValue());
+	}
+
+	ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
+	if (hideTitles != null) {
+	    scratchieAdminForm.setHideTitles(Boolean.valueOf(hideTitles.getConfigValue()));
 	}
 
 	request.setAttribute("error", false);
@@ -91,6 +95,10 @@ public class AdminController {
 	ScratchieConfigItem presetMarks = scratchieService.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
 	presetMarks.setConfigValue(scratchieAdminForm.getPresetMarks());
 	scratchieService.saveOrUpdateScratchieConfigItem(presetMarks);
+
+	ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
+	hideTitles.setConfigValue("" + scratchieAdminForm.isHideTitles());
+	scratchieService.saveOrUpdateScratchieConfigItem(hideTitles);
 
 	request.setAttribute("savedSuccess", true);
 	return "pages/admin/config";

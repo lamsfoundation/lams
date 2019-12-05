@@ -25,13 +25,18 @@
 			
 			<form:form action="/lams/tool/lascrt11/admin/saveContent.do" modelAttribute="scratchieAdminForm" id="scratchieAdminForm" method="post" enctype="multipart/form-data">
 				<div class="checkbox">
-					<label for="enabledExtraPointOption">
+					<label>
 					<form:checkbox path="enabledExtraPointOption"/>
 					<fmt:message key="admin.extra.mark" /></label>
 				</div>
 				<div class="form-group">
 					<label for="presetMarks"><fmt:message key="admin.preset.marks" /></label>
 					<form:input path="presetMarks" size="50" maxlength="255" cssClass="form-control form-control-inline" />
+				</div>
+				<div class="checkbox">
+					<label>
+					<form:checkbox path="hideTitles"/>
+					<fmt:message key="admin.hide.titles" /></label>
 				</div>
 				<button class="btn btn-primary  pull-right"><fmt:message key="admin.button.save" /></button>
 			</form:form>
