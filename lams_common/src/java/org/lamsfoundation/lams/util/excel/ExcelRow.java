@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
  * @author Andrey Balan
  */
 public class ExcelRow {
+    private boolean isBold = false;
     private List<ExcelCell> cells = new ArrayList<>();
     
     /**
@@ -84,6 +85,14 @@ public class ExcelRow {
 	    ExcelCell cell = new ExcelCell("");
 	    cells.add(cell);
 	}
+    }
+    
+    public boolean isBold() {
+	return isBold;
+    }
+
+    public void setBold(boolean isBold) {
+	this.isBold = isBold;
     }
     
     public List<ExcelCell> getCells() {

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -48,7 +47,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -584,7 +583,7 @@ public class MonitoringController {
 	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 	    ServletOutputStream out = response.getOutputStream();
 
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportTeamReportSpreadsheet(toolContentId);
+	    List<ExcelSheet> sheets = service.exportTeamReportSpreadsheet(toolContentId);
 
 	    // set cookie that will tell JS script that export has been finished
 	    String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
@@ -592,7 +591,7 @@ public class MonitoringController {
 	    fileDownloadTokenCookie.setPath("/");
 	    response.addCookie(fileDownloadTokenCookie);
 
-	    ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
+	    ExcelUtil.createExcel(out, sheets, "Exported on:", true);
 
 	} catch (IOException e) {
 	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: " + e.getMessage(), e);
