@@ -26,6 +26,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.multipart.MultipartFile;
@@ -105,59 +107,52 @@ public class OutcomeService implements IOutcomeService {
     }
 
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportScales() {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
+    public List<ExcelSheet> exportScales() {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	ExcelSheet scalesSheet = new ExcelSheet(messageService.getMessage("scale.title"));
+ 	sheets.add(scalesSheet);
 
-	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<>();
-	ExcelCell[] row = new ExcelCell[4];
-	row[0] = new ExcelCell(messageService.getMessage("outcome.manage.add.name"), true);
-	row[1] = new ExcelCell(messageService.getMessage("outcome.manage.add.code"), true);
-	row[2] = new ExcelCell(messageService.getMessage("outcome.manage.add.description"), true);
-	row[3] = new ExcelCell(messageService.getMessage("scale.manage.add.value"), true);
-	rowList.add(row);
+ 	ExcelRow headerRow = scalesSheet.initRow();
+ 	headerRow.addCell(messageService.getMessage("outcome.manage.add.name"), true);
+ 	headerRow.addCell(messageService.getMessage("outcome.manage.add.code"), true);
+ 	headerRow.addCell(messageService.getMessage("outcome.manage.add.description"), true);
+ 	headerRow.addCell(messageService.getMessage("scale.manage.add.value"), true);
 
 	List<OutcomeScale> scales = getScales();
 	for (OutcomeScale scale : scales) {
-	    row = new ExcelCell[4];
-	    row[0] = new ExcelCell(scale.getName(), false);
-	    row[1] = new ExcelCell(scale.getCode(), false);
-	    row[2] = new ExcelCell(scale.getDescription(), false);
-	    row[3] = new ExcelCell(scale.getItemString(), false);
-	    rowList.add(row);
+	    ExcelRow scaleRow = scalesSheet.initRow();
+	    scaleRow.addCell(scale.getName());
+	    scaleRow.addCell(scale.getCode());
+	    scaleRow.addCell(scale.getDescription());
+	    scaleRow.addCell(scale.getItemString());
 	}
 
-	ExcelCell[][] data = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(messageService.getMessage("scale.title"), data);
-	return dataToExport;
+	return sheets;
     }
 
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportOutcomes() {
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
+    public List<ExcelSheet> exportOutcomes() {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	ExcelSheet outcomeSheet = new ExcelSheet(messageService.getMessage("index.outcome.manage"));
+ 	sheets.add(outcomeSheet);
 
 	// The entire data list
-	List<ExcelCell[]> rowList = new LinkedList<>();
-	ExcelCell[] row = new ExcelCell[4];
-	row[0] = new ExcelCell(messageService.getMessage("outcome.manage.add.name"), true);
-	row[1] = new ExcelCell(messageService.getMessage("outcome.manage.add.code"), true);
-	row[2] = new ExcelCell(messageService.getMessage("outcome.manage.add.description"), true);
-	row[3] = new ExcelCell(messageService.getMessage("outcome.manage.add.scale"), true);
-	rowList.add(row);
+	ExcelRow headerRow = outcomeSheet.initRow();
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.name"), true);
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.code"), true);
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.description"), true);
+	headerRow.addCell(messageService.getMessage("outcome.manage.add.scale"), true);
 
 	List<Outcome> outcomes = getOutcomes();
 	for (Outcome outcome : outcomes) {
-	    row = new ExcelCell[4];
-	    row[0] = new ExcelCell(outcome.getName(), false);
-	    row[1] = new ExcelCell(outcome.getCode(), false);
-	    row[2] = new ExcelCell(outcome.getDescription(), false);
-	    row[3] = new ExcelCell(outcome.getScale().getName(), false);
-	    rowList.add(row);
+	    ExcelRow outcomeRow = outcomeSheet.initRow();
+	    outcomeRow.addCell(outcome.getName());
+	    outcomeRow.addCell(outcome.getCode());
+	    outcomeRow.addCell(outcome.getDescription());
+	    outcomeRow.addCell(outcome.getScale().getCode());
 	}
 
-	ExcelCell[][] data = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(messageService.getMessage("index.outcome.manage"), data);
-	return dataToExport;
+	return sheets;
     }
 
     @Override
