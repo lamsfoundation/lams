@@ -225,8 +225,9 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
 	    + " LEFT JOIN ( SELECT rating, user_id FROM lams_rating "
 	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND item_id = :itemId) r ON r.user_id = user.user_id "
-	    + " LEFT JOIN ( SELECT item_id, comment, user_id FROM lams_rating_comment "
-	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND (item_id = :itemId || item_id = rating_criteria_id) ) rc ON rc.user_id = user.user_id " 
+	    + " LEFT JOIN ( SELECT rc.item_id, rc.comment, rc.user_id FROM lams_rating_comment rc "
+	    + "    JOIN lams_rating_criteria criteria ON criteria.rating_criteria_id = :ratingCriteriaId "
+	    + "    WHERE rc.rating_criteria_id = :ratingCriteriaId AND (rc.item_id = :itemId || (rc.item_id = rc.rating_criteria_id AND criteria.rating_style=3)) ) rc ON rc.user_id = user.user_id " 
 	    + " WHERE r.rating IS NOT NULL OR rc.comment IS NOT NULL";
     @SuppressWarnings("unchecked")
     @Override
