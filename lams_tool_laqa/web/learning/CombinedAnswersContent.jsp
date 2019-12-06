@@ -40,7 +40,6 @@
 
 							<c:choose>
 								<c:when test="${hasEditRight}">
-
 									<div data-sequence-id="${questionEntry.key}"
 										data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
 										data-min-words-limit="${questionEntry.value.minWordsLimit}"
@@ -61,7 +60,6 @@
 											</c:otherwise>
 										</c:choose>
 									</div>
-
 								</c:when>
 
 								<c:otherwise>
@@ -88,9 +86,3 @@
 		</button>
 	</div>
 </c:if>
-
-<script type="text/javascript">
-	window.onload = function() {
-		document.getElementById("answer1").focus();
-	}
-</script>

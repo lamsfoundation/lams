@@ -42,6 +42,7 @@ public class IndexOrgBean implements Comparable {
     private Date archivedDate;
     private Integer type;
     private boolean favorite = false;
+    private boolean collapsed = false;
     private List<IndexLinkBean> links;
     private List<IndexLinkBean> moreLinks;
     private List<IndexLessonBean> lessons;
@@ -209,6 +210,14 @@ public class IndexOrgBean implements Comparable {
 
     public void setFavorite(boolean favorite) {
 	this.favorite = favorite;
+    }
+    
+    public boolean getCollapsed() {
+	return this.collapsed;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+	this.collapsed = collapsed;
     }
 
 }

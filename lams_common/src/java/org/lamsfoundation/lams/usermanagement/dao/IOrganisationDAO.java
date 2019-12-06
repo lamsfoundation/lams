@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
 /**
@@ -79,5 +80,14 @@ public interface IOrganisationDAO extends IBaseDAO {
      */
     int getCountCoursesByParentCourseAndTypeAndState(final Integer parentOrgId, final Integer typeId,
 	    final Integer stateId, String searchString);
+    
+    /**
+     * Returns list of UserOrganisationCollapsed, indicating which sub-courses was collapsed by the given user.
+     * 
+     * @param parentOrganisationId
+     * @param userId
+     * @return
+     */
+    List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId);
 
 }

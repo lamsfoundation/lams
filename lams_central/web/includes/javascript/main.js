@@ -101,6 +101,25 @@ $(document).ready(function () {
            railOpacity: 0.9
         });
     });
+    
+	//collapse subcourse. (Doing it manually instead of using bootstrap collapse in order to prevent bootstrap choppiness)
+    $(document).on('click', '.subcourse-title', function() { 
+		var orgId = $(this).data("groupid");
+		var collapsed = $("#" + orgId + "-lessons").hasClass("in");
+		
+		$("#" + orgId + "-lessons").toggleClass("in");
+		$(this).toggleClass("collapsed");
+		$("i", $(this)).toggleClass("fa-minus-square-o fa-plus-square-o");
+
+		//store course collapse in DB
+		$.ajax({
+			url: LAMS_URL + "/collapseOrganisation.do",
+			data: {
+				orgId: orgId, 
+				collapsed: collapsed
+			}
+		});
+    });
 
 });
 
