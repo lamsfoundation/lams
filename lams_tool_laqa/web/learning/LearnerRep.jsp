@@ -319,7 +319,7 @@
 					<div class="col-xs-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
-								${status.count}. <c:out value="${userResponse.qaQuestion.qbQuestion.name}" escapeXml="false" />
+								<c:if test="${generalLearnerFlowDTO.userResponses.size() != 1}">${status.count}.&nbsp;</c:if> <c:out value="${userResponse.qaQuestion.qbQuestion.name}" escapeXml="false" />
 							</div>
 							
 							<div class="panel-body">
@@ -375,7 +375,7 @@
 	
 				<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 					<p>
-						${status.count}. <c:out value="${question.qbQuestion.name}" escapeXml="false" />
+					<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if>	<c:out value="${question.qbQuestion.name}" escapeXml="false" />
 					</p>
 	
 					<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
