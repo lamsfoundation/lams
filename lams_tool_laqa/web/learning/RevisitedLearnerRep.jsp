@@ -301,8 +301,7 @@
 				<div class="col-xs-12">
 					<div class="panel panel-default">
 						<div class="panel-heading panel-title">
-							<fmt:message key="label.question" />
-							${status.count}:
+							<fmt:message key="label.question" />&nbsp;${status.count}:
 						</div>
 						<div class="panel-body">
 							<div class="panel">
@@ -362,14 +361,13 @@
 
 		<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 			<h4>
-				<fmt:message key="label.other.answers" />
+				<fmt:message key="label.other.answers" /> 
 			</h4>
 
 			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 
 				<p>
-					<strong> <fmt:message key="label.question" /> ${status.count}:
-					</strong>
+					<strong><fmt:message key="label.question" /> ${status.count}:</strong>
 					<c:out value="${question.question}" escapeXml="false" />
 				</p>
 

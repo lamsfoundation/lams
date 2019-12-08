@@ -61,18 +61,21 @@
 				<div class="row no-gutter">
 					<div class="col-xs-12">
 						<div class="panel panel-default">
+						<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">
 							<div class="panel-heading panel-title">
-								<strong> <fmt:message key="label.question" /> <c:out value="${questionEntry.key}" escapeXml="false" />:
-								</strong> <br>
-								<c:out value="${questionEntry.value.question}" escapeXml="false" />
+								<strong><fmt:message key="label.question" />&nbsp;<c:out value="${questionEntry.key}" escapeXml="false" /></strong>
 							</div>
+						</c:if>	
 							<div class="panel-body">
+							<div class="panel">
+								<c:out value="${questionEntry.value.question}" escapeXml="false" />
+							</div>	
 
 								<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 									<c:if test="${answerEntry.key == questionEntry.key}">
 
 										<h5>
-											<fmt:message key="label.learning.yourAnswer" />
+											<fmt:message key="label.learning.yourAnswer" />:
 										</h5>
 
 										<div class="panel" id="answer${questionEntry.key}">

@@ -318,10 +318,11 @@
 				<div class="row no-gutter">
 					<div class="col-xs-12">
 						<div class="panel panel-default">
+						<c:if test="${generalLearnerFlowDTO.userResponses.size() != 1}">
 							<div class="panel-heading panel-title">
-								<fmt:message key="label.question" />
-								${status.count}:
+								<fmt:message key="label.question" />&nbsp;${status.count}
 							</div>
+						</c:if>	
 							<div class="panel-body">
 								<div class="panel">
 									<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
@@ -368,16 +369,18 @@
 	
 			<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 				<h4>
-					<fmt:message key="label.other.answers" />
+					<fmt:message key="label.other.answers" /> 
 				</h4>
 	
 				<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
-					<p>
-						<strong> <fmt:message key="label.question" /> ${status.count}:
-						</strong>
+					<div class="panel">
+					    <c:if test="${generalLearnerFlowDTO.questions.size() != 1}">
+							<strong> <fmt:message key="label.question" />&nbsp;${status.count}:
+							</strong>
+						</c:if>
 						<c:out value="${question.question}" escapeXml="false" />
-					</p>
-	
+					</div>	
+
 					<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
 						<lams:Alert id="rating-info" type="info" close="false">
 							<fmt:message key="label.comment.minimum.number.words">
