@@ -44,7 +44,7 @@ public class QuestionsController {
     @RequestMapping("/questions")
     public String execute(@RequestParam(name = "file", required = false) MultipartFile file,
 	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,
-	    @RequestParam String callerID, @RequestParam(defaultValue = "false") boolean collectionChoice,
+	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
 	    HttpServletRequest request) throws Exception {
 
 	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
@@ -69,7 +69,7 @@ public class QuestionsController {
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 
-	if (collectionChoice) {
+	if (collectionChoice != null && collectionChoice) {
 	    // in the view a drop down with collections will be displayed
 	    request.setAttribute("collections", qbService.getUserCollections(QuestionsController.getUserId()));
 	}
