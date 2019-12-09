@@ -336,7 +336,7 @@ public class ImsQtiController {
 
 	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 
-	    qbQuestionUidsString.append(qbQuestion.getQuestionId()).append(',');
+	    qbQuestionUidsString.append(qbQuestion.getUid()).append(',');
 
 	    if (log.isDebugEnabled()) {
 		log.debug("Imported QTI question. Name: " + qbQuestion.getName() + ", uid: " + qbQuestion.getUid());
@@ -344,7 +344,8 @@ public class ImsQtiController {
 	}
 
 	String qbQuestionUids = null;
-	if (qbQuestionUidsString.length() > 0 && qbQuestionUidsString.charAt(qbQuestionUidsString.length() - 1) == ',') {
+	if (qbQuestionUidsString.length() > 0
+		&& qbQuestionUidsString.charAt(qbQuestionUidsString.length() - 1) == ',') {
 	    qbQuestionUids = qbQuestionUidsString.substring(0, qbQuestionUidsString.length() - 1);
 	} else {
 	    qbQuestionUids = qbQuestionUidsString.toString();
