@@ -187,11 +187,7 @@ public interface QaAppConstants {
     public static final String TO_TOOL_CONTENT_ID = "toToolContentId";
     public static final String LEARNER_REPORT = "learnerRep";
     public static final String LEARNER_REP = "individualLearnerRep";
-    public static final String REQUEST_LEARNING_REPORT = "requestLearningReport";
-    public static final String REQUEST_LEARNING_REPORT_PROGRESS = "requestLearningReportProgress";
     public static final String REQUEST_PREVIEW = "requestPreview";
-    public static final String REQUEST_LEARNING_REPORT_VIEWONLY = "requestLearningReportViewOnly";
-    public static final String REVISITED_LEARNER_REP = "revisitedLearnerRep";
     public static final String IS_DISABLED = "isDisabled";
 
     /*

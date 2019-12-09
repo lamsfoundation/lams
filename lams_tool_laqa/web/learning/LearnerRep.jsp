@@ -20,7 +20,7 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="<lams:WebAppURL/> includes/css/qalearning.css">
+	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
 	<lams:css />
 
 	<script type="text/javascript">
@@ -48,7 +48,6 @@
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 
@@ -256,11 +255,11 @@
 <body class="stripes">
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-	<form:form action="${generalLearnerFlowDTO.requestLearningReportProgress != 'true' ? (((generalLearnerFlowDTO.reflection != 'true') || !hasEditRight) ? '/lams/tool/laqa11/learning/endLearning.do' : '/lams/tool/laqa11/learning/forwardtoReflection.do') : '/lams/tool/laqa11/learning/learning.do'}"  modelAttribute="qaLearningForm" method="POST" target="_self">
+	<form:form action="/lams/tool/laqa11/learning/learning.do"  modelAttribute="qaLearningForm" method="POST" target="_self">
 
 		<lams:Page type="learner" title="${qaContent.title}">
 	
-			<!-- Announcements and advanced settings -->
+			<!-- Announcements -->
 	
 			<c:if test="${not empty sessionMap.submissionDeadline}">
 				<lams:Alert id="submission-deadline" type="danger" close="false">
@@ -303,15 +302,10 @@
 					</fmt:message>
 				</lams:Alert>
 			</c:if>
-			<!-- End Announcements and advanced settings -->
 	
 			<c:if test="${isLeadershipEnabled}">
 				<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
 			</c:if>
-	
-			<h4>
-				<fmt:message key="label.learnerReport" />
-			</h4>
 	
 			<!-- Questions and answers -->
 			<c:forEach var="userResponse" items="${generalLearnerFlowDTO.userResponses}" varStatus="status">
@@ -425,56 +419,83 @@
 			<!-- End of others questions -->
 	
 			<!-- buttons -->
-				<form:hidden path="toolSessionID" id="toolSessionID" />
-				<form:hidden path="userID" id="userID" />
-				<form:hidden path="httpSessionID" />
-				<form:hidden path="totalQuestionCount" />
-				<form:hidden path="refreshAnswers" />
+			<form:hidden path="toolSessionID" id="toolSessionID" />
+			<form:hidden path="userID" id="userID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="totalQuestionCount" />
+			<form:hidden path="refreshAnswers" />
+				
+			<!-- reflections -->
+			<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
+				<div class="row no-gutter">
+					<div class="col-xs-12">
+						<div class="panel panel-default voffset10">
+							<div class="panel-heading panel-title">
+								<fmt:message key="label.reflection" />
+							</div>
+							<div class="panel-body">
+								<div class="reflectionInstructions">
+									<lams:out value="${qaLearningForm.reflectionSubject}" escapeHtml="true" />
+								</div>
+								<div class="panel">
+									<lams:out value="${qaLearningForm.entryText}" escapeHtml="true" />
+								</div>
 	
-				<c:if test="${generalLearnerFlowDTO.requestLearningReportViewOnly != 'true' }">
-					<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-						<div class="right-buttons voffset5" align="right" id="learner-submit">
-							<button type="button" class="btn btn-default voffset5 roffset5 pull-left"
-									onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
-								<fmt:message key="label.refresh" />
-							</button>
-	
-							<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-								<button name="redoQuestions" type="button" class="btn btn-default voffset5  pull-left"
-										onclick="submitMethod('redoQuestions');">
-									<fmt:message key="label.redo" />
-								</button>
-							</c:if>
-	
-							<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-								<button type="button" id="finishButton"
-										onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
-									<c:choose>
-										<c:when test="${sessionMap.isLastActivity}">
-											<fmt:message key="button.submit" />
-										</c:when>
-										<c:otherwise>
-											<fmt:message key="button.endLearning" />
-										</c:otherwise>
-									</c:choose>
-								</button>
-							</c:if>
-	
-							<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-								<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-										class="btn btn-default">
-									<fmt:message key="label.continue" />
-								</button>
-							</c:if>
+								<c:if test="${hasEditRight && mode != 'teacher'}">
+									<button name="forwardtoReflection" type="button" class="btn btn-default pull-left"
+										onclick="submitMethod('forwardtoReflection');">
+										<fmt:message key="label.edit" />
+									</button>
+								</c:if>
+							</div>
 						</div>
+					</div>
+				</div>
+			</c:if>
+	
+			<c:if test="${mode != 'teacher'}">
+				<div class="right-buttons voffset5" align="right" id="learner-submit">
+					<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">
+						<button type="button" class="btn btn-default voffset5 roffset5 pull-left"
+								onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
+							<fmt:message key="label.refresh" />
+						</button>
 					</c:if>
-				</c:if>
+	
+					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+						<button name="redoQuestions" type="button" class="btn btn-default voffset5  pull-left"
+								onclick="submitMethod('redoQuestions');">
+							<fmt:message key="label.redo" />
+						</button>
+					</c:if>
+					
+					<c:choose>
+						<c:when test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight && !generalLearnerFlowDTO.isLearnerFinished}">
+							<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+									class="btn btn-default">
+								<fmt:message key="label.continue" />
+							</button>
+						</c:when>
+	
+						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
+							<button type="button" id="finishButton"
+									onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
+								<c:choose>
+									<c:when test="${sessionMap.isLastActivity}">
+										<fmt:message key="button.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.endLearning" />
+									</c:otherwise>
+								</c:choose>
+							</button>
+						</c:when>
+					</c:choose>
+				</div>
+			</c:if>
 	
 			<div id="footer"></div>
-	
 		</lams:Page>
-
 	</form:form>
-
 </body>
 </lams:html>
