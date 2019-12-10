@@ -3,7 +3,7 @@ function gradientNumberFormatter (cellvalue) {
 	var MIN_DATA_VALUE = 0,
 		MAX_DATA_VALUE = 10,
 		//default CONFIDENCE_LEVELS_TYPE to 1
-		type = confidenceLevelsSettings ? confidenceLevelsSettings.type : '1';
+		type = typeof confidenceLevelsSettings !== 'undefined' ? confidenceLevelsSettings.type : '1';
 	
 	var dataAsNumber = parseInt(cellvalue, 10);
 	if (dataAsNumber == -1) {
