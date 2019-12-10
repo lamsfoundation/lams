@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
@@ -45,6 +46,10 @@ public class TblMonitoringController {
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	request.setAttribute("questions", mcContent.getMcQueContents());
+
+	String hideTitles = mcService.getConfigValue(McAppConstants.CONFIG_KEY_HIDE_TITLES);
+	request.setAttribute(McAppConstants.CONFIG_KEY_HIDE_TITLES, Boolean.valueOf(hideTitles));
+
 	return "tblmonitoring/mcq";
     }
 

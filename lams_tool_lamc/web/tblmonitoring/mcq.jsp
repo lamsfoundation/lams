@@ -50,7 +50,9 @@
 		<div class="panel-heading">
 			<h4 class="panel-title">
 				<span class="float-left space-right">Q${i.index + 1})</span> 
-				<c:out value="${question.name}" escapeXml="false"/>
+				<c:if test="${not hideTitles}">
+					<c:out value="${question.name}" escapeXml="false"/>
+				</c:if>
 				<br>
 				<c:out value="${question.description}" escapeXml="false"/>
 			</h4>
