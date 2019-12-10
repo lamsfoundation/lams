@@ -70,7 +70,10 @@
 								<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
 							</c:when>
 							<c:otherwise>
-								Q${i.index+1}) <c:out value="${item.qbQuestion.name}" escapeXml="false"/> 
+								Q${i.index+1}) 
+								<c:if test="${not hideTitles}">
+									<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+								</c:if> 
 							</c:otherwise>
 						</c:choose>
 					</c:set>

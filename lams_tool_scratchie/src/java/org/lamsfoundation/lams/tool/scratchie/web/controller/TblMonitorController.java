@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -170,7 +171,9 @@ public class TblMonitorController {
 		groupSummary.setMark(total);
 
 		String totalPercentageStr = groupRow.getCell(itemDtos.size() + 2).toString();
-		int totalPercentage = NumberUtils.isNumber(totalPercentageStr) ? (int) (Double.parseDouble(totalPercentageStr)*100) : 0;
+		int totalPercentage = NumberUtils.isNumber(totalPercentageStr)
+			? (int) (Double.parseDouble(totalPercentageStr) * 100)
+			: 0;
 		groupSummary.setTotalPercentage(totalPercentage + "%");
 	    }
 
@@ -265,6 +268,10 @@ public class TblMonitorController {
 	    }
 
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
+
+	    ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
+	    request.setAttribute(ScratchieConfigItem.KEY_HIDE_TITLES, Boolean.valueOf(hideTitles.getConfigValue()));
+
 	}
 
 	return "pages/tblmonitoring/burningQuestions";
