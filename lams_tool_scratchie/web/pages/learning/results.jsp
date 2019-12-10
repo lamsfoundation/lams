@@ -166,7 +166,25 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
-                    caption: <c:choose><c:when test="${scratchieItemUid == 0}">"${scratchieItem.qbQuestion.name}"</c:when><c:otherwise>"<a href='#${scratchieItem.qbQuestion.name}' class='bq-title'>${scratchieItem.qbQuestion.name}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
+                    caption: <c:choose>
+								<%-- General burning question --%>
+								<c:when test="${scratchieItemUid == 0}">"<c:out value='${scratchieItem.qbQuestion.name}' />"
+								</c:when>
+								<c:otherwise>
+									<%-- Regular burning question --%>
+									<c:choose>
+										<%-- If we hide titles, we just display a link for "Question 1)" --%>
+										<c:when test="${sessionMap.hideTitles}">
+										 	"<a href='#questionTitle${i.count}' class='bq-title'><fmt:message key='label.question'/>&nbsp;${i.count})</a>"
+										</c:when>
+										<%-- If we show titles, we display question number and then a link with question title --%>
+										<c:otherwise>
+											"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><c:out value='${scratchieItem.qbQuestion.name}' /></a>"
+										</c:otherwise>
+									</c:choose>
+								</c:otherwise>
+							</c:choose> 
+							+ " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItemUid}',
 	  	          	beforeEditRow: function (options, rowid) {
 		  	          	alert("aaa");
