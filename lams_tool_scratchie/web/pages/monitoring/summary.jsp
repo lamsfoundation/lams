@@ -358,7 +358,9 @@
 								${i.count})&nbsp;
 								
 							</c:if>
-							<c:out value="${burningQuestionItemDto.scratchieItem.qbQuestion.name}" />
+							<c:if test="${not sessionMap.hideTitles}">
+								<c:out value="${burningQuestionItemDto.scratchieItem.qbQuestion.name}" />
+							</c:if>
 						</strong></div>
 						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</c:forEach>

@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +50,7 @@ import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -60,7 +60,6 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -121,6 +120,9 @@ public class MonitoringController {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
+
+	ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
+	sessionMap.put(ScratchieConfigItem.KEY_HIDE_TITLES, Boolean.valueOf(hideTitles.getConfigValue()));
 
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
