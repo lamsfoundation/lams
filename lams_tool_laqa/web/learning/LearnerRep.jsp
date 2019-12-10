@@ -46,6 +46,10 @@
 		.other-users-responses .table>thead>tr>th {
 			line-height: 0.2;
 		}
+		
+		.rate-answers-area {
+			 min-height: 120px;
+		}
 	</style>
 
 	<script type="text/javascript">
@@ -376,7 +380,7 @@
 											</div>
 										</div>
 										<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-											<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+											<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 rate-answers-area">
 												<h4 class="text-center">
 													<fmt:message key="label.learning.rating" />
 												</h4>
