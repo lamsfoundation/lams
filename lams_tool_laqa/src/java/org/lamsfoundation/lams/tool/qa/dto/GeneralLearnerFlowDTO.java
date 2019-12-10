@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.tool.qa.model.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 
@@ -64,8 +63,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String remainingQuestionCount;
 
-    protected String teacherViewOnly;
-
     protected String notebookEntriesVisible;
 
     protected String reflection;
@@ -76,15 +73,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String endLearningMessage;
 
-    protected String userNameVisible;
+    protected boolean userNameVisible;
 
     protected boolean showOtherAnswers;
 
-    protected String requestLearningReport;
-
-    protected String requestLearningReportProgress;
-
-    protected String requestLearningReportViewOnly;
+    protected boolean isLearnerFinished;
 
     protected Map mapAnswers;
 
@@ -96,8 +89,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Set<QaQueContent> questions;
 
-    protected List<QaUsrResp> userResponses;
-
     protected String initialScreen;
 
     protected String lockWhenFinished;
@@ -106,28 +97,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String userUid;
 
-    protected String usernameVisible;
-
     protected String allowRichEditor;
 
     protected String useSelectLeaderToolOuput;
 
     protected boolean allowRateAnswers;
-
-    /**
-     * @return Returns the usernameVisible.
-     */
-    public String getUsernameVisible() {
-	return usernameVisible;
-    }
-
-    /**
-     * @param usernameVisible
-     *            The usernameVisible to set.
-     */
-    public void setUsernameVisible(String usernameVisible) {
-	this.usernameVisible = usernameVisible;
-    }
 
     /**
      * @return Returns the currentAnswer.
@@ -247,22 +221,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	}
     }
 
-    @Override
-    public String toString() {
-	return new ToStringBuilder(this).append("remainingQuestionCount: ", remainingQuestionCount)
-		.append("totalQuestionCount : ", totalQuestionCount)
-		.append("activityInstructions: ", activityInstructions).append("teacherViewOnly: ", teacherViewOnly)
-		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle)
-		.append("countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
-		.append("currentQuestionIndex: ", currentQuestionIndex)
-		.append("questionListingMode: ", questionListingMode)
-		.append("userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
-		.append("requestLearningReportProgress: ", requestLearningReportProgress)
-		.append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)
-		.append("mapAnswers: ", mapAnswers).append("mapQuestions: ", mapQuestions)
-		.append("mapQuestionContentLearner: ", mapQuestionContentLearner).toString();
-    }
-
     /**
      * @param currentQuestionIndex
      *            The currentQuestionIndex to set.
@@ -338,18 +296,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.endLearningMessage = endLearningMessage;
     }
 
-    /**
-     * @return Returns the userNameVisible.
-     */
-    public String getUserNameVisible() {
+    public boolean getUserNameVisible() {
 	return userNameVisible;
     }
 
-    /**
-     * @param userNameVisible
-     *            The userNameVisible to set.
-     */
-    public void setUserNameVisible(String userNameVisible) {
+    public void setUserNameVisible(boolean userNameVisible) {
 	this.userNameVisible = userNameVisible;
     }
 
@@ -398,64 +349,12 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.httpSessionID = httpSessionID;
     }
 
-    /**
-     * @return Returns the requestLearningReport.
-     */
-    public String getRequestLearningReport() {
-	return requestLearningReport;
+    public boolean getIsLearnerFinished() {
+	return isLearnerFinished;
     }
 
-    /**
-     * @param requestLearningReport
-     *            The requestLearningReport to set.
-     */
-    public void setRequestLearningReport(String requestLearningReport) {
-	this.requestLearningReport = requestLearningReport;
-    }
-
-    /**
-     * @return Returns the requestLearningReportProgress.
-     */
-    public String getRequestLearningReportProgress() {
-	return requestLearningReportProgress;
-    }
-
-    /**
-     * @param requestLearningReportProgress
-     *            The requestLearningReportProgress to set.
-     */
-    public void setRequestLearningReportProgress(String requestLearningReportProgress) {
-	this.requestLearningReportProgress = requestLearningReportProgress;
-    }
-
-    /**
-     * @return Returns the requestLearningReportViewOnly.
-     */
-    public String getRequestLearningReportViewOnly() {
-	return requestLearningReportViewOnly;
-    }
-
-    /**
-     * @param requestLearningReportViewOnly
-     *            The requestLearningReportViewOnly to set.
-     */
-    public void setRequestLearningReportViewOnly(String requestLearningReportViewOnly) {
-	this.requestLearningReportViewOnly = requestLearningReportViewOnly;
-    }
-
-    /**
-     * @return Returns the questions.
-     */
-    public List<QaUsrResp> getUserResponses() {
-	return userResponses;
-    }
-
-    /**
-     * @param questions
-     *            The questions to set.
-     */
-    public void setUserResponses(List<QaUsrResp> userResponses) {
-	this.userResponses = userResponses;
+    public void setIsLearnerFinished(boolean isLearnerFinished) {
+	this.isLearnerFinished = isLearnerFinished;
     }
 
     /**
@@ -561,21 +460,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setUserName(String userName) {
 	this.userName = userName;
-    }
-
-    /**
-     * @return Returns the teacherViewOnly.
-     */
-    public String getTeacherViewOnly() {
-	return teacherViewOnly;
-    }
-
-    /**
-     * @param teacherViewOnly
-     *            The teacherViewOnly to set.
-     */
-    public void setTeacherViewOnly(String teacherViewOnly) {
-	this.teacherViewOnly = teacherViewOnly;
     }
 
     /**

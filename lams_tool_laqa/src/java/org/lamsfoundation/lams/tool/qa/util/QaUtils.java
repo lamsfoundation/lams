@@ -159,11 +159,7 @@ public abstract class QaUtils implements QaAppConstants {
 	request.getSession().removeAttribute(QaAppConstants.CURRENT_ANSWER);
 	request.getSession().removeAttribute(QaAppConstants.DEFINE_LATER);
 	request.getSession().removeAttribute(QaAppConstants.SOURCE_MC_STARTER);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT_VIEWONLY);
 	request.getSession().removeAttribute(QaAppConstants.REQUEST_PREVIEW);
-	request.getSession().removeAttribute(QaAppConstants.REQUEST_LEARNING_REPORT_PROGRESS);
-
 	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_WRONG_FORMAT);
 	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_UNCOMPATIBLE_IDS);
 	request.getSession().removeAttribute(QaAppConstants.USER_EXCEPTION_NUMBERFORMAT);
