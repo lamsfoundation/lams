@@ -22,6 +22,31 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
 	<lams:css />
+	<style>
+		#rating-comment-info {
+			margin: 10px 0;
+    		padding: 5px;
+		}
+		
+		.other-users-responses {
+			margin: 0 -15px -35px -15px;
+		}
+		
+		.add-comment {
+			margin-left: 10px;
+			float: left !important;
+			margin-top: auto;
+		}
+		
+		.comment-textarea {
+			float: left;
+    		width: 85%;
+		}
+		
+		.other-users-responses .table>thead>tr>th {
+			line-height: 0.2;
+		}
+	</style>
 
 	<script type="text/javascript">
 		//var for jquery.jRating.js
@@ -97,7 +122,7 @@
 								rows += '<tr>';
 								rows += '<td style="vertical-align:top;">';
 								
-								if (${generalLearnerFlowDTO.userNameVisible == 'true'}) {
+								if (${generalLearnerFlowDTO.userNameVisible}) {
 									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}', userData["userName"], 
 											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>', 
 											false, "sbox-heading bg-warning")
@@ -201,7 +226,7 @@
 										//show comments textarea and a submit button
 										} else if (! (IS_DISABLED || usesRatings && MAX_RATES>0 && countRatedItems >= MAX_RATES && !hasStartedRating)) {
 											rows += '<div id="add-comment-area-' + itemId + '">';											
-											rows +=		'<textarea class="form-control" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
+											rows +=		'<textarea class="form-control comment-textarea" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
 											
 											rows += 	'<div class="button add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
 											rows += 	'</div>';
@@ -256,6 +281,11 @@
 
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 	<form:form action="/lams/tool/laqa11/learning/learning.do"  modelAttribute="qaLearningForm" method="POST" target="_self">
+		<form:hidden path="toolSessionID" id="toolSessionID" />
+		<form:hidden path="userID" id="userID" />
+		<form:hidden path="httpSessionID" />
+		<form:hidden path="totalQuestionCount" />
+		<form:hidden path="refreshAnswers" />
 
 		<lams:Page type="learner" title="${qaContent.title}">
 	
@@ -308,8 +338,8 @@
 			</c:if>
 	
 			<!-- Questions and answers -->
-			<c:forEach var="userResponse" items="${generalLearnerFlowDTO.userResponses}" varStatus="status">
-				<div class="row no-gutter">
+			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
+				<div class="row no-gutter voffset20">
 					<div class="col-xs-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
@@ -318,112 +348,95 @@
 							</div>
 							<div class="panel-body">
 								<div class="panel">
-									<c:out value="${userResponse.qaQuestion.question}" escapeXml="false" />
+									<c:out value="${question.question}" escapeXml="false" />
 								</div>
 	
-								<div class="row no-gutter">
-									<!-- split if ratings are on -->
-									<c:set var="splitRow" value="col-xs-12" />
-									<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-										<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-10 col-lg-10" />
-									</c:if>
-									<div class="${splitRow}">
-										<div class="sbox">
-											<div class="sbox-heading bg-warning">
-												<div class="pull-left roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
-													<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
-													<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
-											</div>
-											<div class="sbox-body">
-												<c:out value="${userResponse.answer}" escapeXml="false" />
+								<%--User own responses---------------------------------------%>
+								<c:set var="userResponse" value="${question.userResponse}"/>
+								<c:if test="${userResponse != null}">
+									<div class="row no-gutter">
+										<!-- split if ratings are on -->
+										<c:set var="splitRow" value="col-xs-12" />
+										<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
+											<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-10 col-lg-10" />
+										</c:if>
+										<div class="${splitRow}">
+											<div class="sbox">
+												<div class="sbox-heading bg-warning">
+													<div class="pull-left roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
+														<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
+														<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
+												</div>
+												<div class="sbox-body">
+													<c:out value="${userResponse.answer}" escapeXml="false" />
+												</div>
 											</div>
 										</div>
-	
+										<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
+											<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
+												<h4 class="text-center">
+													<fmt:message key="label.learning.rating" />
+												</h4>
+												<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
+													maxRates="${qaContent.maximumRates}" />
+											</div>
+										</c:if>
 									</div>
-									<%--Rating area---------------------------------------%>
-									<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-										<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2">
-											<h4 class="text-center">
-												<fmt:message key="label.learning.rating" />
-											</h4>
-											<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
-												maxRates="${qaContent.maximumRates}" />
-										</div>
+								</c:if>
+								
+								<!-- Others users' responses -->
+								<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
+									<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
+										<lams:Alert id="rating-comment-info" type="info" close="false" >
+											<fmt:message key="label.comment.minimum.number.words">
+												<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
+											</fmt:message>
+										</lams:Alert>
 									</c:if>
-								</div>
+					
+									<c:choose>
+										<c:when test="${isCommentsEnabled}">
+											<c:set var="numColumns" value="3" />
+										</c:when>
+										<c:when test="${!isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
+											<c:set var="numColumns" value="2" />
+										</c:when>
+										<c:otherwise>
+											<c:set var="numColumns" value="1" />
+										</c:otherwise>
+									</c:choose>
+					
+									<div class="other-users-responses">
+										<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' >
+											<thead>
+												<tr>
+													<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
+													<c:choose>
+													<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
+														<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
+													</c:when>
+													<c:otherwise>
+														<th style="display:none;"></th>
+													</c:otherwise>
+													</c:choose>
+													<c:if test="${isCommentsEnabled}">
+														<th><fmt:message key="label.comment" /></th>
+													</c:if>
+												</tr>
+											</thead>
+											<tbody>
+						
+											</tbody>
+										</lams:TSTable>
+									</div>
+								</c:if>
+								
 							</div>
 						</div>
 					</div>
 				</div>
 			</c:forEach>
 			<!-- End questions and answers -->
-	
-			<!-- Others questions -->
-	
-			<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-				<h4>
-					<fmt:message key="label.other.answers" />
-				</h4>
-	
-				<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
-					<p>
-						<strong> <fmt:message key="label.question" /> ${status.count}:
-						</strong>
-						<c:out value="${question.question}" escapeXml="false" />
-					</p>
-	
-					<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-						<lams:Alert id="rating-info" type="info" close="false">
-							<fmt:message key="label.comment.minimum.number.words">
-								<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
-							</fmt:message>
-						</lams:Alert>
-					</c:if>
-	
-					<c:choose>
-						<c:when test="${isCommentsEnabled}">
-							<c:set var="numColumns" value="3" />
-						</c:when>
-						<c:when test="${!isCommentsEnabled and generalLearnerFlowDTO.allowRateAnswers}">
-							<c:set var="numColumns" value="2" />
-						</c:when>
-						<c:otherwise>
-							<c:set var="numColumns" value="1" />
-						</c:otherwise>
-					</c:choose>
-	
-					<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"'>
-						<thead>
-							<tr>
-								<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
-								<c:choose>
-								<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
-									<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
-								</c:when>
-								<c:otherwise>
-									<th style="display:none;"></th>
-								</c:otherwise>
-								</c:choose>
-								<c:if test="${isCommentsEnabled}">
-									<th><fmt:message key="label.comment" /></th>
-								</c:if>
-							</tr>
-						</thead>
-						<tbody>
-	
-						</tbody>
-					</lams:TSTable>
-	
-				</c:forEach>
-			</c:if>
-			<!-- End of others questions -->
-	
-			<!-- buttons -->
-			<form:hidden path="toolSessionID" id="toolSessionID" />
-			<form:hidden path="userID" id="userID" />
-			<form:hidden path="httpSessionID" />
-			<form:hidden path="totalQuestionCount" />
-			<form:hidden path="refreshAnswers" />
 				
 			<!-- reflections -->
 			<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
@@ -435,7 +448,7 @@
 							</div>
 							<div class="panel-body">
 								<div class="reflectionInstructions">
-									<lams:out value="${qaLearningForm.reflectionSubject}" escapeHtml="true" />
+									<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 								</div>
 								<div class="panel">
 									<lams:out value="${qaLearningForm.entryText}" escapeHtml="true" />
@@ -453,6 +466,7 @@
 				</div>
 			</c:if>
 	
+			<!-- buttons -->
 			<c:if test="${mode != 'teacher'}">
 				<div class="right-buttons voffset5" align="right" id="learner-submit">
 					<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">

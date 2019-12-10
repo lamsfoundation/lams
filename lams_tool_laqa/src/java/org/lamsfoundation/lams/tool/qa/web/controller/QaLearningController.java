@@ -39,7 +39,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -98,6 +97,11 @@ public class QaLearningController implements QaAppConstants {
     @Autowired
     @Qualifier("qaMessageService")
     private MessageService messageService;
+    
+    @RequestMapping("/")
+    public String unspecified() throws IOException, ServletException, ToolException {
+	return null;
+    }
 
     @RequestMapping("/learning")
     public String execute(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm, HttpServletRequest request)
@@ -342,7 +346,7 @@ public class QaLearningController implements QaAppConstants {
 			    user, generalLearnerFlowDTO);
 
 		    generalLearnerFlowDTO.setIsLearnerFinished(user.isLearnerFinished());
-		    return "learning/learnerRep";
+		    return "learning/LearnerRep";
 		}
 	    }
 	}
@@ -613,7 +617,7 @@ public class QaLearningController implements QaAppConstants {
 	    generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 
 	    boolean usernameVisible = qaContent.isUsernameVisible();
-	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
+	    generalLearnerFlowDTO.setUserNameVisible(usernameVisible);
 
 	    NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
@@ -694,7 +698,7 @@ public class QaLearningController implements QaAppConstants {
 	generalLearnerFlowDTO.setUserUid(qaQueUsr.getQueUsrId().toString());
 
 	boolean usernameVisible = qaContent.isUsernameVisible();
-	generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
+	generalLearnerFlowDTO.setUserNameVisible(usernameVisible);
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -1012,7 +1016,6 @@ public class QaLearningController implements QaAppConstants {
 	}
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-
 	return "learning/Notebook";
     }
 
@@ -1024,13 +1027,10 @@ public class QaLearningController implements QaAppConstants {
      */
     public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, QaSession qaSession,
 	    IQaService qaService, String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
-
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(httpSessionID);
 	Long userId = user.getQueUsrId();
-	Set<QaQueContent> questions = qaContent.getQaQueContents();
-	generalLearnerFlowDTO.setQuestions(questions);
-	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
+	generalLearnerFlowDTO.setUserNameVisible(qaContent.isUsernameVisible());
 
 	// potentially empty list if the user starts the lesson after the time restriction has expired.
 	List<QaUsrResp> userResponses = qaService.getResponsesByUserUid(user.getUid());
@@ -1085,14 +1085,23 @@ public class QaLearningController implements QaAppConstants {
 		countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	    }
 	}
+	
+	Set<QaQueContent> questions = qaContent.getQaQueContents();
+	generalLearnerFlowDTO.setQuestions(questions);
+	//find according QaQueContent, if any
+	for (QaQueContent question : questions) {
+	    for (QaUsrResp userResponse : userResponses) {
+		if (question.getUid().equals(userResponse.getQaQuestion().getUid())) {
+		    question.setUserResponse(userResponse);
+		    break;
+		}
+	    }
+	}
 
 	request.setAttribute(TOOL_SESSION_ID, qaSession.getQaSessionId());
-
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
-
-	generalLearnerFlowDTO.setUserResponses(userResponses);
     }
 
     /**

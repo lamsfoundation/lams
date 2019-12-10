@@ -73,7 +73,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String endLearningMessage;
 
-    protected String userNameVisible;
+    protected boolean userNameVisible;
 
     protected boolean showOtherAnswers;
 
@@ -89,8 +89,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Set<QaQueContent> questions;
 
-    protected List<QaUsrResp> userResponses;
-
     protected String initialScreen;
 
     protected String lockWhenFinished;
@@ -99,28 +97,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String userUid;
 
-    protected String usernameVisible;
-
     protected String allowRichEditor;
 
     protected String useSelectLeaderToolOuput;
 
     protected boolean allowRateAnswers;
-
-    /**
-     * @return Returns the usernameVisible.
-     */
-    public String getUsernameVisible() {
-	return usernameVisible;
-    }
-
-    /**
-     * @param usernameVisible
-     *            The usernameVisible to set.
-     */
-    public void setUsernameVisible(String usernameVisible) {
-	this.usernameVisible = usernameVisible;
-    }
 
     /**
      * @return Returns the currentAnswer.
@@ -315,18 +296,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.endLearningMessage = endLearningMessage;
     }
 
-    /**
-     * @return Returns the userNameVisible.
-     */
-    public String getUserNameVisible() {
+    public boolean getUserNameVisible() {
 	return userNameVisible;
     }
 
-    /**
-     * @param userNameVisible
-     *            The userNameVisible to set.
-     */
-    public void setUserNameVisible(String userNameVisible) {
+    public void setUserNameVisible(boolean userNameVisible) {
 	this.userNameVisible = userNameVisible;
     }
 
@@ -381,21 +355,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     public void setIsLearnerFinished(boolean isLearnerFinished) {
 	this.isLearnerFinished = isLearnerFinished;
-    }
-
-    /**
-     * @return Returns the questions.
-     */
-    public List<QaUsrResp> getUserResponses() {
-	return userResponses;
-    }
-
-    /**
-     * @param questions
-     *            The questions to set.
-     */
-    public void setUserResponses(List<QaUsrResp> userResponses) {
-	this.userResponses = userResponses;
     }
 
     /**

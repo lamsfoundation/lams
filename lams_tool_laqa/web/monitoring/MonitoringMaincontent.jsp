@@ -1,16 +1,11 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
 
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 <c:set var="qaContent" value="${content}" />
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
@@ -39,6 +34,9 @@
 		}
 		a.image-link {
 			border-bottom: none !important;
+		}
+		.tablesorter.table>tbody>tr>td {
+			vertical-align:top;
 		}
 	</style>
 	
@@ -132,15 +130,9 @@
 								rows += '<tr>';
 								rows += '<td>';
 								
-									rows += '<div>';
-									rows += 	definePortraitPopover(userData["portraitId"], userData["userID"], fullName, fullName) 
-									rows += 	'</span> ';
-									rows += 	'(<time class="timeago" title="';
-									rows += 	userData["attemptTime"]
-									rows += 	'" datetime="';
-									rows += 	userData["timeAgo"];
-									rows += 	'"></time>)';
-									rows += '</div>';
+								rows += 	definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}', fullName,
+										 		'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>',
+												false, "sbox-heading bg-warning");
 								
 								rows += 	'<div class="user-answer">';
 								if (userData["visible"] == 'true') {
