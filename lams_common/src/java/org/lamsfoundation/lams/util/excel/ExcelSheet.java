@@ -34,11 +34,16 @@ public class ExcelSheet {
     public ExcelRow getRow(int index) {
 	return rows.get(index);
     }
-    
-    public ExcelRow initRow() {
+
+    public ExcelRow initRow(boolean isBold) {
 	ExcelRow row = new ExcelRow();
 	rows.add(row);
+	row.setBold(isBold);
 	return row;
+    }
+    
+    public ExcelRow initRow() {
+	return initRow(false);
     }
     
     public void addRow(ExcelRow row) {

@@ -87,7 +87,6 @@ public interface QaAppConstants {
 
     // LEARNER mode contants
     public static final String LEARNER_REP = "individualLearnerRep";
-    public static final String REVISITED_LEARNER_REP = "revisitedLearnerRep";
     public static final String IS_DISABLED = "isDisabled";
 
     /*

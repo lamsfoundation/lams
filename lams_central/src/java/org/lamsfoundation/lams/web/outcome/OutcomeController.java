@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -403,7 +404,7 @@ public class OutcomeController {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcomes", true);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = outcomeService.exportOutcomes();
+	List<ExcelSheet> sheets = outcomeService.exportOutcomes();
 
 	String fileName = "lams_outcomes.xls";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -419,7 +420,7 @@ public class OutcomeController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcelXLS(out, dataToExport, messageService.getMessage("outcome.export.date"), true);
+	ExcelUtil.createExcel(out, sheets, messageService.getMessage("outcome.export.date"), true, false);
     }
 
     @RequestMapping("/outcomeImport")
@@ -576,7 +577,7 @@ public class OutcomeController {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "export outcome scales", true);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = outcomeService.exportScales();
+	List<ExcelSheet> sheets = outcomeService.exportScales();
 
 	String fileName = "lams_outcome_scales.xls";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -592,7 +593,7 @@ public class OutcomeController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcelXLS(out, dataToExport, messageService.getMessage("outcome.export.date"), true);
+	ExcelUtil.createExcel(out, sheets, messageService.getMessage("outcome.export.date"), true, false);
     }
 
     @RequestMapping("/scaleImport")

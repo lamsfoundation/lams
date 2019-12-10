@@ -7,6 +7,7 @@
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <lams:css suffix="jquery.jRating"/>
 <link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
+<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <style type="text/css">
 	#common-buttons-area {
 		overflow: auto;
@@ -32,8 +33,12 @@
 	WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
