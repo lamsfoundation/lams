@@ -342,10 +342,11 @@
 				<div class="row no-gutter voffset20">
 					<div class="col-xs-12">
 						<div class="panel panel-default">
+						<c:if test="${generalLearnerFlowDTO.userResponses.size() != 1}">
 							<div class="panel-heading panel-title">
-								<fmt:message key="label.question" />
-								${status.count}:
+								<fmt:message key="label.question" />&nbsp;${status.count}
 							</div>
+						</c:if>	
 							<div class="panel-body">
 								<div class="panel">
 									<c:out value="${question.question}" escapeXml="false" />

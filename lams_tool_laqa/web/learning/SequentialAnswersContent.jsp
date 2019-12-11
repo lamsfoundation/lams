@@ -11,34 +11,34 @@
 		<div class="row no-gutter">
 			<div class="col-xs-12">
 				<div class="panel panel-default">
+				<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1 }">
 					<div class="panel-heading">
 						<div class="panel-title">
-							<strong> <fmt:message key="label.question" /> <c:out value="${questionEntry.key}" />
+							<strong> <fmt:message key="label.question" />&nbsp;<c:out value="${questionEntry.key}" />
 							</strong>
 						</div>
 					</div>
+				</c:if>	
 					<div class="panel-body">
 						<div class="panel">
 							<c:out value="${questionEntry.value.question}" escapeXml="false" />
 						</div>
 						<div class="answer-req">
-							<fmt:message key="label.learning.yourAnswer" />
 							<c:if test="${questionEntry.value.required}">
-								<small>
-									<mark>
-										<fmt:message key="label.required" />
-									</mark>
-								</small>
+									<span class="label label-danger pull-right"><fmt:message key="label.required" /></span>
 							</c:if>
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">
-								<br />
-								<fmt:message key="label.words.required" />: <span id="words-required-"></span>
+								<button class="btn btn-xs btn-primary" type="button">
+									<strong><fmt:message key="label.words.required" />&nbsp;</strong><span id="words-required-" class="badge"></span>
+								</button>
+								<div class="voffset5">&nbsp;</div>
 							</c:if>
 						</div>
 
 						<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
 							data-min-words-limit="${questionEntry.value.minWordsLimit}"
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
+							<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
 							<c:choose>
 								<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 									<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
@@ -47,7 +47,7 @@
 								</c:when>
 
 								<c:otherwise>
-									<lams:textarea name="answer" id="answer" rows="5" class="form-control">
+									<lams:textarea name="answer" id="answer" rows="5" placeholder="${placeholder}" class="form-control">
 										<c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' />
 									</lams:textarea>
 								</c:otherwise>
