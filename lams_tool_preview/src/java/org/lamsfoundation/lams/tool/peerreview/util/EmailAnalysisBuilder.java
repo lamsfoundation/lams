@@ -290,39 +290,41 @@ public class EmailAnalysisBuilder {
     @SuppressWarnings("unchecked")
     private HashMap<Long, HashMap<Long, SummingData>> processRawRatingData() {
 	Collection<Long> criteriaIds = new ArrayList<Long>();
-	for ( RatingCriteria criteria : criteriaForCriteriaTable ) {
+	for (RatingCriteria criteria : criteriaForCriteriaTable) {
 	    criteriaIds.add(criteria.getRatingCriteriaId());
 	}
-	List<Object> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds, learnerDataMap.keySet());
 	HashMap<Long, HashMap<Long, SummingData>> tally = new HashMap<Long, HashMap<Long, SummingData>>();
-	for ( Object obj : rawRatingsForSession ) {
-	    Rating rating = (Rating) obj;
-	    SummingData sd = null;
-	    Long itemId = rating.getItemId();
-	    HashMap<Long, SummingData> itemMap = tally.get(itemId);
-	    if ( itemMap == null ) {
-		itemMap = new HashMap<Long, SummingData>();
-		sd = new SummingData();
-		itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
-		tally.put(itemId, itemMap);
-	    } else {
-		sd = itemMap.get(rating.getRatingCriteria().getRatingCriteriaId());
-		if ( sd == null ) {
+	if (criteriaIds.size() > 0) {
+	    List<Object> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
+		    learnerDataMap.keySet());
+	    for (Object obj : rawRatingsForSession) {
+		Rating rating = (Rating) obj;
+		SummingData sd = null;
+		Long itemId = rating.getItemId();
+		HashMap<Long, SummingData> itemMap = tally.get(itemId);
+		if (itemMap == null) {
+		    itemMap = new HashMap<Long, SummingData>();
 		    sd = new SummingData();
 		    itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
+		    tally.put(itemId, itemMap);
+		} else {
+		    sd = itemMap.get(rating.getRatingCriteria().getRatingCriteriaId());
+		    if (sd == null) {
+			sd = new SummingData();
+			itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
+		    }
+		}
+		Float newRating = rating.getRating() != null ? rating.getRating() : 0.0f;
+		sd.peerRatingIncSelf += newRating;
+		sd.numRatingsIncSelf++;
+		if (rating.getItemId().longValue() == rating.getLearner().getUserId().longValue()) {
+		    sd.selfRating = newRating;
+		} else {
+		    sd.peerRatingExcSelf += newRating;
+		    sd.numRatingsExcSelf++;
 		}
 	    }
-	    Float newRating = rating.getRating() != null ? rating.getRating() : 0.0f;
-	    sd.peerRatingIncSelf += newRating;
-	    sd.numRatingsIncSelf++;
-	    if ( rating.getItemId().longValue() == rating.getLearner().getUserId().longValue() ) {
-		sd.selfRating = newRating;
-	    } else {
-		sd.peerRatingExcSelf += newRating;
-		sd.numRatingsExcSelf++;
-	    }
 	}
-	
 	return tally;
     }
 
