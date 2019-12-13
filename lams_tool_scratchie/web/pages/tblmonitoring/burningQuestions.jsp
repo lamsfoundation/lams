@@ -66,7 +66,7 @@
 					<!-- Don't display number prior to general burning question -->
 					<c:set var="itemTitle">
 						<c:choose>
-							<c:when test="${burningQuestionItemDto.scratchieItem.uid == 0}">
+							<c:when test="${empty burningQuestionItemDto.scratchieItem.uid}">
 								<c:out value="${item.qbQuestion.name}" escapeXml="false"/>
 							</c:when>
 							<c:otherwise>
