@@ -400,10 +400,12 @@
 				</div>
 
 				<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
-					<c:set var="scratchieItemUid" value="${burningQuestionItemDto.scratchieItem.uid == null ? 0 : burningQuestionItemDto.scratchieItem.uid}"/>
-					<div class="burning-question-dto">
-						<table id="burningQuestions${scratchieItemUid}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</div>
+					<c:if test="${not empty burningQuestionItemDto.burningQuestionDtos}">
+						<c:set var="scratchieItemUid" value="${empty burningQuestionItemDto.scratchieItem.uid ? 0 : burningQuestionItemDto.scratchieItem.uid}"/>
+						<div class="burning-question-dto">
+							<table id="burningQuestions${scratchieItemUid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+						</div>
+					</c:if>
 				</c:forEach>
 			</div>
 		</c:if>

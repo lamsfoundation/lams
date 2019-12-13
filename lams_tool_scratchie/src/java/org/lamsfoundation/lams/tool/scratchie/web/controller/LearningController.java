@@ -556,7 +556,7 @@ public class LearningController {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    toolSessionId, false);
+		    toolSessionId, true);
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
