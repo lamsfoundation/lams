@@ -142,10 +142,7 @@ public class MonitoringController {
 
     @RequestMapping("/itemSummary")
     private String itemSummary(HttpServletRequest request) {
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
 	if (itemUid.equals(-1L)) {
@@ -155,12 +152,12 @@ public class MonitoringController {
 	request.setAttribute(ScratchieConstants.ATTR_ITEM, item);
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = scratchieService.getQuestionSummary(contentId, itemUid);
+	List<GroupSummary> summaryList = scratchieService.getGroupSummariesByItem(contentId, itemUid);
 
 	// escape JS sensitive characters in option descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (OptionDTO optionDto : summary.getOptionDtos()) {
-		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer());
+		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer()).replace("\\r\\n", "<br>");
 		optionDto.setAnswer(escapedAnswer);
 	    }
 	}
@@ -186,17 +183,9 @@ public class MonitoringController {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
     @RequestMapping("/setSubmissionDeadline")
     private String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(contentID);
 
@@ -221,16 +210,11 @@ public class MonitoringController {
 
     /**
      * Exports tool results into excel.
-     *
-     * @throws IOException
      */
     @RequestMapping("/exportExcel")
     @ResponseStatus(HttpStatus.OK)
     private void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 
 	List<ExcelSheet> sheets = scratchieService.exportExcel(scratchie.getContentId());
@@ -258,11 +242,7 @@ public class MonitoringController {
     @RequestMapping("/getMarkChartData")
     private String getMarkChartData(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	List<Number> results = null;
@@ -286,11 +266,7 @@ public class MonitoringController {
 
     @RequestMapping("/statistic")
     private String statistic(HttpServletRequest request) {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	if (scratchie != null) {
@@ -310,5 +286,12 @@ public class MonitoringController {
 	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/parts/statisticpart";
+    }
+
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
 }

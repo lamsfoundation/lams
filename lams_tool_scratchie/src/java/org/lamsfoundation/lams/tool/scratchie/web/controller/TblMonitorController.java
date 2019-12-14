@@ -41,6 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
@@ -48,10 +50,13 @@ import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
+import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -94,21 +99,22 @@ public class TblMonitorController {
 	request.setAttribute("items", items);
 
 	if (attemptedLearnersNumber != 0) {
-	    // find the first page in excel file
-	    List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
-	    ExcelSheet firstPageData = sheets.get(0);
-
-	    int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	    ArrayList<String[]> groupRows = new ArrayList<>();
-	    for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
-		ExcelRow groupRow = firstPageData.getRow(5 + groupCount);
-
-		String[] groupRow2 = new String[2];
-		groupRow2[0] = (String) groupRow.getCell(1);
-		groupRow2[1] = String.valueOf((Double) groupRow.getCell(groupRow.getCells().size() - 1) * 100);
-		groupRows.add(groupRow2);
+	    List<GroupSummary> groupSummaries = scratchieService.getSummaryByTeam(scratchie, items);
+	    
+	    //calculate what is the percentage of first choice events in each session
+	    for (GroupSummary summary : groupSummaries) {
+		int numberOfFirstChoiceEvents = 0;
+		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		    if (itemDto.isUnraveledOnFirstAttempt()) {
+			numberOfFirstChoiceEvents++;
+		    }
+		}
+		
+		Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
+		summary.setTotalPercentage(percentage.toString());
 	    }
-	    request.setAttribute("groupRows", groupRows);
+	    
+	    request.setAttribute("groupSummaries", groupSummaries);
 	}
 
 	return "pages/tblmonitoring/tra";
@@ -126,34 +132,22 @@ public class TblMonitorController {
 	items.addAll(scratchie.getScratchieItems());
 	request.setAttribute("items", items);
 
-	//find second page in excel file
-	List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
-	ExcelSheet secondPageData = sheets.get(1);
+	//correct answers row
+	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
+	request.setAttribute("correctAnswerLetters", correctAnswerLetters);
 
-	//correct answers
-	ExcelRow correctOptionsRow = secondPageData.getRow(4);
-	request.setAttribute("correctAnswers", correctOptionsRow);
-
-	//prepare data for displaying user answers table
-	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
-	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
-	    ExcelRow groupRow = secondPageData.getRows().get(6 + groupCount);
-
-	    GroupSummary groupSummary = new GroupSummary();
-	    String sessionName = groupRow.getCell(0).toString();
-	    groupSummary.setSessionName(sessionName);
-
-	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
-	    for (int i = 1; i <= items.size(); i++) {
-		ScratchieItemDTO itemDto = new ScratchieItemDTO();
-		String optionSequence = groupRow.getCell(i).toString();
+	List<GroupSummary> groupSummaries = scratchieService.getSummaryByTeam(scratchie, items);
+	for (GroupSummary summary : groupSummaries) {
+	    //prepare OptionDtos to display
+	    int i = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		String optionSequence = itemDto.getOptionsSequence();
 		String[] optionLetters = optionSequence.split(", ");
 
 		List<OptionDTO> optionDtos = new LinkedList<>();
 		for (int j = 0; j < optionLetters.length; j++) {
 		    String optionLetter = optionLetters[j];
-		    String correctOptionLetter = correctOptionsRow.getCell(i).toString();
+		    String correctOptionLetter = correctAnswerLetters.get(i);
 
 		    OptionDTO optionDto = new OptionDTO();
 		    optionDto.setAnswer(optionLetter);
@@ -162,25 +156,22 @@ public class TblMonitorController {
 		}
 
 		itemDto.setOptionDtos(optionDtos);
-		itemDtos.add(itemDto);
+		i++;
 	    }
-	    groupSummary.setItemDtos(itemDtos);
-
-	    if (!itemDtos.isEmpty()) {
-		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
-		groupSummary.setMark(total);
-
-		String totalPercentageStr = groupRow.getCell(itemDtos.size() + 2).toString();
-		int totalPercentage = NumberUtils.isNumber(totalPercentageStr)
-			? (int) (Double.parseDouble(totalPercentageStr) * 100)
-			: 0;
-		groupSummary.setTotalPercentage(totalPercentage + "%");
+	    
+	    //calculate what is the percentage of first choice events in each session
+	    int numberOfFirstChoiceEvents = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
+		    numberOfFirstChoiceEvents++;
+		}
 	    }
-
-	    sessionDtos.add(groupSummary);
+	    summary.setMark(numberOfFirstChoiceEvents);
+	    Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
+	    summary.setTotalPercentage(percentage + "%");
 	}
-	request.setAttribute("sessionDtos", sessionDtos);
 
+	request.setAttribute("sessionDtos", groupSummaries);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	return "pages/tblmonitoring/traStudentChoices";
     }
@@ -195,7 +186,6 @@ public class TblMonitorController {
     @RequestMapping("/exportExcel")
     @ResponseStatus(HttpStatus.OK)
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
 
@@ -219,7 +209,6 @@ public class TblMonitorController {
     @ResponseBody
     public String isBurningQuestionsEnabled(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
@@ -236,7 +225,6 @@ public class TblMonitorController {
      */
     @RequestMapping("/burningQuestions")
     public String burningQuestions(HttpServletRequest request) throws IOException, ServletException {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
@@ -282,7 +270,6 @@ public class TblMonitorController {
      */
     @RequestMapping("/getModalDialogForTeamsTab")
     public String getModalDialogForTeamsTab(HttpServletRequest request) throws IOException, ServletException {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 
