@@ -151,9 +151,10 @@ public class TBLTemplateController extends LdTemplateController {
 	    // iRA Test - MCQ
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
+	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 	    Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable, false,
-		    JsonUtil.readArray(data.testQuestions.values()));
+		    testQuestionsArray);
 	    ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
@@ -186,7 +187,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    : null;
 	    Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
-		    JsonUtil.readArray(data.testQuestions.values()));
+		    testQuestionsArray);
 	    activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle));
 

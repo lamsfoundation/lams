@@ -2081,7 +2081,8 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	// Questions
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
-	for (JsonNode questionData : questions) {
+	for (JsonNode questionDataJson : questions) {
+	    ObjectNode questionData = (ObjectNode) questionDataJson;
 	    boolean addToCollection = false;
 	    McQueContent question = null;
 	    QbQuestion qbQuestion = null;
@@ -2101,7 +2102,17 @@ public class McService implements IMcService, ToolContentManager, ToolSessionMan
 		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
 		qbQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 		qbQuestion.setMaxMark(1);
+		// UUID normally gets generated in the DB, but we need it immediately,
+		// so we generate it programatically.
+		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
+		// not from DB where UUID is filed
+		qbQuestion.setUuid(UUID.randomUUID());
 		userManagementService.save(qbQuestion);
+
+		// Store it back into JSON so Scratchie can read it
+		// and use the same questions, not create new ones
+		uuid = qbQuestion.getUuid().toString();
+		questionData.put(RestTags.QUESTION_UUID, uuid);
 
 		ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
 		for (JsonNode optionData : optionsData) {
