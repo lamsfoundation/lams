@@ -37,13 +37,13 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="archive*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="recalculate*">PROPAGATION_REQUIRED</prop>
-				<prop key="toggleMarksReleased">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="export*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="recalculate*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggleMarksReleased">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

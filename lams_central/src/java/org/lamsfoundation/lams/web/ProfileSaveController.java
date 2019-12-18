@@ -74,17 +74,6 @@ public class ProfileSaveController {
 
 	request.setAttribute("submitted", true);
 
-	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
-
-	// check requestor is same as user being edited
-	if (!requestor.getLogin().equals(userForm.getLogin())) {
-	    ProfileSaveController.log
-		    .warn(requestor.getLogin() + " tried to edit profile of user " + userForm.getLogin());
-	    errorMap.add("GLOBAL", messageService.getMessage("error.authorisation"));
-	    request.setAttribute("errorMap", errorMap);
-	    return "forward:/profile/edit.do";
-	}
-
 	// (dyna)form validation
 	//first name validation
 	String firstName = (userForm.getFirstName() == null) ? null : (String) userForm.getFirstName();
@@ -123,6 +112,7 @@ public class ProfileSaveController {
 	    return "forward:/profile/edit.do";
 	}
 
+	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)
 		&& Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
 	    // update only contact fields
@@ -144,7 +134,6 @@ public class ProfileSaveController {
 	    Theme cssTheme = (Theme) userManagementService.findById(Theme.class, userForm.getUserTheme());
 	    requestor.setTheme(cssTheme);
 	}
-
 	userManagementService.saveUser(requestor);
 
 	// replace UserDTO in the shared session
@@ -153,5 +142,4 @@ public class ProfileSaveController {
 
 	return "forward:/profile/view.do";
     }
-
 }

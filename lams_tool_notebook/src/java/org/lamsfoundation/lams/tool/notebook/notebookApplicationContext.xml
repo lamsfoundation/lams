@@ -44,21 +44,25 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+                <prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="finishToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
-				<prop key="add*">PROPAGATION_REQUIRED</prop>
-				<prop key="finishToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
+				<prop key="import*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
-				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
-				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
-				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
+				<prop key="notify*">PROPAGATION_REQUIRED</prop>
+                <prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>				
 			</props>
 		</property>

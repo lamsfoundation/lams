@@ -31,7 +31,6 @@ import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
 
 /**
  * @author jliew
- *
  */
 public interface ILdapService {
 

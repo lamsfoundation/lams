@@ -40,14 +40,13 @@
 		
 		<property name="transactionAttributes">
 			<props>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="store*">PROPAGATION_REQUIRED</prop>
 				<prop key="copy*">PROPAGATION_REQUIRED</prop>
-				<prop key="rename*">PROPAGATION_REQUIRED</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED</prop>				
-				<prop key="move*">PROPAGATION_REQUIRED</prop>	
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>			
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>	
+				<prop key="move*">PROPAGATION_REQUIRED</prop>					
+				<prop key="rename*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

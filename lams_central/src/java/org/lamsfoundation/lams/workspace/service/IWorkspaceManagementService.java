@@ -281,5 +281,4 @@ public interface IWorkspaceManagementService {
      */
     boolean isUserAuthorizedToModifyFolderContents(Integer folderID, Integer userID)
 	    throws UserException, WorkspaceFolderException;
-
 }
