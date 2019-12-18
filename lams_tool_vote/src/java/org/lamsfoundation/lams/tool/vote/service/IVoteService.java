@@ -146,10 +146,6 @@ public interface IVoteService extends ICommonToolService {
 
     void showOpenVote(VoteUsrAttempt voteUsrAttempt);
 
-//    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
-
-//    int getUserEnteredVotesCountForContent(final Long voteContentUid);
-
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 
     List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid);

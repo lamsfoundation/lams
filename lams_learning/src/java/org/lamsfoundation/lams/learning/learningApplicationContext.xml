@@ -60,22 +60,23 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="joinLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="calculate*">PROPAGATION_REQUIRED</prop>
 				<prop key="chooseActivity">PROPAGATION_REQUIRED</prop>
-				<prop key="moveToActivity">PROPAGATION_REQUIRED</prop>
 				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW</prop>
 				<prop key="completeActivity">PROPAGATION_REQUIRED</prop>
-				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
-				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>
-				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
-				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>				
-				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="createCommand*">PROPAGATION_REQUIRES_NEW</prop>
-				<prop key="learner*">PROPAGATION_REQUIRED</prop>
+				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>	
+				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="joinLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
+				<prop key="learner*">PROPAGATION_REQUIRED</prop>
+				<prop key="moveToActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>		
+				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>	
+				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 
@@ -96,14 +97,14 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="start*">PROPAGATION_REQUIRED</prop>
-				<prop key="finish*">PROPAGATION_REQUIRED</prop>
-				<prop key="score*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="export*">PROPAGATION_REQUIRED</prop>
-				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="log*">PROPAGATION_REQUIRED</prop>
+				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="score*">PROPAGATION_REQUIRED</prop>
+				<prop key="start*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
 	</bean> 

@@ -1279,9 +1279,6 @@ public class LearnerService implements ILearnerFullService {
 	this.progressEngine = progressEngine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Long groupingId) {
 	LearnerChoiceGrouping grouping = (LearnerChoiceGrouping) getGrouping(groupingId);

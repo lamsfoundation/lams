@@ -92,22 +92,30 @@
 			</property>
 			<property name="transactionAttributes">
 				<props>
-					<prop key="create*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+            		<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            		<prop key="buildGroupsMarkData">PROPAGATION_REQUIRED</prop>
+					<prop key="changeUserAttemptMark">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="create*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="existsSession">PROPAGATION_REQUIRED</prop>
+					<prop key="export*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="find*">PROPAGATION_REQUIRED</prop>
+					<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+					<prop key="get*">PROPAGATION_REQUIRED</prop>
+					<prop key="import*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="is*">PROPAGATION_REQUIRED</prop>
+					<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+					<prop key="persistFile">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="prepareSessionDataSpreadsheet">PROPAGATION_REQUIRED</prop>
+					<prop key="recalculateUserAnswers">PROPAGATION_REQUIRED</prop>
+					<prop key="refreshQuestionContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
+                	<prop key="release*">PROPAGATION_REQUIRED</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
+                	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -McApplicationException</prop>
 					<prop key="set*">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED, -MccpApplicationException</prop>
-					<prop key="remove*">PROPAGATION_REQUIRED,-McApplicationException</prop>
-                	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-					<prop key="persistFile">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="importToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="exportToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="setDefineLater">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
-					<prop key="changeUserAttemptMark">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

@@ -34,7 +34,6 @@ import org.lamsfoundation.lams.usermanagement.User;
  * Export tool content service provides ability to export learning design and its relative activities' tool content.
  *
  * @author Steve.Ni
- * @version $Revision$
  */
 public interface IExportToolContentService {
     /**

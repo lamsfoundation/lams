@@ -158,30 +158,29 @@
 			</list>
 		</property>
 		<property name="transactionAttributes">
-			<props>
-			    <prop key="get*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>
-			    <prop key="is*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>			
-				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="rateMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="sendNotificationsOnNewPosting">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<!--  Tool Content Manager and Tool Session Manager calls -->
-				<prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="removeToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="exportToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="removeToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			<props>		
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
 				<prop key="cloneContentTopics">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="importToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="exportToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="import102ToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="setReflectiveData">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="export*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+			    <prop key="get*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>
+			    <prop key="is*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>	
+				<prop key="import*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="rateMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="sendNotificationsOnNewPosting">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="uploadAttachment">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 			</props>
 		</property>
 	</bean>

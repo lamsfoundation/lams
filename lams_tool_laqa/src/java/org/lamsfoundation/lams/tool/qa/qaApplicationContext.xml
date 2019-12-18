@@ -85,21 +85,24 @@
 			</property>
 			<property name="transactionAttributes">
 				<props>
+            		<prop key="audit*">PROPAGATION_REQUIRED</prop>
+					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
-					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
-					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-                	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-                	<prop key="setDefineLater">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-                	<prop key="notifyTeachersOnResponseSubmit">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="importToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="exportToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="export*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="finishToolSession">PROPAGATION_REQUIRED, -QaApplicationException</prop>
+					<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+					<prop key="get*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
+					<prop key="import*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="is*">PROPAGATION_REQUIRED</prop>
+					<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                	<prop key="notifyTeachersOnResponseSubmit">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="recalculateUserAnswers">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+                	<prop key="resetDefineLater">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
+					<prop key="set*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
+					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

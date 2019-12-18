@@ -63,7 +63,6 @@ public class LearningDesignValidator {
     }
 
     /** Run the validation */
-    @SuppressWarnings("unchecked")
     public Vector<ValidationErrorDTO> validate() {
 	errors = new Vector<ValidationErrorDTO>(); // initialises the list of validation messages.
 
