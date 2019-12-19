@@ -11,9 +11,7 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
 <c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
-<c:set var="authenticationMethodId">
-	<lams:user property="authenticationMethodId" />
-</c:set>
+<c:set var="authenticationMethodId"><lams:user property="authenticationMethodId" /></c:set>
 <c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 <%-- This gets overwritten for a client during build process (SP-3) --%>
 <c:set var="editOnlyName" value="false" />
@@ -47,9 +45,6 @@
 
 <body>
 	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
-		<form:hidden path="userId" />
-		<form:hidden path="login" />
-		<form:hidden path="password" />
 		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
 		<lams:errors path="*"/>
@@ -68,7 +63,7 @@
 										<label>
 											<fmt:message key="label.username" />
 										</label>: 
-										${newForm.login}
+										<lams:user property="login" />
 									</span>
 								</div>
 								
@@ -225,21 +220,10 @@
 								<form:hidden path="fax" />
 
 								<div class="form-group">
-									<label><fmt:message key="label.username" /></label> <input
-										type="text" class="form-control"
-										value="${UserForm.login}">
+									<label><fmt:message key="label.username" /></label> 
+									<lams:user property="login" />
 								</div>
 
-								<div class="form-group">
-									<label><fmt:message key="label.username" /></label> <input
-										type="text" class="form-control"
-										value="${UserForm.login}" />
-								</div>
-								<div class="form-group">
-									<label><fmt:message key="label.title" />:</label> <input
-										type="text" class="form-control"
-										value="${UserForm.title}"/>
-								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.first_name" /> *:</label> <input
 										type="text" class="form-control"
@@ -361,6 +345,8 @@
 					</div>
 				</div>
 			</div>
+		</div>
+			
 		<div class="form-group" align="right">
 			<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
 				<fmt:message key="button.cancel" />

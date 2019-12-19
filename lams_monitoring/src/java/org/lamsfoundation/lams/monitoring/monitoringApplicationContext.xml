@@ -61,25 +61,27 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="initializeLesson*">PROPAGATION_REQUIRED</prop>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="start*">PROPAGATION_REQUIRED</prop>
-				<prop key="finishLesson*">PROPAGATION_REQUIRED</prop>
-				<prop key="*suspendLesson">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="*archive*">PROPAGATION_REQUIRED</prop>
-				<prop key="open*">PROPAGATION_REQUIRED</prop>
-				<prop key="runGateScheduler">PROPAGATION_REQUIRED</prop>
-				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="force*">PROPAGATION_REQUIRED</prop>
 				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="cloneLesson*">PROPAGATION_REQUIRED</prop>
-				<prop key="setGroupName">PROPAGATION_REQUIRED</prop>
-				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
+				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="finishLesson*">PROPAGATION_REQUIRED</prop>
+				<prop key="force*">PROPAGATION_REQUIRED</prop>
 				<prop key="generateLessonProgressEmail">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="initializeLesson*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="open*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="scheduleGate">PROPAGATION_REQUIRED</prop>
+				<prop key="*suspendLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="start*">PROPAGATION_REQUIRED</prop>
+				<prop key="setGroupName">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>    

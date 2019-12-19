@@ -64,16 +64,17 @@ public class LearningWebsocketServer {
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
-			// if all learners left the activity, remove the obsolete mapping
+
 			Set<Session> sessionWebsockets = entry.getValue();
-			if (sessionWebsockets.isEmpty()) {
+			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
+				.getScratchieSessionBySessionId(toolSessionId);
+			// if all learners left the activity or session is missing, remove the obsolete mapping
+			if (sessionWebsockets.isEmpty() || toolSession == null) {
 			    entryIterator.remove();
 			    LearningWebsocketServer.cache.remove(toolSessionId);
 			    continue;
 			}
 
-			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
-				.getScratchieSessionBySessionId(toolSessionId);
 			boolean timeLimitUp = false;
 			boolean scratchingFinished = toolSession.isScratchingFinished();
 			// is Scratchie time limited?
@@ -127,6 +128,8 @@ public class LearningWebsocketServer {
 		} catch (IllegalStateException e) {
 		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
+		    //TODO remove this once NullPointerExceptions do not show anymore in logs
+		    e.printStackTrace();
 		    // error caught, but carry on
 		    log.error("Error in Scratchie worker thread", e);
 		} finally {

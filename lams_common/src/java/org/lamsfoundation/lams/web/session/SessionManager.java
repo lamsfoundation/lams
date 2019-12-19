@@ -36,11 +36,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionManager {
+    private static Logger log = Logger.getLogger(SessionManager.class);
+
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
 
     // singleton
@@ -87,11 +90,21 @@ public class SessionManager {
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
 		if (session.getCreationTime() > existingSession.getCreationTime()) {
-		    // invalidate the other session
-		    existingSession.invalidate();
+		    try {
+			// invalidate the other session
+			existingSession.invalidate();
+		    } catch (Exception e) {
+			log.warn("SessionMananger invalidation exception", e);
+			// if it was already invalidated, do nothing
+		    }
 		} else {
-		    // invalidate this session
-		    session.invalidate();
+		    try {
+			// invalidate this session
+			session.invalidate();
+		    } catch (Exception e) {
+			log.warn("SessionMananger invalidation exception", e);
+			// if it was already invalidated, do nothing
+		    }
 		    throw new SecurityException("You were logged out");
 		}
 	    }
@@ -120,8 +133,8 @@ public class SessionManager {
 	if (invalidate) {
 	    try {
 		session.invalidate();
-	    } catch (IllegalStateException e) {
-		System.out.println("SessionMananger invalidation exception");
+	    } catch (Exception e) {
+		log.warn("SessionMananger invalidation exception", e);
 		// if it was already invalidated, do nothing
 	    }
 	}
@@ -137,8 +150,8 @@ public class SessionManager {
 	    if (invalidate) {
 		try {
 		    session.invalidate();
-		} catch (IllegalStateException e) {
-		    System.out.println("SessionMananger invalidation exception");
+		} catch (Exception e) {
+		    log.warn("SessionMananger invalidation exception", e);
 		    // if it was already invalidated, do nothing
 		}
 	    }

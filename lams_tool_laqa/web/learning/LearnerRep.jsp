@@ -350,7 +350,7 @@
 								<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if> 
 								<c:out value="${question.qbQuestion.name}" escapeXml="false" />
 							</div>
-							
+
 							<div class="panel-body">
 								<c:if test="${not empty question.qbQuestion.description}">
 									<div class="panel">

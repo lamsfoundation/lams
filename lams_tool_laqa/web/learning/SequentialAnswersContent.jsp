@@ -16,7 +16,7 @@
 							<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}"><c:out value="${questionEntry.key}" />.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
 						</div>
 					</div>
-					
+
 					<div class="panel-body">
 						<c:if test="${not empty questionEntry.value.description}">
 							<div class="panel">
@@ -29,10 +29,10 @@
 									<span class="label label-danger pull-right"><fmt:message key="label.required" /></span>
 							</c:if>
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">
-									<button class="btn btn-xs btn-primary" type="button">
+								<button class="btn btn-xs btn-primary" type="button">
 									<strong><fmt:message key="label.words.required" />&nbsp;</strong><span id="words-required-" class="badge"></span>
-									</button>
-									<div class="voffset5">&nbsp;</div>
+								</button>
+								<div class="voffset5">&nbsp;</div>
 							</c:if>
 						</div>
 
@@ -40,7 +40,6 @@
 							data-min-words-limit="${questionEntry.value.minWordsLimit}"
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
 							<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
-							
 							<c:choose>
 								<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 									<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
@@ -49,7 +48,7 @@
 								</c:when>
 
 								<c:otherwise>
-									<lams:textarea name="answer" id="answer" rows="5" class="form-control" placeholder="${placeholder}"> 
+									<lams:textarea name="answer" id="answer" rows="5" placeholder="${placeholder}" class="form-control">
 										<c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' />
 									</lams:textarea>
 								</c:otherwise>

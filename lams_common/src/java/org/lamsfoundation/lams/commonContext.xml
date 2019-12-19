@@ -86,19 +86,22 @@
 		</property> 
 		<property name="transactionAttributes">
 			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="find*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="canEditGroup">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="disable*">PROPAGATION_REQUIRED</prop>
-				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="find*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="hasRoleInOrganisation">PROPAGATION_REQUIRED</prop>
 				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
 				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
-				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="upload*">PROPAGATION_REQUIRED</prop>
+				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -124,13 +127,14 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="validateLearningDesign">PROPAGATION_REQUIRED</prop>
-				<prop key="setValid">PROPAGATION_REQUIRED</prop>
-				<prop key="getAllLearningLibraryDetails">PROPAGATION_REQUIRED</prop>
-				<prop key="getToolDTOs">PROPAGATION_REQUIRED</prop>
-				<prop key="getLearning*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="fillLearningLibraryID">PROPAGATION_REQUIRED</prop>
+				<prop key="internationaliseActivityTitle">PROPAGATION_REQUIRED</prop>
+				<prop key="getAllLearningLibraryDetails">PROPAGATION_REQUIRED</prop>
+				<prop key="getLearning*">PROPAGATION_REQUIRED</prop>
+				<prop key="getToolDTOs">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="setValid">PROPAGATION_REQUIRED</prop>
+				<prop key="validateLearningDesign">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -155,13 +159,14 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="checkLessonReleaseConditions">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="perform*">PROPAGATION_REQUIRED</prop>
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="add*">PROPAGATION_REQUIRED</prop>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -183,8 +188,8 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="removeTheme">PROPAGATION_REQUIRED</prop>
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
-				<prop key="set*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -205,6 +210,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
@@ -227,11 +233,11 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="sign*">PROPAGATION_REQUIRED</prop>
 				<prop key="contextExists">PROPAGATION_REQUIRED</prop>
 				<prop key="courseKeyIsValid">PROPAGATION_REQUIRED</prop>
 				<prop key="emailVerify">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="sign*">PROPAGATION_REQUIRED</prop>
 				<prop key="usernameExists">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
@@ -254,12 +260,14 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
-				<prop key="change*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
-	
+
 	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
 		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
@@ -291,10 +299,9 @@
 		
 		<property name="transactionAttributes">
 			<props>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="register*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -332,10 +339,11 @@
 		
 		<property name="transactionAttributes">
 			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -362,13 +370,16 @@
 		</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="rate*">PROPAGATION_REQUIRED</prop>
 				<prop key="commentItem">PROPAGATION_REQUIRED</prop>
+				<prop key="convertToStyled">PROPAGATION_REQUIRED</prop>
+				<prop key="countUsersRatedEachItem*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="rate*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 
@@ -421,14 +432,14 @@
 			<props>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="eventExists">PROPAGATION_REQUIRED</prop>
-				<prop key="sendMessage">PROPAGATION_REQUIRED</prop>
-				<prop key="resendMessages">PROPAGATION_REQUIRED</prop>
-				<prop key="notify*">PROPAGATION_REQUIRED</prop>
-				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
-				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
-				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="isSubscribed">PROPAGATION_REQUIRED</prop>
-				<prop key="getNotification*">PROPAGATION_REQUIRED</prop>
+				<prop key="notify*">PROPAGATION_REQUIRED</prop>
+				<prop key="resendMessages">PROPAGATION_REQUIRED</prop>
+				<prop key="sendMessage">PROPAGATION_REQUIRED</prop>
+				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
+				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
+				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -469,7 +480,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="logEvent">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>	
@@ -492,8 +503,11 @@
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="transactionAttributes">
 			<props>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="persist*">PROPAGATION_REQUIRED</prop>
+				<prop key="refreshCache">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

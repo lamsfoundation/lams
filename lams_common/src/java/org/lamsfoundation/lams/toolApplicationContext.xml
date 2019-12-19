@@ -19,9 +19,7 @@
 	</bean>
 	
 	
-	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator"
-		
-	>
+	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator">
 		<property name="toolContentDao"><ref bean="toolContentDAO"/></property>
 	</bean>	
 	
@@ -60,14 +58,18 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="createToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="deleteToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="findToolService">PROPAGATION_REQUIRED</prop>
+				<prop key="forceCompleteActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			    <prop key="is*">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyTool*">PROPAGATION_REQUIRED</prop>
 				<prop key="notifyToolToDeleteContent">PROPAGATION_REQUIRES_NEW</prop>
-			    <prop key="update*">PROPAGATION_REQUIRED</prop>
 			    <prop key="remove*">PROPAGATION_REQUIRED</prop>
 			    <!-- It needs to be committed before the subsequent isReadOnly check -->
 				<prop key="removeLearnerContent">PROPAGATION_REQUIRES_NEW</prop>
-			    <prop key="is*">PROPAGATION_REQUIRED</prop>
-			    <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			    <prop key="setupToolURLWithTool*">PROPAGATION_REQUIRED</prop>
+			    <prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>   	
@@ -96,14 +98,15 @@
 			</property>
 		<property name="transactionAttributes">
 			<props>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="auditLogStartEditingActivityInMonitor">PROPAGATION_REQUIRED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="removeActivityMark">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="updateActivityMark">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>  
 		
 </beans>
-
-
-
-	

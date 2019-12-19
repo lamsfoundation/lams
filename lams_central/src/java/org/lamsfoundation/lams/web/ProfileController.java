@@ -95,7 +95,6 @@ public class ProfileController {
 
     @RequestMapping("/view")
     public String view(HttpServletRequest request) throws Exception {
-
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
 	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
 		+ " " + requestor.getLastName();
@@ -281,5 +280,4 @@ public class ProfileController {
 
 	return "profile/editprofile";
     }
-
 }

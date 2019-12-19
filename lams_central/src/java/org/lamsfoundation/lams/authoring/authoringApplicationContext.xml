@@ -82,20 +82,18 @@
 		
 		<property name="transactionAttributes">
 			<props>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="store*">PROPAGATION_REQUIRED</prop>
-				<prop key="copy*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="validate*">PROPAGATION_REQUIRED</prop>
-				<prop key="setup*">PROPAGATION_REQUIRED</prop>
-				<prop key="finish*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="insert*">PROPAGATION_REQUIRED</prop>
-				<prop key="rename*">PROPAGATION_REQUIRED</prop>
 				<prop key="getToolOutputDefinitions">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="setup*">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="validate*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

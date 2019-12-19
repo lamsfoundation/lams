@@ -14,7 +14,7 @@
 								<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() !=1}"><c:out value="${questionEntry.key}" />.</c:if>  <c:out value="${questionEntry.value.name}" escapeXml="false" />
 							</div>
 						</div>
-						
+
 						<div class="panel-body">
 							<c:if test="${not empty questionEntry.value.description}">
 								<div class="panel">
@@ -26,13 +26,14 @@
 								<c:if test="${questionEntry.value.required}">
 									<span class="label label-danger pull-right"><fmt:message key="label.required" /></span>
 								</c:if> 
-								
+
 								<c:if test="${questionEntry.value.minWordsLimit != 0}">
-									<button class="btn btn-xs btn-primary" type="button">
+								<button class="btn btn-xs btn-primary" type="button">
 									<strong><fmt:message key="label.words.required" />&nbsp;</strong><span id="words-required-${questionEntry.key}" class="badge"></span>
-									</button>
-									<div class="voffset5">&nbsp;</div>
+								</button>
+								<div class="voffset5">&nbsp;</div>
 								</c:if>
+
 							</div>
 
 							<c:choose>
@@ -45,7 +46,7 @@
 										<c:choose>
 											<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 												<lams:CKEditor id="answer${questionEntry.key}"
-													value="${answerEntry.value}"
+													value="${answerEntry.value}" 
 													contentFolderID="${sessionMap.learnerContentFolder}"
 													toolbarSet="DefaultLearner">
 												</lams:CKEditor>
