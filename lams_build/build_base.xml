@@ -366,13 +366,6 @@
 				<include name="**/*"/>
 			</fileset>
 	 	</copy>
-		
-		<echo>${ant.project.name}: Copying additional property files</echo>
-	 	<copy todir="${basedir}/build/war/WEB-INF" flatten="true" verbose="true">
-			<fileset dir="${basedir}/conf/security" erroronmissingdir="false">
-				<include name="*.properties"/>
-			</fileset>
-	 	</copy>
 	</target>
 	
 	<target name="_copy-deployment-handler">

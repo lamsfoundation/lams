@@ -41,14 +41,6 @@
 		<param-name>parentContextKey</param-name>
 		<param-value>context.central</param-value>
 	</context-param>
-	<context-param>
-        <param-name>Owasp.CsrfGuard.Config</param-name>
-        <param-value>WEB-INF/Owasp.CsrfGuard.properties</param-value>
-    </context-param>
-    <context-param>
-        <param-name>Owasp.CsrfGuard.Config.Print</param-name>
-        <param-value>true</param-value>
-    </context-param>
 
 	<filter>
 		<filter-name>UrlRewriteFilter</filter-name>
@@ -76,10 +68,6 @@
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
-	</filter>
-	<filter>
-		<filter-name>CSRFGuard</filter-name>
-		<filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
 	</filter>
 
 	<filter-mapping>
@@ -159,12 +147,7 @@
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/ckeditor/*</url-pattern>
 	</filter-mapping>
-	<filter-mapping>
-		<filter-name>CSRFGuard</filter-name> 
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-
+	
 	<listener>
 		<listener-class>
 			org.springframework.web.context.ContextLoaderListener
@@ -176,13 +159,6 @@
 			org.lamsfoundation.lams.web.SessionListener
 		</listener-class>
 	</listener>
-
-	<listener>
-        <listener-class>org.owasp.csrfguard.CsrfGuardServletContextListener</listener-class>
-    </listener>
-     <listener>
-        <listener-class>org.owasp.csrfguard.CsrfGuardHttpSessionListener</listener-class>
-    </listener>
 
 	<servlet>
 		<servlet-name>GetRecordingServlet</servlet-name>
@@ -521,9 +497,6 @@
 		<url-pattern>/services/SPEnrolment</url-pattern>
 	</servlet-mapping>
 	
-
-	
-	
 	<mime-mapping>
 		<extension>csv</extension>
 		<mime-type>text/plain</mime-type>
@@ -586,11 +559,6 @@
 		<taglib>
 			<taglib-uri>tags-lams</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
-		</taglib>
-		
-		<taglib>
-			<taglib-uri>csrfguard</taglib-uri>
-			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
 		</taglib>
 
 	</jsp-config>
