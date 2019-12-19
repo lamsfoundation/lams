@@ -1193,10 +1193,11 @@ public class GradebookService implements IGradebookFullService {
 	    userDataRow.addCell(userRow.getLogin());
 	    userDataRow.addCell(getProgressMessage(userRow));
 	    userDataRow.addCell(userRow.getTimeTakenSeconds());
+	    Double mark = userRow.getMark();
 	    if (isWeighted) {
-		userDataRow.addPercentageCell(userRow.getMark() / 100.0);
+		userDataRow.addPercentageCell(mark / 100.0);
 	    } else {
-		userDataRow.addCell(userRow.getMark());
+		userDataRow.addCell(mark);
 	    }
 	}
 	summarySheet.addEmptyRow();
