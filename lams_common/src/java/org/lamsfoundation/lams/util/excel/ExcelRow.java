@@ -30,11 +30,11 @@ public class ExcelRow {
 	return cell;
     }
     
-    public ExcelCell addPercentageCell(Object cellValue) {
+    public ExcelCell addPercentageCell(Double cellValue) {
 	return addPercentageCell(cellValue, false, 0);
     }
     
-    public ExcelCell addPercentageCell(Object cellValue, Boolean isBold, int borderStyle) {
+    public ExcelCell addPercentageCell(Double cellValue, Boolean isBold, int borderStyle) {
 	ExcelCell cell = new ExcelCell(cellValue);
 	cell.setDataFormat(ExcelCell.CELL_FORMAT_PERCENTAGE);
 	cells.add(cell);
