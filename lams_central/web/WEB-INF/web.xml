@@ -161,7 +161,7 @@
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>CSRFGuard</filter-name> 
-		<url-pattern>/*</url-pattern>
+		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
 
 
