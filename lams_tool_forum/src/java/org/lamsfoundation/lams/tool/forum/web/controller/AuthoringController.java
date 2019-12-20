@@ -76,6 +76,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -112,7 +113,7 @@ public class AuthoringController {
 
 	// update define later flag to true
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-	    
+
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Forum forum = forumService.getForumByContentId(contentId);
 
@@ -126,7 +127,7 @@ public class AuthoringController {
 
 	return readDatabaseData(forumForm, request);
     }
-    
+
     /**
      * Common method for "start" and "defineLater"
      */
@@ -227,10 +228,9 @@ public class AuthoringController {
      * <li>Author user information</li>
      * </ol>
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute ForumForm forumForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -420,7 +420,7 @@ public class AuthoringController {
 	Set<Attachment> attSet = null;
 	if (messageForm.getAttachmentFile() != null
 		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(),  message);
+	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(), message);
 	}
 	message.setAttachments(attSet);
 
@@ -577,7 +577,7 @@ public class AuthoringController {
     /* only allow one attachment, so replace whatever */
     private Set<Attachment> setupAttachmentSet(MultipartFile attachmentFile, Message msg) {
 	Attachment att = forumService.uploadAttachment(attachmentFile);
-	Set<Attachment> attSet = new HashSet<Attachment>();
+	Set<Attachment> attSet = new HashSet<>();
 	attSet.add(att);
 	att.setMessage(msg);
 	return attSet;

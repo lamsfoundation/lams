@@ -23,7 +23,7 @@
 		<param-name>parentContextKey</param-name>
 		<param-value>context.central</param-value>
 	</context-param>
-
+    
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
 		<filter-class>
@@ -51,7 +51,11 @@
 			<param-value>UTF-8</param-value>
 		</init-param>
 	</filter>
-
+	<filter>
+		<filter-name>CSRFGuard</filter-name>
+		<filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
+	</filter>
+	
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -64,7 +68,11 @@
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
+	<filter-mapping>
+		<filter-name>CSRFGuard</filter-name> 
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	
 	<servlet>
 		<servlet-name>spring</servlet-name>
 		<servlet-class>
@@ -78,7 +86,7 @@
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
 	</listener>
-
+    
 	<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
@@ -173,7 +181,14 @@
 			<taglib-uri>tags-lams</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
 		</taglib>
-
+		<!-- ======================================================== -->
+		<!-- CSRF Guard Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>csrfguard</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
+		</taglib>
+		
 	</jsp-config>
 
 	<!-- Security Constraint -->
