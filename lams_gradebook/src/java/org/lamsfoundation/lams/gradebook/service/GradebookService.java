@@ -1195,7 +1195,7 @@ public class GradebookService implements IGradebookFullService {
 	    userDataRow.addCell(userRow.getTimeTakenSeconds());
 	    Double mark = userRow.getMark();
 	    if (isWeighted) {
-		userDataRow.addPercentageCell(mark / 100.0);
+		userDataRow.addPercentageCell(mark == null ? 0 : mark / 100.0);
 	    } else {
 		userDataRow.addCell(mark);
 	    }
