@@ -45,7 +45,8 @@
 </lams:head>
 
 <body>
-	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form action="/lams/saveprofile.do?${csrfToken}" modelAttribute='newForm' method="post" id='newForm'>
 	  	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
