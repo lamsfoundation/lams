@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <style>
 	#barChart {
 		width: 515px !important; 
@@ -11,14 +12,14 @@
 <script>
 	$(document).ready(function(){
 		var barData = {
-			labels: [<c:forEach var="groupRow" items="${groupRows}">"${groupRow[0]}",</c:forEach>],
+			labels: [<c:forEach var="groupSummary" items="${groupSummaries}">"${groupSummary.sessionName}",</c:forEach>],
 			datasets: [{
 				label: "My First dataset",
 				fillColor: "#85237d",
 				strokeColor: "#85237d",
 				highlightFill: "#85237d",
 				highlightStroke: "#85237d",
-				data: [<c:forEach var="groupRow" items="${groupRows}">${groupRow[1]},</c:forEach>]
+				data: [<c:forEach var="groupSummary" items="${groupSummaries}">${groupSummary.totalPercentage},</c:forEach>]
 			}]
 		};
 
@@ -92,15 +93,22 @@
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<tbody>
-						<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
+						<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
 							<tr>
 								<td width="5px">
 									${ALPHABET[j.index]}.
-								</td>
+								</td>									
 								<td>
-									<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
+									<c:choose>
+										<c:when test="${item.qbQuestion.type == 1}">
+											<c:out value="${qbOption.name}" escapeXml="false"/>
+										</c:when>
+										<c:otherwise>
+											${fn:replace(qbOption.name, newLineChar, ', ')}
+										</c:otherwise>
+									</c:choose>
 								</td>
-							</tr>
+							</tr>					
 						</c:forEach>
 					</tbody>
 				</table>

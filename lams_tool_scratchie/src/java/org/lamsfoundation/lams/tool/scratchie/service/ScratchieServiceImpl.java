@@ -419,6 +419,11 @@ public class ScratchieServiceImpl
     public int countSessionsByContentId(Long toolContentId) {
 	return scratchieSessionDao.getByContentId(toolContentId).size();
     }
+    
+    @Override
+    public List<ScratchieSession> getSessionsByContentId(Long toolContentId) {
+	return scratchieSessionDao.getByContentId(toolContentId);
+    }
 
     @Override
     public void saveOrUpdateScratchieSession(ScratchieSession resSession) {
@@ -828,6 +833,16 @@ public class ScratchieServiceImpl
 	    if (item.getQbQuestion().getType() != QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
 		continue;
 	    }
+	    //clear optionDtos in case fillItemsWithVsaAnswers is used in a loop
+//	    item.getOptionDtos().clear();
+	    List<OptionDTO> optionDtosFromScratchieUsers = new LinkedList<>();
+	    for (OptionDTO optionDto : item.getOptionDtos()) {
+		if (optionDto.getDisplayOrder() == -200) {
+		    optionDtosFromScratchieUsers.add(optionDto);
+		}
+	    }
+	    item.getOptionDtos().clear();
+	    item.getOptionDtos().addAll(optionDtosFromScratchieUsers);
 
 	    //populate Scratchie items with VSA answers, entered by learners in Assessment tool
 	    if (scratchie.isAnswersFetchingEnabled()) {
@@ -839,6 +854,7 @@ public class ScratchieServiceImpl
 			optionDto.setCorrect(assessmentAnswer.isCorrect());
 			optionDto.setUserId(assessmentAnswer.getUserId());
 			optionDto.setQbQuestionUid(assessmentAnswer.getQbQuestionUid());
+optionDto.setDisplayOrder(-100);
 			if (!scratchie.isConfidenceLevelsEnabled()) {
 			    //don't show confidence levels
 			    for (ConfidenceLevelDTO confidenceLevel : assessmentAnswer.getConfidenceLevels()) {
@@ -863,6 +879,7 @@ public class ScratchieServiceImpl
 			if (itemQbQuestionUid.equals(optionDtoIter.getQbQuestionUid())
 				&& isAnswersEqual(item, optionDtoIter.getAnswer(), userLog.getAnswer())) {
 			    optionDto = optionDtoIter;
+			    //skip showing ConfidenceLevel, as we already show it due to this user's answer in Assessment
 			    skipAddingUserAnswerToConfidenceLevel = optionDtoIter.getUserId()
 				    .equals(leader.getUserId());
 			    break;
@@ -877,8 +894,10 @@ public class ScratchieServiceImpl
 			optionDto.setQbQuestionUid(itemQbQuestionUid);
 			String answer = userLog.getAnswer();
 			optionDto.setAnswer(answer);
+			optionDto.setDisplayOrder(-200);
 			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
 			optionDto.setCorrect(isCorrect);
+			optionDto.setUserId(leader.getUserId());
 			item.getOptionDtos().add(optionDto);
 		    }
 
@@ -944,7 +963,7 @@ public class ScratchieServiceImpl
     public static boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
 	QbQuestion qbQuestion = item.getQbQuestion();
 
-	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).getMaxMark() == 1
+	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect()
 		? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
 	String[] correctAnswers = correctAnswersGroup.getName().strip().split("\\r\\n");
@@ -1028,11 +1047,11 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid) {
+    public List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
-	Scratchie scratchie = getScratchieByContentId(contentId);
 	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
 	boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+	List<QbOption> options = item.getQbQuestion().getQbOptions();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
@@ -1041,27 +1060,17 @@ public class ScratchieServiceImpl
 	    GroupSummary groupSummary = new GroupSummary(session);
 	    List<ScratchieAnswerVisitLog> sessionAttempts = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    itemUid);
+	    int numberColumns = options.size() > sessionAttempts.size() || isMcqItem ? options.size() : sessionAttempts.size();
+	    groupSummary.setNumberColumns(numberColumns);
 
 	    Map<Long, OptionDTO> optionMap = new HashMap<>();
-	    if (isMcqItem) {
-		List<QbOption> options = item.getQbQuestion().getQbOptions();
-		for (QbOption dbOption : options) {
-		    // clone it so it doesn't interfere with values from other sessions
-		    OptionDTO optionDto = new OptionDTO(dbOption);
-		    int[] attempts = new int[options.size()];
-		    optionDto.setAttempts(attempts);
-		    optionMap.put(dbOption.getUid(), optionDto);
-		}
-
-	    } else {
-		item.getOptionDtos().clear();
-		fillItemsWithVsaAnswers(List.of(item), sessionId, scratchie, sessionAttempts);
-		List<OptionDTO> optionDtos = item.getOptionDtos();
-		for (OptionDTO optionDto : optionDtos) {
-		    int[] attempts = new int[optionDtos.size()];
-		    optionDto.setAttempts(attempts);
-		    optionMap.put(Long.valueOf(optionDto.getAnswerHash()), optionDto);
-		}
+	    Long i = 0l;
+	    for (QbOption dbOption : options) {
+		// clone it so it doesn't interfere with values from other sessions
+		OptionDTO optionDto = new OptionDTO(dbOption);
+		int[] attempts = new int[numberColumns];
+		optionDto.setAttempts(attempts);
+		optionMap.put(dbOption.getUid(), optionDto);
 	    }
 
 	    // calculate attempts table
@@ -1070,18 +1079,26 @@ public class ScratchieServiceImpl
 		int attemptNumber = 0;
 
 		for (ScratchieAnswerVisitLog attempt : sessionAttempts) {
-		    Long optionUidOrAnswer = isMcqItem ? attempt.getQbOption().getUid()
-			    : attempt.getAnswer().hashCode();
-		    OptionDTO optionDto = optionMap.get(optionUidOrAnswer);
-		    int[] attempts = optionDto == null ? new int[optionMap.size()] : optionDto.getAttempts();
+		    Long optionUid;
+		    if (isMcqItem) {
+			optionUid = attempt.getQbOption().getUid();
+			
+		    } else {
+			String answer = attempt.getAnswer();
+			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+			boolean isFirstAnswersGroupCorrect = options.get(0).isCorrect();
+
+			optionUid = isCorrect && isFirstAnswersGroupCorrect
+				    || !isCorrect && !isFirstAnswersGroupCorrect ? options.get(0).getUid() : options.get(1).getUid();
+		    }
+		    OptionDTO optionDto = optionMap.get(optionUid);
+		    int[] attempts = optionDto.getAttempts();
 		    // +1 for corresponding choice
 		    attempts[attemptNumber++]++;
 		}
 	    }
 
-	    Collection<OptionDTO> sortedOptions = new LinkedList<>();
-	    sortedOptions.addAll(optionMap.values());
-	    groupSummary.setOptionDtos(sortedOptions);
+	    groupSummary.setOptionDtos(optionMap.values());
 	    groupSummaryList.add(groupSummary);
 	}
 
@@ -1091,11 +1108,10 @@ public class ScratchieServiceImpl
 	    groupSummaryTotal.setSessionId(0L);
 	    groupSummaryTotal.setSessionName("Summary");
 	    groupSummaryTotal.setMark(0);
+	    groupSummaryTotal.setNumberColumns(options.size());
 
 	    Map<Long, OptionDTO> optionMapTotal = new HashMap<>();
-	    List<QbOption> options = item.getQbQuestion().getQbOptions();
 	    for (QbOption dbOption : options) {
-
 		// clone it so it doesn't interfere with values from other sessions
 		OptionDTO optionDto = new OptionDTO(dbOption);
 		int[] attempts = new int[options.size()];
@@ -1116,9 +1132,7 @@ public class ScratchieServiceImpl
 		}
 	    }
 
-	    Collection<OptionDTO> sortedOptions = new TreeSet<>();
-	    sortedOptions.addAll(optionMapTotal.values());
-	    groupSummaryTotal.setOptionDtos(sortedOptions);
+	    groupSummaryTotal.setOptionDtos(optionMapTotal.values());
 	    groupSummaryList.add(0, groupSummaryTotal);
 	}
 
@@ -1265,6 +1279,38 @@ public class ScratchieServiceImpl
     public ScratchieUser getUser(Long uid) {
 	return (ScratchieUser) scratchieUserDao.getObject(ScratchieUser.class, uid);
     }
+    
+    /**
+     * Return list of correct AnswerLetters, one per each item
+     */
+    public static List<String> getCorrectAnswerLetters(Collection<ScratchieItem> items) {
+	List<String> correctAnswerLetters = new ArrayList<>();
+	for (ScratchieItem item : items) {
+	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+
+	    // find out the correct answer's sequential letter - A,B,C...
+	    String correctAnswerLetter = "";
+	    if (isMcqItem) {
+		int answerCount = 1;
+		for (OptionDTO answer : item.getOptionDtos()) {
+		    if (answer.isCorrect()) {
+			correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
+			break;
+		    }
+		    answerCount++;
+		}
+		
+	    } else {
+		List<QbOption> options = item.getQbQuestion().getQbOptions();
+		if (!options.isEmpty()) {
+		    correctAnswerLetter = options.get(0).isCorrect() ? "A" : "B";
+		}
+	    }
+	    correctAnswerLetters.add(correctAnswerLetter);
+	}
+	
+	return correctAnswerLetters;
+    }
 
     @Override
     public List<ExcelSheet> exportExcel(Long contentId) {
@@ -1355,18 +1401,7 @@ public class ScratchieServiceImpl
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.correct.answer"));
-	for (ScratchieItem item : items) {
-
-	    // find out the correct answer's sequential letter - A,B,C...
-	    String correctAnswerLetter = "";
-	    int answerCount = 1;
-	    for (OptionDTO answer : item.getOptionDtos()) {
-		if (answer.isCorrect()) {
-		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
-		    break;
-		}
-		answerCount++;
-	    }
+	for (String correctAnswerLetter : ScratchieServiceImpl.getCorrectAnswerLetters(items)) {
 	    row.addCell(correctAnswerLetter);
 	}
 
@@ -1524,7 +1559,7 @@ public class ScratchieServiceImpl
 	SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 
 	for (ScratchieItem item : items) {
-	    List<GroupSummary> itemSummary = getQuestionSummary(contentId, item.getUid());
+	    List<GroupSummary> itemSummary = getGroupSummariesByItem(contentId, item.getUid());
 	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 
 	    row = researchAndAnalysisSheet.initRow();
@@ -1636,13 +1671,14 @@ public class ScratchieServiceImpl
 			    false);
 
 		    int i = 1;
+		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 			    item.getUid());
 		    for (ScratchieAnswerVisitLog log : logs) {
 			row = researchAndAnalysisSheet.initRow();
 			row.addCell(Integer.valueOf(i++));
-			String answerDescr = removeHtmlMarkup(log.getQbOption().getName());
-			row.addCell(answerDescr);
+			String answerDescr = isMcqItem ? log.getQbOption().getName() : log.getAnswer();
+			row.addCell(removeHtmlMarkup(answerDescr));
 			row.addCell(fullDateFormat.format(log.getAccessDate()));
 
 		    }
@@ -1742,8 +1778,9 @@ public class ScratchieServiceImpl
 			logs = new ArrayList<>();
 		    }
 
+		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 		    for (ScratchieAnswerVisitLog log : logs) {
-			String answer = removeHtmlMarkup(log.getQbOption().getName());
+			String answer = removeHtmlMarkup(isMcqItem ? log.getQbOption().getName() : log.getAnswer());
 			row.addCell(answer);
 		    }
 		    for (int i = logs.size(); i < itemDto.getOptionDtos().size(); i++) {
@@ -1858,7 +1895,8 @@ public class ScratchieServiceImpl
     /**
      * Serves merely for excel export purposes. Produces data for "Summary By Team" section.
      */
-    private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
+    @Override
+    public List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
 	String[] presetMarks = getPresetMarks(scratchie);
 
@@ -1870,10 +1908,7 @@ public class ScratchieServiceImpl
 	    ArrayList<ScratchieItemDTO> itemDtos = new ArrayList<>();
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
-
 	    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
-	    //populate Scratchie items with VSA answers (both from Assessment tool and entered by current learner)
-	    fillItemsWithVsaAnswers(sortedItems, sessionId, scratchie, logs);
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
@@ -1881,7 +1916,8 @@ public class ScratchieServiceImpl
 		int mark = -1;
 		boolean isUnraveledOnFirstAttempt = false;
 		String optionsSequence = "";
-		boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		QbQuestion qbQuestion = item.getQbQuestion();
+		boolean isMcqItem = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 
 		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
@@ -1903,20 +1939,28 @@ public class ScratchieServiceImpl
 			    && ScratchieServiceImpl.isItemUnraveled(item, logs);
 
 		    // find out options' sequential letters - A,B,C...
-		    for (ScratchieAnswerVisitLog itemAttempt : visitLogs) {
+		    for (ScratchieAnswerVisitLog visitLog : visitLogs) {
 			String sequencialLetter = "";
 
-			int optionCount = 1;
-			for (OptionDTO optionDto : item.getOptionDtos()) {
-			    boolean isOptionMet = isMcqItem
-				    && optionDto.getQbOptionUid().equals(itemAttempt.getQbOption().getUid())
-				    || !isMcqItem
-					    && isAnswersEqual(item, optionDto.getAnswer(), itemAttempt.getAnswer());
-			    if (isOptionMet) {
-				sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
-				break;
+			if (isMcqItem) {
+			    int optionCount = 1;
+			    for (OptionDTO optionDto : item.getOptionDtos()) {
+				boolean isOptionMet = optionDto.getQbOptionUid()
+					.equals(visitLog.getQbOption().getUid());
+				if (isOptionMet) {
+				    sequencialLetter = String.valueOf((char) ((optionCount + 'A') - 1));
+				    break;
+				}
+				optionCount++;
 			    }
-			    optionCount++;
+
+			} else {
+			    String answer = visitLog.getAnswer();
+			    boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
+			    boolean isFirstAnswersGroupCorrect = qbQuestion.getQbOptions().get(0).isCorrect();
+
+			    sequencialLetter = isCorrect && isFirstAnswersGroupCorrect
+				    || !isCorrect && !isFirstAnswersGroupCorrect ? "A" : "B";
 			}
 
 			optionsSequence += optionsSequence.isEmpty() ? sequencialLetter : ", " + sequencialLetter;
@@ -1924,7 +1968,8 @@ public class ScratchieServiceImpl
 		}
 
 		itemDto.setUid(item.getUid());
-		itemDto.setTitle(item.getQbQuestion().getName());
+		itemDto.setTitle(qbQuestion.getName());
+		itemDto.setType(qbQuestion.getType());
 		itemDto.setOptionDtos(item.getOptionDtos());
 		itemDto.setUserAttempts(numberOfAttempts);
 		itemDto.setUserMark(mark);

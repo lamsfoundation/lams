@@ -224,6 +224,14 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     int countSessionsByContentId(Long toolContentId);
+    
+    /**
+     * Return all sessions.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    List<ScratchieSession> getSessionsByContentId(Long toolContentId);
 
     /**
      * Save or update scratchie session.
@@ -302,7 +310,7 @@ public interface IScratchieService extends ICommonToolService {
      */
     List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
 
-    List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
+    List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid);
 
     /**
      * In order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs.
@@ -328,6 +336,11 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     List<ExcelSheet> exportExcel(Long contentId);
+    
+    /**
+     * Used by TblMonitoringController.tra() to get numberOfFirstChoiceEvents.
+     */
+    List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems);
 
     /**
      * Create refection entry into notebook tool.

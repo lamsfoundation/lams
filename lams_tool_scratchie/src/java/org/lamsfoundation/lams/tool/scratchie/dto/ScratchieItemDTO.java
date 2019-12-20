@@ -12,6 +12,7 @@ public class ScratchieItemDTO implements Cloneable {
 
     private Long uid;
     private String title;
+    private Integer type;
     private List<OptionDTO> optionDtos;
     private boolean unraveledOnFirstAttempt;
     private int userMark;
@@ -43,6 +44,14 @@ public class ScratchieItemDTO implements Cloneable {
 
     public void setTitle(String title) {
 	this.title = title;
+    }
+    
+    public Integer getType() {
+	return type;
+    }
+
+    public void setType(Integer type) {
+	this.type = type;
     }
 
     public List<OptionDTO> getOptionDtos() {

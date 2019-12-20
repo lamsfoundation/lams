@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -106,12 +107,10 @@
 					</b>
 				</th>
 				
-				<c:forEach var="correctAnswerCell"  items="${correctAnswers.cells}" varStatus="status">
-					<c:if test="${!status.first}">
-						<td class="text-center">
-							${correctAnswerCell.cellValue}
-						</td>
-					</c:if>
+				<c:forEach var="correctAnswerLetter"  items="${correctAnswerLetters}" varStatus="status">
+					<td class="text-center">
+						${correctAnswerLetter}
+					</td>
 				</c:forEach>
 				
 				<td class="text-center"></td>
@@ -191,16 +190,24 @@
 					<table class="table table-striped table-hover">
 						<tbody>
 						
-							<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${optionDto.correct}'>bg-success</c:if></c:set>
+							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
+								
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
-									</td>
+									</td>									
 									<td class="${cssClass}">
-										<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
+										<c:choose>
+											<c:when test="${item.qbQuestion.type == 1}">
+												<c:out value="${qbOption.name}" escapeXml="false"/>
+											</c:when>
+											<c:otherwise>
+												${fn:replace(qbOption.name, newLineChar, ', ')}
+											</c:otherwise>
+										</c:choose>
 									</td>
-								</tr>
+								</tr>					
 							</c:forEach>
 							
 						</tbody>
