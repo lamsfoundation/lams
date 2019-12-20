@@ -25,6 +25,8 @@ Commons IO 2.5
 
 Commons Validator 1.6
 
+CSRF Guard 3.1.0 manual build from master made on 2019-12-19
+
 Hibernate Core 5.3.6
 
 httpunit 1.7
