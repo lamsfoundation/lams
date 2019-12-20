@@ -587,7 +587,9 @@
 			<taglib-uri>tags-lams</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
 		</taglib>
-		
+		<!-- ======================================================== -->
+		<!-- CSRF Guard Tag Library -->
+		<!-- ======================================================== -->
 		<taglib>
 			<taglib-uri>csrfguard</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
