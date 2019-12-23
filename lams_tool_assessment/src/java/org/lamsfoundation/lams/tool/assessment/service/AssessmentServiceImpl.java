@@ -2011,7 +2011,8 @@ public class AssessmentServiceImpl
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
 		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		Double optionPercentage = (double) summaryOfAnswers.get(option.getUid()) / total;
+		Double optionPercentage = total == 0 || summaryOfAnswers.get(option.getUid()) == null ? 0
+			: (double) summaryOfAnswers.get(option.getUid()) / total;
 		ExcelCell optionCell = summaryTableRow.addPercentageCell(optionPercentage);
 		if (option.getGrade() > 0) {
 		    optionCell.setColor(IndexedColors.GREEN);
@@ -2019,10 +2020,12 @@ public class AssessmentServiceImpl
 	    }
 	    
 	} else {
-	    Double correctPercentage = (double) summaryOfAnswers.get(trueKey) / total;
+	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null ? 0
+		    : (double) summaryOfAnswers.get(trueKey) / total;
 	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
 	    
-	    Double wrongPercentage = (double) summaryOfAnswers.get(falseKey) / total;
+	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null ? 0
+		    : (double) summaryOfAnswers.get(falseKey) / total;
 	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
 	    
 	    if (question.getCorrectAnswer()) {
@@ -2032,7 +2035,7 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	Double summaryNAPercentage = (double) summaryNACount / total;
+	Double summaryNAPercentage = total == 0 ? 0 : (double) summaryNACount / total;
 	summaryTableRow.addPercentageCell(summaryNAPercentage);
 	    
 	return summaryTableRow;

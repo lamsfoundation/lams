@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.survey.web.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -65,10 +64,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -303,213 +302,186 @@ public class MonitoringController {
 
     /**
      * Export Excel format survey data.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping(value = "/exportSurvey")
-    private String exportSurvey(HttpServletRequest request, HttpServletResponse response) {
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-
+    @ResponseStatus(HttpStatus.OK)
+    private void exportSurvey(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> groupList = surveyService
 		.exportBySessionId(toolSessionID);
-	String errors = null;
-	try {
-	    // create an empty excel file
-	    Workbook workbook = new SXSSFWorkbook();
 
-	    // Date format for the timestamp field
-	    CellStyle dateStyle = workbook.createCellStyle();
-	    dateStyle.setDataFormat((short) 0x16); // long date/time format e.g. DD/MM/YYYY MM:HH
+	// create an empty excel file
+	Workbook workbook = new SXSSFWorkbook();
 
-	    Sheet sheet = workbook.createSheet("Survey");
-	    sheet.setColumnWidth(0, 5000);
-	    Row row;
-	    Cell cell;
-	    int idx = 0;
-	    Set<Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>> entries = groupList.entrySet();
-	    for (Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> entry : entries) {
-		SurveySession session = entry.getKey();
-		SortedMap<SurveyQuestion, List<AnswerDTO>> map = entry.getValue();
-		// display survey title, instruction and questions
-		Survey survey = session.getSurvey();
-		// survey title
-		row = sheet.createRow(idx++);
-		cell = row.createCell(0);
-		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
+	// Date format for the timestamp field
+	CellStyle dateStyle = workbook.createCellStyle();
+	dateStyle.setDataFormat((short) 0x16); // long date/time format e.g. DD/MM/YYYY MM:HH
 
-		// survey instruction
-		row = sheet.createRow(idx++);
-		cell = row.createCell(0);
-		cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
+	Sheet sheet = workbook.createSheet("Survey");
+	sheet.setColumnWidth(0, 5000);
+	Row row;
+	Cell cell;
+	int idx = 0;
+	Set<Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>>> entries = groupList.entrySet();
+	for (Entry<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> entry : entries) {
+	    SurveySession session = entry.getKey();
+	    SortedMap<SurveyQuestion, List<AnswerDTO>> map = entry.getValue();
+	    // display survey title, instruction and questions
+	    Survey survey = session.getSurvey();
+	    // survey title
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell(0);
+	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
 
-		// display 2 empty row
+	    // survey instruction
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell(0);
+	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
+
+	    // display 2 empty row
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell(0);
+	    cell.setCellValue("");
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell(0);
+	    cell.setCellValue("");
+
+	    // display session name
+	    row = sheet.createRow(idx++);
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_SESSION_NAME));
+	    cell = row.createCell(1);
+	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
+
+	    // begin to display question and its answers
+	    Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
+	    int questionIdx = 0;
+	    for (Entry<SurveyQuestion, List<AnswerDTO>> questionEntry : questionEntries) {
+		// display 1 empty row
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
 		cell.setCellValue("");
-		row = sheet.createRow(idx++);
-		cell = row.createCell(0);
-		cell.setCellValue("");
 
-		// display session name
+		questionIdx++;
+		SurveyQuestion question = questionEntry.getKey();
+		List<AnswerDTO> answers = questionEntry.getValue();
+
+		// display question content
 		row = sheet.createRow(idx++);
 		cell = row.createCell(0);
-		cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_SESSION_NAME));
+		cell.setCellValue(
+			messageService.getMessage(MonitoringController.MSG_LABEL_QUESTION) + " " + questionIdx);
 		cell = row.createCell(1);
-		cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
+		cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
 
-		// begin to display question and its answers
-		Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
-		int questionIdx = 0;
-		for (Entry<SurveyQuestion, List<AnswerDTO>> questionEntry : questionEntries) {
-		    // display 1 empty row
+		// display options content
+		Set<SurveyOption> options = question.getOptions();
+
+		row = sheet.createRow(idx++);
+		cell = row.createCell(0);
+		cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_POSSIBLE_ANSWERS));
+
+		int optionIdx = 0;
+		for (SurveyOption option : options) {
+		    optionIdx++;
 		    row = sheet.createRow(idx++);
 		    cell = row.createCell(0);
-		    cell.setCellValue("");
-
-		    questionIdx++;
-		    SurveyQuestion question = questionEntry.getKey();
-		    List<AnswerDTO> answers = questionEntry.getValue();
-
-		    // display question content
-		    row = sheet.createRow(idx++);
-		    cell = row.createCell(0);
-		    cell.setCellValue(
-			    messageService.getMessage(MonitoringController.MSG_LABEL_QUESTION) + " " + questionIdx);
+		    cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 		    cell = row.createCell(1);
-		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
-
-		    // display options content
-		    Set<SurveyOption> options = question.getOptions();
-
+		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
+		}
+		if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+		    optionIdx++;
 		    row = sheet.createRow(idx++);
 		    cell = row.createCell(0);
-		    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_POSSIBLE_ANSWERS));
+		    cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
+		    cell = row.createCell(1);
+		    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_OPEN_RESPONSE));
+		}
 
-		    int optionIdx = 0;
+		// display 1 empty row
+		row = sheet.createRow(idx++);
+		cell = row.createCell(0);
+		cell.setCellValue("");
+
+		// //////////////////////////
+		// display answer list
+		// //////////////////////////
+		// first display option title : a1 , a2, a3 etc
+
+		int cellIdx = 0;
+		row = sheet.createRow(idx++);
+		cell = row.createCell(cellIdx);
+		cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_LOGIN));
+		cellIdx++;
+		cell = row.createCell(cellIdx);
+		cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_LEARNER_NAME));
+		cellIdx++;
+		cell = row.createCell(cellIdx);
+		cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_TIMESTAMP));
+
+		int optionsNum = options.size();
+
+		int iterOpts;
+		for (iterOpts = 1; iterOpts <= optionsNum; iterOpts++) {
+		    cellIdx++;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + iterOpts);
+		}
+
+		// display all users' answers for this question in multiple
+		// rows
+		for (AnswerDTO answer : answers) {
+		    row = sheet.createRow(idx++);
+		    cellIdx = 0;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellValue(answer.getReplier().getLoginName());
+		    cellIdx++;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellValue(answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
+		    cellIdx++;
+		    cell = row.createCell(cellIdx);
+		    cell.setCellStyle(dateStyle);
+		    Date updateDate = answer.getAnswer() == null ? null : answer.getAnswer().getUpdateDate();
+		    cell.setCellValue(updateDate);
+		    // for answer's options
 		    for (SurveyOption option : options) {
-			optionIdx++;
-			row = sheet.createRow(idx++);
-			cell = row.createCell(0);
-			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
-			cell = row.createCell(1);
-			cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
+			cellIdx++;
+			cell = row.createCell(cellIdx);
+			if (answer.getAnswer() == null) {
+			    break;
+			}
+			for (String choice : answer.getAnswer().getChoices()) {
+			    if (StringUtils.equals(choice, option.getUid().toString())) {
+				cell.setCellValue("X");
+			    }
+			}
 		    }
+		    // for textEntry option
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-			optionIdx++;
-			row = sheet.createRow(idx++);
-			cell = row.createCell(0);
-			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
-			cell = row.createCell(1);
-			cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_OPEN_RESPONSE));
-		    }
-
-		    // display 1 empty row
-		    row = sheet.createRow(idx++);
-		    cell = row.createCell(0);
-		    cell.setCellValue("");
-
-		    // //////////////////////////
-		    // display answer list
-		    // //////////////////////////
-		    // first display option title : a1 , a2, a3 etc
-
-		    int cellIdx = 0;
-		    row = sheet.createRow(idx++);
-		    cell = row.createCell(cellIdx);
-		    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_LOGIN));
-		    cellIdx++;
-		    cell = row.createCell(cellIdx);
-		    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_LEARNER_NAME));
-		    cellIdx++;
-		    cell = row.createCell(cellIdx);
-		    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_TIMESTAMP));
-
-		    int optionsNum = options.size();
-
-		    int iterOpts;
-		    for (iterOpts = 1; iterOpts <= optionsNum; iterOpts++) {
-			cellIdx++;
-			cell = row.createCell(cellIdx);
-			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + iterOpts);
-		    }
-
-		    // display all users' answers for this question in multiple
-		    // rows
-		    for (AnswerDTO answer : answers) {
-			row = sheet.createRow(idx++);
-			cellIdx = 0;
-			cell = row.createCell(cellIdx);
-			cell.setCellValue(answer.getReplier().getLoginName());
-			cellIdx++;
-			cell = row.createCell(cellIdx);
-			cell.setCellValue(
-				answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
-			cellIdx++;
-			cell = row.createCell(cellIdx);
-			cell.setCellStyle(dateStyle);
-			cell.setCellValue(answer.getAnswer().getUpdateDate());
-			// for answer's options
-			for (SurveyOption option : options) {
-			    cellIdx++;
-			    cell = row.createCell(cellIdx);
-			    if (answer.getAnswer() == null) {
-				break;
-			    }
-			    String[] choices = answer.getAnswer().getChoices();
-			    for (String choice : choices) {
-				if (StringUtils.equals(choice, option.getUid().toString())) {
-				    cell.setCellValue("X");
-				}
-			    }
+			cell = row.createCell(++cellIdx);
+			if (answer.getAnswer() != null) {
+			    cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
 			}
-			// for textEntry option
-			if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-			    cell = row.createCell(++cellIdx);
-			    if (answer.getAnswer() != null) {
-				cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
-			    }
-			}
-
 		    }
+
 		}
 	    }
-
-	    // set cookie that will tell JS script that export has been finished
-	    String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-	    Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-	    fileDownloadTokenCookie.setPath("/");
-	    response.addCookie(fileDownloadTokenCookie);
-
-	    String fileName = "lams_survey_" + toolSessionID + ".xlsx";
-	    response.setContentType("application/x-download");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-
-	    ServletOutputStream out = response.getOutputStream();
-	    workbook.write(out);
-	    out.close();
-
-	} catch (Exception e) {
-	    MonitoringController.log.error(e);
-	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	    errorMap.add("GLOBAL",
-		    messageService.getMessage("error.monitoring.export.excel", new Object[] { e.toString() }));
-	    errors = errorMap.toString();
 	}
 
-	if (errors != null) {
-	    try {
-		PrintWriter out = response.getWriter();
-		out.write(errors);
-		out.flush();
-	    } catch (IOException e) {
-	    }
-	}
-	return null;
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	String fileName = "lams_survey_" + toolSessionID + ".xlsx";
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	ServletOutputStream out = response.getOutputStream();
+	workbook.write(out);
+	out.close();
     }
 
     /**
