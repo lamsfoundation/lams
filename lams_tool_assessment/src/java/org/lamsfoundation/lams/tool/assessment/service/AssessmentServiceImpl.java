@@ -2173,7 +2173,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
-		Double optionPercentage = (double) summaryOfAnswers.get(option.getUid()) / total;
+		Double optionPercentage = total == 0 || summaryOfAnswers.get(option.getUid()) == null ? 0
+			: (double) summaryOfAnswers.get(option.getUid()) / total;
 		ExcelCell optionCell = summaryTableRow.addPercentageCell(optionPercentage);
 		if (option.getMaxMark() > 0) {
 		    optionCell.setColor(IndexedColors.GREEN);
@@ -2181,10 +2182,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	} else {
-	    Double correctPercentage = (double) summaryOfAnswers.get(trueKey) / total;
+	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null ? 0
+		    : (double) summaryOfAnswers.get(trueKey) / total;
 	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
-
-	    Double wrongPercentage = (double) summaryOfAnswers.get(falseKey) / total;
+	    
+	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null ? 0
+		    : (double) summaryOfAnswers.get(falseKey) / total;
 	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
 
 	    if (question.getQbQuestion().getCorrectAnswer()) {
@@ -2193,7 +2196,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		wrongCell.setColor(IndexedColors.GREEN);
 	    }
 	}
-	Double summaryNAPercentage = (double) summaryNACount / total;
+
+	Double summaryNAPercentage = total == 0 ? 0 : (double) summaryNACount / total;
 	summaryTableRow.addPercentageCell(summaryNAPercentage);
 
 	return summaryTableRow;
