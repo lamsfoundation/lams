@@ -59,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -304,33 +305,7 @@ public class MonitoringController implements VoteAppConstants {
 	return responseJSON.toString();
     }
 
-    /*
-     * Possible error: forward "learnerNotebook" is not listed in Struts
-     *
-     * @RequestMapping("/openNotebook")
-     * public ActionForward openNotebook(HttpServletRequest request) throws IOException, ServletException, ToolException
-     * {
-     * String userId = request.getParameter("userId");
-     *
-     * String userName = request.getParameter("userName");
-     *
-     * String sessionId = request.getParameter("sessionId");
-     *
-     * NotebookEntry notebookEntry = voteService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
-     * VoteAppConstants.MY_SIGNATURE, new Integer(userId));
-     *
-     * VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-     * if (notebookEntry != null) {
-     * //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-     * voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-     * voteGeneralLearnerFlowDTO.setUserName(userName);
-     * }
-     * request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-     *
-     * return mapping.findForward(VoteAppConstants.LEARNER_NOTEBOOK);
-     * }
-     */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -350,6 +325,7 @@ public class MonitoringController implements VoteAppConstants {
 	}
 	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
 	voteService.updateVote(voteContent);
+	
 	return formattedDate;
     }
 

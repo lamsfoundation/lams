@@ -63,8 +63,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -180,17 +183,10 @@ public class MonitoringController {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
-    @RequestMapping("/setSubmissionDeadline")
-    private String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    private String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(contentID);
 
@@ -208,9 +204,7 @@ public class MonitoringController {
 	scratchie.setSubmissionDeadline(tzSubmissionDeadline);
 	scratchieService.saveOrUpdateScratchie(scratchie);
 
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
     /**
@@ -221,7 +215,6 @@ public class MonitoringController {
     @RequestMapping("/exportExcel")
     @ResponseStatus(HttpStatus.OK)
     private void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);

@@ -68,6 +68,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -381,10 +382,9 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
 
@@ -402,7 +402,6 @@ public class MonitoringController {
 	content.setSubmissionDeadline(tzSubmissionDeadline);
 	submitFilesService.saveOrUpdateContent(content);
 
-	response.setContentType("text/plain;charset=utf-8");
 	return formattedDate;
     }
 

@@ -15,7 +15,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',

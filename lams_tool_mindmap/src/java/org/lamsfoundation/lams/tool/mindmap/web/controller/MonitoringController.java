@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -153,10 +154,9 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Mindmap mindmap = mindmapService.getMindmapByContentId(contentID);
 
@@ -173,6 +173,7 @@ public class MonitoringController {
 	}
 	mindmap.setSubmissionDeadline(tzSubmissionDeadline);
 	mindmapService.saveOrUpdateMindmap(mindmap);
+	
 	return formattedDate;
     }
 

@@ -70,6 +70,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -310,10 +311,9 @@ public class McMonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request) {
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(contentID);
 
@@ -331,6 +331,7 @@ public class McMonitoringController {
 	}
 	mcContent.setSubmissionDeadline(tzSubmissionDeadline);
 	mcService.updateMc(mcContent);
+	
 	return formattedDate;
     }
 

@@ -63,9 +63,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -240,17 +242,10 @@ public class QaMonitoringController implements QaAppConstants {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
-    @RequestMapping("/setSubmissionDeadline")
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);
 
@@ -271,9 +266,7 @@ public class QaMonitoringController implements QaAppConstants {
 	content.setSubmissionDeadline(tzSubmissionDeadline);
 	qaService.saveOrUpdateQaContent(content);
 
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
     /**
