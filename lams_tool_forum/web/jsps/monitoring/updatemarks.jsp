@@ -11,8 +11,9 @@
 	<body class="stripes">
 			
 			<lams:Page type="monitor" title="${page.title.monitoring.edit.user.mark}">
+            <c:set var="csrfToken"><csrf:token/></c:set>
 
-			<form:form action="updateMark.do" id="markForm" modelAttribute="markForm" method="post">
+			<form:form action="updateMark.do?${csrfToken}" id="markForm" modelAttribute="markForm" method="post">
 
 			<c:set var="sessionMap" value="${sessionScope[markForm.sessionMapID]}" />
 			<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>

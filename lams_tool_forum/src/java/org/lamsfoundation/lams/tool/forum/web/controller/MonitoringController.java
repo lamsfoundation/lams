@@ -629,7 +629,7 @@ public class MonitoringController {
     /**
      * Update mark for a special user
      */
-    @RequestMapping("/updateMark")
+    @RequestMapping(path = "/updateMark", method = RequestMethod.POST)
     public String updateMark(@ModelAttribute MarkForm markForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
