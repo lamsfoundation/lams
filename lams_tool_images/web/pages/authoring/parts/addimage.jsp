@@ -1,10 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="csrfToken"><csrf:token/></c:set>
 <c:choose>
 	<c:when test="${saveUsingLearningAction}">
-		<c:set var="FORM_ACTION" value="../learning/saveNewImage.do"/>
+		<c:set var="FORM_ACTION" value="../learning/saveNewImage.do?${csrfToken}"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do"/>
+		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do?${csrfToken}"/>
 	</c:otherwise>
 </c:choose>
 
