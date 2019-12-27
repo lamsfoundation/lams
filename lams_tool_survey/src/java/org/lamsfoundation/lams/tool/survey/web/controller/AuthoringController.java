@@ -349,7 +349,7 @@ public class AuthoringController {
 	return readDatabaseData(startForm, request);
     }
 
-    @RequestMapping(value = "/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String definelater(SurveyForm startForm, HttpServletRequest request) throws Exception {
 	// update define later flag to true
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));

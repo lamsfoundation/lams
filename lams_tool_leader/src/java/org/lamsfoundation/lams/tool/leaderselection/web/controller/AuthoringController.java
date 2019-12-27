@@ -60,16 +60,11 @@ public class AuthoringController {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     *
      */
     @RequestMapping("")
     protected String unspecified(AuthoringForm authoringForm, HttpServletRequest request) {
-
 	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Leaderselection with given toolContentID
@@ -81,17 +76,33 @@ public class AuthoringController {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
-	    leaderselection.setDefineLater(true);
-	    leaderselectionService.saveOrUpdateLeaderselection(leaderselection);
+	return readDatabaseData(authoringForm, leaderselection, request, mode);
+    }
 
-	    //audit log the teacher has started editing activity in monitor
-	    leaderselectionService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Leaderselection leaderselection = leaderselectionService.getContentByContentId(toolContentID);
+	leaderselection.setDefineLater(true);
+	leaderselectionService.saveOrUpdateLeaderselection(leaderselection);
 
+	//audit log the teacher has started editing activity in monitor
+	leaderselectionService.auditLogStartEditingActivityInMonitor(toolContentID);
+
+	return readDatabaseData(authoringForm, leaderselection, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Leaderselection leaderselection, HttpServletRequest request, ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// Set up the authForm.
 	authoringForm.setTitle(leaderselection.getTitle());
 	authoringForm.setInstructions(leaderselection.getInstructions());

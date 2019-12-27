@@ -108,7 +108,7 @@ public class AuthoringController {
 	return readDatabaseData(forumForm, request);
     }
 
-    @RequestMapping("/defineLater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
 
 	// update define later flag to true

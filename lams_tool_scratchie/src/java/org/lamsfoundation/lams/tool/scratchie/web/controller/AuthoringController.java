@@ -104,7 +104,7 @@ public class AuthoringController {
 
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     private String definelater(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true

@@ -68,6 +68,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -95,7 +96,26 @@ public class QaAuthoringController implements QaAppConstants {
     @RequestMapping("/authoring")
     public String execute(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request)
 	    throws IOException, ServletException, QaApplicationException {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	return readDatabaseData(authoringForm, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm, HttpServletRequest request) {
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	qaService.setDefineLater(strToolContentID, true);
 
+	return readDatabaseData(authoringForm, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(QaAuthoringForm authoringForm, HttpServletRequest request, ToolAccessMode mode) {
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -119,7 +139,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    throw new ServletException("No Tool Content ID found");
+	    throw new RuntimeException("No Tool Content ID found");
 	}
 
 	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
@@ -132,11 +152,6 @@ public class QaAuthoringController implements QaAppConstants {
 
 	prepareDTOandForm(request, authoringForm, qaContent, qaService, sessionMap);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	// request is from monitoring module
-	if (mode.isTeacher()) {
-	    qaService.setDefineLater(strToolContentID, true);
-	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);

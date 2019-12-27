@@ -48,6 +48,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/authoring")
@@ -63,12 +64,7 @@ public class AuthoringController {
     @RequestMapping("/start")
     public String start(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
-
-	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Zoom with given toolContentID
@@ -79,17 +75,34 @@ public class AuthoringController {
 	    zoomService.saveOrUpdateZoom(zoom);
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we are editing. This flag is released when updateContent is
-	    // called.
-	    zoom.setDefineLater(true);
-	    zoomService.saveOrUpdateZoom(zoom);
+	return readDatabaseData(authoringForm, zoom, request, mode);
+    }
 
-	    //audit log the teacher has started editing activity in monitor
-	    zoomService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws ServletException {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Zoom zoom = zoomService.getZoomByContentId(toolContentID);
+	zoom.setDefineLater(true);
+	zoomService.saveOrUpdateZoom(zoom);
 
+	//audit log the teacher has started editing activity in monitor
+	zoomService.auditLogStartEditingActivityInMonitor(toolContentID);
+
+	return readDatabaseData(authoringForm, zoom, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Zoom zoom, HttpServletRequest request,
+	    ToolAccessMode mode) throws ServletException {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// Set up the authForm.
 	copyProperties(authoringForm, zoom);
 

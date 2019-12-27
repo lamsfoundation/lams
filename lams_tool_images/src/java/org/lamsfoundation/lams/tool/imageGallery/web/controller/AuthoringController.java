@@ -103,7 +103,7 @@ public class AuthoringController {
 	return readDatabaseData(imageGalleryForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute ImageGalleryForm imageGalleryForm, HttpServletRequest request)
 	    throws ServletException {
 

@@ -58,6 +58,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -772,6 +773,26 @@ public class AuthoringController implements VoteAppConstants {
 
     @RequestMapping("/start")
     public String start(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	return readDatabaseData(voteAuthoringForm, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute VoteAuthoringForm voteAuthoringForm, HttpServletRequest request) {
+	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	VoteUtils.setDefineLater(request, true, strToolContentId, voteService);
+
+	return readDatabaseData(voteAuthoringForm, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "start" and "defineLater"
+     */
+    private String readDatabaseData(VoteAuthoringForm voteAuthoringForm, HttpServletRequest request, ToolAccessMode mode) {
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
@@ -813,11 +834,6 @@ public class AuthoringController implements VoteAppConstants {
 	    return "/error";
 	}
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	// request is from monitoring module
-	if (mode.isTeacher()) {
-	    VoteUtils.setDefineLater(request, true, strToolContentId, voteService);
-	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	VoteContent voteContent = voteService.getVoteContent(new Long(strToolContentId));

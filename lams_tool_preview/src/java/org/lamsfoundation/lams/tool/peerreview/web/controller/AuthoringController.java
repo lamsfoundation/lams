@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Steve.Ni
@@ -75,7 +76,7 @@ public class AuthoringController {
 	return doStart(peerreviewForm, request, session);
     }
 
-    @RequestMapping("/defineLater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request,
 	    HttpSession session) throws ServletException {
 	// update define later flag to true

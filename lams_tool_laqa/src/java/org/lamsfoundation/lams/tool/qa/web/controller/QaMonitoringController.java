@@ -53,10 +53,8 @@ import org.lamsfoundation.lams.tool.qa.model.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.model.QaSession;
 import org.lamsfoundation.lams.tool.qa.model.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
-import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -65,7 +63,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -86,34 +83,24 @@ public class QaMonitoringController implements QaAppConstants {
     @Autowired
     private IQaService qaService;
 
-    @RequestMapping("/")
-    public String unspecified() throws IOException, ServletException, ToolException {
-	return null;
-    }
-
     @RequestMapping("/monitoring")
-    private String execute(@ModelAttribute("qaMonitoringForm") QaMonitoringForm qaMonitoringForm,
-	    HttpServletRequest request) throws IOException, ServletException, QaApplicationException {
+    private String execute(HttpServletRequest request) throws ServletException {
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	qaMonitoringForm.setContentFolderID(contentFolderID);
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	if ((strToolContentID == null) || (strToolContentID.length() == 0)) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("No Tool Content ID found");
 	}
-	qaMonitoringForm.setToolContentID(strToolContentID);
 
-	String toolContentID = qaMonitoringForm.getToolContentID();
-	QaContent qaContent = qaService.getQaContent(new Long(toolContentID).longValue());
+	QaContent qaContent = qaService.getQaContent(new Long(strToolContentID).longValue());
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    throw new ServletException("Data not initialised in Monitoring");
-	}
-
-	qaMonitoringForm.setCurrentTab("1");	
+	}	
 
 	/* this section is related to summary tab. Starts here. */
 //	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -147,7 +134,7 @@ public class QaMonitoringController implements QaAppConstants {
 	}
 	request.setAttribute(LIST_ALL_GROUPS_DTO, groupDTOs);
 
-	// setting up the advanced summary for LDEV-1662
+	// setting up the advanced summary
 	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
 
 	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());

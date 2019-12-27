@@ -25,14 +25,15 @@
 			</td>
 		</tr>
 	</c:forEach>
-
 </table>
 
-<c:url var="authoringUrl" value="/authoring/start.do">
-	<c:param name="toolContentID" value="${voteMonitoringForm.toolContentID}" />
-	<c:param name="contentFolderID" value="${voteMonitoringForm.contentFolderID}" />
-	<c:param name="mode" value="teacher" />
-</c:url>
-<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
-	<fmt:message key="label.edit"/>
-</a> 
+<form id='define-later-form' method='post' action='../authoring/definelater.do' target='definelater'>
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+	<input type="hidden" name="toolContentID" value="${toolContentID}" />
+	<input type="hidden" name="contentFolderID" value="${contentFolderID}" />
+</form>
+	
+<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
+	<fmt:message key="label.edit" />
+</a>
+

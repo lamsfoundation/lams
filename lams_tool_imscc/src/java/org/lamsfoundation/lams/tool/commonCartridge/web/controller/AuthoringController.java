@@ -293,7 +293,6 @@ public class AuthoringController {
      * @throws ServletException
      *
      */
-
     @RequestMapping("/start")
     private String start(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
@@ -302,7 +301,7 @@ public class AuthoringController {
 	return starting(authoringForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     private String definelater(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
 	    HttpServletRequest request) throws ServletException {
 	// update define later flag to true

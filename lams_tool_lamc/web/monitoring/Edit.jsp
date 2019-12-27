@@ -16,11 +16,12 @@
 	</tr>
 </table>
 
-<c:url  var="authoringUrl" value="/authoring/authoring.do">
-	<c:param name="toolContentID" value="${mcGeneralMonitoringDTO.toolContentID}" />
-	<c:param name="contentFolderID" value="${contentFolderID}" />
-	<c:param name="mode" value="teacher" />
-</c:url>
-<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
-	<fmt:message key="label.edit"/>
-</a>				 		  					
+<form id='define-later-form' method='post' action='../authoring/definelater.do' target='definelater'>
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+	<input type="hidden" name="toolContentID" value="${mcGeneralMonitoringDTO.toolContentID}" />
+	<input type="hidden" name="contentFolderID" value="${contentFolderID}" />
+</form>
+	
+<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
+	<fmt:message key="label.edit" />
+</a>			 		  					

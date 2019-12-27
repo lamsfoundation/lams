@@ -109,7 +109,7 @@ public class AuthoringController {
 	return readDatabaseData(taskListForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true

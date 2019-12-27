@@ -96,7 +96,31 @@ public class NbAuthoringController {
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	return readDatabaseData(nbAuthoringForm, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
+	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
+	NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
+	nb.setDefineLater(true);
+	nbService.saveNoticeboard(nb);
 
+	// audit log the teacher has started editing activity in monitor
+	nbService.auditLogStartEditingActivityInMonitor(contentId);
+
+	return readDatabaseData(nbAuthoringForm, request, ToolAccessMode.TEACHER);
+    }
+
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(NbAuthoringForm nbAuthoringForm, HttpServletRequest request, ToolAccessMode mode) {
 	Long contentId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_CONTENT_ID);
 	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
@@ -147,14 +171,8 @@ public class NbAuthoringController {
 	    boolean isDefineLater = Boolean.parseBoolean(nbAuthoringForm.getDefineLater());
 	    nb.setDefineLater(isDefineLater);
 	    nbService.saveNoticeboard(nb);
-
-	    if (isDefineLater) {
-		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
-
-		// audit log the teacher has started editing activity in monitor
-		nbService.auditLogStartEditingActivityInMonitor(contentId);
-	    }
 	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 
 	request.setAttribute(FORM, nbAuthoringForm);
 

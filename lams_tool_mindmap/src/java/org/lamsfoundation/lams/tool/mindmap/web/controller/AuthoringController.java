@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -83,10 +84,7 @@ public class AuthoringController {
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-
-	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Mindmap with given toolContentID
@@ -109,15 +107,33 @@ public class AuthoringController {
 	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "#ffffff", null, mindmap, null);
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we are editing. This flag is released when updateContent is called.
-	    mindmap.setDefineLater(true);
-	    mindmapService.saveOrUpdateMindmap(mindmap);
+	return readDatabaseData(authoringForm, mindmap, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentID);
+	mindmap.setDefineLater(true);
+	mindmapService.saveOrUpdateMindmap(mindmap);
 
-	    //audit log the teacher has started editing activity in monitor
-	    mindmapService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+	//audit log the teacher has started editing activity in monitor
+	mindmapService.auditLogStartEditingActivityInMonitor(toolContentID);
+
+	return readDatabaseData(authoringForm, mindmap, request, ToolAccessMode.TEACHER);
+    }
+
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Mindmap mindmap, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	/* Mindmap Attributes */
 	request.setAttribute("mindmapId", mindmap.getUid());

@@ -48,7 +48,6 @@ import org.lamsfoundation.lams.tool.vote.model.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
-import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -115,12 +114,9 @@ public class MonitoringController implements VoteAppConstants {
     }
 
     @RequestMapping("/getVoteNomination")
-    public String getVoteNomination(VoteMonitoringForm voteMonitoringForm, HttpServletRequest request) {
-
-	voteMonitoringForm.setVoteService(voteService);
-
+    public String getVoteNomination(HttpServletRequest request) {
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	MonitoringController.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringController.repopulateRequestParameters(request, voteGeneralMonitoringDTO);
 
 	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
@@ -330,28 +326,23 @@ public class MonitoringController implements VoteAppConstants {
     }
 
     @RequestMapping("/start")
-    public String start(VoteMonitoringForm voteMonitoringForm, HttpServletRequest request) {
-
+    public String start(HttpServletRequest request) {
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-
-	boolean validateParameters = validateParameters(request, voteMonitoringForm);
-	if (!validateParameters) {
-	    return "/error";
-	}
+	
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	// initialiseMonitoringData
 	voteGeneralMonitoringDTO.setRequestLearningReport(Boolean.FALSE.toString());
 
-	/* we have made sure TOOL_CONTENT_ID is passed */
-	String toolContentID = voteMonitoringForm.getToolContentID();
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	logger.warn("Make sure ToolContentId is passed" + toolContentID);
 	VoteContent voteContent = voteService.getVoteContent(new Long(toolContentID));
 
 	if (voteContent == null) {
-
 	    logger.error("Vote Content does not exist");
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(Boolean.TRUE.toString());
 	    return "/error";
@@ -391,11 +382,9 @@ public class MonitoringController implements VoteAppConstants {
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-	voteMonitoringForm.setCurrentTab("1");
 	voteGeneralMonitoringDTO.setCurrentTab("1");
 
 	if (sessionDTOs.size() > 0) {
-
 	    voteGeneralMonitoringDTO.setUserExceptionContentInUse(Boolean.TRUE.toString());
 	}
 
@@ -405,8 +394,6 @@ public class MonitoringController implements VoteAppConstants {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	sessionMap.put(VoteAppConstants.ACTIVITY_TITLE_KEY, voteContent.getTitle());
 	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, voteContent.getInstructions());
-
-	voteMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	List<VoteQuestionDTO> listQuestionDTO = new LinkedList<VoteQuestionDTO>();
@@ -431,31 +418,13 @@ public class MonitoringController implements VoteAppConstants {
 	voteGeneralAuthoringDTO.setActivityTitle(voteGeneralMonitoringDTO.getActivityTitle());
 	voteGeneralAuthoringDTO.setActivityInstructions(voteGeneralMonitoringDTO.getActivityInstructions());
 
-	MonitoringController.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringController.repopulateRequestParameters(request, voteGeneralMonitoringDTO);
 
 	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	request.setAttribute("isAllowText", voteContent.isAllowText());
 
 	return "/monitoring/MonitoringMaincontent";
-    }
-
-    private boolean validateParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm) {
-	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	if ((strToolContentId == null) || (strToolContentId.length() == 0)) {
-
-	    return false;
-	} else {
-	    try {
-		voteMonitoringForm.setToolContentID(strToolContentId);
-	    } catch (NumberFormatException e) {
-		logger.error("Number Format Exception");
-
-		return false;
-	    }
-	}
-	return true;
     }
 
     public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {
@@ -474,18 +443,14 @@ public class MonitoringController implements VoteAppConstants {
 	return map;
     }
 
-    public static void repopulateRequestParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm,
+    public static void repopulateRequestParameters(HttpServletRequest request,
 	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) {
-
 	String toolContentID = request.getParameter(VoteAppConstants.TOOL_CONTENT_ID);
-	voteMonitoringForm.setToolContentID(toolContentID);
 	voteGeneralMonitoringDTO.setToolContentID(toolContentID);
 
 	String responseId = request.getParameter(VoteAppConstants.RESPONSE_ID);
-	voteMonitoringForm.setResponseId(responseId);
 	voteGeneralMonitoringDTO.setResponseId(responseId);
 
 	String currentUid = request.getParameter(VoteAppConstants.CURRENT_UID);
-	voteMonitoringForm.setCurrentUid(currentUid);
     }
 }

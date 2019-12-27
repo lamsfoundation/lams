@@ -25,7 +25,7 @@
 		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 	</lams:head>
 	<body class="stripes" onload="init();">
-		<form:form action="authoring/updateContent.do"  modelAttribute="authoringForm" id="authoringForm" method="post" >
+		<form:form action="/lams/tool/lalead11/authoring/updateContent.do"  modelAttribute="authoringForm" id="authoringForm" method="post" >
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 			<c:set var="title">
 				<fmt:message key="activity.title" />

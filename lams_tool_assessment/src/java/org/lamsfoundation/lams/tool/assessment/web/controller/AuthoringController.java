@@ -85,6 +85,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -118,7 +119,7 @@ public class AuthoringController {
 	return readDatabaseData(assessmentForm, request, mode);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String definelater(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws ServletException {
 	// update define later flag to true

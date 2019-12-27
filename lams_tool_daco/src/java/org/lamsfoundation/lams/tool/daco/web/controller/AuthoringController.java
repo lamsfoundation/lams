@@ -612,7 +612,7 @@ public class AuthoringController {
 	return starting(authoringForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     protected String defineLater(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true

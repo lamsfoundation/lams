@@ -32,39 +32,15 @@ import org.apache.log4j.Logger;
 /**
  * @author mtruong
  */
-public class NbMonitoringForm {
-
-    private static final long serialVersionUID = 6958826482877304278L;
-
-    static Logger logger = Logger.getLogger(NbMonitoringForm.class.getName());
-
+public class MonitoringDTO {
     private String toolContentID;
-
-    private String method;
-
     private String currentTab;
-
     /* Only valid when form just set up by Java. Values are not returned from jsp page */
     private String title;
     private String basicContent;
     private Integer totalLearners;
     private Map groupStatsMap;
     private Map sessionIdMap;
-
-    /**
-     * @return Returns the method.
-     */
-    public String getMethod() {
-	return method;
-    }
-
-    /**
-     * @param method
-     *            The method to set.
-     */
-    public void setMethod(String method) {
-	this.method = method;
-    }
 
     /**
      * @return Returns the toolContentId.
@@ -79,11 +55,6 @@ public class NbMonitoringForm {
      */
     public void setToolContentID(String toolContentId) {
 	this.toolContentID = toolContentId;
-    }
-
-    public void reset(HttpServletRequest request) {
-	this.method = null;
-
     }
 
     public String getCurrentTab() {

@@ -81,10 +81,6 @@ public class MonitoringController {
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
-
-//    private void addTab(HttpServletRequest request) {
-//	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-//    }
     
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request,

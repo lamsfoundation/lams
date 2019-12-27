@@ -323,21 +323,6 @@
 			$('#edit-response-dialog').dialog( 'option' , 'responseUid' , responseUid );
 			$('#edit-response-dialog').dialog('open');
 		}
-	  	
-		function submitMonitoringMethod(actionMethod) {
-			document.forms.qaMonitoringForm.action=actionMethod+".do"; 
-			document.forms.qaMonitoringForm.submit();
-		}
-		
-		function submitMethod(actionMethod) {
-			submitMonitoringMethod(actionMethod);
-		}
-
-		function submitModifyMonitoringQuestion(questionIndexValue, actionMethod) {
-			document.forms.qaMonitoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
-		}
-
         
         function doSelectTab(tabId) {
 	    	selectTab(tabId);
@@ -347,14 +332,7 @@
 </lams:head>
 <body class="stripes">
 
-<form:form action="monitoring.do" method="POST" modelAttribute="qaMonitoringForm" >
-	<c:set var="title"><fmt:message key="activity.title" /></c:set>
-	
-	<form:hidden path="currentUid"/>
-	<form:hidden path="toolContentID"/>
-	<form:hidden path="httpSessionID"/>					
-	<form:hidden path="contentFolderID"/>	
-	
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>	
 	<lams:Page title="${title}" type="navbar">
 	
 		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
@@ -388,6 +366,5 @@
 			</c:choose>
 		</div>
 	</lams:Page>
-</form:form>
 </body>
 </lams:html>

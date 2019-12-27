@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.tool.chat.web.controller;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +60,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -75,9 +73,6 @@ public class MonitoringController {
     @Autowired
     @Qualifier("chatMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("/monitoring")
     public String unspecified(HttpServletRequest request) {
