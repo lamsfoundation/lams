@@ -29,7 +29,11 @@
 		<listener-class>
 			org.springframework.web.context.ContextLoaderListener
 		</listener-class>
-	</listener>
+    </listener>
+    <filter>
+        <filter-name>CSRFGuard</filter-name>
+        <filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
+    </filter>
 
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
@@ -66,7 +70,11 @@
 	<filter-mapping>
 		<filter-name>hibernateFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CSRFGuard</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
 	<filter-mapping>
 		<filter-name>SystemSessionFilter</filter-name>
 		<url-pattern>/*</url-pattern>
