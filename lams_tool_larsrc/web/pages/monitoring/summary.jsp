@@ -221,7 +221,7 @@
 	
 	function changeItemVisibility(linkObject, itemUid, toolSessionId, isHideItem) {
         $.ajax({
-            url: '<c:url value="/monitoring/changeItemVisibility.do"/>',
+            url: '<c:url value="/monitoring/changeItemVisibility.do"/>?<csrf:token/>',
             data: 'sessionMapID=${sessionMapID}&toolSessionID='+toolSessionId+'&itemUid=' + itemUid + '&isHideItem=' + isHideItem + '&toolContentID=' + ${sessionMap.toolContentID},
             type: 'post',
             success: function () {
