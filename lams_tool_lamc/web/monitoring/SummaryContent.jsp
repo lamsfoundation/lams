@@ -114,7 +114,7 @@
 	  			   	{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
-				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>?<csrf:token/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);

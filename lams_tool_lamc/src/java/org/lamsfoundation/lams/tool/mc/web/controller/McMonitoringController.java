@@ -472,7 +472,7 @@ public class McMonitoringController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("/saveUserMark")
+    @RequestMapping(path = "/saveUserMark", method = RequestMethod.POST)
     public String saveUserMark(HttpServletRequest request) {
 
 	if ((request.getParameter(McAppConstants.PARAM_NOT_A_NUMBER) == null)
