@@ -143,7 +143,7 @@
  					}).text(comment).appendTo(subgrid); 
   					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
- 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid='/>" + userUid,
+ 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid='/>" + userUid + "&<csrf:token/>",
  					    textOnly: true,
  					    placeholder: '<fmt:message key="label.click.to.edit" />',
  					    okButton: "<fmt:message key='button.ok' />",
