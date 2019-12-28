@@ -165,7 +165,7 @@ public class MonitoringController {
 	return "pages/monitoring/parts/itemSummary";
     }
 
-    @RequestMapping("/saveUserMark")
+    @RequestMapping(path = "/saveUserMark", method = RequestMethod.POST)
     private String saveUserMark(HttpServletRequest request) {
 
 	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null)

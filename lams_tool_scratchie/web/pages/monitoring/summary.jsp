@@ -74,7 +74,7 @@
 					launchPopup(userSummaryUrl, "MonitoringReview");		
 			  	},
 			   	// caption: "${summary.sessionName}",
-				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>?<csrf:token/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);
