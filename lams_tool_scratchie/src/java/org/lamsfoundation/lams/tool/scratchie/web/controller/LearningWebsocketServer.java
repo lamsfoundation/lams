@@ -24,6 +24,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -221,6 +222,14 @@ public class LearningWebsocketServer {
     public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	String login = websocket.getUserPrincipal().getName();
+	ScratchieUser user = LearningWebsocketServer.getScratchieService().getUserByLoginAndSessionId(login,
+		toolSessionId);
+	if (user == null) {
+	    throw new SecurityException("User \"" + login
+		    + "\" is not a participant in Scratchie activity with tool session ID " + toolSessionId);
+	}
+
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    sessionWebsockets = ConcurrentHashMap.newKeySet();
@@ -232,8 +241,7 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName() + " entered Scratchie with toolSessionId: "
-		    + toolSessionId);
+	    log.debug("User " + login + " entered Scratchie with toolSessionId: " + toolSessionId);
 	}
     }
 
