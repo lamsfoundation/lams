@@ -56,7 +56,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
+
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -223,6 +223,13 @@ public class LearningWebsocketServer {
     public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	String login = websocket.getUserPrincipal().getName();
+	MindmapUser user = LearningWebsocketServer.getMindmapService().getUserByLoginAndSessionId(login, toolSessionId);
+	if (user == null) {
+	    throw new SecurityException("User \"" + login
+		    + "\" is not a participant in Mindmap activity with tool session ID " + toolSessionId);
+	}
+
 	Long lastActionId = Long.valueOf(websocket.getRequestParameterMap().get("lastActionId").get(0));
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
@@ -232,8 +239,8 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (LearningWebsocketServer.log.isDebugEnabled()) {
-	    LearningWebsocketServer.log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " entered Mindmap with toolSessionId: " + toolSessionId + " lastActionId: " + lastActionId);
+	    LearningWebsocketServer.log.debug("User " + login + " entered Mindmap with toolSessionId: " + toolSessionId
+		    + " lastActionId: " + lastActionId);
 	}
 
 	new Thread(() -> {
