@@ -112,7 +112,7 @@
 			   	],
 			   	multiselect: false,
 
-				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
+				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);
@@ -213,7 +213,8 @@
 		// ajax calls to disclose correct/groups answers
 	    correctButton.click(function(){
 			$.ajax({
-				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do',
+                type: 'POST',
+				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
 				'data' : {
 					'questionUid'   : questionUidSelect.val(),
 					'toolContentID' : '${sessionMap.assessment.contentId}'
@@ -226,7 +227,8 @@
 
 	    groupsButton.click(function(){
 			$.ajax({
-				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do',
+                type: 'POST',
+				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
 				'data' : {
 					'questionUid'   : questionUidSelect.val(),
 					'toolContentID' : '${sessionMap.assessment.contentId}'
@@ -242,7 +244,8 @@
 			    var option = $(this),
 			    	questionUid = option.val();
 				$.ajax({
-					'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do',
+                    type: 'POST',
+					'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
 					'data' : {
 						'questionUid'   : questionUid,
 						'toolContentID' : '${sessionMap.assessment.contentId}'
@@ -262,7 +265,8 @@
 			    var option = $(this),
 			    	questionUid = option.val();
 				$.ajax({
-					'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do',
+                    type: 'POST',
+					'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
 					'data' : {
 						'questionUid'   : questionUid,
 						'toolContentID' : '${sessionMap.assessment.contentId}'

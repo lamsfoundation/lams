@@ -197,7 +197,7 @@ public class MonitoringController {
 	return "pages/monitoring/parts/usersummary";
     }
 
-    @RequestMapping("/saveUserGrade")
+    @RequestMapping(path = "/saveUserGrade", method = RequestMethod.POST)
     public void saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
@@ -568,7 +568,7 @@ public class MonitoringController {
     /**
      * Allows displaying correct answers to learners
      */
-    @RequestMapping("/discloseCorrectAnswers")
+    @RequestMapping(path = "/discloseCorrectAnswers", method = RequestMethod.POST)
     public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
@@ -588,7 +588,7 @@ public class MonitoringController {
     /**
      * Allows displaying other groups' answers to learners
      */
-    @RequestMapping("/discloseGroupsAnswers")
+    @RequestMapping(path = "/discloseGroupsAnswers", method = RequestMethod.POST)
     public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
