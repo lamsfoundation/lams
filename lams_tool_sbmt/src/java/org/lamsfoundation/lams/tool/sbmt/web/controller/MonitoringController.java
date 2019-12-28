@@ -264,7 +264,7 @@ public class MonitoringController {
     /**
      * Release mark
      */
-    @RequestMapping("/releaseMarks")
+    @RequestMapping(path = "/releaseMarks", method = RequestMethod.POST)
     @ResponseBody
     public void releaseMarks(HttpServletRequest request, HttpServletResponse response) {
 
@@ -276,7 +276,7 @@ public class MonitoringController {
     /**
      * Download submit file marks by MS Excel file format.
      */
-    @RequestMapping("/downloadMarks")
+    @RequestMapping(path = "/downloadMarks", method = RequestMethod.POST)
     public void downloadMarks(HttpServletRequest request, HttpServletResponse response) {
 
 	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);

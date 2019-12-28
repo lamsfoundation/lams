@@ -55,9 +55,9 @@
 <body class="stripes">
 <c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
 <lams:Page title="${title}" type="monitor">
-
+<c:set var="csrfToken"><csrf:token/></c:set>
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<form:form action="updateMark.do" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
+			<form:form action="updateMark.do?${csrfToken}" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="reportID" />

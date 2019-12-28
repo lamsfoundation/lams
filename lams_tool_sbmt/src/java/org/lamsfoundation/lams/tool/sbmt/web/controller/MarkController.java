@@ -47,6 +47,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author lfoxton
@@ -65,7 +66,7 @@ public class MarkController {
     /**
      * Update mark.
      */
-    @RequestMapping("/updateMark")
+    @RequestMapping(path = "/updateMark", method = RequestMethod.POST)
     public String updateMark(@ModelAttribute MarkForm markForm, HttpServletRequest request)
 	    throws InvalidParameterException, RepositoryCheckedException {
 
