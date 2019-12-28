@@ -64,7 +64,8 @@
 	<div class="loffset5">
 		<c:choose>
 			<c:when test="${not empty session.userDTOs and (not dto.autoSelectScribe or session.appointedScribe != null)}">
-				<form:form action="/lams/tool/lascrb11/monitoring/appointScribe.do" modelAttribute="monitoringForm">
+            <c:set var="csrfToken"><csrf:token/></c:set>
+				<form:form action="/lams/tool/lascrb11/monitoring/appointScribe.do?${csrfToken}" modelAttribute="monitoringForm" method="post">
 		
 					<form:hidden path="toolSessionID" value="${session.sessionID}" />
 					<form:hidden path="contentFolderID" />
