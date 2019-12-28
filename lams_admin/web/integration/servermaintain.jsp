@@ -71,8 +71,8 @@
 	</p>
 	
 	<lams:errors/>
-			
-	<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
+    <c:set var="csrfToken"><csrf:token/></c:set>
+    <form:form action="serversave.do?${csrfToken}" id="extServerForm" modelAttribute="extServerForm" method="post">
 		<form:hidden path="sid" />
 		
 		<div class="form-group">

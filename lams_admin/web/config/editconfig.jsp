@@ -27,8 +27,8 @@
 				<c:out value="${error}" />
 			</lams:Alert>
 		</c:if>
-				
-		<form:form action="config/save.do" modelAttribute="configForm" id="configForm" method="post">
+		<c:set var="csrfToken"><csrf:token/></c:set>
+		<form:form action="config/save.do?${csrfToken}" modelAttribute="configForm" id="configForm" method="post">
 				
 			<c:forEach items="${config}" var="group">
 				<div class="panel panel-default">

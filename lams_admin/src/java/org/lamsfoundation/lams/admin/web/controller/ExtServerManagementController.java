@@ -44,6 +44,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
@@ -158,7 +159,7 @@ public class ExtServerManagementController {
 	}
     }
 
-    @RequestMapping(path = "/disable")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = integrationService.getExtServer(sid);
@@ -167,7 +168,7 @@ public class ExtServerManagementController {
 	return "redirect:/extserver/serverlist.do";
     }
 
-    @RequestMapping(path = "/enable")
+    @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	ExtServer map = integrationService.getExtServer(sid);
@@ -176,7 +177,7 @@ public class ExtServerManagementController {
 	return "redirect:/extserver/serverlist.do";
     }
 
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
 	userManagementService.deleteById(ExtServer.class, sid);

@@ -20,8 +20,8 @@
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
 			<a href="<lams:LAMSURL/>admin/signupManagement/start.do" class="btn btn-default loffset5"><fmt:message key="admin.signup.title" /></a>
 		</div>
-			
-		<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
+		<c:set var="csrfToken"><csrf:token/></c:set>	
+		<form:form action="add.do?${csrfToken}" modelAttribute="signupForm" id="signupForm" method="post">
 				<form:hidden path="signupOrganisationId" />
 				
 				<table class="table table-condensed table-no-border">

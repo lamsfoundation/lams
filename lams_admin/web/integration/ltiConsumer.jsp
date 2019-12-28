@@ -53,8 +53,8 @@
 		</p>
 					
 		<lams:errors path="*"/>
-				
-		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
+	<c:set var="csrfToken"><csrf:token/></c:set>			
+		<form:form action="save.do?${csrfToken}" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 			<form:hidden path="sid" />
 						
 			<table class="table table-no-border">

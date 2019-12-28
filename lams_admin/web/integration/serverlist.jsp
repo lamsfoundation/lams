@@ -14,6 +14,7 @@
 </lams:head>
     
 <body class="stripes">
+    <c:set var="csrfToken"><csrf:token/></c:set>
 	<lams:Page type="admin" title="${title}">
 		<p>
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
@@ -47,18 +48,18 @@
 						</c:choose>
 					</td>
 					<td>
-						<a id="edit_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
+						<a style="display: inline-block;" class="btn btn-primary btn-xs" id="edit_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
 						&nbsp;
 						<c:choose>
 							<c:when test="${server.disabled}">
-								<a id="enable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/enable.do?sid=${server.sid}"><fmt:message key="admin.enable" /></a>
+                                <csrf:form style="display: inline-block;" id="enable_${server.serverid}" method="post" action="/lams/admin/extserver/enable.do"><input type="hidden" name="sid" value="${server.sid}"/><input type="submit" class="btn btn-success btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
 							</c:when>
 							<c:otherwise>
-								<a id="disable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/disable.do?sid=${server.sid}"><fmt:message key="admin.disable" /></a>
+                                <csrf:form style="display: inline-block;" id="disable_${server.serverid}" method="post" action="/lams/admin/extserver/disable.do"><input type="hidden" name="sid" value="${server.sid}"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.disable" />"/></csrf:form>
 							</c:otherwise>
 						</c:choose>
 						&nbsp;
-						<a id="delete_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/delete.do?sid=${server.sid}"><fmt:message key="admin.delete" /></a>
+                        <csrf:form id="delete_${server.serverid}" style="display: inline-block;" method="post" action="/lams/admin/extserver/delete.do"><input type="hidden" name="sid" value="${server.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
 					</td>
 				</tr>
 				</c:forEach>
