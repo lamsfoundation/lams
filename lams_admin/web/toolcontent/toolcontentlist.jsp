@@ -14,38 +14,23 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	
 	<script type="text/javascript">
-		$(document).ready(function(){
-			$('#toolGroupsDialog').dialog({
-				'autoOpen' : false,
-				'modal'	   : true,
-				'draggable': false,
-				'width'	   : 900,
-				'height'   : 700,
-				'title'	   : '<fmt:message key="tool.groups.dialog.title" />',
-				'open' 	   : function(){
-					$('#toolGroupsFrame', this).attr('src', 'openLearningLibraryGroups.do');
-				},
-				'beforeClose'	   : function(){
-					$('#toolGroupsFrame', this).attr('src', null);
-				}
-			});
-	
-			$('div.ui-dialog-titlebar').prepend($('.customDialogButton'));
-		});
-	
 		function openToolGroups(){
-			$('#toolGroupsDialog').dialog('open');
-		}
-		
-		function saveToolGroups(){
-			var result = $('#toolGroupsFrame')[0].contentWindow.saveGroups();
-			if (result) {
-				$('#toolGroupsDialog').dialog('close');
-			}
+			showDialog("dialogToolGroup", {
+				'width' : 900,
+				'height': 700,
+				'title'	: '<fmt:message key="tool.groups.dialog.title" />',
+				'open' : function() {
+					// load contents after opening the dialog
+					$('iframe', this).attr('src', 'openLearningLibraryGroups.do');
+				}
+			}, false);
 		}
 	</script>
-	
+				
 </lams:head>
     
 <body class="stripes">
@@ -67,12 +52,7 @@
 					
 					<a href="javascript:openToolGroups()" class="btn btn-default pull-right" 
 					   title="<fmt:message key='tool.groups.open.button.tooltip' />" ><fmt:message key="tool.groups.open.button" /></a>
-					<div id="toolGroupsDialog" style="display: none">
-						<a class="customDialogButton" href="javascript:saveToolGroups()" style="right: 50px;">
-							<fmt:message key="admin.save" />
-						</a>
-						<iframe id="toolGroupsFrame" style="border: none; width: 100%; height: 100%"></iframe>
-					</div>
+					<div class="clearfix"></div>
 					
 					<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
 				</div>	
