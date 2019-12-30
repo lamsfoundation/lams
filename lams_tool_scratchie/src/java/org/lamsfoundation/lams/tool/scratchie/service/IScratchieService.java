@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +44,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.quartz.SchedulerException;
 
@@ -74,7 +72,7 @@ public interface IScratchieService extends ICommonToolService {
      */
     void populateItemsWithConfidenceLevels(Long userId, Long toolSessionId, Integer confidenceLevelsActivityUiid,
 	    Collection<ScratchieItem> items);
-    
+
 //    /**
 //     * Populate scratchie items with the VSA answers from the Assessment activity specified in author
 //     *
@@ -94,7 +92,7 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
-    
+
     /**
      * Returns all activities that precede specified activity and produce VSA answers (only Assessments at the moment).
      *
@@ -103,7 +101,7 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId);
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      *
@@ -167,6 +165,8 @@ public interface IScratchieService extends ICommonToolService {
      */
     ScratchieUser getUserByIDAndSession(Long userId, Long sessionId);
 
+    ScratchieUser getUserByLoginAndSessionId(String login, long toolSessionId);
+
     /**
      * Get users by given toolSessionId.
      *
@@ -224,10 +224,10 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     int countSessionsByContentId(Long toolContentId);
-    
+
     /**
      * Return all sessions.
-     * 
+     *
      * @param toolContentId
      * @return
      */
@@ -256,7 +256,7 @@ public interface IScratchieService extends ICommonToolService {
      * @param scratchieItemList
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
-    
+
     /**
      * Return log for VSA type item.
      */
@@ -267,7 +267,7 @@ public interface IScratchieService extends ICommonToolService {
      * update all the marks.
      */
     void recordItemScratched(Long toolSessionId, Long itemUid, Long scratchieItemUid);
-    
+
     /**
      * Leader has left this answer. We will store this answer for all users in his group. It will also
      * update all the marks.
@@ -336,7 +336,7 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     List<ExcelSheet> exportExcel(Long contentId);
-    
+
     /**
      * Used by TblMonitoringController.tra() to get numberOfFirstChoiceEvents.
      */

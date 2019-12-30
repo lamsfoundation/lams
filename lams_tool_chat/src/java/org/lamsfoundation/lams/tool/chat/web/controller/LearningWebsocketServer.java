@@ -85,7 +85,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
+
 		    Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go throus Tool Session and update registered users with messages and roster
@@ -260,6 +260,14 @@ public class LearningWebsocketServer {
     public void registerUser(Session session) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	String userName = session.getUserPrincipal().getName();
+	ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
+		toolSessionId);
+	if (chatUser == null) {
+	    throw new SecurityException("User \"" + userName
+		    + "\" is not a participant in Chat activity with tool session ID " + toolSessionId);
+	}
+
 	Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    sessionWebsockets = ConcurrentHashMap.newKeySet();
@@ -267,13 +275,11 @@ public class LearningWebsocketServer {
 	}
 	final Set<Websocket> finalSessionWebsockets = sessionWebsockets;
 
-	String userName = session.getUserPrincipal().getName();
 	new Thread(() -> {
 	    try {
 		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		HibernateSessionManager.openSession();
-		ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
-			toolSessionId);
+
 		Websocket websocket = new Websocket(session, chatUser.getNickname(), chatUser.getUserId(),
 			LearningWebsocketServer.getPortraitId(chatUser.getUserId()));
 		finalSessionWebsockets.add(websocket);

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -154,7 +153,7 @@ public class LeaderselectionService
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -209,7 +208,7 @@ public class LeaderselectionService
 	    logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
-	for (LeaderselectionSession session : (Set<LeaderselectionSession>) content.getLeaderselectionSessions()) {
+	for (LeaderselectionSession session : content.getLeaderselectionSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, LeaderselectionConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -233,7 +232,7 @@ public class LeaderselectionService
 	    return;
 	}
 
-	for (LeaderselectionSession session : (Set<LeaderselectionSession>) selection.getLeaderselectionSessions()) {
+	for (LeaderselectionSession session : selection.getLeaderselectionSessions()) {
 	    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUserId().equals(userId.longValue())) {
 		session.setGroupLeader(null);
 		leaderselectionSessionDAO.update(session);
@@ -315,7 +314,7 @@ public class LeaderselectionService
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	Leaderselection selection = leaderselectionDAO.getByContentId(toolContentId);
-	for (LeaderselectionSession session : (Set<LeaderselectionSession>) selection.getLeaderselectionSessions()) {
+	for (LeaderselectionSession session : selection.getLeaderselectionSessions()) {
 	    if (session.getGroupLeader() != null) {
 		return true;
 	    }
@@ -440,6 +439,14 @@ public class LeaderselectionService
 	return leaderselectionUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public LeaderselectionUser getUserByLoginAndSessionId(String login, long toolSessionId) {
+	List<User> user = leaderselectionUserDAO.findByProperty(User.class, "login", login);
+	return user.isEmpty() ? null
+		: leaderselectionUserDAO.getByUserIdAndSessionId(user.get(0).getUserId().longValue(), toolSessionId);
+    }
+
     @Override
     public LeaderselectionUser getUserByUserIdAndContentId(Long userId, Long toolContentId) {
 	return leaderselectionUserDAO.getByUserIdAndContentId(userId, toolContentId);
@@ -471,7 +478,7 @@ public class LeaderselectionService
 	saveOrUpdateUser(leaderselectionUser);
 	return leaderselectionUser;
     }
-    
+
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) {
 	LeaderselectionUser user = leaderselectionUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
@@ -565,7 +572,7 @@ public class LeaderselectionService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);

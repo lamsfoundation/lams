@@ -203,6 +203,14 @@ public class ScratchieServiceImpl
 	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ScratchieUser getUserByLoginAndSessionId(String login, long toolSessionId) {
+	List<User> user = scratchieUserDao.findByProperty(User.class, "login", login);
+	return user.isEmpty() ? null
+		: scratchieUserDao.getUserByUserIDAndSessionID(user.get(0).getUserId().longValue(), toolSessionId);
+    }
+
     @Override
     public int countUsersByContentId(Long contentId) {
 	return scratchieUserDao.countUsersByContentId(contentId);
@@ -419,7 +427,7 @@ public class ScratchieServiceImpl
     public int countSessionsByContentId(Long toolContentId) {
 	return scratchieSessionDao.getByContentId(toolContentId).size();
     }
-    
+
     @Override
     public List<ScratchieSession> getSessionsByContentId(Long toolContentId) {
 	return scratchieSessionDao.getByContentId(toolContentId);
@@ -854,7 +862,7 @@ public class ScratchieServiceImpl
 			optionDto.setCorrect(assessmentAnswer.isCorrect());
 			optionDto.setUserId(assessmentAnswer.getUserId());
 			optionDto.setQbQuestionUid(assessmentAnswer.getQbQuestionUid());
-optionDto.setDisplayOrder(-100);
+			optionDto.setDisplayOrder(-100);
 			if (!scratchie.isConfidenceLevelsEnabled()) {
 			    //don't show confidence levels
 			    for (ConfidenceLevelDTO confidenceLevel : assessmentAnswer.getConfidenceLevels()) {
@@ -963,8 +971,7 @@ optionDto.setDisplayOrder(-100);
     public static boolean isItemUnraveledByAnswers(ScratchieItem item, List<String> userAnswers) {
 	QbQuestion qbQuestion = item.getQbQuestion();
 
-	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect()
-		? qbQuestion.getQbOptions().get(0)
+	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
 	String[] correctAnswers = correctAnswersGroup.getName().strip().split("\\r\\n");
 	for (String correctAnswer : correctAnswers) {
@@ -1060,7 +1067,8 @@ optionDto.setDisplayOrder(-100);
 	    GroupSummary groupSummary = new GroupSummary(session);
 	    List<ScratchieAnswerVisitLog> sessionAttempts = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    itemUid);
-	    int numberColumns = options.size() > sessionAttempts.size() || isMcqItem ? options.size() : sessionAttempts.size();
+	    int numberColumns = options.size() > sessionAttempts.size() || isMcqItem ? options.size()
+		    : sessionAttempts.size();
 	    groupSummary.setNumberColumns(numberColumns);
 
 	    Map<Long, OptionDTO> optionMap = new HashMap<>();
@@ -1082,14 +1090,15 @@ optionDto.setDisplayOrder(-100);
 		    Long optionUid;
 		    if (isMcqItem) {
 			optionUid = attempt.getQbOption().getUid();
-			
+
 		    } else {
 			String answer = attempt.getAnswer();
 			boolean isCorrect = ScratchieServiceImpl.isItemUnraveledByAnswers(item, List.of(answer));
 			boolean isFirstAnswersGroupCorrect = options.get(0).isCorrect();
 
-			optionUid = isCorrect && isFirstAnswersGroupCorrect
-				    || !isCorrect && !isFirstAnswersGroupCorrect ? options.get(0).getUid() : options.get(1).getUid();
+			optionUid = isCorrect && isFirstAnswersGroupCorrect || !isCorrect && !isFirstAnswersGroupCorrect
+				? options.get(0).getUid()
+				: options.get(1).getUid();
 		    }
 		    OptionDTO optionDto = optionMap.get(optionUid);
 		    int[] attempts = optionDto.getAttempts();
@@ -1279,7 +1288,7 @@ optionDto.setDisplayOrder(-100);
     public ScratchieUser getUser(Long uid) {
 	return (ScratchieUser) scratchieUserDao.getObject(ScratchieUser.class, uid);
     }
-    
+
     /**
      * Return list of correct AnswerLetters, one per each item
      */
@@ -1299,7 +1308,7 @@ optionDto.setDisplayOrder(-100);
 		    }
 		    answerCount++;
 		}
-		
+
 	    } else {
 		List<QbOption> options = item.getQbQuestion().getQbOptions();
 		if (!options.isEmpty()) {
@@ -1308,7 +1317,7 @@ optionDto.setDisplayOrder(-100);
 	    }
 	    correctAnswerLetters.add(correctAnswerLetter);
 	}
-	
+
 	return correctAnswerLetters;
     }
 

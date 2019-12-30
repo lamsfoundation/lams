@@ -15,6 +15,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -47,7 +48,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
+
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -103,6 +104,14 @@ public class LearningWebsocketServer {
     public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	String login = websocket.getUserPrincipal().getName();
+	LeaderselectionUser user = LearningWebsocketServer.getLeaderService().getUserByLoginAndSessionId(login,
+		toolSessionId);
+	if (user == null) {
+	    throw new SecurityException("User \"" + login
+		    + "\" is not a participant in Leader Selection activity with tool session ID " + toolSessionId);
+	}
+
 	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    sessionWebsockets = ConcurrentHashMap.newKeySet();
@@ -111,8 +120,7 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " entered Leader Selection with toolSessionId: " + toolSessionId);
+	    log.debug("User " + login + " entered Leader Selection with toolSessionId: " + toolSessionId);
 	}
     }
 

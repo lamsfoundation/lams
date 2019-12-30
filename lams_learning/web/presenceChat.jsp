@@ -28,8 +28,7 @@
 			<%-- Learner interface uses attribues, Monitor uses parameters --%>
 			presenceEnabled = ${param.presenceEnabledPatch eq 'true' or presenceEnabledPatch},
 			presenceShown = ${param.presenceShown eq 'true' or presenceShown},
-			presenceImEnabled = ${param.presenceImEnabled eq 'true' or presenceImEnabled},
-			nickname = '<lams:user property="firstName"/> <lams:user property="lastName"/>',
+			nickname = '<lams:user property="firstName"/>' + ' ' + '<lams:user property="lastName"/>',
 			// labels used in JS file
 			labelSend = '<fmt:message key="learner.im.send"/>',
 			labelUsers = '<fmt:message key="learner.im.users"/>',
