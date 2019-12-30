@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-        
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
 
@@ -29,8 +28,8 @@
 
 </lams:head>
 <body class="stripes" onLoad="init()">
-
-	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form action="update.do?${csrfToken}" method="post" modelAttribute="authoringForm" id="authoringForm">
 		<form:hidden path="survey.contentId" />
 		<input type="hidden" name="mode" value="${mode}"/>
 		<form:hidden path="sessionMapID" />

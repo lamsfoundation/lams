@@ -75,8 +75,8 @@
 	
 </lams:head>
 <body onLoad="init();" class="stripes">
-
-	<form:form  action="submitAllContent.do" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST" target="_self">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form  action="submitAllContent.do?${csrfToken}" modelAttribute="mcAuthoringForm" id="mcAuthoringForm" enctype="multipart/form-data" method="POST" target="_self">
 		<form:hidden path="httpSessionID" value="${sessionMapId}"/>
 			
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>

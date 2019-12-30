@@ -169,20 +169,10 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include
      * all dokumaran item, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") DokumaranForm authoringForm,
 	    HttpServletRequest request) throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);

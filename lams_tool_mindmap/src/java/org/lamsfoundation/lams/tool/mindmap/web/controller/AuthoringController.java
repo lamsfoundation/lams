@@ -184,7 +184,7 @@ public class AuthoringController {
     /**
      * Saves Mindmap Nodes to Database
      */
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 

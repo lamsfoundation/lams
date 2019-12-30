@@ -43,7 +43,8 @@
 </lams:head>
 
 <body class="stripes">
-<form:form action="submitAllContent.do" modelAttribute="authoringForm" method="POST" id="authoringForm">
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="submitAllContent.do?${csrfToken}" modelAttribute="authoringForm" method="POST" id="authoringForm">
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.httpSessionID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	

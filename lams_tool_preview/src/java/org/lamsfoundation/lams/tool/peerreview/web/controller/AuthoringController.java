@@ -171,10 +171,6 @@ public class AuthoringController {
     /**
      * This method will persist all information in this authoring page, include
      * all peer review item, information etc.
-     *
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/update")

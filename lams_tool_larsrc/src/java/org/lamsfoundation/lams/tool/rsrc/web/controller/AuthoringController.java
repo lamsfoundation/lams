@@ -468,8 +468,6 @@ public class AuthoringController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
 	    throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 

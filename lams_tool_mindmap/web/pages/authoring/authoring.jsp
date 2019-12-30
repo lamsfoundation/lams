@@ -40,8 +40,8 @@
 	
 		<c:set var="title"><fmt:message key="activity.title" /></c:set>
 		<lams:Page title="${title}" type="navbar" formID="authoringForm">
-		
-			<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+			<c:set var="csrfToken"><csrf:token/></c:set>
+			<form:form action="updateContent.do?${csrfToken}" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
 				<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 				
 				<form:hidden path="currentTab" id="currentTab" />

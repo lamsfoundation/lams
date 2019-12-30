@@ -476,19 +476,10 @@ public class AuthoringController {
 
     /**
      * This method will persist all inforamtion in this authoring page, include all survey item, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("authoringForm") SurveyForm authoringForm, HttpServletRequest request)
 	    throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 

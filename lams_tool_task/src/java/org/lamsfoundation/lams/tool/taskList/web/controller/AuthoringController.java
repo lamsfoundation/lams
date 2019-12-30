@@ -231,8 +231,6 @@ public class AuthoringController {
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute TaskListForm taskListForm, HttpServletRequest request)
 	    throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(taskListForm.getSessionMapID());
 

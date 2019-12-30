@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.daco.DacoConstants"%>
 
@@ -29,7 +28,8 @@
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="update.do?${csrfToken}" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
 
 	<c:set var="title"><fmt:message key="label.common.heading" /></c:set>
 	<lams:Page title="${title}" type="navbar">

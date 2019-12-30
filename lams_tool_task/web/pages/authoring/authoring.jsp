@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.taskList.TaskListConstants"%>
 
@@ -64,7 +63,8 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<form:form action="update.do" method="post" modelAttribute="taskListForm" id="taskListForm">
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="update.do?${csrfToken}" method="post" modelAttribute="taskListForm" id="taskListForm">
 	<form:hidden path="taskList.contentId" />
 	<input type="hidden" name="mode" value="${mode}"/>
 	<form:hidden path="sessionMapID" />

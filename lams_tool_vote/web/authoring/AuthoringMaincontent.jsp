@@ -107,8 +107,8 @@
 	
 </lams:head>
 <body class="stripes" ><!-- onLoad="init();" -->
-
-	<form:form modelAttribute="voteAuthoringForm" action="submitAllContent.do" method="POST">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form modelAttribute="voteAuthoringForm" action="submitAllContent.do?${csrfToken}" method="POST">
 		<form:hidden path="toolContentID"/>
 		<form:hidden path="currentTab" styleId="currentTab" />
 		<form:hidden path="httpSessionID"/>									

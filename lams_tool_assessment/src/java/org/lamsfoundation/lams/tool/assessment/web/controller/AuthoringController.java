@@ -221,7 +221,7 @@ public class AuthoringController {
      * etc.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws Exception {
 	// get back sessionMAP

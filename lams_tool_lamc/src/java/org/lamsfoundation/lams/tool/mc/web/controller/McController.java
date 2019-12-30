@@ -160,7 +160,7 @@ public class McController {
     /**
      * submits content into the tool database
      */
-    @RequestMapping("/submitAllContent")
+    @RequestMapping(path = "/submitAllContent", method = RequestMethod.POST)
     public String submitAllContent(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 

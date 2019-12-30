@@ -125,7 +125,7 @@ public class AuthoringController {
      * Update all content for submit tool except online/offline instruction files list.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 

@@ -706,19 +706,10 @@ public class AuthoringController {
 
     /**
      * This method will persist all inforamtion in this authoring page, include all daco question, information etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     protected String updateContent(@ModelAttribute("authoringForm") DacoForm authoringForm, HttpServletRequest request)
 	    throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 

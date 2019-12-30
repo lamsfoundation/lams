@@ -25,7 +25,8 @@
 		</script>
 	</lams:head>
 	<body class="stripes" onload="init();">
-		<form:form action="/lams/tool/lascrb11/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
+		<c:set var="csrfToken"><csrf:token/></c:set>
+		<form:form action="/lams/tool/lascrb11/authoring/updateContent.do?${csrfToken}" modelAttribute="authoringForm" id="authoringForm" method="post">
 		
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 		

@@ -248,7 +248,7 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include all scratchie item, information etc.
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") ScratchieForm authoringForm,
 	    HttpServletRequest request) throws Exception {
 

@@ -129,7 +129,7 @@ public class AuthoringController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 	// TODO need error checking.
 

@@ -51,7 +51,8 @@
 </lams:head>
 
 <body class="stripes" onLoad="init();">
-	<form:form action="update.do" method="post" modelAttribute="imageGalleryForm" id="imageGalleryForm" enctype="multipart/form-data">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form action="update.do?${csrfToken}" method="post" modelAttribute="imageGalleryForm" id="imageGalleryForm" enctype="multipart/form-data">
 	
 		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
 		<lams:Page title="${title}" type="navbar" formID="imageGalleryForm">

@@ -17,8 +17,8 @@
 	</lams:head>
 	
 	<body class="stripes" onload="init();">
-	
-		<form:form action="updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
+		<c:set var="csrfToken"><csrf:token/></c:set>
+		<form:form action="updateContent.do?${csrfToken}" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data">
 
 		<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	

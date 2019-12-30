@@ -317,7 +317,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * submits content into the tool database
      */
-    @RequestMapping("/submitAllContent")
+    @RequestMapping(path = "/submitAllContent", method = RequestMethod.POST)
     public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm authoringForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 

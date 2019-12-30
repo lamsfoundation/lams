@@ -123,7 +123,7 @@ public class AuthoringController {
 	return "pages/authoring/authoring";
     }
 
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 

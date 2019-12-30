@@ -50,18 +50,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * <p>
- * This class is a simple combination of NbAuthoringStarterAction and NbAuthoringAction. It has been created for the
- * purpose of supporting the new authoring page which is done using DHTML.
- * </p>
- *
- * <p>
- * The unspecified method, is the same as the execute method for NbAuthoringStarterAction. It will get called when the
- * method parameter is not specified (that is on first entry into the authoring environment).
- * </p>
- *
- * <p>
- * The save, upload and delete method is the same as that of NbAuthoringAction, to see its explanation, please see
- * org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction
+ * The unspecified method will get called on first entry into the authoring environment.
  * </p>
  *
  * @author mtruong
@@ -194,7 +183,6 @@ public class NbAuthoringController {
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String save(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request) {
-
 	//copyAuthoringFormValuesIntoFormBean(request, nbForm);
 	String idAsString = nbAuthoringForm.getToolContentID();
 

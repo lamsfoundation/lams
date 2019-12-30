@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants"%>
 
@@ -30,7 +29,8 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-<form:form action="update.do" method="post" modelAttribute="peerreviewForm" enctype="multipart/form-data">
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="update.do?${csrfToken}" method="post" modelAttribute="peerreviewForm" enctype="multipart/form-data">
 	<form:hidden path="peerreview.contentId" />
 	<input type="hidden" name="mode" value="${mode}"/>
 	<form:hidden path="sessionMapID" />
