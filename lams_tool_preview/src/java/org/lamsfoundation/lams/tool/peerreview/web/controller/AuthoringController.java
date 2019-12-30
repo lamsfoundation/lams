@@ -173,7 +173,7 @@ public class AuthoringController {
      * all peer review item, information etc.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute PeerreviewForm peerreviewForm, HttpServletRequest request,
 	    HttpSession session) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
