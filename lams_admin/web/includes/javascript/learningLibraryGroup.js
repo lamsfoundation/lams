@@ -201,8 +201,7 @@ function removeGroup(container) {
  * Save groups and let parent window that it can close the dialog
  */
 function saveGroups(){
-	var groups = [],
-		result = false;
+	var groups = [];
 	
 	$('#groupsTable .groupContainer').not('#newGroupPlaceholder').each(function(){
 		var learningLibraries = $('div.draggableLearningLibrary', this),
@@ -235,13 +234,11 @@ function saveGroups(){
 			},
 			'type' 	  : 'POST',
 			'success' : function(){
-				result = true;
+				$('#dialogToolGroup', window.parent.document).remove();
 			},
 			'error'	  : function(){
 				alert(LABELS.SAVE_ERROR);
 			}
 		});
 	}
-	
-	return result;
 }

@@ -37,6 +37,11 @@
 	
 		<div id="titleDiv">
 			<fmt:message key="tool.groups.dialog.instructions" />
+			<button class="pull-right btn btn-default btn-disable-on-downupload" onClick="javascript:saveGroups()">
+					<i class="fa fa-save"></i>
+				<span><fmt:message key="admin.save" /></span>
+			</button>
+			<div class="clearfix"></div>
 		</div>
 		
 		<table id="groupsTable">
