@@ -92,9 +92,7 @@ $(document).ready(function (){
 	
 	presenceWebsocketInitTime = Date.now(),
 	// init the connection with server using server URL but with different protocol
-	presenceWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId 
-															        + '&imEnabled=' + presenceImEnabled 
-															        + '&nickname=' + encodeURIComponent(nickname)),
+	presenceWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId),
 	presenceWebsocketPingTimeout = null,
 	presenceWebsocketPingFunc = null;
 	
@@ -242,7 +240,6 @@ function addTab(nick, tag) {
 	roster.lastMessageUids[nick] = null;
 	var data = {
 		 'type'     : 'fetchConversation',
-		 'lessonID' : lessonId,
 		 'to'       : nick
 		};
 	
@@ -303,7 +300,6 @@ function sendMessage(receiver) {
 	
 	var data = {
 		 'type'     : 'message',
-		 'lessonID' : lessonId,
 		 'to'       : tag == groupChatInfo.tag ? '' : receiver,
 		 'message'  : message
 		};

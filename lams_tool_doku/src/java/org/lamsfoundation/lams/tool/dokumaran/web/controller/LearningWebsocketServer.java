@@ -17,6 +17,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
+import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -50,7 +51,7 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    
+
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through activities and update registered learners with reports and vote count
@@ -117,6 +118,14 @@ public class LearningWebsocketServer {
     public void registerUser(Session websocket) throws IOException {
 	Long toolContentID = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	String login = websocket.getUserPrincipal().getName();
+	DokumaranUser user = LearningWebsocketServer.getDokumaranService().getUserByLoginAndContent(login,
+		toolContentID);
+	if (user == null) {
+	    throw new SecurityException("User \"" + login
+		    + "\" is not a participant in Dokumaran activity with tool content ID " + toolContentID);
+	}
+
 	Set<Session> toolContentWebsockets = websockets.get(toolContentID);
 	if (toolContentWebsockets == null) {
 	    toolContentWebsockets = ConcurrentHashMap.newKeySet();
@@ -125,8 +134,7 @@ public class LearningWebsocketServer {
 	toolContentWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName() + " entered Dokumaran with toolContentId: "
-		    + toolContentID);
+	    log.debug("User " + login + " entered Dokumaran with toolContentId: " + toolContentID);
 	}
     }
 

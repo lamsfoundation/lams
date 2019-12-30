@@ -24,6 +24,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatMessage;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatUser;
 import org.lamsfoundation.lams.learning.presence.service.IPresenceChatService;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -45,20 +50,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class PresenceWebsocketServer {
 
     /**
-     * Identifies a single connection. There can be more than one connection for the same user: multiple windows open or
-     * the same user in an another role.
-     */
-    private static class Websocket {
-	private final Session session;
-	private final String nickName;
-
-	private Websocket(Session session) {
-	    this.session = session;
-	    this.nickName = session.getRequestParameterMap().get("nickname").get(0);
-	}
-    }
-
-    /**
      * A singleton which updates Learners with messages and roster.
      */
     private static class SendWorker extends Thread {
@@ -74,11 +65,11 @@ public class PresenceWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    Iterator<Entry<Long, Set<Websocket>>> entryIterator = PresenceWebsocketServer.websockets.entrySet()
+		    Iterator<Entry<Long, Set<Session>>> lessonIterator = PresenceWebsocketServer.websockets.entrySet()
 			    .iterator();
 		    // go through lessons and update registered learners with messages and roster
-		    while (entryIterator.hasNext()) {
-			Entry<Long, Set<Websocket>> entry = entryIterator.next();
+		    while (lessonIterator.hasNext()) {
+			Entry<Long, Set<Session>> entry = lessonIterator.next();
 			Long lessonId = entry.getKey();
 			Long lastSendTime = lastSendTimes.get(lessonId);
 			if ((lastSendTime == null)
@@ -87,9 +78,9 @@ public class PresenceWebsocketServer {
 			}
 
 			// if all learners left the chat, remove the obsolete mapping
-			Set<Websocket> lessonWebsockets = entry.getValue();
+			Set<Session> lessonWebsockets = entry.getValue();
 			if (lessonWebsockets.isEmpty()) {
-			    entryIterator.remove();
+			    lessonIterator.remove();
 			    PresenceWebsocketServer.rosters.remove(lessonId);
 			    lastSendTimes.remove(lessonId);
 			}
@@ -127,13 +118,14 @@ public class PresenceWebsocketServer {
 		lastSendTimes.put(lessonId, System.currentTimeMillis());
 	    }
 
-	    Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	    Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    Roster roster = PresenceWebsocketServer.rosters.get(lessonId);
 	    try {
 		ArrayNode rosterJSON = roster.getRosterJSON();
-		for (Websocket websocket : lessonWebsockets) {
+		for (Session websocket : lessonWebsockets) {
 		    // if this run is meant only for one learner, skip the others
-		    if ((nickName != null) && !nickName.equals(websocket.nickName)) {
+		    String websocketNickName = (String) websocket.getUserProperties().get(PARAM_NICKNAME);
+		    if ((nickName != null) && !nickName.equals(websocketNickName)) {
 			continue;
 		    }
 
@@ -142,14 +134,14 @@ public class PresenceWebsocketServer {
 
 		    // if it is just roster, skip messages
 		    if (roster.imEnabled) {
-			ArrayNode messagesJSON = PresenceWebsocketServer.filterMessages(messages, websocket.nickName);
+			ArrayNode messagesJSON = PresenceWebsocketServer.filterMessages(messages, websocketNickName);
 			responseJSON.set("messages", messagesJSON);
 		    }
 		    responseJSON.set("roster", rosterJSON);
 
 		    // send the payload to the Learner's browser
-		    if (websocket.session.isOpen()) {
-			websocket.session.getBasicRemote().sendText(responseJSON.toString());
+		    if (websocket.isOpen()) {
+			websocket.getBasicRemote().sendText(responseJSON.toString());
 		    }
 
 		}
@@ -185,10 +177,10 @@ public class PresenceWebsocketServer {
 	 */
 	private ArrayNode getRosterJSON() throws JsonProcessingException, IOException {
 	    Set<String> localActiveUsers = new TreeSet<>();
-	    Set<Websocket> sessionWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	    Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	    // find out who is active locally
-	    for (Websocket websocket : sessionWebsockets) {
-		localActiveUsers.add(websocket.nickName);
+	    for (Session websocket : lessonWebsockets) {
+		localActiveUsers.add((String) websocket.getUserProperties().get(PARAM_NICKNAME));
 	    }
 
 	    // is it time to sync with the DB yet?
@@ -218,11 +210,16 @@ public class PresenceWebsocketServer {
 
     private static Logger log = Logger.getLogger(PresenceWebsocketServer.class);
 
+    private static final String PARAM_NICKNAME = "nickname";
+
     private static IPresenceChatService presenceChatService;
+    private static ISecurityService securityService;
+    private static ILessonService lessonService;
+    private static IUserManagementService userManagementService;
 
     private static final SendWorker sendWorker = new SendWorker();
     private static final Map<Long, Roster> rosters = new ConcurrentHashMap<>();
-    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
 
     static {
 	// run the singleton thread
@@ -233,21 +230,31 @@ public class PresenceWebsocketServer {
      * Registeres the Learner for processing by SendWorker.
      */
     @OnOpen
-    public void registerUser(Session session) throws IOException {
-	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
-	Set<Websocket> sessionWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
-	if (sessionWebsockets == null) {
-	    sessionWebsockets = ConcurrentHashMap.newKeySet();
-	    PresenceWebsocketServer.websockets.put(lessonId, sessionWebsockets);
+    public void registerUser(Session websocket) throws IOException {
+	Long lessonId = Long.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
+
+	String login = websocket.getUserPrincipal().getName();
+	User user = PresenceWebsocketServer.getUserManagementService().getUserByLogin(login);
+
+	String nickname = user.getFirstName() + " " + user.getLastName();
+	websocket.getUserProperties().put(PARAM_NICKNAME, nickname);
+	websocket.getUserProperties().put(AttributeNames.PARAM_LESSON_ID, lessonId);
+
+	PresenceWebsocketServer.getSecurityService().isLessonParticipant(lessonId, user.getUserId(), "join lesson chat",
+		true);
+
+	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	if (lessonWebsockets == null) {
+	    lessonWebsockets = ConcurrentHashMap.newKeySet();
+	    PresenceWebsocketServer.websockets.put(lessonId, lessonWebsockets);
 	}
-	Websocket websocket = new Websocket(session);
-	sessionWebsockets.add(websocket);
+	lessonWebsockets.add(websocket);
 
 	Roster roster = PresenceWebsocketServer.rosters.get(lessonId);
 	if (roster == null) {
-	    boolean imEnabled = Boolean.valueOf(session.getRequestParameterMap().get("imEnabled").get(0));
+	    Lesson lesson = PresenceWebsocketServer.getLessonService().getLesson(lessonId);
 	    // build a new roster object
-	    roster = new Roster(lessonId, imEnabled);
+	    roster = new Roster(lessonId, lesson.getLearnerImAvailable());
 	    PresenceWebsocketServer.rosters.put(lessonId, roster);
 	}
 
@@ -255,7 +262,7 @@ public class PresenceWebsocketServer {
 	    try {
 		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		HibernateSessionManager.openSession();
-		SendWorker.send(lessonId, websocket.nickName);
+		SendWorker.send(lessonId, nickname);
 	    } finally {
 		HibernateSessionManager.closeSession();
 	    }
@@ -263,7 +270,7 @@ public class PresenceWebsocketServer {
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
 	    PresenceWebsocketServer.log
-		    .debug("User " + websocket.nickName + " entered Presence Chat with lesson ID: " + lessonId);
+		    .debug("User " + nickname + " entered Presence Chat with lesson ID: " + lessonId);
 	}
     }
 
@@ -271,26 +278,26 @@ public class PresenceWebsocketServer {
      * If there was something wrong with the connection, put it into logs.
      */
     @OnClose
-    public void unregisterUser(Session session, CloseReason reason) {
-	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
-	Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
-	Iterator<Websocket> websocketIterator = lessonWebsockets.iterator();
-	while (websocketIterator.hasNext()) {
-	    Websocket websocket = websocketIterator.next();
-	    if (websocket.session.equals(session)) {
-		websocketIterator.remove();
+    public void unregisterUser(Session websocket, CloseReason reason) {
+	Long lessonId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_LESSON_ID);
+	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	Iterator<Session> sessionIterator = lessonWebsockets.iterator();
+	while (sessionIterator.hasNext()) {
+	    Session storedSession = sessionIterator.next();
+	    if (storedSession.equals(websocket)) {
+		sessionIterator.remove();
 		break;
 	    }
 	}
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
-	    PresenceWebsocketServer.log.debug(
-		    "User " + session.getUserPrincipal().getName() + " left Presence Chat with lessonId: " + lessonId
-			    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-				    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-					    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-						    + reason.getReasonPhrase()
-					    : ""));
+	    PresenceWebsocketServer.log.debug("User " + websocket.getUserProperties().get(PARAM_NICKNAME)
+		    + " left Presence Chat with lessonId: " + lessonId
+		    + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+			    || reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
+				    ? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
+					    + reason.getReasonPhrase()
+				    : "(unknown)"));
 	}
     }
 
@@ -300,7 +307,7 @@ public class PresenceWebsocketServer {
      * @throws IOException
      */
     @OnMessage
-    public void receiveRequest(String input, Session session) throws IOException {
+    public void receiveRequest(String input, Session websocket) throws IOException {
 	if (StringUtils.isBlank(input)) {
 	    return;
 	}
@@ -312,10 +319,10 @@ public class PresenceWebsocketServer {
 	ObjectNode requestJSON = JsonUtil.readObject(input);
 	switch (JsonUtil.optString(requestJSON, "type")) {
 	    case "message":
-		PresenceWebsocketServer.storeMessage(requestJSON, session);
+		PresenceWebsocketServer.storeMessage(requestJSON, websocket);
 		break;
 	    case "fetchConversation":
-		PresenceWebsocketServer.sendConversation(requestJSON, session);
+		PresenceWebsocketServer.sendConversation(requestJSON, websocket);
 		break;
 	}
     }
@@ -323,16 +330,16 @@ public class PresenceWebsocketServer {
     /**
      * Stores a message sent by a Learner.
      */
-    private static void storeMessage(ObjectNode requestJSON, Session session) {
+    private static void storeMessage(ObjectNode requestJSON, Session websocket) {
 	String message = JsonUtil.optString(requestJSON, "message");
 	if (StringUtils.isBlank(message)) {
 	    return;
 	}
-	Long lessonId = JsonUtil.optLong(requestJSON, "lessonID");
+	Long lessonId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_LESSON_ID);
 
 	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 
-	String from = session.getRequestParameterMap().get("nickname").get(0);
+	String from = (String) websocket.getUserProperties().get(PARAM_NICKNAME);
 	String to = JsonUtil.optString(requestJSON, "to");
 	if (StringUtils.isBlank(to)) {
 	    to = null;
@@ -353,11 +360,11 @@ public class PresenceWebsocketServer {
     /**
      * Sends the whole message history between the current and the chosen learner.
      */
-    private static void sendConversation(ObjectNode requestJSON, Session session) throws IOException {
-	Long lessonId = JsonUtil.optLong(requestJSON, "lessonID");
+    private static void sendConversation(ObjectNode requestJSON, Session websocket) throws IOException {
+	Long lessonId = (Long) websocket.getUserProperties().get(AttributeNames.PARAM_LESSON_ID);
 
 	String to = JsonUtil.optString(requestJSON, "to");
-	String from = session.getRequestParameterMap().get("nickname").get(0);
+	String from = (String) websocket.getUserProperties().get(PARAM_NICKNAME);
 
 	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 	new Thread(() -> {
@@ -375,7 +382,7 @@ public class PresenceWebsocketServer {
 		ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 		responseJSON.set("messages", messagesJSON);
 		// send the payload to the Learner's browser
-		session.getBasicRemote().sendText(responseJSON.toString());
+		websocket.getBasicRemote().sendText(responseJSON.toString());
 	    } catch (Exception e) {
 		log.error("Error while seding conversation", e);
 	    } finally {
@@ -412,14 +419,14 @@ public class PresenceWebsocketServer {
     }
 
     public static int getActiveUserCount(long lessonId) {
-	Set<Websocket> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
+	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	if (lessonWebsockets == null) {
 	    return 0;
 	}
 	// there can be few websockets (browser windows) for a single learner
 	Set<String> activeNicknames = new TreeSet<>();
-	for (Websocket websocket : lessonWebsockets) {
-	    activeNicknames.add(websocket.nickName);
+	for (Session websocket : lessonWebsockets) {
+	    activeNicknames.add((String) websocket.getUserProperties().get(PARAM_NICKNAME));
 	}
 	return activeNicknames.size();
     }
@@ -431,5 +438,33 @@ public class PresenceWebsocketServer {
 	    PresenceWebsocketServer.presenceChatService = (IPresenceChatService) ctx.getBean("presenceChatService");
 	}
 	return PresenceWebsocketServer.presenceChatService;
+    }
+
+    private static ISecurityService getSecurityService() {
+	if (PresenceWebsocketServer.securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    PresenceWebsocketServer.securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return PresenceWebsocketServer.securityService;
+    }
+
+    private static ILessonService getLessonService() {
+	if (PresenceWebsocketServer.lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    PresenceWebsocketServer.lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return PresenceWebsocketServer.lessonService;
+    }
+
+    private static IUserManagementService getUserManagementService() {
+	if (PresenceWebsocketServer.userManagementService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(SessionManager.getServletContext());
+	    PresenceWebsocketServer.userManagementService = (IUserManagementService) ctx
+		    .getBean("userManagementService");
+	}
+	return PresenceWebsocketServer.userManagementService;
     }
 }

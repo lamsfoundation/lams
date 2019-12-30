@@ -197,6 +197,14 @@ public class ScratchieServiceImpl
 	return scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ScratchieUser getUserByLoginAndSessionId(String login, long toolSessionId) {
+	List<User> user = scratchieUserDao.findByProperty(User.class, "login", login);
+	return user.isEmpty() ? null
+		: scratchieUserDao.getUserByUserIDAndSessionID(user.get(0).getUserId().longValue(), toolSessionId);
+    }
+
     @Override
     public int countUsersByContentId(Long contentId) {
 	return scratchieUserDao.countUsersByContentId(contentId);
@@ -237,7 +245,7 @@ public class ScratchieServiceImpl
 	}
 
 	//remove all white spaces and split the settings around matches of ","
-	return presetMarks.replaceAll("\\s+","").split(",");
+	return presetMarks.replaceAll("\\s+", "").split(",");
     }
 
     @Override
@@ -271,8 +279,8 @@ public class ScratchieServiceImpl
 	for (ScratchieItem item : items) {
 
 	    //init answers' confidenceLevelDtos list
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<ConfidenceLevelDTO>();
+	    for (ScratchieAnswer answer : item.getAnswers()) {
+		LinkedList<ConfidenceLevelDTO> confidenceLevelDtosTemp = new LinkedList<>();
 		answer.setConfidenceLevelDtos(confidenceLevelDtosTemp);
 	    }
 
@@ -284,7 +292,7 @@ public class ScratchieServiceImpl
 		if (question.equals(confidenceLevelDto.getQuestion().replaceAll("(\\r|\\n)", ""))) {
 
 		    //find according answer
-		    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+		    for (ScratchieAnswer answer : item.getAnswers()) {
 			String answerText = answer.getDescription().replaceAll("(\\r|\\n)", "");
 			if (answerText.equals(confidenceLevelDto.getAnswer().replaceAll("(\\r|\\n)", ""))) {
 			    answer.getConfidenceLevelDtos().add(confidenceLevelDto);
@@ -301,7 +309,7 @@ public class ScratchieServiceImpl
     public Set<ToolActivity> getPrecedingConfidenceLevelsActivities(Long toolContentId) {
 	return toolService.getPrecedingConfidenceLevelsActivities(toolContentId);
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
@@ -611,7 +619,7 @@ public class ScratchieServiceImpl
 	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	    user.setSessionFinished(true);
 	    scratchieUserDao.saveObject(user);
-	    
+
 	    //if this is a leader finishes, complete all non-leaders as well
 	    boolean isUserGroupLeader = user.getSession().isUserGroupLeader(user.getUid());
 	    if (isUserGroupLeader) {
@@ -712,7 +720,7 @@ public class ScratchieServiceImpl
 	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
 		    item.getUid());
 
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 
 		int attemptNumber;
 		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getUid(), sessionId);
@@ -746,7 +754,7 @@ public class ScratchieServiceImpl
 
 	for (ScratchieItem item : items) {
 
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 
 		// find according log if it exists
 		ScratchieAnswerVisitLog log = null;
@@ -782,7 +790,7 @@ public class ScratchieServiceImpl
     private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
-	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	for (ScratchieAnswer answer : item.getAnswers()) {
 
 	    ScratchieAnswerVisitLog log = null;
 	    for (ScratchieAnswerVisitLog userLog : userLogs) {
@@ -1077,7 +1085,7 @@ public class ScratchieServiceImpl
 	items.addAll(scratchie.getScratchieItems());
 	int numberOfItems = items.size();
 
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// ======================================================= For Immediate Analysis page
 	// =======================================
@@ -1086,7 +1094,7 @@ public class ScratchieServiceImpl
 
 	ExcelRow row = immediateAnalysisSheet.initRow();
 	row.addCell(getMessage("label.quick.analysis"), true);
-	
+
 	row = immediateAnalysisSheet.initRow();
 	row.addEmptyCell();
 	row.addCell(getMessage("label.in.table.below.we.show"));
@@ -1143,7 +1151,7 @@ public class ScratchieServiceImpl
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.quick.analysis"), true);
-	
+
 	row = reportByTeamSheet.initRow();
 	row.addEmptyCell();
 	row.addCell(getMessage("label.table.below.shows.which.answer.teams.selected.first.try"));
@@ -1164,7 +1172,7 @@ public class ScratchieServiceImpl
 	    // find out the correct answer's sequential letter - A,B,C...
 	    String correctAnswerLetter = "";
 	    int answerCount = 1;
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    for (ScratchieAnswer answer : item.getAnswers()) {
 		if (answer.isCorrect()) {
 		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		    break;
@@ -1222,7 +1230,7 @@ public class ScratchieServiceImpl
 	if ((percentages.length % 2) == 1) {
 	    median = percentages[middle];
 	} else {
-	    median = (double) ((percentages[middle - 1] + percentages[middle]) / 2.0);
+	    median = (percentages[middle - 1] + percentages[middle]) / 2.0;
 	}
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.median"));
@@ -1434,8 +1442,7 @@ public class ScratchieServiceImpl
 
 		for (ScratchieItem item : items) {
 		    row = researchAndAnalysisSheet.initRow();
-		    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }),
-			    false);
+		    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getTitle() }), false);
 
 		    int i = 1;
 		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
@@ -1723,7 +1730,7 @@ public class ScratchieServiceImpl
 	String sequencialLetter = "";
 
 	int answerCount = 1;
-	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	for (ScratchieAnswer answer : item.getAnswers()) {
 	    if (answer.getUid().equals(asnwer.getUid())) {
 		sequencialLetter = String.valueOf((char) ((answerCount + 'A') - 1));
 		break;
@@ -1765,7 +1772,7 @@ public class ScratchieServiceImpl
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -2111,7 +2118,7 @@ public class ScratchieServiceImpl
 	    scratchieUser = new ScratchieUser(user.getUserDTO(), session);
 	    createUser(scratchieUser);
 	}
-	
+
 	checkLeaderSelectToolForSessionLeader(scratchieUser, toolSessionId);
 	//if this is a leader finishes, complete all non-leaders as well
 	boolean isUserGroupLeader = session.isUserGroupLeader(scratchieUser.getUid());

@@ -21,18 +21,18 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.learning.presence.dao;
 
 import java.util.Date;
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatMessage;
 import org.lamsfoundation.lams.learning.presence.model.PresenceChatUser;
 
-public interface IPresenceChatDAO {
+public interface IPresenceChatDAO extends IBaseDAO {
 
+    @Override
     void insertOrUpdate(Object object);
 
     List<PresenceChatMessage> getNewMessages(Long lessonId, Date lastCheck);

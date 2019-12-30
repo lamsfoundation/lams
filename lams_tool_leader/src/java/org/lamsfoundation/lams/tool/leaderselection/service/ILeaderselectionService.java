@@ -21,20 +21,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
 import java.io.IOException;
 import java.util.List;
 
-
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.exception.DataMissingException;
-import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
-import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -56,9 +51,9 @@ public interface ILeaderselectionService extends ICommonToolService {
      *
      * @param userId
      * @param toolSessionId
-     * @return 
-     * @throws IOException 
-     * @throws JSONException 
+     * @return
+     * @throws IOException
+     * @throws JSONException
      */
     boolean setGroupLeader(Long userId, Long toolSessionId) throws IOException;
 
@@ -115,6 +110,8 @@ public interface ILeaderselectionService extends ICommonToolService {
      */
     LeaderselectionUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
+    LeaderselectionUser getUserByLoginAndSessionId(String login, long toolSessionId);
+
     LeaderselectionUser getUserByUserIdAndContentId(Long userId, Long toolContentId);
 
     /**
@@ -137,7 +134,7 @@ public interface ILeaderselectionService extends ICommonToolService {
      * @return
      */
     LeaderselectionUser createLeaderselectionUser(UserDTO user, LeaderselectionSession leaderselectionSession);
-    
+
     String finishToolSession(Long toolSessionId, Long userId);
 
     /**
