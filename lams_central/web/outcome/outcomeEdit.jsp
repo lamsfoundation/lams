@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="csrfguard" prefix="csrf" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 
 <!DOCTYPE html>
@@ -47,8 +48,8 @@
 	</script>
 </lams:head>
 <body>
-
-<form:form action="outcomeSave.do" method="post" modelAttribute="outcomeForm">
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="outcomeSave.do?${csrfToken}" method="post" modelAttribute="outcomeForm">
 	<c:set var="formDisabled" value="${not empty outcomeForm.outcomeId and empty outcomeForm.organisationId and not canManageGlobal}" />
 
 	<form:hidden path="outcomeId" />

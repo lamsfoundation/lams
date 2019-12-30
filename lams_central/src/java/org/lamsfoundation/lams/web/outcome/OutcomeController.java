@@ -64,6 +64,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -156,7 +157,7 @@ public class OutcomeController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("/outcomeSave")
+    @RequestMapping(path = "/outcomeSave", method = RequestMethod.POST)
     public String outcomeSave(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
