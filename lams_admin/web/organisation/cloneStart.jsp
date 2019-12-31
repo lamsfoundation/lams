@@ -185,6 +185,7 @@
 			
 			
 			<form name="cloneForm" id="cloneForm" action="start.do" method="post">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<input type="hidden" name="method" value="clone">
 				<input type="hidden" name="groupId" value="<c:out value="${org.organisationId}" />">
 				<input type="hidden" name="lessons">

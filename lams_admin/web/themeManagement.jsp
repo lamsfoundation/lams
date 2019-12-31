@@ -149,8 +149,8 @@
 				</div>
 				
 				<div class="panel-body">
-				<c:set var="csrfToken"><csrf:token/></c:set>
 				<form:form action="addOrEditTheme.do?${csrfToken}" method="post" modelAttribute="themeForm" id="themeForm">	
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="id" id="id" />
 				
 				<table class="table table-no-border" >

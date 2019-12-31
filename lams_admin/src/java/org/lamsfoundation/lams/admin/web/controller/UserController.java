@@ -70,7 +70,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Jun-Dir Liew
  */
 @Controller
-@RequestMapping(path = "/user", method = RequestMethod.POST)
+@RequestMapping(path = "/user")
 public class UserController {
     private static Logger log = Logger.getLogger(UserController.class);
 
@@ -89,7 +89,7 @@ public class UserController {
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
-    @RequestMapping(path = "/edit", method = RequestMethod.POST)
+    @RequestMapping(path = "/edit")
     public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
 	if (locales == null) {
 	    locales = userManagementService.findAll(SupportedLocale.class);

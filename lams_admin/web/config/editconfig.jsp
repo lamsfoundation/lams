@@ -27,8 +27,8 @@
 				<c:out value="${error}" />
 			</lams:Alert>
 		</c:if>
-		<c:set var="csrfToken"><csrf:token/></c:set>
 		<form:form action="config/save.do?${csrfToken}" modelAttribute="configForm" id="configForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				
 			<c:forEach items="${config}" var="group">
 				<div class="panel panel-default">

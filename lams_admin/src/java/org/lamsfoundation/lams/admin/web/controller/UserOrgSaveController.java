@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Jun-Dir Liew
@@ -59,7 +60,7 @@ public class UserOrgSaveController {
     private IUserManagementService userManagementService;
     private List<Role> rolelist;
 
-    @RequestMapping(path = "/userorgsave")
+    @RequestMapping(path = "/userorgsave", method = RequestMethod.POST)
     public String execute(@ModelAttribute UserOrgForm userOrgForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
