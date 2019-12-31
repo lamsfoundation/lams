@@ -163,8 +163,8 @@
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userForm">
-	
-			<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form id="userForm" action="../usersave/saveUserDetails.do?${csrfToken}" modelAttribute="userForm" method="post">
 				<form:hidden path="orgId" />
 				<form:hidden path="userId" />
 

@@ -64,12 +64,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Jun-Dir Liew
  */
 @Controller
-@RequestMapping("/user")
+@RequestMapping(path = "/user", method = RequestMethod.POST)
 public class UserController {
     private static Logger log = Logger.getLogger(UserController.class);
 
@@ -88,7 +89,7 @@ public class UserController {
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
-    @RequestMapping(path = "/edit")
+    @RequestMapping(path = "/edit", method = RequestMethod.POST)
     public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
 	if (locales == null) {
 	    locales = userManagementService.findAll(SupportedLocale.class);
@@ -281,7 +282,7 @@ public class UserController {
     }
 
     // determine whether to disable or delete user based on their lams data
-    @RequestMapping(path = "/remove")
+    @RequestMapping(path = "/remove", method = RequestMethod.POST)
     public String remove(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
@@ -301,7 +302,7 @@ public class UserController {
 	return "remove";
     }
 
-    @RequestMapping(path = "/disable")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
@@ -326,7 +327,7 @@ public class UserController {
 	}
     }
 
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");
@@ -358,7 +359,7 @@ public class UserController {
     }
 
     // called from disabled users screen
-    @RequestMapping(path = "/enable")
+    @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enable(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserController");
