@@ -230,7 +230,7 @@ public class OutcomeController {
 	return "outcome/outcomeEdit";
     }
 
-    @RequestMapping("/outcomeRemove")
+    @RequestMapping(path = "/outcomeRemove", method = RequestMethod.POST)
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId", false);
 	Outcome outcome = (Outcome) userManagementService.findById(Outcome.class, outcomeId);
@@ -381,7 +381,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("/outcomeRemoveMapping")
+    @RequestMapping(path = "/outcomeRemoveMapping", method = RequestMethod.POST)
     public void outcomeRemoveMapping(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long mappingId = WebUtil.readLongParam(request, "mappingId");
 	OutcomeMapping outcomeMapping = (OutcomeMapping) userManagementService.findById(OutcomeMapping.class,
