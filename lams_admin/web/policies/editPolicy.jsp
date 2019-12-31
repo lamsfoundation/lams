@@ -70,7 +70,7 @@
 				<fmt:message key="admin.policies.title" />
 			</a>
 		</div>
-    <form:form action="../policyManagement/save.do?${csrfToken}" modelAttribute="policyForm" id="policy-form" cssClass="voffset20" method="post">
+    <form:form action="../policyManagement/save.do" modelAttribute="policyForm" id="policy-form" cssClass="voffset20" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="policyUid" />
 			<form:hidden path="policyId" />

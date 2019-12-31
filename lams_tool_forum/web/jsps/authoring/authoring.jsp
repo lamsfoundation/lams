@@ -36,8 +36,8 @@
 
 	<body class="stripes" onLoad="init()">
 	
-		<c:set var="csrfToken"><csrf:token/></c:set>
-		<form:form action="update.do?${csrfToken}" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data">
+		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="toolContentID" />
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />

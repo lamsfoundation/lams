@@ -52,8 +52,8 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<c:set var="csrfToken"><csrf:token/></c:set>
-<form:form modelAttribute="nbAuthoringForm" action="save.do" id="nbAuthoringForm?${csrfToken}" enctype="multipart/form-data">
+<form:form modelAttribute="nbAuthoringForm" action="save.do" id="nbAuthoringForm" enctype="multipart/form-data">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar" formID="nbAuthoringForm">

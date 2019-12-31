@@ -37,8 +37,8 @@
     </script> 
 </lams:head>
 <body class="stripes" onLoad="init()">
-<c:set var="csrfToken"><csrf:token/></c:set>
-<form:form action="updateContent.do?${csrfToken}" method="post" id="spreadsheetForm" modelAttribute="spreadsheetForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
+<form:form action="updateContent.do" method="post" id="spreadsheetForm" modelAttribute="spreadsheetForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<form:hidden path="spreadsheet.contentId" />
 	<form:hidden path="sessionMapID" />
 	<form:hidden path="contentFolderID" />

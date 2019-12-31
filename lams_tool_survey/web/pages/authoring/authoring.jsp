@@ -28,8 +28,8 @@
 
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<c:set var="csrfToken"><csrf:token/></c:set>
-	<form:form action="update.do?${csrfToken}" method="post" modelAttribute="authoringForm" id="authoringForm">
+	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="survey.contentId" />
 		<input type="hidden" name="mode" value="${mode}"/>
 		<form:hidden path="sessionMapID" />

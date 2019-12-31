@@ -149,7 +149,7 @@
 				</div>
 				
 				<div class="panel-body">
-				<form:form action="addOrEditTheme.do?${csrfToken}" method="post" modelAttribute="themeForm" id="themeForm">	
+				<form:form action="addOrEditTheme.do" method="post" modelAttribute="themeForm" id="themeForm">	
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="id" id="id" />
 				

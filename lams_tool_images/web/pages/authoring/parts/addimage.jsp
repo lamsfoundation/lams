@@ -1,15 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="csrfToken"><csrf:token/></c:set>
 <c:choose>
 	<c:when test="${saveUsingLearningAction}">
-		<c:set var="FORM_ACTION" value="../learning/saveNewImage.do?${csrfToken}"/>
+		<c:set var="FORM_ACTION" value="../learning/saveNewImage.do"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do?${csrfToken}"/>
+		<c:set var="FORM_ACTION" value="saveOrUpdateImage.do"/>
 	</c:otherwise>
 </c:choose>
 
 <form:form action="${FORM_ACTION}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm" enctype="multipart/form-data">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<c:set var="sessionMap"	value="${sessionScope[imageGalleryForm.sessionMapID]}" />
 	
 	<div class="panel panel-default">

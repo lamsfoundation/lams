@@ -32,8 +32,8 @@
 
 	<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
 	<lams:Page type="learner" title="${title}">
-	<c:set var="csrfToken"><csrf:token/></c:set>		
-		<form action="<c:url value='/monitoring/saveLeaders.do?${csrfToken}'/>" method="post" id="leaders">
+		<form action="<c:url value='/monitoring/saveLeaders.do'/>" method="post" id="leaders">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
                 <input name="sessionMapID" type="hidden" value="${sessionMapID}"/>
 				<c:forEach var="session" items="${sessionMap.leaderselectionDT0.sessionDTOs}" varStatus="status">
 					<h1></h1>

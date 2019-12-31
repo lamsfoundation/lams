@@ -40,9 +40,8 @@
 	</lams:head>
 
 	<body class="stripes">
-		<c:set var="csrfToken"><csrf:token/></c:set>
-		<form:form action="updateContent.do?${csrfToken}" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
-
+		<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 		
 			<form:hidden path="currentTab" id="currentTab" />

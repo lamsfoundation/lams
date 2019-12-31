@@ -42,8 +42,8 @@
 	</script>
 </lams:head>
 <body>
-<c:set var="csrfToken"><csrf:token/></c:set>
-<form:form action="outcomeSave.do?${csrfToken}" method="post" modelAttribute="outcomeForm">
+<form:form action="outcomeSave.do" method="post" modelAttribute="outcomeForm">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<c:set var="formDisabled" value="${not empty outcomeForm.outcomeId and empty outcomeForm.organisationId and not canManageGlobal}" />
 
 	<form:hidden path="outcomeId" />

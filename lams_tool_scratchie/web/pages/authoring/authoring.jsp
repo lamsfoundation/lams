@@ -39,8 +39,8 @@
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<c:set var="csrfToken"><csrf:token/></c:set>
-	<form:form action="/lams/tool/lascrt11/authoring/update.do?${csrfToken}" modelAttribute="authoringForm" method="post" id="authoringForm" >
+	<form:form action="/lams/tool/lascrt11/authoring/update.do" modelAttribute="authoringForm" method="post" id="authoringForm" >
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="scratchie.contentId" />
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
