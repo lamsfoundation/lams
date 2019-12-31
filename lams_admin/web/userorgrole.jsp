@@ -15,7 +15,7 @@
 	<script type="text/JavaScript">
 		function toggleCheckboxes(roleIndex, object){
 			<c:forEach var="userBean" items="${userOrgRoleForm.userBeans}" varStatus="beanIndex" >
-			document.forms.userOrgRoleForm.elements[roleIndex+1+<c:out value="${numroles}"/>*(<c:out value="${beanIndex.index}"/>+1)].checked=object.checked;
+			document.forms.userOrgRoleForm.elements[roleIndex+2+<c:out value="${numroles}"/>*(<c:out value="${beanIndex.index}"/>+1)].checked=object.checked;
 			</c:forEach>
 		}
 	</script>
