@@ -1,13 +1,8 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="csrfguard" prefix="csrf" %>
-
 <!DOCTYPE html>
-<lams:html>
+<%@ include file="/common/taglibs.jsp"%>
+
 <lams:head>
-		<title><fmt:message key="index.outcome.manage" /></title>
+	<title><fmt:message key="index.outcome.manage" /></title>
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />

@@ -98,7 +98,7 @@ function initLessonTab(){
 	$('#lesson-name-strong').editable({
 	    type: 'text',
 	    pk: lessonId,
-	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do',
+	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
 	    validate: function(value) {
 		    //close editing area on validation failure
             if (!value.trim()) {
@@ -261,7 +261,6 @@ function lessonStateFieldChanged() {
  * Apply the lesson state change and update widgets.
  */
 function changeLessonState(){
-	
 	var method = null;
 	
 	//state chosen in the dropdown menu
@@ -322,18 +321,16 @@ function disableLesson() {
 }			
 
 function applyStateChange(state, method, newLessonEndDate) {
-	var params = {
-			'lessonID'  : lessonId,
-		};
-	if ( newLessonEndDate ) {
-		params.lessonEndDate = newLessonEndDate;
+    var params = $("#lesson-state-form").serialize();
+	if (newLessonEndDate) {
+	    params += "&lessonEndDate=" + token;
 	}
 	
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
-		cache : false,
-		data : params,
-		success : function() {
+		type: "POST",
+		data: params,
+	    success: function() {
 			if (state == 7) {
 				// user chose to finish the lesson, close monitoring and refresh the lesson list
 				closeMonitorLessonDialog(true);
@@ -342,8 +339,8 @@ function applyStateChange(state, method, newLessonEndDate) {
 			}
 			if ( state == 4 ) {
 				lessonEndDate = newLessonEndDate;
-			} 	
-		}
+			}
+	    }
 	});
 }
 

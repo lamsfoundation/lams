@@ -669,18 +669,18 @@ function removeLesson(lessonID) {
 	if (confirm(LABELS.REMOVE_LESSON_CONFIRM1)) {
 		if (confirm(LABELS.REMOVE_LESSON_CONFIRM2)) {
 			$.ajax({
-				async : false,
 				url : LAMS_URL + "monitoring/monitoring/removeLesson.do",
-				data : "lessonID=" + lessonID,
-				type : "POST",
-				success : function(json) {
+				type: "POST",
+				async : false,
+				data: $("#csrf-form").serialize() + "&lessonID=" + lessonID,
+			    success: function(json) {
 					if (json.removeLesson == true) {
 						loadOrganisation();
 					} else {
 						alert(json.removeLesson);
-					}
-				}
-			});
+					}    
+			    }
+			})
 		}
 	}
 }

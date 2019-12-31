@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
+<%@ taglib uri="csrfguard" prefix="csrf" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-core" prefix="c" %>

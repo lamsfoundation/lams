@@ -1,11 +1,7 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="title.lams"/> :: <fmt:message key="index.welcome" /></title>
@@ -323,6 +319,8 @@
 	<!-- /footer -->
 
 </div>
+
+<csrf:form id="csrf-form" method="post" action=""></csrf:form>
 
 </body>
 </lams:html>
