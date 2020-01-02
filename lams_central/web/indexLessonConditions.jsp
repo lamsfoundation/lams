@@ -1,8 +1,5 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <!DOCTYPE html>
 <lams:html>
@@ -30,9 +27,8 @@
 		var lessonId="${lsId}";
 		var edit="${edit}";
 		
-		function removePrecedingLesson(precedingLessonId){
-			document.location.href="<lams:LAMSURL/>lessonConditions/removeLessonDependency.do?lsId=" + lessonId
-						  + "&precedingLessonId=" + precedingLessonId;
+		function submitForm(formId){
+			$(formId).submit();
 		}
 
 		$(document).ready(function(){
@@ -66,9 +62,13 @@
 				 <div class="list-group-item">
 					<c:out value="${precedingLesson.name}" />
 					<c:if test="${edit}">
+					<csrf:form style="display: inline-block;" class="pull-right" id="delete_${precedingLesson.id}" method="post" action="/lams/lessonConditions/removeLessonDependency.do">
+						<input type="hidden" name="lsId" value="${lsId}"/>
+						<input type="hidden" name="precedingLessonId" value="${precedingLesson.id}"/>
 						<span class="badge" style="background-color:white">
-							<i class="fa fa-fw fa-trash-o text-danger" style="cursor: pointer;" title="<fmt:message key="label.conditions.box.remove.dependency" />" onclick="javascript:removePrecedingLesson(${precedingLesson.id})"></i>
+							<i class="fa fa-fw fa-trash-o text-danger" style="cursor: pointer;" title="<fmt:message key="label.conditions.box.remove.dependency" />" onclick="javascript:submitForm(delete_${precedingLesson.id})"></i>
 						</span>
+					</csrf:form>
 					</c:if>
 				</div>
 			</c:forEach>
@@ -92,6 +92,8 @@
 				</c:when>
 				<c:otherwise>
 					<form action="${addLessonDependencyUrl}" method="post">
+						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+
 						<div class="form-group">	
 							<select class="form-control" name="precedingLessonId">
 								<c:forEach var="availableLesson" items="${availableLessons}">
@@ -141,6 +143,8 @@
 		<!-- Changing finish date -->
 		<div class="panel-body">
 			<form action="${setDaysToLessonFinishUrl}" method="post">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+
 						<div class="form-group">
 							<label for="lessonDaysToFinish"><fmt:message key="advanced.tab.form.enter.number.days.label"/>: </label>
 							<select class="form-control" id="lessonDaysToFinish" name="lessonDaysToFinish">
