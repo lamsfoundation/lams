@@ -122,7 +122,7 @@
     			
     	        $.ajax({
     	        	async: false,
-    	            url: '<c:url value="/emailNotifications/emailUsers.do"/>',
+    	            url: '<c:url value="/emailNotifications/emailUsers.do"/>?<csrf:token/>',
     	            data: "emailBody=" + emailBody + params,
     	            dataType: 'json',
     	            type: 'post',

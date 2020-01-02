@@ -5,6 +5,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="csrfguard" prefix="csrf" %>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <title><fmt:message key="title.admin.window" /></title>
 <link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico"
@@ -95,6 +96,7 @@ input[type="checkbox"] {
 			<div class="panel-body">
 				<form id="emailUserForm"
 					action="<lams:LAMSURL/>emailUser/send.do" method="post">
+					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 					<c:if test="${not empty user}">
 						<input type="hidden" name="userId" value="${user.userId}" />
 					</c:if>

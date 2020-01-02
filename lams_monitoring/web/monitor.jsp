@@ -43,6 +43,9 @@
 			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
 			tourInProgress = false,
 			LAMS_URL = '<lams:LAMSURL/>',
+			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>',
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>

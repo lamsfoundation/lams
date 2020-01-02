@@ -803,7 +803,7 @@ public class MonitoringController {
     /**
      * Adds/removes learners and monitors to/from lesson class.
      */
-    @RequestMapping("/updateLessonClass")
+    @RequestMapping(path = "/updateLessonClass", method = RequestMethod.POST)
     public void updateLessonClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
@@ -1535,7 +1535,7 @@ public class MonitoringController {
      * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
      * presenceAvailable.
      */
-    @RequestMapping("/presenceAvailable")
+    @RequestMapping(path = "/presenceAvailable", method = RequestMethod.POST)
     public String presenceAvailable(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
@@ -1559,7 +1559,7 @@ public class MonitoringController {
      * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
      * presenceImAvailable.
      */
-    @RequestMapping("/presenceImAvailable")
+    @RequestMapping(path = "/presenceImAvailable", method = RequestMethod.POST)
     public String presenceImAvailable(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
@@ -1578,7 +1578,7 @@ public class MonitoringController {
      * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson.
      * Expects parameters lessonID and presenceAvailable.
      */
-    @RequestMapping("/gradebookOnComplete")
+    @RequestMapping(path = "/gradebookOnComplete", method = RequestMethod.POST)
     public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 

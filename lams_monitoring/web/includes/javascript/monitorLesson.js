@@ -46,13 +46,16 @@ function initLessonTab(){
 	// sets presence availability. buttons may be temporarily disable by the tour.
 	$('#presenceButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
+			'presenceAvailable' : checked,
+			'lessonID'      : lessonId
+		};
+		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
+			type : 'POST',
 			cache : false,
-			data : {
-				'presenceAvailable' : checked,
-				'lessonID'      : lessonId
-			},
+			data : data, 
 			success : function() {
 				updatePresenceAvailableCount();
 				if (checked) {
@@ -70,13 +73,16 @@ function initLessonTab(){
 	// sets instant messaging availability
 	$('#imButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
+			'presenceImAvailable' : checked,
+			'lessonID'      : lessonId
+		};
+		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/presenceImAvailable.do',
+			type : 'POST',
 			cache : false,
-			data : {
-				'presenceImAvailable' : checked,
-				'lessonID'      : lessonId
-			},
+			data : data,
 			success : function() {
 				if (checked) {
 					$('#openImButton').show();
@@ -198,13 +204,16 @@ function initLessonTab(){
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var data = {
+			'gradebookOnComplete' : checked,
+			'lessonID'      : lessonId
+		};
+		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/gradebookOnComplete.do',
+			type : 'POST',
 			cache : false,
-			data : {
-				'gradebookOnComplete' : checked,
-				'lessonID'      : lessonId
-			},
+			data : data,
 			success : function() {
 				if (checked) {
 					alert(LABELS.LESSON_ACTIVITY_SCORES_ENABLE_ALERT);
@@ -667,16 +676,17 @@ function configureProgressEmail(){
 function editEmailProgressDate(dateCheckbox){
 	var dateid = dateCheckbox.parent().attr('dateid'),
 		add = dateCheckbox.is(':checked');
-		
+	var data = {
+		'lessonID' : lessonId,
+		'id' : dateid,
+		'add' : add
+	};	
+	data[csrfTokenName] = csrfTokenValue;
 	$.ajax({
 		url : LAMS_URL + 'monitoring/emailProgress/updateEmailProgressDate.do',
 		type : 'POST',
 		cache : false,
-		data : {
-			'lessonID' : lessonId,
-			'id'   : dateid,
-			'add' 	   : add
-		},
+		data : data,
 		success : function( dateObj ) {
 			dateCheckbox.parent().attr('dateid', dateObj.id);
 			dateCheckbox.parent().attr('datems', dateObj.ms);
@@ -1863,20 +1873,19 @@ function fillClassList(role, disableCreator) {
  * Adds/removes a Learner/Monitor to/from the class.
  */
 function editClassMember(userCheckbox){
-	var userID = userCheckbox.parent().attr('userId'),
-		role = userCheckbox.closest('table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
-		add = userCheckbox.is(':checked');
-		
+	var data={ 
+		'lessonID' : lessonId,
+		'userID'   : userCheckbox.parent().attr('userId'),
+		'role'     : userCheckbox.closest('table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
+		'add'      : userCheckbox.is(':checked')
+	};
+	data[csrfTokenName] = csrfTokenValue;
+
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/updateLessonClass.do',
 		type : 'POST',
 		cache : false,
-		data : {
-			'lessonID' : lessonId,
-			'userID'   : userID,
-			'role'     : role,
-			'add' 	   : add
-		}
+		data : data
 	});
 }
 
