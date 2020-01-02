@@ -28,7 +28,7 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
+<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm">
 	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<form:hidden path="dokumaran.contentId" />
 	<form:hidden path="mode" value="${mode}"/>
