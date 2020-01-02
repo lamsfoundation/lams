@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
+<lams:html>
 <lams:head>
 	<title><fmt:message key="index.outcome.manage" /></title>
 	<lams:css/>

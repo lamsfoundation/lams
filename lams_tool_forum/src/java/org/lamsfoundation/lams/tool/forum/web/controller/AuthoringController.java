@@ -369,7 +369,7 @@ public class AuthoringController {
     /**
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
      */
-    @RequestMapping("/createTopic")
+    @RequestMapping(path = "/createTopic", method = RequestMethod.POST)
     public String createTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
 	//validate form
@@ -448,7 +448,7 @@ public class AuthoringController {
      * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring
      * page.
      */
-    @RequestMapping("/deleteTopic")
+    @RequestMapping(path = "/deleteTopic", method = RequestMethod.POST)
     public String deleteTopic(HttpServletRequest request) throws PersistenceException {
 
 	// get SessionMAP
@@ -521,7 +521,7 @@ public class AuthoringController {
      * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user save
      * whole authoring page.
      */
-    @RequestMapping("/updateTopic")
+    @RequestMapping(path = "/updateTopic", method = RequestMethod.POST)
     public String updateTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws PersistenceException {
 	//validate form
@@ -586,7 +586,7 @@ public class AuthoringController {
     /**
      * Remove message attachment.
      */
-    @RequestMapping("/deleteAttachment")
+    @RequestMapping(path = "/deleteAttachment", method = RequestMethod.POST)
     public String deleteAttachment(HttpServletRequest request) {
 	request.setAttribute("itemAttachment", null);
 	return "jsps/authoring/parts/msgattachment";

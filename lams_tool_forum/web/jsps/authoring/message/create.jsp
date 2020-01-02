@@ -18,7 +18,8 @@
 		<!-- Basic Info Form-->
 		<lams:errors/>
 
-		<form:form action="createTopic.do" modelAttribute="topicFormId" id="topicFormId" focus="message.subject" enctype="multipart/form-data">
+		<c:set var="csrfToken"><csrf:token/></c:set>
+		<form:form action="createTopic.do?${csrfToken}" modelAttribute="topicFormId" id="topicFormId" focus="message.subject" enctype="multipart/form-data">
 			<form:hidden path="sessionMapID" />
 			<c:set var="sessionMap" value="${sessionScope[topicFormId.sessionMapID]}" />
 

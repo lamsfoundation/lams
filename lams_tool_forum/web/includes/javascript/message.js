@@ -10,12 +10,16 @@
  		var url= removeItemAttachmentUrl;
 	    var reqIDVar = new Date();
 	    var param = "reqID="+reqIDVar.getTime();
+		var data = {
+			'reqID=' : reqIDVar.getTime()
+		};
+		data[csrfTokenName] = csrfTokenValue;
 	    removeItemAttachmentLoading();
 	    
 		$.ajax({
-            type: 'get',
+            type: 'POST',
             url: url,
-            data: param,
+            data: data,
             success: function(data) {
             	$("#"+itemAttachmentTargetDiv).html(data);
             	removeItemAttachmentComplete();

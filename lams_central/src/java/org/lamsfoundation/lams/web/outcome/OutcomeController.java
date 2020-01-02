@@ -299,7 +299,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("/outcomeMap")
+    @RequestMapping(path = "/outcomeMap", method = RequestMethod.POST)
     @ResponseBody
     public String outcomeMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long outcomeId = WebUtil.readLongParam(request, "outcomeId");
