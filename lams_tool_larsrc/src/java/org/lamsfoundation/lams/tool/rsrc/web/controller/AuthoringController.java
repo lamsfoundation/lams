@@ -119,7 +119,7 @@ public class AuthoringController {
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
      */
-    @RequestMapping("/removeItem")
+    @RequestMapping(path = "/removeItem", method = RequestMethod.POST)
     private String removeItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
@@ -210,7 +210,7 @@ public class AuthoringController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the
      * entire authoring page is being persisted.
      */
-    @RequestMapping(value = "/saveOrUpdateItem")
+    @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
     private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);

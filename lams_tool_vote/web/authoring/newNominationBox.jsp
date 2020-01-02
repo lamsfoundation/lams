@@ -17,6 +17,7 @@
 		<div class="panel-body">
 
 		<form:form action="addSingleNomination.do" modelAttribute="voteAuthoringForm" id="newNominationForm" method="POST">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="toolContentID" />
 			<form:hidden path="currentTab" />
 			<form:hidden path="httpSessionID" />
