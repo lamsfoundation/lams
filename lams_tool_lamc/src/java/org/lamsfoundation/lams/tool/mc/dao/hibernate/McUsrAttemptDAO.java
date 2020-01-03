@@ -120,9 +120,9 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
+    public McUsrAttempt getUserAttemptByQuestion(final Long userUid, final Long mcQueContentId) {
 	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
-		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", queUsrUid)
+		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setParameter("queUsrUid", userUid)
 		.setParameter("mcQueContentId", mcQueContentId).list();
 	if (userAttemptList.size() > 1) {
 	    throw new RuntimeException("There are more than 1 latest questionDescription attempt");
@@ -171,12 +171,12 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     }
 
     @Override
-    public boolean isMcContentAttempted(Long mcContentUid) {
-	final String IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT = "select COUNT(*) > 0 FROM " + McUsrAttempt.class.getName()
-		+ " AS attempt WHERE attempt.qbToolQuestion.uid=:mcContentUid";
+    public boolean isMcContentAttempted(long toolContentId) {
+	final String IS_USER_ATTEMPT_EXIST_BY_TOOL_CONTENT = "select COUNT(*) > 0 FROM " + McUsrAttempt.class.getName()
+		+ " AS attempt WHERE attempt.qbToolQuestion.toolContentId=:toolContentId";
 
-	Query<Boolean> q = getSession().createQuery(IS_USER_ATTEMPT_EXIST_BY_MC_CONTENT, Boolean.class);
-	q.setParameter("mcContentUid", mcContentUid);
+	Query<Boolean> q = getSession().createQuery(IS_USER_ATTEMPT_EXIST_BY_TOOL_CONTENT, Boolean.class);
+	q.setParameter("toolContentId", toolContentId);
 	return q.uniqueResult();
     }
 

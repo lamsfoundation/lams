@@ -72,7 +72,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -90,9 +89,6 @@ public class LearnerController implements SbmtConstants {
     @Autowired
     @Qualifier("sbmtMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
@@ -152,8 +148,9 @@ public class LearnerController implements SbmtConstants {
 	sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION, content.getReflectInstructions());
 	sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(SbmtConstants.ATTR_INSTRUCTION, content.getInstruction());
-	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD, content.isLimitUpload());
-	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
+	sessionMap.put(SbmtConstants.ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED, content.isLimitUpload());
+	sessionMap.put(SbmtConstants.ATTR_MAX_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
+	sessionMap.put(SbmtConstants.ATTR_MIN_LIMIT_UPLOAD_NUMBER, content.getMinLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
 	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
@@ -250,7 +247,7 @@ public class LearnerController implements SbmtConstants {
 	}
 
 	sessionMap.put(SbmtConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner, toolSessionID);
+	boolean isUserLeader = submitFilesService.isUserGroupLeader(learner.getUserID().longValue(), toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	boolean hasEditRight = !content.isUseSelectLeaderToolOuput()
@@ -472,16 +469,12 @@ public class LearnerController implements SbmtConstants {
 	// preset
 	// Monitor can edit the activity and set a limit / decreased the limit with
 	// the learner having already uploaded more files so ensure code handles that case.
-	boolean limitUpload = (Boolean) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD);
+	boolean limitUpload = (Boolean) sessionMap.get(SbmtConstants.ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED);
 	if (limitUpload && filesUploaded != null) {
-	    int limit = (Integer) sessionMap.get(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER);
-	    int limitUploadLeft = 0;
-	    if (limit <= filesUploaded.size()) {
-		sessionMap.put(SbmtConstants.ATTR_ARRIVE_LIMIT, Boolean.TRUE);
-	    } else {
-		limitUploadLeft = limit - filesUploaded.size();
+	    int maxLimit = (Integer) sessionMap.get(SbmtConstants.ATTR_MAX_LIMIT_UPLOAD_NUMBER);
+	    if (maxLimit <= filesUploaded.size()) {
+		sessionMap.put(SbmtConstants.ATTR_MAX_LIMIT_REACHED, Boolean.TRUE);
 	    }
-	    dto.setLimitUploadLeft(limitUploadLeft);
 	}
 
 	// retrieve notebook reflection entry.

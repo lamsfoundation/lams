@@ -296,9 +296,8 @@ public class AssessmentEscapeUtils {
 		}
 
 	    } else if (type == QbQuestion.TYPE_MATCHING_PAIRS) {
-
 		for (QbOption option : options) {
-		    sb.append("[" + option.getName() + ", ");
+		    sb.append("[" + option.getMatchingPair() + "-");
 
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
 			if (option.getUid().equals(optionAnswer.getOptionUid())) {
@@ -317,7 +316,7 @@ public class AssessmentEscapeUtils {
 	    }
 
 	}
-	String ret = sb.toString().replaceAll("\\<.*?\\>", "");
+	String ret = sb.toString().replaceAll("\\<.*?\\>|\\r|\\n", "");
 
 	if (trimLastComma) {
 	    ret = ret.substring(0, ret.lastIndexOf(","));

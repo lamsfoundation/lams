@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rest;
 
 /** Commonly used JSON tags for the calling the REST servlets */
@@ -59,6 +58,7 @@ public class RestTags {
     public static String QUESTIONS = "questions";
     public static String QUESTION_TEXT = "questionText";
     public static String QUESTION_TITLE = "questionTitle";
+    public static String QUESTION_UUID = "questionUuid";
     public static String ANSWERS = "answers";
     public static String ANSWER_TEXT = "answerText";
     public static String DISPLAY_ORDER = "displayOrder";

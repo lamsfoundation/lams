@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -316,8 +316,8 @@ public class AuthoringController {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (organisationID == null) {
 	    // if organisation ID is not set explicitly, derived it from external course
-	    String serverID = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
-	    String courseID = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
+	    String serverID = request.getParameter(IntegrationConstants.PARAM_SERVER_ID);
+	    String courseID = request.getParameter(IntegrationConstants.PARAM_COURSE_ID);
 	    ExtServer extServer = integrationService.getExtServer(serverID);
 	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), courseID);
 	    organisationID = orgMap.getOrganisation().getOrganisationId();

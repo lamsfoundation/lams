@@ -1,9 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:forEach var="item" items="${sessionMap.itemList}">
-	<div class="lead">
-        <a name="${item.qbQuestion.name}" style="text-decoration:none;color:black"><c:out value="${item.qbQuestion.name}" escapeXml="true" /></a>
+<c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
+	
+	<div class="lead" id="questionTitle${questionNumber.count}">
+        ${questionNumber.count})&nbsp;
+        <c:if test="${not sessionMap.hideTitles}">
+        	<c:out value="${item.qbQuestion.name}" escapeXml="true" />
+       </c:if>
 	</div>
+	
 	<div class="panel-body-sm">
 		<c:out value="${item.qbQuestion.description}" escapeXml="false" />
 	</div>

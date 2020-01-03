@@ -109,22 +109,24 @@
 		</property>
         <property name="transactionAttributes">
             <props>
-                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="notifyTeachers*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            	<prop key="check*">PROPAGATION_REQUIRED</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
                 <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
-                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
-				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
-				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="notifyTeachers*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="retrieveComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                    
+				<prop key="set*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
             </props>
         </property>
     </bean>

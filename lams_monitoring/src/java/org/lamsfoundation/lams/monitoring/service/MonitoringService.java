@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -111,10 +110,11 @@ import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedExceptio
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
@@ -124,6 +124,9 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * <p>
@@ -205,8 +208,6 @@ public class MonitoringService implements IMonitoringFullService {
     private static final String FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_END = "force.complete.stop.message.completed.to.end";
 
     private static final String FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY = "force.complete.stop.message.stopped.unexpectedly";
-
-    private static final ExcelCell[] EMPTY_ROW = new ExcelCell[1];
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
@@ -1157,7 +1158,7 @@ public class MonitoringService implements IMonitoringFullService {
 	lessonDAO.deleteByProperty(ToolSession.class, "lesson.lessonId", lessonId);
 	Map<String, Object> notebookProperties = new TreeMap<>();
 	notebookProperties.put("externalID", lessonId);
-	notebookProperties.put("externalSignature", CoreNotebookConstants.SCRATCH_PAD_SIG);
+	notebookProperties.put("externalIDType", CoreNotebookConstants.SCRATCH_PAD);
 	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
 	lessonDAO.deleteLesson(lesson);
 
@@ -1306,10 +1307,28 @@ public class MonitoringService implements IMonitoringFullService {
 	} else {
 	    securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
 	}
-	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
+	Lesson lesson = lessonDAO.getLesson(Long.valueOf(lessonId));
 	User learner = (User) baseDAO.find(User.class, learnerId);
 
 	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+
+	// trigger autosave on current activity so learner's progress is not lost
+	Activity currentActivity = learnerProgress == null ? null : learnerProgress.getCurrentActivity();
+	if (!removeLearnerContent && currentActivity != null) {
+	    ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	    // command websocket on Page.tag understands this message
+	    jsonCommand.put("message", "autosave");
+	    learnerService.createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
+
+	    try {
+		// make sure that Command Websocket server picked up the command
+		// and then some more so autosave completes
+		Thread.sleep(ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL + 2000);
+	    } catch (InterruptedException e) {
+		log.warn("Monitoring service thread interrupted while giving time for learner to autosave");
+	    }
+	}
+
 	Activity stopActivity = null;
 
 	if (activityId != null) {
@@ -1349,7 +1368,6 @@ public class MonitoringService implements IMonitoringFullService {
 	    baseDAO.insert(learnerProgress);
 	}
 
-	Activity currentActivity = learnerProgress.getCurrentActivity();
 	Activity stopPreviousActivity = null;
 	if (stopActivity != null) {
 	    Activity firstActivity = lesson.getLearningDesign().getFirstActivity();
@@ -1922,49 +1940,41 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportArchivedEmailNotification(Long emailNotificationUid) {
+    public List<ExcelSheet> exportArchivedEmailNotification(Long emailNotificationUid) {
 	EmailNotificationArchive notification = (EmailNotificationArchive) baseDAO.find(EmailNotificationArchive.class,
 		emailNotificationUid);
 
-	LinkedHashMap<String, ExcelCell[][]> sheets = new LinkedHashMap<>();
-	List<ExcelCell[]> rows = new LinkedList<>();
-	ExcelCell[] row = new ExcelCell[3];
-	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.date"), true);
-	row[1] = new ExcelCell(
-		messageService.getMessage("email.notifications.scheduled.messages.list.notify.sudents.that"), true);
-	row[2] = new ExcelCell(messageService.getMessage("email.notifications.scheduled.messages.list.email.body"),
-		true);
-	rows.add(row);
+	List<ExcelSheet> sheets = new LinkedList<>();
+	ExcelSheet sheet = new ExcelSheet(messageService.getMessage("email.notifications.archived.export.sheet.name"));
+	sheets.add(sheet);
 
-	row = new ExcelCell[3];
-	row[0] = new ExcelCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()),
-		false);
-	row[1] = new ExcelCell(
+	ExcelRow row = sheet.initRow();
+	row.addCell(messageService.getMessage("email.notifications.archived.messages.list.sent.date"), true);
+	row.addCell(messageService.getMessage("email.notifications.scheduled.messages.list.notify.sudents.that"), true);
+	row.addCell(messageService.getMessage("email.notifications.scheduled.messages.list.email.body"), true);
+
+	row = sheet.initRow();
+	row.addCell(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT.format(notification.getSentOn()), false);
+	row.addCell(
 		messageService.getMessage("email.notifications.user.search.property." + notification.getSearchType()),
 		false);
-	row[2] = new ExcelCell(notification.getBody(), false);
-	rows.add(row);
-	rows.add(EMPTY_ROW);
+	row.addCell(notification.getBody(), false);
+	sheet.addEmptyRow();
 
-	row = new ExcelCell[2];
-	row[0] = new ExcelCell(messageService.getMessage("email.notifications.archived.messages.list.sent.count"),
-		true);
-	row[1] = new ExcelCell(notification.getRecipients().size() + " "
+	row = sheet.initRow();
+	row.addCell(messageService.getMessage("email.notifications.archived.messages.list.sent.count"), true);
+	row.addCell(notification.getRecipients().size() + " "
 		+ messageService.getMessage("email.notifications.archived.messages.list.learners"), false);
-	rows.add(row);
 
 	// get all recipient objects, sorted by name
 	List<User> recipients = getArchivedEmailNotificationRecipients(emailNotificationUid, null, null);
 	for (User recipient : recipients) {
-	    row = new ExcelCell[1];
+	    row = sheet.initRow();
 	    String recipientName = new StringBuilder(recipient.getLastName()).append(", ")
 		    .append(recipient.getFirstName()).append(" [").append(recipient.getLogin()).append("]").toString();
-	    row[0] = new ExcelCell(recipientName, false);
-	    rows.add(row);
+	    row.addCell(recipientName, false);
 	}
 
-	sheets.put(messageService.getMessage("email.notifications.archived.export.sheet.name"),
-		rows.toArray(new ExcelCell[][] {}));
 	return sheets;
     }
 

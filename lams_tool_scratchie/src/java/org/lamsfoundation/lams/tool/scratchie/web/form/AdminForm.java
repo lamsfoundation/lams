@@ -32,6 +32,8 @@ public class AdminForm {
 
     private String presetMarks;
 
+    private boolean hideTitles;
+
     public boolean isEnabledExtraPointOption() {
 	return enabledExtraPointOption;
     }
@@ -46,5 +48,13 @@ public class AdminForm {
 
     public void setPresetMarks(String presetMarks) {
 	this.presetMarks = presetMarks;
+    }
+
+    public boolean isHideTitles() {
+	return hideTitles;
+    }
+
+    public void setHideTitles(boolean hideTitles) {
+	this.hideTitles = hideTitles;
     }
 }

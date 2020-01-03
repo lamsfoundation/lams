@@ -60,7 +60,7 @@ public class McPedagogicalPlannerController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     protected String unspecified(@ModelAttribute McPedagogicalPlannerForm plannerForm, HttpServletRequest request) {
 	return initPedagogicalPlannerForm(plannerForm, request);

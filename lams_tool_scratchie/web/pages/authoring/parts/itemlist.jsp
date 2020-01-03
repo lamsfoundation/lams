@@ -27,6 +27,11 @@
 <!-- Dropdown menu for choosing a question from question bank -->
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
+		<div id="importExport" class="btn-group pull-right">
+			<a href="#" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs loffset5">
+				<fmt:message key="label.authoring.import.qti" /> 
+			</a>
+		</div> 
 		<fmt:message key="label.questions"/>
 	</div>
 	<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
@@ -34,6 +39,9 @@
 	<table class="table table-condensed table-striped">
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<tr>
+				<td style="width:5%">
+					${status.count})
+				</td>
 				<td style="padding-top:15px; padding-bottom:15px;">
 					<c:out value="${item.qbQuestion.name}" escapeXml="true"/>
 					

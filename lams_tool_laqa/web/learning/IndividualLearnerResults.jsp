@@ -62,14 +62,14 @@
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<strong>
-									<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" /> 
+									<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">${questionEntry.key}.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" /> 
 								</strong> 
-								<br>
-								
-								<c:out value="${questionEntry.value.description}" escapeXml="false" />
 							</div>
 							
 							<div class="panel-body">
+								<div class="panel">
+									<c:out value="${questionEntry.value.description}" escapeXml="false" />
+								</div>
 
 								<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 									<c:if test="${answerEntry.key == questionEntry.key}">

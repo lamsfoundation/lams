@@ -120,12 +120,6 @@ public interface IIntegrationService {
      * @return
      */
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
-   
-    /**
-     * Try to get users from ext server using membership service.
-     */
-    void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
-	    throws IOException, UserInfoFetchException, UserInfoValidationException;
 
     ExtServerLessonMap getExtServerLessonMap(Long lessonId);
 
@@ -210,7 +204,7 @@ public interface IIntegrationService {
     ExtServerLessonMap createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
 
     /**
-     * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
+     * Checks whether the lesson was created from extServer (not an LTI consumer one) and returns lessonFinishCallbackUrl if it's not blank.
      *
      * @param user
      * @param lesson
@@ -218,6 +212,14 @@ public interface IIntegrationService {
      * @throws UnsupportedEncodingException
      */
     String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
+    
+    /**
+     * Check whether specified lesson was created using LTI consumer, and if so - push user mark to that server
+     * 
+     * @param user
+     * @param lesson
+     */
+    void pushMarkToLtiConsumer(User user, Lesson lesson, Double mark);
 
     /**
      * Checks whether lesson was created using integrations and whether according integrated server has ExtGroupsUrl
@@ -232,9 +234,28 @@ public interface IIntegrationService {
     List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
 
     ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
+    
+    /**
+     * Try to get users from ext server using membership service.
+     * 
+     * @param lessonId if supplied, user will be added to the according lesson; and only to the course otherwise
+     */
+    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException;
+    
+    /**
+     * Adds an external user to the course with specified courseId.
+     */
+    ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
+	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException;
 
-    ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, String lsIdStr, String username, String firstName,
-	    String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
+    /**
+     * Add an external user to the course with specified courseId and then adds it the the lesson with specified
+     * lessonId. (This method makes internal call to addExtUserToCourse()).
+     */
+    ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lessonId, String username, String firstName,
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**

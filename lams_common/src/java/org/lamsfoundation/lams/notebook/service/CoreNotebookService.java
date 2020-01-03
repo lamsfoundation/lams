@@ -61,15 +61,16 @@ public class CoreNotebookService implements ICoreNotebookService {
     }
 
     @Override
-    public TreeMap<Long, List<NotebookEntry>> getEntryByLesson(Integer userID, Integer idType) {
-	TreeMap<Long, List<NotebookEntry>> entryMap = new TreeMap<Long, List<NotebookEntry>>();
-	List<NotebookEntry> list = getEntry(userID, idType);
+    public TreeMap<Long, List<NotebookEntry>> getEntriesGroupedByLesson(Integer userID) {
+	TreeMap<Long, List<NotebookEntry>> lessonIdToEntriesMap = new TreeMap<Long, List<NotebookEntry>>();
+	List<NotebookEntry> entries = getEntry(userID, CoreNotebookConstants.SCRATCH_PAD);
 
-	for (NotebookEntry entry : list) {
-	    if (entryMap.containsKey(entry.getExternalID())) {
-		String lessonName = entryMap.get(entry.getExternalID()).get(0).getLessonName();
+	for (NotebookEntry entry : entries) {
+	    if (lessonIdToEntriesMap.containsKey(entry.getExternalID())) {
+		String lessonName = lessonIdToEntriesMap.get(entry.getExternalID()).get(0).getLessonName();
 		entry.setLessonName(lessonName);
-		entryMap.get(entry.getExternalID()).add(entry);
+		lessonIdToEntriesMap.get(entry.getExternalID()).add(entry);
+		
 	    } else {
 		Lesson lesson = (Lesson) baseDAO.find(Lesson.class, entry.getExternalID());
 		List<NotebookEntry> newEntryList = new ArrayList<NotebookEntry>();
@@ -77,11 +78,11 @@ public class CoreNotebookService implements ICoreNotebookService {
 		entry.setLessonName(lesson.getLessonName());
 		newEntryList.add(entry);
 
-		entryMap.put(entry.getExternalID(), newEntryList);
+		lessonIdToEntriesMap.put(entry.getExternalID(), newEntryList);
 	    }
 	}
 
-	return entryMap;
+	return lessonIdToEntriesMap;
     }
 
     @Override

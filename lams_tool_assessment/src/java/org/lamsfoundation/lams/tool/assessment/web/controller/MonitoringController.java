@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -64,10 +63,10 @@ import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -543,8 +542,7 @@ public class MonitoringController {
 	    return null;
 	}
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportSummary(assessment, sessionDtos,
-		showUserNames);
+	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos, showUserNames);
 
 	// Setting the filename if it wasn't passed in the request
 	if (fileName == null) {
@@ -562,7 +560,7 @@ public class MonitoringController {
 	response.addCookie(fileDownloadTokenCookie);
 
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
+	ExcelUtil.createExcel(out, sheets, service.getMessage("label.export.exported.on"), true);
 
 	return null;
     }

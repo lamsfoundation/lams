@@ -41,7 +41,7 @@ import org.imsglobal.lti.launch.LtiVerifier;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -78,8 +78,15 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String extUsername = request.getParameter(BasicLTIConstants.USER_ID);
+	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
+	//get user id as "user_id" parameter, or as lis_person_sourcedid (if according option is ON for this LTI server)
+	String lisPersonSourcedid = request.getParameter(BasicLTIConstants.LIS_PERSON_SOURCEDID);
+	String extUsername = extServer.getUseAlternativeUseridParameterName()
+		&& StringUtils.isNotBlank(lisPersonSourcedid) ? lisPersonSourcedid
+			: request.getParameter(BasicLTIConstants.USER_ID);
 	String roles = request.getParameter(BasicLTIConstants.ROLES);
+	
 	// implicit login params
 	String firstName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_GIVEN);
 	String lastName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FAMILY);
@@ -88,11 +95,29 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
 	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
 	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
-
-	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
+	
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
+	
+	//log all incoming request parameters, so we can use them later to debug future issues
+	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            logMessage += paramName + "=";
+ 
+            String[] paramValues = request.getParameterValues(paramName);
+            for (int i = 0; i < paramValues.length; i++) {
+                String paramValue = paramValues[i];
+                if (i>0) {
+                    logMessage += "|";
+                }
+                logMessage += paramValue;
+            }
+            logMessage += ", ";
+        }
+        log.debug(logMessage);
 
 	if ((extUsername == null) || (consumerKey == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
@@ -100,7 +125,6 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 
 	//verify whether request was correctly signed by OAuth
-	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	String secret = extServer.getServerkey();// retrieve corresponding secret for key from db
 	LtiVerificationResult ltiResult = null;
 	try {
@@ -151,8 +175,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	boolean isCustomMonitorRole = LtiUtils.isToolConsumerCustomRole(roles,
 		extServer.getLtiToolConsumerMonitorRoles());
 	String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles) || isCustomMonitorRole
-		? LoginRequestDispatcher.METHOD_AUTHOR
-		: LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION;
+		? IntegrationConstants.METHOD_AUTHOR
+		: IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION;
 
 	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
 	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
@@ -163,13 +187,13 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	// regular case: [ts + uid + method + serverID + serverKey]
 	String plaintext = timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim()
 		+ method.toLowerCase().trim()
-		+ (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
+		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
 		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha1(plaintext);
 
 	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
-	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + LoginRequestDispatcher.PARAM_METHOD, method);
+	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + IntegrationConstants.PARAM_METHOD, method);
 	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 	    String paramName = e.nextElement();
 
@@ -183,22 +207,22 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 
 	String url = "LoginRequest";
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_USER_ID,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_USER_ID,
 		URLEncoder.encode(extUsername, "UTF8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_METHOD, method);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_TIMESTAMP, timestamp);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_SERVER_ID, consumerKey);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_HASH, hash);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COURSE_ID, contextId);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_METHOD, method);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_TIMESTAMP, timestamp);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_SERVER_ID, consumerKey);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_HASH, hash);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_COURSE_ID, contextId);
 	url = WebUtil.appendParameterToURL(url, CentralConstants.PARAM_COURSE_NAME, contextLabel);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_COUNTRY, countryIsoCode);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LANGUAGE, langIsoCode);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_FIRST_NAME,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_COUNTRY, countryIsoCode);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LANGUAGE, langIsoCode);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_FIRST_NAME,
 		URLEncoder.encode(firstName, "UTF-8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LAST_NAME,
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LAST_NAME,
 		URLEncoder.encode(lastName, "UTF-8"));
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_LESSON_ID, lessonId);
-	url = WebUtil.appendParameterToURL(url, LoginRequestDispatcher.PARAM_EMAIL, email);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_LESSON_ID, lessonId);
+	url = WebUtil.appendParameterToURL(url, IntegrationConstants.PARAM_EMAIL, email);
 	url = WebUtil.appendParameterToURL(url, "redirectURL", URLEncoder.encode(redirectUrl, "UTF-8"));
 	response.sendRedirect(response.encodeRedirectURL(url));
     }

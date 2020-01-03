@@ -71,7 +71,7 @@ public class LearningUtil implements QaAppConstants {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
 	}
 
-	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
+	generalLearnerFlowDTO.setUserNameVisible(qaContent.isUsernameVisible());
 	generalLearnerFlowDTO.setShowOtherAnswers(qaContent.isShowOtherAnswers());
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
 	generalLearnerFlowDTO

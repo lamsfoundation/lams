@@ -2277,6 +2277,63 @@ GeneralLib = {
 			error = null,
 			weightsSum = null;
 		
+		// validate if groupings and inputs still exist for activities that need them
+		$.each(layout.activities, function(){
+			var coreActivity =  this.branchingActivity || this;
+			if (coreActivity.grouping || coreActivity.input) {
+				var candidate = this.branchingActivity ? coreActivity.start : this,
+					groupingFound = false,
+					inputFound = false;
+				do {
+					if (candidate.transitions && candidate.transitions.to.length > 0) {
+						candidate = candidate.transitions.to[0].fromActivity;
+					} else if (candidate.branchingActivity && !candidate.isStart) {
+						candidate = candidate.branchingActivity.start;
+					}  else if (!candidate.branchingActivity && candidate.parentActivity) {
+						candidate = candidate.parentActivity;
+					} else {
+						candidate = null;
+					}
+					
+					if (coreActivity.grouping == candidate) {
+						groupingFound = true;
+					}
+					if (coreActivity.input == candidate) {
+						inputFound = true;
+					}
+				} while (candidate != null);
+				
+				if (coreActivity.grouping && !groupingFound) {
+					coreActivity.grouping = null;
+					this.draw();
+					
+					if (displayErrors) {
+						layout.ldStoreDialog.modal('hide');
+						layout.infoDialog.data('show')(LABELS.GROUPING_DETACHED_ERROR.replace('{0}', coreActivity.title));
+					}
+					error = true;
+					return false;
+				}
+				if (coreActivity.input && !inputFound) {
+					coreActivity.input = null;
+					// refresh properties box to remove buttons
+					$('input', this.propertiesContent).first().change();
+					
+					if (displayErrors) {
+						layout.ldStoreDialog.modal('hide');
+						layout.infoDialog.data('show')(LABELS.INPUT_DETACHED_ERROR.replace('{0}', coreActivity.title));
+					}
+					error = true;
+					return false;
+				}
+			}
+		});
+		
+		if (error) {
+			return false;
+		}
+		
+		
 		$.each(layout.activities, function(){
 			if (this.parentActivity	&& (this.parentActivity instanceof ActivityDefs.BranchingActivity
 							|| this.parentActivity instanceof ActivityDefs.BranchActivity)){
@@ -2296,6 +2353,7 @@ GeneralLib = {
 		
 		if (weightsSum != null && weightsSum != 100) {
 			if (displayErrors) {
+				layout.ldStoreDialog.modal('hide');
 				layout.infoDialog.data('show')(LABELS.WEIGHTS_SUM_ERROR);
 			}
 			return false;

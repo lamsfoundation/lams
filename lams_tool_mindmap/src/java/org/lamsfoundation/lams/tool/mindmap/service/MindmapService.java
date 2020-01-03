@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -174,6 +173,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
+    }
+
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	return false;
     }
 
     @Override
@@ -330,19 +334,20 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		}
 
 		int edit;
-		if ( isAuthor ){
-			edit = 1;
-		} else if ( isMonitor || isUserLocked || mindmapUser == null) {
+		if (isAuthor) {
+		    edit = 1;
+		} else if (isMonitor || isUserLocked || mindmapUser == null) {
 		    edit = 0;
-		    } else {
+		} else {
 		    edit = mindmapUser.equals(mindmapNode.getUser()) ? 1 : 0;
-		    }
+		}
 
-		NodeModel nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(), mindmapNode.getText(),
-			    mindmapNode.getColor(), mindmapUserName, edit));
+		NodeModel nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(),
+			mindmapNode.getText(), mindmapNode.getColor(), mindmapUserName, edit));
 
 		rootNodeModel.addNode(nodeModel);
-		getMindmapXMLFromDatabase(mindmapNode.getNodeId(), mindmapId, nodeModel, mindmapUser, isMonitor, isAuthor, isUserLocked);
+		getMindmapXMLFromDatabase(mindmapNode.getNodeId(), mindmapId, nodeModel, mindmapUser, isMonitor,
+			isAuthor, isUserLocked);
 	    }
 	}
 
@@ -399,7 +404,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return;
 	}
 
-	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	for (MindmapSession session : mindmap.getMindmapSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -426,7 +431,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
 
 	List<MindmapNode> nodesToDelete = new LinkedList<>();
-	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	for (MindmapSession session : mindmap.getMindmapSessions()) {
 	    List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
 		    userId.longValue());
 
@@ -446,7 +451,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    mindmapNodeDAO.delete(node);
 	}
 
-	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
+	for (MindmapSession session : mindmap.getMindmapSessions()) {
 	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
 		if (user.getEntryUID() != null) {
@@ -605,8 +610,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public boolean isReadOnly(Long toolContentId) {
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 
-	for (MindmapSession session : (Set<MindmapSession>) mindmap.getMindmapSessions()) {
-	    for (MindmapUser user : (Set<MindmapUser>) session.getMindmapUsers()) {
+	for (MindmapSession session : mindmap.getMindmapSessions()) {
+	    for (MindmapUser user : session.getMindmapUsers()) {
 		if (!mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(), user.getUserId())
 			.isEmpty()) {
 		    return true;
@@ -711,6 +716,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public MindmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return mindmapUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public MindmapUser getUserByLoginAndSessionId(String login, long toolSessionId) {
+	List<User> user = mindmapUserDAO.findByProperty(User.class, "login", login);
+	return user.isEmpty() ? null
+		: mindmapUserDAO.getByUserIdAndSessionId(user.get(0).getUserId().longValue(), toolSessionId);
     }
 
     public MindmapUser getUserByLoginNameAndSessionId(String loginName, Long toolSessionId) {
@@ -833,7 +846,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);

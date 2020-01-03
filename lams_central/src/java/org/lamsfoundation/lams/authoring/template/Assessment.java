@@ -54,11 +54,12 @@ public class Assessment {
     int defaultGrade = 1;
     boolean multipleAnswersAllowed = false; // only used if type == 1
     List<AssessMCAnswer> answers = null; // only used if type == 1
+    String uuid = null; // used when QTI gets imported and it contains QB question UUID
 
     public void setType(short type) {
 	this.type = type;
 	if (type == 1 && this.answers == null) {
-	    this.answers = new LinkedList<AssessMCAnswer>();
+	    this.answers = new LinkedList<>();
 	}
     }
 
@@ -111,16 +112,26 @@ public class Assessment {
     }
 
     public boolean isMultipleAnswersAllowed() {
-        return multipleAnswersAllowed;
+	return multipleAnswersAllowed;
     }
 
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
-        this.multipleAnswersAllowed = multipleAnswersAllowed;
+	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
+
+    public String getUuid() {
+	return uuid;
+    }
+
+    public void setUuid(String uuid) {
+	this.uuid = uuid;
+    }
+
     public ObjectNode getAsObjectNode(int displayOrder) {
 	ObjectNode json = JsonNodeFactory.instance.objectNode();
 	json.put(RestTags.QUESTION_TITLE, title != null ? title : "");
 	json.put(RestTags.QUESTION_TEXT, text != null ? text : "");
+	json.put(RestTags.QUESTION_UUID, uuid != null ? uuid : "");
 	json.put(RestTags.DISPLAY_ORDER, displayOrder);
 	json.put("answerRequired", required);
 	json.put("defaultGrade", defaultGrade);
@@ -140,7 +151,6 @@ public class Assessment {
 	return json;
     }
 
-    
     public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter,
 	    Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
 	boolean errorsExist = false;
@@ -154,9 +164,9 @@ public class Assessment {
 	    if (answers.size() == 0) {
 		errorMessages.add(TextUtil.getText(appBundle, formatter,
 			"authoring.error.application.exercise.must.have.answer.num",
-			new Object[] { applicationExerciseTitle, "\""+ title +"\"" }));
+			new Object[] { applicationExerciseTitle, "\"" + title + "\"" }));
 		errorsExist = true;
-	    } else if ( !multipleAnswersAllowed ){
+	    } else if (!multipleAnswersAllowed) {
 		// multiple answers -> no validation, single answer -> must have one with 100%
 		boolean found100percent = false;
 		for (AssessMCAnswer answer : answers) {
@@ -168,7 +178,7 @@ public class Assessment {
 		if (!found100percent) {
 		    errorMessages.add(TextUtil.getText(appBundle, formatter,
 			    "authoring.error.application.exercise.must.have.100.percent",
-			    new Object[] { applicationExerciseTitle, "\""+ title +"\""}));
+			    new Object[] { applicationExerciseTitle, "\"" + title + "\"" }));
 		    errorsExist = true;
 		}
 	    }

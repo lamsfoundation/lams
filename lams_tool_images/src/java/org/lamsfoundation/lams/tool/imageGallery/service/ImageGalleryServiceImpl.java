@@ -567,7 +567,12 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    image.setOriginalImageHeight(originalImage.getHeight(null));
 
 	    // prepare medium image
-	    InputStream mediumIS = ResizePictureUtil.resize(originalImage, mediumImageDimensions);
+	    originalIS.close();
+	    originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
+	    InputStream mediumIS = ResizePictureUtil.resize(originalIS, mediumImageDimensions);
+	    if (mediumIS == null) {
+		throw new UploadImageGalleryFileException("Impossible to resize image");
+	    }
 	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
 		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName, "image/jpeg");
@@ -638,7 +643,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1063,6 +1068,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
+    }
+
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	return false;
     }
 
     @Override

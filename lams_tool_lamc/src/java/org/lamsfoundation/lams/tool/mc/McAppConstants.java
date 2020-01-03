@@ -114,4 +114,7 @@ public interface McAppConstants {
     public static final String CANDIDATE_ANSWER_PREFIX = "candidateAnswer";
     public static final int QUESTION_DEFAULT_MARK = 1;
     public static final int CANDIDATE_ANSWER_DEFAULT_COUNT = 3;
+    
+    // configuration keys
+    public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
 }

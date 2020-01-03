@@ -22,99 +22,16 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-public class LtiConsumerForm {
-
-    private Integer sid;
-
-    private String serverid;
-
-    private String serverkey;
-
-    private String servername;
-
-    private String serverdesc;
-
-    private String prefix;
-
-    private boolean disabled = false;
-
-    private String lessonFinishUrl;
-
-    private boolean timeToLiveLoginRequestEnabled = false;
+/**
+ * Form for managing LTI tool consumers (ExtServer instances).
+ * 
+ * @author Andrey Balan
+ */
+public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
-
-    public Integer getSid() {
-	return sid;
-    }
-
-    public void setSid(Integer sid) {
-	this.sid = sid;
-    }
-
-    public String getServerid() {
-	return serverid;
-    }
-
-    public void setServerid(String serverid) {
-	this.serverid = serverid;
-    }
-
-    public String getServerkey() {
-	return serverkey;
-    }
-
-    public void setServerkey(String serverkey) {
-	this.serverkey = serverkey;
-    }
-
-    public String getServername() {
-	return servername;
-    }
-
-    public void setServername(String servername) {
-	this.servername = servername;
-    }
-
-    public String getServerdesc() {
-	return serverdesc;
-    }
-
-    public void setServerdesc(String serverdesc) {
-	this.serverdesc = serverdesc;
-    }
-
-    public String getPrefix() {
-	return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-	this.prefix = prefix;
-    }
-
-    public boolean isDisabled() {
-	return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-	this.disabled = disabled;
-    }
-
-    public String getLessonFinishUrl() {
-	return lessonFinishUrl;
-    }
-
-    public void setLessonFinishUrl(String lessonFinishUrl) {
-	this.lessonFinishUrl = lessonFinishUrl;
-    }
-
-    public boolean isTimeToLiveLoginRequestEnabled() {
-	return timeToLiveLoginRequestEnabled;
-    }
-
-    public void setTimeToLiveLoginRequestEnabled(boolean timeToLiveLoginRequestEnabled) {
-	this.timeToLiveLoginRequestEnabled = timeToLiveLoginRequestEnabled;
-    }
+    
+    private Boolean useAlternativeUseridParameterName;
 
     public String getLtiToolConsumerMonitorRoles() {
 	return ltiToolConsumerMonitorRoles;
@@ -122,6 +39,14 @@ public class LtiConsumerForm {
 
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
+    }
+    
+    public Boolean getUseAlternativeUseridParameterName() {
+	return useAlternativeUseridParameterName;
+    }
+
+    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
+	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
     }
 
 }

@@ -43,9 +43,9 @@
 			<props>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="hide*">PROPAGATION_REQUIRED</prop>
  				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+ 				<prop key="hide*">PROPAGATION_REQUIRED</prop>
+ 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

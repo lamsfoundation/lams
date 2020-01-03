@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,11 +45,11 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
  * Interface that defines the contract that all ShareAssessment service provider must follow.
- * 
+ *
  * @author Andrey Balan
  */
 public interface IAssessmentService extends ICommonToolService {
@@ -60,7 +59,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId);
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -225,7 +224,7 @@ public interface IAssessmentService extends ICommonToolService {
      */
     void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId,
 	    List<Set<QuestionDTO>> pagedQuestionDtos);
-    
+
     void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    Long singleMarkHedgingQuestionUid)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
@@ -243,7 +242,7 @@ public interface IAssessmentService extends ICommonToolService {
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
-    
+
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**
@@ -328,7 +327,7 @@ public interface IAssessmentService extends ICommonToolService {
     /**
      * Count how many last finished attempts selected specified option.
      */
-    int countAttemptsPerOption(Long optionUid);
+    int countAttemptsPerOption(Long toolContentId, Long optionUid);
 
     /**
      * Return the latest *finished* result (the same as the method above). But previously evicting it from the cache. It
@@ -348,7 +347,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     int getAssessmentResultCount(Long assessmentUid, Long userId);
-    
+
     /**
      * Checks whether anyone has attempted this assessment.
      */
@@ -424,9 +423,8 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
-    
-    void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
-	    Long questionResultUid);
+
+    void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, Long questionResultUid);
 
     /**
      * For export purposes
@@ -445,8 +443,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param showUserNames
      * @return
      */
-    LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
-	    boolean showUserNames);
+    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames);
 
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
@@ -529,4 +526,7 @@ public interface IAssessmentService extends ICommonToolService {
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
 
+    void setConfigValue(String key, String value);
+
+    String getConfigValue(String key);
 }

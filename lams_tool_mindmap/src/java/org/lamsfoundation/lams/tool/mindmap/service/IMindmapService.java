@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import java.util.List;
@@ -61,6 +60,8 @@ public interface IMindmapService extends ICommonToolService {
     public void saveOrUpdateMindmapSession(MindmapSession mindmapSession);
 
     public MindmapUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
+
+    public MindmapUser getUserByLoginAndSessionId(String login, long toolSessionId);
 
     public MindmapUser getUserByUID(Long uid);
 

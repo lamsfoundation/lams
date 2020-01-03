@@ -376,7 +376,7 @@
 	    	var form = $($.parseHTML(formHTML));
 			$.ajax({
 				type: "POST",
-				url: '<c:url value="/imsqti/saveQTI.do" />?contentFolderID=${contentFolderID}&collectionUid=${collection.uid}',
+				url: '<c:url value="/imsqti/saveQTI.do" />?collectionUid=${collection.uid}',
 				data: form.serializeArray(),
 				success: function() {
 					location.reload();

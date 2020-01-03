@@ -70,6 +70,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	try {
 	    item = (ScratchieItem) super.clone();
 	    item.uid = null;
+	    item.scratchieUid = null;
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ScratchieItem.class + " failed");
 	}

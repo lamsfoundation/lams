@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.peerreview.service;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -315,7 +314,7 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String emailReportToUser);
 
     /** Spreadsheet */
-    LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);
+    List<ExcelSheet> exportTeamReportSpreadsheet(Long toolContentId);
 
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
 

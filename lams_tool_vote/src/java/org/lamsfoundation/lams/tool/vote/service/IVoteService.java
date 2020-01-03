@@ -75,7 +75,7 @@ public interface IVoteService extends ICommonToolService {
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(VoteQueUsr user, Long toolSessionId);
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -145,10 +145,6 @@ public interface IVoteService extends ICommonToolService {
     void hideOpenVote(VoteUsrAttempt voteUsrAttempt);
 
     void showOpenVote(VoteUsrAttempt voteUsrAttempt);
-
-//    boolean studentActivityOccurredStandardAndOpen(VoteContent voteContent);
-
-//    int getUserEnteredVotesCountForContent(final Long voteContentUid);
 
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 

@@ -6,12 +6,16 @@ import static org.imsglobal.lti.BasicLTIConstants.LTI_VERSION;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.Vector;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +34,7 @@ import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -97,36 +101,50 @@ public class LtiController {
 	String extUserId = request.getParameter(BasicLTIConstants.USER_ID);
 	Long customLessonId = WebUtil.readLongParam(request, "custom_lessonid", true);
 	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
+	//parameter containing original resource_link_id, available after course copy (BB only)
+	String resourceLinkIdHistory = request.getParameter("resource_link_id_history");
 
 	ExtServerLessonMap extLessonMap = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	
-//	log.info("" request.getParameter(name));
-	Map params = request.getParameterMap();
-	Iterator i = params.keySet().iterator();
-	while (i.hasNext()) {
-	    String key = (String) i.next();
-	    String value = ((String[]) params.get(key))[0];
-	    log.info("#### Parameter " + key + ": " + value);
-	}
-	
-	//it's the case of ContentItemSelection request or course-copy. (Currently we support course-copy only for links created using ContentItemSelection)
-	if (extLessonMap == null && (customLessonId != null) && isContentItemSelection) {
-	    Lesson lesson = lessonService.getLesson(customLessonId);
+	//it's the case of ContentItemSelection request or course-copy. (Currently we support course-copy only for links created using ContentItemSelection or from Blackboard server)
+	if (extLessonMap == null && (isContentItemSelection || StringUtils.isNotBlank(resourceLinkIdHistory))) {
+
+	    //figure out original lesson
+	    Lesson lesson;
+	    if (isContentItemSelection) {
+		lesson = lessonService.getLesson(customLessonId);
+
+	    } else {
+		ExtServerLessonMap oldExtLessonMap = integrationService.getLtiConsumerLesson(consumerKey,
+			resourceLinkIdHistory);
+		lesson = lessonService.getLesson(oldExtLessonMap.getLessonId());		
+	    }
+	    
+	    if (lesson == null) {
+		//abort as this is not normal case
+		request.setAttribute("messageKey", "lessonsearch.noresults");
+		return "msgContent";
+	    }
 
 	    String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), extCourseId);
-	    Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+	    ExtCourseClassMap currentOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), extCourseId);
+	    Integer currentOrganisationId = currentOrgMap.getOrganisation().getOrganisationId();
 
-	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side.
-	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one)
+	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side;
+	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one).
+	    //Otherwise this is the case of a first call after deep linking was used, and thus we need to update resourceLinkId, which was empty previously. 
 	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
-		    && !lesson.getOrganisation().getOrganisationId().equals(organisationId);
+		    && !lesson.getOrganisation().getOrganisationId().equals(currentOrganisationId);
 	    if (isLessonCopyRequired) {
+		
+		//add users to the course
+		integrationService.addUsersUsingMembershipService(extServer, null, extCourseId, resourceLinkId);
+		
 		// clone lesson
 		Integer creatorId = lesson.getUser().getUserId();
-		Long newLessonId = monitoringService.cloneLesson(customLessonId, creatorId, true, true, null, null,
-			orgMap.getOrganisation());
+		Long newLessonId = monitoringService.cloneLesson(lesson.getLessonId(), creatorId, true, true, null, null,
+			currentOrgMap.getOrganisation());
 		// store information which extServer has started the lesson
 		extLessonMap = integrationService.createExtServerLessonMap(newLessonId, extServer);	
             
@@ -154,8 +172,8 @@ public class LtiController {
 	}
 
 	//check if learner tries to access the link that hasn't been authored by teacher yet
-	String method = request.getParameter("_" + LoginRequestDispatcher.PARAM_METHOD);
-	if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
+	String method = request.getParameter("_" + IntegrationConstants.PARAM_METHOD);
+	if (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
 	    String roles = request.getParameter(BasicLTIConstants.ROLES);
 	    //try to detect monitor with custom roles not supported by LTI specification
 	    String messageKey = roles.contains("Instructor") || roles.contains("Admin") ? "message.teacher.role.not.recognized"
@@ -226,7 +244,10 @@ public class LtiController {
 	    request.setAttribute(BasicLTIConstants.LTI_MESSAGE_TYPE, ltiMessageType);
 	    request.setAttribute(LtiUtils.CONTENT_ITEM_RETURN_URL, contentItemReturnUrl);
 	    request.setAttribute("title", request.getParameter("title"));
-	    request.setAttribute("desc", request.getParameter("text").replaceAll("\\<[^>]*>", ""));
+	    //text parameter can be null in case of BB server 
+	    String description = request.getParameter("text") == null ? ""
+		    : request.getParameter("text").replaceAll("\\<[^>]*>", "");
+	    request.setAttribute("desc", description);
 	    request.setAttribute("data", request.getParameter("data"));
 	}
 
@@ -247,7 +268,7 @@ public class LtiController {
 	String title = request.getParameter(CentralConstants.PARAM_TITLE);
 	String desc = request.getParameter(CentralConstants.PARAM_DESC);
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
+	String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	Integer organisationId = WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID);
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
@@ -283,7 +304,7 @@ public class LtiController {
 	// store information which extServer has started the lesson
 	integrationService.createExtServerLessonMap(lessonId, resourceLinkId, extServer);
 	
-	integrationService.addExtUsersToLesson(extServer, lessonId, contextId, resourceLinkId);
+	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId);
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -319,7 +340,7 @@ public class LtiController {
 	    String redirectURL = "redirect:/lti/learnerMonitor.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, LtiUtils.OAUTH_CONSUMER_KEY, consumerKey);
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.RESOURCE_LINK_ID, resourceLinkId);
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.CONTEXT_ID, contextId);
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, BasicLTIConstants.CONTEXT_ID, extCourseId);
 	    return redirectURL;
 	}
     }
@@ -374,7 +395,20 @@ public class LtiController {
 //	    "custom" : {
 //	      "chapter" : "12",
 //	      "section" : "3"
-//	    }
+//	    },
+//	    "lineItem":{
+//	      "reportingMethod":"http://purl.imsglobal.org/ctx/lis/v2p1/Result#totalScore",
+//	      "@type":"LineItem",
+//	      "assignedActivity":{
+//	        "activityId":"a-9334df-33"
+//	      },
+//	      "scoreConstraints":{
+//	        "@type":"NumericLimits",
+//	        "normalMaximum":45,
+//	        "extraCreditMaximum":5,
+//	        "totalMaximum":50
+//	      }
+//	    },
 //	  }
 //	]
 //    }
@@ -388,6 +422,21 @@ public class LtiController {
 	customJSON.put("iscontentitemselection", "true");
 	contentItemJSON.set("custom", customJSON);
 	
+	ObjectNode lineItem = JsonNodeFactory.instance.objectNode();
+	lineItem.put("reportingMethod", "http://purl.imsglobal.org/ctx/lis/v2p1/Result#totalScore");
+	lineItem.put("@type", "LineItem");
+	lineItem.put("label", lesson.getLessonName());
+	ObjectNode assignedActivity = JsonNodeFactory.instance.objectNode();
+	assignedActivity.put("activityId", key + "_" + lesson.getLessonId().toString());
+	lineItem.set("assignedActivity", assignedActivity);
+	ObjectNode scoreConstraints = JsonNodeFactory.instance.objectNode();
+	scoreConstraints.put("@type", "NumericLimits");
+	scoreConstraints.put("normalMaximum", 10);
+	scoreConstraints.put("extraCreditMaximum", 1);
+	scoreConstraints.put("totalMaximum", 100);
+	lineItem.set("scoreConstraints", scoreConstraints);
+	contentItemJSON.set("lineItem", lineItem);
+	
 	ArrayNode graph = JsonNodeFactory.instance.arrayNode();
 	graph.add(contentItemJSON);
 
@@ -395,7 +444,7 @@ public class LtiController {
 	responseJSON.set("@graph", graph);
 	responseJSON.put("@context", "http://purl.imsglobal.org/ctx/lti/v1/ContentItem");
 
-	String content_items = URLEncoder.encode(responseJSON.toString(), "UTF-8");
+	String content_items = responseJSON.toString();//URLEncoder.encode(responseJSON.toString(), "UTF-8");
 //	content_items = content_items.replace("\"", "%22");
 //	content_items = content_items.replace("'", "%27");
 	properties.put("content_items", content_items);

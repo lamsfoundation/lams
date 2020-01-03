@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -45,19 +44,21 @@ import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -557,8 +558,8 @@ public class MonitoringController {
      * @throws IOException
      */
     @RequestMapping("/exportTeamReport")
-    @ResponseBody
-    public String exportTeamReport(HttpServletRequest request,
+    @ResponseStatus(HttpStatus.OK)
+    public void exportTeamReport(HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
@@ -566,7 +567,7 @@ public class MonitoringController {
 	Peerreview peerreview = service.getPeerreviewByContentId(toolContentId);
 	if (peerreview == null) {
 	    log.warn("Did not find Peer Review with toolContentId: " + toolContentId + " export content");
-	    return null;
+	    return;
 	}
 
 	String fileName = peerreview.getTitle().replaceAll(" ", "_") + ".xlsx";
@@ -582,7 +583,7 @@ public class MonitoringController {
 	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 	    ServletOutputStream out = response.getOutputStream();
 
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportTeamReportSpreadsheet(toolContentId);
+	    List<ExcelSheet> sheets = service.exportTeamReportSpreadsheet(toolContentId);
 
 	    // set cookie that will tell JS script that export has been finished
 	    String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
@@ -590,14 +591,12 @@ public class MonitoringController {
 	    fileDownloadTokenCookie.setPath("/");
 	    response.addCookie(fileDownloadTokenCookie);
 
-	    ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
+	    ExcelUtil.createExcel(out, sheets, "Exported on:", true);
 
 	} catch (IOException e) {
 	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: " + e.getMessage(), e);
 	    throw new ServletException(e);
 	}
-
-	return null;
     }
 
     @RequestMapping("/manageUsers")

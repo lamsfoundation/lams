@@ -1144,8 +1144,8 @@ ActivityLib = {
 	 * It is run from authoringConfirm.jsp
 	 * It closes the dialog with activity authoring 
 	 */
-	closeActivityAuthoring : function(){
-		$("#dialogActivity").off('hide.bs.modal').on('hide.bs.modal', function(){
+	closeActivityAuthoring : function(dialogID){
+		$("#" + dialogID).off('hide.bs.modal').on('hide.bs.modal', function(){
 			$('iframe', this).attr('src', null);
 		}).modal('hide');
 	},
@@ -1387,7 +1387,8 @@ ActivityLib = {
 		}
 		
 		if (activity.authorURL) {
-			showDialog("dialogActivity", {
+			var dialogID = "dialogActivity" + activity.toolContentID;
+			showDialog(dialogID, {
 				'height' : Math.max(300, $(window).height() - 30),
 				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
 				'draggable' : true,
@@ -1408,10 +1409,14 @@ ActivityLib = {
 					PropertyLib.validateConditionMappings(activity);
 				},
 				'open' : function() {
+					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', this).attr('src', activity.authorURL).load(function(){
+					$('iframe', dialog).attr('id', dialogID).attr('src', activity.authorURL).load(function(){
 						// override the close function so it works with the dialog, not window
-						this.contentWindow.closeWindow = ActivityLib.closeActivityAuthoring;
+						this.contentWindow.closeWindow = function(){
+							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
+							ActivityLib.closeActivityAuthoring(dialogID);
+						}
 					});
 				}
 			}, true);
@@ -1632,46 +1637,6 @@ ActivityLib = {
 				// reset the first branch as the default one
 				branches[0].defaultBranch = true;
 			}
-		}
-		
-		// redraw means that the transition will be drawn again in just a moment
-		// so do not do any structural changes
-		if (!redraw){
-			// remove grouping or input references if chain was broken by the removed transition
-			$.each(layout.activities, function(){
-				var coreActivity =  this.branchingActivity || this;
-				if (coreActivity.grouping || coreActivity.input) {
-					var candidate = this.branchingActivity ? coreActivity.start : this,
-						groupingFound = false,
-						inputFound = false;
-					do {
-						if (candidate.transitions && candidate.transitions.to.length > 0) {
-							candidate = candidate.transitions.to[0].fromActivity;
-						} else if (candidate.branchingActivity && !candidate.isStart) {
-							candidate = candidate.branchingActivity.start;
-						}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-							candidate = candidate.parentActivity;
-						} else {
-							candidate = null;
-						}
-						
-						if (coreActivity.grouping == candidate) {
-							groupingFound = true;
-						}
-						if (coreActivity.input == candidate) {
-							inputFound = true;
-						}
-					} while (candidate != null);
-					
-					if (!groupingFound) {
-						coreActivity.grouping = null;
-						this.draw();
-					}
-					if (!inputFound) {
-						coreActivity.input = null;
-					}
-				}
-			});
 		}
 		
 		transition.items.remove();

@@ -26,13 +26,13 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,9 +41,10 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -62,23 +63,27 @@ import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -132,7 +137,7 @@ public class AuthoringController {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	authoringForm.setContentFolderID(contentFolderID);
-	
+
 	// save toolContentID into HTTPSession
 	Long contentId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_TOOL_CONTENT_ID);
 	sessionMap.put(ScratchieConstants.PARAM_TOOL_CONTENT_ID, contentId);
@@ -190,6 +195,14 @@ public class AuthoringController {
 	Set<ToolActivity> activitiesProvidingVsaAnswers = scratchieService.getActivitiesProvidingVsaAnswers(contentId);
 	sessionMap.put(ScratchieConstants.ATTR_ACTIVITIES_PROVIDING_VSA_ANSWERS, activitiesProvidingVsaAnswers);
 
+	String notifyCloseURL = request.getParameter("notifyCloseURL");
+	if (StringUtils.isNotBlank(notifyCloseURL)) {
+	    try {
+		request.setAttribute("notifyCloseURL", URLEncoder.encode(notifyCloseURL, "UTF-8"));
+	    } catch (UnsupportedEncodingException e) {
+		throw new ServletException("Exception while encoding notifyCloseURL: " + notifyCloseURL, e);
+	    }
+	}
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
 	return "pages/authoring/start";
@@ -229,7 +242,8 @@ public class AuthoringController {
 	Scratchie scratchiePO = scratchieService.getScratchieByContentId(authoringForm.getScratchie().getContentId());
 
 	//allow using old and modified questions together
-	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>() : scratchiePO.getScratchieItems();
+	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>()
+		: new HashSet<>(scratchiePO.getScratchieItems());
 
 	if (scratchiePO == null) {
 	    // new Scratchie, create it.
@@ -331,8 +345,7 @@ public class AuthoringController {
      * Display edit page for existed scratchie item.
      */
     @RequestMapping("/editItem")
-    private String editItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
-	    HttpServletRequest request) {
+    private String editItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request) {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
@@ -361,13 +374,29 @@ public class AuthoringController {
 
 	form.setSessionMapID(sessionMap.getSessionID());
 	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
-	
+
 	form.setContentFolderID(qbQuestion.getContentFolderId());
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
-	return isMcqQuestionType ? "pages/authoring/parts/addMcq"
-		: "pages/authoring/parts/addVsa";
+	return isMcqQuestionType ? "pages/authoring/parts/addMcq" : "pages/authoring/parts/addVsa";
     }
-    
+
+    /**
+     * Adds multiple QbQuestions, imported from QTI
+     */
+    @RequestMapping(value = "/importQbQuestions", method = RequestMethod.POST)
+    private String importQbQuestions(HttpServletRequest request, @RequestParam String sessionMapID,
+	    @RequestParam String qbQuestionUids) {
+	// get a list of QB question UIDs and add each of them to the activity
+	for (String qbQuestionUid : qbQuestionUids.split(",")) {
+	    if (StringUtils.isNotBlank(qbQuestionUid)) {
+		importQbQuestion(request, sessionMapID, Long.valueOf(qbQuestionUid));
+	    }
+	}
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return "pages/authoring/parts/itemlist";
+    }
+
     /**
      * QB callback handler which adds selected QbQuestion into question list.
      */
@@ -378,9 +407,17 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
-	
+
+	//check whether this QB question is a duplicate
+	for (ScratchieItem item : itemList) {
+	    if (qbQuestionUid.equals(item.getQbQuestion().getUid())) {
+		//let jsp know it's a duplicate
+		return "forward:/authoring/showDuplicateQuestionError.do";
+	    }
+	}
+
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
-	
+
 	//create new ScratchieItem and assign imported qbQuestion to it
 	ScratchieItem item = new ScratchieItem();
 	item.setQbQuestion(qbQuestion);
@@ -391,10 +428,23 @@ public class AuthoringController {
 	}
 	item.setDisplayOrder(maxSeq);
 	itemList.add(item);
+	ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
+    }
+
+    /**
+     * Shows "This question has already been added" error message in a browser.
+     */
+    @RequestMapping("/showDuplicateQuestionError")
+    @ResponseBody
+    public String showDuplicateQuestionError(HttpServletResponse response) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDuplicated", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**
@@ -404,13 +454,12 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form,
-	    HttpServletRequest request) {
+    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(form.getSessionMapID());
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	int itemIdx = NumberUtils.toInt(form.getItemIndex(), -1);
-	
+
 	// check whether it is "edit(old Question)" or "add(new Question)"
 	QbQuestion qbQuestion;
 	ScratchieItem item;
@@ -420,7 +469,7 @@ public class AuthoringController {
 	    qbQuestion.setType(form.getQuestionType());
 	    qbQuestion.setMaxMark(1);
 	    qbQuestion.setPenaltyFactor(0);
-	    
+
 	    item = new ScratchieItem();
 	    int maxSeq = 1;
 	    if (itemList != null && itemList.size() > 0) {
@@ -429,9 +478,9 @@ public class AuthoringController {
 	    }
 	    item.setDisplayOrder(maxSeq);
 	    itemList.add(item);
-	    
-	// edit
-	} else { 
+
+	    // edit
+	} else {
 	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
 	    qbQuestion = qbService.getQuestionByUid(item.getQbQuestion().getUid());
@@ -446,7 +495,7 @@ public class AuthoringController {
 	qbQuestion.setName(form.getTitle().strip());
 	qbQuestion.setDescription(form.getDescription().strip());
 	qbQuestion.setContentFolderId(form.getContentFolderID());
-	
+
 	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 	//handle VSA question type
 	if (!isMcqQuestionType) {
@@ -485,12 +534,12 @@ public class AuthoringController {
 		// save the old question anyway, as it may contain some minor changes (like title or description change)
 		updatedQuestion = qbQuestion;
 	    }
-		break;		
+		break;
 	}
 	userManagementService.save(updatedQuestion);
 	item.setQbQuestion(updatedQuestion);
 	request.setAttribute("qbQuestionModified", isQbQuestionModified);
-	
+
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
@@ -499,7 +548,8 @@ public class AuthoringController {
 	}
 	//remove from the old collection, if needed
 	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
-	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(), false);
+	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
+		    false);
 	}
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
@@ -783,7 +833,8 @@ public class AuthoringController {
      *            whether the blank options will be preserved or not
      *
      */
-    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isMcqQuestion, boolean isForSaving) {
+    private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isMcqQuestion,
+	    boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, QbConstants.ATTR_OPTION_LIST);
 	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null) ? null
 		: NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_CORRECT));
@@ -810,10 +861,8 @@ public class AuthoringController {
 	    Integer displayOrder = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_DISPLAY_ORDER_PREFIX + i));
 	    option.setDisplayOrder(displayOrder);
 	    option.setName(optionName);
-	    if ((correctOptionIndex != null) && correctOptionIndex.equals(displayOrder) && isMcqQuestion) {
-		option.setCorrect(true);
-	    }
-	    
+	    option.setCorrect((correctOptionIndex != null) && correctOptionIndex.equals(displayOrder) && isMcqQuestion);
+
 	    //handle VSA question type
 	    if (!isMcqQuestion) {
 		float maxMark = i == 0 ? 1 : 0;
@@ -822,7 +871,7 @@ public class AuthoringController {
 		String feedback = paramMap.get(QbConstants.ATTR_OPTION_FEEDBACK_PREFIX + i);
 		option.setFeedback(feedback);
 	    }
-	    
+
 	    optionList.add(option);
 
 	}
@@ -859,7 +908,7 @@ public class AuthoringController {
 	}
 	return paramMap;
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);

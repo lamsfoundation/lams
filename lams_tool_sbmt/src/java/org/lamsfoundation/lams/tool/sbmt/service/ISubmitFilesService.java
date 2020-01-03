@@ -359,11 +359,11 @@ public interface ISubmitFilesService extends ICommonToolService {
     void createUser(SubmitUser submitUser);
 
     /**
-     * @param user
+     * @param userId
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(SubmitUser user, Long toolSessionId);
+    boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser);
 

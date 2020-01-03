@@ -47,25 +47,25 @@
 						</c:choose>
 					</td>
 					<td>
-						<a id="edit_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/servermaintain/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
+						<a id="edit_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/edit.do?sid=${server.sid}"><fmt:message key="admin.edit" /></a>
 						&nbsp;
 						<c:choose>
 							<c:when test="${server.disabled}">
-								<a id="enable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/servermaintain/enable.do?sid=${server.sid}"><fmt:message key="admin.enable" /></a>
+								<a id="enable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/enable.do?sid=${server.sid}"><fmt:message key="admin.enable" /></a>
 							</c:when>
 							<c:otherwise>
-								<a id="disable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/servermaintain/disable.do?sid=${server.sid}"><fmt:message key="admin.disable" /></a>
+								<a id="disable_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/disable.do?sid=${server.sid}"><fmt:message key="admin.disable" /></a>
 							</c:otherwise>
 						</c:choose>
 						&nbsp;
-						<a id="delete_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/servermaintain/delete.do?sid=${server.sid}"><fmt:message key="admin.delete" /></a>
+						<a id="delete_<c:out value='${server.serverid}'/>" href="<lams:LAMSURL/>admin/extserver/delete.do?sid=${server.sid}"><fmt:message key="admin.delete" /></a>
 					</td>
 				</tr>
 				</c:forEach>
 			</table>
 			<p>${fn:length(servers)}&nbsp;<fmt:message key="sysadmin.integrated.servers" /></p>
 			
-			<input class="btn btn-default pull-right" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='./servermaintain/edit.do'" />
+			<input class="btn btn-default pull-right" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='edit.do'" />
 
 	</lams:Page>
 </body>

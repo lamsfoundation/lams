@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
@@ -134,13 +135,14 @@ public class QbQuestion implements Serializable, Cloneable {
     /** ---- only for hedging type of question ---- */
     @Column(name = "hedging_justification_enabled")
     private boolean hedgingJustificationEnabled;
-    
+
     /** ---- only for VSA type of question ---- */
     @Column(name = "autocomplete_enabled")
     private boolean autocompleteEnabled;
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
+    @OrderBy("displayOrder")
     private List<QbOption> qbOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -252,13 +254,13 @@ public class QbQuestion implements Serializable, Cloneable {
 	    }
 	}
     }
-    
+
     /**
      * Check if it's a TBL case, i.e. only two option groups available, one has 0%, second - 100%
      */
     public boolean isVsaAndCompatibleWithTbl() {
 	boolean isVsaAndCompatibleWithTbl = false;
-	
+
 	if (qbOptions.size() == 2) {
 	    float firstGroupMark = qbOptions.get(0).getMaxMark();
 	    float secondGroupMark = qbOptions.get(1).getMaxMark();
@@ -267,7 +269,7 @@ public class QbQuestion implements Serializable, Cloneable {
 		    && (secondGroupMark == 0 || secondGroupMark == 1) && (firstGroupMark != secondGroupMark)
 		    && type == QbQuestion.TYPE_VERY_SHORT_ANSWERS;
 	}
-	
+
 	return isVsaAndCompatibleWithTbl;
     }
 
@@ -277,6 +279,14 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public UUID getUuid() {
 	return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+	this.uuid = uuid;
+    }
+
+    public void setUuid(String uuid) {
+	this.uuid = uuid == null ? null : UUID.fromString(uuid);
     }
 
     public Integer getType() {
@@ -476,7 +486,7 @@ public class QbQuestion implements Serializable, Cloneable {
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
     public boolean isAutocompleteEnabled() {
 	return autocompleteEnabled;
     }

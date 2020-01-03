@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO"%>
 
 <script lang="javascript">
 	$(document).ready(function(){
@@ -18,8 +19,8 @@
 			$('#display-summary-area').toggle('slow');
 			$('#allowQuestionFeedback').prop("checked", false);
 			$('#allowDiscloseAnswers').prop("checked", false);
-			$('#allowRightAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
-			$('#allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().removeClass('text-muted');
 			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
 		});
 
@@ -29,6 +30,7 @@
 			} else {
 				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', false);
 			}
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().toggleClass('text-muted');
 		});
 		
 		$("#useSelectLeaderToolOuput").change(function() {
@@ -41,13 +43,21 @@
 				$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
 			}		
 		});
+
+		$("#enable-confidence-levels").change(function(){
+			$('#confidence-levels-type-area').toggle('slow');
+		});
 		
 		<c:if test="${assessmentForm.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
 		<c:if test="${assessmentForm.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
 		<c:if test="${assessmentForm.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
 		<c:if test="${assessmentForm.assessment.allowDiscloseAnswers}">
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true)
-		;</c:if>
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true);
+			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().addClass('text-muted');
+		</c:if>
+		<c:if test="${!assessmentForm.assessment.enableConfidenceLevels}">
+			$('#confidence-levels-type-area').css('display', 'none');
+		</c:if>
 	});
 </script>
 
@@ -69,19 +79,19 @@
 <div class="form-inline">
 	<label for="assessment.questionsPerPage">
 		<fmt:message key="label.authoring.advance.questions.per.page" />&nbsp;
-	<form:select path="assessment.questionsPerPage" cssClass="form-control input-sm">
-		<form:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></form:option>
-		<form:option value="10">10</form:option>
-		<form:option value="9">9</form:option>
-		<form:option value="8">8</form:option>
-		<form:option value="7">7</form:option>
-		<form:option value="6">6</form:option>
-		<form:option value="5">5</form:option>
-		<form:option value="4">4</form:option>
-		<form:option value="3">3</form:option>
-		<form:option value="2">2</form:option>
-		<form:option value="1">1</form:option>
-	</form:select>
+		<form:select path="assessment.questionsPerPage" cssClass="form-control input-sm">
+			<form:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></form:option>
+			<form:option value="10">10</form:option>
+			<form:option value="9">9</form:option>
+			<form:option value="8">8</form:option>
+			<form:option value="7">7</form:option>
+			<form:option value="6">6</form:option>
+			<form:option value="5">5</form:option>
+			<form:option value="4">4</form:option>
+			<form:option value="3">3</form:option>
+			<form:option value="2">2</form:option>
+			<form:option value="1">1</form:option>
+		</form:select>
 	</label>
 </div>
 
@@ -213,6 +223,23 @@
 	<label for="enable-confidence-levels">
 		<form:checkbox path="assessment.enableConfidenceLevels" id="enable-confidence-levels"/>
 		<fmt:message key="label.enable.confidence.levels" />
+	</label>
+	<br>
+	
+	<label for="assessment.confidenceLevelsType" id="confidence-levels-type-area" class="radio form-inline">
+		<fmt:message key="label.scale" />&nbsp;
+		
+		<form:select path="assessment.confidenceLevelsType" cssClass="form-control input-sm">
+			<form:option value="<%= ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100 %>">
+				<fmt:message key="label.0.to.100" />
+			</form:option>
+			<form:option value="<%= ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_CONFIDENT %>">
+				<fmt:message key="label.not.confident" />, <fmt:message key="label.confident" />, <fmt:message key="label.very.confident" />
+			</form:option>
+			<form:option value="<%= ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_SURE %>">
+				<fmt:message key="label.not.sure" />, <fmt:message key="label.sure" />, <fmt:message key="label.very.sure" />
+			</form:option>
+		</form:select>
 	</label>
 </div>
 </lams:SimplePanel>

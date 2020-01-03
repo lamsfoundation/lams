@@ -99,6 +99,7 @@
 						</tr>
 					</table>
 				</lams:TabBody>
+				
 				<lams:TabBody id="2" titleKey="label.tab.class">
 					<!-- Class panel -->
 					<div id="tabClassTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.class.title" /></div>
@@ -154,9 +155,10 @@
 						</tr>
 					</table>
 				</lams:TabBody>
+				
 				<lams:TabBody id="3" titleKey="label.tab.advanced">
 					<!-- Advanced Panel -->
-					<input name="organisationID" value="${param.organisationID}" type="hidden" />
+					<input id="organisation-id" name="organisationID" value="${param.organisationID}" type="hidden" />
 					<input id="ldIdField" name="learningDesignID" type="hidden" />
 					<input id="lessonNameField" name="lessonName" type="hidden" />
 					<input id="learnersField" name="learners" type="hidden" />
@@ -164,33 +166,32 @@
 					<input id="splitNumberLessonsField" name="splitNumberLessons" type="hidden" />
 					
 					<div class="lead"><fmt:message key="label.tab.advanced.details" /></div>
-						<div class="options">
-							<div class="checkbox">
-								<label>
-									<input id="introEnableField" name="introEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.intro.enable" />
-								</label>
-							</div>
-						</div>							
-						<div  id="introDescriptionDiv">
-							<div id="introDescriptionLabelDiv">
-							 <fmt:message key="label.tab.advanced.intro.description" />
-							</div>
-							<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" value="">
-							</lams:CKEditor>
-
-							<div class="checkbox">
-								<label>
-									<input id="introImageField" name="introImage" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.intro.image" />
-								</label>
-							</div>
+					<div class="options">
+						<div class="checkbox">
+							<label>
+								<input id="introEnableField" name="introEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.intro.enable" />
+							</label>
 						</div>
+					</div>							
+					<div  id="introDescriptionDiv">
+						<div id="introDescriptionLabelDiv">
+						 <fmt:message key="label.tab.advanced.intro.description" />
+						</div>
+						<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" value=""></lams:CKEditor>
 
+						<div class="checkbox">
+							<label>
+								<input id="introImageField" name="introImage" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.intro.image" />
+							</label>
+						</div>
+					</div>
 					
 					<div class="lead"><fmt:message key="label.tab.advanced.section.advanced" /></div>
 					<div class="options">
 						<div class="checkbox">
 							<label>
-								<input id="gradebookOnCompleteField" name="gradebookOnComplete" value="true" checked="checked" type="checkbox"/><fmt:message key="label.tab.advanced.field.gradebook.complete" />
+								<input id="gradebookOnCompleteField" name="gradebookOnComplete" value="true" checked="checked" type="checkbox"/>
+								<fmt:message key="label.tab.advanced.field.gradebook.complete" />
 							</label>
 						</div>	
 						<div class="checkbox">
@@ -201,67 +202,101 @@
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="forceRestart" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.force.restart" />
+								<input name="forceRestart" value="true" type="checkbox"/>
+								<fmt:message key="label.tab.advanced.field.force.restart" />
 							</label>
 						</div>		
 						<div class="checkbox">
 							<label>
-								<input name="allowRestart" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.allow.restart" />
+								<input name="allowRestart" value="true" type="checkbox"/>
+								<fmt:message key="label.tab.advanced.field.allow.restart" />
 							</label>
 						</div>	
 						<div class="checkbox">
 							<label>
-								<input name="liveEditEnable" value="true" type="checkbox" checked="checked"/><fmt:message key="label.tab.advanced.field.liveedit" />
+								<input name="liveEditEnable" value="true" type="checkbox" checked="checked"/>
+								<fmt:message key="label.tab.advanced.field.liveedit" />
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="notificationsEnable" value="true" type="checkbox" checked="checked"/><fmt:message key="label.tab.advanced.field.notification" />
+								<input name="notificationsEnable" value="true" type="checkbox" checked="checked"/>
+								<fmt:message key="label.tab.advanced.field.notification" />
 							</label>
 						</div>
 
 						<div class="checkbox">
 							<label>
-								<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.presence" />
+								<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"/>
+								<fmt:message key="label.tab.advanced.field.presence" />
 							</label>
 						</div>
 						
 						<div class="checkbox">
 							<label>
-								<input id="imEnableField" name="imEnable" value="true" type="checkbox" disabled="disabled"/><fmt:message key="label.tab.advanced.field.im" />
+								<input id="imEnableField" name="imEnable" value="true" type="checkbox" disabled="disabled"/>
+								<fmt:message key="label.tab.advanced.field.im" />
 							</label>
 						</div>
 
 						<div class="checkbox">
 							<label>
-								<input id="splitLearnersField" type="checkbox"/><fmt:message key="label.tab.advanced.field.split" />
+								<input id="splitLearnersField" type="checkbox"/>
+								<fmt:message key="label.tab.advanced.field.split" />
 							</label>
 						</div>
 						<div id="splitLearnersTable" style="display: none">
-									<span><fmt:message key="label.tab.advanced.field.split.number" /> </span> <input value="1" id="splitLearnersCountField" type="number" />
-										<span class="roffset5" id="splitLearnersDescription"></span>
+							<span><fmt:message key="label.tab.advanced.field.split.number" /> </span> 
+							<input value="1" id="splitLearnersCountField" type="number" />
+							<span class="roffset5" id="splitLearnersDescription"></span>
 						</div>
+						
+						<!-- Scheduling -->
 						<div class="checkbox">
 							<label>
 								<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.scheduling" />
 							</label>
 						</div>		
-						<div id="schedulingError" class="errorMessage"><fmt:message key="error.lesson.end.date.must.be.after.start.date"/></div>
+						<div id="schedulingError" class="errorMessage">
+							<fmt:message key="error.lesson.end.date.must.be.after.start.date"/>
+						</div>
 						<div id="scheduleStartTime" class="form-group">
-						<label for="schedulingDatetimeField"><fmt:message key="label.start"/></label>
-						<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" />
+							<label for="schedulingDatetimeField"><fmt:message key="label.start"/></label>
+							<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" />
 						</div>
 						<div id="scheduleEndTime" class="form-group">
-						<label for="schedulingEndDatetimeField"><fmt:message key="label.end"/></label>
-						<input id="schedulingEndDatetimeField" name="schedulingEndDatetime" type="text" />
+							<label for="schedulingEndDatetimeField"><fmt:message key="label.end"/></label>
+							<input id="schedulingEndDatetimeField" name="schedulingEndDatetime" type="text" />
 						</div>
 					</div>
+					
+					<!-- Add multiple lessons -->
+					<c:if test="${not empty subgroups}">
+						<div class="lead"><fmt:message key="label.multiple.lessons" /></div>
+						<div class="options">
+							<div class="fieldSectionDescription">
+								<fmt:message key="label.add.lessons.to.subgroups" />
+							</div>
+							
+							<c:forEach var="subgroup" items="${subgroups}">
+								<div class="checkbox">
+									<label>
+										<input name="organisationID" class="multiple-lessons" value="${subgroup.organisationId}" type="checkbox"/>
+										${subgroup.name}
+									</label>
+								</div>
+							</c:forEach>
+						</div>
+					</c:if>
 				</lams:TabBody>
+				
 				<lams:TabBody id="4" titleKey="label.tab.conditions">
 					<!-- Conditions Panel -->
 					<div class="lead"><fmt:message key="label.tab.conditions.dependencies" /></div>
 					<div class="options">
-						<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.dependencies.desc" /></div>
+						<div class="fieldSectionDescription">
+							<fmt:message key="label.tab.conditions.dependencies.desc" />
+						</div>
 						<div class="checkbox">
 							<label>
 								<input id="precedingLessonEnableField" name="precedingLessonEnable" value="true"
@@ -277,8 +312,12 @@
 					
 					<div class="lead"><fmt:message key="label.tab.conditions.timelimit" /></div>
 					<div class="options">
-						<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.timelimit.desc" /></div>
-						<div id="timelimitError" class="errorMessage"><fmt:message key="error.lesson.with.scheduled.end.only.have.individual.limits"/></div>
+						<div class="fieldSectionDescription">
+							<fmt:message key="label.tab.conditions.timelimit.desc" />
+						</div>
+						<div id="timelimitError" class="errorMessage">
+							<fmt:message key="error.lesson.with.scheduled.end.only.have.individual.limits"/>
+						</div>
 						
 						<div class="checkbox">
 							<label>
@@ -286,11 +325,12 @@
 							</label>	
 						</div>
 						<div id="timeLimitDiv" style="display: none;">
-							<span><fmt:message key="label.tab.conditions.timelimit.days" /> </span> <input id="timeLimitDaysField" name="timeLimitDays" type="number" /><br />
+							<span><fmt:message key="label.tab.conditions.timelimit.days" /> </span> 
+							<input id="timeLimitDaysField" name="timeLimitDays" type="number" /><br />
 							<div class="checkbox">
 								<label>
-									<input id="timeLimitIndividualField" name="timeLimitIndividual" value="true"
-							       type="checkbox"/><fmt:message key="label.tab.conditions.timelimit.individual" />
+									<input id="timeLimitIndividualField" name="timeLimitIndividual" value="true" type="checkbox"/>
+							       <fmt:message key="label.tab.conditions.timelimit.individual" />
 							  </label>     
 							</div>       
 						</div>

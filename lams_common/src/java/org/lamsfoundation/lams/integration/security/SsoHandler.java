@@ -100,7 +100,6 @@ public class SsoHandler implements ServletExtension {
 
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
-
 		/*
 		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
@@ -160,9 +159,6 @@ public class SsoHandler implements ServletExtension {
 
 		}
 
-		// check if user is already logged in
-		HttpSession existingSession = SessionManager.getSessionForLogin(login);
-
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 
@@ -177,12 +173,6 @@ public class SsoHandler implements ServletExtension {
 		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
 
-		    // if user is already logged in on another browser, log him out
-		    if (existingSession != null) {
-			SessionManager.removeSessionByID(existingSession.getId(), true, false);
-			SsoHandler.logLogout(userDTO);
-		    }
-
 		    Integer failedAttempts = user.getFailedAttempts();
 		    if (failedAttempts != null && failedAttempts > 0 && password != null
 			    && !password.startsWith("#LAMS")) {
@@ -193,14 +183,14 @@ public class SsoHandler implements ServletExtension {
 
 		    SsoHandler.logLogin(userDTO, request);
 		} else {
+		    // clear after failed authentication, if it was set in LoginRequestServlet
+		    session.removeAttribute("integratedLogoutURL");
+
 		    Integer failedAttempts = user.getFailedAttempts();
-		    if (failedAttempts == null) {
-			failedAttempts = 1;
-		    } else {
-			failedAttempts++;
-		    }
-		    user.setFailedAttempts(failedAttempts);
 		    Integer failedAttemptsConfig = Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS);
+		    // do not allow more failed attempts than limit in config as we may overflow failedAttempts column in DB
+		    failedAttempts = failedAttempts == null ? 1 : Math.min(failedAttempts + 1, failedAttemptsConfig);
+		    user.setFailedAttempts(failedAttempts);
 
 		    if (failedAttempts >= failedAttemptsConfig) {
 			Integer lockOutTimeConfig = Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME);

@@ -40,6 +40,8 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
+import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
@@ -171,6 +173,12 @@ public interface IUserManagementService {
      * @return true or false
      */
     boolean isUserInRole(Integer userId, Integer orgId, String roleName);
+    
+    /**
+     * @param organisationId
+     * @return organisation by its id
+     */
+    Organisation getOrganisationById(Integer organisationId);
 
     /**
      * @param typeId
@@ -215,7 +223,16 @@ public interface IUserManagementService {
      *            user's login
      * @return a list of UserOrganisationRoles
      */
-    List getUserOrganisationRoles(Integer orgId, String login);
+    List<UserOrganisationRole> getUserOrganisationRoles(Integer orgId, String login);
+    
+    /**
+     * Returns list of UserOrganisationCollapsed, indicating which sub-courses was collapsed by the given user.
+     * 
+     * @param parentOrganisationId
+     * @param userId
+     * @return
+     */
+    List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId);
 
     /**
      * Returns mapping org ID -> role IDs
@@ -264,6 +281,13 @@ public interface IUserManagementService {
      * @return UserOrganisation
      */
     UserOrganisation getUserOrganisation(Integer userId, Integer orgId);
+    
+    /**
+     * @param userId
+     * @param orgId
+     * @return
+     */
+    UserOrganisationCollapsed getUserOrganisationCollapsed(Integer userId, Integer orgId);
 
     /**
      * Save an organisation. If it is a new course organisation then it will create a workspace and its workspace

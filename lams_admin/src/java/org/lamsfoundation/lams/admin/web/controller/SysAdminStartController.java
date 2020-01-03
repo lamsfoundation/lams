@@ -61,7 +61,7 @@ public class SysAdminStartController {
 	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
 	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
 	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
-	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
+	    links.add(new LinkBean("extserver/serverlist.do", "sysadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement/start.do", "label.manage.tool.consumers"));
 	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));
 	    links.add(new LinkBean("toolcontentlist/start.do", "sysadmin.tool.management"));

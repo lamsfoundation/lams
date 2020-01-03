@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -51,23 +50,26 @@ import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -119,6 +121,9 @@ public class MonitoringController {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
 
+	ScratchieConfigItem hideTitles = scratchieService.getConfigItem(ScratchieConfigItem.KEY_HIDE_TITLES);
+	sessionMap.put(ScratchieConfigItem.KEY_HIDE_TITLES, Boolean.valueOf(hideTitles.getConfigValue()));
+
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
@@ -137,10 +142,7 @@ public class MonitoringController {
 
     @RequestMapping("/itemSummary")
     private String itemSummary(HttpServletRequest request) {
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
 	if (itemUid.equals(-1L)) {
@@ -150,12 +152,12 @@ public class MonitoringController {
 	request.setAttribute(ScratchieConstants.ATTR_ITEM, item);
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = scratchieService.getQuestionSummary(contentId, itemUid);
+	List<GroupSummary> summaryList = scratchieService.getGroupSummariesByItem(contentId, itemUid);
 
 	// escape JS sensitive characters in option descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (OptionDTO optionDto : summary.getOptionDtos()) {
-		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer());
+		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer()).replace("\\r\\n", "<br>");
 		optionDto.setAnswer(escapedAnswer);
 	    }
 	}
@@ -181,17 +183,9 @@ public class MonitoringController {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
     @RequestMapping("/setSubmissionDeadline")
     private String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(contentID);
 
@@ -216,18 +210,14 @@ public class MonitoringController {
 
     /**
      * Exports tool results into excel.
-     *
-     * @throws IOException
      */
     @RequestMapping("/exportExcel")
-    private String exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
+    @ResponseStatus(HttpStatus.OK)
+    private void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = scratchieService.exportExcel(scratchie.getContentId());
+	List<ExcelSheet> sheets = scratchieService.exportExcel(scratchie.getContentId());
 
 	String fileName = "scratchie_export.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -243,9 +233,7 @@ public class MonitoringController {
 
 	// Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcel(out, dataToExport, null, false);
-
-	return null;
+	ExcelUtil.createExcel(out, sheets, null, false);
     }
 
     /**
@@ -254,11 +242,7 @@ public class MonitoringController {
     @RequestMapping("/getMarkChartData")
     private String getMarkChartData(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	List<Number> results = null;
@@ -282,11 +266,7 @@ public class MonitoringController {
 
     @RequestMapping("/statistic")
     private String statistic(HttpServletRequest request) {
-
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	if (scratchie != null) {
@@ -306,5 +286,12 @@ public class MonitoringController {
 	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/parts/statisticpart";
+    }
+
+    @SuppressWarnings("unchecked")
+    private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
 }

@@ -15,6 +15,9 @@
 		tr.selected-by-groups span {
 			font-weight: bold;
 		}
+		.slider.slider-horizontal {
+			margin-left: 40px;
+		}
 	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>

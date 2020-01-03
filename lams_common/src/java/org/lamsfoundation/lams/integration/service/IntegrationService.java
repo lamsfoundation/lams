@@ -67,7 +67,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -102,10 +102,8 @@ import oauth.signpost.exception.OAuthException;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class IntegrationService implements IIntegrationService {
-
     private static Logger log = Logger.getLogger(IntegrationService.class);
 
-    private IGradebookService gradebookService;
     private IUserManagementService service;
     private ILessonService lessonService;
     private ILamsCoreToolService toolService;
@@ -243,10 +241,10 @@ public class IntegrationService implements IIntegrationService {
 	}
 	
 	Integer[] roles;
-	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)) {
+	if (StringUtils.equals(method, IntegrationConstants.METHOD_AUTHOR)) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
 	    
-	} else if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+	} else if (StringUtils.equals(method, IntegrationConstants.METHOD_MONITOR)) {
 	    roles = new Integer[] { Role.ROLE_MONITOR };
 	    
 	} else {
@@ -634,88 +632,95 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
+	if (lesson == null) {
+	    return null;
+	}
+	
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://server.com/lams--bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
 	String lessonFinishCallbackUrl = null;
 
-	if (lesson != null) {
-	    Long lessonId = lesson.getLessonId();
-	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
-	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
-	    if (extServerLesson != null
-		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
-		ExtServer server = extServerLesson.getExtServer();
+	Long lessonId = lesson.getLessonId();
+	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	ExtUserUseridMap extUser = extServerLesson == null ? null
+		: getExtUserUseridMapByUserId(server, user.getUserId());
 
-		ExtUserUseridMap extUser = getExtUserUseridMapByUserId(server, user.getUserId());
-		if (extUser != null) {
-		    String extUsername = extUser.getExtUsername();
+	// checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
+	if (extServerLesson != null && extUser != null
+		&& server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
 
-		    //return URL in case of integration server
-		    if (server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)) {
-			// construct real lessonFinishCallbackUrl
-			lessonFinishCallbackUrl = server.getLessonFinishUrl();
-			String timestamp = Long.toString(new Date().getTime());
-			String hash = hash(server, extUsername, timestamp);
-			String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
+	    // construct real lessonFinishCallbackUrl
+	    lessonFinishCallbackUrl = server.getLessonFinishUrl();
+	    String timestamp = Long.toString(new Date().getTime());
+	    String extUsername = extUser.getExtUsername();
+	    String hash = hash(server, extUsername, timestamp);
+	    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
 
-			// set the values for the parameters
-			lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
-				.replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
-				.replaceAll("%hash%", hash);
-			log.debug(lessonFinishCallbackUrl);
-
-			// in case of LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
-		    } else {
-
-			// calculate lesson's MaxPossibleMark
-			Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
-			GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId,
-				user.getUserId());
-			Double userTotalMark = (gradebookUserLesson == null) || (gradebookUserLesson.getMark() == null)
-				? null
-				: gradebookUserLesson.getMark();
-
-			final String lessonFinishUrl = server.getLessonFinishUrl();
-			if (userTotalMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
-
-			    Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userTotalMark / lessonMaxPossibleMark;
-			    final String scoreStr = (userTotalMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
-				    : score.toString();
-
-			    final String serverKey = server.getServerid();
-			    final String serverSecret = server.getServerkey();
-			    final String tcGradebookId = extUser.getTcGradebookId();
-			    final ExtUserUseridMap extUserFinal = extUser;
-
-			    Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-				    //send Request directly
-				    try {
-					IMSPOXRequest.sendReplaceResult(lessonFinishUrl, serverKey, serverSecret,
-						tcGradebookId, scoreStr);
-				    } catch (IOException e) {
-					throw new RuntimeException(e);
-				    } catch (OAuthException e) {
-					throw new RuntimeException(e);
-				    } catch (GeneralSecurityException e) {
-					throw new RuntimeException(e);
-				    }
-				    log.debug("Score (" + scoreStr + ") posted to Tool Consumer (serverKey:" + serverKey
-					    + "). extUsername:" + extUserFinal.getExtUsername());
-				}
-			    }, "LAMS_sendScoresLTI_thread");
-			    preaddLearnersMonitorsThread.start();
-
-			}
-		    }
-
-		}
-	    }
+	    // set the values for the parameters
+	    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
+		    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
+		    .replaceAll("%hash%", hash);
+	    log.debug(lessonFinishCallbackUrl);
 	}
+	// in case of LTI Tool Consumer - pushMarkToIntegratedServer() method will be invoked from GradebookService on mark update
 
 	return lessonFinishCallbackUrl;
+    }
+    
+    @Override
+    public void pushMarkToLtiConsumer(User user, Lesson lesson, Double userMark) {
+	if (lesson == null) {
+	    return;
+	}
+	Long lessonId = lesson.getLessonId();
+	ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
+	ExtUserUseridMap extUser = extServerLesson == null ? null
+		: getExtUserUseridMapByUserId(server, user.getUserId());
+	
+	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
+	if (extServerLesson != null && extUser != null
+		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
+		&& StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+
+	    // calculate lesson's MaxPossibleMark
+	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
+
+	    final String lessonFinishUrl = server.getLessonFinishUrl();
+	    if (userMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
+		Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
+		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
+			: score.toString();
+
+		final String serverKey = server.getServerid();
+		final String serverSecret = server.getServerkey();
+		final String tcGradebookId = extUser.getTcGradebookId();
+		final ExtUserUseridMap extUserFinal = extUser;
+
+		Thread sendMarkToLtiConsumerThread = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+			//send Request directly
+			try {
+			    IMSPOXRequest.sendReplaceResult(lessonFinishUrl, serverKey, serverSecret, tcGradebookId,
+				    scoreStr);
+			} catch (IOException e) {
+			    throw new RuntimeException(e);
+			} catch (OAuthException e) {
+			    throw new RuntimeException(e);
+			} catch (GeneralSecurityException e) {
+			    throw new RuntimeException(e);
+			}
+			log.debug("Score (" + scoreStr + ") posted to Tool Consumer (serverKey:" + serverKey
+				+ "). extUsername:" + extUserFinal.getExtUsername());
+		    }
+		}, "LAMS_sendScoresLTI_thread");
+		sendMarkToLtiConsumerThread.start();
+	    }
+	}
     }
 
     @Override
@@ -839,7 +844,7 @@ public class IntegrationService implements IIntegrationService {
 		    Integer userId = extUserUseridMap.getUser().getUserId();
 
 		    //add user to organisation if it's not there
-		    updateUserRoles(user, organisation, LoginRequestDispatcher.METHOD_LEARNER);
+		    updateUserRoles(user, organisation, IntegrationConstants.METHOD_LEARNER);
 
 		    //check if user belong to the lesson. and if not - add it
 		    if (!lesson.getLessonClass().getLearnersGroup().hasLearner(user)) {
@@ -871,12 +876,12 @@ public class IntegrationService implements IIntegrationService {
     }
     
     @Override
-    public ExtUserUseridMap addExtUserToLesson(ExtServer extServer, String method, String lsIdStr, String username,
-	    String firstName, String lastName, String email, String courseId, String countryIsoCode, String langIsoCode)
+    public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
+	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lsIdStr + "'.");
+	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId + "'.");
 	}
 
 	ExtUserUseridMap userMap = null;
@@ -889,12 +894,26 @@ public class IntegrationService implements IIntegrationService {
 		    email, usePrefix, isUpdateUserDetails);
 	}
 
-	// ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 	// adds user to group
-	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, courseId, null, method);
+	ExtCourseClassMap orgMap = getExtCourseClassMap(extServer, userMap, extCourseId, null, method);
 	//TODO when merging to newer branch, check and maybe change to the following
 //		getExtCourseClassMap(extServer, userMap, courseId, countryIsoCode, langIsoCode, null,
 //		method);
+
+	return userMap;
+    }
+    
+    @Override
+    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId, String username,
+	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
+	    throws UserInfoFetchException, UserInfoValidationException {
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
+	}
+	
+	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email, extCourseId,
+		countryIsoCode, langIsoCode);
 
 	User user = userMap.getUser();
 	if (user == null) {
@@ -903,10 +922,10 @@ public class IntegrationService implements IIntegrationService {
 	    throw new UserInfoFetchException(error);
 	}
 
-	if (LoginRequestDispatcher.METHOD_LEARNER.equals(method)) {
-	    lessonService.addLearner(Long.parseLong(lsIdStr), user.getUserId());
-	} else if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-	    lessonService.addStaffMember(Long.parseLong(lsIdStr), user.getUserId());
+	if (IntegrationConstants.METHOD_LEARNER.equals(method)) {
+	    lessonService.addLearner(lesssonId, user.getUserId());
+	} else if (IntegrationConstants.METHOD_MONITOR.equals(method)) {
+	    lessonService.addStaffMember(lesssonId, user.getUserId());
 	}
 
 	return userMap;
@@ -954,7 +973,7 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void addExtUsersToLesson(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
+    public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
 	    throws IOException, UserInfoFetchException, UserInfoValidationException {
 	
 	String membershipUrl = extServer.getMembershipUrl();
@@ -969,16 +988,6 @@ public class IntegrationService implements IIntegrationService {
         log.debug("Make a call to remote membershipUrl:" + membershipUrl);
         HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
         ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
-//	request.setEntity(new StringEntity(xml, "UTF-8"));
-//	ltiServiceGetRequest.setAdditionalParameters(parameters);
-//        if (empty($data)) {
-//            if (!empty($type)) {
-//                $header .= "\nAccept: {$type}";
-//            }
-//        } else if (isset($type)) {
-//            $header .= "\nContent-Type: {$type}";
-//            $header .= "\nContent-Length: " . strlen($data);
-//        }
 
 	LtiSigner ltiSigner = new LtiOauthSigner();
 	try {
@@ -1014,9 +1023,9 @@ public class IntegrationService implements IIntegrationService {
 	    String extUserId = member.get("userId").asText();
 	    //to address Moodle version 3.7.1 bug
 	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
-		    : member.get("giveName").asText();
+		    : member.get("givenName").asText();
 	    String lastName = member.get("familyName").asText();
-	    String fullName = member.get("name").asText();
+//	    String fullName = member.get("name").asText();
 	    String email = member.get("email").asText();
 	    // Set the user country and lang
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
@@ -1032,12 +1041,17 @@ public class IntegrationService implements IIntegrationService {
 		roles += role + ",";
 	    }
 	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
-		    ? LoginRequestDispatcher.METHOD_MONITOR
-		    : LoginRequestDispatcher.METHOD_LEARNER;
-	    ExtUserUseridMap extUser = addExtUserToLesson(extServer, method, lessonId.toString(), extUserId, firstName,
-		    lastName, email, courseId, countryIsoCode, langIsoCode);
+		    ? IntegrationConstants.METHOD_MONITOR
+		    : IntegrationConstants.METHOD_LEARNER;
+	    
+	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
+	    ExtUserUseridMap extUser = lessonId == null
+		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
+			    countryIsoCode, langIsoCode)
+		    : addExtUserToCourseAndLesson(extServer, method, lessonId, extUserId, firstName, lastName, email,
+			    courseId, countryIsoCode, langIsoCode);
 
-	    // If a result sourcedid is providedm, save it to the user object
+	    // If a result sourcedid is provided, save it to the user object
 	    JsonNode messages = membership.get("message");
 	    if (messages != null && messages.size() > 0) {
 		for (int k = 0; k < messages.size(); k++) {
@@ -1069,10 +1083,6 @@ public class IntegrationService implements IIntegrationService {
 
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
-    }
-
-    public void setGradebookService(IGradebookService gradebookService) {
-	this.gradebookService = gradebookService;
     }
 
     public void setToolService(ILamsCoreToolService toolService) {

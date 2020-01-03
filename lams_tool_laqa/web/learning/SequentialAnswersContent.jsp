@@ -13,10 +13,10 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">
-							<c:out value="${questionEntry.key}" />. <c:out value="${questionEntry.value.name}" escapeXml="false" />
+							<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}"><c:out value="${questionEntry.key}" />.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
 						</div>
 					</div>
-					
+
 					<div class="panel-body">
 						<c:if test="${not empty questionEntry.value.description}">
 							<div class="panel">
@@ -25,23 +25,21 @@
 						</c:if>
 						
 						<div class="answer-req">
-							<fmt:message key="label.learning.yourAnswer" />
 							<c:if test="${questionEntry.value.required}">
-								<small>
-									<mark>
-										<fmt:message key="label.required" />
-									</mark>
-								</small>
+									<span class="label label-danger pull-right"><fmt:message key="label.required" /></span>
 							</c:if>
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">
-								<br />
-								<fmt:message key="label.words.required" />: <span id="words-required-"></span>
+								<button class="btn btn-xs btn-primary" type="button">
+									<strong><fmt:message key="label.words.required" />&nbsp;</strong><span id="words-required-" class="badge"></span>
+								</button>
+								<div class="voffset5">&nbsp;</div>
 							</c:if>
 						</div>
 
 						<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
 							data-min-words-limit="${questionEntry.value.minWordsLimit}"
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
+							<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
 							<c:choose>
 								<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 									<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
@@ -50,7 +48,7 @@
 								</c:when>
 
 								<c:otherwise>
-									<lams:textarea name="answer" id="answer" rows="5" class="form-control">
+									<lams:textarea name="answer" id="answer" rows="5" placeholder="${placeholder}" class="form-control">
 										<c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' />
 									</lams:textarea>
 								</c:otherwise>
@@ -70,7 +68,6 @@
 	<c:choose>
 		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
 				  				  (generalLearnerFlowDTO.totalQuestionCount != 1) }">
-
 			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>
@@ -83,7 +80,6 @@
 					<fmt:message key="button.done" />
 				</button>
 			</div>
-
 		</c:when>
 
 		<c:when test="${(generalLearnerFlowDTO.currentQuestionIndex == generalLearnerFlowDTO.totalQuestionCount) && 
@@ -94,12 +90,10 @@
 					<fmt:message key="button.done" />
 				</button>
 			</div>
-
 		</c:when>
 
 		<c:when test="${generalLearnerFlowDTO.currentQuestionIndex != generalLearnerFlowDTO.totalQuestionCount && 
 				 				  generalLearnerFlowDTO.currentQuestionIndex > 1}">
-
 			<button id="btnGetPrevious" type="button" onclick="javascript:submitMethod('getPreviousQuestion');"
 				class="btn btn-sm btn-default voffset10">
 				<i class="fa fa-arrow-left"></i>&nbsp;
@@ -110,7 +104,6 @@
 				<fmt:message key="button.getNextQuestion" />
 				&nbsp; <i class="fa fa-arrow-right"></i>
 			</button>
-
 		</c:when>
 
 		<c:otherwise>
@@ -124,9 +117,3 @@
 
 </div>
 <!-- End pane body -->
-
-<script type="text/javascript">
-	window.onload = function() {
-		document.getElementById("answer").focus();
-	}
-</script>

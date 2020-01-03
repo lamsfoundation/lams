@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -49,8 +48,6 @@ public class PopulateMarksServlet extends HttpServlet {
 
     @Autowired
     private static IScratchieService scratchieService;
-    @Autowired
-    private static ScratchieSessionDAO scratchieSessionDAO;
 
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
@@ -91,7 +88,7 @@ public class PopulateMarksServlet extends HttpServlet {
 
 		//otherwise - only the ones that belong to specified toolContentId
 	    } else {
-		List<ScratchieSession> dbSessions = scratchieSessionDAO.getByContentId(toolContentId);
+		List<ScratchieSession> dbSessions = scratchieService.getSessionsByContentId(toolContentId);
 		sessions.addAll(dbSessions);
 	    }
 

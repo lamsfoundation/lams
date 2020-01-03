@@ -48,7 +48,6 @@
 		$(function() {
 			// Setup form validation 
 			$("#userForm").validate({
-								debug : true,
 								errorClass : 'help-block',
 								//  validation rules
 								rules : {

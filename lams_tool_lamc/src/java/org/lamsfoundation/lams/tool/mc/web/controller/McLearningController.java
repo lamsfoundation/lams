@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
@@ -88,7 +89,7 @@ public class McLearningController {
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     @RequestMapping("/displayMc")
     public String displayMc(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
@@ -140,6 +141,9 @@ public class McLearningController {
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
+
+	sessionMap.put(McAppConstants.CONFIG_KEY_HIDE_TITLES,
+		Boolean.valueOf(mcService.getConfigValue(McAppConstants.CONFIG_KEY_HIDE_TITLES)));
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	mcLearningForm.setToolSessionID(toolSessionID);
@@ -241,8 +245,8 @@ public class McLearningController {
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
-		List<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
-								      // Long(toolSessionID).longValue());
+		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
+								     // Long(toolSessionID).longValue());
 		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
@@ -283,10 +287,6 @@ public class McLearningController {
 	return "learning/AnswersContent";
     }
 
-    /**
-     * ActionForward endLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     */
     @RequestMapping("/endLearning")
     public String endLearning(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -393,20 +393,20 @@ public class McLearningController {
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	McSession session = mcService.getMcSessionById(new Long(toolSessionID));
 	String toolContentId = session.getMcContent().getMcContentId().toString();
-	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
+	McContent content = mcService.getMcContent(new Long(toolContentId));
 
 	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
-		mcContent.isQuestionsSequenced());
+		content.isQuestionsSequenced());
 
 	Map<String, Integer> learnerConfidenceLevels = null;
-	if (mcContent.isEnableConfidenceLevels()) {
+	if (content.isEnableConfidenceLevels()) {
 	    learnerConfidenceLevels = parseLearnerConfidenceLevels(mcLearningForm, request,
-		    mcContent.isQuestionsSequenced());
+		    content.isQuestionsSequenced());
 	}
 
-	if (mcContent.isQuestionsSequenced()) {
+	if (content.isQuestionsSequenced()) {
 	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
-	    if (mcContent.isEnableConfidenceLevels()) {
+	    if (content.isEnableConfidenceLevels()) {
 		sessionMap.put(McAppConstants.CONFIDENCE_LEVELS_KEY, learnerConfidenceLevels);
 	    }
 	}
@@ -421,7 +421,7 @@ public class McLearningController {
 	}
 
 	/* process the answers */
-	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, mcContent, request);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, learnerConfidenceLevels, content, request);
 	mcService.saveUserAttempt(user, answerDtos);
 
 	//calculate total learner mark
@@ -435,6 +435,18 @@ public class McLearningController {
 	user.setLastAttemptTotalMark(learnerMark);
 	user.setResponseFinalised(true);
 	mcService.updateMcQueUsr(user);
+
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	if (content.isUseSelectLeaderToolOuput() && session.isUserGroupLeader(user)) {
+	    session.getMcQueUsers().forEach(sessionUser -> {
+		//finish non-leader
+		sessionUser.setResponseFinalised(true);
+		mcService.updateMcQueUsr(user);
+
+		//copy answers from leader to non-leaders
+		mcService.copyAnswersFromLeader(sessionUser, session.getGroupLeader());
+	    });
+	}
 
 	return viewAnswers(mcLearningForm, request, response);
     }
@@ -560,13 +572,13 @@ public class McLearningController {
 	//rebuildFeedbackMapfromDB
 	Map mapFeedbackContent = new TreeMap(new McComparator());
 	int i = 1;
-	for(McQueContent question : questions) {
+	for (McQueContent question : questions) {
 	    String feedback = question.getFeedback();
 	    mapFeedbackContent.put(String.valueOf(i++), feedback);
 	}
 	mcGeneralLearnerFlowDTO.setMapFeedbackContent(mapFeedbackContent);
 
-	McQueUsr user = getCurrentUser(toolSessionID);
+	McQueUsr user = getSpecifiedUser(toolSessionID, mcLearningForm.getUserID().intValue());
 
 	Long toolContentUID = mcContent.getUid();
 

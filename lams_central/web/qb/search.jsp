@@ -173,22 +173,31 @@
 	    	}
 	    	//disabling the button
     		$(this).attr("disabled", "disabled");
-		    	
-	    	$("#itemArea").load(
-				"${param.returnUrl}",
-				{
+
+			$.ajax({
+				url: "${param.returnUrl}",
+				data: {
 					qbQuestionUid: $("#selected-question-uid").val()
 				},
-				function() {
-					//invoke refreshThickbox() only in case parent page has this method 
-					if (typeof refreshThickbox === "function") {
-						refreshThickbox();
-					}
+				type: "POST",
+				success: function(response, status, xhr) {
+					if (response.isDuplicated) {
+						//show not successfull notification
+	                	$.growlUI('<i class="fa fa-lg fa-ban" style="color:red"></i> <fmt:message key="label.question.not.added" />');
+						
+					} else {
+						$("#itemArea").html(response);
 
-					//show successfull notification
-                	$.growlUI('<i class="fa fa-lg fa-download"></i> <fmt:message key="label.question.successfully.imported" />');
+						//invoke refreshThickbox() only in case parent page has this method 
+						if (typeof refreshThickbox === "function") {
+							refreshThickbox();
+						}
+
+						//show successfull notification
+	                	$.growlUI('<i class="fa fa-lg fa-check" style="color:green"></i>&nbsp;<fmt:message key="label.question.successfully.imported" />');
+					}
 				}
-			);
+			});
         });
 
 		//handler for "Advanced search" button

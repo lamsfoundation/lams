@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Entity
 @Table(name = "lams_ext_server_org_map")
 public class ExtServer implements Serializable, Comparable<ExtServer> {
-    
+
     private static final long serialVersionUID = 337894825609071182L;
 
     /*
@@ -56,6 +56,9 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     @Column(name = "lesson_finish_url")
     private String lessonFinishUrl;
+
+    @Column(name = "logout_url")
+    private String logoutUrl;
 
     @Column(name = "ext_groups_url")
     private String extGroupsUrl;
@@ -105,16 +108,19 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     private Boolean gradebookOnComplete;
 
     @OneToMany(mappedBy = "extServer")
-    private Set<ExtCourseClassMap> extCourseClassMaps = new HashSet<ExtCourseClassMap>();
+    private Set<ExtCourseClassMap> extCourseClassMaps = new HashSet<>();
 
     @OneToMany(mappedBy = "extServer")
-    private Set<ExtUserUseridMap> extUserUseridMaps = new HashSet<ExtUserUseridMap>();
+    private Set<ExtUserUseridMap> extUserUseridMaps = new HashSet<>();
 
     /**
      * Comma-separated list of roles that LTI tool consumer uses to indicate user monitor role
      */
     @Column(name = "lti_consumer_monitor_roles")
     private String ltiToolConsumerMonitorRoles;
+    
+    @Column(name = "use_alternative_user_id_parameter_name")
+    private Boolean useAlternativeUseridParameterName;
 
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
@@ -190,6 +196,14 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setLessonFinishUrl(String lessonFinishUrl) {
 	this.lessonFinishUrl = lessonFinishUrl;
+    }
+
+    public String getLogoutUrl() {
+	return logoutUrl;
+    }
+
+    public void setLogoutUrl(String logoutUrl) {
+	this.logoutUrl = logoutUrl;
     }
 
     public String getExtGroupsUrl() {
@@ -332,5 +346,13 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setGradebookOnComplete(Boolean gradebookOnComplete) {
 	this.gradebookOnComplete = gradebookOnComplete;
+    }
+    
+    public Boolean getUseAlternativeUseridParameterName() {
+	return useAlternativeUseridParameterName;
+    }
+
+    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
+	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
     }
 }

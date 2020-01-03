@@ -1,14 +1,13 @@
 package org.lamsfoundation.lams.outcome.service;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
 import org.lamsfoundation.lams.outcome.OutcomeScale;
-import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IOutcomeService {
@@ -41,9 +40,9 @@ public interface IOutcomeService {
 	    Integer sourceQbQuestionId, Long targetLessonId, Long targetToolContentId, Long targetItemId,
 	    Integer targetQbQuestionId);
 
-    LinkedHashMap<String, ExcelCell[][]> exportScales();
+    List<ExcelSheet> exportScales();
 
-    LinkedHashMap<String, ExcelCell[][]> exportOutcomes();
+    List<ExcelSheet> exportOutcomes();
 
     int importScales(MultipartFile fileItem) throws IOException;
 

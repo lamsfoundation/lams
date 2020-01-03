@@ -35,6 +35,9 @@ public class GroupSummary {
     private int mark;
     private int totalAttempts;
     private String totalPercentage;
+    
+    //used for itemSummary page
+    private int numberColumns;
 
     private Collection<ScratchieUser> users;
     private Collection<ScratchieItemDTO> itemDtos;
@@ -96,6 +99,14 @@ public class GroupSummary {
 
     public void setTotalPercentage(String totalPercentage) {
 	this.totalPercentage = totalPercentage;
+    }
+    
+    public int getNumberColumns() {
+	return numberColumns;
+    }
+
+    public void setNumberColumns(int numberColumns) {
+	this.numberColumns = numberColumns;
     }
 
     public Collection<ScratchieUser> getUsers() {

@@ -25,6 +25,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -64,16 +65,17 @@ public class LearningWebsocketServer {
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
-			// if all learners left the activity, remove the obsolete mapping
+
 			Set<Session> sessionWebsockets = entry.getValue();
-			if (sessionWebsockets.isEmpty()) {
+			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
+				.getScratchieSessionBySessionId(toolSessionId);
+			// if all learners left the activity or session is missing, remove the obsolete mapping
+			if (sessionWebsockets.isEmpty() || toolSession == null) {
 			    entryIterator.remove();
 			    LearningWebsocketServer.cache.remove(toolSessionId);
 			    continue;
 			}
 
-			ScratchieSession toolSession = LearningWebsocketServer.getScratchieService()
-				.getScratchieSessionBySessionId(toolSessionId);
 			boolean timeLimitUp = false;
 			boolean scratchingFinished = toolSession.isScratchingFinished();
 			// is Scratchie time limited?
@@ -127,6 +129,8 @@ public class LearningWebsocketServer {
 		} catch (IllegalStateException e) {
 		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
 		} catch (Exception e) {
+		    //TODO remove this once NullPointerExceptions do not show anymore in logs
+		    e.printStackTrace();
 		    // error caught, but carry on
 		    log.error("Error in Scratchie worker thread", e);
 		} finally {
@@ -166,7 +170,8 @@ public class LearningWebsocketServer {
 			    }
 			}
 
-			String optionUidOrAnswer = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType()
+			boolean isMCQItem = QbQuestion.TYPE_MULTIPLE_CHOICE == item.getQbQuestion().getType();
+			String optionUidOrAnswer = isMCQItem
 				? optionDto.getQbOptionUid().toString()
 				: optionDto.getAnswer();
 			Boolean isCorrectStoredAnswer = optionDto.isCorrect();
@@ -179,7 +184,10 @@ public class LearningWebsocketServer {
 			    if (itemJSON == null) {
 				itemJSON = JsonNodeFactory.instance.objectNode();
 			    }
-			    itemJSON.put(optionUidOrAnswer.toString(), isCorrectStoredAnswer);
+			    ObjectNode optionPropertiesJSON = JsonNodeFactory.instance.objectNode();
+			    optionPropertiesJSON.put("isCorrect", isCorrectStoredAnswer);
+			    optionPropertiesJSON.put("isVSA", !isMCQItem);
+			    itemJSON.set(optionUidOrAnswer, optionPropertiesJSON);
 			}
 		    }
 		}
@@ -222,6 +230,14 @@ public class LearningWebsocketServer {
     public void registerUser(Session websocket) throws IOException {
 	Long toolSessionId = Long
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	String login = websocket.getUserPrincipal().getName();
+	ScratchieUser user = LearningWebsocketServer.getScratchieService().getUserByLoginAndSessionId(login,
+		toolSessionId);
+	if (user == null) {
+	    throw new SecurityException("User \"" + login
+		    + "\" is not a participant in Scratchie activity with tool session ID " + toolSessionId);
+	}
+
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    sessionWebsockets = ConcurrentHashMap.newKeySet();
@@ -233,8 +249,7 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (log.isDebugEnabled()) {
-	    log.debug("User " + websocket.getUserPrincipal().getName() + " entered Scratchie with toolSessionId: "
-		    + toolSessionId);
+	    log.debug("User " + login + " entered Scratchie with toolSessionId: " + toolSessionId);
 	}
     }
 

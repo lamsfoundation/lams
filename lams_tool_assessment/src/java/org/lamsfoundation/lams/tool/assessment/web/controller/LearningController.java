@@ -192,7 +192,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user, toolSessionId);
+	boolean isUserLeader = service.isUserGroupLeader(user.getUserId(), toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
@@ -833,7 +833,7 @@ public class LearningController {
 		    if (questionDto.isMultipleAnswersAllowed()) {
 			String answer = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
-			answerBoolean = !StringUtils.isBlank(answer);
+			answerBoolean = StringUtils.isNotBlank(answer);
 		    } else {
 			String optionUidSelectedStr = request
 				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);

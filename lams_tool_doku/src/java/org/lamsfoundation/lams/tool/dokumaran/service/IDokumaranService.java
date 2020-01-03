@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.servlet.http.Cookie;
 
-
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -66,7 +65,7 @@ public interface IDokumaranService extends ICommonToolService {
      * @throws DokumaranApplicationException
      */
     Dokumaran getDefaultContent(Long contentId) throws DokumaranApplicationException;
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      *
@@ -76,50 +75,52 @@ public interface IDokumaranService extends ICommonToolService {
      *            whether user is accessing this doKumaran tool for the first time. If it's true - it will try to update
      *            leaders list from the Leader Selection activity
      */
-    List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId, boolean isFirstTimeAccess);
-    
+    List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId,
+	    boolean isFirstTimeAccess);
+
     /**
      * Is user is as a leader. It works OK in all cases regardless whether isAllowMultipleLeaders option is ON or OFF
      * (as all leaders are kept in leaders list anyway).
-     * 
+     *
      * @param leaders
      * @param userId
      * @return
      */
     boolean isUserLeader(List<DokumaranUser> leaders, Long userId);
-    
+
     /**
-     * Checks whether at least one of the leaders has finished activity and thus all non-leaders can proceed with finishing it as well.
-     * 
+     * Checks whether at least one of the leaders has finished activity and thus all non-leaders can proceed with
+     * finishing it as well.
+     *
      * @param leaders
      * @return
      */
     boolean isLeaderResponseFinalized(List<DokumaranUser> leaders);
-    
+
     /**
      * Checks whether at least one of the leaders has finished activity and thus all non-leaders can proceed with
      * finishing it as well. It differs from the above method that is should be used when leaders list is not
      * constructed yet.
-     * 
+     *
      * @param session
      * @return
      */
     boolean isLeaderResponseFinalized(Long toolSessionId);
-    
+
     /**
      * Stores date when user has started activity with time limit.
-     * 
+     *
      * @param toolContentId
-     * @throws IOException 
-     * @throws JSONException 
+     * @throws IOException
+     * @throws JSONException
      */
     void launchTimeLimit(Long toolContentId) throws IOException;
-    
+
     void addOneMinute(Long toolContentId) throws IOException;
 
     /**
-     * Calculates how many seconds left till the time limit will expire. 
-     * 
+     * Calculates how many seconds left till the time limit will expire.
+     *
      * @param assessment
      * @return
      */
@@ -130,26 +131,28 @@ public interface IDokumaranService extends ICommonToolService {
      * @return whether the time limit is exceeded already
      */
     boolean checkTimeLimitExceeded(Dokumaran dokumaran);
-    
-    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException;
-    
-    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws DokumaranConfigurationException, URISyntaxException;
-    
+
+    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
+	    throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException;
+
+    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId)
+	    throws DokumaranConfigurationException, URISyntaxException;
+
     /**
      * Creates EPLiteClient that will make calls to Etherpad server. Throws DokumaranConfigurationException tf the tool
      * is not configured appropriately (either etherpadServerUrl or etherpadApiKey is missing).
-     * 
+     *
      * @return
      * @throws DokumaranConfigurationException
      */
     EPLiteClient initializeEPLiteClient() throws DokumaranConfigurationException;
-    
+
     /**
      * Creates pad on Etherpad server side.
-     * 
+     *
      * @param dokumaran
      * @param session
-     * @throws DokumaranConfigurationException 
+     * @throws DokumaranConfigurationException
      */
     void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException;
 
@@ -167,6 +170,8 @@ public interface IDokumaranService extends ICommonToolService {
      */
     DokumaranUser getUserByIDAndContent(Long userID, Long contentId);
 
+    DokumaranUser getUserByLoginAndContent(String login, long contentId);
+
     /**
      * Get user by sessionID and UserID
      *
@@ -175,7 +180,7 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     DokumaranUser getUserByIDAndSession(Long long1, Long sessionId);
-    
+
     /**
      * Get users by the given toolSessionId.
      *
@@ -183,7 +188,7 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     List<DokumaranUser> getUsersBySession(Long toolSessionId);
-    
+
     DokumaranConfigItem getConfigItem(String key);
 
     void saveOrUpdateDokumaranConfigItem(DokumaranConfigItem item);

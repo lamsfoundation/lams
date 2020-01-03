@@ -24,7 +24,8 @@
 package org.lamsfoundation.lams.tool.dokumaran.dao;
 
 import java.io.Serializable;
-import java.util.List;
+
+import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
  * Data Access Object (DAO) interface. This is an interface
@@ -32,7 +33,7 @@ import java.util.List;
  *
  * @author Dapeng.Ni
  */
-public interface DAO {
+public interface DAO extends IBaseDAO {
 
     /**
      * Generic method to get an object based on class and identifier. An
@@ -49,7 +50,7 @@ public interface DAO {
 
     /**
      * Generic method to save an object - handles both update and insert.
-     * 
+     *
      * @param o
      *            the object to save
      */
@@ -57,7 +58,7 @@ public interface DAO {
 
     /**
      * Generic method to delete an object based on class and id
-     * 
+     *
      * @param clazz
      *            model class to lookup
      * @param id

@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.web.session;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +35,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class SessionManager {
+    private static Logger log = Logger.getLogger(SessionManager.class);
+
     public static final String SYS_SESSION_COOKIE = "JSESSIONID";
-    // if this attribute is set in session, next call will force the user to log out
-    public static final String LOG_OUT_FLAG = "lamsLogOutFlag";
 
     // singleton
     private static SessionManager sessionManager;
@@ -74,11 +78,6 @@ public class SessionManager {
      */
     public static void startSession(HttpServletRequest request) {
 	HttpSession session = request.getSession();
-	if (session.getAttribute(LOG_OUT_FLAG) != null) {
-	    // session was flagged for invalidation
-	    session.invalidate();
-	    throw new SecurityException("You were logged out");
-	}
 
 	String sessionId = session.getId();
 	sessionIdMapping.put(sessionId, session);
@@ -91,11 +90,21 @@ public class SessionManager {
 	    // check if it's a different session and if so, which one is newer
 	    if (existingSession != null && !existingSession.getId().equals(sessionId)) {
 		if (session.getCreationTime() > existingSession.getCreationTime()) {
-		    // mark the other session for invalidation
-		    existingSession.setAttribute(LOG_OUT_FLAG, true);
+		    try {
+			// invalidate the other session
+			existingSession.invalidate();
+		    } catch (Exception e) {
+			log.warn("SessionMananger invalidation exception", e);
+			// if it was already invalidated, do nothing
+		    }
 		} else {
-		    // invalidate this session
-		    session.invalidate();
+		    try {
+			// invalidate this session
+			session.invalidate();
+		    } catch (Exception e) {
+			log.warn("SessionMananger invalidation exception", e);
+			// if it was already invalidated, do nothing
+		    }
 		    throw new SecurityException("You were logged out");
 		}
 	    }
@@ -122,10 +131,12 @@ public class SessionManager {
 	SessionManager.loginMapping.remove(login);
 
 	if (invalidate) {
-	    // only mark for invalidation, not invalidate
-	    // otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
-	    // see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
-	    session.setAttribute(LOG_OUT_FLAG, true);
+	    try {
+		session.invalidate();
+	    } catch (Exception e) {
+		log.warn("SessionMananger invalidation exception", e);
+		// if it was already invalidated, do nothing
+	    }
 	}
     }
 
@@ -136,12 +147,13 @@ public class SessionManager {
 	HttpSession session = SessionManager.getSession(sessionID);
 	if (session != null) {
 	    SessionManager.sessionIdMapping.remove(sessionID);
-
 	    if (invalidate) {
-		// only mark for invalidation, not invalidate
-		// otherwise on clustered environment we get problems with server-side invalidation of Infinispan distributed sessions
-		// see WFLY-7281 and WFLY-7229; maybe it will work on WildFly 11
-		session.setAttribute(LOG_OUT_FLAG, true);
+		try {
+		    session.invalidate();
+		} catch (Exception e) {
+		    log.warn("SessionMananger invalidation exception", e);
+		    // if it was already invalidated, do nothing
+		}
 	    }
 	}
 	if (clearLoginMapping) {
@@ -218,14 +230,18 @@ public class SessionManager {
     /**
      * Lists all logins with their assigned sessions
      */
-    public static Map<String, List<String>> getLoginToSessionIDMappings() {
-	Map<String, List<String>> result = new TreeMap<>();
+    public static Map<String, List<Object>> getLoginToSessionIDMappings() {
+	FastDateFormat sessionCreatedDateFormatter = FastDateFormat.getInstance(DateUtil.PRETTY_FORMAT);
+
+	Map<String, List<Object>> result = new TreeMap<>();
 	for (Entry<String, HttpSession> entry : loginMapping.entrySet()) {
 	    HttpSession session = entry.getValue();
 	    UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    List<String> sessionInfo = new LinkedList<>();
+	    List<Object> sessionInfo = new LinkedList<>();
 	    sessionInfo.add(user.getFirstName());
 	    sessionInfo.add(user.getLastName());
+	    sessionInfo.add(new Date(session.getLastAccessedTime()));
+	    sessionInfo.add(sessionCreatedDateFormatter.format(new Date(session.getCreationTime())));
 	    sessionInfo.add(session.getId());
 	    result.put(entry.getKey(), sessionInfo);
 	}

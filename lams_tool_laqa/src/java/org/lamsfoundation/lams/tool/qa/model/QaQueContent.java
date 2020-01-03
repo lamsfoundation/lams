@@ -31,6 +31,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -52,6 +53,10 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
+    
+    // *************** NON Persist Fields used in learning ********************
+    @Transient
+    private QaUsrResp userResponse;
 
     public QaQueContent() {
     }
@@ -82,5 +87,15 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
     public void setQaContent(QaContent qaContent) {
 	this.qaContent = qaContent;
 	this.toolContentId = qaContent == null ? null : qaContent.getQaContentId();
+    }
+    
+    // *************** NON Persist Fields used in monitoring ********************
+
+    public QaUsrResp getUserResponse() {
+	return userResponse;
+    }
+
+    public void setUserResponse(QaUsrResp userResponse) {
+	this.userResponse = userResponse;
     }
 }

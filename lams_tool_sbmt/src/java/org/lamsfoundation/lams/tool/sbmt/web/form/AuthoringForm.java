@@ -32,6 +32,8 @@ public class AuthoringForm {
     private boolean useSelectLeaderToolOuput;
 
     private int limitUploadNumber;
+    
+    private Integer minLimitUploadNumber;
 
     private boolean reflectOnActivity;
 
@@ -61,6 +63,7 @@ public class AuthoringForm {
 	useSelectLeaderToolOuput = content.isUseSelectLeaderToolOuput();
 	limitUpload = content.isLimitUpload();
 	limitUploadNumber = content.getLimitUploadNumber();
+	minLimitUploadNumber = content.getMinLimitUploadNumber();
 
 	reflectOnActivity = content.isReflectOnActivity();
 	reflectInstructions = content.getReflectInstructions();
@@ -157,6 +160,14 @@ public class AuthoringForm {
 
     public void setLimitUploadNumber(int limitUploadNumber) {
 	this.limitUploadNumber = limitUploadNumber;
+    }
+    
+    public Integer getMinLimitUploadNumber() {
+	return minLimitUploadNumber;
+    }
+
+    public void setMinLimitUploadNumber(Integer minLimitUploadNumber) {
+	this.minLimitUploadNumber = minLimitUploadNumber;
     }
 
     public boolean isNotifyLearnersOnMarkRelease() {

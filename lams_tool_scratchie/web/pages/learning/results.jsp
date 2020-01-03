@@ -119,8 +119,9 @@
 			<!-- Display burningQuestionItemDtos -->
 			<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 				<c:set var="scratchieItem" value="${burningQuestionItemDto.scratchieItem}"/>
-			
-				jQuery("#burningQuestions${scratchieItem.uid}").jqGrid({
+				<c:set var="scratchieItemUid" value="${scratchieItem.uid == null ? 0 : scratchieItem.uid}"/>
+
+				jQuery("#burningQuestions${scratchieItemUid}").jqGrid({
 					datatype: "local",
 					rowNum: 10000,
 					height: 'auto',
@@ -165,8 +166,26 @@
 						},
 				   		{name:'count', index:'count', width:50, align:"right", title: false}
 				   	],
-                    caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.qbQuestion.name}"</c:when><c:otherwise>"<a href='#${scratchieItem.qbQuestion.name}' class='bq-title'>${scratchieItem.qbQuestion.name}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
-                    editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
+                    caption: <c:choose>
+								<%-- General burning question --%>
+								<c:when test="${scratchieItemUid == 0}">"<c:out value='${scratchieItem.qbQuestion.name}' />"
+								</c:when>
+								<c:otherwise>
+									<%-- Regular burning question --%>
+									<c:choose>
+										<%-- If we hide titles, we just display a link for "Question 1)" --%>
+										<c:when test="${sessionMap.hideTitles}">
+										 	"<a href='#questionTitle${i.count}' class='bq-title'><fmt:message key='label.question'/>&nbsp;${i.count})</a>"
+										</c:when>
+										<%-- If we show titles, we display question number and then a link with question title --%>
+										<c:otherwise>
+											"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><c:out value='${scratchieItem.qbQuestion.name}' /></a>"
+										</c:otherwise>
+									</c:choose>
+								</c:otherwise>
+							</c:choose> 
+							+ " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
+                    editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItemUid}',
 	  	          	beforeEditRow: function (options, rowid) {
 		  	          	alert("aaa");
 	  	          	},
@@ -187,7 +206,7 @@
 		  	            	$self.jqGrid("editRow", rowid, { focusField: "burningQuestion" });
 
 		  	            	//Modify event handler to save on blur
-		  	            	var gridId = "#burningQuestions${scratchieItem.uid}";
+		  	            	var gridId = "#burningQuestions${scratchieItemUid}";
 		  	              	$("textarea[id^='"+rowid+"_burningQuestion']", gridId).bind('blur',function(){
 		  	                	$(gridId).saveRow(rowid);
 		  	              	});
@@ -200,7 +219,7 @@
 				});
 				
 			    <c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">			    
-			    		jQuery("#burningQuestions${scratchieItem.uid}").addRowData(${i.index + 1}, {
+			    		jQuery("#burningQuestions${scratchieItemUid}").addRowData(${i.index + 1}, {
 			   			id:"${i.index + 1}",
 			   			isUserAuthor:"${burningQuestionDto.userAuthor}",
 			   	     	groupName:"${burningQuestionDto.sessionName}",
@@ -214,18 +233,18 @@
 				   			</c:when>
 							<c:when test="${burningQuestionDto.userLiked}">
 								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
-										'onclick="javascript:likeEntry(${scratchieItem.uid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
+										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:when>
 							<c:otherwise>
 								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<fmt:message key="label.like"/>"' +
-										'onclick="javascript:likeEntry(${scratchieItem.uid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
+										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:otherwise>
 						</c:choose>
 				   	 	count:'${burningQuestionDto.likeCount}'
 			   	   	});
 		        </c:forEach>
 
-		        jQuery("#burningQuestions${scratchieItem.uid}").jqGrid('sortGrid','groupName', false, 'asc');
+		        jQuery("#burningQuestions${scratchieItemUid}").jqGrid('sortGrid','groupName', false, 'asc');
 	        </c:forEach>
 			
 			<!-- Display reflection entries -->
@@ -381,9 +400,12 @@
 				</div>
 
 				<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
-					<div class="burning-question-dto">
-						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</div>
+					<c:if test="${not empty burningQuestionItemDto.burningQuestionDtos}">
+						<c:set var="scratchieItemUid" value="${empty burningQuestionItemDto.scratchieItem.uid ? 0 : burningQuestionItemDto.scratchieItem.uid}"/>
+						<div class="burning-question-dto">
+							<table id="burningQuestions${scratchieItemUid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+						</div>
+					</c:if>
 				</c:forEach>
 			</div>
 		</c:if>
@@ -418,7 +440,6 @@
 								</button>
 							</div>
 						</c:if>
-
 					</div>
 				</div>
 

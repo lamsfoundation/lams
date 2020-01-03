@@ -31,7 +31,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +67,12 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
-import org.lamsfoundation.lams.util.ExcelCell;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,8 +110,8 @@ public class GroupingUploadAJAXController {
 
     /**
      * Get the spreadsheet file containing list of the current users, ready for uploading with groups. If lesson
-     * supplied,
-     * list lesson users, otherwise list organisation users (course grouping screen has just the organisation).
+     * supplied, list lesson users, otherwise list organisation users (course grouping screen has just the
+     * organisation).
      *
      * @throws Exception
      */
@@ -151,8 +151,7 @@ public class GroupingUploadAJAXController {
 		.append(" ").append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = null;
-
+	List<ExcelSheet> sheets;
 	if (lesson != null) {
 	    Set<User> learners = lesson.getLessonClass().getLearners();
 	    // check for any groups already exist in this grouping
@@ -160,7 +159,7 @@ public class GroupingUploadAJAXController {
 	    Activity activity = monitoringService.getActivityById(activityId);
 	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
 		    : ((GroupingActivity) activity).getCreateGrouping();
-	    dataToExport = exportLearnersForGrouping(learners, grouping.getGroups(), null);
+	    sheets = exportLearnersForGrouping(learners, grouping.getGroups(), null);
 
 	} else {
 	    Long groupingId = WebUtil.readLongParam(request, "groupingId", true);
@@ -174,7 +173,7 @@ public class GroupingUploadAJAXController {
 	    }
 	    Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationId, Role.LEARNER,
 		    true);
-	    dataToExport = exportLearnersForGrouping(learners, null, groups);
+	    sheets = exportLearnersForGrouping(learners, null, groups);
 	}
 
 	// set cookie that will tell JS script that export has been finished
@@ -186,21 +185,20 @@ public class GroupingUploadAJAXController {
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 	ServletOutputStream out = response.getOutputStream();
-	ExcelUtil.createExcelXLS(out, dataToExport, null, false);
+	ExcelUtil.createExcel(out, sheets, null, false, false);
     }
 
-    private LinkedHashMap<String, ExcelCell[][]> exportLearnersForGrouping(Collection<User> learners, Set<Group> groups,
+    private List<ExcelSheet> exportLearnersForGrouping(Collection<User> learners, Set<Group> groups,
 	    Set<OrganisationGroup> orgGroups) {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	ExcelSheet excelSheet = new ExcelSheet(messageService.getMessage("label.course.groups.prefix"));
+ 	sheets.add(excelSheet);
 
-	List<ExcelCell[]> rowList = new LinkedList<>();
-	int numberOfColumns = 4;
-
-	ExcelCell[] title = new ExcelCell[numberOfColumns];
-	title[0] = new ExcelCell(messageService.getMessage("spreadsheet.column.login"), false);
-	title[1] = new ExcelCell(messageService.getMessage("spreadsheet.column.firstname"), false);
-	title[2] = new ExcelCell(messageService.getMessage("spreadsheet.column.lastname"), false);
-	title[3] = new ExcelCell(messageService.getMessage("spreadsheet.column.groupname"), false);
-	rowList.add(title);
+	ExcelRow titleRow = excelSheet.initRow();
+	titleRow.addCell(messageService.getMessage("spreadsheet.column.login"));
+	titleRow.addCell(messageService.getMessage("spreadsheet.column.firstname"));
+	titleRow.addCell(messageService.getMessage("spreadsheet.column.lastname"));
+	titleRow.addCell(messageService.getMessage("spreadsheet.column.groupname"));
 
 	if (groups != null) {
 	    List<Group> groupList = new LinkedList<>(groups);
@@ -208,7 +206,7 @@ public class GroupingUploadAJAXController {
 	    for (Group group : groupList) {
 		String groupName = group.getGroupName();
 		for (User groupUser : group.getUsers()) {
-		    rowList.add(generateUserRow(numberOfColumns, groupName, groupUser));
+		    generateUserRow(groupName, groupUser, excelSheet);
 		    learners.remove(groupUser);
 		}
 	    }
@@ -219,7 +217,7 @@ public class GroupingUploadAJAXController {
 	    for (OrganisationGroup group : groupList) {
 		String groupName = group.getName();
 		for (User groupUser : group.getUsers()) {
-		    rowList.add(generateUserRow(numberOfColumns, groupName, groupUser));
+		    generateUserRow(groupName, groupUser, excelSheet);
 		    learners.remove(groupUser);
 		}
 	    }
@@ -227,22 +225,18 @@ public class GroupingUploadAJAXController {
 
 	// all the remaining users are unassigned to any group
 	for (User unassignedUser : learners) {
-	    rowList.add(generateUserRow(numberOfColumns, null, unassignedUser));
+	    generateUserRow(null, unassignedUser, excelSheet);
 	}
 
-	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<>();
-	dataToExport.put(messageService.getMessage("label.course.groups.prefix"), summaryData);
-	return dataToExport;
+	return sheets;
     }
 
-    private ExcelCell[] generateUserRow(int numberOfColumns, String groupName, User groupUser) {
-	ExcelCell[] userRow = new ExcelCell[numberOfColumns];
-	userRow[0] = new ExcelCell(groupUser.getLogin(), false);
-	userRow[1] = new ExcelCell(groupUser.getFirstName(), false);
-	userRow[2] = new ExcelCell(groupUser.getLastName(), false);
-	userRow[3] = new ExcelCell(groupName, false);
-	return userRow;
+    private void generateUserRow(String groupName, User groupUser, ExcelSheet excelSheet) {
+	ExcelRow userRow = excelSheet.initRow();
+	userRow.addCell(groupUser.getLogin());
+	userRow.addCell(groupUser.getFirstName());
+	userRow.addCell(groupUser.getLastName());
+	userRow.addCell(groupName);
     }
 
     /**

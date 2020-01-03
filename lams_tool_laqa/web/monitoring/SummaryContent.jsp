@@ -48,14 +48,14 @@
 		</div>
 	</c:if>
 				  	
-	<c:forEach var="questionDto" items="${questions}">
+	<c:forEach var="questionDto" items="${questions}" varStatus="loop">
 		<div class="panel panel-default"">
 			<div class="panel-heading">
 				<a href="javascript:launchPopup('<lams:WebAppURL/>monitoring/getPrintAnswers.do?questionUid=${questionDto.uid}&toolSessionID=${groupDto.sessionId}');"	
 					id="printAnswers" class="btn btn-default btn-xs pull-right"><i class="fa fa-print"></i></a>
-				<c:out value="${questionDto.name}" escapeXml="false"/>
-				<br>
-				<c:out value="${questionDto.description}" escapeXml="false"/>
+				<strong><c:if test="${questions.size() > 1}"><c:out value="${loop.index +1}"></c:out>.&nbsp;</c:if><c:out value="${questionDto.name}" escapeXml="false"/></strong>
+				</br>
+				<div><c:out value="${questionDto.description}" escapeXml="false"/></div>
 			</div>
 			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${questionDto.uid}'">

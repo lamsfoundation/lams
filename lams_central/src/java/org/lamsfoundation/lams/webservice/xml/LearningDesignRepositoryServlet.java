@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
-import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
@@ -247,9 +247,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	    final boolean isUpdateUserDetails = false;
 
-	    String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
-	    String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
-	    String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
+	    String firstName = request.getParameter(IntegrationConstants.PARAM_FIRST_NAME);
+	    String lastName = request.getParameter(IntegrationConstants.PARAM_LAST_NAME);
+	    String email = request.getParameter(IntegrationConstants.PARAM_EMAIL);
 
 	    if ((serverId == null) || (datetime == null) || (hashValue == null) || (username == null)
 		    || (courseId == null) || (country == null) || (locale == null)) {
@@ -338,7 +338,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 		// create group for external course if necessary
 		integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
-			LoginRequestDispatcher.METHOD_AUTHOR);
+			IntegrationConstants.METHOD_AUTHOR);
 		Integer userId = userMap.getUser().getUserId();
 
 		String contentTree = buildContentTree(userId, mode).toString();
@@ -388,7 +388,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	// create group for external course if necessary
 	integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
-		LoginRequestDispatcher.METHOD_AUTHOR);
+		IntegrationConstants.METHOD_AUTHOR);
 	Integer userId = userMap.getUser().getUserId();
 	return userId;
     }

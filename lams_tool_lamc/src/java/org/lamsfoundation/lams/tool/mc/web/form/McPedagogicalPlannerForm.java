@@ -51,7 +51,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivitySpringFo
 
     @Autowired
     @Qualifier("lamcMessageService")
-    private static MessageService messageService;
+    private MessageService messageService;
 
     private List<String> descriptions;
     private List<Integer> candidateAnswerCount;

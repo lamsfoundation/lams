@@ -52,7 +52,12 @@
         </property>
     </bean>
 
-
+   <bean id="laasseAssessmentConfigDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentConfigDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
     <!-- Managers -->
 	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
 	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -79,6 +84,9 @@
         </property>
         <property name="assessmentSessionDao">
             <ref bean="laasseAssessmentSessionDao"/>
+        </property>
+        <property name="assessmentConfigDao">
+            <ref bean="laasseAssessmentConfigDao"/>
         </property>
         <property name="assessmentToolContentHandler">
             <ref bean="laasseAssessmentToolContentHandler"/>
@@ -130,30 +138,35 @@
 		</property>
         <property name="transactionAttributes">
             <props>
-                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="unset*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="allocateAnswerToOption">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="allocateAnswerToOption">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            	<prop key="audit*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
                 <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="notify*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
-                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
-				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="count*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>   
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                 
+				<prop key="get*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="loadupLastAttempt">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notify*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="recalculate*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="releaseFromCache">readOnly, PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="unset*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="replaceQuestions">PROPAGATION_REQUIRED</prop>
             </props>
         </property>

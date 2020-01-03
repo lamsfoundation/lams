@@ -337,6 +337,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public DokumaranUser getUserByLoginAndContent(String login, long contentId) {
+	List<User> user = dokumaranUserDao.findByProperty(User.class, "login", login);
+	return user.isEmpty() ? null
+		: dokumaranUserDao.getUserByUserIDAndContentID(user.get(0).getUserId().longValue(), contentId);
+    }
+
     @Override
     public DokumaranUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return dokumaranUserDao.getUserByUserIDAndSessionID(userId, sessionId);
@@ -546,7 +554,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1040,6 +1048,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
+    }
+
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
+	DokumaranUser groupLeader = session == null ? null : session.getGroupLeader();
+
+	return (groupLeader != null) && userId.equals(groupLeader.getUserId());
     }
 
     @Override

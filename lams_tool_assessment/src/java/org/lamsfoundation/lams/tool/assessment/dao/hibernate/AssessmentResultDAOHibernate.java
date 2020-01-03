@@ -43,8 +43,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
     
-    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT (r.finishDate IS NOT NULL) FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
+    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT COUNT(*) > 0 FROM " + AssessmentResult.class.getName()
+	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1 AND r.finishDate != null";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
@@ -299,20 +299,20 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
     
     @Override
-    public int countAttemptsPerOption(Long optionUid) {
+    public int countAttemptsPerOption(Long toolContentId, Long optionUid) {
 	String COUNT_ATTEMPTS_BY_OPTION_UID = "SELECT count(*) "
 		+ "FROM tl_laasse10_assessment_result AS result "
-		+ "JOIN tl_laasse10_question_result AS questionResult ON result.uid = questionResult.result_uid "
-		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid AND optionAnswer.answer_boolean=1 AND optionAnswer.question_option_uid = :optionUid "
-		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1";
+		+ "JOIN tl_laasse10_assessment AS assessment ON assessment.uid = result.assessment_uid "
+		+ "JOIN tl_laasse10_question_result AS questionResult ON questionResult.result_uid = result.uid "
+		+ "JOIN lams_qb_tool_answer AS qbToolAnswer ON qbToolAnswer.answer_uid = questionResult.uid "
+		+ "JOIN tl_laasse10_option_answer AS optionAnswer ON questionResult.uid = optionAnswer.question_result_uid "		
+		+ "WHERE (result.finish_date IS NOT NULL) AND result.latest=1 && assessment.content_id = :toolContentId"
+		+ "	AND optionAnswer.question_option_uid = :optionUid AND (optionAnswer.answer_boolean=1 OR qbToolAnswer.qb_option_uid = :optionUid)  ";
 
-	NativeQuery<?> query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	NativeQuery<Number> query = getSession().createNativeQuery(COUNT_ATTEMPTS_BY_OPTION_UID);
+	query.setParameter("toolContentId", toolContentId);
 	query.setParameter("optionUid", optionUid);
-	List list = query.list();
-	if (list == null || list.size() == 0) {
-	    return 0;
-	}
-	return ((Number) list.get(0)).intValue();
+	return query.uniqueResult().intValue();
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {

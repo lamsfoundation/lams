@@ -6,7 +6,6 @@
            				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
            				   
 	<bean id="integrationServiceTarget" class="org.lamsfoundation.lams.integration.service.IntegrationService">
-		<property name="gradebookService"><ref bean="gradebookService"/></property>
 		<property name="lessonService"><ref bean="lessonService"/></property>
 		<property name="service"><ref bean="userManagementService"/></property>
 		<property name="toolService"><ref bean="lamsCoreToolServiceTarget"/></property>
@@ -28,13 +27,16 @@
 		</property>  
 		<property name="transactionAttributes">
 			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="find*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="find*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="pushMarkToLtiConsumer">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

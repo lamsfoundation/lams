@@ -44,12 +44,12 @@ public class LtiConsumerManagementController {
      * Shows all available LTI tool consumers
      */
     @RequestMapping(path = "/start")
-    public String unspecified(HttpServletRequest request) {
+    public String start(HttpServletRequest request) {
 	List<ExtServer> ltiConsumers = integrationService.getAllToolConsumers();
 	Collections.sort(ltiConsumers);
 	request.setAttribute("ltiConsumers", ltiConsumers);
 
-	return "lti/ltiConsumerList";
+	return "integration/ltiConsumerList";
     }
 
     /**
@@ -63,6 +63,8 @@ public class LtiConsumerManagementController {
 	if (sid != null) {
 	    ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(ltiConsumerForm, ltiConsumer);
+	    
+	    //display lessonFinishUrl. it's not part of ltiConsumerForm, as long as this property is not going to be edited 
 	    String lessonFinishUrl = ltiConsumer.getLessonFinishUrl() == null ? "-" : ltiConsumer.getLessonFinishUrl();
 	    request.setAttribute("lessonFinishUrl", lessonFinishUrl);
 
@@ -71,7 +73,7 @@ public class LtiConsumerManagementController {
 	    //do nothing
 	}
 
-	return "lti/ltiConsumer";
+	return "integration/ltiConsumer";
     }
 
     /**
@@ -85,7 +87,7 @@ public class LtiConsumerManagementController {
 	ltiConsumer.setDisabled(disable);
 	integrationService.saveExtServer(ltiConsumer);
 
-	return unspecified(request);
+	return start(request);
     }
 
     /**
@@ -96,7 +98,7 @@ public class LtiConsumerManagementController {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	userManagementService.deleteById(ExtServer.class, sid);
 
-	return unspecified(request);
+	return start(request);
     }
 
     /**
@@ -160,22 +162,24 @@ public class LtiConsumerManagementController {
 
 	if (errorMap.isEmpty()) {
 	    ExtServer ltiConsumer = null;
-	    if (sid == null) {
+	    if (sid.equals(-1)) {
 		ltiConsumer = new ExtServer();
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 		ltiConsumer.setSid(null);
 		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
 		ltiConsumer.setUserinfoUrl("blank");
+		
 	    } else {
 		ltiConsumer = integrationService.getExtServer(sid);
 		BeanUtils.copyProperties(ltiConsumer, ltiConsumerForm);
 	    }
+	    ltiConsumer.setTimeToLiveLoginRequestEnabled(false);
 	    integrationService.saveExtServer(ltiConsumer);
-	    return unspecified(request);
+	    return start(request);
 
 	} else {
 	    request.setAttribute("errorMap", errorMap);
-	    return "lti/ltiConsumer";
+	    return "integration/ltiConsumer";
 	}
     }
 

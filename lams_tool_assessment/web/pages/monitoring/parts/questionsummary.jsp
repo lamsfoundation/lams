@@ -20,6 +20,18 @@
 			}
 		</style>
 		
+		<script>
+			// pass settings to jquery.jqGrid.confidence-level-formattter.js
+			var confidenceLevelsSettings = {
+				type: "${assessment.confidenceLevelsType}",
+				LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
+				LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
+				LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
+				LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
+				LABEL_SURE : '<fmt:message key="label.sure" />',
+				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
+			};
+		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>

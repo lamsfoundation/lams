@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import javax.persistence.Column;
@@ -37,15 +36,16 @@ public class ScratchieConfigItem implements java.io.Serializable {
 
     public static final String KEY_IS_ENABLED_EXTRA_POINT_OPTION = "isEnabledExtraPointOption";
     public static final String KEY_PRESET_MARKS = "presetMarks";
+    public static final String KEY_HIDE_TITLES = "hideTitles";
 
     @Id
     @Column(name = "uid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "config_key")
     private String configKey;
-    
+
     @Column(name = "config_value")
     private String configValue;
 

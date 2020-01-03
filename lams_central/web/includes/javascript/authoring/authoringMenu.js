@@ -655,7 +655,7 @@ var MenuLib = {
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', dialog).attr('src', LAMS_URL + '/authoring/template/list.jsp').load(function(){
+					$('iframe', dialog).attr('id','templateModal').attr('src', LAMS_URL + '/authoring/template/list.jsp').load(function(){
 						// override the close function so it works with the dialog, not window
 						this.contentWindow.closeWindow = function(){
 							// detach the 'beforeClose' handler above, attach the standard one and close the dialog

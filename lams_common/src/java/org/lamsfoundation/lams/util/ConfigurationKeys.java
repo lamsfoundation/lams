@@ -117,7 +117,9 @@ public class ConfigurationKeys {
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
 
     public static String ALLOW_KUMALIVE = "AllowKumalive";
-
+    
+    public static String ENABLE_COLLAPSING_SUBCOURSES = "EnableCollapsingSubcourses";
+    
     public static String DISPLAY_PORTRAIT = "DisplayPortrait";
 
     public static String ENABLE_PORTRAIT_EDITING = "EnablePortraitEditing";
@@ -247,6 +249,8 @@ public class ConfigurationKeys {
     public static String USER_VALIDATION_REQUIRED_FIRST_LAST_NAME = "UserValidationFirstLastName";
 
     public static String USER_VALIDATION_REQUIRED_EMAIL = "UserValidationEmail";
+    
+    public static String RESTRICTED_DISPLAYING_OF_USER_NAMES_IN_GROUPS = "RestrictedGroupUserNames";
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
@@ -302,6 +306,7 @@ public class ConfigurationKeys {
     public static String QB_MONITORS_READ_ONLY = "QbMonitorsReadOnly";
     public static String QB_STATS_MIN_PARTICIPANTS = "QbStatsMinParticipants";
     public static String QB_STATS_GROUP_SIZE = "QbStatsGroupSize";
+    public static String QB_MERGE_ENABLE = "QbMergeEnable";
     
     // LKC-213 LKC Workflow Automation
     public static String WORKFLOW_AUTOMATION_ENABLE = "WorkflowAutomationEnable";

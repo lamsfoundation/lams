@@ -133,7 +133,7 @@ public class GateController {
 	}
 
 	// gate is open, so let the learner go to the next activity ( updating the cached learner progress on the way )
-	return learnerService.completeActivity(learnerProgress, activity, learner.getUserId(), true);
+	return learnerService.completeActivity(activityMapping, learnerProgress, activity, learner.getUserId(), true);
     }
 
     // ---------------------------------------------------------------------

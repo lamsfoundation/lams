@@ -11,6 +11,14 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+	
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.timeago.js"></script>	
+	<script type="text/javascript">
+	    jQuery(document).ready(function() {
+	    	jQuery("time.timeago").timeago();
+	    });
+	</script>
 </lams:head>
     
 <body class="stripes">
@@ -18,11 +26,14 @@
 		<p>
 			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
 		</p>
+		
+		<div class="alert alert-info">${fn:length(sessions)}&nbsp;<fmt:message key="sysadmin.maintain.session.count" /></div>
 
 		<table class="table table-striped">
 			<tr>
 				<th><fmt:message key="sysadmin.maintain.session.login" /></th>
 				<th><fmt:message key="sysadmin.maintain.session.name" /></th>
+				<th><fmt:message key="sysadmin.maintain.session.access" /></th>
 				<th><fmt:message key="sysadmin.maintain.session.id" /></th>
 				<th></th>
 			</tr>
@@ -30,7 +41,10 @@
 			<tr>
 				<td><c:out value="${ses.key}" /></td>
 				<td><c:out value="${ses.value[0]} ${ses.value[1]}" /></td>
-				<td><c:out value="${ses.value[2]}" /></td>
+				<td><lams:Date value="${ses.value[2]}" timeago="true"/></td>
+				<td title="<fmt:message key="sysadmin.maintain.session.created" />&nbsp;<c:out value="${ses.value[3]}" />">
+					<c:out value="${ses.value[4]}" />
+				</td>
 				<td>
 					<a href="<lams:LAMSURL/>admin/sessionmaintain/delete.do?login=${ses.key}" class="btn btn-default">
 				<fmt:message key="sysadmin.maintain.session.delete" />

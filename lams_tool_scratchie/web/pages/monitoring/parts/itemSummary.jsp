@@ -49,14 +49,14 @@
 	  					iconSet: 'fontAwesome',
 	  				   	colNames:[
 		  				   	"<fmt:message key="label.monitoring.summary.answer" />"
-		  			  	   	<c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
-		  			  	   		,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i.index + 1}"
+		  			  	   	<c:forEach var="i" begin="0" end="${summary.numberColumns-1}">
+		  			  	   		,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i+1}"
 					  		</c:forEach>
 	  					],
 	  				   	colModel:[
 							{name:'option',index:'option', width:180}
-  			  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
-			  	   	 			,{name:'choice${i.index}', index:'${i.index}choice', align:"center", sorttype:"int"}
+  			  	   	        <c:forEach var="i" begin="0" end="${summary.numberColumns-1}">
+			  	   	 			,{name:'choice${i}', index:'${i}choice', align:"center", sorttype:"int"}
 		  		        	</c:forEach>		
 	  				   	],
 	  				   	multiselect: false
@@ -65,7 +65,7 @@
 	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
 	  	   	     			option:"<c:out value='${optionDto.answer}' escapeXml='${!optionDto.mcqType}' /><c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
-	  	   	     			<c:forEach var="j" begin="0" end="${fn:length(summary.optionDtos)-1}">
+	  	   	     			<c:forEach var="j" begin="0" end="${summary.numberColumns-1}">
 	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>
 	  	   	   	   	    });

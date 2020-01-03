@@ -251,21 +251,17 @@ public class UserSaveController {
 
 	if (errorMap.isEmpty()) {
 	    if ((orgId == null) || (orgId == 1)) {
-		return "forward:/usersearch.do";
+		return "redirect:/usersearch.do";
 	    }
 	    if (!edit && !canEditRole) {
 		// Course Admin created new learner
 		userManagementService.setRolesForUserOrganisation(user, orgId,
 			Arrays.asList(Role.ROLE_LEARNER.toString()));
-		request.setAttribute("org", orgId);
-		return "forward:/usermanage.do";
+		return "redirect:/usermanage.do?org=" + orgId;
 	    } else if (edit) {
-		request.setAttribute("org", orgId);
-		return "forward:/usermanage.do";
+		return "redirect:/usermanage.do?org=" + orgId;
 	    } else {
-		request.setAttribute("orgId", orgId);
-		request.setAttribute("userId", user.getUserId());
-		return "forward:/userroles.do";
+		return "redirect:/userroles.do?orgId=" + orgId + "&userId=" + user.getUserId();
 	    }
 	} else {
 	    request.setAttribute("orgId", orgId);
@@ -297,6 +293,8 @@ public class UserSaveController {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
 	    return null;
 	}
+	
+	User sysadmin = (User) userManagementService.findById(User.class, loggeduserId);
 
 	String password = WebUtil.readStrParam(request, "password");
 	String password2 = WebUtil.readStrParam(request, "password2");
@@ -320,6 +318,7 @@ public class UserSaveController {
 	    String passwordHash = HashUtil.sha256(password, salt);
 	    user.setSalt(salt);
 	    user.setPassword(passwordHash);
+	    userManagementService.logPasswordChanged(user, sysadmin);
 	    userManagementService.saveUser(user);
 	    return "forward:/user/edit.do";
 	}

@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * A Team Based Learning template. There are two versions - the full blown one that is accessed from authoring
  * and one that allows just sections of a TBL sequence to be created for the LAMS TBL system. Which bits are created
- * are controlled by a series of checkboxes (set to true and hidden in the full authoring version). The LAMS TBL 
+ * are controlled by a series of checkboxes (set to true and hidden in the full authoring version). The LAMS TBL
  * version also has the option for timed gates, but the standard version uses permission gates.
  */
 @Controller
@@ -84,10 +84,11 @@ public class TBLTemplateController extends LdTemplateController {
 	if (sessionMapID != null) {
 	    request.setAttribute("sessionMapID", sessionMapID);
 	}
-	if (isConfigurableVersion)
+	if (isConfigurableVersion) {
 	    return super.init(request, "authoring/template/tbl/tbloptional");
-	else
+	} else {
 	    return super.init(request);
+	}
     }
 
     @Override
@@ -143,16 +144,17 @@ public class TBLTemplateController extends LdTemplateController {
 		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
 			activityTitle, null, data.iraStartOffset));
 	    } else {
-		activities.add(
-			createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), activityTitle, activityTitle));
+		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+			activityTitle, activityTitle));
 	    }
 
 	    // iRA Test - MCQ
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
+	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 	    Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable, false,
-		    JsonUtil.readArray(data.testQuestions.values()));
+		    testQuestionsArray);
 	    ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
@@ -180,18 +182,18 @@ public class TBLTemplateController extends LdTemplateController {
 	    // tRA Test
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.tra.title");
-		Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
-			? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
-			: null;
+	    Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
+		    ? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
+		    : null;
 	    Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.tra.instructions"), false,  confidenceLevelsActivityUIID,
-		    JsonUtil.readArray(data.testQuestions.values()));
+		    data.getText("boilerplate.tra.instructions"), false, confidenceLevelsActivityUIID,
+		    testQuestionsArray);
 	    activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle));
 
 	}
 
-	// Application Exercises - multiple exercises with gates between each exercise. There may also be a grouped 
+	// Application Exercises - multiple exercises with gates between each exercise. There may also be a grouped
 	// notebook after an exercise if indicated by the user. Each Application Exercise will have one or more questions.
 	// Start a new row so that they group nicely together
 	int displayOrder = 1;
@@ -199,13 +201,14 @@ public class TBLTemplateController extends LdTemplateController {
 	if (data.useApplicationExercises) {
 
 	    for (AppExData applicationExercise : data.applicationExercises.values()) {
-		
+
 		// Start a new row for each application exercise and potentially the notebook.
 		firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
 		currentActivityPosition = firstActivityInRowPosition;
 
-		//  Gate before Application Exercise 
-		String gateTitleBeforeAppEx = data.getText("boilerplate.before.app.ex", new String[] {applicationExercise.title});
+		//  Gate before Application Exercise
+		String gateTitleBeforeAppEx = data.getText("boilerplate.before.app.ex",
+			new String[] { applicationExercise.title });
 		if (data.useScheduledGates && data.aeStartOffset != null) {
 		    activities.add(createScheduledGateActivity(maxUIID, order++,
 			    calcGateOffset(currentActivityPosition), gateTitleBeforeAppEx, null, data.aeStartOffset));
@@ -220,8 +223,8 @@ public class TBLTemplateController extends LdTemplateController {
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		ArrayNode questionsJSONArray = JsonNodeFactory.instance.arrayNode();
 		for (Assessment exerciseQuestion : applicationExercise.assessments.values()) {
-			questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
-			assessmentNumber++;
+		    questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
+		    assessmentNumber++;
 		}
 		Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
 			data.getText("boilerplate.ae.instructions"), null, true, false, questionsJSONArray);
@@ -231,21 +234,22 @@ public class TBLTemplateController extends LdTemplateController {
 		// Optional Gate / Noticeboard. Don't add the extra gate in LAMS TBL or we will get too many scheduled gates to manage
 		if (applicationExercise.useNoticeboard) {
 		    noticeboardCount++;
-		    String noticeboardCountAsString =  Integer.toString(noticeboardCount);
+		    String noticeboardCountAsString = Integer.toString(noticeboardCount);
 
 		    if (!data.useScheduledGates) {
 			currentActivityPosition = calcPositionNextRight(currentActivityPosition);
-			String gateTitle = data.getText("boilerplate.before.app.ex.noticeboard", new String[] {noticeboardCountAsString} );
+			String gateTitle = data.getText("boilerplate.before.app.ex.noticeboard",
+				new String[] { noticeboardCountAsString });
 			activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
 				gateTitle, gateTitle));
 		    }
 		    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		    String notebookTitle = data.getText("boilerplate.grouped.ae.noticeboard.num",
-				new String[] { noticeboardCountAsString });
+			    new String[] { noticeboardCountAsString });
 		    Long aeNoticeboardContentId = createNoticeboardToolContent(userDTO, notebookTitle,
 			    applicationExercise.noticeboardInstructions, null);
-		    activities.add(createNoticeboardActivity(maxUIID, order++, currentActivityPosition, aeNoticeboardContentId,
-			    data.contentFolderID, groupingUIID, null, null, notebookTitle));
+		    activities.add(createNoticeboardActivity(maxUIID, order++, currentActivityPosition,
+			    aeNoticeboardContentId, data.contentFolderID, groupingUIID, null, null, notebookTitle));
 		}
 
 		displayOrder++;
@@ -257,16 +261,17 @@ public class TBLTemplateController extends LdTemplateController {
 	currentActivityPosition = firstActivityInRowPosition;
 
 	if (data.usePeerReview) {
-	    // Peer Review - optional. Start by eliminating all criterias with no title. Then if any are left 
+	    // Peer Review - optional. Start by eliminating all criterias with no title. Then if any are left
 	    // we create the gate before the Peer Review and the Peer Review tool data and activity
 	    ArrayNode criterias = JsonNodeFactory.instance.arrayNode();
 	    for (PeerReviewCriteria criteria : data.peerReviewCriteria.values()) {
-		if (criteria.getTitle() != null && criteria.getTitle().length() > 0)
+		if (criteria.getTitle() != null && criteria.getTitle().length() > 0) {
 		    criterias.add(criteria.getAsObjectNode());
+		}
 	    }
 	    if (criterias.size() > 0) {
 		// Stop!
-		String gateTitle =data.getText("boilerplate.before.peer.review");
+		String gateTitle = data.getText("boilerplate.before.peer.review");
 		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), gateTitle,
 			gateTitle));
 
@@ -297,19 +302,19 @@ public class TBLTemplateController extends LdTemplateController {
 
 	// fill in required LD data and send it to the LearningDesignRestServlet
 	ArrayNode transitions = createTransitions(maxUIID, activities);
-	
+
 	return saveLearningDesign(templateCode, data.sequenceTitle, "", workspaceFolderID, data.contentFolderID,
 		maxUIID.get(), activities, transitions, groupings, null);
 
     }
 
     class AppExData {
-	String title="Fix me"; 
+	String title = "Fix me";
 	SortedMap<Integer, Assessment> assessments;
 	boolean useNoticeboard = false;
 	String noticeboardInstructions;
     }
-    
+
     /**
      * TBLData contains all the data we need for the current instance. Created for each call to ensure that we have the
      * correct locale, messages, etc for this particular call.
@@ -323,13 +328,13 @@ public class TBLTemplateController extends LdTemplateController {
      * "correctOption" (Boolean).
      */
     class TBLData extends TemplateData {
-	
+
 	/* The error messages are to be sorted by tab, so store them separately and join together */
-	List<String> lessonDetailsErrors = new ArrayList<String>();
-	List<String> ratErrors = new ArrayList<String>();
-	List<String> applicationExerciseErrors = new ArrayList<String>();
-	List<String> peerReviewErrors = new ArrayList<String>();
-	
+	List<String> lessonDetailsErrors = new ArrayList<>();
+	List<String> ratErrors = new ArrayList<>();
+	List<String> applicationExerciseErrors = new ArrayList<>();
+	List<String> peerReviewErrors = new ArrayList<>();
+
 	/* Fields from form */
 	String contentFolderID;
 	String sequenceTitle;
@@ -383,9 +388,9 @@ public class TBLTemplateController extends LdTemplateController {
 	    numLearners = WebUtil.readIntParam(request, "numLearners", true);
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
 
-	    testQuestions = new TreeMap<Integer, ObjectNode>();
-	    applicationExercises = new TreeMap<Integer, AppExData>();
-	    peerReviewCriteria = new TreeMap<Integer, PeerReviewCriteria>();
+	    testQuestions = new TreeMap<>();
+	    applicationExercises = new TreeMap<>();
+	    peerReviewCriteria = new TreeMap<>();
 
 	    useIntroduction = WebUtil.readBooleanParam(request, "introduction", false);
 	    useIRATRA = WebUtil.readBooleanParam(request, "iratra", false);
@@ -394,7 +399,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    useReflection = WebUtil.readBooleanParam(request, "reflect", false);
 
 	    String start = WebUtil.readStrParam(request, "startLogistic", true);
-	    if ( start != null ) {
+	    if (start != null) {
 		// we are using the TBL version of LAMS to start the lessons, so we need to use schedule gates
 		// and set the timings of the gates. Need to take into account if the lesson is started now or in the future.
 		useScheduledGates = true;
@@ -414,9 +419,9 @@ public class TBLTemplateController extends LdTemplateController {
 		traStartOffset = getOffsetFromRequest(request, "traLogistic", "traScheduled", "traStartDatetime");
 		aeStartOffset = getOffsetFromRequest(request, "aeLogistic", "aeScheduled", "aeStartDatetime");
 	    }
-	    
+
 	    // Process the Multiple Choice Questions that go to IRA and TRA & Peer Review fields
-	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<Integer, Integer>();
+	    TreeMap<Integer, Integer> correctAnswers = new TreeMap<>();
 	    Enumeration parameterNames = request.getParameterNames();
 	    while (parameterNames.hasMoreElements()) {
 		String name = (String) parameterNames.nextElement();
@@ -431,18 +436,21 @@ public class TBLTemplateController extends LdTemplateController {
 			if (optionIndex > 0) {
 			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, optionIndex));
 			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
-			    processTestQuestion(name, null, null, questionDisplayOrder, optionDisplayOrder,
+			    processTestQuestion(name, null, null, questionDisplayOrder, null, optionDisplayOrder,
 				    getTrimmedString(request, name, true));
 			} else {
 			    int titleIndex = name.indexOf("title");
 			    if (titleIndex > 0) { // question1title
-				Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, titleIndex));
+				Integer questionDisplayOrder = Integer
+					.valueOf(name.substring(questionOffset, titleIndex));
 				processTestQuestion(name, null, getTrimmedString(request, name, false),
-					questionDisplayOrder, null, null);
-			    } else {
+					questionDisplayOrder, null, null, null);
+			    } else if (name.indexOf("uuid") < 0) {
 				Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset));
 				processTestQuestion(name, getTrimmedString(request, name, true), null,
-					questionDisplayOrder, null, null);
+					questionDisplayOrder,
+					getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false),
+					null, null);
 			    }
 			}
 		    }
@@ -451,9 +459,9 @@ public class TBLTemplateController extends LdTemplateController {
 		}
 	    }
 
-	    confidenceLevelEnable = WebUtil.readBooleanParam(request,  "confidenceLevelEnable", false);
+	    confidenceLevelEnable = WebUtil.readBooleanParam(request, "confidenceLevelEnable", false);
 	    if (useIRATRA) {
-		if ( testQuestions.size() == 0 ) {
+		if (testQuestions.size() == 0) {
 		    addValidationErrorMessage("authoring.error.rat.not.blank", null, ratErrors);
 		}
 		updateCorrectAnswers(correctAnswers);
@@ -472,11 +480,11 @@ public class TBLTemplateController extends LdTemplateController {
 	    errorMessages.addAll(peerReviewErrors);
 	}
 
-	// Reset the display order or it confuses matters in the MCQ tool. Display order may skip numbers if the user 
+	// Reset the display order or it confuses matters in the MCQ tool. Display order may skip numbers if the user
 	// deletes questions on the screen before saving.
 	private void redoDisplayOrder() {
 	    SortedMap<Integer, ObjectNode> oldTestQuestions = testQuestions;
-	    testQuestions = new TreeMap<Integer, ObjectNode>();
+	    testQuestions = new TreeMap<>();
 	    int newDisplayOrder = 1;
 	    for (Map.Entry<Integer, ObjectNode> oldQuestionEntry : oldTestQuestions.entrySet()) {
 		ObjectNode question = oldQuestionEntry.getValue();
@@ -493,8 +501,8 @@ public class TBLTemplateController extends LdTemplateController {
 		String dateTimeString = WebUtil.readStrParam(request, dateField);
 		if (dateTimeString != null) {
 		    try {
-			Long offset = TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString).getTime()
-				- this.startTime;
+			Long offset = TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString)
+				.getTime() - this.startTime;
 			return offset > 0 ? offset / 60000 : 0; // from ms to minutes
 		    } catch (ParseException e) {
 			log.error("Unable to parse date from " + dateField
@@ -509,62 +517,69 @@ public class TBLTemplateController extends LdTemplateController {
 	private void processApplicationExercises(HttpServletRequest request) {
 	    int numAppEx = WebUtil.readIntParam(request, "numAppEx");
 	    for (int i = 1; i <= numAppEx; i++) {
-		String appexDiv = "divappex"+i;
+		String appexDiv = "divappex" + i;
 		AppExData newAppex = new AppExData();
-		newAppex.title = WebUtil.readStrParam(request,  appexDiv+"Title", true);
+		newAppex.title = WebUtil.readStrParam(request, appexDiv + "Title", true);
 		newAppex.assessments = processAssessments(request, i, newAppex.title);
 		// null indicates appex was deleted
-		if ( newAppex.assessments != null ) {
-        		newAppex.useNoticeboard = WebUtil.readBooleanParam(request,  appexDiv+"NB", false);
-        		if ( newAppex.useNoticeboard ) {
-        		    newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv+"NBEntry", true);
-        		    if ( newAppex.noticeboardInstructions == null )
-        			addValidationErrorMessage(
-        				    "authoring.error.application.exercise.needs.noticeboard.text", new Object[] {"\"" + newAppex.title + "\""}, applicationExerciseErrors);
-        		}
-        		applicationExercises.put(i,  newAppex);
-		} 
+		if (newAppex.assessments != null) {
+		    newAppex.useNoticeboard = WebUtil.readBooleanParam(request, appexDiv + "NB", false);
+		    if (newAppex.useNoticeboard) {
+			newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv + "NBEntry", true);
+			if (newAppex.noticeboardInstructions == null) {
+			    addValidationErrorMessage("authoring.error.application.exercise.needs.noticeboard.text",
+				    new Object[] { "\"" + newAppex.title + "\"" }, applicationExerciseErrors);
+			}
+		    }
+		    applicationExercises.put(i, newAppex);
+		}
 	    }
 	}
 
-	private SortedMap<Integer, Assessment> processAssessments(HttpServletRequest request, int appexNumber, String appexTitle) {
-	    SortedMap<Integer, Assessment> applicationExercises = new TreeMap<Integer, Assessment>();
+	private SortedMap<Integer, Assessment> processAssessments(HttpServletRequest request, int appexNumber,
+		String appexTitle) {
+	    SortedMap<Integer, Assessment> applicationExercises = new TreeMap<>();
 	    Integer numAssessments = WebUtil.readIntParam(request, "numAssessments" + appexNumber, true);
-	    if ( numAssessments == null ) {
+	    if (numAssessments == null) {
 		// Application Exercise has been deleted
 		return null;
 	    }
-	    
+
 	    for (int i = 1; i <= numAssessments; i++) {
-		String assessmentPrefix = new StringBuilder("divass").append(appexNumber).append("assessment")
-			.append(i).toString();
+		String assessmentPrefix = new StringBuilder("divass").append(appexNumber).append("assessment").append(i)
+			.toString();
 		String questionText = getTrimmedString(request, assessmentPrefix, true);
 		String questionTitle = getTrimmedString(request, assessmentPrefix + "title", true);
-		String markAsString = getTrimmedString(request, assessmentPrefix + "mark", false);		
+		String questionUuid = getTrimmedString(request, assessmentPrefix + "uuid", false);
+		String markAsString = getTrimmedString(request, assessmentPrefix + "mark", false);
 		Assessment assessment = new Assessment();
 		if (questionText != null) {
 		    assessment.setTitle(questionTitle);
 		    assessment.setText(questionText);
 		    assessment.setType(WebUtil.readStrParam(request, assessmentPrefix + "type"));
 		    assessment.setRequired(true);
+		    assessment.setUuid(questionUuid);
 
 		    Integer mark = -1;
-		    if ( markAsString != null ) {
+		    if (markAsString != null) {
 			try {
 			    mark = Integer.parseInt(markAsString);
 			} catch (Exception e) {
 			}
 		    }
-		    if ( mark < 1 ) {
-			addValidationErrorMessage("authoring.error.application.exercise.mark.one.or.more", new String[] {"\"" + appexTitle + "\"", "\"" + questionTitle + "\""}, applicationExerciseErrors);
+		    if (mark < 1) {
+			addValidationErrorMessage("authoring.error.application.exercise.mark.one.or.more",
+				new String[] { "\"" + appexTitle + "\"", "\"" + questionTitle + "\"" },
+				applicationExerciseErrors);
 		    } else {
 			assessment.setDefaultGrade(mark);
 		    }
 
 		    if (assessment.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
-			assessment.setMultipleAnswersAllowed(WebUtil.readBooleanParam(request,  assessmentPrefix + "multiAllowed", false));
-			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq")
-				.append(i).append("option").toString();
+			assessment.setMultipleAnswersAllowed(
+				WebUtil.readBooleanParam(request, assessmentPrefix + "multiAllowed", false));
+			String optionPrefix = new StringBuilder("divass").append(appexNumber).append("assmcq").append(i)
+				.append("option").toString();
 			for (int o = 1, order = 0; o <= MAX_OPTION_COUNT; o++) {
 			    String answer = getTrimmedString(request, optionPrefix + o, true);
 			    if (answer != null) {
@@ -575,7 +590,8 @@ public class TBLTemplateController extends LdTemplateController {
 				} catch (Exception e) {
 				    log.error("Error parsing " + grade + " for float", e);
 				    addValidationErrorMessage(
-					    "authoring.error.application.exercise.not.blank.and.grade", new Object[] {"\"" + appexTitle + "\"", i}, applicationExerciseErrors);
+					    "authoring.error.application.exercise.not.blank.and.grade",
+					    new Object[] { "\"" + appexTitle + "\"", i }, applicationExerciseErrors);
 				}
 			    }
 			}
@@ -614,7 +630,7 @@ public class TBLTemplateController extends LdTemplateController {
 	}
 
 	void processTestQuestion(String name, String questionText, String questionTitle, Integer questionDisplayOrder,
-		Integer optionDisplayOrder, String optionText) {
+		String questionUuid, Integer optionDisplayOrder, String optionText) {
 
 	    ObjectNode question = testQuestions.get(questionDisplayOrder);
 	    if (question == null) {
@@ -627,15 +643,19 @@ public class TBLTemplateController extends LdTemplateController {
 	    if (questionText != null) {
 		question.put(RestTags.QUESTION_TEXT, questionText);
 		// default title just in case - used for scratchie. Should be replaced with a user value
-		if ( ! question.has(RestTags.QUESTION_TITLE) ) {
-		    question.put(RestTags.QUESTION_TITLE, "Q" + questionDisplayOrder.toString()); 
+		if (!question.has(RestTags.QUESTION_TITLE)) {
+		    question.put(RestTags.QUESTION_TITLE, "Q" + questionDisplayOrder.toString());
 		}
 	    }
-	    
+
 	    if (questionTitle != null) {
 		question.put(RestTags.QUESTION_TITLE, questionTitle);
 	    }
-	    
+
+	    if (questionUuid != null) {
+		question.put(RestTags.QUESTION_UUID, questionUuid);
+	    }
+
 	    if (optionDisplayOrder != null && optionText != null) {
 		ObjectNode newOption = JsonNodeFactory.instance.objectNode();
 		newOption.put(RestTags.DISPLAY_ORDER, optionDisplayOrder);
@@ -651,19 +671,23 @@ public class TBLTemplateController extends LdTemplateController {
 		Integer questionNumber = entry.getKey();
 		ObjectNode question = entry.getValue();
 		if (!question.has(RestTags.QUESTION_TEXT)) {
-		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE) : questionNumber;
+		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+			    : questionNumber;
 		    addValidationErrorMessage("authoring.error.question.num", new Object[] { param }, ratErrors);
 		}
 
 		Integer correctAnswerDisplay = correctAnswers.get(entry.getKey());
 		if (correctAnswerDisplay == null) {
-		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE): questionNumber;
-		    addValidationErrorMessage("authoring.error.question.correct.num", new Object[] { param }, ratErrors);
+		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+			    : questionNumber;
+		    addValidationErrorMessage("authoring.error.question.correct.num", new Object[] { param },
+			    ratErrors);
 		} else {
 
 		    ArrayNode answers = (ArrayNode) question.get(RestTags.ANSWERS);
 		    if (answers == null || answers.size() == 0) {
-			Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE): questionNumber;
+			Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+				: questionNumber;
 			addValidationErrorMessage("authoring.error.question.must.have.answer.num",
 				new Object[] { param }, ratErrors);
 		    } else {
@@ -677,9 +701,10 @@ public class TBLTemplateController extends LdTemplateController {
 			    }
 			}
 			if (!correctAnswerFound) {
-			    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE): questionNumber;
-			    addValidationErrorMessage("authoring.error.question.correct.num",
-				    new Object[] { param }, ratErrors);
+			    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+				    : questionNumber;
+			    addValidationErrorMessage("authoring.error.question.correct.num", new Object[] { param },
+				    ratErrors);
 			}
 		    }
 		}
@@ -692,9 +717,10 @@ public class TBLTemplateController extends LdTemplateController {
 		addValidationErrorMessage("authoring.error.content.id", null, lessonDetailsErrors);
 	    }
 	    if (sequenceTitle == null || !ValidationUtil.isOrgNameValid(sequenceTitle)) {
-		lessonDetailsErrors.add(new StringBuilder(TextUtil.getText(appBundle, "authoring.section.lessondetails"))
-			.append(": ").append(TextUtil.getText(appBundle, "authoring.fla.title.validation.error"))
-			.toString());
+		lessonDetailsErrors.add(
+			new StringBuilder(TextUtil.getText(appBundle, "authoring.section.lessondetails")).append(": ")
+				.append(TextUtil.getText(appBundle, "authoring.fla.title.validation.error"))
+				.toString());
 	    }
 
 	    if (useApplicationExercises) {
@@ -706,20 +732,21 @@ public class TBLTemplateController extends LdTemplateController {
 
 	private void validateApplicationExercises() {
 	    if (applicationExercises.size() == 0) {
-	        addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 }, applicationExerciseErrors);
+		addValidationErrorMessage("authoring.error.application.exercise.num", new Integer[] { 1 },
+			applicationExerciseErrors);
 	    } else {
-	        for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
-	    	AppExData appEx = appExEntry.getValue();
-	    	if (appEx.assessments == null || appEx.assessments.size() == 0) {
-	    	    addValidationErrorMessage("authoring.error.application.exercise.num",
-	    		    new String[] { "\""+appEx.title +"\""}, applicationExerciseErrors);
-	    	} else {
-	    	    for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
-	    		assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
-	    			appExEntry.getKey(), "\""+appEx.title +"\"", assessmentEntry.getKey());
-	    	    }
-	    	}
-	        }
+		for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
+		    AppExData appEx = appExEntry.getValue();
+		    if (appEx.assessments == null || appEx.assessments.size() == 0) {
+			addValidationErrorMessage("authoring.error.application.exercise.num",
+				new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
+		    } else {
+			for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
+			    assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
+				    appExEntry.getKey(), "\"" + appEx.title + "\"", assessmentEntry.getKey());
+			}
+		    }
+		}
 	    }
 	}
 
@@ -732,6 +759,5 @@ public class TBLTemplateController extends LdTemplateController {
 	request.setAttribute("appexNumber", WebUtil.readIntParam(request, "appexNumber"));
 	return "/authoring/template/tbl/appex";
     }
-
 
 }

@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
@@ -68,6 +69,7 @@ import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -249,9 +251,8 @@ public class HomeController {
 
     @RequestMapping("/addLesson")
     @SuppressWarnings("unchecked")
-    public String addLesson(HttpServletRequest req, HttpServletResponse res)
+    public String addLesson(HttpServletRequest req, HttpServletResponse res, @RequestParam Integer organisationID)
 	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
-	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 	UserDTO userDTO = getUser();
 	if (!securityService.isGroupMonitor(organisationID, userDTO.getUserID(), "add lesson", false)) {
 	    res.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
@@ -287,7 +288,6 @@ public class HomeController {
 		users.withArray("unselectedMonitors").add(userJSON);
 	    }
 	}
-
 	req.setAttribute("users", users.toString());
 
 	// find lessons which can be set as preceding ones for newly created lesson
@@ -301,6 +301,9 @@ public class HomeController {
 	    }
 	}
 	req.setAttribute("availablePrecedingLessons", availableLessons);
+
+	// find subgroups which can be set as multiple lessons start
+	req.setAttribute("subgroups", organisation.getChildOrganisations());
 
 	return "addLesson";
     }
@@ -356,8 +359,10 @@ public class HomeController {
     @RequestMapping("/logout")
     public String logout(HttpServletRequest req) throws IOException, ServletException {
 	UserDTO userDTO = getUser();
+	HttpSession session = req.getSession();
+	String logoutURL = (String) session.getAttribute("integratedLogoutURL");
 
-	req.getSession().invalidate();
+	session.invalidate();
 
 	if (userDTO != null) {
 	    String message = new StringBuilder("User ").append(userDTO.getLogin()).append(" (")
@@ -366,7 +371,7 @@ public class HomeController {
 		    message);
 	}
 
-	return "redirect:/index.do";
+	return "redirect:" + (StringUtils.isBlank(logoutURL) ? "/index.do" : logoutURL);
     }
 
     private String displayMessage(HttpServletRequest req, String messageKey) {

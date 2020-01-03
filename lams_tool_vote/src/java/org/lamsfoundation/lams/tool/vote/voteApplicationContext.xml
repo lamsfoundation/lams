@@ -81,25 +81,29 @@
 				</bean>
 			</property>
 			<property name="transactionAttributes">
-				<props>
-				    
-				    <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED</prop>
-				    <prop key="prepareChartData">PROPAGATION_REQUIRED</prop>
-				    <prop key="prepareChartData">PROPAGATION_REQUIRED</prop>
-				    <prop key="countSessionComplete">PROPAGATION_REQUIRED</prop>
-				    <prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-				    <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
-				    <prop key="is*">PROPAGATION_REQUIRED</prop>
-					<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<props>			
+            		<prop key="audit*">PROPAGATION_REQUIRED</prop>	    
 					<prop key="buildQuestionMap">PROPAGATION_REQUIRED</prop>
+				    <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED</prop>
-					<prop key="save*">PROPAGATION_REQUIRED</prop>
-					<prop key="update*">PROPAGATION_REQUIRED</prop>
+					<prop key="count*">PROPAGATION_REQUIRED</prop>
+					<prop key="create*">PROPAGATION_REQUIRED</prop>
+				    <prop key="countSessionComplete">PROPAGATION_REQUIRED</prop>
+					<prop key="export*">PROPAGATION_REQUIRED</prop>
 					<prop key="get*">PROPAGATION_REQUIRED</prop>
+					<prop key="hideOpenVote">PROPAGATION_REQUIRED</prop>
+				    <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+					<prop key="import*">PROPAGATION_REQUIRED</prop>
+				    <prop key="is*">PROPAGATION_REQUIRED</prop>
+				    <prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+				    <prop key="recalculateUserAnswers">PROPAGATION_REQUIRED</prop>
+				    <prop key="prepareChartData">PROPAGATION_REQUIRED</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED</prop>
               	    <prop key="resetDefineLater">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
-					<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
-					<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
+					<prop key="save*">PROPAGATION_REQUIRED</prop>
+					<prop key="showOpenVote">PROPAGATION_REQUIRED</prop>
+					<prop key="studentActivityOccurredGlobal">PROPAGATION_REQUIRED</prop>
+					<prop key="update*">PROPAGATION_REQUIRED</prop>
 				</props>
 			</property>
 	</bean>  

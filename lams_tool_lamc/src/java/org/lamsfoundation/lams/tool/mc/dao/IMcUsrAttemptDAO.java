@@ -101,7 +101,7 @@ public interface IMcUsrAttemptDAO {
     /**
      * Get the highest attempt order for a user for a particular questionDescription
      */
-    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
+    McUsrAttempt getUserAttemptByQuestion(Long userUid, Long mcQueContentId);
 
     /**
      * Get the highest attempt order for a all users in a session for a particular questionDescription
@@ -119,7 +119,7 @@ public interface IMcUsrAttemptDAO {
     /**
      * Checks whether anyone has attempted this assessment.
      */
-    boolean isMcContentAttempted(Long mcContentUid);
+    boolean isMcContentAttempted(long toolContentId);
 
     /**
      * Calculate what is the total mark scored by user in this activity. Only responseFinalised is taken into account.

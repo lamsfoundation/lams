@@ -15,7 +15,7 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tourist.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="progressBar"/>
@@ -212,7 +212,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>

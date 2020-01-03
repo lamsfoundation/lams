@@ -107,8 +107,10 @@
 										${status.count})
 									</td>
 									<td width="100%" style="padding: 5px">
-										<c:out value="${question.name}" escapeXml="false" />
-										<br>
+										<c:if test="${not sessionMap.hideTitles}">
+											<c:out value="${question.name}" escapeXml="false" />
+											<br>
+										</c:if>
 										<c:out value="${question.description}" escapeXml="false" />
 									</td>
 								</tr>
@@ -195,7 +197,7 @@
 															<fmt:message key="label.confidence" />
 														</div>
 														
-														<div>
+														<div class="loffset10">
 															<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 																<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
 																	<input class="bootstrap-slider" type="text" 

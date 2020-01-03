@@ -78,7 +78,7 @@ public class TblMonitoringController {
 
 	    //show only questions from question list otherwise
 	} else {
-	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+	    for (QuestionReference reference : assessment.getQuestionReferences()) {
 		questionList.add(reference.getQuestion());
 	    }
 	}
@@ -103,7 +103,7 @@ public class TblMonitoringController {
 
 	    // build candidate dtos
 	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		int optionAttemptCount = assessmentService.countAttemptsPerOption(optionDto.getUid());
+		int optionAttemptCount = assessmentService.countAttemptsPerOption(toolContentId, optionDto.getUid());
 
 		float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
 		optionDto.setPercentage(percentage);
@@ -116,7 +116,7 @@ public class TblMonitoringController {
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {
-	List<TblAssessmentDTO> assessmentDtos = new ArrayList<TblAssessmentDTO>();
+	List<TblAssessmentDTO> assessmentDtos = new ArrayList<>();
 	int i = 0;
 	for (String toolContentIdStr : toolContentIds) {
 	    String activityTitle = activityTitles[i++];
@@ -146,7 +146,7 @@ public class TblMonitoringController {
 	// question list to display
 	Set<AssessmentQuestion> questions = new TreeSet<>();
 	boolean hasRandomQuestion = false;
-	for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+	for (QuestionReference reference : assessment.getQuestionReferences()) {
 	    hasRandomQuestion |= reference.isRandomQuestion();
 	}
 	// in case there is at least one random question - we need to show all questions
@@ -155,7 +155,7 @@ public class TblMonitoringController {
 
 	    // show only questions from question list otherwise
 	} else {
-	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+	    for (QuestionReference reference : assessment.getQuestionReferences()) {
 		//sort questions the same way references are sorted (as per LKC request)
 		AssessmentQuestion question = reference.getQuestion();
 		question.setDisplayOrder(reference.getSequenceId());
@@ -191,16 +191,17 @@ public class TblMonitoringController {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment);
-	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<TblAssessmentQuestionDTO>();
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = new ArrayList<>();
 	for (QuestionSummary questionSummary : questionSummaries.values()) {
 	    QuestionDTO questionDto = questionSummary.getQuestionDto();
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
 	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto.setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLabel(questionDto.getType()));
+	    tblQuestionDto
+		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
 	    tblQuestionDto.setCorrectAnswer(getAssessmentCorrectAnswer(questionDto));
 
-	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<TblAssessmentQuestionResultDTO>();
+	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
 	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
 		    .getQuestionResultsPerSession()) {
 
@@ -246,8 +247,9 @@ public class TblMonitoringController {
 
 		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-			sb.append((optionDto.getMatchingPair() + " - " + optionDto.getName()).replaceAll("\\<.*?\\>", "")
-				+ " <br>");
+			sb.append(
+				(optionDto.getMatchingPair() + " - " + optionDto.getName()).replaceAll("\\<.*?\\>", "")
+					+ " <br>");
 		    }
 		    return sb.toString();
 

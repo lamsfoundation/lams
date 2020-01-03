@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -59,6 +60,8 @@ public class NotebookController {
     private ILearnerFullService learnerService;
     @Autowired
     private IUserManagementService userManagementService;
+    @Autowired
+    private ISecurityService securityService;
 
     /**
      * View all notebook entries
@@ -66,7 +69,6 @@ public class NotebookController {
     @RequestMapping("/viewAll")
     public String viewAll(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-
 	// getting requested object according to coming parameters
 	Integer learnerID = LearningWebUtil.getUserId();
 
@@ -77,15 +79,11 @@ public class NotebookController {
 	}
 
 	// get all notebook entries for the learner
-
-	TreeMap<Long, List<NotebookEntry>> entries = coreNotebookService.getEntryByLesson(learnerID,
-		CoreNotebookConstants.SCRATCH_PAD);
-
+	TreeMap<Long, List<NotebookEntry>> entries = coreNotebookService.getEntriesGroupedByLesson(learnerID);
 	request.getSession().setAttribute("entries", entries.values());
 	request.setAttribute("lessonID", lessonID);
 
 	return "notebook/viewall";
-
     }
 
     /**
@@ -94,63 +92,22 @@ public class NotebookController {
     @RequestMapping("/viewAllJournals")
     public String viewAllJournals(@ModelAttribute NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
-
-	// getting requested object according to coming parameters
 	Integer userID = LearningWebUtil.getUserId();
-	User user = (User) userManagementService.findById(User.class, userID);
-
-	// lesson service
 	Long lessonID = notebookForm.getLessonID();
 	Lesson lesson = learnerService.getLesson(lessonID);
 
-	if (!hasStaffAccessToJournals(user, lesson)) {
+	if (!securityService.isLessonMonitor(lessonID, userID, "view all journals", false)) {
 	    throw new UserAccessDeniedException(
 		    "User " + userID + " may not retrieve journal entries for lesson " + lessonID);
 	}
 
 	// List of Journal entries
-	List<NotebookEntry> journals = getJournals(lesson.getLessonId());
+	List<NotebookEntry> journals = coreNotebookService.getEntry(lesson.getLessonId(), CoreNotebookConstants.SCRATCH_PAD,
+		CoreNotebookConstants.JOURNAL_SIG);
 	request.getSession().setAttribute("journals", journals);
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonID);
 
 	return "notebook/viewalljournals";
-    }
-
-    // check user has permission to access all the journals for a lesson
-    private boolean hasStaffAccessToJournals(User user, Lesson lesson) {
-
-	if (lesson == null) {
-	    return false;
-	}
-
-	// lesson owner okay
-	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(user.getUserId())) {
-	    return true;
-	}
-
-	// staff member okay
-	if ((lesson.getLessonClass() != null) && lesson.getLessonClass().isStaffMember(user)) {
-	    return true;
-	}
-
-	return false;
-    }
-
-    /**
-     *
-     * @param lessonID
-     *            Lesson to get the journals from.
-     * @return List of Journal entries
-     */
-    private List<NotebookEntry> getJournals(Long lessonID) {
-	// initialize service object
-
-	if (lessonID == null) {
-	    return null;
-	}
-
-	return coreNotebookService.getEntry(lessonID, CoreNotebookConstants.SCRATCH_PAD, CoreNotebookConstants.JOURNAL_SIG);
-
     }
 
     /**
@@ -172,8 +129,7 @@ public class NotebookController {
 
 	if (entry.getUser() != null && !entry.getUser().getUserId().equals(user.getUserId())) {
 	    // wants to look at someone else's entry - check they are a teacher
-	    Lesson lesson = learnerService.getLesson(currentLessonID);
-	    if (!hasStaffAccessToJournals(user, lesson)) {
+	    if (!securityService.isLessonMonitor(currentLessonID, userID, "view notebook entry", false)) {
 		throw new UserAccessDeniedException(
 			"User " + userID + " may not retrieve journal entries for lesson " + currentLessonID);
 	    }
@@ -199,9 +155,6 @@ public class NotebookController {
 	return "notebook/addnew";
     }
 
-    /**
-     *
-     */
     @RequestMapping("/processNewEntry")
     public String processNewEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
@@ -218,9 +171,6 @@ public class NotebookController {
 	return skipViewAll ? null : viewAll(notebookForm, request);
     }
 
-    /**
-     *
-     */
     @RequestMapping(path = "/updateEntry")
     public String updateEntry(@ModelAttribute("notebookForm") NotebookForm notebookForm, HttpServletRequest request)
 	    throws IOException, ServletException {
@@ -247,7 +197,6 @@ public class NotebookController {
 	coreNotebookService.updateEntry(entryObj);
 
 	return viewAll(notebookForm, request);
-
     }
 
 }

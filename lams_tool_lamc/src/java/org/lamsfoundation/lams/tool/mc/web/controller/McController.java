@@ -34,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -62,6 +63,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Action class that controls the logic of tool behavior.
@@ -141,7 +146,7 @@ public class McController {
 	sessionMap.put(McAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	boolean isMcContentAttempted = mcContent.getUid() == null ? false
-		: mcService.isMcContentAttempted(mcContent.getUid());
+		: mcService.isMcContentAttempted(mcContent.getMcContentId());
 	sessionMap.put(McAppConstants.ATTR_IS_AUTHORING_RESTRICTED, isMcContentAttempted && mode.isTeacher());
 
 	return "authoring/AuthoringTabsHolder";
@@ -437,6 +442,21 @@ public class McController {
     }
 
     /**
+     * Adds multiple QbQuestions, imported from QTI
+     */
+    @RequestMapping(value = "/importQbQuestions", method = RequestMethod.POST)
+    private String importQbQuestions(HttpServletRequest request, @RequestParam String sessionMapId,
+	    @RequestParam String qbQuestionUids) {
+	// get a list of QB question UIDs and add each of them to the activity
+	for (String qbQuestionUid : qbQuestionUids.split(",")) {
+	    if (StringUtils.isNotBlank(qbQuestionUid)) {
+		importQbQuestion(request, sessionMapId, Long.valueOf(qbQuestionUid));
+	    }
+	}
+	return "authoring/itemlist";
+    }
+
+    /**
      * Adds QbQuestion, selected in the questionDescription bank, to the current questionDescription list.
      */
     @SuppressWarnings("unchecked")
@@ -447,6 +467,14 @@ public class McController {
 		.getAttribute(sessionMapId);
 	request.setAttribute(McAppConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	List<McQuestionDTO> questionDtos = (List<McQuestionDTO>) sessionMap.get(McAppConstants.QUESTION_DTOS);
+
+	//check whether this QB question is a duplicate
+	for (McQuestionDTO questionDto : questionDtos) {
+	    if (qbQuestionUid.equals(questionDto.getQbQuestionUid())) {
+		//let jsp know it's a duplicate
+		return "forward:/authoring/showDuplicateQuestionError.do";
+	    }
+	}
 
 	//get QbQuestion from DB
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
@@ -480,6 +508,18 @@ public class McController {
 	questionDtos.add(questionDto);
 
 	return "authoring/itemlist";
+    }
+
+    /**
+     * Shows "This question has already been added" error message in a browser.
+     */
+    @RequestMapping("/showDuplicateQuestionError")
+    @ResponseBody
+    public String showDuplicateQuestionError(HttpServletResponse response) throws IOException {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isDuplicated", true);
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     @SuppressWarnings("unchecked")

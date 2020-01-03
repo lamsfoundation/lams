@@ -80,9 +80,10 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -499,7 +500,7 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId) {
+    public List<ExcelSheet> exportTeamReportSpreadsheet(Long toolContentId) {
 
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	if (peerreview == null) {
@@ -509,7 +510,6 @@ public class PeerreviewServiceImpl
 
 	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao, this)
 		.generateTeamReport();
-
     }
 
     @Override
@@ -882,6 +882,11 @@ public class PeerreviewServiceImpl
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
+    }
+    
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	return false;
     }
 
     @Override

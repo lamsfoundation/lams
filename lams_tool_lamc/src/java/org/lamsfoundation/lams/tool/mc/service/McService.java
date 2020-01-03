@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -51,6 +53,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.util.CellUtil;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -60,6 +63,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -75,6 +79,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.dao.IMcConfigDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
@@ -103,10 +108,10 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
@@ -132,6 +137,7 @@ public class McService
     private IMcSessionDAO mcSessionDAO;
     private IMcUserDAO mcUserDAO;
     private IMcUsrAttemptDAO mcUsrAttemptDAO;
+    private IMcConfigDAO mcConfigDAO;
     private MCOutputFactory mcOutputFactory;
 
     private ILogEventService logEventService;
@@ -615,7 +621,7 @@ public class McService
 	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(
@@ -920,7 +926,7 @@ public class McService
 	Set<McSession> sessionList = content.getMcSessions();
 	for (McSession session : sessionList) {
 	    Long toolSessionId = session.getMcSessionId();
-	    List<McQueUsr> sessionUsers = session.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 
 	    for (McQueUsr user : sessionUsers) {
 
@@ -995,7 +1001,6 @@ public class McService
 
     @Override
     public byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException {
-
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
 	for (McQueContent question : questions) {
@@ -1020,6 +1025,8 @@ public class McService
 	whiteFont.setColor(IndexedColors.WHITE.getIndex());
 	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
 	greenColor.setFont(whiteFont);
+
+	short percentageFormat = wb.createDataFormat().getFormat("0%");
 
 	// ======================================================= Report by questionDescription IRA page
 	// =======================================
@@ -1054,15 +1061,17 @@ public class McService
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = getAttemptsCountPerOption(option.getUid(), question.getUid());
 		cell = row.createCell(count++);
-		int percentage = (optionAttemptCount * 100) / totalNumberOfUsers;
-		cell.setCellValue(percentage + "%");
+		int percentage = optionAttemptCount / totalNumberOfUsers;
+		cell.setCellValue(percentage);
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 		totalPercentage += percentage;
 		if (option.isCorrect()) {
 		    cell.setCellStyle(greenColor);
 		}
 	    }
 	    cell = row.createCell(maxOptionsInQuestion + 1);
-	    cell.setCellValue((100 - totalPercentage) + "%");
+	    cell.setCellValue((1 - totalPercentage));
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	rowCount++;
@@ -1154,10 +1163,11 @@ public class McService
 		cell = row.createCell(count++);
 		cell.setCellValue(new Long(userMark.getTotalMark()));
 
-		int totalPercents = (numberOfCorrectlyAnsweredByUser * 100) / questions.size();
+		int totalPercents = numberOfCorrectlyAnsweredByUser / questions.size();
 		totalPercentList.add(totalPercents);
 		cell = row.createCell(count++);
-		cell.setCellValue(totalPercents + "%");
+		cell.setCellValue(totalPercents);
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	    }
 
 	    rowCount++;
@@ -1170,7 +1180,8 @@ public class McService
 	cell.setCellValue(messageService.getMessage("label.ave"));
 	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
 	    cell = row.createCell(count++);
-	    cell.setCellValue(((numberOfCorrectAnswers * 100) / totalPercentList.size()) + "%");
+	    cell.setCellValue(numberOfCorrectAnswers / totalPercentList.size());
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	// class mean
@@ -1186,7 +1197,8 @@ public class McService
 	if (totalPercents.length != 0) {
 	    int classMean = sum / totalPercents.length;
 	    cell = row.createCell(questions.size() + 3);
-	    cell.setCellValue(classMean + "%");
+	    cell.setCellValue(classMean);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	// median
@@ -1202,7 +1214,8 @@ public class McService
 		median = (int) ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
 	    }
 	    cell = row.createCell(questions.size() + 3);
-	    cell.setCellValue(median + "%");
+	    cell.setCellValue(median);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	row = sheet.createRow(rowCount++);
@@ -1296,7 +1309,6 @@ public class McService
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) {
-
 	if (fromContentId == null) {
 	    logger.warn("fromContentId is null.");
 	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
@@ -1514,7 +1526,7 @@ public class McService
 	if (!existsSession(toolSessionId)) {
 	    try {
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
-			McSession.INCOMPLETE, toolSessionName, mcContent, new ArrayList<McQueUsr>());
+			McSession.INCOMPLETE, toolSessionName, mcContent, new HashSet<McQueUsr>());
 
 		mcSessionDAO.saveMcSession(mcSession);
 
@@ -1645,6 +1657,7 @@ public class McService
 	    confidenceLevelDto.setUserName(userName);
 	    confidenceLevelDto.setPortraitUuid(portraitUuid);
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
+	    confidenceLevelDto.setType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
 	    QbQuestion qbQuestion = userAttempt.getMcQueContent().getQbQuestion();
 	    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
 	    confidenceLevelDto.setQbOptionUid(userAttempt.getQbOption().getUid());
@@ -1653,6 +1666,14 @@ public class McService
 	}
 
 	return confidenceLevelDtos;
+    }
+
+    @Override
+    public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
+	McSession session = getMcSessionById(toolSessionId);
+	McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
+
+	return (session != null) && (mcUser != null) && session.isUserGroupLeader(mcUser);
     }
 
     @Override
@@ -1665,30 +1686,44 @@ public class McService
 	}
 	McContent content = session.getMcContent();
 
-	// copy answers only in case leader aware feature is ON
-	if (content.isUseSelectLeaderToolOuput()) {
-
-	    McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
-	    // create user if he hasn't accessed this activity yet
-	    if (mcUser == null) {
-
-		String userName = user.getLogin();
-		String fullName = user.getFirstName() + " " + user.getLastName();
-		mcUser = new McQueUsr(userId, userName, fullName, session);
-		mcUserDAO.saveMcUser(mcUser);
-	    }
-
-	    McQueUsr groupLeader = session.getGroupLeader();
-
-	    // check if leader has submitted answers
-	    if ((groupLeader != null) && groupLeader.isResponseFinalised()) {
-
-		// we need to make sure specified user has the same scratches as a leader
-		copyAnswersFromLeader(mcUser, groupLeader);
-	    }
-
+	McQueUsr mcUser = getMcUserBySession(userId, session.getUid());
+	// create user if he hasn't accessed this activity yet
+	if (mcUser == null) {
+	    String userName = user.getLogin();
+	    String fullName = user.getFirstName() + " " + user.getLastName();
+	    mcUser = new McQueUsr(userId, userName, fullName, session);
+	    mcUserDAO.saveMcUser(mcUser);
 	}
 
+	//finalize the latest result, if it's still active
+	if (!mcUser.isResponseFinalised()) {
+
+	    //calculate total learner mark
+	    int learnerMark = 0;
+	    for (McQueContent question : content.getMcQueContents()) {
+		McUsrAttempt attempt = mcUsrAttemptDAO.getUserAttemptByQuestion(mcUser.getUid(), question.getUid());
+		learnerMark += attempt == null ? 0 : attempt.getMark();
+	    }
+
+	    Integer numberOfAttempts = mcUser.getNumberOfAttempts() + 1;
+	    mcUser.setNumberOfAttempts(numberOfAttempts);
+	    mcUser.setLastAttemptTotalMark(learnerMark);
+	    mcUser.setResponseFinalised(true);
+	    updateMcQueUsr(mcUser);
+	}
+
+	//if this is a leader finishes, complete all non-leaders as well, also copy leader results to them
+	McQueUsr groupLeader = checkLeaderSelectToolForSessionLeader(mcUser, toolSessionId);
+	if (session.isUserGroupLeader(mcUser)) {
+	    session.getMcQueUsers().forEach(sessionUser -> {
+		//finish non-leader
+		sessionUser.setResponseFinalised(true);
+		updateMcQueUsr(sessionUser);
+
+		//copy answers from leader to non-leaders
+		copyAnswersFromLeader(sessionUser, groupLeader);
+	    });
+	}
     }
 
     @Override
@@ -1775,6 +1810,10 @@ public class McService
      */
     public void setMcUsrAttemptDAO(IMcUsrAttemptDAO mcUsrAttemptDAO) {
 	this.mcUsrAttemptDAO = mcUsrAttemptDAO;
+    }
+
+    public void setMcConfigDAO(IMcConfigDAO mcConfigDAO) {
+	this.mcConfigDAO = mcConfigDAO;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
@@ -2004,7 +2043,6 @@ public class McService
      *
      * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
@@ -2039,29 +2077,66 @@ public class McService
 
 	createMc(mcq);
 
+	QbCollection collection = qbService.getUserPrivateCollection(userID);
+	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
+		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
+			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	// Questions
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
-	for (JsonNode questionData : questions) {
-	    QbQuestion qbQuestion = new QbQuestion();
-	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-	    qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
-	    qbQuestion.setMaxMark(1);
-	    userManagementService.save(qbQuestion);
-	    
-	    McQueContent question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
-		    mcq);
+	for (JsonNode questionDataJson : questions) {
+	    ObjectNode questionData = (ObjectNode) questionDataJson;
+	    boolean addToCollection = false;
+	    McQueContent question = null;
+	    QbQuestion qbQuestion = null;
+	    String uuid = JsonUtil.optString(questionData, RestTags.QUESTION_UUID);
 
-	    ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
-	    for (JsonNode optionData : optionsData) {
-		QbOption qbOption = new QbOption();
-		qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
-		qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
-		qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
-		qbOption.setQbQuestion(qbQuestion);
-		question.getQbQuestion().getQbOptions().add(qbOption);
+	    // try to match the question to an existing QB question in DB
+	    if (StringUtils.isNotBlank(uuid)) {
+		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
+
+	    if (qbQuestion == null) {
+		addToCollection = collection != null;
+
+		qbQuestion = new QbQuestion();
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
+		qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TITLE));
+		qbQuestion.setDescription(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
+		qbQuestion.setMaxMark(1);
+		// UUID normally gets generated in the DB, but we need it immediately,
+		// so we generate it programatically.
+		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
+		// not from DB where UUID is filed
+		qbQuestion.setUuid(UUID.randomUUID());
+		userManagementService.save(qbQuestion);
+
+		// Store it back into JSON so Scratchie can read it
+		// and use the same questions, not create new ones
+		uuid = qbQuestion.getUuid().toString();
+		questionData.put(RestTags.QUESTION_UUID, uuid);
+
+		ArrayNode optionsData = JsonUtil.optArray(questionData, RestTags.ANSWERS);
+		for (JsonNode optionData : optionsData) {
+		    QbOption qbOption = new QbOption();
+		    qbOption.setName(JsonUtil.optString(optionData, RestTags.ANSWER_TEXT));
+		    qbOption.setCorrect(JsonUtil.optBoolean(optionData, RestTags.CORRECT));
+		    qbOption.setDisplayOrder(JsonUtil.optInt(optionData, RestTags.DISPLAY_ORDER));
+		    qbOption.setQbQuestion(qbQuestion);
+		    qbQuestion.getQbOptions().add(qbOption);
+		}
+	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
+		addToCollection = true;
+	    }
+
+	    question = new McQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER), mcq);
 	    saveOrUpdateMcQueContent(question);
+
+	    // all questions need to end up in user's private collection
+	    if (addToCollection) {
+		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		collectionUUIDs.add(uuid);
+	    }
 	}
 
     }
@@ -2145,6 +2220,16 @@ public class McService
 	    McQueContent mcQuestion = new McQueContent(qbQuestion, displayOrder++, mcContent);
 	    mcQueContentDAO.insert(mcQuestion);
 	}
+    }
+    
+    @Override
+    public void setConfigValue(String key, String value) {
+	mcConfigDAO.setConfigValue(key, value);
+    }
+
+    @Override
+    public String getConfigValue(String key) {
+	return mcConfigDAO.getConfigValue(key);
     }
 
     private void releaseQbQuestionFromCache(QbQuestion qbQuestion) {
