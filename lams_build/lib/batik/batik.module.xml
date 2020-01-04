@@ -24,17 +24,13 @@
 
 <module xmlns="urn:jboss:module:1.3" name="org.apache.batik">
   <resources>
-    <resource-root path="batik-all-1.7.jar"/>
+    <resource-root path="batik-dom.jar"/>
+    <resource-root path="batik-svggen.jar"/>
+    <resource-root path="batik-xml.jar"/>
+    <resource-root path="batik-util.jar"/>
+    <resource-root path="batik-awt-util.jar"/>
   </resources>
-  
   <dependencies>
- 	<system>
-  		<paths>
-  			<path name="org/w3c/dom"/>
-  			<path name="org/w3c/dom/css"/>
-  			<path name="org/w3c/dom/traversal"/>
-  		</paths>
-  	</system>
   	<module name="org.apache.xmlcommons" />
   </dependencies>
 </module>
