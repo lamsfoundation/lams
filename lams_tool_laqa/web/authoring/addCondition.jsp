@@ -13,6 +13,7 @@
 	 </form:form>
 		<!-- Basic Info Form-->
 		<form:form action="/lams/tool/laqa11/authoringConditions/saveOrUpdateCondition.do" method="post" modelAttribute="QaConditionForm" id="QaConditionForm" >
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<lams:errors/>
 			<form:hidden path="orderId" />
 			

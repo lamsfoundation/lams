@@ -610,7 +610,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * saveSingleQuestion
      */
-    @RequestMapping("/saveSingleQuestion")
+    @RequestMapping(path = "/saveSingleQuestion", method = RequestMethod.POST)
     public String saveSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 
@@ -729,7 +729,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * addSingleQuestion
      */
-    @RequestMapping("/addSingleQuestion")
+    @RequestMapping(path = "/addSingleQuestion", method = RequestMethod.POST)
     public String addSingleQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 
@@ -893,7 +893,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * removes a question from the questions map
      */
-    @RequestMapping("/removeQuestion")
+    @RequestMapping(path = "/removeQuestion", method = RequestMethod.POST)
     public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm newQuestionForm,
 	    HttpServletRequest request) throws IOException, ServletException {
 
