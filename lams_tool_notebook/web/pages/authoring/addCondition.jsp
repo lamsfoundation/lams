@@ -15,6 +15,7 @@
 		 </form:form>		
 		<form:form action="authoringCondition/saveOrUpdateCondition.do" method="post"
 			modelAttribute="notebookConditionForm" id="notebookConditionForm" focus="displayName">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<lams:errors/>
 			<form:hidden path="orderId" />
 

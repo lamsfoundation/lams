@@ -19,9 +19,11 @@
 	}
 
 	function deleteCondition(orderId, sessionMapID){
-		$("#conditionsArea").load("<c:url value='/authoringCondition/removeCondition.do'/>",{
-			'orderId' : orderId,
-			'sessionMapID' : sessionMapID
+		$.ajax({
+			async : false,
+			url : '<c:url value="/authoringCondition/removeCondition.do"/>',
+			data : 'orderId=' + orderId + '&sessionMapID=' + sessionMapID + '&<csrf:token/>',
+			type : "POST"
 		});
 	}
 	
@@ -41,7 +43,8 @@
 	//Packs additional elements and submits the question form
 	function submitCondition(){
 		var form = $('#notebookConditionForm');
-		$('#conditionInputArea').load(form.attr('action'), form.serialize());
+		var obj = form.serializeArray();
+		$('#conditionInputArea').load(form.attr('action'), obj);
 	} 
 </script>
 
