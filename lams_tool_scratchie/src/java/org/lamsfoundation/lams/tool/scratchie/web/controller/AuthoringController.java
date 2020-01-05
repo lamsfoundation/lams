@@ -580,7 +580,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping("/removeItem")
+    @RequestMapping(path = "/removeItem", method = RequestMethod.POST)
     private String removeItem(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
