@@ -2,9 +2,7 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <!DOCTYPE html>
 <lams:html>
@@ -291,7 +289,9 @@
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
 			learningLibraryGroups = ${learningLibraryGroups},
-			initAccess = ${access};
+			initAccess = ${access},
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>
 </lams:head>
 <body>

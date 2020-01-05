@@ -346,17 +346,19 @@ GeneralInitLib = {
 			if (!title) {
 				return;
 			}
-			
-			
+			var data = {
+                    'name'           : title,
+                    'parentFolderID' : parentFolder.data.folderID
+			};
+			data[csrfTokenName] = csrfTokenValue;
+
 			$.ajax({
+				type  : 'POST',
 				cache : false,
 				async : true,
 				url : LAMS_URL + "workspace/createFolder.do",
 				dataType : 'text',
-				data : {
-					'name' 		     : title,
-					'parentFolderID' : parentFolder.data.folderID
-				},
+				data : data,
 				success : function() {
 					tree.removeChildren(parentFolder);
 					parentFolder.expand();
@@ -411,16 +413,20 @@ GeneralInitLib = {
 				}
 			}
 
+			var data = {
+                'targetFolderID' : folderNode.data.folderID,
+                'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.data.folderID
+                                                           : copiedResource.resourceNode.data.learningDesignId ,
+                'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
+			};
+			data[csrfTokenName] = csrfTokenValue;
+
 			$.ajax({
+				type  : 'POST',
 				cache : false,
 				url : copiedResource.isCut ? LAMS_URL + "workspace/moveResource.do" : LAMS_URL + "workspace/copyResource.do",
 				dataType : 'text',
-				data : {
-					'targetFolderID' : folderNode.data.folderID,
-					'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.data.folderID
-															   : copiedResource.resourceNode.data.learningDesignId ,
-					'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
-				},
+				data : data,
 				success : function() {
 					if (copiedResource.isCut) {
 						tree.removeNode(copiedResource.resourceNode, true);
@@ -451,16 +457,18 @@ GeneralInitLib = {
     		if (!confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
     			return;
     		}
-			
+			var data = {
+                    'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+                    'resourceType' : isFolder ? 'Folder' : 'LearningDesign'				
+			}
+			data[csrfTokenName] = csrfTokenValue;
 			$.ajax({
+				type  : 'POST',
 				cache : false,
 				async : true,
 				url : LAMS_URL + "workspace/deleteResource.do",
 				dataType : 'text',
-				data : {
-					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
-					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
-				},
+				data : data,
 				success : function() {
 					var parentFolder = ldNode.parent;
 					tree.removeChildren(parentFolder);
@@ -505,17 +513,21 @@ GeneralInitLib = {
 			if (!title) {
 				return;
 			}
-			
+
+			var data = {
+            	'name'         : title,
+                'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+                'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
+			};
+			data[csrfTokenName] = csrfTokenValue;
+
 			$.ajax({
+				type  : 'POST',
 				cache : false,
 				async : true,
 				url : LAMS_URL + "workspace/renameResource.do",
 				dataType : 'text',
-				data : {
-					'name' 		   : title,
-					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
-					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
-				},
+				data : data,
 				success : function(response) {
 					if (isFolder) {
 						ldNode.data.label = title;
@@ -847,6 +859,7 @@ GeneralInitLib = {
 						// tool content ID can be null if the activity had the default content, i.e. was not edited yet
 						if (activity.toolContentID) {
 							$.ajax({
+								type  : 'POST',
 								cache : false,
 								async : false,
 								url : LAMS_URL + "authoring/copyToolContent.do",
@@ -1727,6 +1740,7 @@ GeneralLib = {
 		}
 		// get LD details
 		$.ajax({
+			type  : 'POST',
 			async : true,
 			cache : false,
 			url : LAMS_URL + "authoring/openLearningDesign.do",
@@ -2876,6 +2890,10 @@ GeneralLib = {
 		   			  ? 1 : 0;
 		ld.readOnly = readOnly;
 		ld.systemGate = null;
+		var data = {
+			'ld'     : JSON.stringify(ld)
+		};
+		data[csrfTokenName] = csrfTokenValue;
 
 		$.ajax({
 			type     : 'POST',
@@ -2883,9 +2901,7 @@ GeneralLib = {
 			async    : false,
 			url      : LAMS_URL + "authoring/saveLearningDesign.do",
 			dataType : 'json',
-			data     : {
-				'ld'     : JSON.stringify(ld)
-			},
+			data     : data,
 			success : function(response) {
 				layout.ld.folderID = folderID;
 				layout.ld.title = title;
@@ -3120,6 +3136,7 @@ GeneralLib = {
 				
 				// load the thumbnail
 				$.ajax({
+					type     : 'POST',
 					dataType : 'text',
 					url : LD_THUMBNAIL_URL_BASE + learningDesignID,
 					cache : false,
