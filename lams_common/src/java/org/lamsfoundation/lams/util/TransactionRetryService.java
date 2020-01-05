@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.util;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 /**
  * Invokes the given service method with a new transaction.
@@ -30,6 +31,15 @@ import org.aopalliance.intercept.MethodInvocation;
 public class TransactionRetryService implements ITransactionRetryService {
     @Override
     public Object retry(MethodInvocation invocation) throws Throwable {
+	// LDEV-4915 introduced it
+
+	// This method uses PROPAGATION_REQUIRES_NEW,
+	// but if first attempt of running the target method failed then we are left without a Hibernate session
+	// and we need to open it manually.
+
+	// Hopefully this can be rewritten back to automatic session management at some point.
+	HibernateSessionManager.openSessionIfNecessary();
+	
 	return invocation.proceed();
     }
 }
