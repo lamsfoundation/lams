@@ -62,7 +62,7 @@
 </div>
 
 <form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring/addLesson.do" method="POST">
-
+<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 <lams:Page type="navbar">
 		<lams:Tabs>
 			<lams:Tab id="1" key="label.tab.lesson" />

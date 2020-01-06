@@ -289,7 +289,7 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/addLesson")
+    @RequestMapping(path = "/addLesson", method = RequestMethod.POST)
     public String addLesson(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam String lessonName, @RequestParam long learningDesignID)
 	    throws IOException, ServletException, ParseException {
