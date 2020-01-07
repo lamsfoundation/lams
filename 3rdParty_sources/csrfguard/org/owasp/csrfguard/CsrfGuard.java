@@ -662,6 +662,9 @@ public final class CsrfGuard {
 			return false;
 		}
 		
+		// LAMS LDEV-4932 Replace multiple slashes with a single one, so it works the same as Spring MVC
+		uri = uri.replaceAll("/{2,}", "/");
+		
 		boolean retval = !isProtectEnabled();
 
 		for (String protectedPage : getProtectedPages()) {

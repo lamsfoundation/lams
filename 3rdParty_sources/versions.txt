@@ -25,7 +25,7 @@ Commons IO 2.5
 
 Commons Validator 1.6
 
-CSRF Guard 3.1.0 manual build from master made on 2019-12-19
+CSRF Guard master from 2020.01.07 with a custom modification in CsrfGuard.java
 
 Hibernate Core 5.3.6
 
