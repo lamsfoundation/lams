@@ -1,6 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>%>
 <%-- Option page for the Assessment Multiple Choice question. Creates the output ${containingDivName}assmcq${questionNumber}option${optionNumber} --%>
 
 		<c:set scope="request" var="qnon">${containingDivName}assmcq${questionNumber}option${optionNumber}</c:set>

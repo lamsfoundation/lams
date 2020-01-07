@@ -1,8 +1,6 @@
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <%@page import="org.springframework.web.context.request.SessionScope"%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
@@ -14,7 +12,6 @@
 </c:if>
 <c:set var="isForgotYourPasswordEnabled"><%=Configuration.get(ConfigurationKeys.FORGOT_YOUR_PASSWORD_LINK_ENABLE)%></c:set>
 
-<!DOCTYPE html>
 <lams:html>
 
 <%-- If login param is empty, this is a regular, manual login page.

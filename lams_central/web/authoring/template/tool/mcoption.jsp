@@ -1,6 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%-- Generic Q&A option page. Expects an input of questionNumber, optionNumber & contentFolderID, and creates a radio button question${questionNumber}correct 
 and a text field field named question${questionNumber}option${optionNumber} --%>
 

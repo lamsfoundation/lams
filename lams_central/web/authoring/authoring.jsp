@@ -1,10 +1,6 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />

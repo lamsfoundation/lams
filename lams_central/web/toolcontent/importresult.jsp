@@ -1,8 +1,5 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="title.import.result" /></title>

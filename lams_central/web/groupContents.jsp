@@ -1,7 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <c:forEach var="lesson" items="${org.lessons}">
 	<div id="${lesson.id}" class="j-single-lesson">

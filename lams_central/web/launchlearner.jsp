@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.lesson.Lesson" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
 <!-- defined Lesson states -->
 <c:set var="created"><%= Lesson.CREATED %></c:set>
 <c:set var="notstarted"><%= Lesson.NOT_STARTED_STATE %></c:set>

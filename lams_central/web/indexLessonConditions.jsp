@@ -1,7 +1,7 @@
-<%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="lams"><lams:LAMSURL/></c:set>
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
 <lams:html>
 <lams:head>
 	<c:url value="/lessonConditions/addLessonDependency.do" var="addLessonDependencyUrl">

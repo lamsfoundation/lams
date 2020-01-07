@@ -1,11 +1,7 @@
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 
 <!-- Wraps up topicview.jsp for paging. The first batch of messages is in viewtopic.jsp then the rest are loaded via scrolling using this jsp. -->
-
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
 
 <c:set var="lams">
 	<lams:LAMSURL />

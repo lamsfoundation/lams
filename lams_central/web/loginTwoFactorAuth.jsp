@@ -1,8 +1,6 @@
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <%@page import="org.springframework.web.context.request.SessionScope"%>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager"%>
@@ -13,7 +11,6 @@
 	<c:set var="password" value="${sessionScope.password}" />
 </c:if>
 
-<!DOCTYPE html>
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="title.login.window" /></title>
