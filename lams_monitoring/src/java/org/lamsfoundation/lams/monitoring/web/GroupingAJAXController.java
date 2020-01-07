@@ -62,6 +62,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -88,8 +89,6 @@ public class GroupingAJAXController {
     @Autowired
     private IUserManagementService userManagementService;
 
-    // ---------------------------------------------------------------------
-
     private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
     private static final String VIEW_GROUPS_SCREEN = "viewGroups";
     private static final String PARAM_ACTIVITY_TITLE = "title";
@@ -109,7 +108,6 @@ public class GroupingAJAXController {
      */
     @RequestMapping("/startGrouping")
     public String startGrouping(HttpServletRequest request) throws IOException, ServletException {
-
 	return startGrouping(request, false);
     }
 
@@ -214,7 +212,7 @@ public class GroupingAJAXController {
     /**
      * Moves users between groups, removing them from previous group and creating a new one, if needed.
      */
-    @RequestMapping("/addMembers")
+    @RequestMapping(path = "/addMembers", method = RequestMethod.POST)
     @ResponseBody
     public String addMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	response.setContentType("application/json;charset=utf-8");
@@ -238,15 +236,15 @@ public class GroupingAJAXController {
 		result = group.mayBeDeleted();
 
 		if (result) {
-		    if (GroupingAJAXController.log.isDebugEnabled()) {
-			GroupingAJAXController.log.debug("Removing users " + membersParam.toString() + " from group "
+		    if (log.isDebugEnabled()) {
+			log.debug("Removing users " + membersParam.toString() + " from group "
 				+ group.getGroupId() + " in activity " + activityID);
 		    }
 
 		    try {
 			monitoringService.removeUsersFromGroup(activityID, group.getGroupId(), members);
 		    } catch (LessonServiceException e) {
-			GroupingAJAXController.log.error(e);
+			log.error(e);
 			result = false;
 		    }
 		}
@@ -264,8 +262,8 @@ public class GroupingAJAXController {
 	if (result && ((groupID == null) || (groupID > 0))) {
 	    if (groupID == null) {
 		String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
-		if (GroupingAJAXController.log.isDebugEnabled()) {
-		    GroupingAJAXController.log
+		if (log.isDebugEnabled()) {
+		    log
 			    .debug("Creating group with name \"" + name + "\" in activity " + activityID);
 		}
 		Group group = monitoringService.addGroup(activityID, name, true);
@@ -280,8 +278,8 @@ public class GroupingAJAXController {
 	    }
 
 	    if (result && (members != null)) {
-		if (GroupingAJAXController.log.isDebugEnabled()) {
-		    GroupingAJAXController.log.debug("Adding users " + membersParam.toString() + " to group " + groupID
+		if (log.isDebugEnabled()) {
+		    log.debug("Adding users " + membersParam.toString() + " to group " + groupID
 			    + " in activity " + activityID);
 		}
 
@@ -289,7 +287,7 @@ public class GroupingAJAXController {
 		try {
 		    monitoringService.addUsersToGroup(activityID, groupID, members);
 		} catch (LessonServiceException e) {
-		    GroupingAJAXController.log.error(e);
+		    log.error(e);
 		    result = false;
 		}
 	    }
@@ -302,7 +300,7 @@ public class GroupingAJAXController {
     /**
      * Stores lesson grouping as a course grouping.
      */
-    @RequestMapping("/saveAsCourseGrouping")
+    @RequestMapping(path = "/saveAsCourseGrouping", method = RequestMethod.POST)
     @ResponseBody
     public String saveAsCourseGrouping(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -352,13 +350,13 @@ public class GroupingAJAXController {
     /**
      * Renames the group.
      */
-    @RequestMapping("/changeGroupName")
+    @RequestMapping(path = "/changeGroupName", method = RequestMethod.POST)
     public String changeGroupName(HttpServletRequest request) {
 	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
 	String name = WebUtil.readStrParam(request, GroupingAJAXController.PARAM_NAME);
 	if (name != null) {
-	    if (GroupingAJAXController.log.isDebugEnabled()) {
-		GroupingAJAXController.log.debug("Renaming group  " + groupID + " to \"" + name + "\"");
+	    if (log.isDebugEnabled()) {
+		log.debug("Renaming group  " + groupID + " to \"" + name + "\"");
 	    }
 	    monitoringService.setGroupName(groupID, name);
 	}
@@ -392,7 +390,7 @@ public class GroupingAJAXController {
     /**
      * Checks if a group can be removed and performs it.
      */
-    @RequestMapping("/removeGroup")
+    @RequestMapping(path = "/removeGroup", method = RequestMethod.POST)
     @ResponseBody
     public String removeGroup(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	response.setContentType("application/json;charset=utf-8");
@@ -406,12 +404,12 @@ public class GroupingAJAXController {
 
 	if (result) {
 	    try {
-		if (GroupingAJAXController.log.isDebugEnabled()) {
-		    GroupingAJAXController.log.debug("Removing group  " + groupID + " from activity " + activityID);
+		if (log.isDebugEnabled()) {
+		    log.debug("Removing group  " + groupID + " from activity " + activityID);
 		}
 		monitoringService.removeGroup(activityID, groupID);
 	    } catch (LessonServiceException e) {
-		GroupingAJAXController.log.error(e);
+		log.error(e);
 		result = false;
 	    }
 	}

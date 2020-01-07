@@ -60,7 +60,7 @@ public interface ILeaderselectionService extends ICommonToolService {
      * @throws IOException 
      * @throws JSONException 
      */
-    boolean setGroupLeader(Long userId, Long toolSessionId) throws IOException;
+    boolean setGroupLeader(Long userId, Long toolSessionId);
 
     /**
      * Makes a copy of the default content and assigns it a newContentID

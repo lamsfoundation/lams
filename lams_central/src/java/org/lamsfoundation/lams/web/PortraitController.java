@@ -42,9 +42,7 @@ public class PortraitController {
     private IUserManagementService userManagementService;
 
     @RequestMapping("/portrait")
-    public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request)
-	    throws Exception {
-
+    public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request) {
 	Long portraitUuid = userManagementService.getUserByLogin(request.getRemoteUser()).getPortraitUuid();
 	log.debug("using portraitUuid=" + portraitUuid);
 	// if no portrait has been uploaded, set the uuid to 0

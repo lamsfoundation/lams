@@ -500,7 +500,6 @@ function checkScheduleDate(startDateString, endDateString) {
 }
 
 function scheduleLesson(){
-	
 	var date = $('#scheduleDatetimeField').val();
 	if (date) {
 		if ( checkScheduleDate (date, lessonEndDate) ) {
@@ -526,13 +525,15 @@ function scheduleLesson(){
 
 
 function startLesson(){
+	var data = {
+		'lessonID': lessonId
+	};
+	data[csrfTokenName] = csrfTokenValue;
 	$.ajax({
 		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring/startLesson.do',
 		cache : false,
-		data : {
-			'lessonID'        : lessonId
-		},
+		data : data,
 		success : function() {
 			refreshMonitor('lesson');
 		}
@@ -1397,17 +1398,20 @@ function forceCompleteExecute(learners, activityId, removeContent) {
 	$.each(learners, function() {
 		learnerIds += this.id + ',';
 	})
+	var data={
+		'lessonID'   		 : lessonId,
+		'learnerID'  		 : learnerIds.slice(0, -1),
+		'activityID' 		 : activityId,
+		'removeContent'		 : removeContent
+	};
+	data[csrfTokenName] = csrfTokenValue;
 	
 	$.ajax({
-		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring/forceComplete.do',
+		type : 'POST',
+		dataType : 'text',
 		cache : false,
-		data : {
-			'lessonID'   		 : lessonId,
-			'learnerID'  		 : learnerIds.slice(0, -1),
-			'activityID' 		 : activityId,
-			'removeContent'		 : removeContent
-		},
+		data : data,
 		success : function(response) {
 			// inform user of result
 			alert(response);

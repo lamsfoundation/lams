@@ -30,7 +30,6 @@ public class TblMonitoringController {
      */
     @RequestMapping("/peerreview")
     public String peerreview(HttpServletRequest request) {
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);

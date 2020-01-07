@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -51,6 +49,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringFullService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
+import org.lamsfoundation.lams.monitoring.web.form.GateForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -60,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * <p>
@@ -78,12 +78,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * </p>
  *
  * @author Jacky Fang
- * @since 2005-4-15
  */
 @Controller
 @RequestMapping("/gate")
 public class GateController {
-
     private static final DateFormat SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
     @Autowired
@@ -93,9 +91,6 @@ public class GateController {
     @Autowired
     private ILessonService lessonService;
 
-    // ---------------------------------------------------------------------
-    // Method
-    // ---------------------------------------------------------------------
     /**
      * <p>
      * The dispatch method that allows the teacher to view the status of the gate. It is expecting the caller passed in
@@ -109,12 +104,9 @@ public class GateController {
      *
      * <b>Note:</b> gate form attribute <code>waitingLearners</code> got setup after the view is dispatch to ensure
      * there won't be casting exception occur if the activity id is not a gate by chance.
-     *
      */
     @RequestMapping("/viewGate")
-    public String viewGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+    public String viewGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response) {
 	// if this is the initial call then activity id will be in the request, otherwise
 	// get it from the form (if being called from openGate.jsp
 	Long gateIdLong = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
@@ -137,10 +129,8 @@ public class GateController {
     /**
      * Open the gate if is closed.
      */
-    @RequestMapping("/openGate")
-    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+    @RequestMapping(path = "/openGate", method = RequestMethod.POST)
+    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response) {
 	GateActivity gate = monitoringService.openGate(gateForm.getActivityId(), getUserId());
 
 	return findViewByGateType(gateForm, gate);
@@ -149,10 +139,9 @@ public class GateController {
     /**
      * Allows a single learner to pass the gate.
      */
-    @RequestMapping("/openGateForSingleUser")
+    @RequestMapping(path = "/openGateForSingleUser", method = RequestMethod.POST)
     public String openGateForSingleUser(@ModelAttribute GateForm gateForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
+	    HttpServletResponse response) {
 	Long gateIdLong = gateForm.getActivityId();
 	String userId = gateForm.getUserId();
 	String[] userIdsString = userId.split(",");
@@ -166,10 +155,9 @@ public class GateController {
 	return findViewByGateType(gateForm, gate);
     }
 
-    @RequestMapping("/scheduleGate")
+    @RequestMapping(path = "/scheduleGate", method = RequestMethod.POST)
     public String scheduleGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, ParseException {
-
+	    HttpServletResponse response) throws ParseException {
 	Long gateId = gateForm.getActivityId();
 	String dateAsString = gateForm.getScheduleDate();
 	GateActivity gate = null;
@@ -192,7 +180,6 @@ public class GateController {
 
     /**
      * Dispatch view the according to the gate type.
-     *
      */
     private String findViewByGateType(@ModelAttribute GateForm gateForm, GateActivity gate) {
 	// reset all the other fields, so that the following code only has to set up its own values (LDEV-1237)

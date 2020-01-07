@@ -34,6 +34,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -79,10 +81,10 @@ public class PortraitSaveController {
     /**
      * Upload portrait image.
      */
-    @RequestMapping("")
+    @RequestMapping(path = "", method = RequestMethod.POST)
     public String unspecified(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, InvalidParameterException, RepositoryCheckedException {
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	MultipartFile file = portraitForm.getFile();
@@ -163,9 +165,8 @@ public class PortraitSaveController {
     }
 
     /** Called from sysadmin to delete an inappropriate portrait */
-    @RequestMapping("/deletePortrait")
-    public String deletePortrait(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+    @RequestMapping(path = "/deletePortrait", method = RequestMethod.POST)
+    public String deletePortrait(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
 
 	// check user is sysadmin

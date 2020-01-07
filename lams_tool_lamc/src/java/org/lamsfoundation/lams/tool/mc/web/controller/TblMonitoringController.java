@@ -38,7 +38,6 @@ public class TblMonitoringController {
      */
     @RequestMapping("/iraMcq")
     public String iraMcq(HttpServletRequest request) {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(toolContentId);
 
@@ -57,7 +56,6 @@ public class TblMonitoringController {
      */
     @RequestMapping("/mcqStudentChoices")
     public String mcqStudentChoices(HttpServletRequest request) {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(toolContentId);
 
@@ -111,7 +109,6 @@ public class TblMonitoringController {
      */
     @RequestMapping("/getModalDialogForTeamsTab")
     public String getModalDialogForTeamsTab(HttpServletRequest request) {
-
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 

@@ -212,14 +212,10 @@ public class MonitoringController {
      * The Struts dispatch method that starts a lesson that has been created beforehand. Most likely, the request to
      * start lesson should be triggered by the Monitoring This method will delegate to the Spring service bean to
      * complete all the steps for starting a lesson.
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/startLesson")
+    @RequestMapping(path = "/startLesson", method = RequestMethod.POST)
     @ResponseBody
-    public String startLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String startLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.startLesson(lessonId, getUserId());
@@ -238,8 +234,7 @@ public class MonitoringController {
      */
     @RequestMapping(path = "/renameLesson", method = RequestMethod.POST)
     @ResponseBody
-    public String renameLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String renameLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, "pk");
 
 	HttpSession ss = SessionManager.getSession();
@@ -574,7 +569,7 @@ public class MonitoringController {
      * activities for this learner will complete to as end as possible.
      * </P>
      */
-    @RequestMapping("/forceComplete")
+    @RequestMapping(path = "/forceComplete", method = RequestMethod.POST)
     @ResponseBody
     public void forceComplete(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -978,7 +973,6 @@ public class MonitoringController {
      * and all activities must be grouped.
      */
     private boolean isTBLSequence(Long lessonId) {
-
 	Lesson lesson = lessonService.getLesson(lessonId);
 	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
 	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
@@ -1470,7 +1464,6 @@ public class MonitoringController {
     /**
      * Checks if a complex activity or its descendats contain an activity with the given ID.
      */
-    @SuppressWarnings("unchecked")
     private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
 	    IMonitoringService monitoringService) {
 	for (Activity childActivity : complexActivity.getActivities()) {
@@ -1538,7 +1531,6 @@ public class MonitoringController {
     @RequestMapping(path = "/presenceAvailable", method = RequestMethod.POST)
     public String presenceAvailable(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
-
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
@@ -1579,9 +1571,7 @@ public class MonitoringController {
      * Expects parameters lessonID and presenceAvailable.
      */
     @RequestMapping(path = "/gradebookOnComplete", method = RequestMethod.POST)
-    public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+    public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
@@ -1596,8 +1586,7 @@ public class MonitoringController {
 
     /** Open Time Chart display */
     @RequestMapping("/viewTimeChart")
-    public String viewTimeChart(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String viewTimeChart(HttpServletRequest request, HttpServletResponse response) {
 	try {
 
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");

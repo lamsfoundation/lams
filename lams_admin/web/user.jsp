@@ -141,20 +141,25 @@
 		}
 		
 		<c:if test="${isSysadmin}">
-		function deletePortrait() {
-			$("#portraitButton").css('display','none');
-			$.ajax({
-				url : '/lams/saveportrait/deletePortrait.do',
-				data : { 	'userId'  : '<c:out value="${userForm.userId}" />' },		
-			success : function(response) {
-				if ( response == 'deleted') {
-					loadPortrait('');
-				} else {
-					alert("<fmt:message key='error.portrait.removal.failed'/>");
-				}
+			function deletePortrait() {
+				$("#portraitButton").css('display','none');
+				
+				$.ajax({
+					url : '/lams/saveportrait/deletePortrait.do',
+					data : { 	
+						'userId': '<c:out value="${userForm.userId}" />' ,
+					  	"<csrf:tokenname/>": "<csrf:tokenvalue/>"
+					},
+					type : 'POST',		
+					success : function(response) {
+						if ( response == 'deleted') {
+							loadPortrait('');
+						} else {
+							alert("<fmt:message key='error.portrait.removal.failed'/>");
+						}
+					}
+				});
 			}
-		});
-		}
 		</c:if>
 		</c:if>
 	</script>

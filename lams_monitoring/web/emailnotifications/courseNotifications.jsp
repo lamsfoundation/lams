@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\n"); %>
 

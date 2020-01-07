@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.monitoring.web;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -70,7 +68,7 @@ public class TblMonitoringController {
      * Displays addStudent page.
      */
     @RequestMapping("/start")
-    public String unspecified(HttpServletRequest request) throws Exception {
+    public String unspecified(HttpServletRequest request) {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 	request.setAttribute("lesson", lesson);
@@ -85,8 +83,7 @@ public class TblMonitoringController {
      * Shows Teams page
      */
     @RequestMapping("/teams")
-    public String teams(HttpServletRequest request) throws IOException, ServletException {
-
+    public String teams(HttpServletRequest request) {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 
@@ -172,7 +169,7 @@ public class TblMonitoringController {
      * Shows Gates page
      */
     @RequestMapping("/gates")
-    public String gates(HttpServletRequest request) throws IOException, ServletException {
+    public String gates(HttpServletRequest request) {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
 	List<PermissionGateDTO> permissionGates = new ArrayList<>();
@@ -214,8 +211,7 @@ public class TblMonitoringController {
      * Shows forum page
      */
     @RequestMapping("/forum")
-    public String forum(HttpServletRequest request) throws IOException, ServletException {
-
+    public String forum(HttpServletRequest request) {
 	long forumActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity forumActivity = (ToolActivity) monitoringService.getActivityById(forumActivityId);
 
@@ -232,8 +228,7 @@ public class TblMonitoringController {
      * Shows peerreview page
      */
     @RequestMapping("/peerreview")
-    public String peerreview(HttpServletRequest request) throws IOException, ServletException {
-
+    public String peerreview(HttpServletRequest request) {
 	long peerreviewActivityId = WebUtil.readLongParam(request, "activityId");
 	ToolActivity peerreviewActivity = (ToolActivity) monitoringService.getActivityById(peerreviewActivityId);
 
@@ -250,7 +245,7 @@ public class TblMonitoringController {
      * Shows sequence diagram page
      */
     @RequestMapping("/sequence")
-    public String sequence(HttpServletRequest request) throws IOException, ServletException {
+    public String sequence(HttpServletRequest request) {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = lessonService.getLesson(lessonId);
 	request.setAttribute("lesson", lesson);
@@ -260,9 +255,7 @@ public class TblMonitoringController {
     /**
      * Returns lesson activities sorted by the learning design order.
      */
-    @SuppressWarnings("unchecked")
     private List<Activity> getLessonActivities(Lesson lesson) {
-
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
 	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
@@ -355,7 +348,6 @@ public class TblMonitoringController {
     }
 
     private void setupAvailableActivityTypes(HttpServletRequest request, List<Activity> activities) {
-
 	//check if there is Scratchie activity. It's used only in case of LKC TBL monitoring, when all assessment are treated as AEs
 	boolean isScratchieAvailable = false;
 	for (Activity activity : activities) {

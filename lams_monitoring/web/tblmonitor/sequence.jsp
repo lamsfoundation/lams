@@ -170,11 +170,13 @@
 		$('#disable-sequence-button').click(function () {
 	        var method = (lessonStateId == 3) ? "suspendLesson.do" : "unsuspendLesson.do";
 			$.ajax({
-				dataType : 'xml',
 				url : LAMS_URL + 'monitoring/monitoring/'+method,
+				type: 'POST',
 				cache : false,
+				dataType : 'xml',
 				data : {
-					'lessonID'  : '${lesson.lessonId}'
+					'lessonID'  : '${lesson.lessonId}',
+					'<csrf:tokenname/>' : '<csrf:tokenvalue/>',
 				},
 				success : function() {
 			       	if (lessonStateId == 3) {

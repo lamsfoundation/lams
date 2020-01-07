@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 
 <lams:html>
@@ -31,7 +30,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
-	
 		<script type="text/javascript">
 			var shown = true;
 			
@@ -71,17 +69,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<p><fmt:message key="label.schedule.gate.open.message"/>&nbsp;<lams:Date value="${gateForm.startingTime}"/></p>
 						
 						<form:form action="scheduleGate.do" modelAttribute="gateForm" id="gateForm" target="_self" cssClass="form-inline">
-						<input type="hidden" name="activityId" value="${gateForm.activityId}" />
-	
-						<div class="form-group">
-							<a id="rescheduleShowButton" class="btn btn-default btn-sm" href="#" onClick="javascript:toggleDateWidget()">
-								   <i class="fa fa-calendar"></i>
-								   <fmt:message key="label.reschedule"/>
-							</a>
-							<%-- padding keeps the inputs the same height as the buttons. No flicking when shown/hidden --%>
-							<form:input cssClass="input input-sm" path="scheduleDate" id="scheduleDate" style="vertical-align:bottom"/> 
-							<input type="submit" id="scheduleDatetimeApply" class="btn btn-primary btn-sm loffset2" value="<fmt:message key="button.apply"/>" />
-						</div>
+							<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+							<input type="hidden" name="activityId" value="${gateForm.activityId}" />
+		
+							<div class="form-group">
+								<a id="rescheduleShowButton" class="btn btn-default btn-sm" href="#" onClick="javascript:toggleDateWidget()">
+									<i class="fa fa-calendar"></i>
+									<fmt:message key="label.reschedule"/>
+								</a>
+								<%-- padding keeps the inputs the same height as the buttons. No flicking when shown/hidden --%>
+								<form:input cssClass="input input-sm" path="scheduleDate" id="scheduleDate" style="vertical-align:bottom"/> 
+								<input type="submit" id="scheduleDatetimeApply" class="btn btn-primary btn-sm loffset2" value="<fmt:message key="button.apply"/>" />
+							</div>
 						</form:form>
 					</c:if>
 					
