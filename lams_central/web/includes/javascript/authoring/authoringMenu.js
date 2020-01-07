@@ -250,8 +250,13 @@ var MenuLib = {
 			'modal'	   : true,
 			'title'	   : LABELS.EXPORT_SEQUENCE_DIALOG_TITLE,
 			'open'	   : function() {
-				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent/export.do?learningDesignID='
-									  	  			   + layout.ld.learningDesignID);
+				//dynamically create a form and submit it
+				var exportExcelUrl = LAMS_URL + 'authoring/exportToolContent/export.do?learningDesignID=' + layout.ld.learningDesignID;
+				var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+			    var hiddenInput = $('<input type="hidden" name="' + csrfTokenName + '" value="' + csrfTokenValue + '"></input>');
+			    form.append(hiddenInput);
+			    $(document.body).append(form);
+			    form.submit();
 			}
 		}, false)
 		.addClass('smallHeader')

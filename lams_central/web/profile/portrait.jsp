@@ -122,9 +122,9 @@
 </lams:head>
 
 <body>
-<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm" id="PortraitActionForm" >
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="saveportrait.do?${csrfToken}" method="post" modelAttribute="PortraitActionForm" id="PortraitActionForm" >
 	<form:hidden path="portraitUuid" />
-	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<div style="clear: both"></div>
 	
 	<div class="container">
