@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="org.owasp.csrfguard">
   <resources>
-    <resource-root path="csrfguard-3.1.0-2019.12.19.jar"/>
+    <resource-root path="csrfguard-3.1.0-custom-2020.01.07.jar"/>
   </resources>
   
   <dependencies>
