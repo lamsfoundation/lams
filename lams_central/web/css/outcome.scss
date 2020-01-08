@@ -1,0 +1,45 @@
+@import "_lams_variables.scss";
+	
+div#titleDiv {
+	font-size: small;
+	font-weight: bold;
+	padding: 5px 0;
+	text-align: center;
+	border-bottom: $border-thin-dotted;
+}
+
+.manageButton {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+#exportButton, #importButton {
+	float: left;
+	margin: 20px 0 10px 10px;
+}
+
+#addButton {
+	float: right;
+	margin: 20px 10px 10px 0;
+}
+
+.outcomeContainer {
+	font-size: 1.3em;
+}
+
+.outcomeContainer .row {
+	padding-top: 10px;
+}
+
+.outcomeContainer .row:first-child {
+	border-bottom: $border-thin-solid;
+}
+
+textarea {
+	width: 100%;	
+}
+
+#importInput {
+	display: none;
+}

@@ -46,6 +46,13 @@ public class HibernateSessionManager {
 	}
     }
 
+    public static void openSessionIfNecessary() {
+	// this call does not only fetch current session
+	// if an open session is missing from Context, it creates it and binds it
+	// with TransactionAwareSessionContext#currentSession()
+	HibernateSessionManager.getSessionFactory().getCurrentSession();
+    }
+
     private static SessionFactory getSessionFactory() {
 	if (HibernateSessionManager.sessionFactory == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils

@@ -34,6 +34,8 @@ import org.lamsfoundation.lams.util.ITransactionRetryService;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Retries proxied method in case of an exception. First attempt is processed as usual. Retrying requires a new
@@ -58,6 +60,18 @@ public class TransactionRetryInterceptor implements MethodInterceptor {
 		if (attempt.intValue() == 1) {
 		    return invocation.proceed();
 		} else {
+		    String transactionName = TransactionSynchronizationManager.getCurrentTransactionName();
+		    if (transactionName != null && log.isDebugEnabled()) {
+			log.debug("Transaction context for retry of method "
+				+ invocation.getMethod().getDeclaringClass().getName() + "#"
+				+ invocation.getMethod().getName() + ". Name: " + transactionName + ", active: "
+				+ TransactionSynchronizationManager.isActualTransactionActive() + ", completed:  "
+				+ TransactionAspectSupport.currentTransactionStatus().isCompleted() + ", new :  "
+				+ TransactionAspectSupport.currentTransactionStatus().isNewTransaction()
+				+ ", rollback:  "
+				+ TransactionAspectSupport.currentTransactionStatus().isRollbackOnly());
+		    }
+
 		    return transactionRetryService.retry(invocation);
 		}
 	    } catch (DataIntegrityViolationException e) {
