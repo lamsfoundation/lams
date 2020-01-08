@@ -12,15 +12,14 @@
         <archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>
-        <archive path="/lams_build/lib/batik/batik-all-1.7.jar"/>
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/fckeditor/fckeditor-java-core-2.6.jar" source="/3rdParty_sources/ckeditor"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator-1.6.jar" source="/3rdParty_sources/commons-validator"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload-1.3.3.jar" source="/3rdParty_sources/commons-fileupload"/>
         <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.8.jar" source="/3rdParty_sources/jlatexmath"/>
         <archive path="/lams_build/lib/json/jjwt-0.9.0.jar" source="/3rdParty_sources/jsonwebtoken"/>
-        <archive path="/lams_build/lib/json/json-simple-1.1.1.jar" javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" />
-		<archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
+        <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
+        <archive path="/lams_build/lib/mysql/mysql-connector-java-8.0.11.jar" source="/3rdParty_sources/mysql-connector"/>
         <archive path="/lams_build/lib/quartz/quartz-2.2.3.jar" source="/3rdParty_sources/quartz"/>
         <archive path="/lams_build/lib/spring/spring-aop-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/spring-beans-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
@@ -34,5 +33,8 @@
         <archive path="/lams_build/lib/spring/spring-web-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/spring/spring-webmvc-4.3.12.RELEASE.jar" source="/3rdParty_sources/spring"/>
         <archive path="/lams_build/lib/xstream/xstream-1.4.11.jar" source="/3rdParty_sources/xstream"/>
+        <archive path="/lams_build/lib/batik/batik-dom.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
+        <archive path="/lams_build/lib/batik/batik-svggen.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
+        <archive path="/lams_build/lib/batik/batik-awt-util.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
     </library>
 </eclipse-userlibraries>
