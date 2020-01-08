@@ -240,7 +240,7 @@
 	});
 	
 	function exportExcel(){
-		var url = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+		var url = "<c:url value='/monitoring/exportExcel.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 	

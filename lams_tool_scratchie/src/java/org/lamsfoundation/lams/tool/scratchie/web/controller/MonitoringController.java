@@ -209,10 +209,8 @@ public class MonitoringController {
 
     /**
      * Exports tool results into excel.
-     *
-     * @throws IOException
      */
-    @RequestMapping("/exportExcel")
+    @RequestMapping(path = "/exportExcel", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     private void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);

@@ -102,17 +102,9 @@ public class MonitoringController {
 
     /**
      * Summary page action.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping(value = "/summary")
     private String summary(HttpServletRequest request) {
-
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -245,7 +237,6 @@ public class MonitoringController {
 
     @RequestMapping(value = "/listReflections")
     private String listReflections(HttpServletRequest request) {
-
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	Survey survey = surveyService.getSurveyBySessionId(sessionId);
@@ -306,17 +297,10 @@ public class MonitoringController {
 
     /**
      * Export Excel format survey data.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
-    @RequestMapping(value = "/exportSurvey")
+    @RequestMapping(path = "/exportSurvey", method = RequestMethod.POST)
     private String exportSurvey(HttpServletRequest request, HttpServletResponse response) {
-	Long toolSessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> groupList = surveyService
 		.exportBySessionId(toolSessionID);

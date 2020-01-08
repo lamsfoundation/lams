@@ -299,10 +299,7 @@
 	}
 
 	function exportSummary() {
-		var url = "<c:url value='/monitoring/exportSummary.do'/>";
-	    var reqIDVar = new Date();
-		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
-		url = url + param;
+		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 </script>
