@@ -42,7 +42,7 @@
 				return;
 			}
 			$.ajax({
-				'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do',
+				'url'     : '<lams:WebAppURL />cleanupPreviewLessons/delete.do?<csrf:token/>',
 				'data'    : {
 					'limit'  : 5
 				},

@@ -74,19 +74,9 @@ public class AuthoringController extends WikiPageController {
     private static final String KEY_MODE = "mode";
 
     @RequestMapping("/authoring")
-    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
-	    throws Exception {
-
-	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+    public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// Set up the authForm.
-
-	Long currentPageUid = authoringForm.getCurrentWikiPageId();
 
 	// retrieving Wiki with given toolContentID
 	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
@@ -97,17 +87,36 @@ public class AuthoringController extends WikiPageController {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
-	    wiki.setDefineLater(true);
-	    wikiService.saveOrUpdateWiki(wiki);
+	return readDatabaseData(authoringForm, wiki, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
+	wiki.setDefineLater(true);
+	wikiService.saveOrUpdateWiki(wiki);
 
-	    //audit log the teacher has started editing activity in monitor
-	    wikiService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+	//audit log the teacher has started editing activity in monitor
+	wikiService.auditLogStartEditingActivityInMonitor(toolContentID);
 
+	return readDatabaseData(authoringForm, wiki, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Wiki wiki, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+
+	Long currentPageUid = authoringForm.getCurrentWikiPageId();
+	
 	// update the form
 	updateAuthForm(authoringForm, wiki);
 

@@ -18,6 +18,7 @@
 	<lams:Page type="admin" title="${title}" formID="userRolesForm">
 	
 		<form:form action="/lams/admin/userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="orgId" />
 		<form:hidden path="userId" />
 		

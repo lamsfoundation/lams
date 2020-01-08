@@ -1,12 +1,7 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration"%>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
 <lams:html>
 <lams:head>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
@@ -291,7 +286,9 @@
 			initContentFolderID = '${contentFolderID}',
 			initLearningDesignID = '${param.learningDesignID}',
 			learningLibraryGroups = ${learningLibraryGroups},
-			initAccess = ${access};
+			initAccess = ${access},
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>';
 	</script>
 </lams:head>
 <body>

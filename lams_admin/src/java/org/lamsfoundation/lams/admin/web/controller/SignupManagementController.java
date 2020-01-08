@@ -22,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/signupManagement")
@@ -134,7 +135,7 @@ public class SignupManagementController {
 	return "signupmanagement/add";
     }
 
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer soid = WebUtil.readIntParam(request, "soid");
 

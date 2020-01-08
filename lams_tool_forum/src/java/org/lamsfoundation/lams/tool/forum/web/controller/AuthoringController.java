@@ -76,6 +76,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -107,12 +108,12 @@ public class AuthoringController {
 	return readDatabaseData(forumForm, request);
     }
 
-    @RequestMapping("/defineLater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute ForumForm forumForm, HttpServletRequest request) {
 
 	// update define later flag to true
 	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
-	    
+
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	Forum forum = forumService.getForumByContentId(contentId);
 
@@ -126,7 +127,7 @@ public class AuthoringController {
 
 	return readDatabaseData(forumForm, request);
     }
-    
+
     /**
      * Common method for "start" and "defineLater"
      */
@@ -227,10 +228,9 @@ public class AuthoringController {
      * <li>Author user information</li>
      * </ol>
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute ForumForm forumForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -369,7 +369,7 @@ public class AuthoringController {
     /**
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
      */
-    @RequestMapping("/createTopic")
+    @RequestMapping(path = "/createTopic", method = RequestMethod.POST)
     public String createTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws IOException, ServletException, PersistenceException {
 	//validate form
@@ -420,7 +420,7 @@ public class AuthoringController {
 	Set<Attachment> attSet = null;
 	if (messageForm.getAttachmentFile() != null
 		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(),  message);
+	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(), message);
 	}
 	message.setAttachments(attSet);
 
@@ -448,7 +448,7 @@ public class AuthoringController {
      * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring
      * page.
      */
-    @RequestMapping("/deleteTopic")
+    @RequestMapping(path = "/deleteTopic", method = RequestMethod.POST)
     public String deleteTopic(HttpServletRequest request) throws PersistenceException {
 
 	// get SessionMAP
@@ -521,7 +521,7 @@ public class AuthoringController {
      * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user save
      * whole authoring page.
      */
-    @RequestMapping("/updateTopic")
+    @RequestMapping(path = "/updateTopic", method = RequestMethod.POST)
     public String updateTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
 	    throws PersistenceException {
 	//validate form
@@ -577,7 +577,7 @@ public class AuthoringController {
     /* only allow one attachment, so replace whatever */
     private Set<Attachment> setupAttachmentSet(MultipartFile attachmentFile, Message msg) {
 	Attachment att = forumService.uploadAttachment(attachmentFile);
-	Set<Attachment> attSet = new HashSet<Attachment>();
+	Set<Attachment> attSet = new HashSet<>();
 	attSet.add(att);
 	att.setMessage(msg);
 	return attSet;
@@ -586,7 +586,7 @@ public class AuthoringController {
     /**
      * Remove message attachment.
      */
-    @RequestMapping("/deleteAttachment")
+    @RequestMapping(path = "/deleteAttachment", method = RequestMethod.POST)
     public String deleteAttachment(HttpServletRequest request) {
 	request.setAttribute("itemAttachment", null);
 	return "jsps/authoring/parts/msgattachment";

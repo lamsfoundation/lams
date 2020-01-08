@@ -1,25 +1,20 @@
 <!DOCTYPE html>
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
-
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+
 <title><fmt:message key="title.admin.window" /></title>
-<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico"
-	type="image/x-icon" />
+<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico"	type="image/x-icon" />
 <lams:css />
 <style type="text/css">
-#cc-email-area {
-	display: none;
-}
-
-input[type="checkbox"] {
-	height: 30px;
-	width: 20px;
-	vertical-align: bottom;
-}
+	#cc-email-area {
+		display: none;
+	}
+	
+	input[type="checkbox"] {
+		height: 30px;
+		width: 20px;
+		vertical-align: bottom;
+	}
 </style>
 
 <script type="text/javascript">
@@ -29,8 +24,7 @@ input[type="checkbox"] {
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/instantedit.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
 	var returnUrl = '${param.returnUrl}';
 
@@ -95,6 +89,7 @@ input[type="checkbox"] {
 			<div class="panel-body">
 				<form id="emailUserForm"
 					action="<lams:LAMSURL/>emailUser/send.do" method="post">
+					<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 					<c:if test="${not empty user}">
 						<input type="hidden" name="userId" value="${user.userId}" />
 					</c:if>

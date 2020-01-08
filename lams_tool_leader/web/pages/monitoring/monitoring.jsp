@@ -1,24 +1,15 @@
 <!DOCTYPE html>
-
-<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants"%>
-<lams:html>
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<c:set var="tool">
-		<lams:WebAppURL />
-	</c:set>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="tool"><lams:WebAppURL /></c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
+<lams:html>
 	<lams:head>
 		<title>
 			<fmt:message key="activity.title" />
 		</title>
 		<lams:headItems />
-		<c:set var="tool">
-			<lams:WebAppURL />
-		</c:set>
-		<c:set var="lams"><lams:LAMSURL /></c:set>
 		
 		<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
 		<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
@@ -31,7 +22,6 @@
 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-
 	</lams:head>
 
 	<body class="stripes" onload="init();">
@@ -61,5 +51,3 @@
 		</lams:Page>
 	</body>
 </lams:html>
-
-

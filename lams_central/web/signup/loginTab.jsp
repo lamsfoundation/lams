@@ -1,8 +1,4 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ include file="/common/taglibs.jsp"%>
 
 <body>
 	<form:form id="SignupForm" modelAttribute="SignupForm" action="/lams/signup/login.do" method="post" autocomplete="off" >

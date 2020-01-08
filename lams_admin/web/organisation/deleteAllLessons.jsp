@@ -49,7 +49,8 @@
 			'url'     : '<lams:LAMSURL/>admin/organisation/deleteAllLessons.do',
 			'data'    : {
 				'limit'  : 5,
-				'orgId'  : ${param.orgId}
+				'orgId'  : ${param.orgId},
+				"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 			},
 			'success' : function(response){
 				try {

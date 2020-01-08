@@ -54,6 +54,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -176,7 +177,7 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/changeItemVisibility")
+    @RequestMapping(path = "/changeItemVisibility", method = RequestMethod.POST)
     public String changeItemVisibility(HttpServletRequest request) {
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.PARAM_RESOURCE_ITEM_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, ResourceConstants.PARAM_IS_HIDE_ITEM);

@@ -56,12 +56,12 @@
 		var	deletionConfirmed = confirm("<fmt:message key='label.authoring.basic.do.you.want.to.delete'></fmt:message>");
 		
 		if (deletionConfirmed) {
-			var url = "<c:url value="/authoring/deleteTopic.do"/>";
+			var url = "<c:url value="/authoring/deleteTopic.do"/>?<csrf:token/>";
 		    var reqIDVar = new Date();
 			var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 			deleteItemLoading();
 			$.ajax({
-	            type: 'get', 
+	            type: 'POST', 
 	            url: url,
 	            data: param,
 	            success: function(data) {

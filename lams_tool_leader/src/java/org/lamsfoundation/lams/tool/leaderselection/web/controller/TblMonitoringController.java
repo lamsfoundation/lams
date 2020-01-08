@@ -1,7 +1,5 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +11,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -27,15 +26,11 @@ public class TblMonitoringController {
     private ILeaderselectionService leaderselectionService;
 
     /**
-     * Save selected user as a leader
-     *
-     * @throws IOException
-     * @throws JSONException
+     * Save selected user as a leader.
      */
-    @RequestMapping(path = "/changeLeader")
+    @RequestMapping(path = "/changeLeader", method = RequestMethod.POST)
     @ResponseBody
-    public String changeLeader(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String changeLeader(HttpServletRequest request, HttpServletResponse response) {
 	Long leaderUserId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	LeaderselectionUser user = leaderselectionService.getUserByUserIdAndContentId(leaderUserId, toolContentId);

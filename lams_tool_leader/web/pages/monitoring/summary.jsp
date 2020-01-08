@@ -1,9 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-$(document).ready(function(){
+	$(document).ready(function(){
 		initializePortraitPopover("<lams:LAMSURL />");
-});
+	});
 </script>
 
 <div class="panel">

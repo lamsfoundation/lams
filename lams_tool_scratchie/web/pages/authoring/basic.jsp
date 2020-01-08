@@ -13,7 +13,7 @@
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 		
 		if (deletionConfirmed) {
-			var url = "<c:url value="/authoring/removeItem.do"/>";
+			var url = "<c:url value="/authoring/removeItem.do"/>?<csrf:token/>";
 			$(itemTargetDiv).load(
 				url,
 				{

@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -45,6 +40,7 @@
 
 <body>
 	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
 		<lams:errors path="*"/>

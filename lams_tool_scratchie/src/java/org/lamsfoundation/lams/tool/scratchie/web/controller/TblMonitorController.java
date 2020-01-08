@@ -63,6 +63,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -186,10 +187,8 @@ public class TblMonitorController {
      * Exports tool results into excel.
      *
      * Had to move it from the tool as tool uses SessionMap
-     *
-     * @throws IOException
      */
-    @RequestMapping("/exportExcel")
+    @RequestMapping(path = "/exportExcel", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
 

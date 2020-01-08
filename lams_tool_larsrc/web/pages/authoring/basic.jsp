@@ -42,7 +42,8 @@
 			{
 				itemIndex: idx,
 				reqID: reqIDVar.getTime(), 
-				sessionMapID: sessionMapID
+				sessionMapID: sessionMapID,
+				"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 			},
 			function() {
 				deleteItemComplete();

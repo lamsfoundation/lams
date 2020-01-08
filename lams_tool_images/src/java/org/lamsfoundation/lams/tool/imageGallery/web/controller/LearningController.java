@@ -71,6 +71,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
@@ -249,7 +250,7 @@ public class LearningController {
     /**
      * Save file or url imageGallery item into database.
      */
-    @RequestMapping("/saveNewImage")
+    @RequestMapping(path = "/saveNewImage", method = RequestMethod.POST)
     public String saveNewImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 

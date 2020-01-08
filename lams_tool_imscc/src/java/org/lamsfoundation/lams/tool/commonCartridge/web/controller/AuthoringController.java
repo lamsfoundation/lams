@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -293,7 +294,6 @@ public class AuthoringController {
      * @throws ServletException
      *
      */
-
     @RequestMapping("/start")
     private String start(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
@@ -302,7 +302,7 @@ public class AuthoringController {
 	return starting(authoringForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     private String definelater(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
 	    HttpServletRequest request) throws ServletException {
 	// update define later flag to true
@@ -423,19 +423,13 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include all commonCartridge item, information
      * etc.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") CommonCartridgeForm authoringForm,
-	    HttpServletRequest request) throws Exception {
-
-	// get back sessionMAP
+	    HttpServletRequest request) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 

@@ -8,7 +8,8 @@
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/authoring.js"></script>
 	</lams:head>
 	<body class="stripes">
-		<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
+		<form:form action="/lams/tool/lantbk11/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 			<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	

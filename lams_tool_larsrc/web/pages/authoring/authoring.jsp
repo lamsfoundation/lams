@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 
@@ -65,8 +64,8 @@
     </script> 
 </lams:head>
 <body class="stripes" onLoad="init()">
-
 	<form:form action="update.do" method="post" modelAttribute="authoringForm" id="authoringForm">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="resource.contentId" />
 		<form:hidden path="mode" />
 		<form:hidden path="sessionMapID" />

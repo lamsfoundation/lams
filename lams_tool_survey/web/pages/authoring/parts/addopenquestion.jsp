@@ -15,6 +15,7 @@
 		
 
 		<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="surveyItemForm" id="surveyItemForm">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="itemIndex" />

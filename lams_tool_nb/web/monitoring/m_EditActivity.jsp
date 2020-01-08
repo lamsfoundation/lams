@@ -2,7 +2,7 @@
 
 <div class="voffset10">
 
-<c:if test="${nbMonitoringForm.totalLearners >= 1}">
+<c:if test="${monitoringDTO.totalLearners >= 1}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
 	</lams:Alert>
@@ -14,7 +14,7 @@
 			<fmt:message key="basic.title" />
 		</td>
 		<td>
-			<c:out value="${nbMonitoringForm.title}" escapeXml="true" />
+			<c:out value="${monitoringDTO.title}" escapeXml="true" />
 		</td>
 	</tr>
 	<tr>
@@ -22,18 +22,19 @@
 			<fmt:message key="basic.content" />
 		</td>
 		<td>
-			<c:out value="${nbMonitoringForm.basicContent}" escapeXml="false" />
+			<c:out value="${monitoringDTO.basicContent}" escapeXml="false" />
 		</td>
 	</tr>
 </table>
 
 <p class="align-right">
-	<c:url value="/authoring/authoring.do" var="authoringUrl">
-		<c:param name="toolContentID" value="${toolContentID}" />
-		<c:param name="defineLater" value="true" />
-		<c:param name="contentFolderID" value="${contentFolderID}" />
-	</c:url>
-	<a href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
+	<form id='define-later-form' method='post' action='../authoring/definelater.do' target='definelater'>
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+		<input type="hidden" name="toolContentID" value="${toolContentID}" />
+		<input type="hidden" name="contentFolderID" value="${contentFolderID}" />
+	</form>
+		
+	<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
 		<fmt:message key="button.edit" />
 	</a>
 </p>

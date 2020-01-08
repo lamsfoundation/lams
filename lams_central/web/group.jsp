@@ -1,17 +1,8 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
 <c:set var="isCollapsingSubcoursesEnabled"><%=Configuration.getAsBoolean(ConfigurationKeys.ENABLE_COLLAPSING_SUBCOURSES)%></c:set>
-
-<script>
-$(document).ready(function(){
-
-})
-</script>
 
 <div class="course-header">
 	<span class="lead">

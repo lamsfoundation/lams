@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -104,7 +105,7 @@ public class MonitoringController {
      * @throws IOException
      * @throws JSONException
      */
-    @RequestMapping(value = "/saveLeaders")
+    @RequestMapping(path = "/saveLeaders", method = RequestMethod.POST)
     public String saveLeaders(HttpServletRequest request) throws IOException {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()

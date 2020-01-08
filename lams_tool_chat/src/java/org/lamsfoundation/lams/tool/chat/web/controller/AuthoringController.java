@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/authoring")
@@ -73,12 +74,8 @@ public class AuthoringController {
      */
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
-
 	// Extract toolContentID from parameters.
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Chat with given toolContentID
@@ -90,17 +87,33 @@ public class AuthoringController {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
-	    chat.setDefineLater(true);
-	    chatService.saveOrUpdateChat(chat);
+	return readDatabaseData(authoringForm, chat, request, mode);
+    }
 
-	    //audit log the teacher has started editing activity in monitor
-	    chatService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Chat chat = chatService.getChatByContentId(toolContentID);
+	chat.setDefineLater(true);
+	chatService.saveOrUpdateChat(chat);
 
+	//audit log the teacher has started editing activity in monitor
+	chatService.auditLogStartEditingActivityInMonitor(toolContentID);
+
+	return readDatabaseData(authoringForm, chat, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Chat chat, HttpServletRequest request, ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// Set up the authForm.
 	updateAuthForm(authoringForm, chat);
 
@@ -116,7 +129,7 @@ public class AuthoringController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
 	// TODO need error checking.
 

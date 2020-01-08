@@ -17,7 +17,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -128,7 +128,8 @@
 		$("#messageArea_Busy").show();
 		
 		$.ajax({
-			url: "<c:url value="/monitoring/releaseMarks.do"/>",
+            type: 'POST',
+			url: "<c:url value="/monitoring/releaseMarks.do"/>?<csrf:token/>",
 			data: {
 				toolSessionID: sessionId, 
 				reqID: (new Date()).getTime()
@@ -205,6 +206,7 @@
 			</button>
 		</c:if>
 		<form action="downloadMarks.do" method="post" style="display:inline">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<input type="hidden" name="toolSessionID" value="${sessionDto.sessionID}" />
 			<input type="submit" name="downloadMarks" value="<fmt:message key="label.monitoring.downloadMarks.button" />" class="btn btn-default loffset5 voffset10" />
 		</form>

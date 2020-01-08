@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.util.NbWebUtil;
-import org.lamsfoundation.lams.tool.noticeboard.web.form.NbMonitoringForm;
+import org.lamsfoundation.lams.tool.noticeboard.web.form.MonitoringDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +65,10 @@ public class NbMonitoringController {
     @Autowired
     private INoticeboardService nbService;
 
-    public final static String FORM = "NbMonitoringForm";
+    public final static String FORM = "MonitoringDTO";
 
     @RequestMapping("/monitoring")
-    public String unspecified(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
-
+    public String unspecified(HttpServletRequest request) {
 	Long toolContentId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
@@ -81,14 +80,16 @@ public class NbMonitoringController {
 
 	NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 
-	nbMonitoringForm.setTitle(content.getTitle());
-	nbMonitoringForm.setBasicContent(content.getContent());
+	MonitoringDTO monitoringDTO = new MonitoringDTO();
+	request.setAttribute("monitoringDTO", monitoringDTO);
+	monitoringDTO.setTitle(content.getTitle());
+	monitoringDTO.setBasicContent(content.getContent());
 
 	request.setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
 
 	//Get the total number of learners that have participated in this tool activity
-	nbMonitoringForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
+	monitoringDTO.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
 
 	Set sessions = content.getNbSessions();
 	Iterator i = sessions.iterator();
@@ -118,8 +119,8 @@ public class NbMonitoringController {
 		}
 	    }
 	}
-	nbMonitoringForm.setGroupStatsMap(numUsersMap);
-	nbMonitoringForm.setSessionIdMap(sessionIdMap);
+	monitoringDTO.setGroupStatsMap(numUsersMap);
+	monitoringDTO.setSessionIdMap(sessionIdMap);
 
 	boolean isGroupedActivity = nbService.isGroupedActivity(toolContentId);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
@@ -132,13 +133,13 @@ public class NbMonitoringController {
 	request.setAttribute("allowComments", content.isAllowComments());
 
 	String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
-	nbMonitoringForm.setCurrentTab(currentTab != null ? currentTab : "1");
-	request.setAttribute(FORM, nbMonitoringForm);
+	monitoringDTO.setCurrentTab(currentTab != null ? currentTab : "1");
+
 	return "/monitoring/monitoring";
     }
 
     @RequestMapping("/viewReflection")
-    public String viewReflection(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
+    public String viewReflection(HttpServletRequest request) {
 	Long userId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.USER_ID));
 	Long toolSessionId = NbWebUtil.convertToLong(request.getParameter(NoticeboardConstants.TOOL_SESSION_ID));
 	NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userId, toolSessionId);
@@ -153,8 +154,7 @@ public class NbMonitoringController {
     }
 
     @RequestMapping("/viewComments")
-    public String viewComments(@ModelAttribute NbMonitoringForm nbMonitoringForm, HttpServletRequest request) {
-
+    public String viewComments(HttpServletRequest request) {
 	Long toolSessionID = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID, false);
 	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
 

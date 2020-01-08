@@ -1,13 +1,7 @@
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+
 <!-- CUSTOMERRORPAGE404: authoring templates string -->
  <lams:html>
 	<lams:head>

@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-core" prefix="c" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
 <lams:html>

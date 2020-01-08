@@ -39,7 +39,7 @@
 		function downloadMarks() {
 			var url = "<c:url value='/monitoring/downloadMarks.do'/>";
 		    var reqIDVar = new Date();
-			var param = "?toolContentID=${mcGeneralMonitoringDTO.toolContentID}&reqID="+reqIDVar.getTime();
+			var param = "?<csrf:token/>&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&reqID="+reqIDVar.getTime();
 			url = url + param;
 
 			return downloadFile(url, 'message-area-busy', '<fmt:message key="label.summary.downloaded"/>', 'message-area', 'btn-disable-on-submit');

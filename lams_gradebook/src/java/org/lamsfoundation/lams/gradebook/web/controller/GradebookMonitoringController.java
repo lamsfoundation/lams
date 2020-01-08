@@ -24,10 +24,8 @@ package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +50,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -87,73 +84,60 @@ public class GradebookMonitoringController {
     private ISecurityService securityService;
 
     @RequestMapping("")
-    public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	try {
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    if (log.isDebugEnabled()) {
-		log.debug("Getting gradebook for lesson " + lessonId);
-	    }
-	    UserDTO user = getUser();
-	    if (user == null) {
-		log.error("User missing from session. ");
-		return "error";
-	    }
-	    if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson gradebook", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-		return null;
-	    }
-
-	    Lesson lesson = lessonService.getLesson(lessonId);
-	    boolean marksReleased = lesson.getMarksReleased();
-	    LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
-	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
-	    request.setAttribute("marksReleased", marksReleased);
-
-	    List<String[]> weights = gradebookService.getWeights(lesson.getLearningDesign());
-	    if (weights.size() > 0) {
-		request.setAttribute("weights", weights);
-	    }
-
-	    request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
-
-	    return "gradebookMonitor";
-	} catch (Exception e) {
-	    log.error("Failed to load lesson gradebook", e);
+    public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Getting gradebook for lesson " + lessonId);
+	}
+	UserDTO user = getUser();
+	if (user == null) {
+	    log.error("User missing from session. ");
 	    return "error";
 	}
+	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson gradebook", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+	boolean marksReleased = lesson.getMarksReleased();
+	LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
+	request.setAttribute("lessonDetails", lessonDetatilsDTO);
+	request.setAttribute("marksReleased", marksReleased);
+
+	List<String[]> weights = gradebookService.getWeights(lesson.getLearningDesign());
+	if (weights.size() > 0) {
+	    request.setAttribute("weights", weights);
+	}
+
+	request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
+
+	return "gradebookMonitor";
     }
 
     @RequestMapping("/courseMonitor")
-    public String courseMonitor(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String courseMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	if (log.isDebugEnabled()) {
+	    log.debug("Getting gradebook for organisation " + organisationID);
+	}
 
-	try {
-	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    if (log.isDebugEnabled()) {
-		log.debug("Getting gradebook for organisation " + organisationID);
-	    }
-
-	    UserDTO user = getUser();
-	    if (user == null) {
-		log.error("User missing from session. ");
-		return "error";
-	    }
-	    if (!securityService.hasOrgRole(organisationID, user.getUserID(),
-		    new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "get course gradebook page", false)) {
-		response.sendError(HttpServletResponse.SC_FORBIDDEN,
-			"User is not a course manager in the organisation");
-		return null;
-	    }
-
-	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
-		    organisationID);
-	    request.setAttribute("organisationID", organisationID);
-	    request.setAttribute("organisationName", organisation.getName());
-
-	    return "gradebookCourseMonitor";
-	} catch (Exception e) {
-	    log.error("Failed to load course gradebook", e);
+	UserDTO user = getUser();
+	if (user == null) {
+	    log.error("User missing from session. ");
 	    return "error";
 	}
+	if (!securityService.hasOrgRole(organisationID, user.getUserID(),
+		new String[] { Role.GROUP_MANAGER, Role.MONITOR }, "get course gradebook page", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a course manager in the organisation");
+	    return null;
+	}
+
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationID);
+	request.setAttribute("organisationID", organisationID);
+	request.setAttribute("organisationName", organisation.getName());
+
+	return "gradebookCourseMonitor";
     }
 
     /**
@@ -161,7 +145,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping(path = "/updateUserLessonGradebookData", method = RequestMethod.POST)
     public void updateUserLessonGradebookData(HttpServletRequest request, HttpServletResponse response)
-	    throws Exception {
+	    throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "update lesson gradebook", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -192,7 +176,7 @@ public class GradebookMonitoringController {
     @RequestMapping(path = "/updateUserActivityGradebookData", method = RequestMethod.POST)
     @ResponseBody
     public void updateUserActivityGradebookData(HttpServletRequest request, HttpServletResponse response)
-	    throws Exception {
+	    throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "update activity gradebook", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -255,9 +239,9 @@ public class GradebookMonitoringController {
     /**
      * Toggles the release mark flag for a lesson.
      */
-    @RequestMapping("/toggleReleaseMarks")
+    @RequestMapping(path = "/toggleReleaseMarks", method = RequestMethod.POST)
     @ResponseBody
-    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
@@ -266,7 +250,6 @@ public class GradebookMonitoringController {
 	gradebookService.toggleMarksReleased(lessonID);
 	response.setContentType("text/plain; charset=utf-8");
 	return "success";
-
     }
 
     /**
@@ -274,7 +257,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelLessonGradebook")
     @ResponseBody
-    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
 		false)) {
@@ -309,7 +292,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelCourseGradebook")
     @ResponseBody
-    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
@@ -345,7 +328,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelSelectedLessons")
     @ResponseBody
-    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.isGroupMonitor(organisationID, user.getUserID(),
@@ -386,9 +369,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/getMarkChartData")
     @ResponseBody
-    public String getMarkChartData(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+    public String getMarkChartData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
 		false)) {
@@ -406,7 +387,6 @@ public class GradebookMonitoringController {
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
-
     }
 
     private UserDTO getUser() {

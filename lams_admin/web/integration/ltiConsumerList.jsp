@@ -51,26 +51,20 @@
 								</c:choose>
 							</td>
 							<td>
-								<a href="../ltiConsumerManagement/edit.do?sid=<c:out value='${ltiConsumer.sid}' />">
+								<a class="btn btn-default btn-xs" id="edit_${ltiConsumer.sid}" href="../ltiConsumerManagement/edit.do?sid=<c:out value='${ltiConsumer.sid}' />">
 									<fmt:message key="admin.edit" />
 								</a>
 								&nbsp;
 								<c:choose>
 									<c:when test="${ltiConsumer.disabled}">
-										<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/disable.do?disable=false&sid=<c:out value='${ltiConsumer.sid}' />">
-											<fmt:message key="admin.enable" />
-										</a>
+                                        <csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/disable.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="hidden" name="disable" value="false"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
 									</c:when>
 									<c:otherwise>
-										<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/disable.do?disable=true&sid=<c:out value='${ltiConsumer.sid}' />">
-											<fmt:message key="admin.disable" />
-										</a>
+                                        <csrf:form style="display: inline-block;" id="disable_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/disable.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="hidden" name="disable" value="true"/><input type="submit" class="btn btn-primary btn-xs" value="<fmt:message key="admin.disable" />"/></csrf:form>
 									</c:otherwise>
 								</c:choose>
 								&nbsp;
-								<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/delete.do?sid=<c:out value='${ltiConsumer.sid}' />">
-									<fmt:message key="admin.delete" />
-								</a>
+                                <csrf:form style="display: inline-block;" id="delete_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/delete.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
 							</td>
 						</tr>
 					</c:forEach>

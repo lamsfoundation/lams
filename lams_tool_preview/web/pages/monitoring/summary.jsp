@@ -41,7 +41,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript">
 	function exportResults() {
-		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
+		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
 		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
 	function sendResults(sessionId) {

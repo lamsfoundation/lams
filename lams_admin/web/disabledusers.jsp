@@ -46,7 +46,7 @@
 					<c:out value="${user.lastName}" />
 				</td>
 				<td>
-					<a href="<lams:LAMSURL/>admin/user/enable.do?userId=<c:out value="${user.userId}"/>" class="btn btn-default btn-sm"><fmt:message key="admin.enable"/></a>
+					<csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/user/enable.do"><input type="hidden" name="userId" value="${user.userId}"/><button type="submit" class="btn btn-primary btn-xs"><fmt:message key="admin.enable" /></button></csrf:form>
 				</td>		
 			</tr>
 		</c:forEach>

@@ -18,6 +18,7 @@
 			
 	
 			<form:form action="saveOrUpdateItem.do" modelAttribute="surveyItemForm" id="surveyItemForm" method="post">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			
 			<lams:errors/>
 				<%-- This field is not belong STRUTS form --%>

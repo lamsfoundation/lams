@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
@@ -44,6 +43,9 @@
 			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
 			tourInProgress = false,
 			LAMS_URL = '<lams:LAMSURL/>',
+			csrfToken = '<csrf:tokenname/> : <csrf:tokenvalue/>',
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>',
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
@@ -364,17 +366,17 @@
 												<div class="form-group" id="lessonDisableApply">
 													<label for="disableDatetimeField" class="col-sm-1"><fmt:message key="lesson.end"/></label>
 													<div class="col-sm-8">
-													<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
-													<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-														   onClick="javascript:scheduleDisableLesson()"
-														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
-												   	<fmt:message key="button.schedule"/>
-													</a>
-													<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
-														   onClick="javascript:disableLesson()"
-														   title='<fmt:message key="button.disable.now.tooltip"/>'>
-													   <fmt:message key="button.disable.now"/>
-													</a>
+														<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+														<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
+															   onClick="javascript:scheduleDisableLesson()"
+															   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+													   	<fmt:message key="button.schedule"/>
+														</a>
+														<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
+															   onClick="javascript:disableLesson()"
+															   title='<fmt:message key="button.disable.now.tooltip"/>'>
+														   <fmt:message key="button.disable.now"/>
+														</a>
 													</div>
 												</div>
 											</form>
@@ -385,14 +387,18 @@
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
 											<span id="lessonStateApply">
-											<button type="button" class="lessonManageField btn btn-xs btn-primary"
-													onClick="javascript:changeLessonState()"
-													title='<fmt:message key="lesson.change.state.tooltip"/>'>
-										   		<i class="fa fa-check"></i> 
-										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
+												<csrf:form id="lesson-state-form" method="post" action="">
+													<input type="hidden" name="lessonID" value="${lesson.lessonID}"/>
+												</csrf:form>
+												
+												<button type="button" class="lessonManageField btn btn-xs btn-primary"
+														onClick="javascript:changeLessonState()"
+														title='<fmt:message key="lesson.change.state.tooltip"/>'>
+											   		<i class="fa fa-check"></i> 
+											   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
 										    	</button>
-										    	</span>
-								    		</div>					
+										    </span>
+								    	</div>					
 									</div>
 								</dd>
 								

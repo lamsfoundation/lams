@@ -140,6 +140,5 @@ public class PasswordChangeController {
 	}
 	request.setAttribute("redirectURL", passwordChangeForm.getRedirectURL());
 	return "/passwordChangeOkContent";
-
     }
 }

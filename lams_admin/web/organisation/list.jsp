@@ -81,7 +81,7 @@
 								rows += '</td>';
 								
 								rows += '<td>';
-								rows += 	'<a id="' + orgData["id"] + '" href="orgmanage.do?org=' + orgData["id"] + '">';
+								rows += 	'<a id="' + orgData["id"] + '" href="orgmanage.do?<csrf:token/>&org=' + orgData["id"] + '">';
 								rows += 		orgData["name"];
 								rows += 	'</a>';
 								rows += '</td>';
@@ -171,7 +171,7 @@
 								<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="btn btn-default"><i class="fa fa-users"></i> <span class="hidden-xs"><fmt:message key="admin.user.manage" /></span></a>
 								
 								<c:if test="${pageContext.request.isUserInRole('SYSADMIN')}">
-									<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
+								<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
 									<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
 								</c:if>
 							</div>
@@ -253,7 +253,7 @@
 								</c:if>
 								<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>' />
 								<c:if test="${pageContext.request.isUserInRole('SYSADMIN')}">
-										<input class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>';">
+								<input class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>';">
 										<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
 								</c:if>
 						</div>

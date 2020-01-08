@@ -15,7 +15,7 @@ function launchInstructionsPopup(url) {
 //		}	
 }
 
-function launchPopup(url,title) {
+function launchPopup(url, title) {
 	var wd = null;
 	if(wd && wd.open && !wd.closed){
 		wd.close();
@@ -25,7 +25,12 @@ function launchPopup(url,title) {
 		top = ((screen.height / 2) - (648 / 2)) / 2;
 	wd = window.open(url,title,'resizable,width=1152,height=648,scrollbars,top=' + top + ',left=' + left);
 	wd.window.focus();
-}	
+}
+
+function launchDefineLaterPopup() {
+	launchPopup('about:blank', 'definelater');
+	document.getElementById('define-later-form').submit();
+}
 	
 function filterData(src,target){
 	if(src.value != null) {

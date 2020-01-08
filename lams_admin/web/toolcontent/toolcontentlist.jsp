@@ -67,7 +67,6 @@
 				<table class="table table-striped table-condensed voffset10">
 					<tr>
 						<th><fmt:message key="label.tool" /></th>
-						<th><fmt:message key="sysadmin.library.activity.description" /></th>
 						<th><fmt:message key="label.tool.version" /></th>
 						<th><fmt:message key="label.database.version" /></th>
 						<th style="padding-right: 15px"><fmt:message key="admin.user.actions" /></th>
@@ -75,9 +74,8 @@
 					<c:forEach items="${toolLibrary}" var="dto">
 						<tr>
 							<td>
-								<c:out value="${dto.activityTitle}" />
-							</td>
-							<td>
+								<strong><c:out value="${dto.activityTitle}" /></strong>
+								<br/>
 								<c:out value="${dto.description}" />
 							</td>
 							<td>
@@ -89,10 +87,10 @@
 							<td>
 								<c:choose>
 									<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-										[<a id="disable${dto.activityTitle}" href="<c:url value='disable.do?libraryID=${dto.learningLibraryID}' />" ><fmt:message key="admin.disable" /></a>] 
+										<csrf:form style="display: inline-block;" id="disable${dto.activityTitle}" method="post" action="disable.do"><input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/><input type="hidden" name="disable" value="false"/><input type="submit" class="btn btn-xs btn-primary" value="<fmt:message key="admin.disable" />"/></csrf:form>
 									</c:when>
 									<c:otherwise>
-										[<a id="enable${dto.activityTitle}" href="<c:url value='enable.do?libraryID=${dto.learningLibraryID}' />" ><fmt:message key="admin.enable" /></a>]
+										<csrf:form style="display: inline-block;" id="enable${dto.activityTitle}" method="post" action="enable.do"><input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/><input type="hidden" name="enable" value="false"/><input type="submit" class="btn btn-success btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
 										
 									</c:otherwise>
 								</c:choose>
@@ -100,10 +98,11 @@
 									<c:set var="editDefaultContentUrl">
 										<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=${dto.toolContentID}&contentFolderID=-1"
 									</c:set>
-									[<a id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>]
+									&nbsp;
+									<a class="btn btn-xs btn-default" id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>
 									<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
-										&nbsp;&nbsp;
-										[<a id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" ><fmt:message key="msg.tool.management" /></a>]
+										&nbsp;
+										<a class="btn btn-xs btn-default" id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" ><fmt:message key="msg.tool.management" /></a>
 									</c:if>
 								</c:if>
 							</td>

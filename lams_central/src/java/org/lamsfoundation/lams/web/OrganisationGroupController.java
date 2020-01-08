@@ -41,8 +41,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
+import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -105,7 +107,8 @@ public class OrganisationGroupController {
      */
     @RequestMapping("/viewGroupings")
     @SuppressWarnings("unchecked")
-    public String viewGroupings(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String viewGroupings(HttpServletRequest request, HttpServletResponse response)
+	    throws GroupInfoFetchException, UserInfoValidationException, IOException {
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
 
 	Integer userId = getUserDTO().getUserID();
@@ -185,14 +188,12 @@ public class OrganisationGroupController {
 
     /**
      * View groups of the given grouping.
-     *
-     * @throws Exception
      */
     @RequestMapping("/viewGroups")
     @SuppressWarnings("unchecked")
     public String viewGroups(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam(value = "organisationID", required = false) Integer organisationId)
-	    throws Exception {
+	    throws IOException, GroupInfoFetchException, UserInfoValidationException {
 	Integer userId = getUserDTO().getUserID();
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	Lesson lesson = null;
@@ -422,11 +423,10 @@ public class OrganisationGroupController {
 
     /**
      * Deletes course grouping with the given ID.
-     *
-     * @throws Exception
      */
-    @RequestMapping("/removeGrouping")
-    public String removeGrouping(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(path = "/removeGrouping", method = RequestMethod.POST)
+    public String removeGrouping(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, GroupInfoFetchException, UserInfoValidationException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);

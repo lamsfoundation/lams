@@ -77,7 +77,7 @@ public class AuthoringController {
 	return readDatabaseData(spreadsheetForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String defineLater(@ModelAttribute SpreadsheetForm spreadsheetForm, HttpServletRequest request)
 	    throws ServletException {
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));

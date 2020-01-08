@@ -32,7 +32,21 @@ function blockExportButton(areaToBlock, exportExcelUrl, labelWait, smallVersion)
 			$('#' + areaToBlock).unblock();
 		}
 	}, 1000);
-			
-	document.location.href = exportExcelUrl + "&downloadTokenValue=" + token;
+	
+	//dynamically create a form and submit it
+	var form = $('<form></form>');
+    form.attr("method", "post");
+    form.attr("action", exportExcelUrl);
+    
+    var hiddenField = $('<input></input>');
+    hiddenField.attr("type", "hidden");
+    hiddenField.attr("name", "downloadTokenValue");
+    hiddenField.attr("value", token);
+    form.append(hiddenField);
+
+    // The form needs to be a part of the document in order to be submitted
+    $(document.body).append(form);
+    form.submit();
+	
 	return false;
 }

@@ -51,6 +51,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
@@ -69,7 +70,7 @@ public class OrgSaveController {
     @Qualifier("adminMessageService")
     private MessageService messageService;
 
-    @RequestMapping(path = "/orgsave")
+    @RequestMapping(path = "/orgsave", method = RequestMethod.POST)
     public String execute(@ModelAttribute OrganisationForm organisationForm, BindingResult bindingResult,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 

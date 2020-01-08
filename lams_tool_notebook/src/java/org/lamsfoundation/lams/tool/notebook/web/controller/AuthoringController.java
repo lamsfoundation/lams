@@ -70,12 +70,8 @@ public class AuthoringController {
      */
     @RequestMapping("")
     protected String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
-
 	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Notebook with given toolContentID
@@ -87,16 +83,34 @@ public class AuthoringController {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content while we are editing. This flag is released
-	    // when updateContent is called.
-	    notebook.setDefineLater(true);
-	    notebookService.saveOrUpdateNotebook(notebook);
+	return readDatabaseData(authoringForm, notebook, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
+	notebook.setDefineLater(true);
+	notebookService.saveOrUpdateNotebook(notebook);
 
-	    //audit log the teacher has started editing activity in monitor
-	    notebookService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+	//audit log the teacher has started editing activity in monitor
+	notebookService.auditLogStartEditingActivityInMonitor(toolContentID);
 
+	return readDatabaseData(authoringForm, notebook, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Notebook notebook, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// Set up the authForm.
 	updateAuthForm(authoringForm, notebook);
 

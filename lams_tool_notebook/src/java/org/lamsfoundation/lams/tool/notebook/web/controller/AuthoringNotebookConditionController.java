@@ -126,7 +126,7 @@ public class AuthoringNotebookConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping("/saveOrUpdateCondition")
+	@RequestMapping(path = "/saveOrUpdateCondition", method = RequestMethod.POST)
     private String saveOrUpdateCondition(
 	    @ModelAttribute("notebookConditionForm") NotebookConditionForm notebookConditionForm,
 	    HttpServletRequest request) {
@@ -166,7 +166,7 @@ public class AuthoringNotebookConditionController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/removeCondition")
+    @RequestMapping(path = "/removeCondition", method = RequestMethod.POST)
     private String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP

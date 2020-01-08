@@ -22,7 +22,11 @@
 
 	        $.ajax({
 	            url: '<lams:LAMSURL/>/tool/lalead11/tblmonitoring/changeLeader.do',
-	            data: 'userID=' + leaderUserId + "&toolContentID=${leaderselectionToolContentId}",
+	            data: {
+	            	userID: leaderUserId,
+	            	toolContentID: "${leaderselectionToolContentId}",
+	    			'<csrf:tokenname/>' : '<csrf:tokenvalue/>',
+		        },
 	            type: 'post',
 	            success: function (json) {
 		            if (json.isSuccessful) {

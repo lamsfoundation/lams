@@ -1,4 +1,4 @@
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 	<div class="panel panel-default">
 	<div class="panel-heading"><div class="panel-title">

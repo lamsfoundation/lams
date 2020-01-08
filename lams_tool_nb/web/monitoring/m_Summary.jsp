@@ -9,8 +9,8 @@
 </script>
 
 <div class="panel">
-	<h4><c:out value="${nbMonitoringForm.title}" escapeXml="true" /></h4>
-	<div class="voffset5"><c:out value="${nbMonitoringForm.basicContent}" escapeXml="false" /></div>
+	<h4><c:out value="${monitoringDTO.title}" escapeXml="true" /></h4>
+	<div class="voffset5"><c:out value="${monitoringDTO.basicContent}" escapeXml="false" /></div>
 </div>
 
 <H4><fmt:message key="titleHeading.statistics"/></H2>

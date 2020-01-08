@@ -1,6 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%-- Generic Q&A page - wraps an option so it is redisplayed after moving. Inputs ${questionNumber}, ${optionCount}, ${option.displayOrder},${option.text} --%>
 
 	<input type="hidden" name="${containingDivName}assmcq${questionNumber}numOptions" id="${containingDivName}assmcq${questionNumber}numOptions" value="${optionCount}"/>

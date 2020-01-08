@@ -9,6 +9,7 @@
 </c:choose>
 
 <form:form action="${FORM_ACTION}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm" enctype="multipart/form-data">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<c:set var="sessionMap"	value="${sessionScope[imageGalleryForm.sessionMapID]}" />
 	
 	<div class="panel panel-default">

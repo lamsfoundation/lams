@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.sbmt.web.controller;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -48,6 +49,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Manpreet Minhas
@@ -69,32 +71,47 @@ public class AuthoringController {
      */
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
-
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	SessionMap<String, Object> sessionMap = new SessionMap<>();
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	sessionMap.put(AttributeNames.PARAM_MODE, mode);
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	// get back the upload file list and display them on page
 
 	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
-
-	if (mode.isTeacher()) {
-	    persistContent.setDefineLater(true);
-	    submitFilesService.saveOrUpdateContent(persistContent);
-
-	    //audit log the teacher has started editing activity in monitor
-	    submitFilesService.auditLogStartEditingActivityInMonitor(contentID);
-	}
-
 	// if this content does not exist(empty without id), create a content by default content record.
 	if (persistContent == null) {
 	    persistContent = submitFilesService.createDefaultContent(contentID);
 	}
 
+	return readDatabaseData(authoringForm, persistContent, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
+	persistContent.setDefineLater(true);
+	submitFilesService.saveOrUpdateContent(persistContent);
+
+	//audit log the teacher has started editing activity in monitor
+	submitFilesService.auditLogStartEditingActivityInMonitor(contentID);
+
+	return readDatabaseData(authoringForm, persistContent, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, SubmitFilesContent persistContent, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	sessionMap.put(AttributeNames.PARAM_MODE, mode);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// set back STRUTS component value
 	authoringForm.initContentValue(persistContent);
 	// session map
@@ -108,7 +125,7 @@ public class AuthoringController {
      * Update all content for submit tool except online/offline instruction files list.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 

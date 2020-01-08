@@ -1,4 +1,5 @@
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ include file="/common/taglibs.jsp"%>
+
 				<select name="${qnon}grade" id="${qnon}grade" class="form-control">
 					<option value="1.0">100 %</option>
 					<option value="0.9">90 %</option>

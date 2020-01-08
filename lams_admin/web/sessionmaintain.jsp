@@ -29,7 +29,7 @@
 		
 		<div class="alert alert-info">${fn:length(sessions)}&nbsp;<fmt:message key="sysadmin.maintain.session.count" /></div>
 
-		<table class="table table-striped">
+		<table class="table table-striped table-hover">
 			<tr>
 				<th><fmt:message key="sysadmin.maintain.session.login" /></th>
 				<th><fmt:message key="sysadmin.maintain.session.name" /></th>
@@ -46,9 +46,7 @@
 					<c:out value="${ses.value[4]}" />
 				</td>
 				<td>
-					<a href="<lams:LAMSURL/>admin/sessionmaintain/delete.do?login=${ses.key}" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain.session.delete" />
-					</a>
+					<csrf:form style="display: inline-block;" id="delete_${ses.key}" method="post" action="/lams/admin/sessionmaintain/delete.do"><input type="hidden" name="login" value="${ses.key}"/><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> <fmt:message key="sysadmin.maintain.session.delete" /></button></csrf:form>
 				</td>
 			</tr>
 			</c:forEach>

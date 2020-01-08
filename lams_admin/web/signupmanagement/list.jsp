@@ -66,9 +66,10 @@
 						<c:out value="${signupOrganisation.context}" />
 					</td>
 					<td>
-						<a href="<lams:LAMSURL/>admin/signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
-						&nbsp;&nbsp;
+						<a id="edit" class="btn btn-default btn-xs" href="<lams:LAMSURL/>admin/signupManagement/edit.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.edit"/></a>
+						&nbsp;
 						<a href="<lams:LAMSURL/>admin/signupManagement/delete.do?soid=${signupOrganisation.signupOrganisationId}"><fmt:message key="admin.delete"/></a>
+                        <csrf:form style="display: inline-block;" id="delete_${signupOrganisation.signupOrganisationId}" method="post" action="/lams/admin/signupManagement/delete.do"><input type="hidden" name="soid" value="${signupOrganisation.signupOrganisationId}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
 					</td>
 				</tr>
 			</c:forEach>

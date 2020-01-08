@@ -9,6 +9,8 @@
 
 		<script type="text/javascript">
 		     //<![CDATA[
+			    var csrfTokenName = '<csrf:tokenname/>',
+    				csrfTokenValue = '<csrf:tokenvalue/>';
 			function init(){
 				var tag = document.getElementById("currentTab");
 				if(tag == null || tag.value != "")
@@ -36,8 +38,8 @@
 
 	<body class="stripes" onLoad="init()">
 	
-		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm" enctype="multipart/form-data">
-
+		<form:form action="update.do" method="post" id="forumForm" modelAttribute="forumForm">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="toolContentID" />
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />

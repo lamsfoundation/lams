@@ -28,12 +28,13 @@
 	</tr>
 </table>
 
-<c:url value="/authoring.do" var="authoringUrl">
-	<c:param name="toolContentID" value="${dto.toolContentId}" />
-	<c:param name="mode" value="teacher" />
-	<c:param name="contentFolderID" value="${contentFolderID}" />
-</c:url>
-<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
+<form id='define-later-form' method='post' action='authoring/definelater.do' target='definelater'>
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+	<input type="hidden" name="toolContentID" value="${dto.toolContentId}" />
+	<input type="hidden" name="contentFolderID" value="${contentFolderID}" />
+</form>
+		
+<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
 	<fmt:message key="button.editActivity" />
 </a>
 

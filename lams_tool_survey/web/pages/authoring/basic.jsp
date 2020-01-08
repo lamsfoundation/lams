@@ -33,7 +33,7 @@
 	function deleteItem(idx,sessionMapID){
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
-		var url = "<c:url value="/authoring/removeItem.do"/>?"+param;
+		var url = "<c:url value="/authoring/removeItem.do"/>?<csrf:token/>&"+param;
 		deleteItemLoading();
 		$("#surveyListArea").load(url,deleteItemComplete);
 	}

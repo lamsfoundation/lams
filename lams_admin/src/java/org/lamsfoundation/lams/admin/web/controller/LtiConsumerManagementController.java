@@ -79,7 +79,7 @@ public class LtiConsumerManagementController {
     /**
      * Disables or enables (depending on "disable" parameter) specified LTI tool consumer
      */
-    @RequestMapping(path = "/disable")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disable(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	boolean disable = WebUtil.readBooleanParam(request, "disable");
@@ -93,7 +93,7 @@ public class LtiConsumerManagementController {
     /**
      * Removes specified LTI tool consumer
      */
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	userManagementService.deleteById(ExtServer.class, sid);

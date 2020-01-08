@@ -5,7 +5,8 @@
 </div>
 
 <div class="panel-body">
-<form:form action="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion.do' : 'saveSingleQuestion.do'}" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form action="${empty newQuestionForm.editableQuestionIndex ? 'addSingleQuestion.do' : 'saveSingleQuestion.do'}?${csrfToken}" modelAttribute="newQuestionForm" id="newQuestionForm" method="POST">
 	<form:hidden path="toolContentID" />
 	<form:hidden path="httpSessionID" />
 	<form:hidden path="contentFolderID" />

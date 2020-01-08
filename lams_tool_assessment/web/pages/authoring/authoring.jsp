@@ -47,8 +47,9 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" enctype="multipart/form-data"
+	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" 
 			onsubmit="return validateQuestionBankIsNotEmpty();">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">

@@ -1,8 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <!-- Add More options menu drop down first (if it contains links) -->
 <c:if test="${not empty org.moreLinks}">

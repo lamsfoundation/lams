@@ -69,9 +69,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -195,7 +199,7 @@ public class MonitoringController {
 	return "pages/monitoring/parts/usersummary";
     }
 
-    @RequestMapping("/saveUserGrade")
+    @RequestMapping(path = "/saveUserGrade", method = RequestMethod.POST)
     public void saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 
 	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
@@ -209,10 +213,9 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping("/setSubmissionDeadline")
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentID);
 
@@ -231,9 +234,7 @@ public class MonitoringController {
 	assessment.setSubmissionDeadline(tzSubmissionDeadline);
 	service.saveOrUpdateAssessment(assessment);
 
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 
     /**
@@ -496,9 +497,10 @@ public class MonitoringController {
     /**
      * Excel Summary Export.
      */
+    @RequestMapping(path = "/exportSummary", method = RequestMethod.POST)
     @SuppressWarnings("unchecked")
-    @RequestMapping("/exportSummary")
-    public String exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @ResponseStatus(HttpStatus.OK)
+    public void exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	String fileName = null;
 	boolean showUserNames = true;
@@ -522,7 +524,7 @@ public class MonitoringController {
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	if (assessment == null) {
-	    return null;
+	    return;
 	}
 
 	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos, showUserNames);
@@ -544,8 +546,6 @@ public class MonitoringController {
 
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, sheets, service.getMessage("label.export.exported.on"), true);
-
-	return null;
     }
 
     @RequestMapping("/statistic")
@@ -569,7 +569,7 @@ public class MonitoringController {
     /**
      * Allows displaying correct answers to learners
      */
-    @RequestMapping("/discloseCorrectAnswers")
+    @RequestMapping(path = "/discloseCorrectAnswers", method = RequestMethod.POST)
     public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
@@ -589,7 +589,7 @@ public class MonitoringController {
     /**
      * Allows displaying other groups' answers to learners
      */
-    @RequestMapping("/discloseGroupsAnswers")
+    @RequestMapping(path = "/discloseGroupsAnswers", method = RequestMethod.POST)
     public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);

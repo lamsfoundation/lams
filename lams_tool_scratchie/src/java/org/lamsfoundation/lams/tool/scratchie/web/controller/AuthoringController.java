@@ -104,7 +104,7 @@ public class AuthoringController {
 
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     private String definelater(@ModelAttribute("authoringForm") ScratchieForm authoringForm, HttpServletRequest request)
 	    throws ServletException {
 	// update define later flag to true
@@ -248,7 +248,7 @@ public class AuthoringController {
     /**
      * This method will persist all inforamtion in this authoring page, include all scratchie item, information etc.
      */
-    @RequestMapping("/update")
+    @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") ScratchieForm authoringForm,
 	    HttpServletRequest request) throws Exception {
 
@@ -580,7 +580,7 @@ public class AuthoringController {
      * @param response
      * @return
      */
-    @RequestMapping("/removeItem")
+    @RequestMapping(path = "/removeItem", method = RequestMethod.POST)
     private String removeItem(HttpServletRequest request) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);

@@ -544,7 +544,6 @@ public class GradebookController {
     /**
      * Gets the average mark for an activity and writes the result in the response
      */
-    @SuppressWarnings("unchecked")
     @RequestMapping("/getActivityMarkAverage")
     @ResponseBody
     public String getActivityMarkAverage(HttpServletRequest request, HttpServletResponse response) throws Exception {

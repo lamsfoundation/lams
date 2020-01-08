@@ -13,6 +13,7 @@
 			<lams:Page type="monitor" title="${page.title.monitoring.edit.user.mark}">
 
 			<form:form action="updateMark.do" id="markForm" modelAttribute="markForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
 			<c:set var="sessionMap" value="${sessionScope[markForm.sessionMapID]}" />
 			<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>

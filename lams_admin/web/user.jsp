@@ -141,20 +141,25 @@
 		}
 		
 		<c:if test="${isSysadmin}">
-		function deletePortrait() {
-			$("#portraitButton").css('display','none');
-			$.ajax({
-				url : '/lams/saveportrait/deletePortrait.do',
-				data : { 	'userId'  : '<c:out value="${userForm.userId}" />' },		
-			success : function(response) {
-				if ( response == 'deleted') {
-					loadPortrait('');
-				} else {
-					alert("<fmt:message key='error.portrait.removal.failed'/>");
-				}
+			function deletePortrait() {
+				$("#portraitButton").css('display','none');
+				
+				$.ajax({
+					url : '/lams/saveportrait/deletePortrait.do',
+					data : { 	
+						'userId': '<c:out value="${userForm.userId}" />' ,
+					  	"<csrf:tokenname/>": "<csrf:tokenvalue/>"
+					},
+					type : 'POST',		
+					success : function(response) {
+						if ( response == 'deleted') {
+							loadPortrait('');
+						} else {
+							alert("<fmt:message key='error.portrait.removal.failed'/>");
+						}
+					}
+				});
 			}
-		});
-		}
 		</c:if>
 		</c:if>
 	</script>
@@ -163,8 +168,8 @@
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
 	<lams:Page type="admin" title="${title}" formID="userForm">
-	
-			<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
+	<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="orgId" />
 				<form:hidden path="userId" />
 

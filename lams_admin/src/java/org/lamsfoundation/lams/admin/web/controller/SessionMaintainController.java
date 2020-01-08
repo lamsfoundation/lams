@@ -43,7 +43,7 @@ public class SessionMaintainController {
 	return "sessionmaintain";
     }
 
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) {
 	String login = request.getParameter("login");
 	if (StringUtils.isNotBlank(login)) {

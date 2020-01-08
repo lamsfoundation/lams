@@ -2,7 +2,6 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="peerreview" value="${sessionMap.peerreview}"/>
 
-
 <c:if test="${sessionMap.isPageEditable}">
 	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
@@ -30,11 +29,13 @@
 
 	<tr>
 		<td colspan="2">
-			<c:url  var="authoringUrl" value="/authoring/defineLater.do">
-				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
-				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
-			</c:url>
-			<a href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" class="btn btn-default pull-right">
+			<form id='define-later-form' method='post' action='../authoring/definelater.do' target='definelater'>
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+				<input type="hidden" name="toolContentID" value="${sessionMap.toolContentID}" />
+				<input type="hidden" name="contentFolderID" value="${sessionMap.contentFolderID}" />
+			</form>
+	
+			<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
 			</a>
 		</td>

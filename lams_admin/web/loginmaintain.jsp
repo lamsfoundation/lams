@@ -21,8 +21,8 @@
 				<fmt:message key="sysadmin.maintain" />
 			</a>
 		</p>
-		
-		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" enctype="multipart/form-data" method="post">
+		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 			<p class="help-block"><fmt:message key="sysadmin.login.text"/></p>
 			

@@ -45,8 +45,8 @@
 		</div>
 			
 		<div class="panel-body">
-
 			<form:form action="updateImage.do" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="imageUid" />		
 				<form:hidden path="sessionMapID" value="${sessionMapID}"/>
 				

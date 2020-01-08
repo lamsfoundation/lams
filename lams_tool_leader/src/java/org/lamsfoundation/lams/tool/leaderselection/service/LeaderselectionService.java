@@ -326,7 +326,7 @@ public class LeaderselectionService
     /* ********** ILeaderselectionService Methods ********************************* */
 
     @Override
-    public boolean setGroupLeader(Long userUid, Long toolSessionId) throws IOException {
+    public boolean setGroupLeader(Long userUid, Long toolSessionId) {
 	if ((userUid == null) || (toolSessionId == null)) {
 	    return false;
 	}

@@ -50,7 +50,7 @@
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' }		
 	  				   	],
 	  				   	multiselect: false,
-	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
+	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
 	  				  	cellEdit: true,
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
   				  			previousCellValue = val;

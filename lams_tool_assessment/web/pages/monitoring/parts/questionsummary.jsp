@@ -60,7 +60,7 @@
 	  				   	],
 	  				   	multiselect: false,
 	  				   	caption: "${sessionDto.sessionName}",
-	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
+	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
 	  				  	cellEdit: true,
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
 	  				  		previousCellValue = val;

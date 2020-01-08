@@ -221,6 +221,7 @@
 			<lams:errors/>
 			
 			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="answerList" id="answerList" />
 				<form:hidden path="itemIndex" />

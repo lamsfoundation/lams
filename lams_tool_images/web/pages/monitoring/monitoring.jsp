@@ -120,7 +120,7 @@
 					
 					$.ajax({
 				    	type: 'POST',
-				    	url: "<c:url value='/monitoring/toggleImageVisibility.do'/>",
+				    	url: "<c:url value='/monitoring/toggleImageVisibility.do'/>?<csrf:token/>",
 				    	data : {
 							'imageUid' : imageUid,
 							'sessionMapID' : '${sessionMapID}'

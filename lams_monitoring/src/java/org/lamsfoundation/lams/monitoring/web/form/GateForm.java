@@ -1,4 +1,4 @@
-package org.lamsfoundation.lams.monitoring.web;
+package org.lamsfoundation.lams.monitoring.web.form;
 
 import java.util.Collection;
 import java.util.Date;
