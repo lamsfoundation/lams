@@ -258,12 +258,12 @@ public class OutcomeService implements IOutcomeService {
 		    continue;
 		}
 		cell = row.getCell(3);
-		String scaleName = cell.getStringCellValue();
-		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "name", scaleName);
+		String scaleCode = cell.getStringCellValue();
+		List<OutcomeScale> foundScales = outcomeDAO.findByProperty(OutcomeScale.class, "code", scaleCode);
 		OutcomeScale scale = foundScales.isEmpty() ? null : foundScales.get(0);
 		if (scale == null) {
 		    if (log.isDebugEnabled()) {
-			log.debug("Skipping an outcome with missing scale with name: " + scaleName);
+			log.debug("Skipping an outcome with missing scale with name: " + scaleCode);
 		    }
 		    continue;
 		}
