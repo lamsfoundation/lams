@@ -184,11 +184,15 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // make a flat set of roles from all subcourses
 		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
 			    .collect(HashSet::new, Set::addAll, Set::addAll);
-		    if (!isStaffMode) {
+		    if (isStaffMode) {
+			// check if the user is learner in any course
+			roles.remove(Role.ROLE_MONITOR);
+			roles.remove(Role.ROLE_AUTHOR);
+		    } else {
 			// check if the user is staff in any course
 			roles.remove(Role.ROLE_LEARNER);
 		    }
-		    if (isStaffMode || roles.isEmpty()) {
+		    if (roles.isEmpty()) {
 			// he is only a learner or this is staff mode, so disable
 			userManagementService.disableUser(user.getUserId());
 
@@ -434,11 +438,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    Map<String, Map<Integer, Set<Integer>>> existingRoles) throws UserInfoValidationException {
 	// this is for detecting which users should be disabled
 	Set<User> allUsersInCourse = new HashSet<>();
-	// we set same roles in all subcourses, so there is point to have a single collection
-	Set<Integer> subcourseRolesToSet = new HashSet<>();
-	subcourseRolesToSet.add(Role.ROLE_LEARNER);
-	subcourseRolesToSet.add(Role.ROLE_AUTHOR);
-	subcourseRolesToSet.add(Role.ROLE_MONITOR);
 
 	Integer courseId = course.getOrganisationId();
 
@@ -474,8 +473,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		if (existingCourseRoles == null) {
 		    existingCourseRoles = new HashSet<>();
 		}
-		// we modify existing role collection, as he can be also a course admin
-		existingCourseRoles.add(Role.ROLE_LEARNER);
+		// we modify existing role collection, as he can be also a course admin and/or learner
 		existingCourseRoles.add(Role.ROLE_AUTHOR);
 		existingCourseRoles.add(Role.ROLE_MONITOR);
 		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
@@ -491,10 +489,15 @@ public class SPEnrolmentServlet extends HttpServlet {
 		if (user == null) {
 		    user = (User) userManagementService.findById(User.class, userId);
 		}
-		userAlreadyStaff = userManagementService.hasRoleInOrganisation(user, Role.ROLE_MONITOR, subcourse);
+		Integer subcourseId = subcourse.getOrganisationId();
+		Set<Integer> existingSubcourseRoles = userManagementService.getUserOrganisationRoles(subcourseId, login)
+			.stream().collect(Collectors.mapping(r -> r.getRole().getRoleId(), Collectors.toSet()));
+		userAlreadyStaff = existingSubcourseRoles.contains(Role.ROLE_MONITOR);
 		if (!userAlreadyStaff) {
-		    Integer subcourseId = subcourse.getOrganisationId();
-		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, subcourseRolesToSet);
+		    // we modify existing role collection, as he can be also a learner
+		    existingSubcourseRoles.add(Role.ROLE_AUTHOR);
+		    existingSubcourseRoles.add(Role.ROLE_MONITOR);
+		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, existingSubcourseRoles);
 
 		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
 			lessonService.addStaffMember(lesson.getLessonId(), userId);
@@ -514,14 +517,20 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null : existingCoursesRoles.get(courseId);
 	    if (existingCourseRoles != null) {
 		Integer userId = user.getUserId();
-		existingCourseRoles.remove(Role.ROLE_LEARNER);
+
 		existingCourseRoles.remove(Role.ROLE_AUTHOR);
 		existingCourseRoles.remove(Role.ROLE_MONITOR);
 		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
 
 		for (Organisation subcourse : course.getChildOrganisations()) {
+		    boolean isLearner = userManagementService.hasRoleInOrganisation(user, Role.ROLE_MONITOR, subcourse);
 		    Integer subcourseId = subcourse.getOrganisationId();
-		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, new HashSet<>());
+		    Set<Integer> subcourseRoles = new HashSet<>();
+		    if (isLearner) {
+			// there are no course admins in subcourses, so either user looses all roles or he stays just a learner
+			subcourseRoles.add(Role.ROLE_LEARNER);
+		    }
+		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, subcourseRoles);
 
 		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
 			lessonService.addStaffMember(lesson.getLessonId(), userId);
