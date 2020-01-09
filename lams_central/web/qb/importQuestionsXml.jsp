@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
@@ -77,8 +74,8 @@
 		</div>
 			
 		<div class="panel-body">
-				
-			<form action="<c:url value="/xmlQuestions/importQuestionsXml.do"/>?collectionUid=${param.collectionUid}" method="post" 
+			<c:set var="csrfToken"><csrf:token/></c:set>
+			<form action="<c:url value="/xmlQuestions/importQuestionsXml.do"/>?${csrfToken}&collectionUid=${param.collectionUid}" method="post" 
 				enctype="multipart/form-data" id="importForm">	
 				
 				<lams:FileUpload fileFieldname="UPLOAD_FILE" fileInputMessageKey="label.file" 

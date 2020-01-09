@@ -63,9 +63,9 @@
     	var form = $($.parseHTML(formHTML));
     	// first, save questions in the QB
 		$.ajax({
-			type: "POST",
-			url: '<lams:LAMSURL />imsqti/saveQTI.do',
+			url: '<lams:LAMSURL />imsqti/saveQTI.do?<csrf:token/>',
 			data: form.serializeArray(),
+			type: "POST",
 			dataType: 'text',
 			// the response is a comma-delimited list of QB question UIDs, for example 4,5,65 
 			success: function(qbQuestionUids) {

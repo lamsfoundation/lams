@@ -3,9 +3,7 @@
 
 <link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
-
 <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-select.css" type="text/css"/>
-	
 <style>
 	#grid-holder {
 	    padding-top: 15px;

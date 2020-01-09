@@ -89,6 +89,7 @@
 			<form:form action="/lams/tool/lascrt11/authoring/saveItem.do" method="post" modelAttribute="scratchieItemForm" id="scratchieItemForm">
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="optionList" id="optionList" />
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="itemIndex" />
 				<form:hidden path="questionType"/>
 				<form:hidden path="contentFolderID" id="contentFolderID"/>

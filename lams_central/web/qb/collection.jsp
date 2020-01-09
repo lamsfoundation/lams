@@ -1,10 +1,7 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="hasQuestions" value="${questionCount > 0}" />
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.qb.collection" /></title>
@@ -199,7 +196,7 @@
 				$('#collection-name').editable({
 				    type: 'text',
 				    pk: ${collection.uid},
-				    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do",
+				    url: "<lams:LAMSURL />qb/collection/changeCollectionName.do?<csrf:token/>",
 				    validate: function(value) {
 					    //close editing area on validation failure
 			            if (!value.trim()) {
@@ -322,7 +319,8 @@
 					'type' : 'POST',
 					'dataType' : 'text',
 					'data' : {
-						'collectionUid' : ${collection.uid}
+						'collectionUid' : ${collection.uid},
+						"<csrf:tokenname/>" : "<csrf:tokenvalue/>"
 					},
 					'cache' : false
 				}).done(function(){
@@ -341,7 +339,8 @@
 				'dataType' : 'text',
 				'data' : {
 					'collectionUid' : ${collection.uid},
-					'organisationId': organisationId
+					'organisationId' : organisationId,
+					"<csrf:tokenname/>" : "<csrf:tokenvalue/>"
 				},
 				'cache' : false
 			}).done(function(){
@@ -359,7 +358,8 @@
 				'dataType' : 'text',
 				'data' : {
 					'collectionUid' : ${collection.uid},
-					'organisationId': organisationId
+					'organisationId' : organisationId,
+					"<csrf:tokenname/>" : "<csrf:tokenvalue/>"
 				},
 				'cache' : false
 			}).done(function(){
@@ -375,9 +375,9 @@
 	    function saveQTI(formHTML, formName) {
 	    	var form = $($.parseHTML(formHTML));
 			$.ajax({
-				type: "POST",
-				url: '<c:url value="/imsqti/saveQTI.do" />?collectionUid=${collection.uid}',
+				url: '<c:url value="/imsqti/saveQTI.do" />?<csrf:token/>&collectionUid=${collection.uid}',
 				data: form.serializeArray(),
+				type: "POST",
 				success: function() {
 					location.reload();
 				}
@@ -385,13 +385,19 @@
 	    }
 
 	    function exportQTI(){
-	    	var frame = document.getElementById("downloadFileDummyIframe");
-	    	frame.src = '<c:url value="/imsqti/exportCollectionAsQTI.do" />?collectionUid=${collection.uid}';
+			//dynamically create a form and submit it
+			var exportExcelUrl = '<c:url value="/imsqti/exportCollectionAsQTI.do" />?<csrf:token/>&collectionUid=${collection.uid}';
+			var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+		    $(document.body).append(form);
+		    form.submit();
 	    }
 		
-		function exportQuestionsXml(){   
-		    var reqIDVar = new Date();
-			location.href="<c:url value='/xmlQuestions/exportQuestionsXml.do'/>?collectionUid=${collection.uid}&reqID="+reqIDVar.getTime();
+		function exportQuestionsXml(){
+			//dynamically create a form and submit it
+			var exportExcelUrl = "<c:url value='/xmlQuestions/exportQuestionsXml.do'/>?<csrf:token/>&collectionUid=${collection.uid}&reqID="+(new Date()).getTime();
+			var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+		    $(document.body).append(form);
+		    form.submit();
 		}
 		
 		//create proper href for "Create question" button
@@ -560,12 +566,9 @@
 			</div>
 		</div>
 	</c:if>
-
 	
 	<!-- Dummy div for question save to work properly -->
 	<div id="itemArea" class="hidden"></div>
-	<!-- Dummy iframe for exporting QTI packages -->
-	<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 </lams:Page>
 </body>
 </lams:html>

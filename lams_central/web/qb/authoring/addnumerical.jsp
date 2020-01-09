@@ -138,6 +138,7 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<input type="hidden" name="unitList" id="unitList" />
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
 				<form:hidden path="contentFolderID" id="contentFolderID"/>

@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -103,7 +104,7 @@ public class QbStatsController {
 	return "qb/stats";
     }
 
-    @RequestMapping("/merge")
+    @RequestMapping(path = "/merge", method = RequestMethod.POST)
     public String mergeQuestions(@RequestParam long sourceQbQuestionUid, @RequestParam long targetQbQuestionUid,
 	    Model model) throws Exception {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_MERGE_ENABLE)) {

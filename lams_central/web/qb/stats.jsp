@@ -1,12 +1,8 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn" %>
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="question" value="${stats.question}" />
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.qb.stats.title" /></title>
@@ -91,7 +87,8 @@
 				'data' : {
 					'targetCollectionUid' : targetCollectionUid,
 					'copy'				  : copy,
-					'qbQuestionId'	      : ${question.questionId}
+					'qbQuestionId'	      : ${question.questionId},
+					"<csrf:tokenname/>"   : "<csrf:tokenvalue/>"
 				},
 				'cache' : false
 			}).done(function(){
@@ -115,7 +112,8 @@
 				'dataType' : 'text',
 				'data' : {
 					'collectionUid' : collectionUid,
-					'qbQuestionId'	: ${question.questionId}
+					'qbQuestionId'	: ${question.questionId},
+				  	"<csrf:tokenname/>": "<csrf:tokenvalue/>"
 				},
 				'cache' : false
 			}).done(function(){
@@ -128,8 +126,11 @@
 		}
 	    
 		function exportQTI(){
-	    	var frame = document.getElementById("downloadFileDummyIframe");
-	    	frame.src = '<c:url value="/imsqti/exportQuestionAsQTI.do" />?qbQuestionUid=${question.uid}';
+			//dynamically create a form and submit it
+			var exportExcelUrl = '<c:url value="/imsqti/exportQuestionAsQTI.do" />?<csrf:token/>&qbQuestionUid=${question.uid}';
+			var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+		    $(document.body).append(form);
+		    form.submit();
 	    }
 
 	    //this method gets invoked after question has been edited and saved
@@ -560,6 +561,7 @@
 				<div class="row">
 					<form action="merge.do" method="post">
 						<input type="hidden" name="sourceQbQuestionUid" value="${question.uid}" />
+						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<div class="col-xs-0 col-md-2">
 							Question UID
 						</div>
@@ -585,8 +587,6 @@
 	</c:if>
 </lams:Page>
 
-<!-- For exporting QTI packages -->
-<iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
 <!-- For receiving question's uid after question has been saved -->
 <div id="itemArea" class="hidden"></div>
 </body>

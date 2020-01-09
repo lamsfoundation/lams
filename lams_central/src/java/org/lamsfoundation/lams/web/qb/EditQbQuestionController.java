@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -164,10 +165,9 @@ public class EditQbQuestionController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
      */
-    @RequestMapping("/saveOrUpdateQuestion")
+    @RequestMapping(path = "/saveOrUpdateQuestion", method = RequestMethod.POST)
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
 	//find according question
 	QbQuestion qbQuestion = null;
 	Long oldQuestionUid = null;

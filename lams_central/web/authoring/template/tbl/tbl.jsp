@@ -87,13 +87,13 @@
 	    	var form = $($.parseHTML(formHTML));
 
 	    	if ( callerID == 'mcq' ) {
-		    	var nextNum  = +$('#numQuestions').val()+1,
-						url=getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=mcquestionQTI&questionNumber='
+		    	var nextNum = +$('#numQuestions').val()+1,
+						url = getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=mcquestionQTI&questionNumber='
 								+nextNum+'&numQuestionsFieldname=numQuestions';
 				$.ajaxSetup({ cache: true });
 				$.ajax({
-					type: "POST",
 					url: url,
+					type: "POST",
 					data: form.serializeArray(),
 					success: function(response, status, xhr) {
 						if ( status == "error" ) {
@@ -106,15 +106,15 @@
 				});
 	    	} else {
 	    		var	appexIndex = +(callerID.substring(5)),
-	    				numQuestionsFieldname = 'numAssessments'+appexIndex,
-	    				containingDivName = 'divass'+appexIndex,
-		    			nextNum  = +$('#'+numQuestionsFieldname).val()+1,
-		    			url=getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=assessmentQTI&questionNumber='
+	    			numQuestionsFieldname = 'numAssessments'+appexIndex,
+	    			containingDivName = 'divass'+appexIndex,
+		    		nextNum = +$('#'+numQuestionsFieldname).val()+1,
+		    		url = getSubmissionURL()+'/importQTI.do?contentFolderID=${contentFolderID}&templatePage=assessmentQTI&questionNumber='
 		    					+nextNum+'&containingDivName='+containingDivName+'&numQuestionsFieldname='+numQuestionsFieldname;
 				$.ajaxSetup({ cache: true });
 				$.ajax({
-					type: "POST",
 					url: url,
+					type: "POST",
 					data: form.serializeArray(),
 					success: function(response, status, xhr) {
 						if ( status == "error" ) {
@@ -128,13 +128,10 @@
 	    	}
 	    }
 
-	</script>
-    <script>
         $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip();
+        	$('[data-toggle="tooltip"]').tooltip();
         });
     </script>
-	
 </lams:head>
 	
 <body class="stripes">

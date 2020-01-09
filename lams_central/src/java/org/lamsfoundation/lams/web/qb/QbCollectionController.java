@@ -49,6 +49,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Document;
@@ -190,13 +191,13 @@ public class QbCollectionController {
 	return null;
     }
 
-    @RequestMapping("/removeCollectionQuestion")
+    @RequestMapping(path = "/removeCollectionQuestion", method = RequestMethod.POST)
     @ResponseBody
     public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId) {
 	qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId, true);
     }
 
-    @RequestMapping("/addCollectionQuestion")
+    @RequestMapping(path = "/addCollectionQuestion", method = RequestMethod.POST)
     @ResponseBody
     public void addCollectionQuestion(@RequestParam long targetCollectionUid, @RequestParam boolean copy,
 	    @RequestParam int qbQuestionId) {
@@ -206,7 +207,7 @@ public class QbCollectionController {
 	qbService.addQuestionToCollection(targetCollectionUid, qbQuestionId, copy);
     }
 
-    @RequestMapping("/addCollection")
+    @RequestMapping(path = "/addCollection", method = RequestMethod.POST)
     @ResponseBody
     public void addCollection(@RequestParam String name) {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_CREATE_ALLOW)) {
@@ -215,7 +216,7 @@ public class QbCollectionController {
 	qbService.addCollection(getUserId(), name);
     }
 
-    @RequestMapping("/changeCollectionName")
+    @RequestMapping(path = "/changeCollectionName", method = RequestMethod.POST)
     @ResponseBody
     public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
 	    @RequestParam(name = "value") String name) {
@@ -236,19 +237,19 @@ public class QbCollectionController {
 	return "true";
     }
 
-    @RequestMapping("/removeCollection")
+    @RequestMapping(path = "/removeCollection", method = RequestMethod.POST)
     @ResponseBody
     public void removeCollection(@RequestParam long collectionUid) {
 	qbService.removeCollection(collectionUid);
     }
 
-    @RequestMapping("/shareCollection")
+    @RequestMapping(path = "/shareCollection", method = RequestMethod.POST)
     @ResponseBody
     public void shareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
 	qbService.shareCollection(collectionUid, organisationId);
     }
 
-    @RequestMapping("/unshareCollection")
+    @RequestMapping(path = "/unshareCollection", method = RequestMethod.POST)
     @ResponseBody
     public void unshareCollection(@RequestParam long collectionUid, @RequestParam int organisationId) {
 	qbService.unshareCollection(collectionUid, organisationId);

@@ -22,6 +22,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +59,7 @@ public class XmlQuestionsController {
      * Imports questions into question bank from uploaded xml file.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/importQuestionsXml")
+    @RequestMapping(path = "/importQuestionsXml", method = RequestMethod.POST)
     @ResponseBody
     public void importQuestionsXml(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request,
 	    @RequestParam long collectionUid) throws ServletException {
@@ -110,7 +111,7 @@ public class XmlQuestionsController {
     /**
      * Exports xml format questions from question collection.
      */
-    @RequestMapping("/exportQuestionsXml")
+    @RequestMapping(path = "/exportQuestionsXml", method = RequestMethod.POST)
     public void exportQuestionsXml(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam long collectionUid) {
 	List<QbQuestion> qbQuestions = qbService.getCollectionQuestions(collectionUid);

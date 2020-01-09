@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <input type="hidden" name="optionDisplayOrder${status.index}" value="${option.displayOrder}">
 <input type="hidden" name="optionUid${status.index}" value="${option.uid}">
 

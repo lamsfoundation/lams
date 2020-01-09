@@ -27,10 +27,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Exports and imports IMS QTI questions.
@@ -55,7 +58,7 @@ public class ImsQtiController {
     /**
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
-    @RequestMapping(path = "/saveQTI", produces = "text/plain")
+    @RequestMapping(path = "/saveQTI", produces = "text/plain", method = RequestMethod.POST)
     @ResponseBody
     public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
 	    @RequestParam(defaultValue = "") String contentFolderID) throws UnsupportedEncodingException {
@@ -356,8 +359,9 @@ public class ImsQtiController {
     /**
      * Exports QB question as IMS QTI package.
      */
-    @RequestMapping("/exportQuestionAsQTI")
-    public String exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
+    @RequestMapping(path = "/exportQuestionAsQTI", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void exportQuestionAsQTI(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam long qbQuestionUid) {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	List<QbQuestion> qbQuestions = new LinkedList<>();
@@ -365,14 +369,14 @@ public class ImsQtiController {
 
 	String fileTitle = qbQuestion.getName();
 	exportQTI(request, response, qbQuestions, fileTitle);
-	return null;
     }
 
     /**
      * Exports all questions from QB Collection as IMS QTI package.
      */
-    @RequestMapping("/exportCollectionAsQTI")
-    public String exportCollectionAsQTI(HttpServletRequest request, HttpServletResponse response,
+    @RequestMapping(path = "/exportCollectionAsQTI", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void exportCollectionAsQTI(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam long collectionUid) {
 	List<QbQuestion> qbQuestions = qbService.getCollectionQuestions(collectionUid);
 
@@ -380,7 +384,6 @@ public class ImsQtiController {
 	String fileTitle = collection.getName();
 
 	exportQTI(request, response, qbQuestions, fileTitle);
-	return null;
     }
 
     /**

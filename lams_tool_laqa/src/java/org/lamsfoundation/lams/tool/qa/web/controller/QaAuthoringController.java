@@ -358,7 +358,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * saveQuestion
      */
-    @RequestMapping("/saveQuestion")
+    @RequestMapping(value = "/saveQuestion", method = RequestMethod.POST)
     public String saveQuestion(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request)
 	    throws IOException, ServletException {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
