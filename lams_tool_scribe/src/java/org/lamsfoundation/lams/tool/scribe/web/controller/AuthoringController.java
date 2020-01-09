@@ -52,6 +52,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/authoring")
@@ -80,17 +81,11 @@ public class AuthoringController {
      * Default method when no dispatch parameter is specified. It is expected
      * that the parameter <code>toolContentID</code> will be passed in. This
      * will be used to retrieve content for this tool.
-     *
      */
     @RequestMapping("")
     protected String unspecified(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
 	    HttpServletRequest request) {
-
-	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Scribe with given toolContentID
@@ -112,17 +107,34 @@ public class AuthoringController {
 	    return "common/message";
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
-	    scribe.setDefineLater(true);
-	    scribeService.saveOrUpdateScribe(scribe);
+	return readDatabaseData(authoringForm, scribe, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Scribe scribe = scribeService.getScribeByContentId(toolContentID);
+	scribe.setDefineLater(true);
+	scribeService.saveOrUpdateScribe(scribe);
 
-	    //audit log the teacher has started editing activity in monitor
-	    scribeService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+	//audit log the teacher has started editing activity in monitor
+	scribeService.auditLogStartEditingActivityInMonitor(toolContentID);
 
+	return readDatabaseData(authoringForm, scribe, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Scribe scribe, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	
 	// Set up the authForm.
 	updateAuthForm(authoringForm, scribe);
 
@@ -137,7 +149,7 @@ public class AuthoringController {
 	return "pages/authoring/authoring";
     }
 
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
 	    HttpServletRequest request) {
 	// TODO need error checking.

@@ -37,7 +37,6 @@
 			org.lamsfoundation.lams.web.session.SystemSessionFilter
 		</filter-class>
 	</filter>
-
 	<filter>
 		<filter-name>hibernateFilter</filter-name>
 		<filter-class>
@@ -48,12 +47,15 @@
 			<param-value>coreSessionFactory</param-value>
 		</init-param>
 	</filter>
-
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>
 			org.lamsfoundation.lams.web.filter.LocaleFilter
 		</filter-class>
+	</filter>
+	<filter>
+		<filter-name>CSRFGuard</filter-name>
+		<filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
 	</filter>
 
 	<filter-mapping>
@@ -69,6 +71,10 @@
 	<filter-mapping>
 		<filter-name>LocaleFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CSRFGuard</filter-name> 
+		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
 
 	<listener>
@@ -171,7 +177,6 @@
 			<taglib-uri>tags-xml</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		</taglib>
-
 		<!-- ======================================================== -->
 		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
 		<!-- ======================================================== -->
@@ -184,14 +189,19 @@
 			<taglib-uri>tags-scriptfree</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
 		</taglib>
-
 		<!-- ======================================================== -->
 		<!-- Customized Tag Library -->
 		<!-- ======================================================== -->
-
 		<taglib>
 			<taglib-uri>tags-lams</taglib-uri>
 			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- CSRF Guard Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>csrfguard</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/security/csrfguard.tld</taglib-location>
 		</taglib>
 
 	</jsp-config>

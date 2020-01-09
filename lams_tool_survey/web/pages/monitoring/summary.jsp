@@ -3,16 +3,13 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="survey" value="${sessionMap.survey}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
-
-<c:set var="lams">
- 		<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <script type="text/javascript">
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
 	    var reqIDVar = new Date();
-		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		var param = "?<csrf:token/>&toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
 		url = url + param;
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}

@@ -1,6 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%-- Handles creation of multiple assessment questions based on QTI input. 
 Expects an input of questionNumber (which will be the question number of the first question) & contentFolderID, 
 which are passed on to the individual question jsps to generate the form fields. --%>

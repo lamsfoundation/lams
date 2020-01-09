@@ -108,7 +108,8 @@
 			</div>
 			
 			<div class="panel-body panel-${type}-body">
-			<form:form action="/lams/tool/laqa11/authoring/saveQuestion.do" method="post" modelAttribute="newQuestionForm" id="newQuestionForm">
+			<c:set var="csrfToken"><csrf:token/></c:set>
+			<form:form action="/lams/tool/laqa11/authoring/saveQuestion.do?${csrfToken}" method="post" modelAttribute="newQuestionForm" id="newQuestionForm">
 				<form:hidden path="sessionMapID" />
 				<form:hidden path="itemIndex" />
 				<form:hidden path="contentFolderID"/>

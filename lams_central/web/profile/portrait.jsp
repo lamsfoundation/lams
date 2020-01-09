@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <c:set var="ENABLE_PORTRAIT_EDITING"><%=Configuration.get(ConfigurationKeys.ENABLE_PORTRAIT_EDITING)%></c:set>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -101,21 +96,21 @@
 		        size: {
 		            width:  PORTRAIT_SIZE,
 		            height: PORTRAIT_SIZE,
-		          },
+		        },
 		        format: 'jpeg',
 		        quality: 0.95,
 		        backgroundColor: '#FFF',
-    			}).then(function(blob) {
+    		}).then(function(blob) {
 				var formData = new FormData();
 				formData.append("file", blob);
 				
 				//upload protrait to server side
-				$.ajax({ 
+				$.ajax({
 					data : formData,
 					async : false,
 					processData : false, // tell jQuery not to process the data
 					contentType : false, // tell jQuery not to set contentType
-					type : $("#PortraitActionForm").attr('method'),
+					type : "post",
 					url : $("#PortraitActionForm").attr('action'),
 					success : function(data) {
 						window.parent.location.reload();
@@ -123,12 +118,12 @@
 				});
 			});
 		}
-
 	</script>
 </lams:head>
 
 <body>
-<form:form action="saveportrait.do" method="post" modelAttribute="PortraitActionForm"	 id="PortraitActionForm" >
+<c:set var="csrfToken"><csrf:token/></c:set>
+<form:form action="saveportrait.do?${csrfToken}" method="post" modelAttribute="PortraitActionForm" id="PortraitActionForm" >
 	<form:hidden path="portraitUuid" />
 	<div style="clear: both"></div>
 	

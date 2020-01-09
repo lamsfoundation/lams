@@ -1,25 +1,18 @@
 <!DOCTYPE html>
-
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<c:set var="lams"><lams:LAMSURL/></c:set>
-
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+<c:set var="lessonMode" value="${not empty param.activityID}" />
 
 <lams:html>
 <lams:head>
 	<lams:css/>
 	<link rel="stylesheet" href="${lams}css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="${lams}css/orgGroup.css" type="text/css" media="screen" />
-
-	<c:set var="lessonMode" value="${not empty param.activityID}" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -44,6 +37,8 @@
 			// When true, it means that groups can not be added or removed, but user can be still moved.
 			usedForBranching = ${usedForBranching eq true},
 			warnBeforeUpload = false,
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>',
 		
 			LAMS_URL = '<lams:LAMSURL/>',
 			decoderDiv = $('<div />'),
@@ -80,10 +75,7 @@
 				ERROR_FILE_WRONG_FORMAT_LABEL : decoderDiv.html('<c:out value="${ERROR_FILE_WRONG_FORMAT_VAR}" />').text(),
 				<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR"><fmt:param value="%1"/><fmt:param value="%2"/></fmt:message>
 				LABEL_IMPORT_SUCCESSFUL_LABEL : decoderDiv.html('<c:out value="${LABEL_IMPORT_SUCCESSFUL_VAR}" />').text(),
-
 			};
-			
-
 	</script>
 	<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->		
 	<script type="text/javascript">

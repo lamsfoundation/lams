@@ -55,6 +55,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -142,7 +143,7 @@ public class MonitoringController {
     /**
      * Update image's title and description set by monitor
      */
-    @RequestMapping("/updateImage")
+    @RequestMapping(path = "/updateImage", method = RequestMethod.POST)
     public String updateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request) {
 
 	// get back sessionMAP
@@ -181,7 +182,7 @@ public class MonitoringController {
     /**
      * Toggle image visibility, i.e. set its hide field to the opposite of the current value
      */
-    @RequestMapping("/toggleImageVisibility")
+    @RequestMapping(path = "/toggleImageVisibility", method = RequestMethod.POST)
     public String toggleImageVisibility(HttpServletRequest request) {
 
 	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);

@@ -71,8 +71,8 @@
 	</p>
 	
 	<lams:errors/>
-			
-	<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
+    <form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<form:hidden path="sid" />
 		
 		<div class="form-group">

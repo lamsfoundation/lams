@@ -8,7 +8,8 @@
 
 function removeOutcome(outcomeId) {
 	if (confirm(LABELS.REMOVE_OUTCOME_CONFIRM_LABEL)) {
-		document.location.href = 'outcomeRemove.do?outcomeId=' + outcomeId;
+		var f = document.getElementById(outcomeId);
+		f.submit();
 	}
 }
 

@@ -119,7 +119,7 @@ public class AuthoringController {
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
      */
-    @RequestMapping("/removeItem")
+    @RequestMapping(path = "/removeItem", method = RequestMethod.POST)
     private String removeItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 
@@ -210,7 +210,7 @@ public class AuthoringController {
      * <code>HttpSession</code> temporarily. Only they will be persist when the
      * entire authoring page is being persisted.
      */
-    @RequestMapping(value = "/saveOrUpdateItem")
+    @RequestMapping(path = "/saveOrUpdateItem", method = RequestMethod.POST)
     private String saveOrUpdateItem(@ModelAttribute ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
@@ -341,7 +341,7 @@ public class AuthoringController {
 	return readDatabaseData(startForm, request);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     private String defineLater(@ModelAttribute("startForm") ResourceForm startForm, HttpServletRequest request)
 	    throws ServletException {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -468,8 +468,6 @@ public class AuthoringController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
 	    throws Exception {
-
-	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 

@@ -1,15 +1,11 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
 
 <%-- Same layout as error.jsp but assumes the error details have been supplied in the request by an Action (e.g. LoginAs) and not from a stacktrace --%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="heading.general.error" /></title>

@@ -1,7 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script>
 	function exportExcel(){
-		location.href = "<lams:LAMSURL/>tool/lamc11/monitoring/downloadMarks.do?downloadTokenValue=jjj&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+		//dynamically create a form and submit it
+		var exportExcelUrl = "<lams:LAMSURL/>tool/lamc11/monitoring/downloadMarks.do?downloadTokenValue=jjj&toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+		var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+	    var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
+	    form.append(hiddenInput);
+	    $(document.body).append(form);
+	    form.submit();
 	};
 </script>
 

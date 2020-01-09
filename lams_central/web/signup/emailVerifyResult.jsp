@@ -1,9 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-
+<%@ include file="/common/taglibs.jsp"%>
 <lams:css/>
 
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>

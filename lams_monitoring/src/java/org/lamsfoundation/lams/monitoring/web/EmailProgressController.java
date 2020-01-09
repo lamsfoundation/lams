@@ -57,6 +57,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -170,7 +171,7 @@ public class EmailProgressController {
     /**
      * Add or remove a date for the email progress
      */
-    @RequestMapping("/updateEmailProgressDate")
+    @RequestMapping(path = "/updateEmailProgressDate", method = RequestMethod.POST)
     @ResponseBody
     public String updateEmailProgressDate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -245,7 +246,7 @@ public class EmailProgressController {
 	return dateJSON.toString();
     }
 
-    @RequestMapping("/sendLessonProgressEmail")
+    @RequestMapping(path = "/sendLessonProgressEmail", method = RequestMethod.POST)
     @ResponseBody
     public String sendLessonProgressEmail(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {

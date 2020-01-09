@@ -1,9 +1,7 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<c:set var="lams"><lams:LAMSURL/></c:set>
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
 <lams:html>
 <lams:head>
 	<lams:css/>
@@ -24,9 +22,9 @@
 			// parameter can be null and the ID available only as a JSP attribute
 			organisationId = ${empty organisationID ? param.organisationID : organisationID},
 			lessonId = '${param.lessonID}',
-		
+			csrfTokenName = '<csrf:tokenname/>',
+			csrfTokenValue = '<csrf:tokenvalue/>',
 			LAMS_URL = '<lams:LAMSURL/>',
-			
 			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="label.course.groups.grouping.remove.confirm" var="REMOVE_GROUPING_CONFIRM_LABEL_VAR"/>

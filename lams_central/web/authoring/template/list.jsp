@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 <c:set var="title" scope="request">
 	<fmt:message key="authoring.learning.design.templates"/>

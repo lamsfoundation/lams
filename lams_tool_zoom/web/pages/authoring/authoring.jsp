@@ -26,7 +26,8 @@
 
 <body class="stripes" onload="init();">
 	<lams:Page title="pageTitle.authoring" type="navbar">
-		<form:form action="updateContent.do" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+		<form:form action="updateContent.do" modelAttribute="authoringForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="title">
 				<fmt:message key="activity.title" />
 			</c:set>

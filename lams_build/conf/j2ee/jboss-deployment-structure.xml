@@ -52,6 +52,7 @@
       <module name="io.jsonwebtoken" export="true" />
       <module name="xyz.capybara.clamav-client" export="true" />
       <module name="org.apache.batik" export="true" />
+      <module name="org.owasp.csrfguard" export="true" />
       
       <!-- Import META-INF/services for ServiceLoader impls as well
       <module name="myservicemodule" services="import"/>

@@ -64,6 +64,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -381,7 +382,7 @@ public class MonitoringController {
     /**
      * Mark taskList user as verified.
      */
-    @RequestMapping("/setVerifiedByMonitor")
+    @RequestMapping(path = "/setVerifiedByMonitor", method = RequestMethod.POST)
     public String setVerifiedByMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long userUid = WebUtil.readLongParam(request, TaskListConstants.ATTR_USER_UID);
@@ -400,10 +401,9 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String setSubmissionDeadline(HttpServletRequest request) {
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	TaskList taskList = taskListService.getTaskListByContentId(contentID);
 
@@ -421,6 +421,7 @@ public class MonitoringController {
 	}
 	taskList.setSubmissionDeadline(tzSubmissionDeadline);
 	taskListService.saveOrUpdateTaskList(taskList);
+	
 	return formattedDate;
     }
 

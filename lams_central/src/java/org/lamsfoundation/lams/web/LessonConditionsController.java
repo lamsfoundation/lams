@@ -60,6 +60,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * This Action takes care of operations on lesson conditional release based on preceding lesson completion.
@@ -164,7 +165,7 @@ public class LessonConditionsController {
      *
      * @throws InvalidParameterException
      */
-    @RequestMapping("/removeLessonDependency")
+    @RequestMapping(path = "/removeLessonDependency", method = RequestMethod.POST)
     public String removeLessonDependency(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "remove lesson dependency", false)) {
@@ -195,7 +196,7 @@ public class LessonConditionsController {
      *
      * @throws InvalidParameterException
      */
-    @RequestMapping("/addLessonDependency")
+    @RequestMapping(path = "/addLessonDependency", method = RequestMethod.POST)
     public String addLessonDependency(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "add lesson dependency", false)) {
@@ -222,7 +223,7 @@ public class LessonConditionsController {
      *
      * @throws IOException
      */
-    @RequestMapping("/setDaysToLessonFinish")
+    @RequestMapping(path = "/setDaysToLessonFinish", method = RequestMethod.POST)
     public String setDaysToLessonFinish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	if (!securityService.isLessonOwner(lessonId, getUser().getUserID(), "set days to lesson finish", false)) {

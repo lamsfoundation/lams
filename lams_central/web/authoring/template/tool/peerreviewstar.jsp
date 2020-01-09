@@ -1,6 +1,4 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%-- Generic Peer Review Criteria page. Expects an input of criteriaNumber, and creates a field named peerreview${criteriaNumber} suitable for a star rating criteria entry --%>
 <%-- Must include a global variable "var minimumWordsSpinnerArray  = new Array();" in the main javascript for the enclosing page. --%>
 

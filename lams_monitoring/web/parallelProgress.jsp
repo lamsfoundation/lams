@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
-<lams:html>
-   
+
+<lams:html>   
 <lams:head></lams:head>
 
 <c:if test="${not empty parallelUrls}">

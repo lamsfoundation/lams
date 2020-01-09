@@ -121,7 +121,7 @@ public class AuthoringController {
 	return readDatabaseData(assessmentForm, request, mode);
     }
 
-    @RequestMapping("/definelater")
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
     public String definelater(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws ServletException {
 	// update define later flag to true
@@ -220,7 +220,7 @@ public class AuthoringController {
      * etc.
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
 	    HttpServletRequest request) throws Exception {
 	// get back sessionMAP

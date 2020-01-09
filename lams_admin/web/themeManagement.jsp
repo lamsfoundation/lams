@@ -70,7 +70,7 @@
 		function submitForm(methodName) {
 			var f = document.getElementById('themeForm');
 			if (methodName) {
-				f.action = methodName + ".do";
+				f.action = methodName + ".do?<csrf:token/>";
 				}
 			f.submit();
 		}
@@ -150,8 +150,8 @@
 				
 				<div class="panel-body">
 				<form:form action="addOrEditTheme.do" method="post" modelAttribute="themeForm" id="themeForm">	
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="id" id="id" />
-				
 				
 				<table class="table table-no-border" >
 					<tr>

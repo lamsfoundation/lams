@@ -23,7 +23,8 @@
     </script>
 </lams:head>
 <body class="stripes">
-<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post" enctype="multipart/form-data">
+<form:form action="updateContent.do" id="authoringForm" modelAttribute="authoringForm" method="post">
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	

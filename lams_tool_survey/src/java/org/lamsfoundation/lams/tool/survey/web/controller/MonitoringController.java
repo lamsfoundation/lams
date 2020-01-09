@@ -64,9 +64,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
@@ -98,17 +101,9 @@ public class MonitoringController {
 
     /**
      * Summary page action.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping(value = "/summary")
     private String summary(HttpServletRequest request) {
-
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -241,7 +236,6 @@ public class MonitoringController {
 
     @RequestMapping(value = "/listReflections")
     private String listReflections(HttpServletRequest request) {
-
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	Survey survey = surveyService.getSurveyBySessionId(sessionId);
@@ -303,10 +297,11 @@ public class MonitoringController {
     /**
      * Export Excel format survey data.
      */
-    @RequestMapping(value = "/exportSurvey")
+    @RequestMapping(path = "/exportSurvey", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     private void exportSurvey(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
 	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> groupList = surveyService
 		.exportBySessionId(toolSessionID);
 
@@ -486,18 +481,10 @@ public class MonitoringController {
 
     /**
      * Set Submission Deadline
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
      */
-
-    @RequestMapping(value = "/setSubmissionDeadline")
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Survey survey = surveyService.getSurveyByContentId(contentID);
 
@@ -515,8 +502,6 @@ public class MonitoringController {
 	survey.setSubmissionDeadline(tzSubmissionDeadline);
 	surveyService.saveOrUpdateSurvey(survey);
 
-	response.setContentType("text/plain;charset=utf-8");
-	response.getWriter().print(formattedDate);
-	return null;
+	return formattedDate;
     }
 }

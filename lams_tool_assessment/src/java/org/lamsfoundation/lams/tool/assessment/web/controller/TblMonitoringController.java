@@ -49,7 +49,7 @@ public class TblMonitoringController {
      * Shows ira page in case of Assessment activity
      */
     @RequestMapping("iraAssessment")
-    public String iraAssessment(HttpServletRequest request) throws IOException, ServletException {
+    public String iraAssessment(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentID");
 
 	String[] toolContentIds = new String[] { toolContentId.toString() };
@@ -66,7 +66,7 @@ public class TblMonitoringController {
      * Shows ira page in case of Assessment activity
      */
     @RequestMapping("iraAssessmentStudentChoices")
-    public String iraAssessmentStudentChoices(HttpServletRequest request) throws IOException, ServletException {
+    public String iraAssessmentStudentChoices(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
@@ -169,7 +169,7 @@ public class TblMonitoringController {
      * Shows aes page
      */
     @RequestMapping("aes")
-    public String aes(HttpServletRequest request) throws IOException, ServletException {
+    public String aes(HttpServletRequest request) {
 	String[] toolContentIds = request.getParameter("assessmentToolContentIds").split(",");
 	String[] activityTitles = request.getParameter("assessmentActivityTitles").split("\\,");
 
@@ -186,8 +186,7 @@ public class TblMonitoringController {
      * Shows ira StudentChoices page
      */
     @RequestMapping("aesStudentChoices")
-    public String aesStudentChoices(HttpServletRequest request) throws IOException, ServletException {
-
+    public String aesStudentChoices(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	Map<Long, QuestionSummary> questionSummaries = assessmentService.getQuestionSummaryForExport(assessment);
@@ -297,12 +296,9 @@ public class TblMonitoringController {
 
     /**
      * Get ModalDialog for Teams tab.
-     *
-     * @throws JSONException
-     * @throws IOException
      */
     @RequestMapping("getModalDialogForTeamsTab")
-    public String getModalDialogForTeamsTab(HttpServletRequest request) throws IOException {
+    public String getModalDialogForTeamsTab(HttpServletRequest request) {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 

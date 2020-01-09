@@ -29,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -189,7 +190,7 @@ public class PolicyManagementController {
 	return "policies/policies";
     }
 
-    @RequestMapping("togglePolicyStatus")
+    @RequestMapping(path = "togglePolicyStatus", method = RequestMethod.POST)
     public String togglePolicyStatus(HttpServletRequest request) {
 
 	long policyUid = WebUtil.readLongParam(request, "policyUid");

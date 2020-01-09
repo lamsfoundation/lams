@@ -14,25 +14,18 @@
 
 		        var submitUid = currentUid;
 		        $.ajax({
-  					url: '<lams:WebAppURL/>monitoring/'+actionMethod+'.do?currentUid='+submitUid,
+                    type: 'POST',
+  					url: '<lams:WebAppURL/>monitoring/'+actionMethod+'.do?<csrf:token/>',
+                    data: {
+                        currentUid : submitUid
+                    },
 				}).done(function( data ) {
-					if ( data.currentUid == submitUid ) {
-						$('#entryTable').trigger('pagerUpdate');
-						return;
-						
-// 						var nextActionMethod = data.nextActionMethod;
-// 						if ( nextActionMethod ) {
-// 						$('table').trigger('pagerUpdate');
-// 							var newLink = buildShowHideLink(currentUid, nextActionMethod);
-// 							$('#link'+data.currentUid).html(newLink);
-//						}
-					}
-					alert("An error has occurred. Please reload screen! [currentUid = "+data.currentUid+" nextActionMethod="+data.nextActionMethod+"]");
+                    location.reload();
 				});
 			}
 			
 			function buildShowHideLink(currentUid, actionMethod) {
-				var str = '<a href="#" onclick="javascript:submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\');"  class="linkbutton">';
+				var str = '<a href="#" onclick="javascript:submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\');"  class="btn btn-primary btn-xs">';
 				if ( actionMethod == 'hideOpenVote' ) 
 					str += '<fmt:message key="label.hide"/></a>';
 				else
@@ -85,7 +78,7 @@
 							rows += '<td>';
 							rows += userData["userEntry"]; 
 							if ( userData["visible"] == false )
-								rows += ' <em><fmt:message key="label.hidden"/></em>';							
+								rows += ' <span class="label label-danger pull-right"><fmt:message key="label.hidden"/></spam>';							
 							rows += '</td>';
 
 							rows += '<td>';

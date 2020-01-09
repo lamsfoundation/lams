@@ -241,10 +241,9 @@ public class MonitoringController extends WikiPageController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Wiki wiki = wikiService.getWikiByContentId(contentID);
 
@@ -261,7 +260,7 @@ public class MonitoringController extends WikiPageController {
 	}
 	wiki.setSubmissionDeadline(tzSubmissionDeadline);
 	wikiService.saveOrUpdateWiki(wiki);
-	response.setContentType("text/plain;charset=utf-8");
+	
 	return formattedDate;
     }
 

@@ -49,8 +49,8 @@
 			</fmt:message>
 			
 			<lams:errors/>
-			
-			<form:form action="save.do" id="timezoneForm" modelAttribute="timezoneForm" method="post">
+        <form:form action="save.do" id="timezoneForm" modelAttribute="timezoneForm" method="post">
+			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				
 				<table class="table table-striped table-condensed">
 					<tr>

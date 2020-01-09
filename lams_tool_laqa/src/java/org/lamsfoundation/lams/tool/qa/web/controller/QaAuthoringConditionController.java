@@ -51,6 +51,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Auxiliary action in author mode. It contains operations with QaCondition. The
@@ -127,7 +128,7 @@ public class QaAuthoringConditionController {
      * @return
      * @throws ServletException
      */
-    @RequestMapping(value = "/saveOrUpdateCondition")
+    @RequestMapping(path = "/saveOrUpdateCondition", method = RequestMethod.POST)
     private String saveOrUpdateCondition(@ModelAttribute("QaConditionForm") QaConditionForm QaConditionForm,
 	    HttpServletRequest request) {
 
@@ -164,7 +165,7 @@ public class QaAuthoringConditionController {
      * @param request
      * @return
      */
-    @RequestMapping("/removeCondition")
+    @RequestMapping(path = "/removeCondition",  method = RequestMethod.POST)
     private String removeCondition(HttpServletRequest request) {
 
 	// get back sessionMAP

@@ -1,8 +1,6 @@
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>

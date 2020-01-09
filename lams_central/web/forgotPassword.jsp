@@ -1,16 +1,9 @@
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-
-
-<!DOCTYPE html>
 <lams:html>
-
 <lams:head>
 	<lams:css />
 	<title><fmt:message key="title.forgot.password" /></title>

@@ -105,7 +105,27 @@ public class QaAuthoringController implements QaAppConstants {
     public String execute(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request,
 	    @RequestParam Long toolContentID) throws IOException, ServletException {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	return readDatabaseData(form, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute("authoringForm") QaAuthoringForm form,
+	    HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	qaService.setDefineLater(toolContentID, true);
 
+	return readDatabaseData(form, request, ToolAccessMode.TEACHER);
+    }
+
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(QaAuthoringForm form, HttpServletRequest request, ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	form.setContentFolderID(contentFolderID);
 
@@ -135,10 +155,6 @@ public class QaAuthoringController implements QaAppConstants {
 	qaQuestions.clear();
 	qaQuestions.addAll(qa.getQaQueContents());
 
-	// request is from monitoring module
-	if (mode.isTeacher()) {
-	    qaService.setDefineLater(toolContentID, true);
-	}
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	//process conditions
@@ -169,7 +185,7 @@ public class QaAuthoringController implements QaAppConstants {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    @RequestMapping("/submitAllContent")
+    @RequestMapping(path = "/submitAllContent", method = RequestMethod.POST)
     public String submitAllContent(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request)
 	    throws IOException, ServletException, IllegalAccessException, InvocationTargetException,
 	    NoSuchMethodException {
@@ -487,7 +503,7 @@ public class QaAuthoringController implements QaAppConstants {
     /**
      * removes a question from the questions map
      */
-    @RequestMapping("/removeQuestion")
+    @RequestMapping(path = "/removeQuestion", method = RequestMethod.POST)
     public String removeQuestion(@ModelAttribute("newQuestionForm") QaAuthoringForm form, HttpServletRequest request)
 	    throws IOException, ServletException {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);

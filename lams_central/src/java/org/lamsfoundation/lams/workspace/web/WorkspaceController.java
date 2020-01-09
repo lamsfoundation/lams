@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -104,7 +105,7 @@ public class WorkspaceController {
      * @throws UserException
      */
     @ResponseBody
-    @RequestMapping("/createFolder")
+    @RequestMapping(path = "/createFolder", method = RequestMethod.POST)
     public void createFolder(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, UserException, WorkspaceFolderException {
 	Integer parentFolderID = WebUtil.readIntParam(request, "parentFolderID", false);
@@ -127,7 +128,7 @@ public class WorkspaceController {
      * @throws IOException
      */
     @ResponseBody
-    @RequestMapping("/deleteResource")
+    @RequestMapping(path = "/deleteResource", method = RequestMethod.POST)
     public void deleteResource(HttpServletRequest request) throws ServletException, IOException {
 	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID));
 	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE);
@@ -155,7 +156,7 @@ public class WorkspaceController {
      * @throws LearningDesignException
      */
     @ResponseBody
-    @RequestMapping("/copyResource")
+    @RequestMapping(path = "/copyResource", method = RequestMethod.POST)
     public void copyResource(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, LearningDesignException, UserException, WorkspaceFolderException {
 	Long resourceID = WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID, false);
@@ -173,7 +174,7 @@ public class WorkspaceController {
     }
 
     @ResponseBody
-    @RequestMapping("/moveResource")
+    @RequestMapping(path = "/moveResource", method = RequestMethod.POST)
     public void moveResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long resourceID = WebUtil.readLongParam(request, WorkspaceController.RESOURCE_ID, false);
 	String resourceType = WebUtil.readStrParam(request, WorkspaceController.RESOURCE_TYPE, false);
@@ -193,7 +194,7 @@ public class WorkspaceController {
     }
 
     @ResponseBody
-    @RequestMapping("/renameResource")
+    @RequestMapping(path = "/renameResource", method = RequestMethod.POST)
     public void renameResource(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, UserException, WorkspaceFolderException {
 	Integer userID = getUserId();

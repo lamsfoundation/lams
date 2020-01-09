@@ -96,6 +96,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
@@ -211,14 +212,10 @@ public class MonitoringController {
      * The Struts dispatch method that starts a lesson that has been created beforehand. Most likely, the request to
      * start lesson should be triggered by the Monitoring This method will delegate to the Spring service bean to
      * complete all the steps for starting a lesson.
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/startLesson")
+    @RequestMapping(path = "/startLesson", method = RequestMethod.POST)
     @ResponseBody
-    public String startLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String startLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.startLesson(lessonId, getUserId());
@@ -235,10 +232,9 @@ public class MonitoringController {
     /**
      * Renames lesson. Invoked by Ajax call from general LAMS monitoring.
      */
-    @RequestMapping("/renameLesson")
+    @RequestMapping(path = "/renameLesson", method = RequestMethod.POST)
     @ResponseBody
-    public String renameLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String renameLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, "pk");
 
 	HttpSession ss = SessionManager.getSession();
@@ -288,7 +284,7 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping("/addLesson")
+    @RequestMapping(path = "/addLesson", method = RequestMethod.POST)
     public String addLesson(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam String lessonName, @RequestParam long learningDesignID)
 	    throws IOException, ServletException, ParseException {
@@ -463,14 +459,10 @@ public class MonitoringController {
 
     /**
      * The Struts dispatch method to archive a lesson.
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/archiveLesson")
+    @RequestMapping(path = "/archiveLesson", method = RequestMethod.POST)
     public void archiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+	    throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.archiveLesson(lessonId, getUserId());
@@ -481,13 +473,10 @@ public class MonitoringController {
 
     /**
      * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state.
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/unarchiveLesson")
+    @RequestMapping(path = "/unarchiveLesson", method = RequestMethod.POST)
     public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+	    throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unarchiveLesson(lessonId, getUserId());
@@ -501,7 +490,7 @@ public class MonitoringController {
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to UI.
      */
-    @RequestMapping("/suspendLesson")
+    @RequestMapping(path = "/suspendLesson", method = RequestMethod.POST)
     public void suspendLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, ParseException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -521,16 +510,8 @@ public class MonitoringController {
     /**
      * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to UI
      * client.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/unsuspendLesson")
+    @RequestMapping(path = "/unsuspendLesson", method = RequestMethod.POST)
     public void unsuspendLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -549,11 +530,8 @@ public class MonitoringController {
      * <P>
      * This action need a lession ID as input.
      * </P>
-     *
-     * @throws IOException
-     * @throws ServletException
      */
-    @RequestMapping("/removeLesson")
+    @RequestMapping(path = "/removeLesson", method = RequestMethod.POST)
     @ResponseBody
     public String removeLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -590,16 +568,8 @@ public class MonitoringController {
      * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is null, all
      * activities for this learner will complete to as end as possible.
      * </P>
-     *
-     * @param form
-     * @param request
-     * @param response
-     * @return An ActionForward
-     * @throws IOException
-     * @throws ServletException
-     * @throws JSONException
      */
-    @RequestMapping("/forceComplete")
+    @RequestMapping(path = "/forceComplete", method = RequestMethod.POST)
     @ResponseBody
     public void forceComplete(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
@@ -828,7 +798,7 @@ public class MonitoringController {
     /**
      * Adds/removes learners and monitors to/from lesson class.
      */
-    @RequestMapping("/updateLessonClass")
+    @RequestMapping(path = "/updateLessonClass", method = RequestMethod.POST)
     public void updateLessonClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonId, getUserId(), "update lesson class", false)) {
@@ -1003,7 +973,6 @@ public class MonitoringController {
      * and all activities must be grouped.
      */
     private boolean isTBLSequence(Long lessonId) {
-
 	Lesson lesson = lessonService.getLesson(lessonId);
 	Long firstActivityId = lesson.getLearningDesign().getFirstActivity().getActivityId();
 	//Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity
@@ -1495,7 +1464,6 @@ public class MonitoringController {
     /**
      * Checks if a complex activity or its descendats contain an activity with the given ID.
      */
-    @SuppressWarnings("unchecked")
     private boolean containsActivity(ComplexActivity complexActivity, long targetActivityId,
 	    IMonitoringService monitoringService) {
 	for (Activity childActivity : complexActivity.getActivities()) {
@@ -1560,10 +1528,9 @@ public class MonitoringController {
      * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
      * presenceAvailable.
      */
-    @RequestMapping("/presenceAvailable")
+    @RequestMapping(path = "/presenceAvailable", method = RequestMethod.POST)
     public String presenceAvailable(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
-
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
@@ -1584,7 +1551,7 @@ public class MonitoringController {
      * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
      * presenceImAvailable.
      */
-    @RequestMapping("/presenceImAvailable")
+    @RequestMapping(path = "/presenceImAvailable", method = RequestMethod.POST)
     public String presenceImAvailable(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
@@ -1603,10 +1570,8 @@ public class MonitoringController {
      * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson.
      * Expects parameters lessonID and presenceAvailable.
      */
-    @RequestMapping("/gradebookOnComplete")
-    public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-
+    @RequestMapping(path = "/gradebookOnComplete", method = RequestMethod.POST)
+    public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	Integer userID = getUserId();
 	Boolean gradebookOnComplete = WebUtil.readBooleanParam(request, "gradebookOnComplete", false);
@@ -1621,8 +1586,7 @@ public class MonitoringController {
 
     /** Open Time Chart display */
     @RequestMapping("/viewTimeChart")
-    public String viewTimeChart(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String viewTimeChart(HttpServletRequest request, HttpServletResponse response) {
 	try {
 
 	    long lessonID = WebUtil.readLongParam(request, "lessonID");

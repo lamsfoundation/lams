@@ -52,7 +52,8 @@
 	<form:hidden path="qa.qaContentId" />
 	<form:hidden path="toolContentID" />
 	<form:hidden path="contentFolderID" />
-	<form:hidden path="sessionMapID"/>		
+	<form:hidden path="sessionMapID"/>
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	
 	<lams:Page title="${title}" type="navbar">
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">

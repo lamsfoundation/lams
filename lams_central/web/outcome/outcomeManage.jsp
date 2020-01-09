@@ -1,12 +1,8 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-
 <!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-		<title><fmt:message key="index.outcome.manage" /></title>
+	<title><fmt:message key="index.outcome.manage" /></title>
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen" />
@@ -62,9 +58,9 @@
 					</i>
 				</div>
 				<div class="col-xs-1">
-					<i class="manageButton fa fa-remove" title="<fmt:message key='outcome.manage.remove' />"
-				   	   onClick="javascript:removeOutcome(${outcome.outcomeId})" >
-					</i>
+					<c:if test="${not empty outcome.organisation or canManageGlobal}">
+						<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do"><input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/><button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger btn-xs"><i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i></button></csrf:form>
+					</c:if>
 				</div>
 			</div>
 		</c:forEach>

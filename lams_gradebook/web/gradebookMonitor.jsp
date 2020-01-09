@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="usesWeights">${not empty weights}</c:set>
 
@@ -74,9 +70,7 @@
 		}
 		</c:if>
 
-
 		function toggleRelease() {
-			
 			var conf;
 			if (marksReleased) {
 				conf = confirm("<fmt:message key="gradebook.monitor.releasemarks.check2"/>");
@@ -85,21 +79,27 @@
 			}
 			
 			if (conf) {
-				$.get("<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", {lessonID:"${lessonDetails.lessonID}"}, function(xml) {
-					var str = new String(xml)
-			    	if (str.indexOf("success") != -1) {
-			    		
-			    		if (marksReleased) {
-			    			marksReleased = false;
-			    		} else {
-		    			marksReleased = true;
-		    		}
-		    		displayReleaseOption();
-		    	} else {
-		    		
-		    		alert("<fmt:message key="error.releasemarks.fail"/>");
-		    	}
-			    });
+				$.post(
+					"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
+					{
+					  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
+						lessonID:"${lessonDetails.lessonID}"
+					}, 
+					function(xml) {
+						var str = new String(xml)
+				    	if (str.indexOf("success") != -1) {
+				    		if (marksReleased) {
+				    			marksReleased = false;
+				    		} else {
+				    			marksReleased = true;
+				    		}
+			    			displayReleaseOption();
+			    			
+				    	} else {
+				    		alert("<fmt:message key="error.releasemarks.fail"/>");
+				    	}
+			    	}
+			    );
 		    }
 		}
 		
@@ -118,7 +118,6 @@
 		}
 
 		jQuery(document).ready(function(){
-  
 			var jqgridWidth = $(window).width() - 100;
 			displayReleaseOption();
 			
@@ -141,7 +140,7 @@
 			    pager: 'userViewPager',
 			    rowList:[10,20,30,40,50,100],
 			    rowNum:10,
-				cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=${lessonDetails.lessonID}",
+				cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}",
 			    colNames:["", 
 			    	"<fmt:message key="gradebook.columntitle.name"/>", 
 			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
@@ -177,12 +176,13 @@
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
-				   var subgrid_table_id = subgrid_id+"_t",
+					var subgrid_table_id = subgrid_id+"_t",
 				   	   rowData = jQuery("#userView").getRowData(row_id),
 				   	   userID = rowData["id"],
 				   	   hasArchivedMarks = rowData["hasArchivedMarks"] == "true";
-					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-					 jQuery("#"+subgrid_table_id).jqGrid({
+			   	   
+					jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					jQuery("#"+subgrid_table_id).jqGrid({
 							 guiStyle: "bootstrap",
 							 iconSet: 'fontAwesome',
 							 autoencode:false,
@@ -197,7 +197,7 @@
 							 rowNum:10,
 							 sortorder: "asc", 
 							 sortname: "sequence", 
-						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
+						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     colNames: [
 						     	'',
 						     	'',
@@ -293,11 +293,18 @@
 							     	}
 							     	
 							     	// Update the aggregated lesson mark
-							     	$.get("<lams:LAMSURL/>/gradebook/gradebook/getLessonMarkAggregate.do", {lessonID:"${lessonDetails.lessonID}", userID:row_id}, function(xml) {
-								    	if (xml!=null) {
-								    		jQuery("#userView").setCell(row_id, "mark", xml, "", "");
-								    	} 
-								    });
+							     	$.get(
+										"<lams:LAMSURL/>/gradebook/gradebook/getLessonMarkAggregate.do", 
+										{
+											lessonID:"${lessonDetails.lessonID}", 
+											userID:row_id
+										}, 
+										function(xml) {
+									    	if (xml!=null) {
+									    		jQuery("#userView").setCell(row_id, "mark", xml, "", "");
+									    	} 
+								    	}
+								    );
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
@@ -490,7 +497,7 @@
 						     autowidth:true,
 						     cmTemplate: { title: false },
 						     cellEdit:true,
-						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
+						     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserActivityGradebookData.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
 						     sortorder: "asc", 
 							 sortname: "fullName", 
 							 pager: subgrid_table_id + "_pager",
@@ -585,11 +592,15 @@
 						     		}
 						     		
 						     		// Update the average activity mark
-							     	$.get("<lams:LAMSURL/>/gradebook/gradebook/getActivityMarkAverage.do", {activityID:row_id}, function(xml) {
-								    	if (xml!=null) {
-								    		jQuery("#activityView").setCell(row_id, "avgMark", xml, "", "");
-								    	} 
-								    });
+							     	$.get(
+										"<lams:LAMSURL/>/gradebook/gradebook/getActivityMarkAverage.do", 
+										{activityID:row_id}, 
+										function(xml) {
+									    	if (xml!=null) {
+									    		jQuery("#activityView").setCell(row_id, "avgMark", xml, "", "");
+									    	} 
+								    	}
+								    );
 						     	}
 						     },
 						     errorCell: function(serverresponse, status) {
@@ -667,7 +678,7 @@
 				
 				$("#export-grades-button").click(function() {
 					var areaToBlock = "export-link-area";
-					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelLessonGradebook.do?lessonID=${lessonDetails.lessonID}";
+					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelLessonGradebook.do?<csrf:token/>&lessonID=${lessonDetails.lessonID}";
 					var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
 					// if exportSpan is hidden then icon only mode, use small font.
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait, $("#exportSpan:hidden").length > 0);

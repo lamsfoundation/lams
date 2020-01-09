@@ -12,7 +12,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -114,7 +114,7 @@
 	  			   	{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
-				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>?<csrf:token/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);

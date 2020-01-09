@@ -36,7 +36,7 @@
 		if (confirm(msg+'\n\n'+deleteConfirmationMessage2)) {
  			$.ajax({
 				async : false,
-				url : '<c:url value="/emailNotifications/"/>deleteNotification.do',
+				url : '<c:url value="/emailNotifications/"/>deleteNotification.do?<csrf:token/>',
  				data : '${deleteUrlParams}&triggerName=' + triggerName,
  				type : "POST",
 				success : function(json) {
@@ -82,7 +82,7 @@
 					<c:set var="tDate"><lams:Date value="${emailJob.triggerDate}"/></c:set>
 					${tDate}<BR/>
 					
-					<a href="#" class="btn btn-default btn-sm" 
+					<a href="#" class="btn btn-danger btn-sm" 
 						onclick="javascript:deleteNotification('${emailJob.triggerName}', '${tDate}', '${deleteUrlParams}');">
 						<i class="fa fa-fw fa-trash-o"></i> <fmt:message key="email.notifications.delete" />
 					</a>

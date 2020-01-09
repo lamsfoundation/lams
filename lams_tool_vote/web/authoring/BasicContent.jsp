@@ -26,11 +26,6 @@
 		document.forms.voteAuthoringForm.questionIndex.value=questionIndex;
         submitMethod('removeNomination');
 	}
-
-	function removeMonitoringNomination(questionIndex){
-		document.voteMonitoringForm.questionIndex.value=questionIndex;
-        submitMonitoringMethod('removeNomination');
-	}
 	
 	
 	function onSelectDataInput(){

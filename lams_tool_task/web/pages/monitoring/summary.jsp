@@ -91,7 +91,7 @@
 	function setVerifiedByMonitor(link, userUid) {
 		$.ajax({
 			type: "POST",
-			url: '<c:url value="/monitoring/setVerifiedByMonitor.do"/>',
+			url: '<c:url value="/monitoring/setVerifiedByMonitor.do"/>?<csrf:token/>',
 			data: { userUid: userUid },
 			success: function(response) {
 				$("#verif-"+response).html('<i class="fa fa-check"></i>');

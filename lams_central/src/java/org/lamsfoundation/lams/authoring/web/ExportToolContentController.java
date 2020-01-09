@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -62,7 +63,7 @@ public class ExportToolContentController {
     private Logger log = Logger.getLogger(ExportToolContentController.class);
 
 
-    @RequestMapping("/authoring/exportToolContent/export")
+    @RequestMapping(path = "/authoring/exportToolContent/export", method = RequestMethod.POST)
     @ResponseBody
     private void exportLD(HttpServletRequest request, HttpServletResponse response) {
 	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentController.PARAM_LEARING_DESIGN_ID);

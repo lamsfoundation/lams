@@ -60,8 +60,7 @@ public class SequenceController {
      * Display the view screen.
      */
     @RequestMapping("/sequence")
-    public String viewSequence(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public String viewSequence(HttpServletRequest request, HttpServletResponse response) {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
@@ -71,8 +70,7 @@ public class SequenceController {
     }
 
     protected String viewSequence(SequenceActivity activity, Long lessonId, boolean useLocalFiles,
-	    HttpServletRequest request, IMonitoringService monitoringService) throws IOException, ServletException {
-
+	    HttpServletRequest request, IMonitoringService monitoringService) {
 	// in general the progress engine expects the activity and lesson id to be in the request,
 	// so follow that standard.
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());

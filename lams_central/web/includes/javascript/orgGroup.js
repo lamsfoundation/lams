@@ -335,15 +335,18 @@ function removeGroup(container) {
 		executeDelete = !lessonMode;
 		
 		if (lessonMode) {
+			var data = {
+				'activityID' : groupingActivityId,
+				'groupID'    : groupId
+			};
+			data[csrfTokenName] = csrfTokenValue;
+			
 			$.ajax({
 				async    : false,
 				cache    : false,
 				dataType : 'json',
 				url : LAMS_URL + 'monitoring/grouping/removeGroup.do',
-				data : {
-					'activityID' : groupingActivityId,
-					'groupID'    : groupId
-				},
+				data : data,
 				type : 'POST',
 				success : function(response) {
 					executeDelete = response.result;
@@ -367,14 +370,16 @@ function renameGroup(container) {
 	var inputEditable = !nameInput.attr('readonly');
 	// only lesson groups which exist on the server need to have their names changed immediatelly
 	if (lessonMode && groupId && inputEditable) {
-		var groupName = nameInput.val();
+		var data = {
+			'groupID'    : groupId,
+			'name'       : nameInput.val()//groupName
+		};
+		data[csrfTokenName] = csrfTokenValue;
+		
 		$.ajax({
 			cache    : false,
 			url : LAMS_URL + 'monitoring/grouping/changeGroupName.do',
-			data : {
-				'groupID'    : groupId,
-				'name'       : groupName
-			},
+			data : data,
 			type : 'POST'
 		});
 	}
@@ -483,18 +488,20 @@ function assignUsersToGroup(userIds, groupContainer) {
 	// name is only needed when creating a new group, i.e. a group which does not have ID yet
 	var groupName = groupId ? null : $('input', groupContainer).val();
 	var result = false;
+	var data = {
+		'activityID' : groupingActivityId,
+		'groupID'    : groupId,
+		'name'       : groupName,
+		'members'    : userIds ? userIds.join() : null
+	};
+	data[csrfTokenName] = csrfTokenValue;
 	
 	$.ajax({
 		async    : false,
 		cache    : false,
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/grouping/addMembers.do',
-		data : {
-			'activityID' : groupingActivityId,
-			'groupID'    : groupId,
-			'name'       : groupName,
-			'members'    : userIds ? userIds.join() : null
-		},
+		data : data,
 		type : 'POST',
 		success : function(response) {
 			result = response.result;
@@ -796,16 +803,20 @@ $(document).ready(function(){
 			},		
 			success : function(response) {
 				if (response.isGroupingNameUnique) {
+					var data = {
+						'organisationID' : organisationId,
+						'activityID' : groupingActivityId,
+						'name'  : name
+					};
+					data[csrfTokenName] = csrfTokenValue;
+					
 					$.ajax({
 						dataType : 'json',
 						url : LAMS_URL + 'monitoring/grouping/saveAsCourseGrouping.do',
+						type : 'POST',
 						cache : false,
 						async : false,
-						data : {
-							'organisationID' : organisationId,
-							'activityID' : groupingActivityId,
-							'name'  : name
-						},
+						data : data,
 						success : function(response) {
 							$('#saveAsCourseGroupingDialog').modal('hide');
 							alert(LABELS.SAVED_SUCCESSFULLY_LABEL);

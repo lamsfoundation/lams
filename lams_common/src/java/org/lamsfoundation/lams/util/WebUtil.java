@@ -404,7 +404,7 @@ public class WebUtil {
      * @throws IOException
      */
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
-	    throws Exception {
+	    throws IOException {
 	if (!urlStr.contains("?")) {
 	    urlStr += "?";
 	}
@@ -419,7 +419,7 @@ public class WebUtil {
 	URLConnection conn = url.openConnection();
 	if (!(conn instanceof HttpURLConnection)) {
 	    WebUtil.log.error("Fail to connect to external server though url:  " + urlStr);
-	    throw new Exception("Fail to connect to external server though url:  " + urlStr);
+	    throw new RuntimeException("Fail to connect to external server though url:  " + urlStr);
 	}
 
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
@@ -430,7 +430,7 @@ public class WebUtil {
 	InputStream is = url.openConnection().getInputStream();
 	if (is == null) {
 	    WebUtil.log.error("Fail to fetch data from external server, return InputStream null:  " + urlStr);
-	    throw new Exception("Fail to fetch data from external server, return inputStream null:  " + urlStr);
+	    throw new RuntimeException("Fail to fetch data from external server, return inputStream null:  " + urlStr);
 	}
 
 	return is;

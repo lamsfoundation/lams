@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.tool.chat.web.controller;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -59,8 +58,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -74,9 +73,6 @@ public class MonitoringController {
     @Autowired
     @Qualifier("chatMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     @RequestMapping("/monitoring")
     public String unspecified(HttpServletRequest request) {
@@ -193,7 +189,6 @@ public class MonitoringController {
     @RequestMapping("/editMessage")
     public String editMessage(@ModelAttribute MonitoringForm monitoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-
 	ChatMessage chatMessage = chatService.getMessageByUID(monitoringForm.getMessageUID());
 
 	boolean hasChanged = false;
@@ -218,10 +213,9 @@ public class MonitoringController {
     /**
      * Set Submission Deadline
      */
-    @RequestMapping(path = "/setSubmissionDeadline", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(path = "/setSubmissionDeadline", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String setSubmissionDeadline(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    public String setSubmissionDeadline(HttpServletRequest request) {
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Chat chat = chatService.getChatByContentId(contentID);
 
@@ -240,22 +234,5 @@ public class MonitoringController {
 	chatService.saveOrUpdateChat(chat);
 
 	return formattedDate;
-    }
-
-    /* Private Methods */
-
-    private ChatUser getCurrentUser(Long toolSessionId) {
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
-
-	if (chatUser == null) {
-	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
-	    chatUser = chatService.createChatUser(user, chatSession);
-	}
-
-	return chatUser;
     }
 }

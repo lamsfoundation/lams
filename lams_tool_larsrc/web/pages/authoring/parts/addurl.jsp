@@ -44,8 +44,8 @@
 			<div class="panel-body">
 
 			<lams:errors/>
-	
-			<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm">
+			<c:set var="csrfToken"><csrf:token/></c:set>
+			<form:form action="saveOrUpdateItem.do?${csrfToken}" method="post" modelAttribute="resourceItemForm" id="resourceItemForm">
 				<form:hidden path="sessionMapID" />
 				<input type="hidden" name="instructionList" id="instructionList" />
 				<input type="hidden" name="itemType" id="itemType" value="1" />

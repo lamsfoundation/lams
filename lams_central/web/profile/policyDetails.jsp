@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 <lams:head>

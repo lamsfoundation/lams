@@ -74,7 +74,7 @@
 					launchPopup(userSummaryUrl, "MonitoringReview");		
 			  	},
 			   	// caption: "${summary.sessionName}",
-				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>?<csrf:token/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
   					oldValue = eval(val);
@@ -241,7 +241,7 @@
 	});
 	
 	function exportExcel(){
-		var url = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+		var url = "<c:url value='/monitoring/exportExcel.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
@@ -250,7 +250,7 @@
 		lams: '<lams:LAMSURL />',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',

@@ -10,6 +10,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="csrfguard" prefix="csrf" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%-- Optional attributes. Must provide at either lessonId or toolContentId --%>
@@ -93,7 +94,7 @@
 			'select' : function(event, ui){
 				var input = $(this);
 				$.ajax({
-					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do',
+					'url' : '<lams:LAMSURL/>outcome/outcomeMap.do?<csrf:token/>',
 					'dataType' : 'text',
 					'data': $.extend({
 						'outcomeId' : ui.item.value,

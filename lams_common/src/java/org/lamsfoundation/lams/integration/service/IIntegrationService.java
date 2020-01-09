@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
+import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -231,7 +232,7 @@ public interface IIntegrationService {
      */
     boolean isIntegratedServerGroupFetchingAvailable(Long lessonId);
 
-    List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
+    List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws GroupInfoFetchException, UserInfoValidationException, IOException;
 
     ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
     

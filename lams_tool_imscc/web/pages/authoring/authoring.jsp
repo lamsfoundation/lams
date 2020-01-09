@@ -66,7 +66,8 @@
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
-	<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm" enctype="multipart/form-data">
+	<form:form action="update.do" modelAttribute="authoringForm" method="post" id="authoringForm">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
 		<lams:Page title="${title}" type="navbar">

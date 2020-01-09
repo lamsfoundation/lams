@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Actions for maintaining and altering system themes
@@ -83,7 +84,7 @@ public class ThemeManagementController {
 	return "themeManagement";
     }
 
-    @RequestMapping(path = "/addOrEditTheme")
+    @RequestMapping(path = "/addOrEditTheme", method = RequestMethod.POST)
     public String addOrEditTheme(@ModelAttribute ThemeForm themeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 

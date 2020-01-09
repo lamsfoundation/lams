@@ -33,6 +33,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Marcin Cieslak
@@ -51,7 +52,7 @@ public class SessionMaintainController {
 	return "sessionmaintain";
     }
 
-    @RequestMapping(path = "/delete")
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
     public String delete(HttpServletRequest request) {
 	String login = request.getParameter("login");
 	if (StringUtils.isNotBlank(login)) {

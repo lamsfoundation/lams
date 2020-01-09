@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
-
 <c:set var="title"><fmt:message key="label.countdown.timer"></fmt:message></c:set>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 
 <lams:html>
-
 <lams:head>
 <title><c:out value="${title}"/></title>
 

@@ -91,7 +91,26 @@ public class McController {
 
     @RequestMapping("/authoring")
     public String execute(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	return readDatabaseData(mcAuthoringForm, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request) {
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	mcService.setDefineLater(strToolContentID, true);
 
+	return readDatabaseData(mcAuthoringForm, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(McAuthoringForm mcAuthoringForm, HttpServletRequest request, ToolAccessMode mode) {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	String sessionMapId = sessionMap.getSessionID();
@@ -101,13 +120,7 @@ public class McController {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, strToolContentID);
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-
-	// request is from monitoring module
-	if (mode.isTeacher()) {
-	    mcService.setDefineLater(strToolContentID, true);
-	}
 
 	if ((strToolContentID == null) || (strToolContentID.equals(""))) {
 	    return "McErrorBox";
@@ -155,7 +168,7 @@ public class McController {
     /**
      * submits content into the tool database
      */
-    @RequestMapping("/submitAllContent")
+    @RequestMapping(path = "/submitAllContent", method = RequestMethod.POST)
     public String submitAllContent(@ModelAttribute McAuthoringForm mcAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 

@@ -66,6 +66,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,7 +127,7 @@ public class OutcomeController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping("/outcomeSave")
+    @RequestMapping(path = "/outcomeSave", method = RequestMethod.POST)
     public String outcomeSave(@ModelAttribute OutcomeForm outcomeForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer userId = getUserDTO().getUserID();
@@ -172,7 +173,7 @@ public class OutcomeController {
 	return "outcome/outcomeEdit";
     }
 
-    @RequestMapping("/outcomeRemove")
+    @RequestMapping(path = "/outcomeRemove", method = RequestMethod.POST)
     public String outcomeRemove(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	UserDTO user = getUserDTO();
 	securityService.isSysadmin(user.getUserID(), "import outcomes", true);
@@ -219,7 +220,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping(path = "/outcomeMap", produces = "text/plain;charset=utf-8")
+    @RequestMapping(path = "/outcomeMap", method = RequestMethod.POST, produces = "text/plain;charset=utf-8")
     @ResponseBody
     public String outcomeMap(@RequestParam(required = false) Long outcomeId,
 	    @RequestParam(required = false) Long lessonId, @RequestParam(required = false) Long toolContentId,
@@ -324,7 +325,7 @@ public class OutcomeController {
 	return responseJSON.toString();
     }
 
-    @RequestMapping("/outcomeRemoveMapping")
+    @RequestMapping(path = "/outcomeRemoveMapping", method = RequestMethod.POST)
     public void outcomeRemoveMapping(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long mappingId = WebUtil.readLongParam(request, "mappingId");
 	OutcomeMapping outcomeMapping = (OutcomeMapping) userManagementService.findById(OutcomeMapping.class,

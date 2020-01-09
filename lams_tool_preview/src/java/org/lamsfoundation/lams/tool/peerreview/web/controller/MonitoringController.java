@@ -57,6 +57,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
@@ -81,10 +82,6 @@ public class MonitoringController {
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
-
-//    private void addTab(HttpServletRequest request) {
-//	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
-//    }
     
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request,
@@ -553,15 +550,10 @@ public class MonitoringController {
 
     /**
      * Exports Team Report into Excel spreadsheet.
-     *
-     * @throws ServletException
-     * @throws IOException
      */
-    @RequestMapping("/exportTeamReport")
+    @RequestMapping(path = "/exportTeamReport", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void exportTeamReport(HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
-
+    public void exportTeamReport(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 
 	Peerreview peerreview = service.getPeerreviewByContentId(toolContentId);

@@ -1,9 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>

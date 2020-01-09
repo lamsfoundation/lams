@@ -54,8 +54,8 @@
 					}		
 				}
 			</script>	
-		
-			<form:form action="authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" enctype="multipart/form-data"  onsubmit="return validate();">
+			<form:form action="/lams/tool/lapixl10/authoring/updateContent.do" modelAttribute="authoringForm" id="authoringForm" method="post" onsubmit="return validate();">
+				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<c:set var="sessionMap" value="${sessionScope[authoringForm.sessionMapID]}" />
 				
 				<form:hidden path="currentTab" id="currentTab" />

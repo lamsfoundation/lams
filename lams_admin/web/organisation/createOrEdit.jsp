@@ -38,6 +38,7 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="organisationForm">
 		<form:form action="../orgsave.do" method="post" modelAttribute="organisationForm" id="organisationForm" onsubmit="return warnIfRemoved()">
+			    <input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="orgId" />
 				<form:hidden path="parentId" />
 				<form:hidden path="typeId" />

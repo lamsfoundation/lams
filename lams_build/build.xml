@@ -417,7 +417,7 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
 			file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
-		
+
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/compress/main" overwrite="true" verbose="true">
 			<fileset dir="lib/apache-poi">
 				<include name="commons-compress-*.jar" />
@@ -425,6 +425,14 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/compress/main/module.xml"
 			  file="lib/apache-poi/compress.module.xml" overwrite="true" verbose="true" />
+
+		<copy todir="${server.home}/modules/system/layers/base/org/owasp/csrfguard/main" overwrite="true" verbose="true">
+			<fileset dir="lib/csrfguard">
+				<include name="csrfguard-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/owasp/csrfguard/main/module.xml"
+			file="lib/csrfguard/csrf.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/imsglobal/main" overwrite="true" verbose="true">
 			<fileset dir="lib/basiclti-util">

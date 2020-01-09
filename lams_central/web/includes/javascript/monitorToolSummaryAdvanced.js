@@ -1,8 +1,6 @@
-
 // Toggles whether to display advanced options in monitor summary for tools
 // TODO remove method once bootstrapping is completed
-function toggleAdvancedOptionsVisibility(div, img, imageUrl)
-{
+function toggleAdvancedOptionsVisibility(div, img, imageUrl) {
 	var treeClosedIcon = imageUrl + "/images/tree_closed.gif"; // 
 	var treeOpenIcon = imageUrl + "/images/tree_open.gif";
 
@@ -62,14 +60,15 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		if (date == null) {
 			return;
 		}
-
-		var reqIDVar = new Date();
-		var parameterDelimiter = (submissionDeadlineSettings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
 		
-		var url = submissionDeadlineSettings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + submissionDeadlineSettings.toolContentID + "&submissionDeadline=" +
-					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
 		$.ajax({
-			url : url,
+			url : submissionDeadlineSettings.setSubmissionDeadlineUrl,
+			method: "POST",
+			data: {
+				toolContentID: submissionDeadlineSettings.toolContentID, 
+				submissionDeadline: date.getTime(),
+				reqID: (new Date()).getTime()
+			},
 			success : function(data) {
 				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionSet);
 				$("#datetimeDiv").hide();
@@ -83,14 +82,14 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		});
 	}
 	function removeSubmissionDeadline() {
-		var reqIDVar = new Date();
-		var parameterDelimiter = (submissionDeadlineSettings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
-		
-		var url = submissionDeadlineSettings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + submissionDeadlineSettings.toolContentID + "&submissionDeadline=" +
-				"&reqID=" + reqIDVar.getTime();
-
 		$.ajax({
-			url : url,
+			url : submissionDeadlineSettings.setSubmissionDeadlineUrl,
+			method: "POST",
+			data: { 
+				toolContentID: submissionDeadlineSettings.toolContentID, 
+				submissionDeadline: '',
+				reqID: (new Date()).getTime()
+			},
 			success : function() {
 				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionRemoved);
 				$("#dateInfoDiv").hide();

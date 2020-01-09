@@ -737,7 +737,8 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception {
+    public List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds)
+	    throws GroupInfoFetchException, UserInfoValidationException, IOException {
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://server.org/lams-bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values

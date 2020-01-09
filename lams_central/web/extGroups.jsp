@@ -1,13 +1,10 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<!DOCTYPE html>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:if test="${lessonID == null}">
 	<c:set var="lessonID"  value="${param.lessonID}"/>
 </c:if>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<lams:css/>

@@ -36,7 +36,8 @@
 		jQuery(document).ready(function() {
 			jQuery("div#existing").load(
 				"user/basiclist.do", 
-				{orgId: <c:out value="${userOrgForm.orgId}"/>},
+				{orgId: <c:out value="${userOrgForm.orgId}"/>,
+				"<csrf:tokenname/>":"<csrf:tokenvalue/>"},
 				function() {
 					updateExistingTotal();
 					jQuery("li", this).each(function() {
@@ -87,6 +88,7 @@
 				jQuery("div#potential").load(
 					"user/basiclist.do",
 					{orgId: <c:out value="${userOrgForm.orgId}"/>,
+					"<csrf:tokenname/>":"<csrf:tokenvalue/>",
 					potential: potential}, 
 					function() {
 						loadSearchResultsCallback(potential);
@@ -96,6 +98,7 @@
 				jQuery("div#potential").load(
 					"user/searchsingle.do",
 					{term: jQuery("#term").val(),
+					"<csrf:tokenname/>":"<csrf:tokenvalue/>",
 					orgId: <c:out value="${userOrgForm.orgId}"/>}, 
 					function() {
 						loadSearchResultsCallback(potential);
@@ -205,6 +208,7 @@
 				
 				<div id="form" class="pull-right">
 					<form:form action="./userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
+						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<form:hidden path="orgId" />
 						<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
 						<input type="submit" id="nextButton" class="btn btn-primary loffset5" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />

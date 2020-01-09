@@ -21,7 +21,7 @@
 		lams: '${lams}',
 		submissionDeadline: '${submissionDeadline}',
 		submissionDateString: '${submissionDateString}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${param.toolContentID}',
 		messageNotification: '<fmt:message key="monitor.summary.notification" />',
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
@@ -143,7 +143,7 @@
  					}).text(comment).appendTo(subgrid); 
   					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
- 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid='/>" + userUid,
+ 					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid='/>" + userUid + "&<csrf:token/>",
  					    textOnly: true,
  					    placeholder: '<fmt:message key="label.click.to.edit" />',
  					    okButton: "<fmt:message key='button.ok' />",

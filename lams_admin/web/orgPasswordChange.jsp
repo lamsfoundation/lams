@@ -378,6 +378,7 @@
 					</lams:Alert>
 					
 					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm" method="post">
+						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<form:hidden path="organisationID" />
 						<form:hidden path="orgName" />
 						<form:hidden path="includedLearners" id="includedLearners" />

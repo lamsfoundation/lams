@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 <lams:head>
@@ -93,11 +89,11 @@
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
-				   var subgrid_table_id;
-				   var lessonID = jQuery("#organisationGrid").getRowData(row_id)["id"];
-				   subgrid_table_id = subgrid_id+"_t";
-				   jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
-				   jQuery("#"+subgrid_table_id).jqGrid({
+					var subgrid_table_id = subgrid_id+"_t";
+						lessonID = jQuery("#organisationGrid").getRowData(row_id)["id"];
+				   
+					jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					jQuery("#"+subgrid_table_id).jqGrid({
 						 guiStyle: "bootstrap",
 						 iconSet: 'fontAwesome',
 						 autoencode:false,
@@ -107,7 +103,7 @@
 					     autowidth:true,
 					     cmTemplate: { title: false },
 					     cellEdit:true,
-					     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID,
+					     cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?<csrf:token/>&lessonID=" + lessonID,
 					     sortorder: "asc", 
 						 sortname: "rowName", 
 						 pager: subgrid_table_id + "_pager",
@@ -312,10 +308,9 @@
 					    	 	
 					    	 	//modify cellurl setting to include lessonid
 					    	 	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
-					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?lessonID=" + lessonID + "&id=" + userID});
+					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />gradebook/gradebookMonitoring/updateUserLessonGradebookData.do?<csrf:token/>&lessonID=" + lessonID + "&id=" + userID});
 					    	 },
 						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
-						     	
 						     	var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     	if (cellname == "mark") {
 							     	
@@ -349,7 +344,7 @@
 			
 			$("#export-course-button").click(function() {
 				var areaToBlock = "export-link-area";
-				var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelCourseGradebook.do?organisationID=${organisationID}";
+				var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelCourseGradebook.do?<csrf:token/>&organisationID=${organisationID}";
 				blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				
 				return false;
@@ -368,7 +363,7 @@
 					var areaToBlock = "select-lessons-area";
 					var simplified = jQuery("#export-selected-simplified").prop('checked');
 					simplified = "simplified="+simplified;
-					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelSelectedLessons.do?"+simplified+"&organisationID=${organisationID}" + lessonIds;
+					var exportExcelUrl = "<lams:WebAppURL/>gradebookMonitoring/exportExcelSelectedLessons.do?<csrf:token/>&"+simplified+"&organisationID=${organisationID}" + lessonIds;
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				}
 				

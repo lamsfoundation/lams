@@ -2,8 +2,21 @@
 
 function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
-		document.location.href = LAMS_URL + "organisationGroup/removeGrouping.do?organisationID="
-			+ organisationId + "&groupingId=" + groupingId;
+		//dynamically create a form and submit it
+		var form = $('<form method="post" action="' +  LAMS_URL + 'organisationGroup/removeGrouping.do"></form>');
+		
+	    var hiddenField = $('<input type="hidden" name="organisationID" value="' + organisationId + '"></input>');
+	    form.append(hiddenField);
+	    
+	    hiddenField = $('<input type="hidden" name="groupingId" value="' + groupingId + '"></input>');
+	    form.append(hiddenField);
+
+	    hiddenField = $('<input type="hidden" name="' + csrfTokenName + '" value="' + csrfTokenValue + '"></input>');
+	    form.append(hiddenField);
+
+	    // The form needs to be a part of the document in order to be submitted
+	    $(document.body).append(form);
+	    form.submit();
 	}
 }
 
@@ -62,12 +75,16 @@ function openGroupMappingDialog(groupingId) {
 			}
 		});
 		
+		var data = {
+			'mapping' : JSON.stringify(groupsToBranches)
+		};
+		data[csrfTokenName] = csrfTokenValue;
+		
 		// save the mapping
 		$.ajax({
 			url : LAMS_URL + 'organisationGroup/saveGroupMappings.do',
-			data : {
-				'mapping' : JSON.stringify(groupsToBranches)
-			},
+			data : data,
+			type : 'POST',
 			success : function(response) {
 				// LAMS can reply 200 even if there is an error, so we need OK response
 				if (response == 'OK') {

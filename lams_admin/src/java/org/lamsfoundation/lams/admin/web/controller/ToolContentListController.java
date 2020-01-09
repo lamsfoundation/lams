@@ -193,7 +193,7 @@ public class ToolContentListController {
 	return true;
     }
 
-    @RequestMapping("/disable")
+    @RequestMapping(path = "/disable", method = RequestMethod.POST)
     public String disableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = learningDesignService;
@@ -201,7 +201,7 @@ public class ToolContentListController {
 	return "forward:/toolcontentlist/start.do";
     }
 
-    @RequestMapping("/enable")
+    @RequestMapping(path = "/enable", method = RequestMethod.POST)
     public String enableLibrary(HttpServletRequest request) {
 	Long learningLibraryId = WebUtil.readLongParam(request, "libraryID", false);
 	ILearningDesignService ldService = learningDesignService;

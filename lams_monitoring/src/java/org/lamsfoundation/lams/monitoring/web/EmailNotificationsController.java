@@ -87,6 +87,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -363,7 +364,7 @@ public class EmailNotificationsController {
      *
      * @throws JSONException
      */
-    @RequestMapping("/deleteNotification")
+    @RequestMapping(path = "/deleteNotification", method = RequestMethod.POST)
     @ResponseBody
     public String deleteNotification(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException, SchedulerException {
@@ -471,7 +472,7 @@ public class EmailNotificationsController {
     /**
      * Method called via Ajax. It either emails selected users or schedules these emails to be sent on specified date.
      */
-    @RequestMapping("/emailUsers")
+    @RequestMapping(path = "/emailUsers", method = RequestMethod.POST)
     @ResponseBody
     public String emailUsers(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {

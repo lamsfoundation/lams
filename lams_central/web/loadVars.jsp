@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/javascript; charset=utf-8"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
 <!--
 		// Setup screen sizes for Authoring
 		var str_regex = new RegExp("\\d{3,4}(x)\\d{3,4}");

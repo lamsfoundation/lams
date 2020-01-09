@@ -15,7 +15,6 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
-		<form>
 				<c:if test="${empty orgId}">
 					<c:url var="cancel" value="/usersearch.do" />
 				</c:if>
@@ -44,9 +43,9 @@
 								<c:param name="orgId" value="${orgId}" />
 							</c:url>
 							<div class="pull-right">
-								<button class="btn btn-primary" type="button" onClick="javascript:document.location='<c:out value="${disableaction}"/>'">
-									Disable
-								</button>
+								<csrf:form style="display: inline-block;" id="disable_${userId}" method="post" action="/lams/admin/user/disable.do"><input type="hidden" name="userId" value="${userId}"/><input type="hidden" name="orgId" value="<c:out value="${orgId}"/>"/><input type="submit" class="btn btn-primary" value="<fmt:message key="admin.disable" />"/></csrf:form>
+								&nbsp;
+
 								<button class="btn btn-default" type="button" onClick="javascript:document.location='<c:out value="${cancel}"/>'">
 									Cancel 
 								</button>
@@ -69,9 +68,8 @@
 								<c:param name="orgId" value="${orgId}" />
 							</c:url>
 							<div class="pull-right">
-								<button class="btn btn-default" type="button" onClick="javascript:document.location='<c:out value="${deleteaction}"/>'">
-									Delete
-								</button>
+								<csrf:form style="display: inline-block;" id="delete_${userId}" method="post" action="delete.do"><input type="hidden" name="userId" value="${userId}"/><input type="hidden" name="orgId" value="${orgId}"/><button type="submit" class="btn btn-danger"><fmt:message key="admin.delete" /></button></csrf:form>
+
 								<button class="btn btn-default" type="button" onClick="javascript:document.location='<c:out value="${cancel}"/>'">
 									Cancel
 								</button>
@@ -79,7 +77,6 @@
 						</div>
 					</div>
 				</c:if>
-		</form>
 				
 	<div id="footer"/>
 	</lams:Page>

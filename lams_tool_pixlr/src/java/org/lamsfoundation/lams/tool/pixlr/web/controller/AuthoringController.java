@@ -55,6 +55,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -83,15 +84,8 @@ public class AuthoringController {
     @RequestMapping("")
     protected String unspecified(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
 	    HttpServletRequest request) {
-
-	// Extract toolContentID from parameters.
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-
-	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-
-	// set up pixlrService
 
 	// retrieving Pixlr with given toolContentID
 	Pixlr pixlr = pixlrService.getPixlrByContentId(toolContentID);
@@ -102,16 +96,33 @@ public class AuthoringController {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode.isTeacher()) {
-	    // Set the defineLater flag so that learners cannot use content
-	    // while we
-	    // are editing. This flag is released when updateContent is called.
-	    pixlr.setDefineLater(true);
-	    pixlrService.saveOrUpdatePixlr(pixlr);
+	return readDatabaseData(authoringForm, pixlr, request, mode);
+    }
+    
+    /**
+     * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
+     * updateContent is called.
+     */
+    @RequestMapping(path = "/definelater", method = RequestMethod.POST)
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Pixlr pixlr = pixlrService.getPixlrByContentId(toolContentID);
+	pixlr.setDefineLater(true);
+	pixlrService.saveOrUpdatePixlr(pixlr);
 
-	    //audit log the teacher has started editing activity in monitor
-	    pixlrService.auditLogStartEditingActivityInMonitor(toolContentID);
-	}
+	//audit log the teacher has started editing activity in monitor
+	pixlrService.auditLogStartEditingActivityInMonitor(toolContentID);
+
+	return readDatabaseData(authoringForm, pixlr, request, ToolAccessMode.TEACHER);
+    }
+    
+    /**
+     * Common method for "unspecified" and "defineLater"
+     */
+    private String readDatabaseData(AuthoringForm authoringForm, Pixlr pixlr, HttpServletRequest request,
+	    ToolAccessMode mode) {
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	String imageUrl = PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL;
 	Boolean imageExists = false;
@@ -143,7 +154,7 @@ public class AuthoringController {
 	return "pages/authoring/authoring";
     }
 
-    @RequestMapping("/updateContent")
+    @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("authoringForm") AuthoringForm authoringForm,
 	    HttpServletRequest request) throws PixlrException {
 	// TODO need error checking.

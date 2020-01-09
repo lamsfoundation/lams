@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
-<%@ taglib uri="tags-core" prefix="c"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
@@ -16,15 +13,15 @@
 
 	<lams:css />
 	<style type="text/css">
-.button {
-	float: right;
-	margin-left: 10px;
-}
-
-div#errorArea {
-	display: none;
-}
-</style>
+	.button {
+		float: right;
+		margin-left: 10px;
+	}
+	
+	div#errorArea {
+		display: none;
+	}
+	</style>
 
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/upload.js"></script>

@@ -53,7 +53,7 @@
 				var policyId = $(this).data("policy-id");
 				
 				$("#policy-table").load(
-					"togglePolicyStatus.do", 
+					"togglePolicyStatus.do?<csrf:token/>", 
 					{
 						policyUid: policyUid,
 						policyId: policyId,
@@ -71,7 +71,7 @@
 	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 		<p>
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default">
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
 				<fmt:message key="sysadmin.maintain" />
 			</a>
 			<c:if test="${viewPreviousVersions}">
