@@ -226,6 +226,14 @@
             <logger category="org.springframework.web">
                 <level name="DEBUG"/>
             </logger>
+                       
+            <logger category="Owasp.CsrfGuard" use-parent-handlers="false">
+                <level name="WARN" />
+                <handlers>
+                    <handler name="LAMSFILE" />
+                    <handler name="LAMSCONSOLE" />
+                </handlers>
+            </logger>
             
             <!-- On production change above settings to INFO -->
             
