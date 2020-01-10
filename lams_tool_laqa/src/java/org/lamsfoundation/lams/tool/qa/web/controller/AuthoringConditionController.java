@@ -62,7 +62,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/authoringConditions")
-public class QaAuthoringConditionController {
+public class AuthoringConditionController {
 
     @Autowired
     private IQaService qaService;
@@ -185,7 +185,7 @@ public class QaAuthoringConditionController {
 	    conditionSet.clear();
 	    conditionSet.addAll(conditionList);
 	    // add to delList
-	    List deletedList = QaAuthoringConditionController.getDeletedQaConditionList(sessionMap);
+	    List deletedList = AuthoringConditionController.getDeletedQaConditionList(sessionMap);
 	    deletedList.add(condition);
 	}
 

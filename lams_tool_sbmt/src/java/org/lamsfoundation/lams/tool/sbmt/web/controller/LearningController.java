@@ -80,8 +80,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequestMapping("/learning")
-public class LearnerController implements SbmtConstants {
-    public static Logger logger = Logger.getLogger(LearnerController.class);
+public class LearningController implements SbmtConstants {
+    public static Logger logger = Logger.getLogger(LearningController.class);
 
     @Autowired
     private ISubmitFilesService submitFilesService;

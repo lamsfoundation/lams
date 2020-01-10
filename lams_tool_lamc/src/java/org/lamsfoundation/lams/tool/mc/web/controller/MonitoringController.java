@@ -85,9 +85,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/monitoring")
-public class McMonitoringController {
+public class MonitoringController {
 
-    private static Logger logger = Logger.getLogger(McMonitoringController.class.getName());
+    private static Logger logger = Logger.getLogger(MonitoringController.class.getName());
 
     @Autowired
     private IMcService mcService;

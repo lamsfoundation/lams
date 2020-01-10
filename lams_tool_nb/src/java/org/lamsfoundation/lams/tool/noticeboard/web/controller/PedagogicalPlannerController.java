@@ -39,8 +39,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/pedagogicalPlanner")
-public class NbPedagogicalPlannerController {
-    private static Logger logger = Logger.getLogger(NbPedagogicalPlannerController.class);
+public class PedagogicalPlannerController {
+    private static Logger logger = Logger.getLogger(PedagogicalPlannerController.class);
 
     @Autowired
     private INoticeboardService nbService;

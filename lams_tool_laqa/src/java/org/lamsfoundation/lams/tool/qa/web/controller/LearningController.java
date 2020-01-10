@@ -88,7 +88,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/learning")
-public class QaLearningController implements QaAppConstants {
+public class LearningController implements QaAppConstants {
+
     @Autowired
     private IQaService qaService;
 
@@ -258,7 +259,7 @@ public class QaLearningController implements QaAppConstants {
 	     * and display under the "my answers" section the answers for the user id in the url
 	     */
 
-	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
+	    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -291,7 +292,7 @@ public class QaLearningController implements QaAppConstants {
 		     * session's entries
 		     */
 		    
-		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
 			    user, generalLearnerFlowDTO);
 
 		    generalLearnerFlowDTO.setIsLearnerFinished(user.isLearnerFinished());
@@ -335,7 +336,7 @@ public class QaLearningController implements QaAppConstants {
 		     * session's entries
 		     */
 
-		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
 			    user, generalLearnerFlowDTO);
 
 		    generalLearnerFlowDTO.setIsLearnerFinished(user.isLearnerFinished());
@@ -427,7 +428,7 @@ public class QaLearningController implements QaAppConstants {
 	    errorMap = (MultiValueMap<String, String>) results[1];
 
 	    mapAnswersPresentable = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
-	    mapAnswersPresentable = QaLearningController.removeNewLinesMap(mapAnswersPresentable);
+	    mapAnswersPresentable = LearningController.removeNewLinesMap(mapAnswersPresentable);
 	}
 
 	//finalize response so user won't need to edit his answers again, if coming back to the activity after leaving activity at this point
@@ -594,7 +595,7 @@ public class QaLearningController implements QaAppConstants {
 	    generalLearnerFlowDTO.setSessionMapID(sessionMapID);
 
 	    /** Set up the data for the view all answers screen */
-	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
+	    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		    generalLearnerFlowDTO);
 
 	    generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
@@ -666,7 +667,7 @@ public class QaLearningController implements QaAppConstants {
 
 	/* recreate the users and responses */
 
-	QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
+	LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());

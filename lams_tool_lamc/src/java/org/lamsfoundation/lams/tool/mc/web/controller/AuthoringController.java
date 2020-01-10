@@ -75,9 +75,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/authoring")
-public class McController {
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(McController.class.getName());
+    private static Logger logger = Logger.getLogger(AuthoringController.class.getName());
 
     @Autowired
     private IMcService mcService;
@@ -188,7 +188,7 @@ public class McController {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("questions.none.submitted"));
 	    request.setAttribute("errorMap", errorMap);
-	    McController.logger.debug("errors saved: " + errorMap);
+	    AuthoringController.logger.debug("errors saved: " + errorMap);
 	    return "authoring/AuthoringTabsHolder";
 	}
 
@@ -354,8 +354,8 @@ public class McController {
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	questionDTOs = McController.swapQuestions(questionDTOs, questionIndex, "down");
-	questionDTOs = McController.reorderQuestionDtos(questionDTOs);
+	questionDTOs = AuthoringController.swapQuestions(questionDTOs, questionIndex, "down");
+	questionDTOs = AuthoringController.reorderQuestionDtos(questionDTOs);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
 	return "authoring/itemlist";
@@ -373,8 +373,8 @@ public class McController {
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.QUESTION_DTOS);
-	questionDTOs = McController.swapQuestions(questionDTOs, questionIndex, "up");
-	questionDTOs = McController.reorderQuestionDtos(questionDTOs);
+	questionDTOs = AuthoringController.swapQuestions(questionDTOs, questionIndex, "up");
+	questionDTOs = AuthoringController.reorderQuestionDtos(questionDTOs);
 	sessionMap.put(McAppConstants.QUESTION_DTOS, questionDTOs);
 
 	return "authoring/itemlist";
@@ -546,7 +546,7 @@ public class McController {
 
 	String mark = request.getParameter("mark");
 
-	List<McOptionDTO> options = McController.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> options = AuthoringController.repopulateOptionDTOs(request, false);
 
 	//remove blank options
 	List<McOptionDTO> optionsWithoutEmptyOnes = new LinkedList<>();
@@ -638,12 +638,12 @@ public class McController {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = AuthoringController.repopulateOptionDTOs(request, false);
 
 	//moveAddedCandidateUp
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 	List<McOptionDTO> listCandidates = new LinkedList<>();
-	listCandidates = McController.swapOptions(optionDtos, candidateIndex, "up");
+	listCandidates = AuthoringController.swapOptions(optionDtos, candidateIndex, "up");
 	questionDto.setOptionDtos(listCandidates);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
@@ -660,12 +660,12 @@ public class McController {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = AuthoringController.repopulateOptionDTOs(request, false);
 
 	//moveAddedCandidateDown
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 	List<McOptionDTO> swapedOptions = new LinkedList<>();
-	swapedOptions = McController.swapOptions(optionDtos, candidateIndex, "down");
+	swapedOptions = AuthoringController.swapOptions(optionDtos, candidateIndex, "down");
 	questionDto.setOptionDtos(swapedOptions);
 	sessionMap.put(McAppConstants.QUESTION_DTO, questionDto);
 
@@ -732,7 +732,7 @@ public class McController {
 	// removeAddedCandidate
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);
 
-	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = AuthoringController.repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<>();
 	int caIndex = 0;
 	for (McOptionDTO mcOptionDTO : optionDtos) {
@@ -760,7 +760,7 @@ public class McController {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = McController.repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = AuthoringController.repopulateOptionDTOs(request, true);
 
 	//newAddedCandidateBox
 	McQuestionDTO questionDto = (McQuestionDTO) sessionMap.get(McAppConstants.QUESTION_DTO);

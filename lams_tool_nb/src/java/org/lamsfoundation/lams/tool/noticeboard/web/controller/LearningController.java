@@ -58,7 +58,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * Creation Date: 27-06-05
@@ -75,9 +74,9 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @RequestMapping("/learning")
-public class NbLearnerController {
+public class LearningController {
 
-    static Logger logger = Logger.getLogger(NbLearnerController.class.getName());
+    static Logger logger = Logger.getLogger(LearningController.class.getName());
 
     @Autowired
     private INoticeboardService nbService;
@@ -85,9 +84,6 @@ public class NbLearnerController {
     @Autowired
     @Qualifier("nbMessageService")
     private MessageService messageService;
-
-    @Autowired
-    private WebApplicationContext applicationContext;
 
     private UserDTO getUserDTO(HttpServletRequest request) {
 	// set up the user details

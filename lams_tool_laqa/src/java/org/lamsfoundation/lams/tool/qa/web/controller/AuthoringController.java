@@ -85,8 +85,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/authoring")
-public class QaAuthoringController implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaAuthoringController.class.getName());
+public class AuthoringController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(AuthoringController.class.getName());
 
     @Autowired
     private IQaService qaService;
@@ -167,7 +167,7 @@ public class QaAuthoringController implements QaAppConstants {
 		}
 	    }
 	}
-	SortedSet<QaCondition> conditionList = QaAuthoringConditionController.getConditions(sessionMap);
+	SortedSet<QaCondition> conditionList = AuthoringConditionController.getConditions(sessionMap);
 	conditionList.clear();
 	conditionList.addAll(qa.getConditions());
 
@@ -259,7 +259,7 @@ public class QaAuthoringController implements QaAppConstants {
 	qaPO.setQaQueContents(items);
 
 	// ************************* Handle Q&A conditions *******************
-	SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
+	SortedSet<QaCondition> conditions = AuthoringConditionController.getConditions(sessionMap);
 	for (QaCondition condition : conditions) {
 	    condition.setQuestions(new TreeSet<>(new QaQuestionComparator()));
 	    for (QaQueContent qaQuestion : condition.temporaryQaQuestions) {
@@ -298,7 +298,7 @@ public class QaAuthoringController implements QaAppConstants {
 	}
 
 	// delete conditions from database
-	List<QaCondition> delConditionList = QaAuthoringConditionController.getDeletedQaConditionList(sessionMap);
+	List<QaCondition> delConditionList = AuthoringConditionController.getDeletedQaConditionList(sessionMap);
 	Iterator<QaCondition> delIter = delConditionList.iterator();
 	while (delIter.hasNext()) {
 	    QaCondition condition = delIter.next();
@@ -521,7 +521,7 @@ public class QaAuthoringController implements QaAppConstants {
 	    delList.add(questionToDelete);
 
 	    //take care about conditions
-	    SortedSet<QaCondition> conditions = QaAuthoringConditionController.getConditions(sessionMap);
+	    SortedSet<QaCondition> conditions = AuthoringConditionController.getConditions(sessionMap);
 	    Iterator<QaCondition> conditionIter = conditions.iterator();
 	    while (conditionIter.hasNext()) {
 		QaCondition condition = conditionIter.next();

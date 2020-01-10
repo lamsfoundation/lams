@@ -184,11 +184,15 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    // make a flat set of roles from all subcourses
 		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
 			    .collect(HashSet::new, Set::addAll, Set::addAll);
-		    if (!isStaffMode) {
+		    if (isStaffMode) {
+			// check if the user is learner in any course
+			roles.remove(Role.ROLE_MONITOR);
+			roles.remove(Role.ROLE_AUTHOR);
+		    } else {
 			// check if the user is staff in any course
 			roles.remove(Role.ROLE_LEARNER);
 		    }
-		    if (isStaffMode || roles.isEmpty()) {
+		    if (roles.isEmpty()) {
 			// he is only a learner or this is staff mode, so disable
 			userManagementService.disableUser(user.getUserId());
 
@@ -373,6 +377,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Iterator<User> subcourseLearnerIterator = subcourseLearners.iterator();
 		while (subcourseLearnerIterator.hasNext()) {
 		    if (userId.equals(subcourseLearnerIterator.next().getUserId())) {
+			// IMPORTANT: if we found a matching existing learner, we get remove him from this collection
+			// so after this loop he does not get removed from subcourses
 			subcourseLearnerIterator.remove();
 			userAlreadyLearner = true;
 			break;
@@ -430,76 +436,116 @@ public class SPEnrolmentServlet extends HttpServlet {
     private Set<User> assignTeachers(Organisation course, List<String> logins, ExtServer extServer, Integer creatorId,
 	    Set<User> allUsersParsed, Map<String, Integer> userIDs,
 	    Map<String, Map<Integer, Set<Integer>>> existingRoles) throws UserInfoValidationException {
-	Set<User> allUsersInCourses = new HashSet<>();
+	// this is for detecting which users should be disabled
+	Set<User> allUsersInCourse = new HashSet<>();
+
 	Integer courseId = course.getOrganisationId();
 
 	// get existing teachers for given course
 	Collection<User> courseTeachers = userManagementService.getUsersFromOrganisationByRole(courseId, Role.MONITOR,
 		true);
-	// add users to set containing all users in any subcourse which is processed
-	allUsersInCourses.addAll(courseTeachers);
+	// add users to set containing all users in any course which is processed
+	allUsersInCourse.addAll(courseTeachers);
 
 	// go through each user
 	for (String login : logins) {
-	    // check if the user is already a teacher in the subcourse
-	    // if so, there is nothing to do
+	    // check if user is alread a teacher in this course
 	    boolean userAlreadyStaff = false;
 	    Integer userId = userIDs.get(login);
+	    User user = null;
 	    Iterator<User> subcourseLearnerIterator = courseTeachers.iterator();
 	    while (subcourseLearnerIterator.hasNext()) {
-		if (userId.equals(subcourseLearnerIterator.next().getUserId())) {
+		User nextUser = subcourseLearnerIterator.next();
+		if (userId.equals(nextUser.getUserId())) {
+		    user = nextUser;
+		    // IMPORTANT: if we found a matching existing teacher, we get remove him from this collection
+		    // so after this loop he does not get removed from the course
 		    subcourseLearnerIterator.remove();
 		    userAlreadyStaff = true;
 		    break;
 		}
 	    }
-	    if (userAlreadyStaff) {
-		continue;
+
+	    // if user is not a teacher, add him
+	    if (!userAlreadyStaff) {
+		// the user is not a teacher in course yet, so assign him roles
+		Set<Integer> existingCourseRoles = existingRoles.get(login).get(courseId);
+		if (existingCourseRoles == null) {
+		    existingCourseRoles = new HashSet<>();
+		}
+		// we modify existing role collection, as he can be also a course admin and/or learner
+		existingCourseRoles.add(Role.ROLE_AUTHOR);
+		existingCourseRoles.add(Role.ROLE_MONITOR);
+		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
+
+		String message = "Teacher \"" + login + "\" added to course " + courseId;
+		logger.info(message);
+		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+			"SPEnrolment: " + message);
 	    }
 
-	    // the user is not a teacher yet, so assign him roles and add him to lessons
-	    Set<Integer> existingCourseRoles = existingRoles.get(login).get(courseId);
-	    if (existingCourseRoles == null) {
-		existingCourseRoles = new HashSet<>();
-	    }
-	    existingCourseRoles.add(Role.ROLE_LEARNER);
-	    existingCourseRoles.add(Role.ROLE_AUTHOR);
-	    existingCourseRoles.add(Role.ROLE_MONITOR);
-	    userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
+	    // now go through each subcourse and make sure the user is also a teacher there and in its lessons
+	    for (Organisation subcourse : course.getChildOrganisations()) {
+		if (user == null) {
+		    user = (User) userManagementService.findById(User.class, userId);
+		}
+		Integer subcourseId = subcourse.getOrganisationId();
+		Set<Integer> existingSubcourseRoles = userManagementService.getUserOrganisationRoles(subcourseId, login)
+			.stream().collect(Collectors.mapping(r -> r.getRole().getRoleId(), Collectors.toSet()));
+		userAlreadyStaff = existingSubcourseRoles.contains(Role.ROLE_MONITOR);
+		if (!userAlreadyStaff) {
+		    // we modify existing role collection, as he can be also a learner
+		    existingSubcourseRoles.add(Role.ROLE_AUTHOR);
+		    existingSubcourseRoles.add(Role.ROLE_MONITOR);
+		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, existingSubcourseRoles);
 
-	    for (Lesson lesson : lessonService.getLessonsByGroup(courseId)) {
-		lessonService.addStaffMember(lesson.getLessonId(), userId);
+		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
+			lessonService.addStaffMember(lesson.getLessonId(), userId);
+		    }
+
+		    String message = "Teacher \"" + login + "\" added to subcourse " + subcourseId + " and its lessons";
+		    logger.info(message);
+		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+			    "SPEnrolment: " + message);
+		}
+	    }
+	}
+
+	// user is a staff member, but he should not; remove all roles from course and lessons
+	for (User user : courseTeachers) {
+	    Map<Integer, Set<Integer>> existingCoursesRoles = existingRoles.get(user.getLogin());
+	    Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null : existingCoursesRoles.get(courseId);
+	    if (existingCourseRoles != null) {
+		Integer userId = user.getUserId();
+
+		existingCourseRoles.remove(Role.ROLE_AUTHOR);
+		existingCourseRoles.remove(Role.ROLE_MONITOR);
+		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
+
+		for (Organisation subcourse : course.getChildOrganisations()) {
+		    boolean isLearner = userManagementService.hasRoleInOrganisation(user, Role.ROLE_MONITOR, subcourse);
+		    Integer subcourseId = subcourse.getOrganisationId();
+		    Set<Integer> subcourseRoles = new HashSet<>();
+		    if (isLearner) {
+			// there are no course admins in subcourses, so either user looses all roles or he stays just a learner
+			subcourseRoles.add(Role.ROLE_LEARNER);
+		    }
+		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, subcourseRoles);
+
+		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
+			lessonService.addStaffMember(lesson.getLessonId(), userId);
+		    }
+		}
 	    }
 
-	    String message = "Teacher \"" + login + "\" added to course " + courseId + " and its lessons";
+	    String message = "Teacher \"" + user.getLogin() + "\" removed from course " + courseId
+		    + ", its subcourses and its lessons";
 	    logger.info(message);
 	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 		    "SPEnrolment: " + message);
 	}
 
-	// user is a staff member, but he should not; remove learner role from course and lessons
-	for (User user : courseTeachers) {
-	    Map<Integer, Set<Integer>> existingCoursesRoles = existingRoles.get(user.getLogin());
-	    Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null : existingCoursesRoles.get(courseId);
-	    if (existingCourseRoles != null) {
-		existingCourseRoles.remove(Role.ROLE_LEARNER);
-		existingCourseRoles.remove(Role.ROLE_AUTHOR);
-		existingCourseRoles.remove(Role.ROLE_MONITOR);
-		userManagementService.setRolesForUserOrganisation(user.getUserId(), courseId, existingCourseRoles);
-
-		for (Lesson lesson : lessonService.getLessonsByGroup(courseId)) {
-		    lessonService.removeStaffMember(lesson.getLessonId(), user.getUserId());
-		}
-
-		String message = "Teacher \"" + user.getLogin() + "\" removed from course " + courseId
-			+ " and its lessons";
-		logger.info(message);
-		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-			"SPEnrolment: " + message);
-	    }
-	}
-
-	return allUsersInCourses;
+	return allUsersInCourse;
     }
 
     @Override
