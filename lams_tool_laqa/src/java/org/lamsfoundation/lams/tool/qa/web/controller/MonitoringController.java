@@ -77,8 +77,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/monitoring")
-public class QaMonitoringController implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaMonitoringController.class.getName());
+public class MonitoringController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(MonitoringController.class.getName());
 
     @Autowired
     private IQaService qaService;

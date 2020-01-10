@@ -78,8 +78,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/authoring")
-public class QaAuthoringController implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaAuthoringController.class.getName());
+public class AuthoringController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(AuthoringController.class.getName());
 
     @Autowired
     private IQaService qaService;
@@ -263,11 +263,11 @@ public class QaAuthoringController implements QaAppConstants {
 	try {
 	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    if (defaultContentID == 0) {
-		QaAuthoringController.logger.debug("default content id has not been setup");
+		AuthoringController.logger.debug("default content id has not been setup");
 		return false;
 	    }
 	} catch (Exception e) {
-	    QaAuthoringController.logger.error("error getting the default content id: " + e.getMessage());
+	    AuthoringController.logger.error("error getting the default content id: " + e.getMessage());
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -279,13 +279,13 @@ public class QaAuthoringController implements QaAppConstants {
 	    //retrieve uid of the content based on default content id determined above
 	    QaContent qaContent = qaService.getQaContent(defaultContentID);
 	    if (qaContent == null) {
-		QaAuthoringController.logger.error("Exception occured: No default content");
+		AuthoringController.logger.error("Exception occured: No default content");
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
 
 	} catch (Exception e) {
-	    QaAuthoringController.logger.error("Exception occured: No default question content");
+	    AuthoringController.logger.error("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -349,7 +349,7 @@ public class QaAuthoringController implements QaAppConstants {
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
-	    QaAuthoringController.logger.debug("errors saved: " + errorMap);
+	    AuthoringController.logger.debug("errors saved: " + errorMap);
 	}
 
 	QaContent qaContent = qaService.getQaContent(toolContentID);
@@ -983,9 +983,9 @@ public class QaAuthoringController implements QaAppConstants {
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
 
-	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
+	questionDTOs = AuthoringController.swapQuestions(questionDTOs, questionIndex, "down", conditionSet);
 
-	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = AuthoringController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -1036,9 +1036,9 @@ public class QaAuthoringController implements QaAppConstants {
 
 	SortedSet<QaCondition> conditionSet = (SortedSet<QaCondition>) sessionMap
 		.get(QaAppConstants.ATTR_CONDITION_SET);
-	questionDTOs = QaAuthoringController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
+	questionDTOs = AuthoringController.swapQuestions(questionDTOs, questionIndex, "up", conditionSet);
 
-	questionDTOs = QaAuthoringController.reorderQuestionDTOs(questionDTOs);
+	questionDTOs = AuthoringController.reorderQuestionDTOs(questionDTOs);
 
 	sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
@@ -1088,10 +1088,10 @@ public class QaAuthoringController implements QaAppConstants {
 	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	QaQuestionDTO mainQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
+	QaQuestionDTO mainQuestion = AuthoringController.getQuestionAtDisplayOrder(questionDTOs,
 		intOriginalQuestionIndex);
 
-	QaQuestionDTO replacedQuestion = QaAuthoringController.getQuestionAtDisplayOrder(questionDTOs,
+	QaQuestionDTO replacedQuestion = AuthoringController.getQuestionAtDisplayOrder(questionDTOs,
 		replacedQuestionIndex);
 
 	List<QaQuestionDTO> newQuestionDtos = new LinkedList<>();

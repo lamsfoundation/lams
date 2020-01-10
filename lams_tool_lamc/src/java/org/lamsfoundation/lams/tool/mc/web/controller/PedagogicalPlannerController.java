@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/pedagogicalPlanner")
-public class McPedagogicalPlannerController {
+public class PedagogicalPlannerController {
 
     @Autowired
     private IMcService mcService;

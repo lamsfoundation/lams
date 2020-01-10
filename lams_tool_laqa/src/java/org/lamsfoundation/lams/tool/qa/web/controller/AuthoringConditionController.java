@@ -62,7 +62,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/authoringConditions")
-public class QaAuthoringConditionController {
+public class AuthoringConditionController {
 
     @Autowired
     private IQaService qaService;

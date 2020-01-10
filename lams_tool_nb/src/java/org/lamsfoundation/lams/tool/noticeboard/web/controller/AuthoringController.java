@@ -57,9 +57,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping("/authoring")
-public class NbAuthoringController {
+public class AuthoringController {
 
-    private static Logger logger = Logger.getLogger(NbAuthoringController.class.getName());
+    private static Logger logger = Logger.getLogger(AuthoringController.class.getName());
     public final static String FORM = "NbAuthoringForm";
 
     @Autowired

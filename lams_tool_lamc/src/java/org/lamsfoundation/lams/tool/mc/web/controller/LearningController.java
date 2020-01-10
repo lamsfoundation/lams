@@ -80,9 +80,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/learning")
-public class McLearningController {
+public class LearningController {
 
-    private static Logger logger = Logger.getLogger(McLearningController.class.getName());
+    private static Logger logger = Logger.getLogger(LearningController.class.getName());
 
     @Autowired
     private IMcService mcService;
@@ -306,13 +306,13 @@ public class McLearningController {
 	try {
 	    nextUrl = mcService.leaveToolSession(new Long(toolSessionID), userDto.getUserID().longValue());
 	} catch (DataMissingException e) {
-	    McLearningController.logger.error("failure getting nextUrl: " + e);
+	    LearningController.logger.error("failure getting nextUrl: " + e);
 	    return "learning/AnswersContent";
 	} catch (ToolException e) {
-	    McLearningController.logger.error("failure getting nextUrl: " + e);
+	    LearningController.logger.error("failure getting nextUrl: " + e);
 	    return "learning/AnswersContent";
 	} catch (Exception e) {
-	    McLearningController.logger.error("unknown exception getting nextUrl: " + e);
+	    LearningController.logger.error("unknown exception getting nextUrl: " + e);
 	    return "learning/AnswersContent";
 	}
 
@@ -391,7 +391,7 @@ public class McLearningController {
 	String toolContentId = session.getMcContent().getMcContentId().toString();
 	McContent content = mcService.getMcContent(new Long(toolContentId));
 
-	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
+	List<String> answers = LearningController.parseLearnerAnswers(mcLearningForm, request,
 		content.isQuestionsSequenced());
 
 	Map<String, Integer> learnerConfidenceLevels = null;
@@ -471,7 +471,7 @@ public class McLearningController {
 	}
 
 	//parse learner input
-	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
+	List<String> answers = LearningController.parseLearnerAnswers(mcLearningForm, request,
 		mcContent.isQuestionsSequenced());
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 
@@ -793,7 +793,7 @@ public class McLearningController {
 	    return null;
 	}
 
-	List<String> answers = McLearningController.parseLearnerAnswers(mcLearningForm, request,
+	List<String> answers = LearningController.parseLearnerAnswers(mcLearningForm, request,
 		mcContent.isQuestionsSequenced());
 	Map<String, Integer> learnerConfidenceLevels = null;
 	if (mcContent.isEnableConfidenceLevels()) {

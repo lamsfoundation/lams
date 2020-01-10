@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/pedagogicalPlanner")
-public class QaPedagogicalPlannerController {
+public class PedagogicalPlannerController {
 
     @Autowired
     private IQaService qaService;

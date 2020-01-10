@@ -93,8 +93,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 @Controller
 @RequestMapping("/learning")
-public class QaLearningController implements QaAppConstants {
-    private static Logger logger = Logger.getLogger(QaLearningController.class.getName());
+public class LearningController implements QaAppConstants {
+    private static Logger logger = Logger.getLogger(LearningController.class.getName());
 
     @Autowired
     private IQaService qaService;
@@ -108,7 +108,7 @@ public class QaLearningController implements QaAppConstants {
 
     @RequestMapping("/")
     public String unspecified() throws IOException, ServletException, ToolException {
-	QaLearningController.logger.warn("dispatching unspecified...");
+	LearningController.logger.warn("dispatching unspecified...");
 	return null;
     }
 
@@ -296,7 +296,7 @@ public class QaLearningController implements QaAppConstants {
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 
-	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
+	    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -330,7 +330,7 @@ public class QaLearningController implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
 			    user, generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
@@ -381,7 +381,7 @@ public class QaLearningController implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
 			    user, generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
@@ -517,7 +517,7 @@ public class QaLearningController implements QaAppConstants {
 	    errorMap = (MultiValueMap<String, String>) results[1];
 
 	    mapAnswersPresentable = (Map) sessionMap.get(QaAppConstants.MAP_ALL_RESULTS_KEY);
-	    mapAnswersPresentable = QaLearningController.removeNewLinesMap(mapAnswersPresentable);
+	    mapAnswersPresentable = LearningController.removeNewLinesMap(mapAnswersPresentable);
 	}
 
 	//finalize response so user won't need to edit his answers again, if coming back to the activity after leaving activity at this point
@@ -692,7 +692,7 @@ public class QaLearningController implements QaAppConstants {
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 
 	    /** Set up the data for the view all answers screen */
-	    QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
+	    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
 		    generalLearnerFlowDTO);
 
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -771,7 +771,7 @@ public class QaLearningController implements QaAppConstants {
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
-	QaLearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
+	LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, httpSessionID, user,
 		generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
