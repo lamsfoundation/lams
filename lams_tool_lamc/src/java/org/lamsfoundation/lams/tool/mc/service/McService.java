@@ -1057,17 +1057,18 @@ public class McService
 	    cell.setCellValue(rowCount);
 	    rowCount++;
 
-	    int totalPercentage = 0;
+	    Double totalPercentage = 0d;
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
 		int optionAttemptCount = getAttemptsCountPerOption(option.getUid(), question.getUid());
 		cell = row.createCell(count++);
-		int percentage = optionAttemptCount / totalNumberOfUsers;
+		Double percentage = (totalNumberOfUsers != 0) ? (double) optionAttemptCount / totalNumberOfUsers : 0d;
 		cell.setCellValue(percentage);
-		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
-		totalPercentage += percentage;
 		if (option.isCorrect()) {
 		    cell.setCellStyle(greenColor);
 		}
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+		
+		totalPercentage += percentage;
 	    }
 	    cell = row.createCell(maxOptionsInQuestion + 1);
 	    cell.setCellValue((1 - totalPercentage));
@@ -1133,7 +1134,7 @@ public class McService
 	cell = row.createCell(count++);
 	cell.setCellValue(messageService.getMessage("label.learner"));
 
-	ArrayList<Integer> totalPercentList = new ArrayList<>();
+	ArrayList<Double> totalPercentList = new ArrayList<>();
 	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
@@ -1163,7 +1164,7 @@ public class McService
 		cell = row.createCell(count++);
 		cell.setCellValue(new Long(userMark.getTotalMark()));
 
-		int totalPercents = numberOfCorrectlyAnsweredByUser / questions.size();
+		Double totalPercents = questions.size() != 0 ? (double) numberOfCorrectlyAnsweredByUser / questions.size() : 0d;
 		totalPercentList.add(totalPercents);
 		cell = row.createCell(count++);
 		cell.setCellValue(totalPercents);
@@ -1180,14 +1181,15 @@ public class McService
 	cell.setCellValue(messageService.getMessage("label.ave"));
 	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
 	    cell = row.createCell(count++);
-	    cell.setCellValue(numberOfCorrectAnswers / totalPercentList.size());
+	    Double average = totalPercentList.size() == 0 ? 0d : (double) numberOfCorrectAnswers / totalPercentList.size();
+	    cell.setCellValue(average);
 	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
 
 	// class mean
-	Integer[] totalPercents = totalPercentList.toArray(new Integer[0]);
+	Double[] totalPercents = totalPercentList.toArray(new Double[0]);
 	Arrays.sort(totalPercents);
-	int sum = 0;
+	Double sum = 0d;
 	for (int i = 0; i < totalPercents.length; i++) {
 	    sum += totalPercents[i];
 	}
@@ -1195,7 +1197,7 @@ public class McService
 	cell = row.createCell(1);
 	cell.setCellValue(messageService.getMessage("label.class.mean"));
 	if (totalPercents.length != 0) {
-	    int classMean = sum / totalPercents.length;
+	    Double classMean = totalPercents.length == 0 ? 0d : sum / totalPercents.length;
 	    cell = row.createCell(questions.size() + 3);
 	    cell.setCellValue(classMean);
 	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
@@ -1206,12 +1208,12 @@ public class McService
 	cell = row.createCell(1);
 	cell.setCellValue(messageService.getMessage("label.median"));
 	if (totalPercents.length != 0) {
-	    int median;
+	    Double median;
 	    int middle = totalPercents.length / 2;
 	    if ((totalPercents.length % 2) == 1) {
 		median = totalPercents[middle];
 	    } else {
-		median = (int) ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
+		median = ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
 	    }
 	    cell = row.createCell(questions.size() + 3);
 	    cell.setCellValue(median);
@@ -1296,14 +1298,12 @@ public class McService
 	    }
 
 	    rowCount++;
-
 	}
 
 	ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	wb.write(bos);
 
 	byte[] data = bos.toByteArray();
-
 	return data;
     }
 
@@ -1311,8 +1311,7 @@ public class McService
     public void copyToolContent(Long fromContentId, Long toContentId) {
 	if (fromContentId == null) {
 	    logger.warn("fromContentId is null.");
-	    long defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
-	    fromContentId = new Long(defaultContentId);
+	    fromContentId = getToolDefaultContentIdBySignature(McAppConstants.TOOL_SIGNATURE);
 	}
 
 	if (toContentId == null) {

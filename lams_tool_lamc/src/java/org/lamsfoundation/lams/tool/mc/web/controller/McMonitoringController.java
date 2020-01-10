@@ -268,11 +268,9 @@ public class McMonitoringController {
     @RequestMapping(path = "/downloadMarks", method = RequestMethod.POST)
     public String downloadMarks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
-
-	McContent mcContent = mcService.getMcContent(new Long(toolContentID));
+	McContent mcContent = mcService.getMcContent(toolContentID);
 
 	byte[] spreadsheet = null;
-
 	try {
 	    spreadsheet = mcService.prepareSessionDataSpreadsheet(mcContent);
 	} catch (Exception e) {
