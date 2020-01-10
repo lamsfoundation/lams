@@ -89,7 +89,7 @@ CREATE TABLE lams_qb_tool_answer (`answer_uid` BIGINT AUTO_INCREMENT,
             
 -- default value for a concat result is 1024 characters, which can be too little for multiple concatenated answers
 -- we choose a value big enough to accept anything
-SET group_concat_max_len = 1000000;
+SET group_concat_max_len = 10000000;
 
 
 -- MULTIPLE CHOICE (MCQ)
