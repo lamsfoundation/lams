@@ -2,6 +2,7 @@ CREATE FUNCTION `strip_tags`($str MEDIUMTEXT, $leaveMeaningfulTags BOOLEAN) RETU
 BEGIN
     DECLARE $start, $end INT DEFAULT 1;
     DECLARE $tag CHAR(3);
+    IF ($str IS NULL) THEN RETURN NULL; END IF;
     main: LOOP
         SET $start = LOCATE("<", $str, $start);
         IF (NOT $start) THEN RETURN $str; END IF;
