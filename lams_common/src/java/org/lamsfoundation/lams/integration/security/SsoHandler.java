@@ -101,10 +101,9 @@ public class SsoHandler implements ServletExtension {
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
 		/*
-		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
+		 * Fetch UserDTO before completing request, so putting it later in session is done ASAP
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
-		 * redirect,
-		 * it results in error. Winning this race is the easiest option.
+		 * redirect, it results in error. Winning this race is the easiest option.
 		 */
 
 		String login = request.getParameter("j_username");
@@ -132,10 +131,14 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.handleRedirectBack(context, redirectURL);
 		}
 
+		//bypass 2FA if using Login-as
+		boolean isUsingLoginAsFeature = password.startsWith("#LAMS")
+			&& StringUtils.equals(redirectURL, "/lams/index.jsp");
+
 		// if user is not yet authorized and has 2FA shared secret set up - redirect him to
 		// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
 		if (request.getRemoteUser() == null && user.isTwoFactorAuthenticationEnabled()
-			&& user.getTwoFactorAuthenticationSecret() != null) {
+			&& user.getTwoFactorAuthenticationSecret() != null && !isUsingLoginAsFeature) {
 		    String verificationCodeStr = request.getParameter("verificationCode");
 		    int verificationCode = NumberUtils.toInt(verificationCodeStr);
 		    GoogleAuthenticator gAuth = new GoogleAuthenticator();
