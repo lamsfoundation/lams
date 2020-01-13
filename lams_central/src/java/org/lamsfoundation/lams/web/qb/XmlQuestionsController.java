@@ -7,6 +7,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -76,14 +79,49 @@ public class XmlQuestionsController {
 	    if (!fileExtension.equalsIgnoreCase("xml")) {
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
-	    
+
 	    // import learning design
 	    String fullFilePath = destinationFile.getAbsolutePath();
 	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
 	    // FileUtil.getFullPath(learningDesignPath, ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    List<QbQuestion> questions = (List<QbQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
 	    if (questions != null) {
+		Set<UUID> collectionUUIDs = null;
+
 		for (QbQuestion qbQuestion : questions) {
+		    UUID uuid = qbQuestion.getUuid();
+		    // try to match the question to an existing QB question in DB
+		    if (uuid != null) {
+			QbQuestion existingQuestion = qbService.getQuestionByUUID(uuid);
+			if (existingQuestion != null) {
+			    // found an existing question with same UUID
+			    // now check if it is in the collection already
+			    if (collectionUUIDs == null) {
+				// get UUIDs of collection questions
+				collectionUUIDs = qbService.getCollectionQuestions(collectionUid).stream()
+					.filter(q -> q.getUuid() != null)
+					.collect(Collectors.mapping(q -> q.getUuid(), Collectors.toSet()));
+			    }
+
+			    if (collectionUUIDs.contains(uuid)) {
+				if (log.isDebugEnabled()) {
+				    log.debug("Skipping an existing question. Name: " + existingQuestion.getName()
+					    + ", uid: " + existingQuestion.getUid());
+				}
+			    } else {
+				qbService.addQuestionToCollection(collectionUid, existingQuestion.getQuestionId(),
+					false);
+				collectionUUIDs.add(uuid);
+
+				if (log.isDebugEnabled()) {
+				    log.debug("Added to collection an existing question. Name: "
+					    + existingQuestion.getName() + ", uid: " + existingQuestion.getUid());
+				}
+			    }
+			    continue;
+			}
+		    }
+
 		    int questionId = qbService.generateNextQuestionId();
 		    qbQuestion.setQuestionId(questionId);
 		    qbQuestion.setCreateDate(new Date());
