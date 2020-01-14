@@ -1329,6 +1329,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	items.addAll(scratchie.getScratchieItems());
 	int numberOfItems = items.size();
 
+	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsByScratchieUid(scratchie.getUid());
+
 	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// ======================================================= For Immediate Analysis page
@@ -1586,11 +1588,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		GroupSummary allTeamSummary = itemSummary.get(0);
 		Collection<OptionDTO> optionDtos = allTeamSummary.getOptionDtos();
-
+	
 		row = researchAndAnalysisSheet.initRow();
 		row.addEmptyCell();
 		for (int i = 0; i < optionDtos.size(); i++) {
-		    row.addCell((long) i + 1, IndexedColors.YELLOW);
+		    row.addCell(Long.valueOf(i + 1), IndexedColors.YELLOW);
 		}
 
 		for (OptionDTO optionDto : optionDtos) {
@@ -1624,17 +1626,28 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(groupSummary.getSessionName(), true);
+		
+		int longestRowLength = 0;
+		if (isMcqItem) {
+		    longestRowLength = optionDtos.size();
+		} else {
+		    for (OptionDTO optionDto : optionDtos) {
+			if (longestRowLength < optionDto.getAttempts().length) {
+			    longestRowLength = optionDto.getAttempts().length;
+			}
+		    }
+		}
 
 		row = researchAndAnalysisSheet.initRow();
 		row.addEmptyCell();
-		for (int i = 0; i < optionDtos.size(); i++) {
+		for (int i = 0; i < longestRowLength; i++) {
 		    row.addCell(Integer.valueOf(i + 1));
 		}
 
 		for (OptionDTO optionDto : optionDtos) {
-
 		    row = researchAndAnalysisSheet.initRow();
-		    String optionTitle = removeHtmlMarkup(optionDto.getAnswer());
+		    String optionTitle = isMcqItem ? removeHtmlMarkup(optionDto.getAnswer())
+			    : optionDto.getAnswer().strip().replace("\r\n", ", ");
 		    if (optionDto.isCorrect()) {
 			optionTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
 		    }
@@ -1658,12 +1671,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
-
 	    ScratchieUser groupLeader = session.getGroupLeader();
 	    Long sessionId = session.getSessionId();
 
 	    if (groupLeader != null) {
-
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(groupLeader.getFirstName() + " " + groupLeader.getLastName(), true);
 		row.addCell(getMessage("label.attempts") + ":");
@@ -1676,21 +1687,27 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		row.addCell(getMessage("label.team.leader") + session.getSessionName());
 
 		for (ScratchieItem item : items) {
+		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
+		    
+		    //build list of all logs left for this item and this session 
+		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
+		    for (ScratchieAnswerVisitLog log : logs) {
+			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid().equals(item.getUid())) {
+			    logsBySessionAndItem.add(log);
+			}
+		    }
+		    
 		    row = researchAndAnalysisSheet.initRow();
 		    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getQbQuestion().getName() }),
 			    false);
 
 		    int i = 1;
-		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
-		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
-			    item.getUid());
-		    for (ScratchieAnswerVisitLog log : logs) {
+		    for (ScratchieAnswerVisitLog log : logsBySessionAndItem) {
 			row = researchAndAnalysisSheet.initRow();
 			row.addCell(Integer.valueOf(i++));
 			String answerDescr = isMcqItem ? log.getQbOption().getName() : log.getAnswer();
 			row.addCell(removeHtmlMarkup(answerDescr));
 			row.addCell(fullDateFormat.format(log.getAccessDate()));
-
 		    }
 		    researchAndAnalysisSheet.addEmptyRow();
 		}
@@ -1705,10 +1722,28 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	// Table header------------------------------------
 
-	int maxOptions = 0;
+	int maxLogCount = 0;
 	for (ScratchieItem item : items) {
-	    if (item.getOptionDtos().size() > maxOptions) {
-		maxOptions = item.getOptionDtos().size();
+	    //search for max value in options size
+	    if (item.getOptionDtos().size() > maxLogCount) {
+		maxLogCount = item.getOptionDtos().size();
+	    }
+	    
+	    //search for max value in logs length
+	    for (GroupSummary summary : summaryByTeam) {
+		Long sessionId = summary.getSessionId();
+
+		int logsBySessionAndItem = 0;
+		for (ScratchieAnswerVisitLog log : logs) {
+		    if (log.getSessionId().equals(sessionId)
+			    && log.getQbToolQuestion().getUid().equals(item.getUid())) {
+			logsBySessionAndItem++;
+		    }
+		}
+		
+		if (logsBySessionAndItem > maxLogCount) {
+		    maxLogCount = logsBySessionAndItem;
+		}
 	    }
 	}
 
@@ -1723,11 +1758,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	row.addCell(getMessage("label.number.of.attempts"), true);
 	row.addCell(getMessage("label.mark.awarded"), true);
 
-	for (int i = 0; i < maxOptions; i++) {
+	for (int i = 0; i < maxLogCount; i++) {
 	    row.addCell(getMessage("label." + (i + 1) + ".answer.selected"), true);
 	}
 	row.addCell(getMessage("label.date"), true);
-	for (int i = 0; i < maxOptions; i++) {
+	for (int i = 0; i < maxLogCount; i++) {
 	    row.addCell(getMessage("label.time.of.selection." + (i + 1)), true);
 	}
 
@@ -1740,6 +1775,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieUser user : users) {
 		int questionCount = 1;
 		for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 
 		    row = spssAnalysisSheet.initRow();
 		    // learner name
@@ -1759,7 +1795,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    for (OptionDTO option : options) {
 			if (option.isCorrect()) {
 			    correctOption = option.getAnswer();
-			    correctOption = removeHtmlMarkup(correctOption);
+			    correctOption = isMcqItem ? removeHtmlMarkup(correctOption)
+				    : correctOption.strip().replace("\r\n", ", ");
 			}
 		    }
 		    row.addCell(correctOption);
@@ -1781,42 +1818,39 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    Object mark = (itemDto.getUserMark() == -1) ? "" : Long.valueOf(itemDto.getUserMark());
 		    row.addCell(mark);
 
-		    // options selected
-		    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndItem(sessionId,
-			    itemDto.getUid());
-		    if (logs == null) {
-			logs = new ArrayList<>();
+		    //build list of all logs left for this item and this session 
+		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
+		    for (ScratchieAnswerVisitLog log : logs) {
+			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid().equals(itemDto.getUid())) {
+			    logsBySessionAndItem.add(log);
+			}
 		    }
 
-		    boolean isMcqItem = itemDto.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
-		    for (ScratchieAnswerVisitLog log : logs) {
+		    for (ScratchieAnswerVisitLog log : logsBySessionAndItem) {
 			String answer = removeHtmlMarkup(isMcqItem ? log.getQbOption().getName() : log.getAnswer());
 			row.addCell(answer);
 		    }
-		    for (int i = logs.size(); i < itemDto.getOptionDtos().size(); i++) {
-			row.addCell(getMessage("label.none"));
-		    }
-		    for (int i = options.size(); i < maxOptions; i++) {
-			row.addCell("");
+		    for (int i = logsBySessionAndItem.size(); i < maxLogCount; i++) {
+			row.addEmptyCell();
 		    }
 
 		    // Date
 		    String dateStr = "";
-		    if (logs.size() > 0) {
+		    if (logsBySessionAndItem.size() > 0) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
-			Date accessDate = logs.iterator().next().getAccessDate();
+			Date accessDate = logsBySessionAndItem.iterator().next().getAccessDate();
 			dateStr = dateFormat.format(accessDate);
 		    }
 		    row.addCell(dateStr);
 
 		    // time of selection
 		    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-		    for (ScratchieAnswerVisitLog log : logs) {
+		    for (ScratchieAnswerVisitLog log : logsBySessionAndItem) {
 			Date accessDate = log.getAccessDate();
 			String timeStr = timeFormat.format(accessDate);
 			row.addCell(timeStr);
 		    }
-		    for (int i = logs.size(); i < maxOptions; i++) {
+		    for (int i = logsBySessionAndItem.size(); i < maxLogCount; i++) {
 			row.addCell("");
 		    }
 		}
@@ -1980,7 +2014,17 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		itemDto.setUid(item.getUid());
 		itemDto.setTitle(qbQuestion.getName());
 		itemDto.setType(qbQuestion.getType());
-		itemDto.setOptionDtos(item.getOptionDtos());
+		List<OptionDTO> optionDtos = new LinkedList<>();
+		if (isMcqItem) {
+		    optionDtos = item.getOptionDtos();
+		} else {
+		    for (QbOption qbOption : qbQuestion.getQbOptions()) {
+			OptionDTO optionDTO = new OptionDTO(qbOption);
+			optionDTO.setMcqType(false);
+			optionDtos.add(optionDTO);
+		    }
+		}
+		itemDto.setOptionDtos(optionDtos);
 		itemDto.setUserAttempts(numberOfAttempts);
 		itemDto.setUserMark(mark);
 		itemDto.setUnraveledOnFirstAttempt(isUnraveledOnFirstAttempt);

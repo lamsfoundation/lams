@@ -29,16 +29,11 @@ import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements ScratchieAnswerVisitDAO {
-    private static final String FIND_BY_SESSION_AND_ITEM = "FROM " + ScratchieAnswerVisitLog.class.getName()
-	    + " AS r WHERE r.sessionId=? AND r.qbToolQuestion.uid = ?  ORDER BY r.accessDate ASC";
-
-    private static final String FIND_BY_SESSION = "FROM " + ScratchieAnswerVisitLog.class.getName()
-	    + " AS r WHERE r.sessionId=? ORDER BY r.accessDate ASC";
-
     private static final String FIND_COUNT_BY_SESSION = "SELECT COUNT(*) FROM "
 	    + ScratchieAnswerVisitLog.class.getName() + " AS r WHERE  r.sessionId=?";
     
@@ -88,16 +83,37 @@ public class ScratchieAnswerVisitDAOHibernate extends LAMSBaseDAO implements Scr
 	return ((Number) list.get(0)).intValue();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid) {
-	return (List<ScratchieAnswerVisitLog>) doFind(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
+	final String FIND_BY_SESSION_AND_ITEM = "FROM " + ScratchieAnswerVisitLog.class.getName()
+		+ " AS r WHERE r.sessionId=:sessionId AND r.qbToolQuestion.uid =:itemUid  ORDER BY r.accessDate ASC";
+
+	Query<ScratchieAnswerVisitLog> query = getSession().createQuery(FIND_BY_SESSION_AND_ITEM,
+		ScratchieAnswerVisitLog.class);
+	query.setParameter("sessionId", sessionId);
+	query.setParameter("itemUid", itemUid);
+	return query.list();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId) {
-	return (List<ScratchieAnswerVisitLog>) doFind(FIND_BY_SESSION, new Object[] { sessionId });
+	final String FIND_BY_SESSION = "FROM " + ScratchieAnswerVisitLog.class.getName()
+		    + " AS r WHERE r.sessionId=:sessionId ORDER BY r.accessDate ASC";
+	
+	Query<ScratchieAnswerVisitLog> query = getSession().createQuery(FIND_BY_SESSION, ScratchieAnswerVisitLog.class);
+	query.setParameter("sessionId", sessionId);
+	return query.list();
+    }
+    
+    @Override
+    public List<ScratchieAnswerVisitLog> getLogsByScratchieUid(Long scratchieUid) {
+	final String FIND_BY_SCRATCHIE_UID = "SELECT log FROM " + ScratchieAnswerVisitLog.class.getName() + " AS log, "
+		+ ScratchieSession.class.getName() + " AS session "
+		+ " WHERE log.sessionId = session.sessionId AND session.scratchie.uid=:scratchieUid ORDER BY log.accessDate ASC";
+
+	Query<ScratchieAnswerVisitLog> query = getSession().createQuery(FIND_BY_SCRATCHIE_UID, ScratchieAnswerVisitLog.class);
+	query.setParameter("scratchieUid", scratchieUid);
+	return query.list();
     }
 
 }

@@ -169,7 +169,7 @@ public class TblMonitorController {
 	    }
 	    summary.setMark(numberOfFirstChoiceEvents);
 	    Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
-	    summary.setTotalPercentage(percentage + "%");
+	    summary.setTotalPercentage(percentage.toString());
 	}
 
 	request.setAttribute("sessionDtos", groupSummaries);

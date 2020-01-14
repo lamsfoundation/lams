@@ -46,5 +46,10 @@ public interface ScratchieAnswerVisitDAO extends DAO {
     List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid);
 
     List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId);
-
+    
+    /**
+     * @param scratchieUid
+     * @return all visit logs left for the activity with specified scratchieUid
+     */
+    List<ScratchieAnswerVisitLog> getLogsByScratchieUid(Long scratchieUid);
 }

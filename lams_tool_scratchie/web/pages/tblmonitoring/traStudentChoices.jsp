@@ -160,7 +160,7 @@
 							</td>
 							
 							<td class="text-center">
-								${sessionDto.totalPercentage}
+								<fmt:formatNumber type="number" minFractionDigits="0" maxFractionDigits="2" value="${sessionDto.totalPercentage}" /> %
 							</td>
 						</c:otherwise>
 					</c:choose>
