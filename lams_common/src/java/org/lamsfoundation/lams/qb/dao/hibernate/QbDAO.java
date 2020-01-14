@@ -82,7 +82,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String ADD_COLLECTION_QUESTION = "INSERT INTO lams_qb_collection_question VALUES (:collectionUid, :qbQuestionId)";
 
-    private static final String EXISTS_COLLECTION_QUESTION = "SELECT 1 FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
+    private static final String IS_QUESTION_IN_COLLECTION = "SELECT 1 FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
 	    + "AND qb_question_id = :qbQuestionId";
 
     private static final String REMOVE_COLLECTION_QUESTION = "DELETE FROM lams_qb_collection_question WHERE collection_uid = :collectionUid "
@@ -96,7 +96,11 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     private static final String IS_QUESTION_IN_USER_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
 	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
-	    + "(c.user_id = :userId OR c.user_id IS NULL) AND cq.qb_question_id = :qbQuestionId";
+	    + "c.user_id = :userId AND cq.qb_question_id = :qbQuestionId";
+
+    private static final String IS_QUESTION_IN_PUBLIC_COLLECTION = "SELECT DISTINCT 1 FROM lams_qb_collection_question AS cq "
+	    + "JOIN lams_qb_collection AS c ON cq.collection_uid = c.uid AND "
+	    + "c.user_id IS NULL AND cq.qb_question_id = :qbQuestionId";
 
     private static final String GENERATE_QUESTION_ID = "INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES (:qbQuestionId)";
 
@@ -381,7 +385,7 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public void addCollectionQuestion(long collectionUid, int qbQuestionId) {
-	if (!questionInCollectionExists(collectionUid, qbQuestionId)) {
+	if (!isQuestionInCollection(collectionUid, qbQuestionId)) {
 	    getSession().createNativeQuery(ADD_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
 		    .setParameter("qbQuestionId", qbQuestionId).executeUpdate();
 	}
@@ -412,8 +416,14 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
     }
 
-    private boolean questionInCollectionExists(long collectionUid, int qbQuestionId) {
-	return !getSession().createNativeQuery(EXISTS_COLLECTION_QUESTION).setParameter("collectionUid", collectionUid)
+    @Override
+    public boolean isQuestionInPublicCollection(int qbQuestionId) {
+	return getSession().createNativeQuery(IS_QUESTION_IN_PUBLIC_COLLECTION)
+		.setParameter("qbQuestionId", qbQuestionId).uniqueResult() != null;
+    }
+
+    private boolean isQuestionInCollection(long collectionUid, int qbQuestionId) {
+	return !getSession().createNativeQuery(IS_QUESTION_IN_COLLECTION).setParameter("collectionUid", collectionUid)
 		.setParameter("qbQuestionId", qbQuestionId).getResultList().isEmpty();
     }
 

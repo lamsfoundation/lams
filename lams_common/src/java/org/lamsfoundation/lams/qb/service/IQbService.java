@@ -137,6 +137,8 @@ public interface IQbService {
 
     boolean isQuestionInUserCollection(int qbQuestionId, int userId);
 
+    boolean isQuestionInPublicCollection(int qbQuestionId);
+
     void insertQuestion(QbQuestion qbQuestion);
 
     void prepareQuestionForExport(QbQuestion qbQuestion);

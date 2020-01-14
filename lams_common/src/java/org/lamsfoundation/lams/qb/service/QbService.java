@@ -583,6 +583,11 @@ public class QbService implements IQbService {
 	return qbDAO.isQuestionInUserCollection(userId, qbQuestionId);
     }
 
+    @Override
+    public boolean isQuestionInPublicCollection(int qbQuestionId) {
+	return qbDAO.isQuestionInPublicCollection(qbQuestionId);
+    }
+
     /**
      * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
      * New QbQuestions need to be saved step by step.

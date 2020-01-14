@@ -3,7 +3,8 @@
 <footer class="footer fixed-bottom">
 	<div class="panel-heading ">
        	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
-       		<span <c:if test="${empty assessmentQuestionForm.sessionMapID}">style="visibility: hidden;"</c:if>>
+       		<%-- Hide if we edit it on QB collections page or if we edit in a tool but the question is not in users' collections  --%>
+       		<span <c:if test="${empty assessmentQuestionForm.sessionMapID or empty assessmentQuestionForm.userCollections}">style="visibility: hidden;"</c:if>>
 	       		Collection
 	        		
 				<select class="btn btn-md btn-default" id="collection-uid-select">

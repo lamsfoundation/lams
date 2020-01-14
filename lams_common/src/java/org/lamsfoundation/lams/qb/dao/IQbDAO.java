@@ -47,9 +47,9 @@ public interface IQbDAO extends IBaseDAO {
 
     Map<String, Long> getBurningQuestions(long qbQuestionUid);
 
-    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy, String sortOrder,
-	    String searchString);
-    
+    List<QbQuestion> getPagedQuestions(String questionTypes, String collectionUids, int page, int size, String sortBy,
+	    String sortOrder, String searchString);
+
     List<BigInteger> getAllQuestionUids(String collectionUids, String sortBy, String sortOrder, String searchString);
 
     int getCountQuestions(String questionTypes, String collectionUids, String searchString);
@@ -72,6 +72,8 @@ public interface IQbDAO extends IBaseDAO {
     Set<Integer> getCollectionQuestionIdsExcluded(long collectionUid, Collection<Integer> qbQuestionIds);
 
     boolean isQuestionInUserCollection(int userId, int qbQuestionId);
-    
+
+    boolean isQuestionInPublicCollection(int qbQuestionId);
+
     int mergeQuestions(long sourceQbQUestionUid, long targetQbQuestionUid);
 }
