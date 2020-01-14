@@ -109,7 +109,8 @@ public class EditQbQuestionController {
      */
     @RequestMapping("/editQuestion")
     public String editQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, IllegalAccessException, InvocationTargetException {
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException, IllegalAccessException, InvocationTargetException {
 	Long qbQuestionUid = WebUtil.readLongParam(request, "qbQuestionUid");
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	if (qbQuestion == null) {
@@ -144,8 +145,9 @@ public class EditQbQuestionController {
 
 	Integer questionType = qbQuestion.getType();
 	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_ORDERING)
-		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS) || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
-		|| (questionType == QbQuestion.TYPE_NUMERICAL) || (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
+		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS)
+		|| (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS) || (questionType == QbQuestion.TYPE_NUMERICAL)
+		|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
 	    List<QbOption> optionList = qbQuestion.getQbOptions();
 	    request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	}
@@ -208,21 +210,23 @@ public class EditQbQuestionController {
 	}
 	userManagementService.save(qbQuestion);
 
-	final boolean IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL = StringUtils.isNotBlank(form.getSessionMapID());
+	final boolean isRequestCameFromTool = StringUtils.isNotBlank(form.getSessionMapID());
 
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion || (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL && !newCollectionUid.equals(oldCollectionUid))) {
+	if (isAddingQuestion
+		|| (isRequestCameFromTool && oldCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, qbQuestion.getQuestionId(), false);
 	}
 
-	//remove from the old collection, if needed
-	if (!isAddingQuestion && IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL && !newCollectionUid.equals(oldCollectionUid)) {
+	//remove from the old collection, if needed and the question is in users' collections
+	if (!isAddingQuestion && isRequestCameFromTool && oldCollectionUid != null
+		&& !newCollectionUid.equals(oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, qbQuestion.getQuestionId(), false);
 	}
 
-	if (IS_REQUEST_CAME_FROM_ASSESSMENT_TOOL) {
+	if (isRequestCameFromTool) {
 	    //forward to Assessment controller
 	    String params = "?qbQuestionUid=" + qbQuestion.getUid();
 	    params += "&questionModificationStatus=" + questionModificationStatus;
@@ -286,35 +290,35 @@ public class EditQbQuestionController {
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnPartiallyCorrect(form.getFeedbackOnPartiallyCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
-	    
+
 	} else if ((type == QbQuestion.TYPE_MATCHING_PAIRS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setShuffle(form.isShuffle());
-	    
+
 	} else if ((type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
-	    
+
 	} else if ((type == QbQuestion.TYPE_NUMERICAL)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
-	    
+
 	} else if ((type == QbQuestion.TYPE_TRUE_FALSE)) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setCorrectAnswer(form.isCorrectAnswer());
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
-	    
+
 	} else if ((type == QbQuestion.TYPE_ESSAY)) {
 	    qbQuestion.setAllowRichEditor(form.isAllowRichEditor());
 	    qbQuestion.setMaxWordsLimit(form.getMaxWordsLimit());
 	    qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
-	    
+
 	} else if (type == QbQuestion.TYPE_ORDERING) {
 	    qbQuestion.setPenaltyFactor(Float.parseFloat(form.getPenaltyFactor()));
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
 	    qbQuestion.setFeedbackOnIncorrect(form.getFeedbackOnIncorrect());
-	    
+
 	} else if (type == QbQuestion.TYPE_MARK_HEDGING) {
 	    qbQuestion.setShuffle(form.isShuffle());
 	    qbQuestion.setFeedbackOnCorrect(form.getFeedbackOnCorrect());
@@ -432,7 +436,8 @@ public class EditQbQuestionController {
 	    }
 	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
 
-	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		    || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
 		if ((name == null) && isForSaving) {
 		    continue;
@@ -500,7 +505,7 @@ public class EditQbQuestionController {
 
 	    optionList.add(option);
 	}
-	
+
 //	//in case of VSA make sure it has 2 option groups, one of which having 0 maxMark
 //	if (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS && optionList.size() == 1) {
 //	    QbOption option = new QbOption();
@@ -510,7 +515,7 @@ public class EditQbQuestionController {
 //	    option.setFeedback("");
 //	    optionList.add(option);
 //	}
-	
+
 	return optionList;
     }
 
