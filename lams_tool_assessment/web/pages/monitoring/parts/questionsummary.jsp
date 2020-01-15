@@ -18,6 +18,9 @@
     			min-height: 110px;
     			padding: 10px;
 			}
+			.list-group-item {
+				cursor: pointer;
+			}
 		</style>
 		
 		<script>
