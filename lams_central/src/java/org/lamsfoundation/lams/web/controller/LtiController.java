@@ -477,7 +477,8 @@ public class LtiController {
 	request.setAttribute("title", lesson.getLessonName());
 	request.setAttribute("description", lesson.getLessonDescription());
 	request.setAttribute("isDisplayDesignImage", lesson.isDisplayDesignImage());
-	boolean isMonitor = securityService.isLessonMonitor(lessonId, userId, "learner monitor", false);
+	// only teachers can see "Open monitor" link 
+	boolean isMonitor = securityService.isLessonMonitor(lessonId, userId, null, false);
 	request.setAttribute("isMonitor", isMonitor);
 
 	//get learnerProgressDto
