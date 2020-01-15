@@ -82,7 +82,7 @@ public class AssessmentQuestionResultDAOHibernate extends LAMSBaseDAO implements
     @Override
     public List<AssessmentQuestionResult> getQuestionResultsByQuestionUid(final Long questionUid) {
 	String FIND_BY_QUESTION_UID = "FROM " + AssessmentQuestionResult.class.getName()
-		    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid ORDER BY queRes.finishDate ASC";
+		    + " AS queRes " + " WHERE queRes.qbToolQuestion.uid =:questionUid AND queRes.finishDate != null ORDER BY queRes.finishDate ASC";
 	Query<AssessmentQuestionResult> q = getSession().createQuery(FIND_BY_QUESTION_UID,
 		AssessmentQuestionResult.class);
 	q.setParameter("questionUid", questionUid);
