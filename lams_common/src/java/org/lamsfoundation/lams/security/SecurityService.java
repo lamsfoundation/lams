@@ -156,8 +156,11 @@ public class SecurityService implements ISecurityService {
 	if (!hasGroupManagerRole && !(hasMonitorRole && securityDAO.isLessonMonitor(lessonId, userId, true))) {
 	    String error = "User " + userId + " is not monitor in lesson " + lessonId + " and can not \"" + action
 		    + "\"";
-	    SecurityService.log.debug(error);
-	    logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    //no logging needed, if action parameter is empty
+	    if (action != null) {
+		SecurityService.log.debug(error);
+		logEventService.logEvent(LogEvent.TYPE_ROLE_FAILURE, userId, userId, lessonId, null, error);
+	    }
 	    if (escalate) {
 		throw new SecurityException(error);
 	    } else {

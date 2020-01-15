@@ -38,6 +38,11 @@ public interface ISecurityService {
 
     /**
      * Checks if the user is a monitor or owner of the given lesson, or a group manager of the organisation.
+     * 
+     * @param lessonId
+     * @param userId
+     * @param action describes action that was requested and is used for logging. If this value is null, no logging will be done.
+     * @param escalate
      */
     boolean isLessonMonitor(Long lessonId, Integer userId, String action, boolean escalate) throws SecurityException;
 
