@@ -193,8 +193,8 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
 	return "pages/monitoring/parts/questionsummary";
     }
-    
-    @RequestMapping("/allocateUserAnswer")
+
+    @RequestMapping(path = "/allocateUserAnswer", method = RequestMethod.POST)
     @ResponseBody
     public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
@@ -263,7 +263,7 @@ public class MonitoringController {
     /**
      * Set tool's activityEvaluation
      */
-    @RequestMapping("/setActivityEvaluation")
+    @RequestMapping(path = "/setActivityEvaluation", method = RequestMethod.POST)
     @ResponseBody
     public String setActivityEvaluation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);

@@ -17,9 +17,11 @@
 			$.ajax({
 				url: '<c:url value="/monitoring/setActivityEvaluation.do?sessionMapID=${sessionMapID}"/>',
 				data: {
-					activityEvaluation: this.value
+					activityEvaluation: this.value,
+					"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 				},
 				dataType: 'json',
+				method: 'post',
 				success: function (json) {
 					if (json.success == "true") {
 						alert("<fmt:message key='label.tool.output.has.been.changed'/>");

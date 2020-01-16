@@ -164,7 +164,8 @@
 	  				            	questionUid: ${questionDto.uid},
 	  				            	targetOptionUid: $(evt.to).data("option-uid"),
 	  				            	previousOptionUid: $(evt.from).data("option-uid"),
-	  				            	questionResultUid: $(evt.item).data("question-result-uid")
+	  				            	questionResultUid: $(evt.item).data("question-result-uid"),
+	  								"<csrf:tokenname/>":"<csrf:tokenvalue/>"
 	  						    },
 	  				            method: 'post',
 	  				          	dataType: "json",
