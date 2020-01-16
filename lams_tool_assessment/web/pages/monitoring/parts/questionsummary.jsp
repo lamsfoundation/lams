@@ -18,6 +18,9 @@
     			min-height: 110px;
     			padding: 10px;
 			}
+			.filtered {
+			    background-color: lightgrey;
+			}
 			.list-group-item {
 				cursor: pointer;
 			}
@@ -146,6 +149,7 @@
 	  			    new Sortable($(this)[0], {
 	  			    	group: 'shared',
 	  				    animation: 150,
+	  				  	filter: '.filtered', // 'filtered' class is not draggable
 	  				    //ghostClass: 'sortable-placeholder',
 	  				    //direction: 'vertical',
 	  					onStart: function (evt) {
@@ -162,18 +166,17 @@
 	  				            	previousOptionUid: $(evt.from).data("option-uid"),
 	  				            	questionResultUid: $(evt.item).data("question-result-uid")
 	  						    },
-	  				            type: 'post'
+	  				            method: 'post',
+	  				          	dataType: "json",
+		  				        success: function (data) {
+		  				            if (data.isAnswerDuplicated) {
+			  				        	alert("<fmt:message key="label.someone.allocated.this.answer" />");
+			  				        	$(evt.item).appendTo("#answer-group" + data.optionUid);
+			  				        	$(evt.item).addClass("filtered");
+				  				    }
+		  				        }
+	  				            	
 	  				       	});
-	  					},
-	  					store: {
-	  						set: function (sortable) {
-	  							//update all displayOrders in order to later save it as options' order
-	  							var order = sortable.toArray();
-	  							for (var i = 0; i < order.length; i++) {
-	  							    var optionIndex = order[i];
-	  							    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
-	  							}
-	  						}
 	  					}
 	  				});
 	  			});
@@ -278,14 +281,14 @@
 						<fmt:message key="label.answer.alternatives" />: 
 						${fn:replace(option0.name, newLineChar, ', ')}
 						
-						<div class="list-group col sortable-on" data-option-uid="${option0.uid}"></div>	
+						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>	
 					</div>
 					
 					<div class="col-sm-4 text-center">
 		            	<h4><fmt:message key="label.answer.queue" /></h4>
 	            		(<fmt:message key="label.drag.and.drop" />)	
 	            		
-	            		<div class="list-group col sortable-on" data-option-uid="-1">
+	            		<div class="list-group col sortable-on" data-option-uid="-1" id="answer-group-1">
 		            		<c:forEach var="questionResult" items="${questionSummary.notAllocatedQuestionResults}">
 		            			<div class="list-group-item" data-question-result-uid="${questionResult.uid}">
 		            				<lams:Portrait userId="${questionResult.assessmentResult.user.userId}"/>&nbsp;
@@ -314,7 +317,7 @@
 						<fmt:message key="label.answer.alternatives" />: 
 						${fn:replace(option1.name, newLineChar, ', ')}
 						
-						<div class="list-group col sortable-on" data-option-uid="${option1.uid}"></div>	
+						<div class="list-group col sortable-on" data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
 					</div>
 				</div>
 				
@@ -332,7 +335,7 @@
 						<fmt:message key="label.answer.alternatives" />: 
 						${fn:replace(optionDto.name, newLineChar, ', ')}
 						
-						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}"></div>	
+						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>	
 					</div>
 					
 					<c:if test="${status.count % 3 == 0 || status.last}">

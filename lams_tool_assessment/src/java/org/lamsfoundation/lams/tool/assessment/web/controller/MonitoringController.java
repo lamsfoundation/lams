@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -194,11 +195,18 @@ public class MonitoringController {
     }
     
     @RequestMapping("/allocateUserAnswer")
-    @ResponseStatus(HttpStatus.OK)
-    public void allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
+    @ResponseBody
+    public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
 	    @RequestParam Long questionResultUid) {
-	service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, questionResultUid);
+	Optional<Long> optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
+		questionResultUid);
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("isAnswerDuplicated", optionUid.isPresent());
+	responseJSON.put("optionUid", optionUid.orElse(-1L));
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     @RequestMapping("/userSummary")

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -1392,7 +1394,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
+    public Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
 	    Long questionResultUid) {
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
@@ -1402,6 +1404,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//adding
 	if (previousOptionUid.equals(-1L)) {
+	    //search for duplicates and, if found, return false 
+	    for (QbOption option : qbQuestion.getQbOptions()) {
+		String name = option.getName();
+		String[] alternatives = name.split("\r\n");
+		if (Arrays.asList(alternatives).contains(answer)) {
+		    return  Optional.of(option.getUid());
+		}
+	    }
+	    
 	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
 		if (targetOption.getUid().equals(targetOptionUid)) {
 		    String name = targetOption.getName();
@@ -1521,6 +1532,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
 	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
 	}
+	
+	return Optional.empty();
     }
 
     @Override

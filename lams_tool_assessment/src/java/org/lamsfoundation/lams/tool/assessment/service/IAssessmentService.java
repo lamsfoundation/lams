@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -424,7 +425,17 @@ public interface IAssessmentService extends ICommonToolService {
      */
     QuestionSummary getQuestionSummary(Long contentId, Long questionUid);
 
-    void allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, Long questionResultUid);
+    /**
+     * Allocate learner's answer into one of the available answer groups.
+     * 
+     * @param questionUid
+     * @param targetOptionUid
+     * @param previousOptionUid
+     * @param questionResultUid
+     * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
+     *         another teacher working in parallel)
+     */
+    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, Long questionResultUid);
 
     /**
      * For export purposes
