@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -599,6 +600,9 @@ public class QbService implements IQbService {
 	}
 	if (qbQuestion.getVersion() == null) {
 	    qbQuestion.setVersion(1);
+	}
+	if (qbQuestion.getContentFolderId() == null) {
+	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 	}
 
 	Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
