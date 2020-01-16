@@ -7,33 +7,7 @@
  * Initialises each part of the Authoring window.
  */
 $(document).ready(function() {
-	canvas = $('#canvas');
-	GeneralInitLib.initTemplates();
-	if (!isReadOnlyMode) {
-		// in read-only mode (SVG generator), some parts are not necessary and not loaded
-		GeneralInitLib.initLayout();
-		PropertyLib.init();
-		
-		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-			$('.desktopButton').hide();
-			
-			document.addEventListener("touchstart", HandlerLib.touchHandler, true);
-			document.addEventListener("touchmove", HandlerLib.touchHandler, true);
-			document.addEventListener("touchend", HandlerLib.touchHandler, true);
-			document.addEventListener("touchcancel", HandlerLib.touchHandler, true);
-		}
-	}
-	
-	GeneralLib.newLearningDesign(true);
-	if (!isReadOnlyMode) {
-		layout.ld.contentFolderID = initContentFolderID;
-	}
-	if (initLearningDesignID) {
-		GeneralLib.openLearningDesign(+initLearningDesignID);
-	}
-	
-	// remove "loading..." screen
-	$('#loadingOverlay').remove();
+	GeneralInitLib.initAll();
 });
 
 
@@ -150,6 +124,41 @@ var paper = null,
  * Contains methods for Authoring window initialisation which are run only once at the beginning 
  */
 GeneralInitLib = {
+	initAll : function() {
+		if (canvas) {
+			// check if initialisation has already been done
+			return;
+		}
+		
+		canvas = $('#canvas');
+		GeneralInitLib.initTemplates();
+		if (!isReadOnlyMode) {
+			// in read-only mode (SVG generator), some parts are not necessary and not loaded
+			GeneralInitLib.initLayout();
+			PropertyLib.init();
+			
+			if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+				$('.desktopButton').hide();
+				
+				document.addEventListener("touchstart", HandlerLib.touchHandler, true);
+				document.addEventListener("touchmove", HandlerLib.touchHandler, true);
+				document.addEventListener("touchend", HandlerLib.touchHandler, true);
+				document.addEventListener("touchcancel", HandlerLib.touchHandler, true);
+			}
+		}
+		
+		GeneralLib.newLearningDesign(true);
+		if (!isReadOnlyMode) {
+			layout.ld.contentFolderID = initContentFolderID;
+		}
+		if (initLearningDesignID) {
+			GeneralLib.openLearningDesign(+initLearningDesignID);
+		}
+		
+		// remove "loading..." screen
+		$('#loadingOverlay').remove();
+	},
+	 
 	/**
 	 * Draw boxes with Tool Activity templates in the panel on the left.
 	 */
@@ -1696,6 +1705,10 @@ GeneralLib = {
 	 * Replace current canvas contents with the loaded sequence.
 	 */
 	openLearningDesign : function(learningDesignID, callback) {
+		// this method is run when LD SVG gets re-created in "add lesson" dialog and other spots
+		// make sure that everything is initialised
+		GeneralInitLib.initAll();
+		
 		if (!learningDesignID){
 			// do just a re-load
 			learningDesignID = layout.ld.learningDesignID;
@@ -3112,7 +3125,7 @@ GeneralLib = {
 						// hide "loading" animation
 						$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
 						// show the thumbnail
-						$('#ldScreenshotAuthor', layout.ldStoreDialog).html(response).show();
+						$('#ldScreenshotAuthor', layout.ldStoreDialog).show().html(response);
 					},
 					// the LD SVG is missing, try to re-generate it
 					error : function(error) {
