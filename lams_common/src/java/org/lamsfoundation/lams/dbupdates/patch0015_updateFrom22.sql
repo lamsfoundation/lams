@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LI-192 This script needs to be in updaters - before new tools are deployed
 --ALTER TABLE lams_tool ADD COLUMN pedagogical_planner_url TEXT;
@@ -150,7 +150,7 @@ values ('Red5RecordingsUrl','', 'config.red5.recordings.url', 'config.header.red
 -- disable videorecorder
 update lams_learning_library set valid_flag=0 where title="VideoRecorder";
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

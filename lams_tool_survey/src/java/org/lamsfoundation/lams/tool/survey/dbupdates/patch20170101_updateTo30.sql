@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-3147 Simplify tools: get rid of instructions tab, define in monitor and offline activity options
 ALTER TABLE tl_lasurv11_survey DROP COLUMN online_instructions;
@@ -74,7 +74,7 @@ ALTER TABLE tl_lasurv11_user MODIFY COLUMN session_finished TINYINT(1);
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lasurv11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

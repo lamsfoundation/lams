@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- patch20140102.sql
 -- LDEV-3123 Make all DB tables names to be lowercase
@@ -126,7 +126,7 @@ ALTER TABLE tl_laimsc11_user MODIFY COLUMN session_finished TINYINT(1);
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='laimsc11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

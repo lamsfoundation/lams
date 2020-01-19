@@ -18,7 +18,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
--- --------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here-------------------------
 
 -- patch20140102.sql
 -- LDEV-3147 Simplify tools: get rid of instructions tab, define in monitor and offline activity options
@@ -39,7 +39,7 @@ UPDATE lams_tool SET tool_version='20141216' WHERE tool_signature='lafrum11';
 -- LDEV-3432 Do not limit reflect instructions length
 ALTER TABLE tl_lafrum11_forum MODIFY COLUMN reflect_instructions text;
 
--- --------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here-------------------------
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
 SET AUTOCOMMIT = 1;
@@ -56,7 +56,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- --------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here-------------------------
 
 ALTER TABLE `tl_lafrum11_message_seq` 
 ADD COLUMN `thread_message_uid` BIGINT(20) DEFAULT NULL,
@@ -68,7 +68,7 @@ ADD CONSTRAINT `fkfrum11mseqthread`
   ON DELETE RESTRICT
   ON UPDATE RESTRICT;
 
--- --------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here-------------------------
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
 SET AUTOCOMMIT = 1;
@@ -257,7 +257,7 @@ END;
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- --------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here-------------------------
 
 call tl_lafrum11_get_all_thread_message_uids_tmp();
 call tl_lafrum11_set_all_thread_message_uids_tmp();
@@ -270,7 +270,7 @@ drop temporary table if exists tl_lafrum11_thread_message_uid_tmp;
 drop temporary table if exists tl_lafrum11_recursive_tmp;
 
 
--- --------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here-------------------------
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
 SET AUTOCOMMIT = 1;
@@ -284,7 +284,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
--- --------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here-------------------------
 
 -- patch20150930.sql
 --  LDEV-3564 tool session id must be unique in tool's session table
@@ -401,7 +401,7 @@ ALTER TABLE tl_lafrum11_tool_session MODIFY COLUMN mark_released TINYINT(1);
 							    
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lafrum11';
 
--- --------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

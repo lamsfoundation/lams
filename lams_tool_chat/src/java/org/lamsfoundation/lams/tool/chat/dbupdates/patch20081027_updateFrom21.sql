@@ -2,7 +2,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- SQL statements to update from LAMS 2.1/2.1.1
 CREATE TABLE tl_lachat11_conditions (
@@ -17,7 +17,7 @@ CREATE TABLE tl_lachat11_conditions (
 
 UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='lachat11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

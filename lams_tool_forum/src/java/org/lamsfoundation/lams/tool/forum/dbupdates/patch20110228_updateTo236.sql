@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 ALTER TABLE tl_lafrum11_forum ADD COLUMN allow_rate_messages smallint not null default 0;
 
@@ -25,7 +25,7 @@ CREATE TABLE tl_lafrum11_message_rating (
 
 UPDATE lams_tool SET tool_version = "20110228" WHERE tool_signature = "lafrum11";
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

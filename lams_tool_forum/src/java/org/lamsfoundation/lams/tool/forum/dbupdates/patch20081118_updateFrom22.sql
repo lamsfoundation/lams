@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 UPDATE lams_tool SET pedagogical_planner_url='tool/lafrum11/authoring/initPedagogicalPlannerForm.do' WHERE tool_signature='lafrum11';
 
@@ -22,7 +22,7 @@ create table tl_lafrum11_timestamp (
 alter table tl_lafrum11_timestamp add index ForumUserFK (forum_user_uid), add constraint ForumUserFK foreign key (forum_user_uid) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_timestamp add index MessageFK (message_uid), add constraint MessageFK foreign key (message_uid) references tl_lafrum11_message (uid);
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

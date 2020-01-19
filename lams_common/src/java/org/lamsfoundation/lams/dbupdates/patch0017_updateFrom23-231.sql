@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- Adding new column to external organisation table for tool adapters
 ALTER TABLE lams_ext_server_org_map ADD COLUMN server_url varchar(255) default null;
@@ -33,7 +33,7 @@ CREATE TABLE lams_user_disabled_tutorials (
   PRIMARY KEY (user_id,page_str)
 )ENGINE=InnoDB;
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

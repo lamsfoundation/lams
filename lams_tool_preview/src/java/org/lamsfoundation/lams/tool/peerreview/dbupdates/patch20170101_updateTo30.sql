@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 ALTER TABLE `tl_laprev11_user`
 ADD UNIQUE INDEX `prev11uniqusersession` (`user_id` ASC, `session_uid` ASC);
@@ -51,7 +51,7 @@ ALTER TABLE tl_laprev11_user MODIFY COLUMN session_finished TINYINT(1);
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='laprev11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

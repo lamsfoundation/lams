@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-2657 Date and time restriction 
 ALTER TABLE tl_laasse10_assessment ADD COLUMN submission_deadline DATETIME DEFAULT null;
@@ -31,7 +31,7 @@ SELECT uid , question_type , title, sequence_id, default_grade, 0, assessment_ui
 -- LDEV-2717 Add passing mark feature to assessment tool
 ALTER TABLE tl_laasse10_assessment ADD COLUMN passing_mark integer DEFAULT 0;
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

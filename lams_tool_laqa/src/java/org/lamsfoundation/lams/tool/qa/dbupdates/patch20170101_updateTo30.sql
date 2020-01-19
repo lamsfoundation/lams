@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-3155 adding all the leader aware tools (lamc,assessment,qa) to regular LAMS
 ALTER TABLE tl_laqa11_content ADD COLUMN use_select_leader_tool_ouput TINYINT(1) NOT NULL DEFAULT 0;
@@ -104,7 +104,7 @@ ALTER TABLE tl_laqa11_content ADD COLUMN show_other_answers_after_deadline TINYI
 -- LDEV-4180
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='laqa11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

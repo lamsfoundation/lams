@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-
 ALTER TABLE tl_lawiki10_wiki_page ADD COLUMN deleted bit DEFAULT 0 AFTER editable;
@@ -67,7 +67,7 @@ alter table tl_lawiki10_wiki add column submission_deadline datetime default nul
 -- LDEV-4180
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lawiki10';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

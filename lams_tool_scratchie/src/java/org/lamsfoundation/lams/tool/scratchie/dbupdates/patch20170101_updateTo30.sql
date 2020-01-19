@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LKC-15 adding a constraint to the scratchie user table so no same user_id and session_id can be repetead 
 ALTER TABLE tl_lascrt11_user ADD UNIQUE INDEX(user_id, session_uid);
@@ -181,7 +181,7 @@ ALTER TABLE tl_lascrt11_burning_question MODIFY COLUMN general_question TINYINT(
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lascrt11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
