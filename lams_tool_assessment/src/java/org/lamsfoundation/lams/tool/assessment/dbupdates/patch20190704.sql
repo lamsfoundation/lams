@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 -- Put all sql statements below here
 
---LDEV-4836 remove obsolete columns
+-- LDEV-4836 remove obsolete columns
 ALTER TABLE tl_laasse10_question_reference DROP COLUMN title;
 ALTER TABLE tl_laasse10_question_reference DROP COLUMN question_type;
 
