@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 --LDEV-4836 remove obsolete columns
 ALTER TABLE tl_laasse10_question_reference DROP COLUMN title;
@@ -16,7 +16,7 @@ WHERE NOT EXISTS
 
 UPDATE lams_tool SET tool_version='20190704' WHERE tool_signature='laasse10';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

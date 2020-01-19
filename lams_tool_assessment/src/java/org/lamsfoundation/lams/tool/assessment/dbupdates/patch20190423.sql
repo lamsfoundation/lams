@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-4813 Add a missing foreign key and index to speed up queries
 -- We need to check if patch20190722.sql from lams_common has not run already						
@@ -14,7 +14,7 @@ SET @sqlstmt := IF(@exist > 0,
 PREPARE stmt FROM @sqlstmt;
 EXECUTE stmt;
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

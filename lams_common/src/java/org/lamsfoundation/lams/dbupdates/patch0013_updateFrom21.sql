@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV1893 - Create notifications/events service ------------------------------
 CREATE TABLE lams_events (
@@ -117,7 +117,7 @@ values ('LDAPBindUserDN','', 'config.ldap.bind.user.dn', 'config.header.ldap', '
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPBindUserPassword','', 'config.ldap.bind.user.password', 'config.header.ldap', 'STRING', 0);
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

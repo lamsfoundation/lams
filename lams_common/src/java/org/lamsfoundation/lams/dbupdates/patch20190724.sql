@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-4828 Add tables for QB collections
 CREATE TABLE lams_qb_collection (`uid` BIGINT AUTO_INCREMENT, 
@@ -38,7 +38,7 @@ INSERT INTO lams_qb_collection_question
 INSERT INTO lams_configuration VALUES
 ('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);
 									  		  
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

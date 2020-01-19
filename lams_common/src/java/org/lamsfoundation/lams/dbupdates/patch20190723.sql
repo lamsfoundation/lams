@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-4827 Add configuration settings for Question Bank
 INSERT INTO lams_configuration VALUES
@@ -12,7 +12,7 @@ INSERT INTO lams_configuration VALUES
 ('QbStatsMinParticipants',   	'2',      	'config.qb.stats.min.participants',    'config.header.qb', 'LONG', 1),
 ('QbStatsGroupSize',   			'27',      	'config.qb.stats.group.size',   	   'config.header.qb', 'LONG', 1);
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

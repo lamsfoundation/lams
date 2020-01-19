@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 CREATE TABLE tl_lasurv11_conditions (
        condition_id BIGINT(20) NOT NULL
@@ -28,7 +28,7 @@ CREATE TABLE tl_lasurv11_condition_questions (
 UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='lasurv11';
 
 ALTER TABLE tl_lasurv11_survey ADD COLUMN answer_submit_notify tinyint DEFAULT 0;
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

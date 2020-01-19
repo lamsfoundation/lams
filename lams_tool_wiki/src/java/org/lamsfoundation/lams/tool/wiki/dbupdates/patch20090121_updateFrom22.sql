@@ -3,7 +3,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 UPDATE lams_tool SET pedagogical_planner_url='tool/lawiki10/pedagogicalPlanner.do' WHERE tool_signature='lawiki10';
 
@@ -32,7 +32,7 @@ alter table tl_lawiki10_wiki_page add index wiki_page_index_4 (wiki_current_cont
 
 SET FOREIGN_KEY_CHECKS=1;
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

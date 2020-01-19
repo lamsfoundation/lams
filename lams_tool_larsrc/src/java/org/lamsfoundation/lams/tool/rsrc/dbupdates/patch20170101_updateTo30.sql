@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- LDEV-2941 Enable the option "Open URL in pop-up" for the example URL by default
 UPDATE tl_larsrc11_resource_item SET open_url_new_window=1 WHERE uid='1';
@@ -90,7 +90,7 @@ ALTER TABLE tl_larsrc11_user MODIFY COLUMN session_finished TINYINT(1);
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='larsrc11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

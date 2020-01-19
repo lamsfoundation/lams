@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- patch20140102.sql
 -- LDEV-3147 Simplify tools: get rid of instructions tab, define in monitor and offline activity options
@@ -39,7 +39,7 @@ UPDATE lams_tool SET tool_version='20160105' WHERE tool_signature='lanb11';
 -- LDEV-4180
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lanb11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;

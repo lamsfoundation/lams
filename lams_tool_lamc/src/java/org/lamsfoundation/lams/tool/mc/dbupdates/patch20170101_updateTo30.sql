@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
-----------------------Put all sql statements below here-------------------------
+-- Put all sql statements below here
 
 -- patch20130325.sql
 ALTER TABLE tl_lamc11_que_usr DROP COLUMN viewSummaryRequested ;
@@ -123,7 +123,7 @@ REFERENCES `tl_lamc11_que_usr` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 -- LDEV-4180
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lamc11';
 
-----------------------Put all sql statements above here-------------------------
+-- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
