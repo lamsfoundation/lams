@@ -1067,7 +1067,7 @@ public class McService
 		    cell.setCellStyle(greenColor);
 		}
 		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
-		
+
 		totalPercentage += percentage;
 	    }
 	    cell = row.createCell(maxOptionsInQuestion + 1);
@@ -1164,7 +1164,9 @@ public class McService
 		cell = row.createCell(count++);
 		cell.setCellValue(new Long(userMark.getTotalMark()));
 
-		Double totalPercents = questions.size() != 0 ? (double) numberOfCorrectlyAnsweredByUser / questions.size() : 0d;
+		Double totalPercents = questions.size() != 0
+			? (double) numberOfCorrectlyAnsweredByUser / questions.size()
+			: 0d;
 		totalPercentList.add(totalPercents);
 		cell = row.createCell(count++);
 		cell.setCellValue(totalPercents);
@@ -1181,7 +1183,8 @@ public class McService
 	cell.setCellValue(messageService.getMessage("label.ave"));
 	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
 	    cell = row.createCell(count++);
-	    Double average = totalPercentList.size() == 0 ? 0d : (double) numberOfCorrectAnswers / totalPercentList.size();
+	    Double average = totalPercentList.size() == 0 ? 0d
+		    : (double) numberOfCorrectAnswers / totalPercentList.size();
 	    cell.setCellValue(average);
 	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
 	}
@@ -1440,7 +1443,7 @@ public class McService
 	    toolContentObj.setMcContentId(toolContentId);
 	    toolContentObj.setCreatedBy(newUserUid);
 
-	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+	    long userQbCollectionUid = qbService.getUserPrivateCollection(newUserUid).getUid();
 
 	    // we need to save QB questions and options first
 	    for (McQueContent mcQuestion : toolContentObj.getMcQueContents()) {
@@ -1452,7 +1455,7 @@ public class McService
 		if (existingQuestion == null) {
 		    // none found, create a new QB question
 		    qbService.insertQuestion(qbQuestion);
-		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(userQbCollectionUid, qbQuestion.getQuestionId(), false);
 		} else {
 		    // found, use the existing one
 		    mcQuestion.setQbQuestion(existingQuestion);
@@ -2205,7 +2208,7 @@ public class McService
 	    mcContent.setTitle(newActivityName);
 	    mcContentDAO.updateMcContent(mcContent);
 	}
-	
+
 	// remove all existing questions
 	for (McQueContent mcQuestion : mcContent.getMcQueContents()) {
 	    mcQueContentDAO.delete(mcQuestion);
@@ -2220,7 +2223,7 @@ public class McService
 	    mcQueContentDAO.insert(mcQuestion);
 	}
     }
-    
+
     @Override
     public void setConfigValue(String key, String value) {
 	mcConfigDAO.setConfigValue(key, value);

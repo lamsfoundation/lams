@@ -613,7 +613,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		}
 	    }
 
-	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+	    long userQbCollectionUid = qbService.getUserPrivateCollection(newUserUid).getUid();
 
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {
@@ -628,7 +628,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		if (existingQuestion == null) {
 		    // none found, create a new QB question
 		    qbService.insertQuestion(qbQuestion);
-		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(userQbCollectionUid, qbQuestion.getQuestionId(), false);
 		} else {
 		    // found, use the existing one
 		    question.setQbQuestion(existingQuestion);
