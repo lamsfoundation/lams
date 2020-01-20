@@ -321,10 +321,10 @@
 				$('#burning-questions').ajaxSubmit({
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 	                success: function() {
-		                	$.jGrowl(
-		                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",
-		                		{ life: 2000, closeTemplate: '' }
-		                	);
+		                $.jGrowl(
+		                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",
+		                	{ life: 2000, closeTemplate: '' }
+		                );
 	                }
 				});
 			}

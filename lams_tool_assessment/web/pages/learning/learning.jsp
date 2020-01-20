@@ -215,10 +215,10 @@
 				$('#answers').ajaxSubmit({
 					url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 	                success: function() {
-		                	$.jGrowl(
-		                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
-		                		{ life: 2000, closeTemplate: '' }
-		                	);
+		                $.jGrowl(
+		                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
+		                	{ life: 2000, closeTemplate: '' }
+		                );
 	                }
 				});
 			}

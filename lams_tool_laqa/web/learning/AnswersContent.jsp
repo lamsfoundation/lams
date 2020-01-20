@@ -134,9 +134,9 @@
 				//ajax form submit
 				$('#qaLearningForm').ajaxSubmit({
 					url: '<c:url value="autoSaveAnswers.do?date=" />' + new Date().getTime(),
-		               success: function() {
+		            success: function() {
 		               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
-		               }
+		            }
 				});
 			}
 		}
