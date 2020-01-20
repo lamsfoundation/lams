@@ -116,6 +116,7 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
@@ -3453,6 +3454,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 		qbQuestion.setType(type);
 		qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
 		qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));

@@ -79,6 +79,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -1189,6 +1190,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    qbQuestion.setType(QbQuestion.TYPE_ESSAY);
 	    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 	    qbQuestion.setVersion(1);
+	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setFeedback(JsonUtil.optString(questionData, "feedback"));
