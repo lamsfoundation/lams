@@ -1404,15 +1404,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//adding
 	if (previousOptionUid.equals(-1L)) {
-	    //search for duplicates and, if found, return false 
+	    //search for duplicates and, if found, return false
 	    for (QbOption option : qbQuestion.getQbOptions()) {
 		String name = option.getName();
 		String[] alternatives = name.split("\r\n");
 		if (Arrays.asList(alternatives).contains(answer)) {
-		    return  Optional.of(option.getUid());
+		    return Optional.of(option.getUid());
 		}
 	    }
-	    
+
 	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
 		if (targetOption.getUid().equals(targetOptionUid)) {
 		    String name = targetOption.getName();
@@ -1532,7 +1532,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
 	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
 	}
-	
+
 	return Optional.empty();
     }
 
@@ -2202,7 +2202,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null ? 0
 		    : (double) summaryOfAnswers.get(trueKey) / total;
 	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
-	    
+
 	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null ? 0
 		    : (double) summaryOfAnswers.get(falseKey) / total;
 	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
@@ -2852,7 +2852,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+	    long userQbCollectionUid = qbService.getUserPrivateCollection(newUserUid).getUid();
 
 	    // we need to save QB questions and options first
 	    for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
@@ -2863,7 +2863,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (existingQuestion == null) {
 		    // none found, create a new QB question
 		    qbService.insertQuestion(qbQuestion);
-		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(userQbCollectionUid, qbQuestion.getQuestionId(), false);
 		} else {
 		    // found, use the existing one
 		    assessmentQuestion.setQbQuestion(existingQuestion);

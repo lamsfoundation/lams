@@ -1588,7 +1588,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		GroupSummary allTeamSummary = itemSummary.get(0);
 		Collection<OptionDTO> optionDtos = allTeamSummary.getOptionDtos();
-	
+
 		row = researchAndAnalysisSheet.initRow();
 		row.addEmptyCell();
 		for (int i = 0; i < optionDtos.size(); i++) {
@@ -1626,7 +1626,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(groupSummary.getSessionName(), true);
-		
+
 		int longestRowLength = 0;
 		if (isMcqItem) {
 		    longestRowLength = optionDtos.size();
@@ -1688,15 +1688,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 		for (ScratchieItem item : items) {
 		    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
-		    
-		    //build list of all logs left for this item and this session 
+
+		    //build list of all logs left for this item and this session
 		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog log : logs) {
-			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid().equals(item.getUid())) {
+			if (log.getSessionId().equals(sessionId)
+				&& log.getQbToolQuestion().getUid().equals(item.getUid())) {
 			    logsBySessionAndItem.add(log);
 			}
 		    }
-		    
+
 		    row = researchAndAnalysisSheet.initRow();
 		    row.addCell(getMessage("label.question.semicolon", new Object[] { item.getQbQuestion().getName() }),
 			    false);
@@ -1728,7 +1729,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    if (item.getOptionDtos().size() > maxLogCount) {
 		maxLogCount = item.getOptionDtos().size();
 	    }
-	    
+
 	    //search for max value in logs length
 	    for (GroupSummary summary : summaryByTeam) {
 		Long sessionId = summary.getSessionId();
@@ -1740,7 +1741,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			logsBySessionAndItem++;
 		    }
 		}
-		
+
 		if (logsBySessionAndItem > maxLogCount) {
 		    maxLogCount = logsBySessionAndItem;
 		}
@@ -1818,10 +1819,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    Object mark = (itemDto.getUserMark() == -1) ? "" : Long.valueOf(itemDto.getUserMark());
 		    row.addCell(mark);
 
-		    //build list of all logs left for this item and this session 
+		    //build list of all logs left for this item and this session
 		    List<ScratchieAnswerVisitLog> logsBySessionAndItem = new ArrayList<>();
 		    for (ScratchieAnswerVisitLog log : logs) {
-			if (log.getSessionId().equals(sessionId) && log.getQbToolQuestion().getUid().equals(itemDto.getUid())) {
+			if (log.getSessionId().equals(sessionId)
+				&& log.getQbToolQuestion().getUid().equals(itemDto.getUid())) {
 			    logsBySessionAndItem.add(log);
 			}
 		    }
@@ -2230,7 +2232,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		user.setUserId(newUserUid.longValue());
 	    }
 
-	    long publicQbCollectionUid = qbService.getPublicCollection().getUid();
+	    long userQbCollectionUid = qbService.getUserPrivateCollection(newUserUid).getUid();
 
 	    // we need to save QB questions and options first
 	    for (ScratchieItem scratchieItem : toolContentObj.getScratchieItems()) {
@@ -2242,7 +2244,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		if (existingQuestion == null) {
 		    // none found, create a new QB question
 		    qbService.insertQuestion(qbQuestion);
-		    qbService.addQuestionToCollection(publicQbCollectionUid, qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(userQbCollectionUid, qbQuestion.getQuestionId(), false);
 		} else {
 		    // found, use the existing one
 		    scratchieItem.setQbQuestion(existingQuestion);
