@@ -1,4 +1,3 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>  
 <%@ taglib uri="csrfguard" prefix="csrf" %>
 <%@ taglib uri="tags-core" prefix="c"%>
