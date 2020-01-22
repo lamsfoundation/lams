@@ -9,8 +9,7 @@
 	
 	<lams:css />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css">
-	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-treeview.css" type="text/css" media="screen" />
 	<lams:css suffix="authoring"/>
 	<style>
 		a, a:hover {
@@ -28,19 +27,17 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/yui/yahoo-dom-event.js" ></script>
-	<script type="text/javascript" src="includes/javascript/yui/animation-min.js"></script>
-	<script type="text/javascript" src="includes/javascript/yui/json-min.js" ></script> 
-	<script type="text/javascript" src="includes/javascript/yui/treeview-min.js" ></script>
-	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="loadVars.jsp"></script>
-	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="includes/javascript/addLesson.js"></script>	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
-	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/addLesson.js"></script>	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
     	var isSelected = false;
 		var tree;
@@ -57,62 +54,37 @@
 			};
 	
 	$(document).ready(function (){
-
-		// generate LD initial tree; folderContents is declared in newLesson.jsp
-		var treeNodes = parseFolderContents(${folderContents});
+		tree = $('#learningDesignTree');
 		
-		// there should be no focus, just highlight
-		//YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
-		tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
-		tree.setDynamicLoad(function(node, callback){
-			// load subfolder contents
-			$.ajax({
-				url : LAMS_URL + 'home/getFolderContents.do',
-				data : {
-					'folderID' : node.data.folderID
-				},
-				cache : false,
-				async: false,
-				dataType : 'json',
-				success : function(result) {
-					var childNodeData = parseFolderContents(result);
-					$.each(childNodeData, function(){
-							new YAHOO.widget.TextNode(this, node);
-						});
-					}
+		// customise treeview label
+		ldTreeview.LABEL_RUN_SEQUENCES_FOLDER = LABEL_RUN_SEQUENCES_FOLDER;
+		
+		ldTreeview.init('#learningDesignTree', 
+		   function(event, node) {
+	        	// if the selected object is a sequence then we assign the id to the hidden ldId
+	         	// also if the name is blank we just add the name of the sequence to the name too.
+	         	document.getElementsByName("ldId")[0].value = node.learningDesignId;
+	         
+				// if a LD is selected
+				if (node.state.selected && node.learningDesignId) {
+		         	if (document.getElementsByName("title")[0].value == '') {
+		         	    document.getElementsByName("title")[0].value = node.label;
+		         	}
+		         	isSelected = true;
+		         	document.getElementById('preview-button').style.visibility='visible';
+				} else {
+		         	isSelected = false;
+		     		document.getElementById('preview-button').style.visibility='hidden';
 				}
-			);
-			
-			// required by YUI
-			callback();
-		});
-
-		tree.singleNodeHighlight = true;
-		tree.subscribe('clickEvent', function(event){
-	         // if the selected object is a sequence (id!=0) then we assign the id to the hidden ldId
-	         // also if the name is blank we just add the name of the sequence to the name too.
-	         var obj = event.node.data.learningDesignId;
-				
-	         document.getElementsByName("ldId")[0].value = obj;
-
-	         if ((typeof obj === "undefined") || (obj==0)) {
-	         	isSelected = false;
-	     		document.getElementById('preview-button').style.visibility='hidden';
-	     		
-	         } else {
-	         	if (document.getElementsByName("title")[0].value == '') {
-	         	    document.getElementsByName("title")[0].value = name;
-	         	}
-	         	isSelected = true;
-	         	document.getElementById('preview-button').style.visibility='visible';
-	         }
-		});
-		tree.subscribe('clickEvent',tree.onEventToggleHighlight);
-		tree.render();
-		
-		// expand the first (user) folder
-		tree.getRoot().children[0].expand();
-
+			},
+		  function(event, node) {
+				if (!node.learningDesignId){
+					if (!node.state.expanded) {
+						ldTreeview.refresh(tree, node);
+					}
+					return;
+				}
+		  });
 	});
 
 	function openPreview() {
