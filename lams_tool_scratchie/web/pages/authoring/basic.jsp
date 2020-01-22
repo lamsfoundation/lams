@@ -42,32 +42,7 @@
 			);
 		};
 	}
-	function upItem(idx){
-		var url = "<c:url value="/authoring/upItem.do"/>";
-		$(itemTargetDiv).load(
-			url,
-			{
-				itemIndex: idx,
-				sessionMapID: "${sessionMapID}"
-			},
-			function(){
-				refreshThickbox();
-			}
-		);
-	}
-	function downItem(idx){
-		var url = "<c:url value="/authoring/downItem.do"/>";
-		$(itemTargetDiv).load(
-			url,
-			{
-				itemIndex: idx,
-				sessionMapID: "${sessionMapID}"
-			},
-			function(){
-				refreshThickbox();
-			}
-		);
-	}
+
 	function initNewItemHref() {
 		var itemTypeDropdown = document.getElementById("item-type");
 		var itemType = itemTypeDropdown.value;
