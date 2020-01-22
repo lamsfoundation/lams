@@ -50,8 +50,10 @@
 					//update all sequenceIds
 					for (var i = 0; i < sortable.el.rows.length; i++) {
 					 	var tr = sortable.el.rows[i];
-					 	var input = $("input[name^=sequenceId]", $(tr));
+					 	var input = $("input[name^=sequenceId]", tr);
 					 	input.val(i);
+					 	var displayOrder = $(".reference-display-order", tr);
+					 	displayOrder.text(i + 1 + ")");
 					}
 
 					//prepare SequenceIds parameter
@@ -104,7 +106,7 @@
 		<c:forEach var="questionReference" items="${sessionMap.questionReferences}" varStatus="status">
 			<c:set var="question" value="${questionReference.question}" />
 			<tr>
-				<td>
+				<td class="reference-display-order">
 					${status.count})
 				</td>
 				<td>

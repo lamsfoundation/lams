@@ -84,6 +84,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -628,61 +629,27 @@ public class AuthoringController {
     }
 
     /**
-     * Move up current item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
+     * Caches references order, along with this caches MaxMarks.
      */
-    @RequestMapping("/upItem")
-    private String upItem(HttpServletRequest request) {
-	return switchItem(request, true);
-    }
-
-    /**
-     * Move down current item.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping("/downItem")
-    private String downItem(HttpServletRequest request) {
-	return switchItem(request, false);
-    }
-
-    private String switchItem(HttpServletRequest request, boolean up) {
+    @RequestMapping("/cacheItemsOrder")
+    @ResponseStatus(HttpStatus.OK)
+    public void cacheItemsOrder(HttpServletRequest request) throws ServletException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
-	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
-	if (itemIndex != -1) {
-	    List<ScratchieItem> rList = new ArrayList<>(itemList);
+	//cache references' sequenceIds
+	Map<String, String> sequenceIdsParamMap = splitRequestParameter(request,
+		ScratchieConstants.ATTR_REFERENCES_SEQUENCE_IDS);
 
-	    // get current and the target item, and switch their sequnece
-	    ScratchieItem item = rList.get(itemIndex);
-	    ScratchieItem repOption;
-	    if (up) {
-		repOption = rList.get(--itemIndex);
-	    } else {
-		repOption = rList.get(++itemIndex);
-	    }
-
-	    int upSeqId = repOption.getDisplayOrder();
-	    repOption.setDisplayOrder(item.getDisplayOrder());
-	    item.setDisplayOrder(upSeqId);
-
-	    // put back list, it will be sorted again
-	    itemList.clear();
-	    itemList.addAll(rList);
+	Set<ScratchieItem> updatedItemList = new TreeSet<>(new ScratchieItemComparator());
+	for (ScratchieItem item : itemList) {
+	    String newSequenceId = sequenceIdsParamMap
+		    .get(ScratchieConstants.PARAM_SEQUENCE_ID + item.getDisplayOrder());
+	    item.setDisplayOrder(Integer.valueOf(newSequenceId));
+	    updatedItemList.add(item);
 	}
-
-	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
-	return "pages/authoring/parts/itemlist";
+	itemList.clear();
+	itemList.addAll(updatedItemList);
     }
 
     @RequestMapping("/changeItemQuestionVersion")

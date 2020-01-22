@@ -64,6 +64,8 @@ public class ScratchieConstants {
 
     public static final String PARAM_BURNING_QUESTION_UID = "burningQuestionUid";
 
+    public static final String PARAM_SEQUENCE_ID = "sequenceId";
+
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
 
@@ -187,4 +189,6 @@ public class ScratchieConstants {
     public static final String ERROR_MSG_ENTERED_MARKS_NOT_COMMA_SEPARATED_INTEGERS = "error.entered.marks.not.comma.separates";
 
     public static final String ATTR_SHOW_RESULTS = "showResults";
+
+    public static final String ATTR_REFERENCES_SEQUENCE_IDS = "sequenceIds";
 }

@@ -4,6 +4,7 @@
 <c:set var="isAuthoringRestricted" value="${mode == 'teacher'}" />
 
 <%@ page import="org.lamsfoundation.lams.qb.service.IQbService" %>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
 <script>
 	// Inform author whether the QB question was modified
 	var qbQuestionModified = ${empty qbQuestionModified ? 0 : qbQuestionModified},
@@ -41,6 +42,48 @@
 	
     $(document).ready(function(){
     	$('[data-toggle="tooltip"]').bootstrapTooltip();
+    	
+    	//init questions sorting
+	    <c:if test="${not empty sessionMap.itemList}">
+		    new Sortable($('#itemTable tbody')[0], {
+			    animation: 150,
+			    direction: 'vertical',
+				store: {
+					set: function (sortable) {
+						//update all sequenceIds
+						for (var i = 0; i < sortable.el.rows.length; i++) {
+						 	var tr = sortable.el.rows[i];
+						 	var input = $("input[name^=sequenceId]", tr);
+						 	input.val(i);
+						 	var displayOrder = $(".item-display-order", tr);
+						 	displayOrder.text(i + 1 + ")");
+						}
+	
+						//prepare SequenceIds parameter
+						var serializedSequenceIds = "";
+						$("[name^=sequenceId]").each(function() {
+							serializedSequenceIds += "&" + this.name + "="  + this.value;
+						});
+	
+						$.ajax({ 
+						    url: '<c:url value="/authoring/cacheItemsOrder.do"/>',
+							type: 'POST',
+							data: {
+								sessionMapID: "${sessionMapID}",
+								sequenceIds: serializedSequenceIds
+							}
+						});
+	
+						//update names
+						$("[name^=sequenceId]").each(function() {
+							var newSequenceId = this.value;
+							//update name of the hidden input
+							this.name = "sequenceId" + newSequenceId;
+						});
+					}
+				}
+			});
+		</c:if>
     });	
 </script>
 
@@ -51,13 +94,15 @@
 	</div>
 	<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
 		
-	<table class="table table-condensed table-striped">
+	<table id="itemTable" class="table table-condensed table-striped">
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<tr>
-				<td style="width:5%">
+				<td style="width:5%" class="item-display-order">
 					${status.count})
 				</td>
 				<td style="padding-top:15px; padding-bottom:15px;">
+					<input type="hidden" name="sequenceId${item.displayOrder}" value="${status.index}" class="item-sequence-id">
+					
 					<c:out value="${item.qbQuestion.name}" escapeXml="true"/>
 				</td>
 				
