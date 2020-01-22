@@ -1,4 +1,3 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <div id="formulaTabs">
 	<ul>
 		<li><a href="#formulaTabMath"><fmt:message key="ckeditor.math.math"/></a></li>

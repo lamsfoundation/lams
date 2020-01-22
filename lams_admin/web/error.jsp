@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-<%@ page language="java" isErrorPage="true" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ page isErrorPage="true"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>

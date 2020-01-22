@@ -17,8 +17,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
