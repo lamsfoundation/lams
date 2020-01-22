@@ -209,10 +209,10 @@ public class Lesson implements Serializable {
     private Organisation organisation;
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LearnerProgress> learnerProgresses = new HashSet<LearnerProgress>();
+    private Set<LearnerProgress> learnerProgresses = new HashSet<>();
 
     @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GradebookUserLesson> gradebookUserLessons = new HashSet<GradebookUserLesson>();
+    private Set<GradebookUserLesson> gradebookUserLessons = new HashSet<>();
 
     @Column(name = "enable_lesson_intro")
     private boolean enableLessonIntro = false;
@@ -266,11 +266,11 @@ public class Lesson implements Serializable {
      */
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "lesson_id"), inverseJoinColumns = @JoinColumn(name = "preceding_lesson_id"))
-    private Set<Lesson> precedingLessons = new HashSet<Lesson>();
+    private Set<Lesson> precedingLessons = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "lams_lesson_dependency", joinColumns = @JoinColumn(name = "preceding_lesson_id"), inverseJoinColumns = @JoinColumn(name = "lesson_id"))
-    private Set<Lesson> succeedingLessons = new HashSet<Lesson>();
+    private Set<Lesson> succeedingLessons = new HashSet<>();
 
     // ---------------------------------------------------------------------
     // constructors
@@ -312,21 +312,21 @@ public class Lesson implements Serializable {
 	this.user = user;
 	this.lessonStateId = lessonStateId;
 	this.previousLessonStateId = previousLessonStateId;
-	this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : Boolean.FALSE;
-	this.displayDesignImage = displayDesignImage != null ? displayDesignImage : Boolean.FALSE;
-	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
-	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
+	this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : false;
+	this.displayDesignImage = displayDesignImage != null ? displayDesignImage : false;
+	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : false;
+	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : false;
 	this.lockedForEdit = false;
 	this.learningDesign = learningDesign;
 	this.lessonClass = lessonClass;
 	this.organisation = organisation;
 	this.learnerProgresses = learnerProgresses;
-	this.liveEditEnabled = liveEditEnabled;
-	this.enableLessonNotifications = enableLessonNotifications;
-	this.forceLearnerRestart = forceLearnerRestart;
-	this.allowLearnerRestart = allowLearnerRestart;
-	this.gradebookOnComplete = gradebookOnComplete;
-	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
+	this.liveEditEnabled = liveEditEnabled != null ? liveEditEnabled : false;
+	this.enableLessonNotifications = enableLessonNotifications != null ? enableLessonNotifications : false;
+	this.forceLearnerRestart = forceLearnerRestart != null ? forceLearnerRestart : false;
+	this.allowLearnerRestart = allowLearnerRestart != null ? allowLearnerRestart : false;
+	this.gradebookOnComplete = gradebookOnComplete != null ? gradebookOnComplete : false;
+	this.gradebookUserLessons = new HashSet<>();
 	this.marksReleased = false;
 	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
     }
@@ -615,90 +615,90 @@ public class Lesson implements Serializable {
     }
 
     public boolean isEnableLessonIntro() {
-        return enableLessonIntro;
+	return enableLessonIntro;
     }
 
     public void setEnableLessonIntro(boolean enableLessonIntro) {
-        this.enableLessonIntro = enableLessonIntro;
+	this.enableLessonIntro = enableLessonIntro;
     }
 
     public boolean isDisplayDesignImage() {
-        return displayDesignImage;
+	return displayDesignImage;
     }
 
     public void setDisplayDesignImage(boolean displayDesignImage) {
-        this.displayDesignImage = displayDesignImage;
+	this.displayDesignImage = displayDesignImage;
     }
 
     public boolean getLockedForEdit() {
-        return lockedForEdit;
+	return lockedForEdit;
     }
 
     public void setLockedForEdit(boolean lockedForEdit) {
-        this.lockedForEdit = lockedForEdit;
+	this.lockedForEdit = lockedForEdit;
     }
 
     public boolean getLearnerPresenceAvailable() {
-        return learnerPresenceAvailable;
+	return learnerPresenceAvailable;
     }
 
     public void setLearnerPresenceAvailable(boolean learnerPresenceAvailable) {
-        this.learnerPresenceAvailable = learnerPresenceAvailable;
+	this.learnerPresenceAvailable = learnerPresenceAvailable;
     }
 
     public boolean getLearnerImAvailable() {
-        return learnerImAvailable;
+	return learnerImAvailable;
     }
 
     public void setLearnerImAvailable(boolean learnerImAvailable) {
-        this.learnerImAvailable = learnerImAvailable;
+	this.learnerImAvailable = learnerImAvailable;
     }
 
     public boolean getLiveEditEnabled() {
-        return liveEditEnabled;
+	return liveEditEnabled;
     }
 
     public void setLiveEditEnabled(boolean liveEditEnabled) {
-        this.liveEditEnabled = liveEditEnabled;
+	this.liveEditEnabled = liveEditEnabled;
     }
 
     public boolean getEnableLessonNotifications() {
-        return enableLessonNotifications;
+	return enableLessonNotifications;
     }
 
     public void setEnableLessonNotifications(boolean enableLessonNotifications) {
-        this.enableLessonNotifications = enableLessonNotifications;
+	this.enableLessonNotifications = enableLessonNotifications;
     }
 
     public boolean getMarksReleased() {
-        return marksReleased;
+	return marksReleased;
     }
 
     public void setMarksReleased(boolean marksReleased) {
-        this.marksReleased = marksReleased;
+	this.marksReleased = marksReleased;
     }
 
     public boolean getForceLearnerRestart() {
-        return forceLearnerRestart;
+	return forceLearnerRestart;
     }
 
     public void setForceLearnerRestart(boolean forceLearnerRestart) {
-        this.forceLearnerRestart = forceLearnerRestart;
+	this.forceLearnerRestart = forceLearnerRestart;
     }
 
     public boolean getAllowLearnerRestart() {
-        return allowLearnerRestart;
+	return allowLearnerRestart;
     }
 
     public void setAllowLearnerRestart(boolean allowLearnerRestart) {
-        this.allowLearnerRestart = allowLearnerRestart;
+	this.allowLearnerRestart = allowLearnerRestart;
     }
 
     public boolean getGradebookOnComplete() {
-        return gradebookOnComplete;
+	return gradebookOnComplete;
     }
 
     public void setGradebookOnComplete(boolean gradebookOnComplete) {
-        this.gradebookOnComplete = gradebookOnComplete;
+	this.gradebookOnComplete = gradebookOnComplete;
     }
 }
