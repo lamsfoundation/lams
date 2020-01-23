@@ -537,8 +537,9 @@ function startLesson(){
 	$.ajax({
 		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring/startLesson.do',
-		cache : false,
 		data : data,
+		cache : false,
+		type : 'POST',
 		success : function() {
 			refreshMonitor('lesson');
 		}
