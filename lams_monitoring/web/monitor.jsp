@@ -387,10 +387,6 @@
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
 											<span id="lessonStateApply">
-												<csrf:form id="lesson-state-form" method="post" action="">
-													<input type="hidden" name="lessonID" value="${lesson.lessonID}"/>
-												</csrf:form>
-												
 												<button type="button" class="lessonManageField btn btn-xs btn-primary"
 														onClick="javascript:changeLessonState()"
 														title='<fmt:message key="lesson.change.state.tooltip"/>'>

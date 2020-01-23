@@ -330,15 +330,20 @@ function disableLesson() {
 }			
 
 function applyStateChange(state, method, newLessonEndDate) {
-    var params = $("#lesson-state-form").serialize();
+	var params = {
+		'lessonID'      : lessonId
+	};
+	params[csrfTokenName] = csrfTokenValue;
+
 	if (newLessonEndDate) {
-	    params += "&lessonEndDate=" + token;
+		params.lessonEndDate = newLessonEndDate;
 	}
 	
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
-		type: "POST",
 		data: params,
+		type: "POST",
+		cache : false,
 	    success: function() {
 			if (state == 7) {
 				// user chose to finish the lesson, close monitoring and refresh the lesson list
