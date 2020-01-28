@@ -199,6 +199,7 @@ public class AssessmentConstants {
     public static final String OUTPUT_NAME_BEST_SCORE = "best.score";
     public static final String OUTPUT_NAME_FIRST_SCORE = "first.score";
     public static final String OUTPUT_NAME_AVERAGE_SCORE = "average.score";
+    public static final String OUTPUT_NAME_LEARNER_ALL_CORRECT = "learner.all.correct";
 
     public static final String OUTPUT_NAME_ORDERED_ANSWERS = "ordered.answers";
     public static final String OUTPUT_NAME_CONDITION_ORDERED_ANSWER = "ordered.answer";

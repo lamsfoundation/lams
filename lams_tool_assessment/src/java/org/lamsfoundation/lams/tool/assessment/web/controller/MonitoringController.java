@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -144,6 +146,16 @@ public class MonitoringController {
 		questionList.add(reference.getQuestion());
 	    }
 	}
+	
+	//check if all questions are of MCQ question type, then exportMarksMCQ export will be available
+	boolean isOnlyMcqQuestionsAvailable = true;
+	for (AssessmentQuestion question : questionList) {
+	    if (question.getQbQuestion().getType() != QbQuestion.TYPE_MULTIPLE_CHOICE) {
+		isOnlyMcqQuestionsAvailable = false;
+		break;
+	    }
+	}
+	sessionMap.put("isOnlyMcqQuestionsAvailable", isOnlyMcqQuestionsAvailable);
 
 	//prepare toolOutputDefinitions and activityEvaluation
 	List<String> toolOutputDefinitions = new ArrayList<>();
@@ -569,6 +581,46 @@ public class MonitoringController {
 
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, sheets, service.getMessage("label.export.exported.on"), true);
+    }
+    
+    /**
+     * Export marks for MCQ questions
+     */
+    @RequestMapping(path = "/exportSummaryMCQ", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void exportSummaryMCQ(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		    .getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	Set<AssessmentQuestion> questions =  (Set<AssessmentQuestion>) sessionMap.get(AssessmentConstants.ATTR_QUESTION_LIST);
+	
+	byte[] spreadsheet = service.exportMarksMcq(assessment, questions);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	// construct download file response header
+	OutputStream out = response.getOutputStream();
+	String fileName = "assessment_marks_" + assessment.getUid() + "_export.xls";
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+	// write response
+	try {
+	    out.write(spreadsheet);
+	    out.flush();
+	} finally {
+	    try {
+		if (out != null) {
+		    out.close();
+		}
+	    } catch (IOException e) {
+	    }
+	}
     }
 
     @RequestMapping("/statistic")
