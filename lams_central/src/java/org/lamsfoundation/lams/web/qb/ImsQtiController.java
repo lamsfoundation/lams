@@ -24,6 +24,7 @@ import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -113,6 +114,7 @@ public class ImsQtiController {
 	    int questionId = qbService.generateNextQuestionId();
 	    qbQuestion.setQuestionId(questionId);
 	    qbQuestion.setVersion(1);
+	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 
 	    int questionMark = 1;
 
