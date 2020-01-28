@@ -197,10 +197,12 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
 	    String paramName = e.nextElement();
 
-	    //skip parameters starting with oath_
+	    //skip parameters starting with "oath_"
 	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
 		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
-		String paramValue = request.getParameter(paramName);
+		//set "user_id" parameter taking into account extServer.getUseAlternativeUseridParameterName() setting
+		String paramValue = BasicLTIConstants.USER_ID.equals(paramName) ? extUsername
+			: request.getParameter(paramName);
 		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName,
 			URLEncoder.encode(paramValue, "UTF-8"));
 	    }
