@@ -1,4 +1,4 @@
-<%@ page language="java" errorPage="/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="csrfguard" prefix="csrf" %>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-core" prefix="c" %>
