@@ -11,6 +11,11 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+	<script>
+		function deleteConsumer() {
+			return confirm('<fmt:message key="label.manage.tool.consumers.delete" />');
+		}
+	</script>
 </lams:head>
     
 <body class="stripes">
@@ -64,7 +69,7 @@
 									</c:otherwise>
 								</c:choose>
 								&nbsp;
-                                <csrf:form style="display: inline-block;" id="delete_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/delete.do"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
+                                <csrf:form style="display: inline-block;" id="delete_${ltiConsumer.sid}" method="post" action="/lams/admin/ltiConsumerManagement/delete.do" onSubmit="javascript:return deleteConsumer()"><input type="hidden" name="sid" value="${ltiConsumer.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
 							</td>
 						</tr>
 					</c:forEach>

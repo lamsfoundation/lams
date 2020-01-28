@@ -11,6 +11,11 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
+	<script>
+		function deleteIntegratedServer() {
+			return confirm('<fmt:message key="sysadmin.server.delete" />');
+		}
+	</script>
 </lams:head>
     
 <body class="stripes">
@@ -58,7 +63,7 @@
 							</c:otherwise>
 						</c:choose>
 						&nbsp;
-                        <csrf:form id="delete_${server.serverid}" style="display: inline-block;" method="post" action="/lams/admin/extserver/delete.do"><input type="hidden" name="sid" value="${server.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
+                        <csrf:form id="delete_${server.serverid}" style="display: inline-block;" method="post" action="/lams/admin/extserver/delete.do" onSubmit="javascript:return deleteIntegratedServer()"><input type="hidden" name="sid" value="${server.sid}"/><input type="submit" class="btn btn-danger btn-xs" value="<fmt:message key="admin.delete" />"/></csrf:form>
 					</td>
 				</tr>
 				</c:forEach>
