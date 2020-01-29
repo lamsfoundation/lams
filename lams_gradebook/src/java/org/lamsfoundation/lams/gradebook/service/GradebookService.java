@@ -836,9 +836,10 @@ public class GradebookService implements IGradebookFullService {
 
 	    // Now update the lesson mark
 	    if (gradebookUserLesson == null) {
-		gradebookUserLesson = new GradebookUserLesson();
-		gradebookUserLesson.setLearner(learner);
-		gradebookUserLesson.setLesson(lesson);
+		gradebookUserLesson = new GradebookUserLesson(lesson, learner);
+		gradebookDAO.insertOrUpdate(gradebookUserLesson);
+		//flush the session to delay the same gradebookUserLesson from being inserted by another user (it  primarily targets situation of leader updating marks for all non-leaders in a group)
+		gradebookDAO.flush();
 	    }
 
 	    boolean isWeightedMarks = toolService.isWeightedMarks(lesson.getLearningDesign());
