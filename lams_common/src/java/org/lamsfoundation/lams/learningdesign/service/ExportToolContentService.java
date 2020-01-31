@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAnnotation;
 import org.lamsfoundation.lams.learningdesign.License;
+import org.lamsfoundation.lams.learningdesign.McqImportContentVersionFilter;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
@@ -127,6 +128,7 @@ import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -734,20 +736,34 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Set<String> importedContentFolder = new HashSet<>();
 	    for (AuthoringActivityDTO activity : activities) {
 		learningDesignService.fillLearningLibraryID(activity, activities);
+		
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
 		    continue;
 		}
 
 		String toolPath = FileUtil.getFullPath(learningDesignPath, activity.getToolContentID().toString());
+		String fromVersion = activity.getToolVersion();
 
-		// To create a new toolContent according to imported tool
-		// signature name.
+		//transform MCQ tool to Assessment
+		if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(activity.getToolSignature())) {
+		    activity.setToolSignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
+		    
+		    // run all appropriate methods from McqImportContentVersionFilter, transforming MCQ object to its latest version and then to Assessment object
+		    filterClass = McqImportContentVersionFilter.class;
+		    final String LAST_MCQ_VERSION = "20200120";
+		    String toolFilePath = FileUtil.getFullPath(toolPath, ExportToolContentService.TOOL_FILE_NAME);
+		    filterVersion(toolFilePath, fromVersion, LAST_MCQ_VERSION);
+		    //set fromVersion as the date when MCQ tool was moved to Assessment, so Assessment can run all subsequent version filters
+		    fromVersion = LAST_MCQ_VERSION;
+		    // clear and ensure next activity can get correct filter thru registerImportVersionFilterClass()
+		    filterClass = null;
+		}
+		
 		// get tool by signature
-		Tool newTool = new ToolCompatibleStrategy().getTool(activity.getToolSignature());
-
+		Tool tool = new ToolCompatibleStrategy().getTool(activity.getToolSignature());
 		// can not find a matching tool
-		if (newTool == null) {
+		if (tool == null) {
 		    log.warn("An activity can not found matching tool [" + activity.getToolSignature() + "].");
 		    toolsErrorMsgs.add(messageService.getMessage(ExportToolContentService.ERROR_TOOL_NOT_FOUND,
 			    new Object[] { activity.getToolSignature() }));
@@ -758,16 +774,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		}
 
 		// imported Learning Library ID and one stored in current DB may not match, so fix it here
-		activity.setLearningLibraryID(newTool.getLearningLibraryId());
+		activity.setLearningLibraryID(tool.getLearningLibraryId());
 
-		// save Tool into lams_tool table.
-		ToolContent newContent = new ToolContent(newTool);
+		// create a new toolContent according to imported tool signature name
+		ToolContent newContent = new ToolContent(tool);
 		toolContentDAO.saveToolContent(newContent);
 
-		// store new toolContent mapped by original activity id
+		// store mapping of original activity id to the new toolContent 
 		toolMapper.put(activity.getActivityID(), newContent);
 
-		// Invoke tool's importToolContent() method.
+		// Invoke tool's importToolContent() method
 		try {
 		    // begin to import
 		    log.debug("Tool begin to import content : " + activity.getActivityTitle() + " by contentID :"
@@ -777,12 +793,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			ExportToolContentService.rewriteToolResourcePaths(toolPath, oldResourcePath, newResourcePath);
 		    }
 
-		    // tool's importToolContent() method
-		    // get from and to version
-		    String toVersion = newTool.getToolVersion();
-		    String fromVersion = activity.getToolVersion();
-
-		    ToolContentManager contentManager = (ToolContentManager) findToolService(newTool);
+		    String toVersion = tool.getToolVersion();
+		    ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
 
 		    // If this is a tool adapter tool, pass the customCSV to
 		    // the special importToolContent method
@@ -813,7 +825,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    log.debug("Tool content import success.");
 		} catch (Exception e) {
 		    String error = messageService.getMessage(ExportToolContentService.ERROR_SERVICE_ERROR,
-			    new Object[] { newTool.getToolDisplayName(), e.toString() });
+			    new Object[] { tool.getToolDisplayName(), e.toString() });
 		    log.error(error, e);
 		    toolsErrorMsgs.add(error);
 		    // remove any unsucessed activities from new Learning

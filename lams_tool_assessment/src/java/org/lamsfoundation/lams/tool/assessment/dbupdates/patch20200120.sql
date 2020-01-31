@@ -142,8 +142,14 @@ ALTER TABLE tl_laasse10_question_reference DROP COLUMN tmp_mcq;
 --           tl_lamc11_que_content,
 --           tl_lamc11_configuration,
 --           tl_lamc11_usr_attempt;
-           
---DELETE FROM `lams_tool` WHERE (`tool_signature` = 'lamc11');
+
+DELETE library FROM `lams_learning_library` library 
+    JOIN lams_tool AS tool ON tool.learning_library_id = library.learning_library_id
+    WHERE (tool.`tool_signature` = 'lamc11');
+
+DELETE FROM `lams_tool` WHERE (`tool_signature` = 'lamc11');
+
+UPDATE lams_tool SET tool_version='20200120' WHERE tool_signature='laasse10';
         
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
