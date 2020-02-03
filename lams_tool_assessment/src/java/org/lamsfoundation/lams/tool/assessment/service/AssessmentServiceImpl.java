@@ -1373,7 +1373,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		for (QbOption option : qbQuestion.getQbOptions()) {
 		    String[] alternatives = option.getName().split("\r\n");
 		    for (String alternative : alternatives) {
-			if (alternative.equals(answer)) {
+			if (AssessmentServiceImpl.isAnswersEqual(question, answer, alternative)) {
 			    isAnswerAllocated = true;
 			    break;
 			}
@@ -1392,6 +1392,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	return questionSummary;
+    }
+    
+    public static boolean isAnswersEqual(AssessmentQuestion question, String answer1, String answer2) {
+	if (answer1 == null || answer2 == null) {
+	    return false;
+	}
+
+	return question.getQbQuestion().isCaseSensitive() ? answer1.equals(answer2) : answer1.equalsIgnoreCase(answer2);
     }
 
     @Override
