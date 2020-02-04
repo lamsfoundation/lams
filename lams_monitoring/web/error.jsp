@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<%@ page isErrorPage="true"%>
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <c:set var="showErrorStack"><lams:Configuration key='<%= ConfigurationKeys.ERROR_STACK_TRACE %>'/></c:set>
