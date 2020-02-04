@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -82,17 +83,16 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	List<Object[]> list = query.list();
 
 	//group by userId as long as it returns all completed visitLogs for each user
-	List<UserDTO> userDtos = new ArrayList<UserDTO>();
+	List<UserDTO> userDtos = new ArrayList<>();
 	for (Object[] element : list) {
 	    Integer userId = ((Number) element[0]).intValue();
 	    String login = (String) element[1];
 	    String firstName = (String) element[2];
 	    String lastName = (String) element[3];
 	    String email = (String) element[4];
-	    Long portraitUuid = element[5] != null ? ((Number) element[5]).longValue() : null;
-
+	    byte[] portraitUuid = (byte[]) element[5];
 	    UserDTO userDto = new UserDTO(userId, firstName, lastName, login, null, null, null, email, null, null, null,
-		    null, false, null, portraitUuid);
+		    null, false, null, portraitUuid == null ? null : UUID.nameUUIDFromBytes(portraitUuid).toString());
 
 	    userDtos.add(userDto);
 	}

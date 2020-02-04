@@ -57,10 +57,10 @@ public class LearningWebsocketServer {
 	private String userName;
 	private String nickName;
 	private Long lamsUserId;
-	private Long portraitId;
+	private String portraitId;
 	private String hash;
 
-	private Websocket(Session session, String nickName, Long lamsUserId, Long portraitId) {
+	private Websocket(Session session, String nickName, Long lamsUserId, String portraitId) {
 	    this.session = session;
 	    this.userName = session.getUserPrincipal().getName();
 	    this.nickName = nickName;
@@ -186,7 +186,7 @@ public class LearningWebsocketServer {
 	private long lastDBCheckTime = 0;
 
 	// Learners who are currently active
-	private final TreeMap<String, Long[]> activeUsers = new TreeMap<>();
+	private final TreeMap<String, String[]> activeUsers = new TreeMap<>();
 
 	private Roster(Long toolSessionId) {
 	    this.toolSessionId = toolSessionId;
@@ -199,11 +199,12 @@ public class LearningWebsocketServer {
 	 * @throws JsonProcessingException
 	 */
 	private ArrayNode getRosterJSON() throws JsonProcessingException, IOException {
-	    TreeMap<String, Long[]> localActiveUsers = new TreeMap<>();
+	    TreeMap<String, String[]> localActiveUsers = new TreeMap<>();
 	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    // find out who is active locally
 	    for (Websocket websocket : sessionWebsockets) {
-		localActiveUsers.put(websocket.nickName, new Long[] { websocket.lamsUserId, websocket.portraitId });
+		localActiveUsers.put(websocket.nickName,
+			new String[] { websocket.lamsUserId.toString(), websocket.portraitId });
 	    }
 
 	    // is it time to sync with the DB yet?
@@ -218,7 +219,7 @@ public class LearningWebsocketServer {
 		// refresh current collection
 		activeUsers.clear();
 		for (ChatUser activeUser : storedActiveUsers) {
-		    activeUsers.put(activeUser.getNickname(), new Long[] { activeUser.getUserId(),
+		    activeUsers.put(activeUser.getNickname(), new String[] { activeUser.getUserId().toString(),
 			    LearningWebsocketServer.getPortraitId(activeUser.getUserId()) });
 		}
 
@@ -229,8 +230,8 @@ public class LearningWebsocketServer {
 	    }
 
 	    ArrayNode rosterJSON = JsonNodeFactory.instance.arrayNode();
-	    for (Map.Entry<String, Long[]> entry : activeUsers.entrySet()) {
-		Long[] ids = entry.getValue();
+	    for (Map.Entry<String, String[]> entry : activeUsers.entrySet()) {
+		String[] ids = entry.getValue();
 		ObjectNode userJSON = JsonNodeFactory.instance.objectNode().put("nickName", entry.getKey())
 			.put("lamsUserId", ids[0]).put("portraitId", ids[1]);
 		rosterJSON.add(userJSON);
@@ -412,12 +413,12 @@ public class LearningWebsocketServer {
 	return messagesJSON;
     }
 
-    private static Long getPortraitId(Long userId) {
+    private static String getPortraitId(Long userId) {
 	if (userId != null) {
 	    User user = (User) LearningWebsocketServer.getUserManagementService().findById(User.class,
 		    userId.intValue());
-	    if (user != null) {
-		return user.getPortraitUuid();
+	    if (user != null && user.getPortraitUuid() != null) {
+		return user.getPortraitUuid().toString();
 	    }
 	}
 	return null;

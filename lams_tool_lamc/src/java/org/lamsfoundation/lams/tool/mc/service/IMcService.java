@@ -83,7 +83,7 @@ public interface IMcService extends ICommonToolService {
 
     McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
-    Long getPortraitId(Long userId);
+    String getPortraitId(Long userId);
 
     void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 

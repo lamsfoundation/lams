@@ -527,7 +527,7 @@ public interface IAssessmentService extends ICommonToolService {
 
     void releaseFromCache(Object object);
 
-    Long getPortraitId(Long userId);
+    String getPortraitId(Long userId);
 
     AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
 

@@ -21,13 +21,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.CrNode;
@@ -68,18 +69,18 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createFileNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode,
      * java.lang.String, java.io.InputStream, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public SimpleVersionedNode createFileNode(CrWorkspace workspace, SimpleVersionedNode parentNode, String relPath,
-	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId)
-	    throws InvalidParameterException {
+	    InputStream istream, String filename, String mimeType, String versionDescription, Integer userId,
+	    boolean generatePortraitUuid) throws InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.FILENODE, workspace, parentNode, relPath,
-		versionDescription, userId);
+		versionDescription, userId, generatePortraitUuid);
 	initialNodeVersion.setFile(istream, filename, mimeType);
 
 	return initialNodeVersion;
@@ -87,7 +88,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createPackageNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, java.lang.String, java.lang.String)
      */
@@ -96,7 +97,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    Integer userId) throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.PACKAGENODE, workspace, null, null,
-		versionDescription, userId);
+		versionDescription, userId, false);
 	initialNodeVersion.setProperty(PropertyName.INITIALPATH, initialPath);
 
 	return initialNodeVersion;
@@ -104,7 +105,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#createDataNode(org.lamsfoundation.lams.
      * contentrepository.CrWorkspace, org.lamsfoundation.lams.contentrepository.service.SimpleVersionedNode,
      * java.lang.String)
@@ -115,14 +116,14 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    throws org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException {
 
 	SimpleVersionedNode initialNodeVersion = createBasicNode(NodeType.DATANODE, workspace, parentNode, null,
-		versionDescription, userId);
+		versionDescription, userId, false);
 
 	return initialNodeVersion;
     }
 
     /** Create the core part of a node */
     private SimpleVersionedNode createBasicNode(String nodeType, CrWorkspace workspace, SimpleVersionedNode parentNode,
-	    String relPath, String versionDescription, Integer userId) {
+	    String relPath, String versionDescription, Integer userId, boolean generatePortraitUuid) {
 
 	SimpleVersionedNode initialNodeVersion = beanFactory.getBean("node", SimpleVersionedNode.class);
 
@@ -130,6 +131,9 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	CrNodeVersion parentNodeVersion = parentNode != null ? parentNode.getNodeVersion() : null;
 	CrNode node = new CrNode(relPath, nodeType, createdDate, userId, workspace, parentNodeVersion,
 		versionDescription);
+	if (generatePortraitUuid) {
+	    node.setPortraitUuid(UUID.randomUUID());
+	}
 	CrNodeVersion nodeVersion = node.getNodeVersion(null);
 
 	initialNodeVersion.setNode(node);
@@ -144,7 +148,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(org.lamsfoundation.lams.contentrepository.
      * CrNode, java.lang.Long)
@@ -159,7 +163,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(java.lang.Long, java.lang.Long,
      * java.lang.Long)
      */
@@ -176,7 +180,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
 	CrNode node = null;
 
-	node = (CrNode) nodeDAO.find(CrNode.class, uuid);
+	node = nodeDAO.find(CrNode.class, uuid);
 	if (node == null) {
 
 	    throw new ItemNotFoundException("Node " + uuid + " not found.");
@@ -192,9 +196,39 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	return getNode(node, versionId);
     }
 
+    @Override
+    public SimpleVersionedNode getNode(Long workspaceId, UUID portraitUuid, Long versionId)
+	    throws ItemNotFoundException {
+
+	if (portraitUuid == null) {
+	    throw new ItemNotFoundException("UUID is null, unable to find node.");
+	}
+
+	if (workspaceId == null) {
+	    throw new ItemNotFoundException("Workspace Id is null, unable to find node.");
+	}
+
+	CrNode node = null;
+	List<CrNode> result = nodeDAO.findByProperty(CrNode.class, "portraitUuid", portraitUuid);
+	node = result.isEmpty() ? null : result.get(0);
+	if (node == null) {
+
+	    throw new ItemNotFoundException("Node " + portraitUuid + " not found.");
+
+	} else if (!workspaceId.equals(node.getCrWorkspace().getWorkspaceId())) {
+
+	    log.error("Security warning. User of workspace " + workspaceId + " is trying to access node " + portraitUuid
+		    + " which is in workspace " + node.getCrWorkspace().getWorkspaceId()
+		    + " Request for node will be rejected.");
+	    throw new ItemNotFoundException("Node " + portraitUuid + " does not exist in workspace " + workspaceId);
+	}
+
+	return getNode(node, versionId);
+    }
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNode(java.lang.Long, java.lang.Long,
      * java.lang.Long, java.lang.String)
      */
@@ -220,7 +254,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#copy(org.lamsfoundation.lams.contentrepository.
      * service.SimpleVersionedNode)
@@ -235,7 +269,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     /**
      * Private method to handle the recursive copy. The parent node is needed to set up the
      * node -> parent link in the CrNode object.
-     * 
+     *
      * @param originalNode
      * @param parentNode
      * @return new Node
@@ -268,7 +302,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 	    }
 	}
 
-	// copy any attached file. don't actually copy the file - set up 
+	// copy any attached file. don't actually copy the file - set up
 	// and input stream and the file will be copied when the node is saved.
 	// this is likely to recopy the Filename and Mimetype properties.
 	if (originalNode.isNodeType(NodeType.FILENODE)) {
@@ -300,7 +334,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#getNodeDAO()
      */
     @Override
@@ -310,7 +344,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.service.INodeFactory#setNodeDAO(org.lamsfoundation.lams.
      * contentrepository.dao.INodeDAO)
      */
@@ -322,7 +356,7 @@ public class NodeFactory implements INodeFactory, BeanFactoryAware {
     /* **** Method for BeanFactoryAware interface *****************/
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.lamsfoundation.lams.contentrepository.service.INodeFactory#setBeanFactory(org.springframework.beans.factory.
      * BeanFactory)

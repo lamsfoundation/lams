@@ -1,27 +1,27 @@
 package org.lamsfoundation.lams.confidencelevel;
 
 public class ConfidenceLevelDTO {
-    
+
     // confidence levels can be of different types:
     public static final int CONFIDENCE_LEVELS_TYPE_0_TO_100 = 1;
     public static final int CONFIDENCE_LEVELS_TYPE_CONFIDENT = 2;
     public static final int CONFIDENCE_LEVELS_TYPE_SURE = 3;
 
     private Integer userId;
-    
+
     private String userName;
-    
-    private Long portraitUuid;
+
+    private String portraitUuid;
 
     private int level;
-    
+
     //confidenceLevel's type: 1)0 to 100, 2)Confident or 3)Sure
     private int type;
-    
+
     private Long qbQuestionUid;
-    
+
     private Long qbOptionUid;
-    
+
     /**
      */
     public Integer getUserId() {
@@ -31,7 +31,7 @@ public class ConfidenceLevelDTO {
     public void setUserId(Integer userId) {
 	this.userId = userId;
     }
-    
+
     /**
      */
     public void setUserName(String userName) {
@@ -44,11 +44,11 @@ public class ConfidenceLevelDTO {
 
     /**
      */
-    public Long getPortraitUuid() {
+    public String getPortraitUuid() {
 	return portraitUuid;
     }
 
-    public void setPortraitUuid(Long portraitUuid) {
+    public void setPortraitUuid(String portraitUuid) {
 	this.portraitUuid = portraitUuid;
     }
 
@@ -61,7 +61,7 @@ public class ConfidenceLevelDTO {
     public int getLevel() {
 	return this.level;
     }
-    
+
     public Integer getType() {
 	return type;
     }
@@ -69,7 +69,7 @@ public class ConfidenceLevelDTO {
     public void setType(Integer type) {
 	this.type = type;
     }
-    
+
     /**
      */
     public void setQbQuestionUid(Long qbQuestionUid) {
@@ -79,7 +79,7 @@ public class ConfidenceLevelDTO {
     public Long getQbQuestionUid() {
 	return this.qbQuestionUid;
     }
-    
+
     /**
      */
     public void setQbOptionUid(Long qbOptionUid) {

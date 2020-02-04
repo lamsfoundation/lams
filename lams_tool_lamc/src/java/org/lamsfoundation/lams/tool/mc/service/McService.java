@@ -464,10 +464,10 @@ public class McService
     }
 
     @Override
-    public Long getPortraitId(Long userId) {
+    public String getPortraitId(Long userId) {
 	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
-	    return user != null ? user.getPortraitUuid() : null;
+	    return user == null || user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString();
 	}
 	return null;
     }
@@ -1649,8 +1649,7 @@ public class McService
 
 	for (Object[] userAttemptAndPortraitIter : userAttemptsAndPortraits) {
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
-	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
-		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
+	    String portraitUuid = (String) userAttemptAndPortraitIter[1];
 	    McQueUsr user = userAttempt.getMcQueUsr();
 
 	    //fill in question and option uids
