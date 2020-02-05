@@ -23,7 +23,7 @@ var NUM_COLORS = 7,
 // Add a portrait to an existing div as specified by selector.
 function addPortrait( selector, portraitId, userId, size, round, LAMS_URL ) {
     var isRound = round == null ? true : round;
-    if ( portraitId  && portraitId > 0) {
+    if ( portraitId ) {
     		selector.css('background-image', 'url(' + LAMS_URL + 'download?preferDownload=false&uuid=' + portraitId + _getSizeVersion(size) + ')');
     		selector.addClass(_getSizeCSS(size));
     		if ( isRound ) {

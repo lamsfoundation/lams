@@ -21,7 +21,8 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
     public List<UserDTO> getAllUsersPaged(Integer page, Integer size, String sortBy, String sortOrder,
 	    String searchPhrase) {
 	return getAllUsersPage(
-		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid FROM User user WHERE user.disabledFlag=0 ",
+		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email, user.portraitUuid "
+			+ "FROM User user WHERE user.disabledFlag=0 ",
 		"user", page, size, sortBy, sortOrder, searchPhrase);
     }
 
@@ -90,9 +91,9 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	    String firstName = (String) element[2];
 	    String lastName = (String) element[3];
 	    String email = (String) element[4];
-	    byte[] portraitUuid = (byte[]) element[5];
+	    UUID portraitUuid = (UUID) element[5];
 	    UserDTO userDto = new UserDTO(userId, firstName, lastName, login, null, null, null, email, null, null, null,
-		    null, false, null, portraitUuid == null ? null : UUID.nameUUIDFromBytes(portraitUuid).toString());
+		    null, false, null, portraitUuid == null ? null : portraitUuid.toString());
 
 	    userDtos.add(userDto);
 	}
