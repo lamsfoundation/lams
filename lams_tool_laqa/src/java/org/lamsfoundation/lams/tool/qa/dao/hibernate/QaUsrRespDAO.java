@@ -29,7 +29,7 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
-import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
@@ -224,7 +224,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	}
 
 	Query<Object[]> query = getSessionFactory().getCurrentSession().createSQLQuery(queryText.toString())
-		.addEntity(QaUsrResp.class).addScalar("portraitId", IntegerType.INSTANCE);
+		.addEntity(QaUsrResp.class).addScalar("portraitId", StringType.INSTANCE);
 
 	if (needsToolContentId) {
 	    query.setParameter("toolContentId", toolContentId.longValue());
@@ -242,7 +242,7 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
 	for (Object[] row : list) {
 	    QaUsrResp resp = (QaUsrResp) row[0];
 	    if (row.length > 1 && row[1] != null) {
-		resp.setPortraitId(((Number) row[1]).longValue());
+		resp.setPortraitId((String) row[1]);
 	    }
 	    respList.add(resp);
 	}

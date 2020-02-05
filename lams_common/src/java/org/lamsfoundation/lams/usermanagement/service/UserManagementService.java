@@ -1083,7 +1083,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public String[] getPortraitSQL(String userIdString) {
 	String[] retValue = new String[2];
-	retValue[0] = ", luser.portrait_uuid portraitId ";
+	retValue[0] = ", BIN_TO_UUID(luser.portrait_uuid) portraitId ";
 	retValue[1] = " JOIN lams_user luser ON luser.user_id = " + userIdString;
 	return retValue;
     }

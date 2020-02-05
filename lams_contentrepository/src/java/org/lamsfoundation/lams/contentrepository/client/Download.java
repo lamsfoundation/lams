@@ -157,6 +157,7 @@ public abstract class Download extends HttpServlet {
 	if (uuid != null) {
 
 	    version = Download.getLong(request.getParameter(Download.VERSION_NAME));
+	    // check if it is plain numeric UUID or complex portrait UUID
 	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
 		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
 	    // update versionId in case it was null and we got the latest version...
@@ -211,6 +212,7 @@ public abstract class Download extends HttpServlet {
 		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
 	    }
 
+	    // check if it is plain numeric UUID or complex portrait UUID
 	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
 		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
 	    if (!node.isNodeType(NodeType.FILENODE)) {

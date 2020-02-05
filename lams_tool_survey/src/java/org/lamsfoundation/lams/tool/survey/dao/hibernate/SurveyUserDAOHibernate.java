@@ -114,11 +114,9 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_SESSION_ID_SELECT)
-		.append(portraitStrings[0])
-		.append(FIND_USER_ANSWERS_BY_SESSION_ID_FROM)
-		.append(portraitStrings[1]);
-	
+	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_SESSION_ID_SELECT).append(portraitStrings[0])
+		.append(FIND_USER_ANSWERS_BY_SESSION_ID_FROM).append(portraitStrings[1]);
+
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
 
@@ -127,9 +125,9 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("answerChoices", StringType.INSTANCE)
-		.addScalar("answerText", StringType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue())
-		.setParameter("questionId", questionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.addScalar("answerText", StringType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
+		.setParameter("sessionId", sessionId.longValue()).setParameter("questionId", questionId.longValue())
+		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -154,8 +152,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
-		.list();
+	List list = getSession().createNativeQuery(queryText.toString())
+		.setParameter("sessionId", sessionId.longValue()).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -169,7 +167,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
      * String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
+	    String searchString, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SurveyConstants.SORT_BY_NAME_ASC:
@@ -209,8 +208,8 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SurveyUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue())
+		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 

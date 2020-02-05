@@ -81,16 +81,16 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
     }
 
     public static final String LOAD_USERS_SELECT = "SELECT user.uid, CONCAT(user.last_name, ' ', user.first_name), user.is_verified_by_monitor, visitLog.taskList_item_uid";
-    public static final String LOAD_USERS_FROM =  " FROM tl_latask10_user user";
+    public static final String LOAD_USERS_FROM = " FROM tl_latask10_user user";
     public static final String LOAD_USERS_JOINS = " INNER JOIN tl_latask10_session session"
-		+ " ON user.session_uid=session.uid" +
+	    + " ON user.session_uid=session.uid" +
 
-		" LEFT OUTER JOIN tl_latask10_item_log visitLog " + " ON visitLog.user_uid = user.uid"
-		+ " 	AND visitLog.complete = 1" +
+	    " LEFT OUTER JOIN tl_latask10_item_log visitLog " + " ON visitLog.user_uid = user.uid"
+	    + " 	AND visitLog.complete = 1" +
 
-		" WHERE session.session_id = :sessionId "
-		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) ";
+	    " WHERE session.session_id = :sessionId "
+	    + " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+	    + " ORDER BY CONCAT(user.last_name, ' ', user.first_name) ";
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
@@ -99,13 +99,9 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
-	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT)
-		.append(portraitStrings[0])
-		.append(LOAD_USERS_FROM)
-		.append(portraitStrings[1])
-		.append(LOAD_USERS_JOINS)
-		.append(sortOrder);
-	
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT).append(portraitStrings[0]).append(LOAD_USERS_FROM)
+		.append(portraitStrings[1]).append(LOAD_USERS_JOINS).append(sortOrder);
+
 	NativeQuery query = getSession().createNativeQuery(bldr.toString());
 	query.setParameter("sessionId", sessionId);
 	// support for custom search from a toolbar
@@ -116,15 +112,15 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 	List<Object[]> list = query.list();
 
 	//group by userId as long as it returns all completed visitLogs for each user
-	HashMap<Long, TaskListUserDTO> userIdToUserDto = new LinkedHashMap<Long, TaskListUserDTO>();
+	HashMap<Long, TaskListUserDTO> userIdToUserDto = new LinkedHashMap<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
 		Long userId = ((Number) element[0]).longValue();
 		String fullName = (String) element[1];
-		boolean isVerifiedByMonitor =  element[2] == null ? false : (Boolean) element[2];
+		boolean isVerifiedByMonitor = element[2] == null ? false : (Boolean) element[2];
 		Long completedTaskUid = element[3] == null ? 0 : ((Number) element[3]).longValue();
-		Long portraitId = element[4] == null ? null : ((Number) element[4]).longValue();
+		String portraitId = (String) element[4];
 
 		TaskListUserDTO userDto = (userIdToUserDto.get(userId) == null) ? new TaskListUserDTO()
 			: userIdToUserDto.get(userId);
@@ -171,7 +167,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
 
-	Collection<TaskListUserDTO> userDtos = new LinkedList<TaskListUserDTO>();
+	Collection<TaskListUserDTO> userDtos = new LinkedList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 

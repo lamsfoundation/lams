@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -116,7 +115,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	queryText.append(
 		" JOIN tl_lasprd10_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	queryText.append(portraitStrings[1]);
-	
+
 	// If sorting by mark then join to mark
 	if (sorting == SpreadsheetConstants.SORT_BY_MARKED_ASC || sorting == SpreadsheetConstants.SORT_BY_MARKED_DESC) {
 	    queryText.append(
@@ -138,8 +137,8 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	@SuppressWarnings("unchecked")
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", SpreadsheetUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setParameter("sessionId", sessionId).setFirstResult(page * size).setMaxResults(size);
+		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId)
+		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 

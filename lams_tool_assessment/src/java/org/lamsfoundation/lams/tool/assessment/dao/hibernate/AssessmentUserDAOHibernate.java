@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -146,7 +145,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String lastName = (String) element[2];
 		String login = (String) element[3];
 		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
-		byte[] portraitId = (byte[]) element[5];
+		String portraitId = (String) element[5];
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
@@ -154,7 +153,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
-		userDto.setPortraitId(portraitId == null ? null : UUID.nameUUIDFromBytes(portraitId).toString());
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
 
@@ -278,7 +277,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String lastName = (String) element[2];
 		String login = (String) element[3];
 		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
-		byte[] portraitId = (byte[]) element[5];
+		String portraitId = (String) element[5];
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setQuestionResultUid(questionResultUid);
@@ -286,7 +285,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
-		userDto.setPortraitId(portraitId == null ? null : UUID.nameUUIDFromBytes(portraitId).toString());
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
 
