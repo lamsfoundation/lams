@@ -40,7 +40,7 @@ function addPortrait( selector, portraitId, userId, size, round, LAMS_URL ) {
 // the HTML which defines a portrait. Use addPortrait if you need to add a portrait to an existing DIV.
 function definePortrait( portraitId, userId, size, round, LAMS_URL, portraitLocationClasses ) {
     var isRound = round == null ? true : round;
-    if ( portraitId  && portraitId > 0) {
+    if ( portraitId ) {
     		var retValue = '<div style="background-image:url(' + LAMS_URL + 'download?preferDownload=false&uuid='
     			+ portraitId + _getSizeVersion(size) + ')" class="' + _getSizeCSS(size);
     		if ( isRound ) {

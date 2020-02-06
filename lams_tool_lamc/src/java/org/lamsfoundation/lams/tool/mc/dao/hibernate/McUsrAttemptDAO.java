@@ -85,7 +85,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     public List<Object[]> getFinalizedAttemptsBySessionId(final Long sessionId) {
-	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, BIN_TO_UUID(u.portraitUuid) FROM "
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM "
 		+ McUsrAttempt.class.getName() + " AS attempt, " + User.class.getName()
 		+ " as u WHERE attempt.mcQueUsr.mcSession.mcSessionId=:sessionId"
 		+ " AND attempt.mcQueUsr.responseFinalised = true AND u.userId=attempt.mcQueUsr.queUsrId";
@@ -96,7 +96,7 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     public List<Object[]> getLeadersFinalizedAttemptsByContentId(final Long contentId) {
-	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, BIN_TO_UUID(u.portraitUuid) FROM "
+	final String LOAD_QUESTION_ATTEMPTS_BY_SESSION_ID = "SELECT attempt, u.portraitUuid FROM "
 		+ McUsrAttempt.class.getName() + " AS attempt, " + User.class.getName()
 		+ " as u WHERE attempt.mcQueUsr=attempt.mcQueUsr.mcSession.groupLeader "
 		+ " AND attempt.mcQueContent.mcContent.mcContentId=:contentId "

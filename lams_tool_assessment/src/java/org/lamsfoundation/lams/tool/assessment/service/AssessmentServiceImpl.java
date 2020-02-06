@@ -3065,7 +3065,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
 	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
-	    String portraitUuid = (String) assessmentResultsAndPortraitIter[1];
+	    UUID portraitUuid = (UUID) assessmentResultsAndPortraitIter[1];
 	    AssessmentUser user = assessmentResult.getUser();
 
 	    //fill in question's and user answer's hashes
@@ -3115,7 +3115,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
 				    : user.getFirstName() + " " + user.getLastName();
 		    confidenceLevelDto.setUserName(userName);
-		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
@@ -3156,7 +3156,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
 	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
-	    String portraitUuid = (String) assessmentResultsAndPortraitIter[1];
+	    UUID portraitUuid = (UUID) assessmentResultsAndPortraitIter[1];
 	    AssessmentUser user = assessmentResult.getUser();
 
 	    //fill in question's and user answer's hashes
@@ -3199,7 +3199,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
 				    : user.getFirstName() + " " + user.getLastName();
 		    confidenceLevelDto.setUserName(userName);
-		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 

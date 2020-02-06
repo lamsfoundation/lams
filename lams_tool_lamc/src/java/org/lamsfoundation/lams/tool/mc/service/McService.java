@@ -1649,7 +1649,7 @@ public class McService
 
 	for (Object[] userAttemptAndPortraitIter : userAttemptsAndPortraits) {
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
-	    String portraitUuid = (String) userAttemptAndPortraitIter[1];
+	    UUID portraitUuid = (UUID) userAttemptAndPortraitIter[1];
 	    McQueUsr user = userAttempt.getMcQueUsr();
 
 	    //fill in question and option uids
@@ -1657,7 +1657,7 @@ public class McService
 	    confidenceLevelDto.setUserId(user.getQueUsrId().intValue());
 	    String userName = StringUtils.isBlank(user.getFullname()) ? user.getUsername() : user.getFullname();
 	    confidenceLevelDto.setUserName(userName);
-	    confidenceLevelDto.setPortraitUuid(portraitUuid);
+	    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
 	    confidenceLevelDto.setType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
 	    QbQuestion qbQuestion = userAttempt.getMcQueContent().getQbQuestion();
