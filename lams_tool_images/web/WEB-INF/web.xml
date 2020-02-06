@@ -179,6 +179,9 @@
 		<web-resource-collection>
 			<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<!-- These URLs are also used by learner -->
+			<url-pattern>/authoring/newImageInit.do</url-pattern>
+			<url-pattern>/authoring/initMultipleImages.do</url-pattern>
 			<http-method>GET</http-method>
  			<http-method>POST</http-method>
 		</web-resource-collection>
