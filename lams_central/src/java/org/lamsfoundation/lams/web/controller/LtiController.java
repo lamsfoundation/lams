@@ -132,8 +132,7 @@ public class LtiController {
 	    Integer currentOrganisationId = currentOrgMap.getOrganisation().getOrganisationId();
 
 	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side;
-	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one).
-	    //Otherwise this is the case of a first call after deep linking was used, and thus we need to update resourceLinkId, which was empty previously. 
+	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one). 
 	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
 		    && !lesson.getOrganisation().getOrganisationId().equals(currentOrganisationId);
 	    if (isLessonCopyRequired) {
@@ -146,15 +145,11 @@ public class LtiController {
 		Long newLessonId = monitoringService.cloneLesson(lesson.getLessonId(), creatorId, true, true, null, null,
 			currentOrgMap.getOrganisation());
 		// store information which extServer has started the lesson
-		extLessonMap = integrationService.createExtServerLessonMap(newLessonId, extServer);	
-            
-	    } else {
-		//support for ContentItemSelectionRequest. If lesson was created during such request, update its ExtServerLesson's resourceLinkId for the first time
-		extLessonMap = integrationService.getExtServerLessonMap(customLessonId);
-	    }
+		extLessonMap = integrationService.createExtServerLessonMap(newLessonId, extServer);
 
-	    extLessonMap.setResourceLinkId(resourceLinkId);
-	    userManagementService.save(extLessonMap);
+		extLessonMap.setResourceLinkId(resourceLinkId);
+		userManagementService.save(extLessonMap);
+	    }
 	}
 
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
