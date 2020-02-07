@@ -31,6 +31,8 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
     
+    private String lessonFinishUrl;
+    
     private Boolean useAlternativeUseridParameterName;
 
     public String getLtiToolConsumerMonitorRoles() {
@@ -39,6 +41,14 @@ public class LtiConsumerForm extends ExtServerCommonForm {
 
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
+    }
+    
+    public String getLessonFinishUrl() {
+	return lessonFinishUrl;
+    }
+
+    public void setLessonFinishUrl(String lessonFinishUrl) {
+	this.lessonFinishUrl = lessonFinishUrl;
     }
     
     public Boolean getUseAlternativeUseridParameterName() {

@@ -20,7 +20,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-	
 			// validate signup form on keyup and submit
 			var validator = $("#ltiConsumerForm").validate({
  				rules: {
@@ -51,7 +50,7 @@
 				<fmt:message key="label.manage.tool.consumers" />
 			</a>
 		</p>
-					
+
 		<lams:errors path="*"/>
 		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -101,7 +100,8 @@
 				<tr>
 					<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
 					<td>
-						${lessonFinishUrl}
+						<form:hidden path="lessonFinishUrl"/>
+						<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
 					</td>
 				</tr>
 				<tr>
