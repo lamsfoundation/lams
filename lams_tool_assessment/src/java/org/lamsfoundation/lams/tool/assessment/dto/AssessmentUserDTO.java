@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.dto;
 
 public class AssessmentUserDTO {
@@ -31,7 +30,7 @@ public class AssessmentUserDTO {
     private float grade;
 
     private Long questionResultUid;
-    private Long portraitId;
+    private String portraitId;
 
     public String getFirstName() {
 	return firstName;
@@ -81,11 +80,11 @@ public class AssessmentUserDTO {
 	this.questionResultUid = questionResultUid;
     }
 
-    public Long getPortraitId() {
+    public String getPortraitId() {
 	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
+    public void setPortraitId(String portraitId) {
 	this.portraitId = portraitId;
     }
 

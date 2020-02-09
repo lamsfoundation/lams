@@ -30,14 +30,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class PortraitActionForm {
 
-    private Long portraitUuid;
+    private String portraitUuid;
     private MultipartFile file;
 
-    public Long getPortraitUuid() {
+    public String getPortraitUuid() {
 	return portraitUuid;
     }
 
-    public void setPortraitUuid(Long uuid) {
+    public void setPortraitUuid(String uuid) {
 	this.portraitUuid = uuid;
     }
 

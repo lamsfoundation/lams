@@ -37,7 +37,7 @@ public class OpenTextAnswerDTO {
     protected String userEntry;
     protected Date attemptTime;
     protected Boolean visible;
-    protected Long portraitId;
+    protected String portraitId;
 
     @Override
     public String toString() {
@@ -102,12 +102,12 @@ public class OpenTextAnswerDTO {
 	this.visible = visible;
     }
 
-    public Long getPortraitId() {
-        return portraitId;
+    public String getPortraitId() {
+	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
-        this.portraitId = portraitId;
+    public void setPortraitId(String portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

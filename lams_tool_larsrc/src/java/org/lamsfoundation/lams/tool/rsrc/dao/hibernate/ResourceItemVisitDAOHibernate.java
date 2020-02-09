@@ -56,7 +56,8 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
     private static final String FIND_SUMMARY = "select v.resourceItem.uid, count(v.resourceItem) from  "
 	    + ResourceItemVisitLog.class.getName() + " as v , " + ResourceSession.class.getName() + " as s, "
 	    + Resource.class.getName() + "  as r " + " where v.sessionId = :sessionId and v.sessionId = s.sessionId "
-	    + " and s.resource.uid = r.uid " + " and r.contentId =:contentId " + " group by v.sessionId, v.resourceItem.uid ";
+	    + " and s.resource.uid = r.uid " + " and r.contentId =:contentId "
+	    + " group by v.sessionId, v.resourceItem.uid ";
 
     private static final String SQL_QUERY_DATES_BY_USER_SESSION = "SELECT MIN(access_date) start_date, MAX(access_date) end_date "
 	    + " FROM tl_larsrc11_item_log WHERE user_uid = :userUid  && session_id = :sessionId";
@@ -84,12 +85,10 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
     public Map<Long, Integer> getSummary(Long contentId, Long sessionId) {
 
 	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-    	List<Object[]> result = getSession().createQuery(FIND_SUMMARY)
-    		.setParameter("sessionId", sessionId)
-    		.setParameter("contentId", contentId)
-    		.list();
-	
-	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
+	List<Object[]> result = getSession().createQuery(FIND_SUMMARY).setParameter("sessionId", sessionId)
+		.setParameter("contentId", contentId).list();
+
+	Map<Long, Integer> summaryList = new HashMap<>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
 		summaryList.put((Long) list[0], ((Number) list[1]).intValue());
@@ -105,14 +104,14 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
     }
 
     private static String LOAD_USERS_ORDERED_BY_NAME_SELECT = " SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visit.complete_date, visit.access_date ";
-    private static String LOAD_USERS_ORDERED_BY_NAME_FROM = " FROM tl_larsrc11_item_log visit " 
-    	+ " JOIN tl_larsrc11_user user ON visit.user_uid = user.uid " 
-    	+ "	AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%'))";
-    private static String LOAD_USERS_ORDERED_BY_NAME_WHERE = " WHERE visit.session_id = :sessionId AND visit.resource_item_uid = :itemUid " 
-    	+ " ORDER BY CASE WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) "
-    	+ "	WHEN :sortBy='startTime' THEN visit.access_date "
-    	+ "	WHEN :sortBy='completeTime' THEN visit.complete_date "
-    	+ "	WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.complete_date,visit.access_date) END ";
+    private static String LOAD_USERS_ORDERED_BY_NAME_FROM = " FROM tl_larsrc11_item_log visit "
+	    + " JOIN tl_larsrc11_user user ON visit.user_uid = user.uid "
+	    + "	AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%'))";
+    private static String LOAD_USERS_ORDERED_BY_NAME_WHERE = " WHERE visit.session_id = :sessionId AND visit.resource_item_uid = :itemUid "
+	    + " ORDER BY CASE WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) "
+	    + "	WHEN :sortBy='startTime' THEN visit.access_date "
+	    + "	WHEN :sortBy='completeTime' THEN visit.complete_date "
+	    + "	WHEN :sortBy='timeTaken' THEN TIMEDIFF(visit.complete_date,visit.access_date) END ";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -121,26 +120,20 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
-	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_NAME_SELECT)
-		.append(portraitStrings[0])
-		.append(LOAD_USERS_ORDERED_BY_NAME_FROM)
-		.append(portraitStrings[1])
-		.append(LOAD_USERS_ORDERED_BY_NAME_WHERE)
-		.append(sortOrder);
-	
-	Query<Object[]> query = getSession().createSQLQuery(bldr.toString())
-		.setParameter("sessionId", sessionId)
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_ORDERED_BY_NAME_SELECT).append(portraitStrings[0])
+		.append(LOAD_USERS_ORDERED_BY_NAME_FROM).append(portraitStrings[1])
+		.append(LOAD_USERS_ORDERED_BY_NAME_WHERE).append(sortOrder);
+
+	Query<Object[]> query = getSession().createSQLQuery(bldr.toString()).setParameter("sessionId", sessionId)
 		.setParameter("itemUid", itemUid);
 
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
-	query.setParameter("searchString", searchString)
-		.setParameter("sortBy", sortBy)
-		.setFirstResult(page * size)
+	query.setParameter("searchString", searchString).setParameter("sortBy", sortBy).setFirstResult(page * size)
 		.setMaxResults(size);
 	List<Object[]> list = query.list();
 
-	ArrayList<VisitLogDTO> visitLogDtos = new ArrayList<VisitLogDTO>();
+	ArrayList<VisitLogDTO> visitLogDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
@@ -150,7 +143,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		Date accessDate = element[3] == null ? null : new Date(((Timestamp) element[3]).getTime());
 		Date timeTaken = (element[2] == null || element[3] == null) ? null
 			: new Date(completeDate.getTime() - accessDate.getTime());
-		Long portraitId =  element[4] == null ? null : ((Number) element[4]).longValue();
+		String portraitId = (String) element[4];
 
 		VisitLogDTO visitLogDto = new VisitLogDTO();
 		visitLogDto.setUserId(userId);
@@ -158,7 +151,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 		visitLogDto.setCompleteDate(completeDate);
 		visitLogDto.setAccessDate(accessDate);
 		visitLogDto.setTimeTaken(timeTaken);
-		visitLogDto.setPortraitId(portraitId);;
+		visitLogDto.setPortraitId(portraitId);
 		visitLogDtos.add(visitLogDto);
 	    }
 	}
@@ -186,7 +179,7 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 	@SuppressWarnings("unchecked")
 	NativeQuery<Object[]> query = getSession().createNativeQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
 		.setParameter("userUid", userUid).setParameter("sessionId", toolSessionId);
-	Object[] values = (Object[]) query.list().get(0);
+	Object[] values = query.list().get(0);
 	return values;
     }
 }

@@ -234,7 +234,7 @@ public class MonitoringController {
 		responseRow.put(DacoConstants.NOTEBOOK_ENTRY, HtmlUtils.htmlEscape((String) userAndReflection[2]));
 	    }
 	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		responseRow.put(DacoConstants.PORTRAIT_ID, (Integer) userAndReflection[3]);
+		responseRow.put(DacoConstants.PORTRAIT_ID, (String) userAndReflection[3]);
 	    }
 	    rows.add(responseRow);
 	}

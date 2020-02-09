@@ -63,14 +63,8 @@ public class LtiConsumerManagementController {
 	if (sid != null) {
 	    ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(ltiConsumerForm, ltiConsumer);
-	    
-	    //display lessonFinishUrl. it's not part of ltiConsumerForm, as long as this property is not going to be edited 
-	    String lessonFinishUrl = ltiConsumer.getLessonFinishUrl() == null ? "-" : ltiConsumer.getLessonFinishUrl();
-	    request.setAttribute("lessonFinishUrl", lessonFinishUrl);
-
-	    // create a tool consumer
 	} else {
-	    //do nothing
+	    // do nothing in case of creating a tool consumer
 	}
 
 	return "integration/ltiConsumer";

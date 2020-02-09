@@ -227,18 +227,16 @@ public class EditQbQuestionController {
 	}
 
 	if (isRequestCameFromTool) {
-	    //forward to Assessment controller
-	    String params = "?qbQuestionUid=" + qbQuestion.getUid();
-	    params += "&questionModificationStatus=" + questionModificationStatus;
+	    //redirect to Assessment controller
+	    String url = "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "tool/laasse10/authoring/saveOrUpdateReference.do";
+	    url = WebUtil.appendParameterToURL(url, "uid", String.valueOf(form.getUid()));
+	    url = WebUtil.appendParameterToURL(url, "sessionMapID", String.valueOf(form.getSessionMapID()));
+	    url = WebUtil.appendParameterToURL(url, "qbQuestionUid", String.valueOf(qbQuestion.getUid()));
+	    url = WebUtil.appendParameterToURL(url, "questionModificationStatus",
+		    String.valueOf(questionModificationStatus));
 
-	    String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
-	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
-		    : "/" + serverURLContextPath;
-	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	    applicationcontext.getServletContext().getContext(serverURLContextPath + "tool/laasse10/")
-		    .getRequestDispatcher("/authoring/saveOrUpdateReference.do" + params).forward(request, response);
-	    return null;
-
+	    return url;
 	} else {
 	    return "forward:returnQuestionUid.do?qbQuestionUid=" + qbQuestion.getUid();
 	}

@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
@@ -65,13 +65,16 @@ public interface IToolContentHandler {
     public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
 
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, boolean generatePortraitUuid)
+	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException;
+
     /**
      * Update an existing file in the repository. This will create a new version of this file (its version number will
      * be equal to the current one incremented by 1).
      *
      * @param uuid
      *            unique id of the updated file. Mandatory
-     * 
+     *
      * @param stream
      *            Input filestream. Mandatory.
      * @param fileName
@@ -91,7 +94,7 @@ public interface IToolContentHandler {
 
     /**
      * Save a directory of files in the content repository.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param dirPath
@@ -111,7 +114,7 @@ public interface IToolContentHandler {
 
     /**
      * Delete a file node. If the node does not exist, then nothing happens (ie ItemNotFoundException is NOT thrown).
-     * 
+     *
      * @param uuid
      *            id of the file node. Mandatory
      * @throws InvalidParameterException
@@ -122,8 +125,13 @@ public interface IToolContentHandler {
     public void deleteFile(Long uuid) throws InvalidParameterException, RepositoryCheckedException;
 
     /**
+     * Delete a file node using portrait UUID
+     */
+    public void deleteFile(UUID portraitUuid) throws InvalidParameterException, RepositoryCheckedException;
+
+    /**
      * Get the file, as an inputstream.
-     * 
+     *
      * @param uuid
      *            id of the file node. Mandatory
      * @throws FileException

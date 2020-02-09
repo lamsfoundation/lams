@@ -1019,9 +1019,14 @@ public class IntegrationService implements IIntegrationService {
 	for (int i = 0; i < memberships.size(); i++) {
 	    JsonNode membership = memberships.get(i);
 	    log.debug("membership" + i + ": " + membership.toString());
-
 	    JsonNode member = membership.get("member");
-	    String extUserId = member.get("userId").asText();
+
+	    //get user id using "userId" property, or "sourcedId" if UseAlternativeUseridParameterName option is ON for this LTI server
+	    JsonNode lisPersonSourcedid = member.get("sourcedId");
+	    String extUserId = extServer.getUseAlternativeUseridParameterName() && lisPersonSourcedid != null
+		    && StringUtils.isNotBlank(lisPersonSourcedid.asText()) ? lisPersonSourcedid.asText()
+			    : member.get("userId").asText();
+
 	    //to address Moodle version 3.7.1 bug
 	    String firstName = member.get("givenName") == null ? member.get("giveName").asText()
 		    : member.get("givenName").asText();

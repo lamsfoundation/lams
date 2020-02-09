@@ -43,6 +43,9 @@ import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -62,6 +65,10 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
     @Autowired
     private IntegrationService integrationService = null;
+    @Autowired
+    private ILessonService lessonService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     private final String DEFAULT_FIRST_NAME = "John";
     private final String DEFAULT_LAST_NAME = "Doe";
@@ -167,8 +174,6 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	} else if (StringUtils.isBlank(lastName)) {
 	    lastName = " ";
 	}
-	
-	ExtServerLessonMap lesson = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 
 	//Determine method based on the "role" parameter. Author roles can be either LTI standard ones or tool consumer's custom ones set
 	//In case of ContentItemSelectionRequest user must still be a stuff member in order to create a lesson.
@@ -178,8 +183,20 @@ public class LoginRequestLtiServlet extends HttpServlet {
 		? IntegrationConstants.METHOD_AUTHOR
 		: IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION;
 
-	//provide empty lessonId in case of learner accesses LTI link before teacher authored it
-	String lessonId = lesson == null ? "" : lesson.getLessonId().toString();
+	ExtServerLessonMap extLessonMap = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
+	if (extLessonMap == null) {
+	    //if deep linking was used to create the lesson and it's accessed for the first time, try to get lessonId as "custom_lessonid" parameter
+	    Long customLessonId = WebUtil.readLongParam(request, "custom_lessonid", true);
+	    boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
+	    if (isContentItemSelection && customLessonId != null) {
+		//update its ExtServerLesson's resourceLinkId for the first time
+		extLessonMap = integrationService.getExtServerLessonMap(customLessonId);
+		extLessonMap.setResourceLinkId(resourceLinkId);
+		userManagementService.save(extLessonMap);
+	    }
+	}
+	//lessonId would be empty in case learner accesses LTI link before teacher authored it
+	String lessonId = extLessonMap == null ? "" : extLessonMap.getLessonId().toString();
 
 	String timestamp = String.valueOf(System.currentTimeMillis());
 

@@ -373,10 +373,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Long getPortraitId(Long userId) {
+    public String getPortraitId(Long userId) {
 	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
-	    return user != null ? user.getPortraitUuid() : null;
+	    return user == null || user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString();
 	}
 	return null;
     }
@@ -1373,7 +1373,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		for (QbOption option : qbQuestion.getQbOptions()) {
 		    String[] alternatives = option.getName().split("\r\n");
 		    for (String alternative : alternatives) {
-			if (alternative.equals(answer)) {
+			if (AssessmentServiceImpl.isAnswersEqual(question, answer, alternative)) {
 			    isAnswerAllocated = true;
 			    break;
 			}
@@ -1392,6 +1392,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	return questionSummary;
+    }
+
+    public static boolean isAnswersEqual(AssessmentQuestion question, String answer1, String answer2) {
+	if (answer1 == null || answer2 == null) {
+	    return false;
+	}
+
+	return question.getQbQuestion().isCaseSensitive() ? answer1.equals(answer2) : answer1.equalsIgnoreCase(answer2);
     }
 
     @Override
@@ -3057,8 +3065,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
 	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
-	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
-		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
+	    UUID portraitUuid = (UUID) assessmentResultsAndPortraitIter[1];
 	    AssessmentUser user = assessmentResult.getUser();
 
 	    //fill in question's and user answer's hashes
@@ -3108,7 +3115,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
 				    : user.getFirstName() + " " + user.getLastName();
 		    confidenceLevelDto.setUserName(userName);
-		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 		    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
@@ -3149,8 +3156,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	for (Object[] assessmentResultsAndPortraitIter : assessmentResultsAndPortraits) {
 	    AssessmentResult assessmentResult = (AssessmentResult) assessmentResultsAndPortraitIter[0];
-	    Long portraitUuid = assessmentResultsAndPortraitIter[1] == null ? null
-		    : ((Number) assessmentResultsAndPortraitIter[1]).longValue();
+	    UUID portraitUuid = (UUID) assessmentResultsAndPortraitIter[1];
 	    AssessmentUser user = assessmentResult.getUser();
 
 	    //fill in question's and user answer's hashes
@@ -3193,7 +3199,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
 				    : user.getFirstName() + " " + user.getLastName();
 		    confidenceLevelDto.setUserName(userName);
-		    confidenceLevelDto.setPortraitUuid(portraitUuid);
+		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
 		    confidenceLevelDto.setType(assessment.getConfidenceLevelsType());
 

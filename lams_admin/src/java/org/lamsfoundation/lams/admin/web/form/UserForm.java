@@ -53,7 +53,7 @@ public class UserForm {
     private Long userTheme;
     private boolean twoFactorAuthenticationEnabled = false;
     // <!-- Name different to real field to avoid overwriting in bean copies -->
-    private Long initialPortraitId = null;
+    private String initialPortraitId = null;
 
     public Integer getOrgId() {
 	return orgId;
@@ -279,11 +279,11 @@ public class UserForm {
 	this.twoFactorAuthenticationEnabled = twoFactorAuthenticationEnabled;
     }
 
-    public Long getInitialPortraitId() {
+    public String getInitialPortraitId() {
 	return initialPortraitId;
     }
 
-    public void setInitialPortraitId(Long initialPortraitId) {
+    public void setInitialPortraitId(String initialPortraitId) {
 	this.initialPortraitId = initialPortraitId;
     }
 

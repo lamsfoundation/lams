@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -172,16 +173,18 @@ public class ToolContentHandler implements IToolContentFullHandler {
     }
 
     @Override
-    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType, boolean generatePortraitUuid)
 	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = repositoryService.addFileItem(getTicket(false), stream, fileName, mimeType, null);
+		nodeKey = repositoryService.addFileItem(getTicket(false), stream, fileName, mimeType, null,
+			generatePortraitUuid);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");
-		nodeKey = repositoryService.addFileItem(getTicket(true), stream, fileName, mimeType, null);
+		nodeKey = repositoryService.addFileItem(getTicket(true), stream, fileName, mimeType, null,
+			generatePortraitUuid);
 	    }
 
 	} catch (RepositoryCheckedException e2) {
@@ -191,6 +194,12 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	}
 
 	return nodeKey;
+    }
+
+    @Override
+    public NodeKey uploadFile(InputStream stream, String fileName, String mimeType)
+	    throws RepositoryCheckedException, InvalidParameterException, RepositoryCheckedException {
+	return uploadFile(stream, fileName, mimeType, false);
     }
 
     @Override
@@ -347,6 +356,25 @@ public class ToolContentHandler implements IToolContentFullHandler {
 	    // didn't exist so don't need to delete. Ignore problem.
 	} catch (RepositoryCheckedException e2) {
 	    log.error("Unable delete file id" + uuid + "Repository Exception: " + e2.getMessage()
+		    + " Retry not possible.");
+	    throw e2;
+	}
+    }
+
+    @Override
+    public void deleteFile(UUID portraitUuid) throws InvalidParameterException, RepositoryCheckedException {
+	try {
+	    try {
+		repositoryService.deleteNode(getTicket(false), portraitUuid);
+	    } catch (AccessDeniedException e) {
+		log.warn("Unable to access repository to delete file id" + portraitUuid + "AccessDeniedException: "
+			+ e.getMessage() + " Retrying login.");
+		repositoryService.deleteNode(getTicket(true), portraitUuid);
+	    }
+	} catch (ItemNotFoundException e1) {
+	    // didn't exist so don't need to delete. Ignore problem.
+	} catch (RepositoryCheckedException e2) {
+	    log.error("Unable delete file id" + portraitUuid + "Repository Exception: " + e2.getMessage()
 		    + " Retry not possible.");
 	    throw e2;
 	}

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.InputStream;
@@ -62,14 +61,14 @@ public interface IVersionedNode {
     /**
      * Returns an Set of all child nodes of node. Returns an empty
      * set if no nodes found.
-     * 
+     *
      * @return Set of nodes.
      */
     public Set getChildNodes();
 
     /**
      * Does this node have a parent node?
-     * 
+     *
      * @return boolean
      */
     public boolean hasParentNode();
@@ -119,6 +118,8 @@ public interface IVersionedNode {
      * @return the UUID of this node
      */
     public Long getUUID();
+
+    public String getPortraitUuid();
 
     /**
      * Indicates whether a property exists for this name
@@ -211,7 +212,7 @@ public interface IVersionedNode {
 
     /**
      * Get the date/time of when this node was created.
-     * 
+     *
      * @return date/time stamp of creation
      */
     public Date getCreatedDateTime();
@@ -219,7 +220,7 @@ public interface IVersionedNode {
     /**
      * Get the file, as an inputstream. It is the responsibility
      * of the caller to close the stream.
-     * 
+     *
      * If the node is a package node, it will get the input stream
      * of the first file.
      */
@@ -227,7 +228,7 @@ public interface IVersionedNode {
 
     /**
      * Get the user_id of the user who created this node.
-     * 
+     *
      * @return userId
      */
     public Integer getUserId();

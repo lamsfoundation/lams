@@ -209,7 +209,7 @@ public class MonitoringController {
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (Integer) userAndReflection[1]);
+		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[1]);
 	    }
 
 	    if (userAndReflection.length > 3) {

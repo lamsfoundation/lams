@@ -48,36 +48,35 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSession.uid=:mcSessionUid";
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT last_attempt_total_mark "
-	    + " FROM tl_lamc11_que_usr usr "
-	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid "
+	    + " FROM tl_lamc11_que_usr usr " + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid "
 	    + " WHERE responseFinalised = 1 AND sess.mc_session_id = :sessionId";
     private static final String FIND_MARK_STATS_FOR_SESSION = "SELECT MIN(last_attempt_total_mark) min_grade, AVG(last_attempt_total_mark) avg_grade, "
-    	    + " MAX(last_attempt_total_mark) max_grade FROM tl_lamc11_que_usr usr "
+	    + " MAX(last_attempt_total_mark) max_grade FROM tl_lamc11_que_usr usr "
 	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid "
 	    + " WHERE responseFinalised = 1 AND sess.mc_session_id = :sessionId";
 
     private static final String LOAD_MARKS_FOR_LEADERS = "SELECT usr.last_attempt_total_mark "
-    	    + " FROM tl_lamc11_que_usr usr "
-    	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
-    	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
-    	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
+	    + " FROM tl_lamc11_que_usr usr "
+	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
+	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
+	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
     private static final String FIND_MARK_STATS_FOR_LEADERS = "SELECT MIN(usr.last_attempt_total_mark) min_grade, AVG(usr.last_attempt_total_mark) avg_grade,  "
-    	    + " MAX(usr.last_attempt_total_mark) max_grade, COUNT(usr.last_attempt_total_mark) num_complete  "
-    	    + " FROM tl_lamc11_que_usr usr "
-    	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
-    	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
-    	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
+	    + " MAX(usr.last_attempt_total_mark) max_grade, COUNT(usr.last_attempt_total_mark) num_complete  "
+	    + " FROM tl_lamc11_que_usr usr "
+	    + " JOIN tl_lamc11_session sess ON usr.mc_session_id = sess.uid AND usr.uid = sess.mc_group_leader_uid "
+	    + " JOIN tl_lamc11_content mcq ON sess.mc_content_id = mcq.uid  "
+	    + " WHERE responseFinalised = 1 AND mcq.content_id = :toolContentId";
 
     @Override
     public McQueUsr getMcUserByUID(Long uid) {
-	return (McQueUsr) this.getSession().get(McQueUsr.class, uid);
+	return this.getSession().get(McQueUsr.class, uid);
     }
-    
+
     @Override
     public McQueUsr getMcUserByContentId(Long userId, Long contentId) {
 	final String GET_USER_BY_USER_ID_AND_CONTENT_ID = "from " + McQueUsr.class.getName()
 		+ " user where user.queUsrId=:userId and user.mcSession.mcContent.mcContentId=:contentId";
-	
+
 	return (McQueUsr) getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_AND_CONTENT_ID)
 		.setParameter("userId", userId).setParameter("contentId", contentId).uniqueResult();
     }
@@ -95,20 +94,20 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	}
 	return null;
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<Object[]> getUsersWithPortraitsBySessionID(Long sessionId) {
-	final String LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID = "SELECT user.user_id, luser.portrait_uuid portraitId FROM tl_lamc11_que_usr user  " +
-		" INNER JOIN tl_lamc11_session session ON user.mc_session_id=session.uid" +
-		" INNER JOIN lams_user luser ON luser.user_id = user.que_usr_id" +
-		" WHERE session.mc_session_id = :sessionId";
-	
+	final String LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID = "SELECT user.user_id, luser.portrait_uuid portraitId FROM tl_lamc11_que_usr user  "
+		+ " INNER JOIN tl_lamc11_session session ON user.mc_session_id=session.uid"
+		+ " INNER JOIN lams_user luser ON luser.user_id = user.que_usr_id"
+		+ " WHERE session.mc_session_id = :sessionId";
+
 	NativeQuery<Object[]> query = getSession().createNativeQuery(LOAD_USERS_WITH_PORTRAITS_BY_SESSION_ID);
 	query.setParameter("sessionId", sessionId);
 	List<Object[]> list = query.list();
 
-	ArrayList<Object[]> userDtos = new ArrayList<Object[]>();
+	ArrayList<Object[]> userDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
@@ -140,14 +139,14 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public void removeMcUser(McQueUsr mcUser) {
 	this.getSession().delete(mcUser);
     }
-    
+
     final String LOAD_USERS_SELECT = "SELECT user.uid, user.que_usr_id, user.fullname, user.last_attempt_total_mark ";
     final String LOAD_USERS_FROM = " FROM tl_lamc11_que_usr user ";
     final String LOAD_USERS_JOINWHERE = " JOIN tl_lamc11_session session on user.mc_session_id = session.uid "
-    	+ " WHERE session.mc_session_id = :sessionId "
-	+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) "
-	+ " ORDER BY CASE WHEN :sortBy='userName' THEN user.fullname "
-	+ " WHEN :sortBy='total' THEN user.last_attempt_total_mark END ";
+	    + " WHERE session.mc_session_id = :sessionId "
+	    + " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) "
+	    + " ORDER BY CASE WHEN :sortBy='userName' THEN user.fullname "
+	    + " WHEN :sortBy='total' THEN user.last_attempt_total_mark END ";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -156,12 +155,8 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.que_usr_id");
 
-	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT)
-		.append(portraitStrings[0])
-		.append(LOAD_USERS_FROM)
-		.append(portraitStrings[1])
-		.append(LOAD_USERS_JOINWHERE)
-		.append(sortOrder);
+	StringBuilder bldr = new StringBuilder(LOAD_USERS_SELECT).append(portraitStrings[0]).append(LOAD_USERS_FROM)
+		.append(portraitStrings[1]).append(LOAD_USERS_JOINWHERE).append(sortOrder);
 
 	NativeQuery<Object[]> query = getSession().createSQLQuery(bldr.toString());
 	query.setParameter("sessionId", sessionId);
@@ -173,7 +168,7 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
 
-	ArrayList<McUserMarkDTO> userDtos = new ArrayList<McUserMarkDTO>();
+	ArrayList<McUserMarkDTO> userDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
@@ -181,14 +176,14 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 		Long userId = ((Number) element[1]).longValue();
 		String fullName = (String) element[2];
 		Integer totalMark = element[3] == null ? 0 : ((Number) element[3]).intValue();
-		Long portraitId = element[4] == null ? null : ((Number) element[4]).longValue();
+		String portraitId = (String) element[4];
 
 		McUserMarkDTO userDto = new McUserMarkDTO();
 		userDto.setQueUsrId(userUid.toString());
 		userDto.setUserId(userId.toString());
 		userDto.setFullName(fullName);
 		userDto.setTotalMark(new Long(totalMark));
-		userDto.setPortraitId(portraitId==null ? null : portraitId.toString());
+		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
 
@@ -224,8 +219,7 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public Object[] getStatsMarksBySession(Long sessionId) {
 
 	Query<?> query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_SESSION)
-		.addScalar("min_grade", FloatType.INSTANCE)
-		.addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
 		.addScalar("max_grade", FloatType.INSTANCE);
 	query.setParameter("sessionId", sessionId);
 	List<?> list = query.list();
@@ -241,10 +235,8 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
 
 	Query<?> query = getSession().createSQLQuery(FIND_MARK_STATS_FOR_LEADERS)
-		.addScalar("min_grade", FloatType.INSTANCE)
-		.addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE)
-		.addScalar("num_complete", IntegerType.INSTANCE);
+		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE).addScalar("num_complete", IntegerType.INSTANCE);
 	query.setParameter("toolContentId", toolContentId);
 	List<?> list = query.list();
 	if ((list == null) || (list.size() == 0)) {

@@ -333,7 +333,7 @@ public class MonitoringController {
 	}
 	mcContent.setSubmissionDeadline(tzSubmissionDeadline);
 	mcService.updateMc(mcContent);
-	
+
 	return formattedDate;
     }
 
@@ -419,14 +419,14 @@ public class MonitoringController {
 	if (groupLeader != null) {
 
 	    Integer totalMark = groupLeader.getLastAttemptTotalMark();
-	    Long portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
+	    String portraitId = mcService.getPortraitId(groupLeader.getQueUsrId());
 
 	    McUserMarkDTO userDto = new McUserMarkDTO();
 	    userDto.setQueUsrId(groupLeader.getUid().toString());
 	    userDto.setUserId(groupLeader.getQueUsrId().toString());
 	    userDto.setFullName(groupLeader.getFullname());
 	    userDto.setTotalMark(totalMark != null ? totalMark.longValue() : null);
-	    userDto.setPortraitId(portraitId == null ? null : portraitId.toString());
+	    userDto.setPortraitId(portraitId);
 	    userDtos.add(userDto);
 	    countVisitLogs = 1;
 

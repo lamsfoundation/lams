@@ -12,12 +12,13 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-treeview.css" type="text/css" media="screen" />
 	<lams:css suffix="authoring"/>
 	<style>
-		a, a:hover {
-			border-bottom: none;
-		}
 		#title-table {
 			padding-top: 10px;
 			padding-bottom: 20px;
+		}
+		#learningDesignTree {
+			clear: both;
+			padding-top: 10px;
 		}
 		#preview-button {
 			visibility: hidden;
@@ -59,8 +60,9 @@
 		// customise treeview label
 		ldTreeview.LABEL_RUN_SEQUENCES_FOLDER = LABEL_RUN_SEQUENCES_FOLDER;
 		
-		ldTreeview.init('#learningDesignTree', 
-		   function(event, node) {
+		ldTreeview.init(
+			'#learningDesignTree', 
+			function(event, node) {
 	        	// if the selected object is a sequence then we assign the id to the hidden ldId
 	         	// also if the name is blank we just add the name of the sequence to the name too.
 	         	document.getElementsByName("ldId")[0].value = node.learningDesignId;
@@ -77,14 +79,15 @@
 		     		document.getElementById('preview-button').style.visibility='hidden';
 				}
 			},
-		  function(event, node) {
+			function(event, node) {
 				if (!node.learningDesignId){
 					if (!node.state.expanded) {
 						ldTreeview.refresh(tree, node);
 					}
 					return;
 				}
-		  });
+			}
+		);
 	});
 
 	function openPreview() {

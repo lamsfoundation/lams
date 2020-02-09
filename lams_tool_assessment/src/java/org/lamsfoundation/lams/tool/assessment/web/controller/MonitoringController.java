@@ -313,7 +313,7 @@ public class MonitoringController {
 	    if (groupLeader != null) {
 
 		float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
-		Long portraitId = service.getPortraitId(groupLeader.getUserId());
+		String portraitId = service.getPortraitId(groupLeader.getUserId());
 
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(groupLeader.getUserId());

@@ -68,11 +68,17 @@
 								<c:param name="orgId" value="${orgId}" />
 							</c:url>
 							<div class="pull-right">
-								<csrf:form style="display: inline-block;" id="delete_${userId}" method="post" action="delete.do"><input type="hidden" name="userId" value="${userId}"/><input type="hidden" name="orgId" value="${orgId}"/><button type="submit" class="btn btn-danger"><fmt:message key="admin.delete" /></button></csrf:form>
-
 								<button class="btn btn-default" type="button" onClick="javascript:document.location='<c:out value="${cancel}"/>'">
 									Cancel
 								</button>
+							
+								<csrf:form style="display: inline-block;" id="delete_${userId}" method="post" action="delete.do">
+									<input type="hidden" name="userId" value="${userId}"/>
+									<input type="hidden" name="orgId" value="${orgId}"/>
+									<button type="submit" class="btn btn-danger">
+										<fmt:message key="admin.delete" />
+									</button>
+								</csrf:form>
 							</div>
 						</div>
 					</div>

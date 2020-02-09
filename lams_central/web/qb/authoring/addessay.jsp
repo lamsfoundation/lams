@@ -124,6 +124,7 @@
 				<form:hidden path="questionType" value="6"/>
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
+				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">

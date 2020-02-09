@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
@@ -31,6 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -57,6 +57,9 @@ public class CrNode implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long nodeId;
 
+    @Column(name = "portrait_uuid")
+    private UUID portraitUuid;
+
     @Column
     private String path;
 
@@ -69,18 +72,15 @@ public class CrNode implements Serializable {
     @Column(name = "next_version_id")
     private Long nextVersionId;
 
-    @ManyToOne(fetch = FetchType.LAZY) 
-    @JoinColumn(name = "workspace_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id")
     private org.lamsfoundation.lams.contentrepository.CrWorkspace crWorkspace;
 
-    @ManyToOne(fetch = FetchType.LAZY) 
-    @JoinColumn(name = "parent_nv_id") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_nv_id")
     private org.lamsfoundation.lams.contentrepository.CrNodeVersion parentNodeVersion;
 
-    @OneToMany(mappedBy = "node",
-	    cascade = CascadeType.ALL,
-	    orphanRemoval = true,
-	    fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<CrNodeVersion> crNodeVersions;
 
     /** default constructor - used by Hibernate */
@@ -131,6 +131,14 @@ public class CrNode implements Serializable {
 
     public void setNodeId(Long nodeId) {
 	this.nodeId = nodeId;
+    }
+
+    public UUID getPortraitUuid() {
+	return portraitUuid;
+    }
+
+    public void setPortraitUuid(UUID portraitUuid) {
+	this.portraitUuid = portraitUuid;
     }
 
     public String getPath() {
@@ -192,7 +200,7 @@ public class CrNode implements Serializable {
     /** Add a version to this node */
     public void addCrNodeVersion(CrNodeVersion version) {
 	if (getCrNodeVersions() == null) {
-	    Set<CrNodeVersion> set = new HashSet<CrNodeVersion>();
+	    Set<CrNodeVersion> set = new HashSet<>();
 	    set.add(version);
 	    setCrNodeVersions(set);
 	} else {
@@ -264,12 +272,12 @@ public class CrNode implements Serializable {
      * Get the history for this node. Quite intensive operation
      * as it has to build all the data structures. Can't cache
      * it as can't tell easily when the versions are changed.
-     * 
+     *
      * @return SortedSet of IVersionDetail objects, ordered by version
      */
     public SortedSet getVersionHistory() {
 
-	SortedSet<SimpleVersionDetail> history = new TreeSet<SimpleVersionDetail>();
+	SortedSet<SimpleVersionDetail> history = new TreeSet<>();
 
 	Set<CrNodeVersion> versions = getCrNodeVersions();
 	if (versions != null) {
@@ -285,7 +293,7 @@ public class CrNode implements Serializable {
 
     /**
      * Indicates whether this node is of the specified node type.
-     * 
+     *
      * @param nodeTypeName
      *            the name of a node type.
      * @return true if this node is of the specified node type

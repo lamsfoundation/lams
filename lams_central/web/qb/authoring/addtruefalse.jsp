@@ -88,6 +88,7 @@
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="oldCollectionUid" id="old-collection-uid"/>
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
+				<form:hidden path="contentFolderID" id="contentFolderID"/>
 
 				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
 					<fmt:message key="label.settings" />

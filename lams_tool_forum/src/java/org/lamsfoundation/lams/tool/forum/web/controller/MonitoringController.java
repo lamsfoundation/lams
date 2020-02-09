@@ -288,7 +288,7 @@ public class MonitoringController {
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID,  (Integer)userAndReflection[2]);
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[2]);
 	    }
 
 	    rows.add(responseRow);

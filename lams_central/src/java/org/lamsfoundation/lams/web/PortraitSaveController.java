@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +68,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PortraitSaveController {
     private static Logger log = Logger.getLogger(PortraitSaveController.class);
     private static final String PORTRAIT_DELETE_AUDIT_KEY = "audit.delete.portrait";
-    
+
     @Autowired
     private IUserManagementService userManagementService;
     @Autowired
@@ -126,10 +127,10 @@ public class PortraitSaveController {
 
 	    // upload to the content repository
 	    originalFileNode = centralToolContentHandler.uploadFile(is, fileNameWithoutExt + "_original.jpg",
-		    "image/jpeg");
+		    "image/jpeg", true);
 	    is.close();
-	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and version: "
-		    + originalFileNode.getVersion());
+	    log.debug("saved file with uuid: " + originalFileNode.getUuid() + " and portrait uuid "
+		    + originalFileNode.getPortraitUuid() + " and version: " + originalFileNode.getVersion());
 
 	    //resize to the large size
 	    is = ResizePictureUtil.resize(file.getInputStream(), CommonConstants.PORTRAIT_LARGEST_DIMENSION_LARGE);
@@ -158,7 +159,7 @@ public class PortraitSaveController {
 	if (user.getPortraitUuid() != null) {
 	    centralToolContentHandler.deleteFile(user.getPortraitUuid());
 	}
-	user.setPortraitUuid(originalFileNode.getUuid());
+	user.setPortraitUuid(UUID.fromString(originalFileNode.getPortraitUuid()));
 	userManagementService.saveUser(user);
 
 	return "forward:/index.do?redirect=portrait";
