@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.dao.hibernate;
 
 import java.util.List;
@@ -104,7 +103,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService) {
+	    String searchString, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case NotebookConstants.SORT_BY_USERNAME_ASC:
@@ -153,9 +153,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", NotebookUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).addScalar("portraitId", IntegerType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue())
-		.setFirstResult(page * size).setMaxResults(size);
+		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
+		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -180,7 +179,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 		" JOIN tl_lantbk11_session session ON user.notebook_session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue()).list();
+	List list = getSession().createSQLQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
+		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -195,7 +195,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 		" JOIN tl_lantbk11_session session ON user.notebook_session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
-	List list = getSession().createSQLQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue()).list();
+	List list = getSession().createSQLQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
+		.list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
@@ -214,7 +215,8 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	NativeQuery<StatisticDTO> query = getSession().createNativeQuery(GET_STATISTICS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("numLearners", IntegerType.INSTANCE).addScalar("numLearnersFinished", IntegerType.INSTANCE)
-		.setParameter("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+		.setParameter("contentId", contentId)
+		.setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
 	return query.list();
     }
 

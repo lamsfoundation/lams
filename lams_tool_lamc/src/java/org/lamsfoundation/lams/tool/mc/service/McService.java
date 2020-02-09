@@ -464,10 +464,10 @@ public class McService
     }
 
     @Override
-    public Long getPortraitId(Long userId) {
+    public String getPortraitId(Long userId) {
 	if (userId != null) {
 	    User user = (User) userManagementService.findById(User.class, userId.intValue());
-	    return user != null ? user.getPortraitUuid() : null;
+	    return user == null || user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString();
 	}
 	return null;
     }
@@ -1649,8 +1649,7 @@ public class McService
 
 	for (Object[] userAttemptAndPortraitIter : userAttemptsAndPortraits) {
 	    McUsrAttempt userAttempt = (McUsrAttempt) userAttemptAndPortraitIter[0];
-	    Long portraitUuid = userAttemptAndPortraitIter[1] == null ? null
-		    : ((Number) userAttemptAndPortraitIter[1]).longValue();
+	    UUID portraitUuid = (UUID) userAttemptAndPortraitIter[1];
 	    McQueUsr user = userAttempt.getMcQueUsr();
 
 	    //fill in question and option uids
@@ -1658,7 +1657,7 @@ public class McService
 	    confidenceLevelDto.setUserId(user.getQueUsrId().intValue());
 	    String userName = StringUtils.isBlank(user.getFullname()) ? user.getUsername() : user.getFullname();
 	    confidenceLevelDto.setUserName(userName);
-	    confidenceLevelDto.setPortraitUuid(portraitUuid);
+	    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 	    confidenceLevelDto.setLevel(userAttempt.getConfidenceLevel());
 	    confidenceLevelDto.setType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
 	    QbQuestion qbQuestion = userAttempt.getMcQueContent().getQbQuestion();

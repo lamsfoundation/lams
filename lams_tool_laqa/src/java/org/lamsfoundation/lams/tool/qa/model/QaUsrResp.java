@@ -73,7 +73,7 @@ public class QaUsrResp extends QbToolAnswer implements Serializable {
     private ItemRatingDTO itemRatingDto;
 
     @Transient
-    private Long portraitId;
+    private String portraitId;
 
     /** full constructor */
     public QaUsrResp(Long uid, String answer, String answerAutosaved, Date attemptTime, String timezone,
@@ -159,11 +159,11 @@ public class QaUsrResp extends QbToolAnswer implements Serializable {
 	this.itemRatingDto = itemRatingDto;
     }
 
-    public Long getPortraitId() {
+    public String getPortraitId() {
 	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
+    public void setPortraitId(String portraitId) {
 	this.portraitId = portraitId;
     }
 }

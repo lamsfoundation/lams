@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
 import java.util.List;
@@ -127,15 +125,13 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	}
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
-	
+
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.* ")
-		.append(portraitStrings[0])
-		.append(", COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ")
+	queryText.append("SELECT user.* ").append(portraitStrings[0]).append(
+		", COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ")
 		.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry")
-		.append(" FROM tl_lasbmt11_user user ")
-		.append(portraitStrings[1])
+		.append(" FROM tl_lasbmt11_user user ").append(portraitStrings[1])
 		.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ")
 		.append(" LEFT JOIN tl_lasbmt11_report report ON details.submission_id = report.report_id ");
 
@@ -156,12 +152,11 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", SubmitUser.class)
-		.addScalar("portraitId", IntegerType.INSTANCE)
+	query.addEntity("user", SubmitUser.class).addScalar("portraitId", StringType.INSTANCE)
 		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
 		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
 		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
-	return query.list(); 
+	return query.list();
     }
 
     private void buildNameSearch(String searchString, StringBuilder sqlBuilder) {
@@ -203,7 +198,8 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	NativeQuery<StatisticDTO> query = getSession().createNativeQuery(GET_STATISTICS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("totalUploadedFiles", IntegerType.INSTANCE).addScalar("markedCount", IntegerType.INSTANCE)
-		.setParameter("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+		.setParameter("contentId", contentId)
+		.setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
 
 	List<StatisticDTO> list = query.list();
 	for (StatisticDTO dto : list) {
@@ -211,13 +207,13 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	}
 	return list;
     }
-    
-    
+
     private static final String GET_LEADER_STATISTICS = "SELECT session.session_id sessionId, session.session_name sessionName, "
 	    + " COUNT(detail.submission_id) totalUploadedFiles, COUNT(report.marks) markedCount"
 	    + " FROM tl_lasbmt11_session session, tl_lasbmt11_submission_details detail, tl_lasbmt11_report report "
 	    + " WHERE session.content_id = :contentId and detail.session_id = session.session_id "
-	    + " AND detail.submission_id = report.report_id AND session.group_leader_uid= detail.learner_id" + " GROUP BY session.session_id";
+	    + " AND detail.submission_id = report.report_id AND session.group_leader_uid= detail.learner_id"
+	    + " GROUP BY session.session_id";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -225,7 +221,8 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	NativeQuery<StatisticDTO> query = getSession().createNativeQuery(GET_LEADER_STATISTICS);
 	query.addScalar("sessionId", LongType.INSTANCE).addScalar("sessionName", StringType.INSTANCE)
 		.addScalar("totalUploadedFiles", IntegerType.INSTANCE).addScalar("markedCount", IntegerType.INSTANCE)
-		.setParameter("contentId", contentId).setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
+		.setParameter("contentId", contentId)
+		.setResultTransformer(Transformers.aliasToBean(StatisticDTO.class));
 
 	List<StatisticDTO> list = query.list();
 	for (StatisticDTO dto : list) {
@@ -233,22 +230,19 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	}
 	return list;
     }
-    
-    
+
     private static final String GET_GROUP_REPORTS = "SELECT report.report_id reportId "
 	    + " FROM tl_lasbmt11_submission_details detail, tl_lasbmt11_report report "
-	    + " WHERE detail.session_id = :sessionId "
-	    + " AND detail.submission_id = report.report_id "
-    	    + " AND detail.uuid = (SELECT uuid from tl_lasbmt11_submission_details "
+	    + " WHERE detail.session_id = :sessionId " + " AND detail.submission_id = report.report_id "
+	    + " AND detail.uuid = (SELECT uuid from tl_lasbmt11_submission_details "
 	    + " WHERE submission_id = :reportId); ";
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<Long> getReportsForGroup(final Long sessionId, final Long reportId) {
 	NativeQuery<Long> query = getSession().createNativeQuery(GET_GROUP_REPORTS);
-	query.addScalar("reportId", LongType.INSTANCE)
-		.setParameter("sessionId", sessionId)
-		.setParameter("reportId", reportId);
+	query.addScalar("reportId", LongType.INSTANCE).setParameter("sessionId", sessionId).setParameter("reportId",
+		reportId);
 
 	return query.list();
     }

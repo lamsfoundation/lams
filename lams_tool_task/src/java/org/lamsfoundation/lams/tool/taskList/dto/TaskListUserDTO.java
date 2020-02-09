@@ -6,11 +6,11 @@ import java.util.Set;
 
 public class TaskListUserDTO {
     private Long userId;
-    private Long portraitId;
+    private String portraitId;
     private String fullName;
     private boolean verifiedByMonitor;
 
-    private Set<Long> completedTaskUids = new LinkedHashSet<Long>();
+    private Set<Long> completedTaskUids = new LinkedHashSet<>();
     private boolean completed;
     // item complete date. Used in monitoring summary page
     private Date accessDate;
@@ -63,12 +63,12 @@ public class TaskListUserDTO {
 	this.accessDate = accessDate;
     }
 
-    public Long getPortraitId() {
-        return portraitId;
+    public String getPortraitId() {
+	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
-        this.portraitId = portraitId;
+    public void setPortraitId(String portraitId) {
+	this.portraitId = portraitId;
     }
 
 }

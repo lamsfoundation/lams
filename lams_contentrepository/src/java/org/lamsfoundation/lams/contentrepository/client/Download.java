@@ -138,8 +138,6 @@ public abstract class Download extends HttpServlet {
     private void handleCall(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, RepositoryCheckedException {
 
-	long start = System.currentTimeMillis();
-
 	ITicket ticket = null;
 	String toolContentHandlerName = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME);
 	if (StringUtils.isBlank(toolContentHandlerName)) {
@@ -152,18 +150,16 @@ public abstract class Download extends HttpServlet {
 	    throw new RepositoryCheckedException("Unable to get ticket - getTicket(false) returned null");
 	}
 
-	Long uuid = Download.getLong(request.getParameter(Download.UUID_NAME));
+	String uuid = request.getParameter(Download.UUID_NAME);
 	Long version = null;
 	boolean saveFile = Download.getBoolean(request.getParameter(Download.PREFER_DOWNLOAD));
-
-	String callId = null;
 
 	if (uuid != null) {
 
 	    version = Download.getLong(request.getParameter(Download.VERSION_NAME));
-
-	    IVersionedNode node = getFileItem(ticket, uuid, version, null);
-
+	    // check if it is plain numeric UUID or complex portrait UUID
+	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
+		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
 	    // update versionId in case it was null and we got the latest version...
 	    version = node.getVersion();
 
@@ -200,11 +196,9 @@ public abstract class Download extends HttpServlet {
 	    // using the /download/<id>/<filename> format - must be a file node!
 	    String pathString = request.getPathInfo();
 	    String[] strings = deriveIdFile(pathString);
-	    uuid = Download.getLong(strings[0]);
+	    uuid = strings[0];
 	    version = Download.getLong(strings[1]);
 	    String relPathString = strings[2];
-
-	    callId = "download " + Math.random() + " " + uuid;
 
 	    if (uuid == null) {
 		throw new RepositoryCheckedException("UUID value is missing. " + Download.expectedFormat);
@@ -218,36 +212,15 @@ public abstract class Download extends HttpServlet {
 		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
 	    }
 
-	    IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
+	    // check if it is plain numeric UUID or complex portrait UUID
+	    IVersionedNode node = uuid.contains("-") ? getRepositoryService().getFileItem(ticket, uuid, version)
+		    : getRepositoryService().getFileItem(ticket, Long.valueOf(uuid), version);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
 		throw new RepositoryCheckedException(
 			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);
 	    }
 	    handleFileNode(response, request, node, saveFile);
 
-	}
-    }
-
-    /**
-     * The call getFileItem was throwing a runtime hibernate/jdbc error when being thrash tested, and I couldn't work
-     * out the context, so I've wrapped the call here so it can be debugged.
-     */
-    private IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version, String relPathString)
-	    throws RepositoryCheckedException {
-	try {
-	    IVersionedNode node = null;
-	    if (relPathString != null) {
-		// get file in package
-		node = getRepositoryService().getFileItem(ticket, uuid, version, relPathString);
-	    } else {
-		// get node
-		node = getRepositoryService().getFileItem(ticket, uuid, version);
-	    }
-	    return node;
-	} catch (RuntimeException e) {
-	    Download.log.error("Exception thrown calling repository.getFileItem(<ticket>," + uuid + "," + version + ","
-		    + relPathString + "). " + e.getMessage(), e);
-	    throw e;
 	}
     }
 

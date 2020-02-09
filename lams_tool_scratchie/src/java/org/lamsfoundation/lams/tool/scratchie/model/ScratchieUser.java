@@ -76,7 +76,7 @@ public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
     //******************** DTO **********************
 
     @Transient
-    private Long portraitId;
+    private String portraitId;
 
     public ScratchieUser() {
     }
@@ -191,11 +191,11 @@ public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
 	this.sessionFinished = sessionFinished;
     }
 
-    public Long getPortraitId() {
+    public String getPortraitId() {
 	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
+    public void setPortraitId(String portraitId) {
 	this.portraitId = portraitId;
     }
 

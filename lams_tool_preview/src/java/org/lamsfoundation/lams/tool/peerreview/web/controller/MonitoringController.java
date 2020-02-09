@@ -82,10 +82,9 @@ public class MonitoringController {
     @Autowired
     @Qualifier("peerreviewService")
     private IPeerreviewService service;
-    
+
     @RequestMapping("/summary")
-    public String summary(HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String summary(HttpServletRequest request, HttpServletResponse response) {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -113,8 +112,7 @@ public class MonitoringController {
 
     @RequestMapping("/criteria")
     @SuppressWarnings("unchecked")
-    public String criteria(HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String criteria(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -147,14 +145,13 @@ public class MonitoringController {
 	}
 	return null;
     }
-    
-    /** 
+
+    /**
      * Refreshes user list.
      */
     @RequestMapping("/getUsers")
     @ResponseBody
-    public String  getUsers(HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
+    public String getUsers(HttpServletRequest request, HttpServletResponse res) throws IOException, ServletException {
 
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
@@ -282,8 +279,7 @@ public class MonitoringController {
 
     @RequestMapping("/getSubgridData")
     @ResponseBody
-    public String getSubgridData(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String getSubgridData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	Long itemId = WebUtil.readLongParam(request, "itemId");
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
@@ -304,8 +300,8 @@ public class MonitoringController {
 	    if (ratingDetails[2] != null) {
 		ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 		userData.add(i);
-		userData.add((String)ratingDetails[4]);
-		userData.add((String)ratingDetails[2]);
+		userData.add((String) ratingDetails[4]);
+		userData.add((String) ratingDetails[2]);
 		userData.add(title);
 
 		ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -326,7 +322,7 @@ public class MonitoringController {
 			|| (criteria.isHedgeStyleRating() && ratingDetails[2] != null))) {
 		    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 		    userData.add(i);
-		    userData.add((String)ratingDetails[4]);
+		    userData.add((String) ratingDetails[4]);
 		    String commentText = HtmlUtils.htmlEscape(comment);
 		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
 		    userData.add(commentText);
@@ -352,8 +348,7 @@ public class MonitoringController {
     }
 
     @RequestMapping("/statistic")
-    public String statistic(HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String statistic(HttpServletRequest request, HttpServletResponse response) {
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	request.setAttribute("summaryList", service.getStatistics(toolContentId));
@@ -363,8 +358,7 @@ public class MonitoringController {
 
     @RequestMapping("/reflections")
     @SuppressWarnings("unchecked")
-    public String reflections(HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String reflections(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -381,8 +375,7 @@ public class MonitoringController {
     @RequestMapping("/getReflections")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public String  getReflections(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String getReflections(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -439,8 +432,8 @@ public class MonitoringController {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(asLong(nbEntry[0])); // user id
 	    userData.add((String) nbEntry[2]); // user name
-	    
-	    Date entryTime = (Date) nbEntry[5];  // when....
+
+	    Date entryTime = (Date) nbEntry[5]; // when....
 	    if (entryTime == null) {
 		userData.add("");
 	    } else {
@@ -450,7 +443,7 @@ public class MonitoringController {
 		userData.add(nameField.toString());
 	    }
 
-	    userData.add(asLong(nbEntry[3]));
+	    userData.add((String) nbEntry[3]);
 	    userData.add(HtmlUtils.htmlEscape((String) nbEntry[4]));
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -468,8 +461,7 @@ public class MonitoringController {
 
     @RequestMapping("/previewResultsToUser")
     @SuppressWarnings("unchecked")
-    public String previewResultsToUser(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String previewResultsToUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -491,8 +483,8 @@ public class MonitoringController {
     @RequestMapping("/sendPreviewedResultsToUser")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public String sendPreviewedResultsToUser(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String sendPreviewedResultsToUser(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	// if we regenerate the results, it is more work for the server and the results may change. if we want to
 	// just send what the monitor already sees, get it back from the sessionMap, check that it should be the
 	// same email (ie check the parameters) and if all good then send.
@@ -530,8 +522,8 @@ public class MonitoringController {
     @RequestMapping("/sendResultsToSessionUsers")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public String sendResultsToSessionUsers(HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String sendResultsToSessionUsers(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -593,8 +585,7 @@ public class MonitoringController {
 
     @RequestMapping("/manageUsers")
     @SuppressWarnings("unchecked")
-   public String manageUsers(HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+    public String manageUsers(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -610,8 +601,8 @@ public class MonitoringController {
      */
     @RequestMapping("/getManageUsers")
     @ResponseBody
-    public String getManageUsers(HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
+    public String getManageUsers(HttpServletRequest request, HttpServletResponse res)
+	    throws IOException, ServletException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
@@ -661,8 +652,7 @@ public class MonitoringController {
 
     @RequestMapping("/setUserHidden")
     @ResponseBody
-    public String setUserHidden(HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String setUserHidden(HttpServletRequest request, HttpServletResponse response) {
 
 	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long userUid = WebUtil.readLongParam(request, "userUid");
@@ -672,5 +662,4 @@ public class MonitoringController {
 	return "";
     }
 
-   
 }

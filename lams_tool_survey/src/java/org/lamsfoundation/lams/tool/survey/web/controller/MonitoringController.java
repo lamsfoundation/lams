@@ -64,8 +64,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -224,7 +224,7 @@ public class MonitoringController {
 		responseRow.put("answerText", answer);
 	    }
 	    if (userAndAnswers.length > 3 && userAndAnswers[3] != null) {
-		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number) userAndAnswers[3]).longValue());
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, (String) userAndAnswers[3]);
 	    }
 	    rows.add(responseRow);
 	}
@@ -283,7 +283,7 @@ public class MonitoringController {
 	    }
 
 	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, ((Number) userAndReflection[2]).longValue());
+		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[2]);
 	    }
 
 	    rows.add(responseRow);

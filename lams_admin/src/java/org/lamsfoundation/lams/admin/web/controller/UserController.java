@@ -173,7 +173,7 @@ public class UserController {
 		userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.setUserTheme(userSelectedTheme);
-	    userForm.setInitialPortraitId(user.getPortraitUuid());
+	    userForm.setInitialPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 
 	    //property available for modification only to sysadmins
 	    userForm.setTwoFactorAuthenticationEnabled(user.isTwoFactorAuthenticationEnabled());
