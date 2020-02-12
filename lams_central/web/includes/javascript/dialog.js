@@ -47,12 +47,13 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		}
 	}
 
-	// checks whether the dialog should be created inside a current window or in a parent one. The latter is prefered 
+	// checks whether the dialog should be created inside a current window or in a parent one. The latter is preferred 
 	//in case we want dialog to be not constrained by the boundaries of a current window
-	var body = initParams.isCreateInParentWindow ? parent.$("body") : 'body';
+	var targetWindow = initParams.isCreateInParentWindow ? window.parent : window;
 	
 	// create a new dialog by cloning a template
-	dialog = dialogTemplate.clone().appendTo(body);
+	dialog = dialogTemplate.clone().appendTo(targetWindow.$('body'));
+	dialog.data('isCreateInParentWindow', initParams.isCreateInParentWindow);
 	
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
@@ -146,11 +147,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			// center the dialog or put it into previously defined position
 			var position = dialog.data('position');
 			if (position !== false) {
-				position = position || {
-					'my' : 'top',
-					'at' : 'top+15px',
-					'of' : window
-				};
+				position = position || 
+					(dialog.data('isCreateInParentWindow') ?
+						{
+							'my' : 'center center',
+							'at' : 'center center',
+							'of' : targetWindow
+						}
+						:
+						{
+							'my' : 'top',
+							'at' : 'top+15px',
+							'of' : window
+						}
+					);
 				dialog.position(position);
 			}
 
@@ -227,11 +237,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				$('.ui-resizable-handle', dialog).hide();
 			}
 			// center the dialog
-			 (initParams.modal ? internalDialog : dialog).position({
-				'my' : 'top',
-				'at' : 'center top',
-				'of' : window
-			});
+			 (initParams.modal ? internalDialog : dialog).position(
+					 dialog.data('isCreateInParentWindow') ?
+								{
+									'my' : 'center center',
+									'at' : 'center center',
+									'of' : window.parent
+								}
+								:
+								{
+									'my' : 'top',
+									'at' : 'center top',
+									'of' : window
+								}
+			);
 			
 			internalContent.trigger('resizestop');
 		});
@@ -405,11 +424,10 @@ function showNotificationsDialog(orgID, lessonID) {
 				}
 			}
 		}, true)
-	
-	// reposition the dialog after showing because it may not fit into current viewport
-	dialog.on('shown.bs.modal', function(){
-		dialog.css('top', '15px');
-	});
+		
+//	dialog.on('shown.bs.modal', function(){
+//		dialog.css('top', '15px');
+//	});
 }
 
 
