@@ -41,7 +41,6 @@
 	
 		  // Setup form validation 
 		  $("#change-password").validate({
-		  		debug: true,
 		  		errorClass: 'help-block',
 		      //  validation rules
 		      rules: {

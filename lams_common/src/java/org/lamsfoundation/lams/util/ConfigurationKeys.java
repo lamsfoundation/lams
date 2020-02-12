@@ -313,4 +313,5 @@ public class ConfigurationKeys {
     public static String WORKFLOW_AUTOMATION_API_URL = "WorkflowAutomationApiURL";
     public static String WORKFLOW_AUTOMATION_CLIENT_ID = "WorkflowAutomationClientID";
     public static String WORKFLOW_AUTOMATION_CLIENT_SECRET = "WorkflowAutomationClientSecret";
+    public static String WORKFLOW_AUTOMATION_INTEGRATED_SERVER = "WorkflowAutomationIntServer";
 }
