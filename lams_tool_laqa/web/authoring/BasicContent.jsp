@@ -38,7 +38,8 @@
 				url,
 				{
 					questionIndex: questionIndex,
-					sessionMapID: "${sessionMapID}"
+					sessionMapID: "${sessionMapID}",
+					'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 				},
 				function(){
 					refreshThickbox();
