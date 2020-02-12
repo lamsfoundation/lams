@@ -378,33 +378,38 @@ function showNotificationsDialog(orgID, lessonID) {
 		height = width < 798 ? 850 : 650;
 	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
-	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
-	showDialog(id, {
-		'data' : {
-			'orgID' : orgID,
-			'lessonID' : lessonID
-		},
-		'height': height,
-		'width' : width,
-		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
-		"isCreateInParentWindow" : !isTopLevelWindow,		
-		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-		'open' : function() {
-			var dialog = this,
-				lessonID = dialog.data('lessonID');
-			// if lesson ID is given, use lesson view; otherwise use course view
-			if (lessonID) {
-				// load contents after opening the dialog
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-					+ lessonID);
-			} else {
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-					+ orgID);
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID),
+		dialog = showDialog(id, {
+			'data' : {
+				'orgID' : orgID,
+				'lessonID' : lessonID
+			},
+			'height': height,
+			'width' : width,
+			//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
+			"isCreateInParentWindow" : !isTopLevelWindow,		
+			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+			'open' : function() {
+				var dialog = $(this),
+					lessonID = dialog.data('lessonID');
+				// if lesson ID is given, use lesson view; otherwise use course view
+				if (lessonID) {
+					// load contents after opening the dialog
+					$('iframe', dialog).attr('src', LAMS_URL
+						+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
+						+ lessonID);
+				} else {
+					$('iframe', dialog).attr('src', LAMS_URL
+						+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
+						+ orgID);
+				}
 			}
-		}
-	}, true);
+		}, true)
+	
+	// reposition the dialog after showing because it may not fit into current viewport
+	dialog.on('shown.bs.modal', function(){
+		dialog.css('top', '15px');
+	});
 }
 
 
