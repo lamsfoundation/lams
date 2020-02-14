@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.util;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 /**
  * General utility functions relating to parsing version strings.
  *
@@ -48,12 +50,15 @@ public class VersionUtil {
 	Long versionParts[] = new Long[4];
 	if (versionString != null) {
 	    String split[] = versionString.split("[\\.]");
+	    
 	    if (split.length > 0) {
-		versionParts[0] = Long.parseLong(split[0]);
+		versionParts[0] = NumberUtils.isNumber(split[0]) ? Long.parseLong(split[0]) : null;
+		
 		if (split.length > 1) {
-		    versionParts[1] = Long.parseLong(split[1]);
+		    versionParts[1] = NumberUtils.isNumber(split[1]) ? Long.parseLong(split[1]) : null;
+		    
 		    if (split.length > 2) {
-			versionParts[2] = Long.parseLong(split[2]);
+			versionParts[2] = NumberUtils.isNumber(split[2]) ? Long.parseLong(split[2]) : null;
 		    }
 		}
 	    }
