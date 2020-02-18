@@ -130,24 +130,25 @@ SET activity.learning_library_id = assmTool.learning_library_id,
 UPDATE lams_notebook_entry
 SET external_signature = 'laasse10'
 WHERE external_signature='lamc11';
-    
+
+--remove temporary columns
 ALTER TABLE tl_laasse10_assessment DROP COLUMN tmp_mcq_uid;
 ALTER TABLE tl_laasse10_session DROP COLUMN tmp_mcq_session_uid;
 ALTER TABLE tl_laasse10_user DROP COLUMN tmp_mcq_user_uid;
 ALTER TABLE tl_laasse10_question_reference DROP COLUMN tmp_mcq;
 
---DROP TABLE tl_lamc11_content,
---           tl_lamc11_session,
---           tl_lamc11_que_usr,
---           tl_lamc11_que_content,
---           tl_lamc11_configuration,
---           tl_lamc11_usr_attempt;
-
+--remove all traces of MCQ tool
+DROP TABLE tl_lamc11_content,
+           tl_lamc11_session,
+           tl_lamc11_que_usr,
+           tl_lamc11_que_content,
+           tl_lamc11_configuration,
+           tl_lamc11_usr_attempt;
 DELETE library FROM `lams_learning_library` library 
     JOIN lams_tool AS tool ON tool.learning_library_id = library.learning_library_id
     WHERE (tool.`tool_signature` = 'lamc11');
-
 DELETE FROM `lams_tool` WHERE (`tool_signature` = 'lamc11');
+DELETE patch FROM `patches` patch where system_name='lamc11';
 
 UPDATE lams_tool SET tool_version='20200120' WHERE tool_signature='laasse10';
         

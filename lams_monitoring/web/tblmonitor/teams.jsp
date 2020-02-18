@@ -124,7 +124,7 @@
 			$('#ira-user-score').html(userScore);
 
 			//load modal dialog content using Ajax
-			var url = "${isIraMcqAvailable}" == "true" ? "<lams:LAMSURL/>tool/lamc11/tblmonitoring/getModalDialogForTeamsTab.do" : "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
+			var url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/getModalDialogForTeamsTab.do";
 			$('#ira-modal .modal-body').load(
 				url, 
 				{
@@ -205,7 +205,7 @@
 										<fmt:message key="label.student"/>
 									</th>
 									
-									<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+									<c:if test="${isIraAvailable}">
 										<th class="text-center">
 											<fmt:message key="label.ira"/>
 										</th>
@@ -233,7 +233,7 @@
 											</c:if>
 										</td>
 										
-										<c:if test="${isIraAssessmentAvailable || isIraMcqAvailable}">
+										<c:if test="${isIraAvailable}">
 											<td class="col-md-2 text-center">
 												<c:choose>
 													<c:when test="${userDto.iraScore != null}">
@@ -269,7 +269,7 @@
 					<!-- Change leader and Compare buttons -->
 					<div class="row">
 						<div class="col-xs-12 col-md-12 col-lg-12">
-							<c:if test="${(isIraAssessmentAvailable || isIraMcqAvailable) && isScratchieAvailable}">
+							<c:if test="${(isIraAvailable) && isScratchieAvailable}">
 								<button href="#" data-toggle="modal" data-target="#comparison-modal" type="button" class="btn btn-sm btn-default pull-right"
 										data-ira-scores="
 										<c:forEach var="userDto" items="${groupDto.userList}">

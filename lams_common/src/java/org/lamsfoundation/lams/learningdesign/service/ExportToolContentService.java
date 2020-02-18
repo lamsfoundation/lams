@@ -746,7 +746,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		String fromVersion = activity.getToolVersion();
 
 		//transform MCQ tool to Assessment
-		if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(activity.getToolSignature())) {
+		if ("lamc11".equals(activity.getToolSignature())) {
 		    activity.setToolSignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
 		    
 		    // run all appropriate methods from McqImportContentVersionFilter, transforming MCQ object to its latest version and then to Assessment object

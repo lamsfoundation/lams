@@ -968,7 +968,7 @@ public class MonitoringController {
     }
 
     /**
-     * If learning design contains the following activities Grouping->(MCQ or Assessment)->Leader Selection->Scratchie
+     * If learning design contains the following activities Grouping->Assessment->Leader Selection->Scratchie
      * (potentially with some other gates or activities in the middle), there is a good chance this is a TBL sequence
      * and all activities must be grouped.
      */
@@ -986,7 +986,7 @@ public class MonitoringController {
      *
      * @param activity
      * @param anticipatedActivity
-     *            could be either "Grouping", "MCQ or Assessment", "Leaderselection" or "Scratchie"
+     *            could be either "Grouping", "Assessment", "Leaderselection" or "Scratchie"
      */
     private boolean verifyNextActivityFitsTbl(Activity activity, String anticipatedActivity) {
 
@@ -1004,22 +1004,20 @@ public class MonitoringController {
 	    case "Grouping":
 		//the first activity should be a grouping
 		if (activity instanceof GroupingActivity) {
-		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		    return verifyNextActivityFitsTbl(nextActivity, "Assessment");
 
 		} else {
 		    return verifyNextActivityFitsTbl(nextActivity, "Grouping");
 		}
 
-	    case "MCQ or Assessment":
-		//the second activity shall be a MCQ or Assessment
+	    case "Assessment":
+		//the second activity shall be Assessment
 		if (activity.isToolActivity() && (CommonConstants.TOOL_SIGNATURE_ASSESSMENT
-			.equals(((ToolActivity) activity).getTool().getToolSignature())
-			|| CommonConstants.TOOL_SIGNATURE_MCQ
-				.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
+			.equals(((ToolActivity) activity).getTool().getToolSignature()))) {
 		    return verifyNextActivityFitsTbl(nextActivity, "Leaderselection");
 
 		} else {
-		    return verifyNextActivityFitsTbl(nextActivity, "MCQ or Assessment");
+		    return verifyNextActivityFitsTbl(nextActivity, "Assessment");
 		}
 
 	    case "Leaderselection":
