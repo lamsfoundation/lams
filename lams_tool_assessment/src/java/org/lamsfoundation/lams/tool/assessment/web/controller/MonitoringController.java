@@ -526,7 +526,6 @@ public class MonitoringController {
     public void exportSummary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	String fileName = null;
-	boolean showUserNames = true;
 
 	Long contentId = null;
 	List<SessionDTO> sessionDtos;
@@ -535,13 +534,11 @@ public class MonitoringController {
 		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	    showUserNames = true;
 	    sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
 
 	} else {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
 	    fileName = WebUtil.readStrParam(request, "fileName");
-	    showUserNames = false;
 	    sessionDtos = service.getSessionDtos(contentId, true);
 	}
 
@@ -550,7 +547,7 @@ public class MonitoringController {
 	    return;
 	}
 
-	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos, showUserNames);
+	List<ExcelSheet> sheets = service.exportSummary(assessment, sessionDtos);
 
 	// Setting the filename if it wasn't passed in the request
 	if (fileName == null) {

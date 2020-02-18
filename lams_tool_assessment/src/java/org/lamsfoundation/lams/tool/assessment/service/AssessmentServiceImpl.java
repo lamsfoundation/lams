@@ -1640,119 +1640,114 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames) {
-	List<ExcelSheet> sheets = new LinkedList<>();
+    public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
-	if (showUserNames) {
-	    ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
-	    sheets.add(summarySheet);
+	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
+	sheets.add(summarySheet);
 
-	    if (sessionDtos != null) {
-		for (SessionDTO sessionDTO : sessionDtos) {
-		    Long sessionId = sessionDTO.getSessionId();
+	if (sessionDtos != null) {
+	    for (SessionDTO sessionDTO : sessionDtos) {
+		Long sessionId = sessionDTO.getSessionId();
 
-		    summarySheet.addEmptyRow();
+		summarySheet.addEmptyRow();
 
-		    ExcelRow sessionTitleRow = summarySheet.initRow();
-		    sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
+		ExcelRow sessionTitleRow = summarySheet.initRow();
+		sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
 
-		    List<AssessmentUserDTO> userDtos = new ArrayList<>();
-		    // in case of UseSelectLeaderToolOuput - display only one user
-		    if (assessment.isUseSelectLeaderToolOuput()) {
+		List<AssessmentUserDTO> userDtos = new ArrayList<>();
+		// in case of UseSelectLeaderToolOuput - display only one user
+		if (assessment.isUseSelectLeaderToolOuput()) {
 
-			AssessmentSession session = getSessionBySessionId(sessionId);
-			AssessmentUser groupLeader = session.getGroupLeader();
+		    AssessmentSession session = getSessionBySessionId(sessionId);
+		    AssessmentUser groupLeader = session.getGroupLeader();
 
-			if (groupLeader != null) {
+		    if (groupLeader != null) {
 
-			    float assessmentResult = getLastTotalScoreByUser(assessment.getUid(),
-				    groupLeader.getUserId());
+			float assessmentResult = getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
 
-			    AssessmentUserDTO userDto = new AssessmentUserDTO();
-			    userDto.setFirstName(groupLeader.getFirstName());
-			    userDto.setLastName(groupLeader.getLastName());
-			    userDto.setGrade(assessmentResult);
-			    userDtos.add(userDto);
-			}
-
-		    } else {
-			int countSessionUsers = sessionDTO.getNumberLearners();
-
-			// Get the user list from the db
-			userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
+			AssessmentUserDTO userDto = new AssessmentUserDTO();
+			userDto.setFirstName(groupLeader.getFirstName());
+			userDto.setLastName(groupLeader.getLastName());
+			userDto.setGrade(assessmentResult);
+			userDtos.add(userDto);
 		    }
 
-		    float minGrade = -9999999;
-		    float maxGrade = 0;
-		    for (AssessmentUserDTO userDto : userDtos) {
-			float grade = userDto.getGrade();
-			if (grade < minGrade || minGrade == -9999999) {
-			    minGrade = grade;
-			}
-			if (grade > maxGrade) {
-			    maxGrade = grade;
-			}
-		    }
-		    if (minGrade == -9999999) {
-			minGrade = 0;
-		    }
+		} else {
+		    int countSessionUsers = sessionDTO.getNumberLearners();
 
-		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
-			    10);
-		    // work out total marks so we can do percentages. need as float for the correct divisions
-		    int totalNumEntries = 0;
-		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-			totalNumEntries += entry.getValue();
-		    }
-
-		    // Mark Summary Min, Max + Grouped Percentages
-		    summarySheet.addEmptyRow();
-		    ExcelRow minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.number.learners"), true);
-		    minMaxRow.addCell(totalNumEntries);
-
-		    minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.lowest.mark"), true);
-		    minMaxRow.addCell((double) minGrade);
-
-		    minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.highest.mark"), true);
-		    minMaxRow.addCell((double) maxGrade);
-		    summarySheet.addEmptyRow();
-
-		    ExcelRow binSummaryRow = summarySheet.initRow();
-		    binSummaryRow.addCell(getMessage("label.authoring.basic.list.header.mark"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow.addCell(getMessage("label.number.learners"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    float totalNumEntriesAsFloat = totalNumEntries;
-		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-			binSummaryRow = summarySheet.initRow();
-			binSummaryRow.addCell(entry.getKey());
-			binSummaryRow.addCell(entry.getValue());
-			binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
-		    }
-		    summarySheet.addEmptyRow();
-		    summarySheet.addEmptyRow();
-
-		    ExcelRow summaryTitleRow = summarySheet.initRow();
-		    summaryTitleRow.addCell(getMessage("label.export.user.id"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-
-		    for (AssessmentUserDTO userDto : userDtos) {
-			ExcelRow userResultRow = summarySheet.initRow();
-			userResultRow.addCell(userDto.getLogin());
-			userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
-			userResultRow.addCell(userDto.getGrade());
-		    }
-		    summarySheet.addEmptyRow();
+		    // Get the user list from the db
+		    userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
 		}
+
+		float minGrade = -9999999;
+		float maxGrade = 0;
+		for (AssessmentUserDTO userDto : userDtos) {
+		    float grade = userDto.getGrade();
+		    if (grade < minGrade || minGrade == -9999999) {
+			minGrade = grade;
+		    }
+		    if (grade > maxGrade) {
+			maxGrade = grade;
+		    }
+		}
+		if (minGrade == -9999999) {
+		    minGrade = 0;
+		}
+
+		LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
+			10);
+		// work out total marks so we can do percentages. need as float for the correct divisions
+		int totalNumEntries = 0;
+		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
+		    totalNumEntries += entry.getValue();
+		}
+
+		// Mark Summary Min, Max + Grouped Percentages
+		summarySheet.addEmptyRow();
+		ExcelRow minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.number.learners"), true);
+		minMaxRow.addCell(totalNumEntries);
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.lowest.mark"), true);
+		minMaxRow.addCell((double) minGrade);
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.highest.mark"), true);
+		minMaxRow.addCell((double) maxGrade);
+		summarySheet.addEmptyRow();
+
+		ExcelRow binSummaryRow = summarySheet.initRow();
+		binSummaryRow.addCell(getMessage("label.authoring.basic.list.header.mark"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		binSummaryRow.addCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		float totalNumEntriesAsFloat = totalNumEntries;
+		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
+		    binSummaryRow = summarySheet.initRow();
+		    binSummaryRow.addCell(entry.getKey());
+		    binSummaryRow.addCell(entry.getValue());
+		    binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
+		}
+		summarySheet.addEmptyRow();
+		summarySheet.addEmptyRow();
+
+		ExcelRow summaryTitleRow = summarySheet.initRow();
+		summaryTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+
+		for (AssessmentUserDTO userDto : userDtos) {
+		    ExcelRow userResultRow = summarySheet.initRow();
+		    userResultRow.addCell(userDto.getLogin());
+		    userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
+		    userResultRow.addCell(userDto.getGrade());
+		}
+		summarySheet.addEmptyRow();
 	    }
 	}
 
@@ -1782,10 +1777,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionTitleRow.addCell(getMessage("label.monitoring.question.summary.default.mark"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	    if (showUserNames) {
-		questionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true,
-			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	    }
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.date.attempted"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.attempted"), true,
@@ -1830,9 +1823,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    hedgeQuestionTitleRow.addCell(getMessage("label.authoring.basic.penalty.factor"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.question.summary.default.mark"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.user.id"), true);
-		    if (showUserNames) {
-			hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
-		    }
+		    hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.date.attempted"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.time.attempted"), true);
 		    for (QbOption option : options) {
@@ -1868,12 +1859,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			Float maxMark = (questionResult.getMaxMark() == null) ? 0
 				: Float.valueOf(questionResult.getMaxMark());
 			userResultRow.addCell(maxMark);
-			if (showUserNames) {
-			    userResultRow.addCell(questionResult.getUser().getLoginName());
-			    userResultRow.addCell(questionResult.getUser().getFullName());
-			} else {
-			    userResultRow.addCell(questionResult.getUser().getUserId());
-			}
+			userResultRow.addCell(questionResult.getUser().getLoginName());
+			userResultRow.addCell(questionResult.getUser().getFullName());
 
 			//date and time
 			ExcelCell dateCell = userResultRow.addCell(questionResult.getFinishDate());
@@ -1935,7 +1922,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		// Calculating the averages
 		ExcelRow averageRow = questionSummarySheet.initRow();
-		averageRow.addEmptyCells(showUserNames ? 8 : 7);
+		averageRow.addEmptyCells(8);
 		averageRow.addCell(getMessage("label.export.average"), true);
 		if (timeTakenTotal > 0) {
 		    averageRow.addCell(Long.valueOf(timeTakenTotal / timeTakenCount));
@@ -2044,7 +2031,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 		if (assessmentUsers != null) {
 		    for (AssessmentUser assessmentUser : assessmentUsers) {
-			if (showUserNames) {
 			    ExcelRow userTitleRow = userSummarySheet.initRow();
 			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
 			    userTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
@@ -2053,28 +2039,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow.addCell(getMessage("label.export.mark"), true);
 
-			} else {
-			    ExcelRow userTitleRow = userSummarySheet.initRow();
-			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
-			    userTitleRow.addCell(getMessage("label.export.mark"), true);
-			}
-
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
 			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
 			    if (questionResults != null) {
 				for (AssessmentQuestionResult questionResult : questionResults) {
 				    ExcelRow userResultRow = userSummarySheet.initRow();
-				    if (showUserNames) {
-					userResultRow.addCell(assessmentUser.getLoginName());
-					userResultRow.addCell(assessmentUser.getFullName());
-				    } else {
-					userResultRow.addCell(assessmentUser.getUserId());
-				    }
-
+				    userResultRow.addCell(assessmentUser.getLoginName());
+				    userResultRow.addCell(assessmentUser.getFullName());
 				    userResultRow.addCell(assessmentResult.getStartDate());
 				    userResultRow.addCell(questionResult.getQbQuestion().getName());
 				    userResultRow.addCell(
@@ -2084,7 +2056,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 
 			    ExcelRow userTotalRow = userSummarySheet.initRow();
-			    userTotalRow.addEmptyCells(showUserNames ? 4 : 3);
+			    userTotalRow.addEmptyCells(4);
 			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
 			    userTotalRow.addCell(assessmentResult.getGrade());
 			    userSummarySheet.addEmptyRow();
