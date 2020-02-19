@@ -66,6 +66,11 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
     @Column
     private boolean passed;
 
+    // this is a copy of tool_question_uid from lams_qb_tool_answer, so we can create an unique index on it and que_usr_id
+    // there are no getters or setter for this column as they are not needed
+    @Column(name = "qb_tool_question_uid")
+    private Long qbToolQuestionUid;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "que_usr_id")
     private McQueUsr mcQueUsr;
@@ -79,7 +84,7 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
     public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, QbOption qbOption, Integer mark,
 	    boolean passed, boolean attemptCorrect, int confidenceLevel) {
 	this.attemptTime = attemptTime;
-	this.qbToolQuestion = mcQueContent;
+	setMcQueContent(mcQueContent);
 	this.mcQueUsr = mcQueUsr;
 	this.qbOption = qbOption;
 	this.mark = mark;
@@ -105,6 +110,7 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
 
     public void setMcQueContent(McQueContent mcQueContent) {
 	this.qbToolQuestion = mcQueContent;
+	this.qbToolQuestionUid = this.qbToolQuestion.getUid();
     }
 
     public McQueUsr getMcQueUsr() {
@@ -158,6 +164,10 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
 
     public void setConfidenceLevel(int confidenceLevel) {
 	this.confidenceLevel = confidenceLevel;
+    }
+
+    public Long getQbToolQuestionUid() {
+	return qbToolQuestionUid;
     }
 
     /**
