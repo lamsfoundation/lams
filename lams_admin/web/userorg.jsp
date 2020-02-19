@@ -51,12 +51,12 @@
 		});
 		
 		function updateExistingTotal() {
-			var size = jQuery("li", "#existing").size();
+			var size = jQuery("li", "#existing").length;
 			jQuery("span#totalUsers").text("<fmt:message key="label.number.of.users"><fmt:param>"+size+"</fmt:param></fmt:message>");
 		}
 		
 		function updatePotentialTotal() {
-			var size = jQuery("li", "#potential").size();
+			var size = jQuery("li", "#potential").length;
 			jQuery("span#potentialUsers").text("<fmt:message key="label.number.of.potential.users"><fmt:param>"+size+"</fmt:param></fmt:message>");
 		}
 		
