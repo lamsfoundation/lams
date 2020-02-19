@@ -161,7 +161,9 @@ public class LearningController {
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(DacoConstants.ATTR_REFLECTION_ENTRY, entryText);
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
-	sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
+	String currentView = request.getParameter(DacoConstants.ATTR_LEARNING_VIEW);
+	sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW,
+		StringUtils.isBlank(currentView) ? DacoConstants.LEARNING_VIEW_VERTICAL : currentView);
 
 	List<List<DacoAnswer>> records = dacoService.getDacoAnswersByUser(dacoUser);
 	sessionMap.put(DacoConstants.ATTR_RECORD_LIST, records);
@@ -1000,18 +1002,16 @@ public class LearningController {
     protected String changeView(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
-		WebUtil.readIntParam(request, DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
-	request.setAttribute(DacoConstants.ATTR_LEARNING_CURRENT_TAB,
-		WebUtil.readIntParam(request, DacoConstants.ATTR_LEARNING_CURRENT_TAB));
 	String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
 	if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
-	    sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
+	    currentView = DacoConstants.LEARNING_VIEW_VERTICAL;
 	} else {
-	    sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_HORIZONTAL);
+	    currentView = DacoConstants.LEARNING_VIEW_HORIZONTAL;
 	}
-	return "pages/learning/learning";
+	return "redirect:start.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
+		+ sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID) + "&" + AttributeNames.PARAM_MODE + "="
+		+ sessionMap.get(AttributeNames.PARAM_MODE) + "&" + DacoConstants.ATTR_LEARNING_VIEW + "="
+		+ currentView;
     }
 
     @RequestMapping("/refreshQuestionSummaries")
