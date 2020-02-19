@@ -315,7 +315,7 @@ function showMonitorLessonDialog(lessonID) {
 		// tell the dialog contents that it was resized
 		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
 		// initial resize
-		$('iframe', dialog).load(resizeSequenceCanvas);
+		$('iframe', dialog).on('load', resizeSequenceCanvas);
 		
 		dialog.modal('show');
 	}
@@ -418,7 +418,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 						'contentFolderID' : response.contentFolderID
 					});
 
-					$('iframe', dialog).load(function(){
+					$('iframe', dialog).on('load', function(){
 						if ($(this).contents().find('span.editForm').length > 0){
 							closeAddSingleActivityLessonDialog('save');
 						}
@@ -625,7 +625,7 @@ function closeAddSingleActivityLessonDialog(action) {
 					var frame = $('iframe', dialog);
 					// disable previous onload handler, set in
 					// showAddSingleActivityLessonDialog()
-					frame.off('load').load(function(){
+					frame.off('load').on('load', function(){
 						// disable current onload handler as closing the dialog reloads the iframe
 						frame.off('load');
 						
