@@ -24,7 +24,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
-		$(window).load(function(){
+		$(window).on('load', function(){
 			//dialog displaying user consents given for the specified policy
 			$(".policy-consents-link").click(function() {
 				var policyUid = $(this).data("policy-uid");

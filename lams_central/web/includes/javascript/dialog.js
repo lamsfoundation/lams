@@ -311,7 +311,7 @@ function restoreMinimisedDialog(dialog) {
 	if (isMonitorDialog) {
 		//hide iframe until it gets loaded
 		$('iframe', dialog).hide();
-		$('iframe', dialog).load(function() {
+		$('iframe', dialog).on('load', function() {
 			$('iframe', dialog).show();
 		});
 		
