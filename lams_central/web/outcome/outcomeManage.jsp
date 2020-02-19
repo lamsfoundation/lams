@@ -58,9 +58,7 @@
 					</i>
 				</div>
 				<div class="col-xs-1">
-					<c:if test="${not empty outcome.organisation or canManageGlobal}">
-						<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do"><input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/><button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger btn-xs"><i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i></button></csrf:form>
-					</c:if>
+					<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do"><input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/><button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger btn-xs"><i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i></button></csrf:form>
 				</div>
 			</div>
 		</c:forEach>
