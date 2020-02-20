@@ -69,7 +69,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${entry_status.first}">
 					<c:set var="sigToCheck">
 						<c:if test="${entry.externalSignature != ''}">
-							<c:out value="${entry.externalSignature}" />
+						<c:out value="${entry.externalSignature}" escapeXml="true"/>
 						</c:if>
 					</c:set>
 	
@@ -83,10 +83,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<h4 class="panel-title">
 								<c:choose>
 									<c:when test="${!empty sigToCheck}">
-										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}" />
+										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}" escapeXml="true"/>
 									</c:when>
 									<c:otherwise>
-										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}"/>
+										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}" escapeXml="true"/>
 									</c:otherwise>
 								</c:choose>
 							</h4>
@@ -105,16 +105,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:if test="${!empty sigToCheck && sigToCheck != entry.externalSignature}">
 									<!-- do segment separator -->
 							</table>
-	
-							<c:set var="sigToCheck" value="${entry.externalSignature}" />
-	
+
+                    		<c:set var="sigToCheck">
+                        		<c:if test="${entry.externalSignature != ''}">
+                            		<c:out value="${entry.externalSignature}" escapeXml="true"/>
+                        		</c:if>
+                    		</c:set>
+
 							<h4>
 								<c:choose>
 									<c:when test="${!empty sigToCheck}">
-										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}"/>
+										<fmt:message key="mynotes.signature.${sigToCheck}.heading" /> - <c:out value="${entry.lessonName}" escapeXml="true"/>
 									</c:when>
 									<c:otherwise>
-										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}"/>
+										<fmt:message key="mynotes.signature.unknown.heading" /> - <c:out value="${entry.lessonName}" escapeXml="true"/>
 									</c:otherwise>
 								</c:choose>
 							</h4>
@@ -139,7 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<fmt:message key="mynotes.entry.no.title.label" />
 												</c:when>
 												<c:otherwise>
-													<c:out value="${entry.title}"/>
+													<c:out value="${entry.title}" escapeXml="true"/>
 												</c:otherwise>
 											</c:choose>
 										</a>
