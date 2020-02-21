@@ -174,13 +174,7 @@
 		if ( ! tabID ) {
 			tabID = currentTab;
 		}
-		var param = {"sessionMapID":sessionMapID,"learningCurrentTab":tabID,"displayedRecordNumber":displayedRecordNumber,"reqID":((new Date()).getTime())};
-		$( "#body" ).load( 
-				changeViewUrl, 
-				param, 
-				function() {
-	    			doSelectTab(tabID);
-				});			
+		document.location.href = changeViewUrl + "?sessionMapID=" + sessionMapID;		
 	}
 	
 

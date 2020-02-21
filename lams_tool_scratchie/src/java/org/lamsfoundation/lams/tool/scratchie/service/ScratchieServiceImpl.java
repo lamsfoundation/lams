@@ -718,7 +718,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		// include only leaders in case isUserGroupLeader is ON, include all otherwise
 		if (isIncludeOnlyLeaders && isUserGroupLeader) {
 		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
-		    user.setPortraitId(systemUser.getPortraitUuid());
+		    user.setPortraitId(
+			    systemUser.getPortraitUuid() == null ? null : systemUser.getPortraitUuid().toString());
 		    usersToShow.add(user);
 		} else if (!isIncludeOnlyLeaders) {
 		    usersToShow.add(user);

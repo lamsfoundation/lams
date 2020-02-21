@@ -1278,15 +1278,17 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	Map<Integer, ComplexActivity> defaultActivityToParentActivityMapping = new HashMap<>();
 
 	for (AuthoringActivityDTO actDto : actDtoList) {
+	    //skip removed activities
+	    if (removedActMap.containsKey(actDto.getActivityID())) {
+		continue;
+	    }
+	    
 	    Activity act = getActivity(actDto, groupingMapper, toolMapper, defaultActivityToParentActivityMapping);
 	    // so far, the activitiy ID is still old one, so setup the
 	    // mapping relation between old ID and new activity.
 	    activityMapper.put(act.getActivityId(), act);
 	    activityByUIIDMapper.put(act.getActivityUIID(), act);
-	    // if this act is removed, then does not save it into LD
-	    if (!removedActMap.containsKey(actDto.getActivityID())) {
-		actList.add(act);
-	    }
+	    actList.add(act);
 	}
 	// rescan the activity list and refresh their parent activity and input
 	// activities

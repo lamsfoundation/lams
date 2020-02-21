@@ -175,7 +175,7 @@ public class MonitoringController implements VoteAppConstants {
 		    DateUtil.convertToStringForJSON((Date) userAndAnswers[3], request.getLocale()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
 		    DateUtil.convertToStringForTimeagoJSON((Date) userAndAnswers[3]));
-	    responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (Integer) userAndAnswers[4]);
+	    responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (String) userAndAnswers[4]);
 	    rows.add(responseRow);
 	}
 	responseJSON.set("rows", rows);
@@ -217,7 +217,7 @@ public class MonitoringController implements VoteAppConstants {
 		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    if (userAndReflection.length > 4) {
-		responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (Integer) userAndReflection[4]);
+		responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[4]);
 	    }
 	    rows.add(responseRow);
 	}
@@ -321,7 +321,7 @@ public class MonitoringController implements VoteAppConstants {
 	}
 	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
 	voteService.updateVote(voteContent);
-	
+
 	return formattedDate;
     }
 
@@ -331,7 +331,7 @@ public class MonitoringController implements VoteAppConstants {
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-	
+
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
@@ -396,7 +396,7 @@ public class MonitoringController implements VoteAppConstants {
 	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, voteContent.getInstructions());
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	List<VoteQuestionDTO> listQuestionDTO = new LinkedList<VoteQuestionDTO>();
+	List<VoteQuestionDTO> listQuestionDTO = new LinkedList<>();
 
 	Iterator<VoteQueContent> queIterator = voteContent.getVoteQueContents().iterator();
 	while (queIterator.hasNext()) {
@@ -428,7 +428,7 @@ public class MonitoringController implements VoteAppConstants {
     }
 
     public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {
-	Map<String, VoteMonitoredUserDTO> map = new TreeMap<String, VoteMonitoredUserDTO>(new VoteComparator());
+	Map<String, VoteMonitoredUserDTO> map = new TreeMap<>(new VoteComparator());
 
 	Iterator<VoteMonitoredUserDTO> listIterator = list.iterator();
 	Long mapIndex = new Long(1);

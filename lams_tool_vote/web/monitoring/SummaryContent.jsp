@@ -3,7 +3,7 @@
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 <script type="text/javascript">
-	$(window).load(function(){
+	$(window).on('load', function(){
 		<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${currentDto.sessionId}&toolContentID=${toolContentID}" />
 			drawChart('pie', 'chartDiv${currentDto.sessionId}', '${chartURL}');

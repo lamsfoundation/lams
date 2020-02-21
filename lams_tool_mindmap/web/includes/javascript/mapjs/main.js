@@ -11384,7 +11384,7 @@ jQuery.fn.extend( {
 	}
 } );
 
-jQuery.fn.andSelf = jQuery.fn.addBack;
+jQuery.fn.addBack = jQuery.fn.addBack;
 
 
 
@@ -19924,7 +19924,7 @@ DOMRender.viewController = function (mapModel, stageElement, touchEnabled, image
 	});
 	mapModel.addEventListener('mapViewResetRequested', function () {
 		stageElement.data({'scale': 1, 'height': 0, 'width': 0, 'offsetX': 0, 'offsetY': 0}).updateStage();
-		stageElement.children().andSelf().finish(nodeAnimOptions.queue);
+		stageElement.children().addBack().finish(nodeAnimOptions.queue);
 		jQuery(stageElement).find('.mapjs-node').each(ensureSpaceForNode);
 		jQuery(stageElement).find('[data-mapjs-role=connector]').updateConnector(true);
 		jQuery(stageElement).find('[data-mapjs-role=link]').updateLink(true);
@@ -19939,7 +19939,7 @@ DOMRender.viewController = function (mapModel, stageElement, touchEnabled, image
 	mapModel.addEventListener('layoutChangeComplete', function (options) {
 		let connectorGroupClone = jQuery(), linkGroupClone = jQuery();
 		if (options && options.themeChanged) {
-			stageElement.children().andSelf().finish(nodeAnimOptions.queue);
+			stageElement.children().addBack().finish(nodeAnimOptions.queue);
 			jQuery(stageElement).find('[data-mapjs-role=connector]').updateConnector(true);
 			jQuery(stageElement).find('[data-mapjs-role=link]').updateLink(true);
 		} else {

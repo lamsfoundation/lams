@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.UUID;
 
 import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -170,7 +171,8 @@ public interface IRepositoryService {
      *             if any internal errors have occured
      */
     public abstract NodeKey addFileItem(ITicket ticket, InputStream istream, String filename, String mimeType,
-	    String versionDescription) throws FileException, AccessDeniedException, InvalidParameterException;
+	    String versionDescription, boolean generatePortraitUuid)
+	    throws FileException, AccessDeniedException, InvalidParameterException;
 
     /**
      * Add a new package of files to the repository. If startFile
@@ -329,6 +331,9 @@ public interface IRepositoryService {
     public abstract IVersionedNode getFileItem(ITicket ticket, Long uuid, Long version)
 	    throws AccessDeniedException, ItemNotFoundException, FileException;
 
+    IVersionedNode getFileItem(ITicket ticket, String portraitUuid, Long version)
+	    throws AccessDeniedException, ItemNotFoundException, FileException;
+
     /**
      * Get an item from the repository based on the UUID and relative
      * path. Only used to get the content from a package. The
@@ -439,6 +444,9 @@ public interface IRepositoryService {
      *         will have been deleted but these files could not be deleted.
      */
     public String[] deleteNode(ITicket ticket, Long uuid)
+	    throws AccessDeniedException, InvalidParameterException, ItemNotFoundException;
+
+    public String[] deleteNode(ITicket ticket, UUID portraitUuid)
 	    throws AccessDeniedException, InvalidParameterException, ItemNotFoundException;
 
     /**

@@ -50,12 +50,12 @@ public class UserDTO implements Serializable {
     private Integer authenticationMethodId;
     private Boolean firstLogin;
     private Integer lastVisitedOrganisationId;
-    private Long portraitUuid;
+    private String portraitUuid;
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, ThemeDTO htmlTheme, TimeZone timezone,
 	    Integer authenticationMethodId, String fckLanguageMapping, Boolean firstLogin,
-	    Integer lastVisitedOrganisationId, Long portraitUuid) {
+	    Integer lastVisitedOrganisationId, String portraitUuid) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -183,11 +183,11 @@ public class UserDTO implements Serializable {
 	return lastVisitedOrganisationId;
     }
 
-    public Long getPortraitUuid() {
+    public String getPortraitUuid() {
 	return portraitUuid;
     }
 
-    public void setPortraitUuid(Long portraitUuid) {
+    public void setPortraitUuid(String portraitUuid) {
 	this.portraitUuid = portraitUuid;
     }
 }

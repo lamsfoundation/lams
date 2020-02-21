@@ -47,12 +47,13 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		}
 	}
 
-	// checks whether the dialog should be created inside a current window or in a parent one. The latter is prefered 
+	// checks whether the dialog should be created inside a current window or in a parent one. The latter is preferred 
 	//in case we want dialog to be not constrained by the boundaries of a current window
-	var body = initParams.isCreateInParentWindow ? parent.$("body") : 'body';
+	var targetWindow = initParams.isCreateInParentWindow ? window.parent : window;
 	
 	// create a new dialog by cloning a template
-	dialog = dialogTemplate.clone().appendTo(body);
+	dialog = dialogTemplate.clone().appendTo(targetWindow.$('body'));
+	dialog.data('isCreateInParentWindow', initParams.isCreateInParentWindow);
 	
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
@@ -146,11 +147,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			// center the dialog or put it into previously defined position
 			var position = dialog.data('position');
 			if (position !== false) {
-				position = position || {
-					'my' : 'top',
-					'at' : 'top+15px',
-					'of' : window
-				};
+				position = position || 
+					(dialog.data('isCreateInParentWindow') ?
+						{
+							'my' : 'center center',
+							'at' : 'center center',
+							'of' : targetWindow
+						}
+						:
+						{
+							'my' : 'top',
+							'at' : 'top+15px',
+							'of' : window
+						}
+					);
 				dialog.position(position);
 			}
 
@@ -227,11 +237,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				$('.ui-resizable-handle', dialog).hide();
 			}
 			// center the dialog
-			 (initParams.modal ? internalDialog : dialog).position({
-				'my' : 'top',
-				'at' : 'center top',
-				'of' : window
-			});
+			 (initParams.modal ? internalDialog : dialog).position(
+					 dialog.data('isCreateInParentWindow') ?
+								{
+									'my' : 'center center',
+									'at' : 'center center',
+									'of' : window.parent
+								}
+								:
+								{
+									'my' : 'top',
+									'at' : 'center top',
+									'of' : window
+								}
+			);
 			
 			internalContent.trigger('resizestop');
 		});
@@ -292,7 +311,7 @@ function restoreMinimisedDialog(dialog) {
 	if (isMonitorDialog) {
 		//hide iframe until it gets loaded
 		$('iframe', dialog).hide();
-		$('iframe', dialog).load(function() {
+		$('iframe', dialog).on('load', function() {
 			$('iframe', dialog).show();
 		});
 		
@@ -378,33 +397,37 @@ function showNotificationsDialog(orgID, lessonID) {
 		height = width < 798 ? 850 : 650;
 	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
-	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
-	showDialog(id, {
-		'data' : {
-			'orgID' : orgID,
-			'lessonID' : lessonID
-		},
-		'height': height,
-		'width' : width,
-		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
-		"isCreateInParentWindow" : !isTopLevelWindow,		
-		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-		'open' : function() {
-			var dialog = this,
-				lessonID = dialog.data('lessonID');
-			// if lesson ID is given, use lesson view; otherwise use course view
-			if (lessonID) {
-				// load contents after opening the dialog
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-					+ lessonID);
-			} else {
-				$('iframe', dialog).attr('src', LAMS_URL
-					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-					+ orgID);
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID),
+		dialog = showDialog(id, {
+			'data' : {
+				'orgID' : orgID,
+				'lessonID' : lessonID
+			},
+			'height': height,
+			'width' : width,
+			//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
+			"isCreateInParentWindow" : !isTopLevelWindow,		
+			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+			'open' : function() {
+				var dialog = $(this),
+					lessonID = dialog.data('lessonID');
+				// if lesson ID is given, use lesson view; otherwise use course view
+				if (lessonID) {
+					// load contents after opening the dialog
+					$('iframe', dialog).attr('src', LAMS_URL
+						+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
+						+ lessonID);
+				} else {
+					$('iframe', dialog).attr('src', LAMS_URL
+						+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
+						+ orgID);
+				}
 			}
-		}
-	}, true);
+		}, true)
+		
+//	dialog.on('shown.bs.modal', function(){
+//		dialog.css('top', '15px');
+//	});
 }
 
 

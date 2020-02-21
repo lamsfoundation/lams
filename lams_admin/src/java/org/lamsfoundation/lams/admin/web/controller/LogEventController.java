@@ -62,7 +62,7 @@ public class LogEventController {
 
     @Autowired
     private ILogEventService logEventService;
-    
+
     @Autowired
     @Qualifier("adminMessageService")
     private MessageService messageService;
@@ -121,11 +121,12 @@ public class LogEventController {
 
 	int sorting = ILogEventService.SORT_BY_DATE_DESC;
 	if (isSortDate != null) {
-	    sorting = isSortDate.equals(1) ? ILogEventService.SORT_BY_DATE_DESC :  ILogEventService.SORT_BY_DATE_ASC;
+	    sorting = isSortDate.equals(1) ? ILogEventService.SORT_BY_DATE_DESC : ILogEventService.SORT_BY_DATE_ASC;
 	} else if (isSortUser != null) {
-	    sorting = isSortUser.equals(1) ? ILogEventService.SORT_BY_USER_DESC :  ILogEventService.SORT_BY_USER_ASC;
+	    sorting = isSortUser.equals(1) ? ILogEventService.SORT_BY_USER_DESC : ILogEventService.SORT_BY_USER_ASC;
 	} else if (isSortTarget != null) {
-	    sorting = isSortTarget.equals(1) ? ILogEventService.SORT_BY_TARGET_DESC :  ILogEventService.SORT_BY_TARGET_ASC;
+	    sorting = isSortTarget.equals(1) ? ILogEventService.SORT_BY_TARGET_DESC
+		    : ILogEventService.SORT_BY_TARGET_ASC;
 	}
 
 	Long dateParameter = WebUtil.readLongParam(request, "startDate", true);
@@ -161,8 +162,10 @@ public class LogEventController {
 		LogEvent event = (LogEvent) eventDetails[0];
 		ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-		responseRow.put("dateOccurred", event.getOccurredDateTime() != null ? 
-			DateUtil.convertToStringForJSON(event.getOccurredDateTime(), request.getLocale()) : "");
+		responseRow.put("dateOccurred",
+			event.getOccurredDateTime() != null
+				? DateUtil.convertToStringForJSON(event.getOccurredDateTime(), request.getLocale())
+				: "");
 		responseRow.put("typeId", event.getLogEventTypeId());
 		responseRow.put("description", event.getDescription());
 		if (event.getLessonId() != null) {
@@ -174,13 +177,15 @@ public class LogEventController {
 
 		User user = event.getUser();
 		if (user != null) {
-		    responseRow.put("userPortraitId", user.getPortraitUuid());
+		    responseRow.put("userPortraitId",
+			    user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 		    responseRow.put("userId", user.getUserId());
 		    responseRow.put("userName", user.getLogin());
 		}
 		User targetUser = event.getTargetUser();
 		if (targetUser != null) {
-		    responseRow.put("targetUserPortraitId", targetUser.getPortraitUuid());
+		    responseRow.put("targetUserPortraitId",
+			    targetUser.getPortraitUuid() == null ? null : targetUser.getPortraitUuid().toString());
 		    responseRow.put("targetUserId", targetUser.getUserId());
 		    responseRow.put("targetUserName", targetUser.getLogin());
 		}

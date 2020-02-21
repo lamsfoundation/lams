@@ -48,18 +48,18 @@ public class PortraitTag extends BodyTagSupport {
 
     private static final String CSS_ROUND = " portrait-round";
     private static final String PORTRAIT_VERSION_SUFFIX = " portrait-color-";
-    
+
     private static final String STYLE_SMALL = "small";
-    private static final String CSS_SMALL[] = {"portrait-sm", "&version=4"};
+    private static final String CSS_SMALL[] = { "portrait-sm", "&version=4" };
     private static final String CSS_GENERIC_SMALL = "portrait-generic-sm";
     private static final String STYLE_MEDIUM = "medium";
-    private static final String CSS_MEDIUM[] = {"portrait-md", "&version=3"};
+    private static final String CSS_MEDIUM[] = { "portrait-md", "&version=3" };
     private static final String CSS_GENERIC_MEDIUM = "portrait-generic-md";
     private static final String STYLE_LARGE = "large";
-    private static final String CSS_LARGE[] = {"portrait-lg", "&version=2"};;
+    private static final String CSS_LARGE[] = { "portrait-lg", "&version=2" };;
     private static final String CSS_GENERIC_LARGE = "portrait-generic-lg";
     private static final String STYLE_XLARGE = "xlarge";
-    private static final String CSS_XLARGE[] = {"portrait-xl", "&version=1"};
+    private static final String CSS_XLARGE[] = { "portrait-xl", "&version=1" };
     private static final String CSS_GENERIC_XLARGE = "portrait-generic-xl";
 
     /* Attributes */
@@ -94,7 +94,7 @@ public class PortraitTag extends BodyTagSupport {
 		    Integer userIdInt = Integer.decode(userId);
 		    User user = (User) getUserManagementService().findById(User.class, userIdInt);
 		    boolean isHover = (hover != null ? Boolean.valueOf(hover) : false);
-		    if ( isHover ) {
+		    if (isHover) {
 			code = buildHoverUrl(user);
 		    } else {
 			code = buildDivUrl(user);
@@ -120,7 +120,7 @@ public class PortraitTag extends BodyTagSupport {
     }
 
     private String buildDivUrl(User user) {
-	Long portraitId = user != null ? user.getPortraitUuid() : null;
+	String portraitId = user == null || user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString();
 	if (portraitId != null) {
 	    boolean isRound = (round != null ? Boolean.valueOf(round) : true);
 	    String[] sizes = getSizeClass();
@@ -142,22 +142,23 @@ public class PortraitTag extends BodyTagSupport {
     }
 
     private String buildHoverUrl(User user) {
-	Long portraitId = user != null ? user.getPortraitUuid() : null;
+	String portraitId = user == null || user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString();
 	String linkText = getBodyContent() != null ? getBodyContent().getString() : null;
 	if (portraitId != null) {
 	    String fullName = user.getFullName();
-	    if ( linkText == null || linkText.length() == 0)
+	    if (linkText == null || linkText.length() == 0) {
 		linkText = fullName;
+	    }
 	    return new StringBuilder(
 		    "<a tabindex=\"0\" class=\"popover-link new-popover\" role=\"button\" data-toggle=\"popover\" data-id=\"popover-")
 			    .append(userId).append("\" data-portrait=\"").append(portraitId)
-			    .append("\" data-fullname=\"").append(fullName).append("\">")
-			    .append(linkText).append("</a>").toString();
+			    .append("\" data-fullname=\"").append(fullName).append("\">").append(linkText)
+			    .append("</a>").toString();
 	} else {
 	    return linkText != null ? linkText : "";
 	}
     }
-    
+
     private IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -170,33 +171,39 @@ public class PortraitTag extends BodyTagSupport {
     private HashMap<String, String> getPortraitCache() {
 	HashMap<String, String> cache = (HashMap<String, String>) pageContext.getAttribute("portraitCache");
 	if (cache == null) {
-	    cache = new HashMap<String, String>();
+	    cache = new HashMap<>();
 	    pageContext.setAttribute("portraitCache", cache);
 	}
 	return cache;
     }
 
     /* Get String[size css class, version id] based on size attribute */
-    private String[]  getSizeClass() {
+    private String[] getSizeClass() {
 	if (size != null) {
-	    if (size.equalsIgnoreCase(STYLE_MEDIUM))
+	    if (size.equalsIgnoreCase(STYLE_MEDIUM)) {
 		return CSS_MEDIUM;
-	    if (size.equalsIgnoreCase(STYLE_LARGE))
+	    }
+	    if (size.equalsIgnoreCase(STYLE_LARGE)) {
 		return CSS_LARGE;
-	    if (size.equalsIgnoreCase(STYLE_XLARGE))
+	    }
+	    if (size.equalsIgnoreCase(STYLE_XLARGE)) {
 		return CSS_XLARGE;
+	    }
 	}
 	return CSS_SMALL;
     }
 
     private String getGenericSizeClass() {
 	if (size != null) {
-	    if (size.equalsIgnoreCase(STYLE_MEDIUM))
+	    if (size.equalsIgnoreCase(STYLE_MEDIUM)) {
 		return CSS_GENERIC_MEDIUM;
-	    if (size.equalsIgnoreCase(STYLE_LARGE))
+	    }
+	    if (size.equalsIgnoreCase(STYLE_LARGE)) {
 		return CSS_GENERIC_LARGE;
-	    if (size.equalsIgnoreCase(STYLE_XLARGE))
+	    }
+	    if (size.equalsIgnoreCase(STYLE_XLARGE)) {
 		return CSS_GENERIC_XLARGE;
+	    }
 	}
 	return CSS_GENERIC_SMALL;
     }

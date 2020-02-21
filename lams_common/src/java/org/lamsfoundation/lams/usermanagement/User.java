@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -162,7 +163,7 @@ public class User implements Serializable, Comparable<User> {
     private AuthenticationMethod authenticationMethod;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserOrganisation> userOrganisations = new HashSet<UserOrganisation>();
+    private Set<UserOrganisation> userOrganisations = new HashSet<>();
 
     @Column(name = "last_visited_organisation_id")
     private Integer lastVisitedOrganisationId;
@@ -173,16 +174,16 @@ public class User implements Serializable, Comparable<User> {
 
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<LearnerProgress> learnerProgresses = new HashSet<LearnerProgress>();
+    private Set<LearnerProgress> learnerProgresses = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<LearningDesign> learningDesigns = new HashSet<LearningDesign>();
+    private Set<LearningDesign> learningDesigns = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<Lesson> lessons = new HashSet<Lesson>();
+    private Set<Lesson> lessons = new HashSet<>();
 
     @Column(name = "portrait_uuid")
-    private Long portraitUuid;
+    private UUID portraitUuid;
 
     @Column(name = "change_password")
     private Boolean changePassword;
@@ -194,7 +195,7 @@ public class User implements Serializable, Comparable<User> {
     @JoinTable(name = "lams_planner_recent_learning_designs", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "learning_design_id")
     @OrderBy("learning_design_id")
-    private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
+    private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<>();
 
     @Column(name = "modified_date")
     private Date modifiedDate;
@@ -522,7 +523,7 @@ public class User implements Serializable, Comparable<User> {
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null, timeZone, authenticationMethod.getAuthenticationMethodId(),
 		fckLanguageMapping, (firstLogin == null || firstLogin ? true : false), // assume no firstLogin value means they haven't logged in
-		lastVisitedOrganisationId, portraitUuid);
+		lastVisitedOrganisationId, portraitUuid == null ? null : portraitUuid.toString());
     }
 
     public UserBasicDTO getUserBasicDTO() {
@@ -590,11 +591,11 @@ public class User implements Serializable, Comparable<User> {
 	this.locale = locale;
     }
 
-    public Long getPortraitUuid() {
+    public UUID getPortraitUuid() {
 	return portraitUuid;
     }
 
-    public void setPortraitUuid(Long portraitUuid) {
+    public void setPortraitUuid(UUID portraitUuid) {
 	this.portraitUuid = portraitUuid;
     }
 

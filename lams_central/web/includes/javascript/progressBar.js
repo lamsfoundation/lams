@@ -72,7 +72,7 @@ function openActivity(url) {
 				'title' : REVIEW_ACTIVITY_TITLE,
 				'open' : function() {
 					// load contents after opening the dialog
-					$('iframe', this).load(function(){
+					$('iframe', this).on('load', function(){
 						// remove finish button
 						// so user can only close dialog with X button
 						$(this).contents().find('#finishButton, #finish').remove();

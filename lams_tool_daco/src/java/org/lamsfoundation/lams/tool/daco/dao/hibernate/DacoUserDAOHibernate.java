@@ -159,7 +159,7 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", DacoUser.class).addScalar("record_count", IntegerType.INSTANCE)
 		.addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE)
+		.addScalar("portraitId", StringType.INSTANCE)
 		.setParameter("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -38,13 +37,15 @@ public class NodeKey {
 
     private Long uuid = null;
     private Long version = null;
+    private String portraitUuid;
 
     /**
-     * 
+     *
      */
-    public NodeKey(Long uuid, Long version) {
+    public NodeKey(Long uuid, Long version, String portraitUuid) {
 	this.uuid = uuid;
 	this.version = version;
+	this.portraitUuid = portraitUuid;
     }
 
     /**
@@ -61,9 +62,14 @@ public class NodeKey {
 	return version;
     }
 
+    public String getPortraitUuid() {
+	return portraitUuid;
+    }
+
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("uuid", uuid).append("version", version).toString();
+	return new ToStringBuilder(this).append("uuid", uuid).append("version", version)
+		.append("portraitUuid", portraitUuid).toString();
     }
 
     @Override

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.rsrc.dto;
 
 import java.util.Date;
@@ -31,16 +30,15 @@ public class VisitLogDTO {
 
     private String userFullName;
 
-    private Long portraitId;
+    private String portraitId;
 
-    // the user access some reousrce item date time. Use in monitoring summary page
+    // the user access some resource item date time. Use in monitoring summary page
     private Date accessDate;
     // resource item complete date. Use in monitoring summary page
     private Date completeDate;
     // difference between completeDate and accessDate
     private Date timeTaken;
 
-    
     public Long getUserId() {
 	return userId;
     }
@@ -81,11 +79,11 @@ public class VisitLogDTO {
 	this.timeTaken = timeTaken;
     }
 
-    public Long getPortraitId() {
+    public String getPortraitId() {
 	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
+    public void setPortraitId(String portraitId) {
 	this.portraitId = portraitId;
     }
 

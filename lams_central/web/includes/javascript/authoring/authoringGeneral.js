@@ -3134,7 +3134,7 @@ GeneralLib = {
 							return;
 						}
 						// iframe just to load another instance of Authoring for a single purpose, generate the SVG
-						$('<iframe />').appendTo('body').css('visibility', 'hidden').load(function(){
+						$('<iframe />').appendTo('body').css('visibility', 'hidden').on('load', function(){
 							// call svgGenerator.jsp code to store LD SVG on the server
 							var frame = $(this),
 								win = frame[0].contentWindow || frame[0].contentDocument;

@@ -89,7 +89,7 @@ public class UserController {
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
-    @RequestMapping(path = "/edit")
+    @RequestMapping("/edit")
     public String edit(@ModelAttribute UserForm userForm, HttpServletRequest request) throws Exception {
 	if (locales == null) {
 	    locales = userManagementService.findAll(SupportedLocale.class);
@@ -173,7 +173,7 @@ public class UserController {
 		userSelectedTheme = themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.setUserTheme(userSelectedTheme);
-	    userForm.setInitialPortraitId(user.getPortraitUuid());
+	    userForm.setInitialPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
 
 	    //property available for modification only to sysadmins
 	    userForm.setTwoFactorAuthenticationEnabled(user.isTwoFactorAuthenticationEnabled());
@@ -282,7 +282,7 @@ public class UserController {
     }
 
     // determine whether to disable or delete user based on their lams data
-    @RequestMapping(path = "/remove", method = RequestMethod.POST)
+    @RequestMapping("/remove")
     public String remove(HttpServletRequest request) throws Exception {
 	if (!(request.isUserInRole(Role.SYSADMIN) || userManagementService.isUserGlobalGroupManager())) {
 	    request.setAttribute("errorName", "UserAction");

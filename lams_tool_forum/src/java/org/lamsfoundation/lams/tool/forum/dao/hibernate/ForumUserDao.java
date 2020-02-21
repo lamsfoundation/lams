@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.dao.hibernate;
 
 import java.util.List;
@@ -30,7 +28,6 @@ import java.util.List;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -86,7 +83,7 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 
     @Override
     public ForumUser getByUid(Long userUid) {
-	return (ForumUser) this.getSession().get(ForumUser.class, userUid);
+	return this.getSession().get(ForumUser.class, userUid);
     }
 
     @Override
@@ -183,8 +180,8 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", ForumUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue())
+		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 
     }
@@ -210,8 +207,8 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 		" JOIN tl_lafrum11_tool_session session ON user.session_id = session.uid and session.session_id = :sessionId");
 	buildNameSearch(queryText, searchString);
 
-	List list = getSession().createNativeQuery(queryText.toString()).setParameter("sessionId", sessionId.longValue())
-		.list();
+	List list = getSession().createNativeQuery(queryText.toString())
+		.setParameter("sessionId", sessionId.longValue()).list();
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}

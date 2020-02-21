@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.web;
 
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -42,11 +44,12 @@ public class PortraitController {
     private IUserManagementService userManagementService;
 
     @RequestMapping("/portrait")
-    public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm, HttpServletRequest request) {
-	Long portraitUuid = userManagementService.getUserByLogin(request.getRemoteUser()).getPortraitUuid();
+    public String execute(@ModelAttribute("PortraitActionForm") PortraitActionForm portraitForm,
+	    HttpServletRequest request) {
+	UUID portraitUuid = userManagementService.getUserByLogin(request.getRemoteUser()).getPortraitUuid();
 	log.debug("using portraitUuid=" + portraitUuid);
 	// if no portrait has been uploaded, set the uuid to 0
-	portraitForm.setPortraitUuid(portraitUuid == null ? 0 : portraitUuid);
+	portraitForm.setPortraitUuid(portraitUuid == null ? "0" : portraitUuid.toString());
 	return "profile/portrait";
     }
 }

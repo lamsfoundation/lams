@@ -319,7 +319,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	NativeQuery<Object[]> query = getSession().createSQLQuery(queryText.toString());
 	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
 		.addScalar("fullname", StringType.INSTANCE).addScalar("attemptTime", TimestampType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE).setParameter("questionUid", questionUid)
+		.addScalar("portraitId", StringType.INSTANCE).setParameter("questionUid", questionUid)
 		.setFirstResult(page * size).setMaxResults(size);
 	if (sessionUid != null) {
 	    query.setParameter("sessionUid", sessionUid);
@@ -431,7 +431,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	NativeQuery<Object[]> query = getSession().createSQLQuery(queryText.toString());
 	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
 		.addScalar("fullname", StringType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", IntegerType.INSTANCE).setParameter("sessionUid", sessionUid)
+		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionUid", sessionUid)
 		.setFirstResult(page * size).setMaxResults(size);
 
 	return query.list();
@@ -512,7 +512,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	query.addScalar("userUid", LongType.INSTANCE).addScalar("login", StringType.INSTANCE)
 		.addScalar("fullName", StringType.INSTANCE).addScalar("userEntryUid", LongType.INSTANCE)
 		.addScalar("userEntry", StringType.INSTANCE).addScalar("attemptTime", TimestampType.INSTANCE)
-		.addScalar("visible", BooleanType.INSTANCE).addScalar("portraitId", LongType.INSTANCE)
+		.addScalar("visible", BooleanType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
 		.setFirstResult(page * size).setMaxResults(size)
 		.setResultTransformer(Transformers.aliasToBean(OpenTextAnswerDTO.class));
 

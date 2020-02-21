@@ -330,15 +330,20 @@ function disableLesson() {
 }			
 
 function applyStateChange(state, method, newLessonEndDate) {
-    var params = $("#lesson-state-form").serialize();
+	var params = {
+		'lessonID'      : lessonId
+	};
+	params[csrfTokenName] = csrfTokenValue;
+
 	if (newLessonEndDate) {
-	    params += "&lessonEndDate=" + token;
+		params.lessonEndDate = newLessonEndDate;
 	}
 	
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
-		type: "POST",
 		data: params,
+		type: "POST",
+		cache : false,
 	    success: function() {
 			if (state == 7) {
 				// user chose to finish the lesson, close monitoring and refresh the lesson list
@@ -532,8 +537,9 @@ function startLesson(){
 	$.ajax({
 		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring/startLesson.do',
-		cache : false,
 		data : data,
+		cache : false,
+		type : 'POST',
 		success : function() {
 			refreshMonitor('lesson');
 		}
@@ -1249,7 +1255,7 @@ function loadLearningDesignSVG() {
 
 			// iframe just to load Authoring for a single purpose, generate the SVG
 			var frame = $('<iframe />').appendTo('body').css('visibility', 'hidden');
-			frame.load(function(){
+			frame.on('load', function(){
 				// disable current onload handler as closing the dialog reloads the iframe
 				frame.off('load');
 				

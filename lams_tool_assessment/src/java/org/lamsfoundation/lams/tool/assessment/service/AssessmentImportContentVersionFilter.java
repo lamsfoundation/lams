@@ -117,6 +117,9 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
      * Migration to Question Bank
      */
     public void up20190704To20190809(String toolFilePath) throws IOException {
+	//perform all transformations from the previous methods. Do it now as long as the following commands expect Assesment model to be in its latest state 
+	transformXML(toolFilePath);
+	
 	// find LD's content folder ID to use it in new QB questions
 	String contentFolderId = null;
 	try {
@@ -280,20 +283,6 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 
 		// remove old units section from the legacy assessment question
 		assessmentQuestion.removeChild(assessmentUnits.item(0).getParentNode());
-	    }
-
-	    // now rewrite question references
-	    NodeList questionReferences = toolRoot
-		    .getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.QuestionReference");
-	    if (questionReferences.getLength() == 0) {
-		return;
-	    }
-
-	    for (int questionReferenceIndex = 0; questionReferenceIndex < questionReferences
-		    .getLength(); questionReferenceIndex++) {
-		Element questionReference = (Element) questionReferences.item(questionReferenceIndex);
-		XMLUtil.rewriteTextElement(questionReference, questionReference, "defaultGrade", "maxMark", "1", false,
-			true);
 	    }
 	});
     }

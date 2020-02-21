@@ -29,6 +29,7 @@ create table tl_laasse10_assessment (
    numbered tinyint(1) DEFAULT 1,
    use_select_leader_tool_ouput tinyint(1) NOT NULL DEFAULT 0,
    enable_confidence_levels TINYINT(1) NOT NULL DEFAULT 0,
+   confidence_levels_type TINYINT DEFAULT 1,
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
 );
@@ -67,45 +68,20 @@ create table tl_laasse10_user (
 
 create table tl_laasse10_assessment_question (
    uid bigint not null auto_increment,
-   question_type smallint,
-   title varchar(255),
-   question MEDIUMTEXT,
    sequence_id integer,
-   default_grade integer DEFAULT 1,
-   penalty_factor float DEFAULT 0,
-   general_feedback MEDIUMTEXT,
-   feedback MEDIUMTEXT,
-   multiple_answers_allowed tinyint DEFAULT 0,
-   feedback_on_correct MEDIUMTEXT,
-   feedback_on_partially_correct MEDIUMTEXT,
-   feedback_on_incorrect MEDIUMTEXT,
-   shuffle tinyint(1),
-   case_sensitive tinyint(1),
-   correct_answer tinyint(1) DEFAULT 0,
-   allow_rich_editor tinyint(1) DEFAULT 0,
+   random_question TINYINT(1) NOT NULL DEFAULT 0,
    assessment_uid bigint,
    session_uid bigint,
-   answer_required tinyint(1) NOT NULL DEFAULT 0,
-   max_words_limit int(11) DEFAULT 0,
-   min_words_limit int(11) DEFAULT 0,
-   incorrect_answer_nullifies_mark tinyint(1) NOT NULL DEFAULT 0,
-   hedging_justification_enabled tinyint(1) NOT NULL DEFAULT 0,
-   question_hash CHAR(40),
    correct_answers_disclosed TINYINT(1) DEFAULT 0,
    groups_answers_disclosed TINYINT(1) DEFAULT 0,
-   prefix_answers_with_letters TINYINT(1) NOT NULL DEFAULT 0, 
    PRIMARY KEY (uid),
    CONSTRAINT FK_NEW_1720029621_F52D1F9330E79035 FOREIGN KEY (assessment_uid)
-   		REFERENCES tl_laasse10_assessment (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-   CONSTRAINT FK_NEW_1720029621_F52D1F93EC0D3147 FOREIGN KEY (session_uid)
-   		REFERENCES tl_laasse10_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
+   		REFERENCES tl_laasse10_assessment (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table tl_laasse10_question_reference (
    uid bigint not null auto_increment,
    question_uid bigint,
-   question_type smallint,
-   title varchar(255),
    sequence_id integer,
    default_grade integer DEFAULT 1,
    random_question tinyint(1) DEFAULT 0,
@@ -117,22 +93,6 @@ create table tl_laasse10_question_reference (
    		REFERENCES tl_laasse10_assessment (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table tl_laasse10_question_option (
-   uid bigint not null unique auto_increment,
-   question_uid bigint,
-   sequence_id integer,
-   question MEDIUMTEXT,
-   option_string MEDIUMTEXT,
-   option_float float,
-   accepted_error float,
-   grade float,
-   feedback MEDIUMTEXT,
-   correct tinyint(1) NOT NULL DEFAULT 0,
-   primary key (uid),
-   CONSTRAINT FK_tl_laasse10_question_option_1 FOREIGN KEY (question_uid)
-   		REFERENCES tl_laasse10_assessment_question (uid) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 create table tl_laasse10_assessment_overall_feedback (
    uid bigint not null unique auto_increment,
    assessment_uid bigint,
@@ -142,16 +102,6 @@ create table tl_laasse10_assessment_overall_feedback (
    primary key (uid),
    CONSTRAINT FK_tl_laasse10_assessment_overall_feedback_1 FOREIGN KEY (assessment_uid)
    		REFERENCES tl_laasse10_assessment (uid) ON DELETE CASCADE ON UPDATE CASCADE
-);
-create table tl_laasse10_assessment_unit (
-   uid bigint not null unique auto_increment,
-   question_uid bigint,
-   sequence_id integer,
-   multiplier float,
-   unit varchar(255),
-   primary key (uid),
-   CONSTRAINT FK_tl_laasse10_assessment_unit_1 FOREIGN KEY (question_uid)
-   		REFERENCES tl_laasse10_assessment_question (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table tl_laasse10_assessment_result (
@@ -167,6 +117,7 @@ create table tl_laasse10_assessment_result (
    time_limit_launched_date datetime,
    primary key (uid),
    UNIQUE KEY `UQ_tl_laasse10_assessment_result_5` (`assessment_uid`,`user_uid`,`latest`),
+   KEY `latest` (`latest`),
    CONSTRAINT FK_tl_laasse10_assessment_result_2 FOREIGN KEY (user_uid)
    		REFERENCES tl_laasse10_user (uid) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT FK_tl_laasse10_assessment_result_3 FOREIGN KEY (assessment_uid)
@@ -175,20 +126,15 @@ create table tl_laasse10_assessment_result (
 
 create table tl_laasse10_question_result (
    uid bigint not null auto_increment,
-   assessment_question_uid bigint,
    result_uid bigint,
-   answer_string MEDIUMTEXT,
    answer_float float,
    answer_boolean tinyint(1),
-   submitted_option_uid bigint,
    mark float,
    penalty float,
    finish_date datetime,
    max_mark float,
    confidence_level INT(11) NOT NULL DEFAULT 0,
    primary key (uid),
-   CONSTRAINT FK_NEW_1720029621_693580A438BF8DFE FOREIGN KEY (assessment_question_uid)
-   		REFERENCES tl_laasse10_assessment_question (uid) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT FK_tl_laasse10_question_result_1 FOREIGN KEY (result_uid)
    		REFERENCES tl_laasse10_assessment_result (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -200,8 +146,11 @@ create table tl_laasse10_option_answer (
    answer_boolean tinyint(1),
    answer_int integer,
    primary key (uid),
+   KEY `answer_boolean` (`answer_boolean`),
    CONSTRAINT FK_tl_laasse10_option_answer_1 FOREIGN KEY (question_result_uid)
-   		REFERENCES tl_laasse10_question_result (uid) ON DELETE CASCADE ON UPDATE CASCADE
+   		REFERENCES tl_laasse10_question_result (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT FK_tl_laasse10_option_answer_2 FOREIGN KEY (question_option_uid) 
+   		REFERENCES lams_qb_option (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -209,11 +158,18 @@ ALTER TABLE tl_laasse10_assessment ADD CONSTRAINT FK_NEW_1720029621_89093BF75809
 		REFERENCES tl_laasse10_user (uid) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE tl_laasse10_session ADD CONSTRAINT tl_laasse10_session FOREIGN KEY (group_leader_uid)
    		REFERENCES tl_laasse10_user (uid) ON DELETE CASCADE ON UPDATE CASCADE;
-  
+   		
+CREATE TABLE `tl_laasse10_configuration` (
+   `config_key` varchar(30),
+   `config_value` varchar(255),
+   PRIMARY KEY (`config_key`)
+);
 
 INSERT INTO tl_laasse10_assessment (uid, title, instructions, define_later, content_id, allow_question_feedback,
 								    allow_overall_feedback, allow_right_answers, allow_wrong_answers,
 								    allow_grades_after_attempt, allow_history_responses, display_summary, shuffled) VALUES
   (1,'Assessment','Instructions',0,${default_content_id},0,0,0,0,0,0,0,0);
+  
+INSERT INTO `tl_laasse10_configuration` (`config_key`, `config_value`) VALUES ('hideTitles', 'false');
 
 SET FOREIGN_KEY_CHECKS=1;

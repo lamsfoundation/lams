@@ -271,6 +271,7 @@ DROP TABLE IF EXISTS `lams_cr_node`;
 
 CREATE TABLE `lams_cr_node` (
   `node_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `portrait_uuid` BINARY(16),
   `workspace_id` bigint(20) unsigned NOT NULL,
   `path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -278,6 +279,7 @@ CREATE TABLE `lams_cr_node` (
   `next_version_id` bigint(20) unsigned NOT NULL DEFAULT '1',
   `parent_nv_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`node_id`),
+  UNIQUE INDEX IDX_portrait_uuid (portrait_uuid),
   KEY `workspace_id` (`workspace_id`),
   CONSTRAINT `FK_lams_cr_node_1` FOREIGN KEY (`workspace_id`) REFERENCES `lams_cr_workspace` (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -459,6 +461,7 @@ CREATE TABLE `lams_ext_server_org_map` (
   `prefix` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
   `userinfo_url` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `lesson_finish_url` text COLLATE utf8mb4_unicode_ci,
+  `logout_url` TEXT,
   `disabled` bit(1) NOT NULL,
   `time_to_live_login_request` int(11) DEFAULT '80',
   `time_to_live_login_request_enabled` tinyint(1) NOT NULL DEFAULT '0',
@@ -472,6 +475,8 @@ CREATE TABLE `lams_ext_server_org_map` (
   `force_restart` tinyint(1) DEFAULT '0',
   `allow_restart` tinyint(1) DEFAULT '0',
   `gradebook_on_complete` tinyint(1) DEFAULT '1',
+  `use_alternative_user_id_parameter_name` tinyint(1) DEFAULT '0',
+  `membership_url` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`sid`),
   UNIQUE KEY `serverid` (`serverid`),
   UNIQUE KEY `prefix` (`prefix`),
@@ -636,7 +641,7 @@ CREATE TABLE `lams_gradebook_user_lesson` (
   `mark` double DEFAULT NULL,
   `feedback` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`uid`),
-  KEY `lesson_id` (`lesson_id`,`user_id`),
+  UNIQUE KEY `lesson_id` (`lesson_id`,`user_id`),
   KEY `FK_lams_gradebook_user_lesson_2` (`user_id`),
   CONSTRAINT `FK_lams_gradebook_user_lesson_1` FOREIGN KEY (`lesson_id`) REFERENCES `lams_lesson` (`lesson_id`),
   CONSTRAINT `FK_lams_gradebook_user_lesson_2` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -993,6 +998,7 @@ CREATE TABLE `lams_learning_activity` (
   `stop_after_activity` tinyint(1) NOT NULL DEFAULT '0',
   `transition_to_id` bigint(20) DEFAULT NULL,
   `transition_from_id` bigint(20) DEFAULT NULL,
+  `branching_ordered_asc` TINYINT(1),
   PRIMARY KEY (`activity_id`),
   KEY `lams_learning_activity_tool_content_id` (`tool_content_id`),
   KEY `learning_library_id` (`learning_library_id`),
@@ -1244,17 +1250,17 @@ CREATE TABLE `lams_lesson` (
   `end_date_time` datetime DEFAULT NULL,
   `schedule_end_date_time` datetime DEFAULT NULL,
   `previous_state_id` int(3) DEFAULT NULL,
-  `learner_presence_avail` tinyint(1) DEFAULT '0',
-  `learner_im_avail` tinyint(1) DEFAULT '0',
-  `live_edit_enabled` tinyint(1) DEFAULT '0',
-  `enable_lesson_notifications` tinyint(1) DEFAULT '0',
-  `locked_for_edit` tinyint(1) DEFAULT '0',
-  `marks_released` tinyint(1) DEFAULT '0',
-  `enable_lesson_INTro` tinyint(1) DEFAULT '0',
-  `display_design_image` tinyint(1) DEFAULT '0',
-  `force_restart` tinyint(1) DEFAULT '0',
-  `allow_restart` tinyint(1) DEFAULT '0',
-  `gradebook_on_complete` tinyint(1) DEFAULT '0',
+  `learner_presence_avail` TINYINT(1) NOT NULL DEFAULT 0,
+  `learner_im_avail` TINYINT(1) NOT NULL DEFAULT 0,
+  `live_edit_enabled` TINYINT(1) NOT NULL DEFAULT 0,
+  `enable_lesson_notifications` TINYINT(1) NOT NULL DEFAULT 0,
+  `locked_for_edit` TINYINT(1) NOT NULL DEFAULT 0,
+  `marks_released` TINYINT(1) NOT NULL DEFAULT 0,
+  `enable_lesson_INTro` TINYINT(1) NOT NULL DEFAULT 0,
+  `display_design_image` TINYINT(1) NOT NULL DEFAULT 0,
+  `force_restart` TINYINT(1) NOT NULL DEFAULT 0,
+  `allow_restart` TINYINT(1) NOT NULL DEFAULT 0,
+  `gradebook_on_complete` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`lesson_id`),
   KEY `learning_design_id` (`learning_design_id`),
   KEY `user_id` (`user_id`),
@@ -1334,6 +1340,7 @@ CREATE TABLE `lams_log_event` (
   PRIMARY KEY (`id`),
   KEY `event_log_occurred_date_time` (`occurred_date_time`),
   KEY `FK_event_log_event_type_idx` (`log_event_type_id`),
+  KEY `event_log_date_and_type` (`occurred_date_time`, `log_event_type_id`),
   CONSTRAINT `FK_event_log_event_type` FOREIGN KEY (`log_event_type_id`) REFERENCES `lams_log_event_type` (`log_event_type_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1519,21 +1526,16 @@ DROP TABLE IF EXISTS `lams_outcome`;
 
 CREATE TABLE `lams_outcome` (
   `outcome_id` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `organisation_id` bigint(20) DEFAULT NULL,
   `scale_id` mediumint(9) NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
-  `content_folder_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `create_by` bigint(20) DEFAULT NULL,
   `create_date_time` datetime NOT NULL,
   PRIMARY KEY (`outcome_id`),
-  UNIQUE KEY `code_2` (`code`,`organisation_id`),
   KEY `name` (`name`),
   KEY `code` (`code`),
-  KEY `FK_lams_outcome_1` (`organisation_id`),
   KEY `FK_lams_outcome_2` (`scale_id`),
-  CONSTRAINT `FK_lams_outcome_1` FOREIGN KEY (`organisation_id`) REFERENCES `lams_organisation` (`organisation_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_lams_outcome_2` FOREIGN KEY (`scale_id`) REFERENCES `lams_outcome_scale` (`scale_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1550,6 +1552,7 @@ CREATE TABLE `lams_outcome_mapping` (
   `lesson_id` bigint(20) DEFAULT NULL,
   `tool_content_id` bigint(20) DEFAULT NULL,
   `item_id` bigint(20) DEFAULT NULL,
+  qb_question_id INT,
   PRIMARY KEY (`mapping_id`),
   KEY `FK_lams_outcome_mapping_1` (`outcome_id`),
   KEY `FK_lams_outcome_mapping_2` (`lesson_id`),
@@ -1588,22 +1591,17 @@ CREATE TABLE `lams_outcome_result` (
 --
 
 DROP TABLE IF EXISTS `lams_outcome_scale`;
-
+			 
 CREATE TABLE `lams_outcome_scale` (
   `scale_id` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `organisation_id` bigint(20) DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
-  `content_folder_id` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `create_by` bigint(20) DEFAULT NULL,
   `create_date_time` datetime NOT NULL,
   PRIMARY KEY (`scale_id`),
-  UNIQUE KEY `code_2` (`code`,`organisation_id`),
   KEY `name` (`name`),
-  KEY `code` (`code`),
-  KEY `FK_lams_outcome_scale_1` (`organisation_id`),
-  CONSTRAINT `FK_lams_outcome_scale_1` FOREIGN KEY (`organisation_id`) REFERENCES `lams_organisation` (`organisation_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `code` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -2272,7 +2270,7 @@ CREATE TABLE `lams_user` (
   `workspace_folder_id` bigint(20) DEFAULT NULL,
   `theme_id` bigint(20) DEFAULT NULL,
   `locale_id` int(11) DEFAULT NULL,
-  `portrait_uuid` bigint(20) DEFAULT NULL,
+  `portrait_uuid` BINARY(16),
   `change_password` tinyint(1) DEFAULT '0',
   `timezone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `first_login` tinyint(1) DEFAULT '1',
@@ -2441,5 +2439,202 @@ CREATE TABLE `patches` (
   `patch_in_progress` char(1) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'F',
   PRIMARY KEY (`system_name`,`patch_level`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_question`
+--
+
+DROP TABLE IF EXISTS `lams_qb_question`;
+
+CREATE TABLE `lams_qb_question` (
+  `uid` BIGINT AUTO_INCREMENT,
+  `uuid` BINARY(16) NOT NULL,
+  `type` TINYINT NOT NULL,
+  `question_id` INT NOT NULL,
+  `version` SMALLINT NOT NULL DEFAULT 1,
+  `create_date` DATETIME NOT NULL DEFAULT NOW(),
+  `content_folder_id` char(36) NOT NULL,
+  `name` TEXT,
+  `description` MEDIUMTEXT,
+  `max_mark` INT,
+  `feedback` TEXT,
+  `penalty_factor` float DEFAULT 0,
+  `answer_required` TINYINT(1) DEFAULT 0,
+  `multiple_answers_allowed` TINYINT(1) DEFAULT 0,
+  `incorrect_answer_nullifies_mark` TINYINT(1) DEFAULT 0,
+  `feedback_on_correct` TEXT,
+  `feedback_on_partially_correct` TEXT,
+  `feedback_on_incorrect` TEXT,
+  `shuffle` TINYINT(1) DEFAULT 0,
+  `prefix_answers_with_letters` TINYINT(1) DEFAULT 0,
+  `case_sensitive` TINYINT(1) DEFAULT 0,
+  `correct_answer` TINYINT(1) DEFAULT 0,
+  `allow_rich_editor` TINYINT(1) DEFAULT 0,
+  `max_words_limit` int(11) DEFAULT 0,
+  `min_words_limit` int(11) DEFAULT 0,
+  `hedging_justification_enabled` TINYINT(1) DEFAULT 0,
+  `autocomplete_enabled` TINYINT(1) DEFAULT 0,
+  PRIMARY KEY (uid),
+  CONSTRAINT UQ_question_version UNIQUE INDEX (question_id, version)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                               
+DROP TRIGGER IF EXISTS before_insert_qb_question;
+			
+CREATE TRIGGER before_insert_qb_question
+  BEFORE INSERT ON lams_qb_question
+  FOR EACH ROW
+  SET new.uuid = IF(new.uuid IS NULL, UUID_TO_BIN(UUID()), new.uuid);
+
+
+--
+-- Table structure for table `lams_qb_tool_question`
+--
+
+DROP TABLE IF EXISTS `lams_qb_tool_question`;
+
+CREATE TABLE lams_qb_tool_question (
+  `tool_question_uid` BIGINT AUTO_INCREMENT,
+  `qb_question_uid` BIGINT NOT NULL,
+  `tool_content_id` BIGINT NOT NULL,
+  `display_order` TINYINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (tool_question_uid),
+  INDEX (tool_content_id),
+  CONSTRAINT FK_lams_qb_tool_question_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_option`
+--
+
+DROP TABLE IF EXISTS `lams_qb_option`;
+
+CREATE TABLE lams_qb_option (
+  `uid` BIGINT AUTO_INCREMENT,
+  `qb_question_uid` BIGINT NOT NULL,
+  `display_order` TINYINT NOT NULL DEFAULT 1,
+  `name` TEXT,
+ `matching_pair` TEXT,
+  `numerical_option` float DEFAULT 0,
+  `max_mark` float DEFAULT 0,
+  `accepted_error` float DEFAULT 0,
+  `feedback` TEXT,
+  PRIMARY KEY (uid),
+  INDEX (display_order),
+  CONSTRAINT FK_lams_qb_option_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_question_unit`
+--
+
+DROP TABLE IF EXISTS `lams_qb_question_unit`;
+
+CREATE TABLE lams_qb_question_unit (
+  `uid` BIGINT AUTO_INCREMENT,
+  `qb_question_uid` BIGINT NOT NULL,
+  `display_order` TINYINT NOT NULL DEFAULT 1,
+  `multiplier` float DEFAULT 0,
+  `name` varchar(255),
+  PRIMARY KEY (uid),
+  CONSTRAINT FK_lams_qb_question_unit_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON DELETE CASCADE ON UPDATE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_tool_answer`
+--
+
+DROP TABLE IF EXISTS `lams_qb_tool_answer`;
+
+CREATE TABLE lams_qb_tool_answer (
+  `answer_uid` BIGINT AUTO_INCREMENT,
+  `tool_question_uid` BIGINT NOT NULL,
+  `qb_option_uid` BIGINT DEFAULT NULL,
+  `answer` MEDIUMTEXT,
+  PRIMARY KEY (answer_uid),
+  CONSTRAINT FK_lams_qb_tool_answer_1 FOREIGN KEY (tool_question_uid) REFERENCES lams_qb_tool_question (tool_question_uid) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_lams_qb_tool_answer_2 FOREIGN KEY (qb_option_uid) REFERENCES lams_qb_option (uid)  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_sequence_generator`
+--
+
+DROP TABLE IF EXISTS `lams_sequence_generator`;
+
+CREATE TABLE lams_sequence_generator (
+  lams_qb_question_question_id INT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE UNIQUE INDEX IDX_lams_qb_question_question_id ON lams_sequence_generator(lams_qb_question_question_id);
+
+
+--
+-- Table structure for table `lams_qb_collection`
+--
+
+DROP TABLE IF EXISTS `lams_qb_collection`;
+
+CREATE TABLE lams_qb_collection (
+  `uid` BIGINT AUTO_INCREMENT, 
+  `name` VARCHAR(255),
+  `user_id` BIGINT,
+  `personal` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (uid),
+  INDEX (personal),
+  CONSTRAINT FK_lams_qb_collection_1 FOREIGN KEY (user_id) REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_collection_question`
+--
+
+DROP TABLE IF EXISTS `lams_qb_collection_question`;
+
+CREATE TABLE lams_qb_collection_question (
+  `collection_uid`  BIGINT NOT NULL,
+  `qb_question_id` INT NOT NULL,
+  CONSTRAINT FK_lams_qb_collection_question_1 FOREIGN KEY (collection_uid) REFERENCES lams_qb_collection (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_lams_qb_collection_question_2 FOREIGN KEY (qb_question_id) REFERENCES lams_qb_question (question_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_qb_collection_organisation`
+--
+
+DROP TABLE IF EXISTS `lams_qb_collection_organisation`;
+
+CREATE TABLE lams_qb_collection_organisation (
+  `collection_uid`  BIGINT NOT NULL,
+  `organisation_id` BIGINT NOT NULL,
+  CONSTRAINT FK_lams_qb_collection_share_1 FOREIGN KEY (collection_uid) REFERENCES lams_qb_collection (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_lams_qb_collection_share_2 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `lams_user_organisation_collapsed`
+--
+
+DROP TABLE IF EXISTS `lams_user_organisation_collapsed`;
+
+CREATE TABLE `lams_user_organisation_collapsed` (
+  `uid` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organisation_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `collapsed` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`uid`),
+  KEY `organisation_id` (`organisation_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_1` FOREIGN KEY (`organisation_id`) REFERENCES `lams_organisation` (`organisation_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_2` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 SET FOREIGN_KEY_CHECKS=1;

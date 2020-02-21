@@ -84,7 +84,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -105,8 +104,6 @@ public class AuthoringController {
     private IAssessmentService service;
     @Autowired
     private IQbService qbService;
-    @Autowired
-    WebApplicationContext applicationcontext;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -373,12 +370,13 @@ public class AuthoringController {
 	    return "pages/authoring/randomQuestion";
 
 	} else {
-	    // sessionMapID and questionType is already supplied as parameters
+	    String url = "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "qb/edit/initNewQuestion.do?"
+		    + request.getQueryString();
 	    boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
-	    String params = "?" + AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED + "=" + isAuthoringRestricted;
+	    url = WebUtil.appendParameterToURL(url, AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED,
+		    String.valueOf(isAuthoringRestricted));
 
-	    forwardToEditQbQuestionController(request, response, "/qb/edit/initNewQuestion.do", params);
-	    return null;
+	    return url;
 	}
     }
 
@@ -412,25 +410,14 @@ public class AuthoringController {
 	    boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	    AssessmentQuestion question = questionReference.getQuestion();
 
-	    // sessionMapID and questionType is already supplied as parameters
-	    String params = "?" + AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED + "=" + isAuthoringRestricted;
-	    params += "&qbQuestionUid=" + question.getQbQuestion().getUid();
+	    String url = "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "qb/edit/editQuestion.do?"
+		    + request.getQueryString();
+	    url = WebUtil.appendParameterToURL(url, AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED,
+		    String.valueOf(isAuthoringRestricted));
+	    url = WebUtil.appendParameterToURL(url, "qbQuestionUid", question.getQbQuestion().getUid().toString());
 
-	    forwardToEditQbQuestionController(request, response, "/qb/edit/editQuestion.do", params);
-	    return null;
+	    return url;
 	}
-    }
-
-    /**
-     * Forwards to the specified jsp page from Assessment tool.
-     */
-    private void forwardToEditQbQuestionController(HttpServletRequest request, HttpServletResponse response, String url,
-	    String params) throws ServletException, IOException {
-	String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
-	serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/" + serverURLContextPath;
-	serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
-	applicationcontext.getServletContext().getContext(serverURLContextPath).getRequestDispatcher(url + params)
-		.forward(request, response);
     }
 
     /**
@@ -721,7 +708,6 @@ public class AuthoringController {
 		.intValue();
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	int i = 1;
 	for (QbQuestion question : questions) {
 	    ArrayNode questionData = JsonNodeFactory.instance.arrayNode();
 	    questionData.add(question.getUid());

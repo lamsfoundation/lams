@@ -41,7 +41,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     private String lastName;
     private String login;
     private String currentActivity;
-    private Long portraitId;
+    private String portraitId;
 
     private boolean hasArchivedMarks;
 
@@ -54,12 +54,12 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.login = user.getLogin();
-	this.setPortraitId(user.getPortraitUuid());
+	this.setPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
     }
 
     @Override
     public ArrayList<String> toStringArray(GBGridView view) {
-	ArrayList<String> ret = new ArrayList<String>();
+	ArrayList<String> ret = new ArrayList<>();
 
 	ret.add(id.toString());
 
@@ -150,11 +150,11 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	this.currentActivity = currentActivity;
     }
 
-    public Long getPortraitId() {
+    public String getPortraitId() {
 	return portraitId;
     }
 
-    public void setPortraitId(Long portraitId) {
+    public void setPortraitId(String portraitId) {
 	this.portraitId = portraitId;
     }
 
