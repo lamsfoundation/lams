@@ -80,7 +80,6 @@ public class LamsToolService implements ILamsToolService {
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
     private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
-    private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     private IActivityDAO activityDAO;
     private ILogEventService logEventService;
@@ -372,7 +371,7 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
-	findPrecedingAssessmentAndMcqActivities(specifiedActivity, confidenceProvidingActivityIds, true);
+	findPrecedingAssessmentActivities(specifiedActivity, confidenceProvidingActivityIds);
 
 	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
@@ -385,12 +384,11 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     * Finds all preceding activities that can provide confidence levels (currently only Assessment and MCQ provide
+     * Finds all preceding activities that can provide confidence levels (currently only Assessment provide
      * them). Please note, it does not check whether enableConfidenceLevels advanced option is ON in those activities.
      */
     @SuppressWarnings("rawtypes")
-    private void findPrecedingAssessmentAndMcqActivities(Activity activity,
-	    Set<Long> confidenceProvidingActivityIds, boolean isMcqIncluded) {
+    private void findPrecedingAssessmentActivities(Activity activity, Set<Long> confidenceProvidingActivityIds) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
 	if (activityClass.equals(ToolActivity.class)) {
@@ -407,8 +405,7 @@ public class LamsToolService implements ILamsToolService {
 	    }
 
 	    String toolSignature = toolActivity.getTool().getToolSignature();
-	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		confidenceProvidingActivityIds.add(toolActivity.getActivityId());
 	    }
 
@@ -418,8 +415,7 @@ public class LamsToolService implements ILamsToolService {
 	    for (Activity activityIter : activities) {
 		if (activityIter instanceof ToolActivity) {
 		    String toolSignatureIter = ((ToolActivity) activityIter).getTool().getToolSignature();
-		    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignatureIter)
-			    || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(toolSignatureIter)) {
+		    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignatureIter)) {
 			confidenceProvidingActivityIds.add(activityIter.getActivityId());
 		    }
 		}
@@ -431,14 +427,14 @@ public class LamsToolService implements ILamsToolService {
 	Transition transitionTo = activity.getTransitionTo();
 	if (transitionTo != null) {
 	    Activity fromActivity = transitionTo.getFromActivity();
-	    findPrecedingAssessmentAndMcqActivities(fromActivity, confidenceProvidingActivityIds, isMcqIncluded);
+	    findPrecedingAssessmentActivities(fromActivity, confidenceProvidingActivityIds);
 	    return;
 	}
 
 	// check parent activity
 	Activity parent = activity.getParentActivity();
 	if (parent != null) {
-	    findPrecedingAssessmentAndMcqActivities(parent, confidenceProvidingActivityIds, isMcqIncluded);
+	    findPrecedingAssessmentActivities(parent, confidenceProvidingActivityIds);
 	    return;
 	}
     }
@@ -453,7 +449,7 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<Long>();
-	findPrecedingAssessmentAndMcqActivities(specifiedActivity, providingVsaAnswersActivityIds, false);
+	findPrecedingAssessmentActivities(specifiedActivity, providingVsaAnswersActivityIds);
 
 	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<ToolActivity>();
 	for (Long confidenceProvidingActivityId : providingVsaAnswersActivityIds) {

@@ -20,25 +20,23 @@
 	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
-		 var mustHaveUppercase = ${mustHaveUppercase},
-	     mustHaveNumerics  = ${mustHaveNumerics},
-	     mustHaveLowercase  = ${mustHaveLowercase},
-	     mustHaveSymbols   = ${mustHaveSymbols};
+		var mustHaveUppercase = ${mustHaveUppercase},
+	    	mustHaveNumerics  = ${mustHaveNumerics},
+	    	mustHaveLowercase  = ${mustHaveLowercase},
+	    	mustHaveSymbols   = ${mustHaveSymbols};
 	
-	     $.validator.addMethod("pwcheck", function(value) {
-	      return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
-	    (!mustHaveNumerics || /\d/.test(value)) && // has a digit
-	    (!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
-	    (!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+	    $.validator.addMethod("pwcheck", function(value) {
+	    	return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+	    		(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+	    		(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+	    		(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
 	     });
 			
 		$.validator.addMethod("charactersAllowed", function(value) {
-				return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/.test(value)
-			
-			});
+			return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/.test(value)
+		});
 	
 		$(function() {
-	
 		  // Setup form validation 
 		  $("#change-password").validate({
 		  		errorClass: 'help-block',
@@ -60,7 +58,7 @@
 		      // Specify the validation error messages
 		      messages: {
 		          oldPassword: {
-		        	 	required: "<fmt:message key='label.password.old.must.entered'/>" 
+		      		  required: "<fmt:message key='label.password.old.must.entered'/>" 
 		          },
 		          password: {
 		              required: "<fmt:message key='error.password.empty'/>",
@@ -78,9 +76,7 @@
 		          form.submit();
 		      }
 		  });
-	
 		});
-	
 		
 		$(document).ready(function () {
 			//update dialog's height and title
@@ -91,6 +87,9 @@
 
 <body>
 <form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
+	<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
+	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -98,34 +97,40 @@
 				<div class="panel voffset20">
 					<lams:errors/>
 					<div class="panel-body">
-						<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 						<form:hidden name="<%=PasswordChangeActionForm.formName%>" path="login" />
-							<div class="form-group">
-								<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
- 								<lams:errors path="oldPassword"/>	
- 								<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
-							</div>
+						
+						<div class="form-group">
+							<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
+ 							<lams:errors path="oldPassword"/>	
+ 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
+						</div>
 							
-							<div class="col-xs-12">
-								 <lams:Alert type="info"  id="passwordConditions" close="false">
-								 <strong><fmt:message key='label.password.must.contain'/>:</strong> 
-								 <ul class="list-unstyled" style="line-height: 1.2">
-								  	<li><span class="fa fa-check"></span> <fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message></li>
-								  <c:if test="${mustHaveUppercase}">
+						<div class="col-xs-12">
+							<lams:Alert type="info"  id="passwordConditions" close="false">
+								<strong><fmt:message key='label.password.must.contain'/>:</strong> 
+								 
+								<ul class="list-unstyled" style="line-height: 1.2">
+									<li>
+										<span class="fa fa-check"></span> 
+										<fmt:message key='label.password.min.length'>
+											<fmt:param value='${minNumChars}'/>
+										</fmt:message>
+									</li>
+									<c:if test="${mustHaveUppercase}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.ucase'/></li>
-								  </c:if>
-								  <c:if test="${mustHaveLowercase}">
-						                <li><span class="fa fa-check"></span> <fmt:message key='label.password.must.lcase' /></li>
-					              </c:if>
-								  <c:if test="${mustHaveNumerics}">
+									</c:if>
+									<c:if test="${mustHaveLowercase}">
+								              <li><span class="fa fa-check"></span> <fmt:message key='label.password.must.lcase' /></li>
+							        </c:if>
+									<c:if test="${mustHaveNumerics}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.number'/></li>
-								  </c:if>	
-								  <c:if test="${mustHaveSymbols}">
+									</c:if>	
+									<c:if test="${mustHaveSymbols}">
 										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
-								  </c:if>	
-								  </ul>
-								 </lams:Alert> 
-							</div>
+									</c:if>	
+								</ul>
+							</lams:Alert> 
+						</div>
 							
 						<lams:errors path="password"/>	
  						<div class="input-group voffset5">

@@ -1255,7 +1255,7 @@ function loadLearningDesignSVG() {
 
 			// iframe just to load Authoring for a single purpose, generate the SVG
 			var frame = $('<iframe />').appendTo('body').css('visibility', 'hidden');
-			frame.load(function(){
+			frame.on('load', function(){
 				// disable current onload handler as closing the dialog reloads the iframe
 				frame.off('load');
 				

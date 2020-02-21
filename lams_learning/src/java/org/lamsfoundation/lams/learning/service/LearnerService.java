@@ -1461,7 +1461,6 @@ public class LearnerService implements ILearnerFullService {
     /* Added for RepopulateProgressMarksServlet - can be removed later */
     private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
     private static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
-    private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     @Override
     public String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList,
@@ -1493,8 +1492,7 @@ public class LearnerService implements ILearnerFullService {
 		    ToolActivity toolActivity = (ToolActivity) activity;
 		    Tool tool = toolActivity.getTool();
 		    if (updateGradebookForAll || TOOL_SIGNATURE_ASSESSMENT.equals(tool.getToolSignature())
-			    || TOOL_SIGNATURE_SCRATCHIE.equals(tool.getToolSignature())
-			    || TOOL_SIGNATURE_MCQ.equals(tool.getToolSignature())) {
+			    || TOOL_SIGNATURE_SCRATCHIE.equals(tool.getToolSignature())) {
 			auditLogBuilder.append("Pushing mark to Gradebook for activity ")
 				.append(activity.getActivityId()).append(" ").append(activity.getTitle()).append("\n");
 			gradebookService.updateGradebookUserActivityMark(lesson, activity, learner);

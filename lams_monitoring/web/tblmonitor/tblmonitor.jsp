@@ -58,10 +58,6 @@
 				toolContentID = "${traToolContentId}";
 				url = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/";
 				
-			} else if (method == "iraMcq" || method == "mcqStudentChoices") {
-				toolContentID = "${iraToolContentId}";
-				url = "<lams:LAMSURL/>tool/lamc11/tblmonitoring/";
-				
 			} else if (method == "iraAssessment" || method == "iraAssessmentStudentChoices") {
 				toolContentID = "${iraToolContentId}";
 				url = "<lams:LAMSURL/>tool/laasse10/tblmonitoring/";
@@ -186,17 +182,10 @@
 					</tr>
 				</c:if>
 				
-				<c:if test="${not empty isIraMcqAvailable || not empty isIraAssessmentAvailable}">
-					<c:set var="iraMethodName">
-						<c:choose>
-							<c:when test="${not empty isIraMcqAvailable}">iraMcq</c:when>
-							<c:otherwise>iraAssessment</c:otherwise>
-						</c:choose>
-					</c:set>
-				
+				<c:if test="${not empty isIraAvailable}">
 					<tr>
 						<td id="menu-item-ira">
-							<a id="tab-link-ira" class="tab-link" href="#ira" data-method="${iraMethodName}">
+							<a id="tab-link-ira" class="tab-link" href="#ira" data-method="iraAssessment">
 								<i class="fa fa-user"></i>
 								<fmt:message key="label.ira"/>
 							</a>

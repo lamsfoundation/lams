@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -451,10 +452,14 @@ public interface IAssessmentService extends ICommonToolService {
      *
      * @param assessment
      * @param sessionDtos
-     * @param showUserNames
      * @return
      */
-    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames);
+    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos);
+
+    /**
+     * Alternative Excel export. (Copied from now obsolete MCQ tool.)
+     */
+    byte[] exportMarksMcq(Assessment assessment, Set<AssessmentQuestion> questions) throws IOException;
 
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using

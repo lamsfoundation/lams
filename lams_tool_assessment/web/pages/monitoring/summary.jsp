@@ -302,6 +302,10 @@
 		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
+	function exportMarksMCQ() {
+		var url = "<c:url value='/monitoring/exportSummaryMCQ.do'/>?sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
+		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+	};
 </script>
 
 <div class="panel">
@@ -330,6 +334,13 @@
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.summary.export.summary" />
 	</button>
+	
+	<c:if test="${sessionMap.isOnlyMcqQuestionsAvailable}">
+		<button onclick="return exportMarksMCQ();" class="btn btn-default btn-sm btn-disable-on-submit pull-right btn btn-default btn-sm btn-disable-on-submit pull-right roffset10">
+			<i class="fa fa-download" aria-hidden="true"></i> 
+			<fmt:message key="label.export.marks.mcq" />
+		</button>
+	</c:if>
 			
 	<h5><fmt:message key="label.monitoring.summary.summary" /></h5>
 	

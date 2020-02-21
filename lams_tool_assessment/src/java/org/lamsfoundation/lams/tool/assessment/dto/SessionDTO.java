@@ -44,6 +44,7 @@ public class SessionDTO {
 
     //used for export purposes only
     private List<AssessmentResult> assessmentResults;
+    private List<UserMarkDTO> userMarkDtos;
 
     public SessionDTO() {
     }
@@ -78,14 +79,6 @@ public class SessionDTO {
 	this.sessionName = sessionName;
     }
 
-    public List<AssessmentResult> getAssessmentResults() {
-	return assessmentResults;
-    }
-
-    public void setAssessmentResults(List<AssessmentResult> assessmentResults) {
-	this.assessmentResults = assessmentResults;
-    }
-
     public int getNumberLearners() {
 	return numberLearners;
     }
@@ -116,6 +109,22 @@ public class SessionDTO {
 
     public void setMaxMark(String maxMark) {
 	this.maxMark = maxMark;
+    }
+
+    public List<AssessmentResult> getAssessmentResults() {
+	return assessmentResults;
+    }
+
+    public void setAssessmentResults(List<AssessmentResult> assessmentResults) {
+	this.assessmentResults = assessmentResults;
+    }
+
+    public List<UserMarkDTO> getUserMarkDtos() {
+	return userMarkDtos;
+    }
+
+    public void setUserMarkDtos(List<UserMarkDTO> userMarkDtos) {
+	this.userMarkDtos = userMarkDtos;
     }
 
 }

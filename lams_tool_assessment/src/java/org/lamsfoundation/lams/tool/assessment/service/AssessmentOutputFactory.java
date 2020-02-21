@@ -65,6 +65,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	definition = buildRangeDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, 0L, null);
 	definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, definition);
+	
+	definition = buildBooleanOutputDefinition(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
+	definitionMap.put(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, definition);
 
 	if (toolContentObject != null) {
 	    Assessment assessment = (Assessment) toolContentObject;
@@ -170,6 +173,10 @@ public class AssessmentOutputFactory extends OutputFactory {
 		output.put(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN,
 			getTimeTaken(assessmentService, learnerId, assessment));
 	    }
+	    if (names == null || names.contains(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
+		output.put(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+			getLearnerAllCorrect(assessmentService, learnerId, assessment));
+	    }
 	    if (names == null || names.contains(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		output.put(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS,
 			getNumberAttempts(assessmentService, learnerId, assessment));
@@ -217,6 +224,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
 		    return getTimeTaken(assessmentService, learnerId, assessment);
 
+		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
+		   return getLearnerAllCorrect(assessmentService, learnerId, assessment);
+
 		} else if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
 		    return getNumberAttempts(assessmentService, learnerId, assessment);
 
@@ -255,6 +265,9 @@ public class AssessmentOutputFactory extends OutputFactory {
 		return convertToToolOutputs(results);
 	    }
 	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
+		return null;
+	    }
+	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
 		return null;
 	    }
 	    if (name.equals(AssessmentConstants.OUTPUT_NAME_LEARNER_NUMBER_ATTEMPTS)) {
@@ -351,6 +364,28 @@ public class AssessmentOutputFactory extends OutputFactory {
 
 	return new ToolOutput(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN,
 		getI18NText(AssessmentConstants.OUTPUT_NAME_LEARNER_TIME_TAKEN, true), timeTaken);
+    }
+    
+    /**
+     * Did the user get the questions all correct. This checks the answers associated with the last attempt. Assumes all
+     * correct if the mark is equal to the maximum possible mark. Will always return a ToolOutput object.
+     */
+    private ToolOutput getLearnerAllCorrect(IAssessmentService assessmentService, Long learnerId, Assessment assessment) {
+
+	//exclude essays maxMark from the total mark (as we need maxMark to be available pronto, and not hours later when teacher assigns it, as with essays)
+	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
+	int maxScore = assessmentResult.getMaximumGrade();
+	for (QuestionReference questionReference: assessment.getQuestionReferences()) {
+	    if (questionReference.getQuestion().getQbQuestion().getType() == QbQuestion.TYPE_ESSAY) {
+		maxScore -= questionReference.getMaxMark();
+	    }
+	};
+
+	// We know the user didn't get everything wrong, but did they answer enough options correctly?
+	// This case is used when there is more than one correct option for each answer. Simple way, compare counts!
+	boolean allCorrect = assessmentResult.getGrade() == maxScore;
+	return new ToolOutput(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+		getI18NText(AssessmentConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
     }
 
     /**

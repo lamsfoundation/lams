@@ -3,10 +3,119 @@
 <project name="LAMS Tool Multiple Choice" basedir=".">
 	
 	<import file="../lams_build/build_tools_base.xml"/>
+	
+	<target name="deploy-tool" depends="_package-create, _package-run" 
+	   description="Build Tool archives and run deployment. Do not run on a production environment." />
+	
+	
+	<target name="_package-create" depends="_build-jar">
+		<!-- Internal target: Generates Tool deployment package. -->
+		<echo>${ant.project.name}: Creating deployment package</echo>
 
-    <fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
-        	<include name="*.js"/>
-    		<exclude name="fastclick.js"/>
-    </fileset>
+		<echo>${ant.project.name}: Copying additional libraries and scripts for deployment</echo>
+		<copy todir="${basedir}/build/deploy" overwrite="true" verbose="true">
+			<fileset dir="../../lams/lams_build/deploy-tool">
+				<include name="**" />
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool SQL files</echo>
+		<copy overwrite="true" todir="${basedir}/build/deploy/sql" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="${tool.build.sql.create}" />
+				<include name="activity_insert.sql" />
+				<include name="library_insert.sql" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${basedir}/build/deploy/sql" overwrite="true" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="tool_insert.sql" />
+			</fileset>	
+			<filterset>
+				<filter token="tool_version" value="${tool.version}" />
+			</filterset>
+		</copy>
+		
+		<copy todir="${basedir}/build/deploy/sql" overwrite="true" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="db_version_insert.sql" />
+			</fileset>	
+			<filterset>
+				<filter token="tool_version" value="${tool.version}" />
+				<filter token="signature" value="${signature}" />
+			</filterset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool language files</echo>
+		<copy todir="${basedir}/build/deploy/language" overwrite="true">
+			<fileset dir="${conf.dir}/language/lams">
+				<include name="*.properties" />
+				<include name="*.txt" />
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool JAR and WAR</echo>
+		<copy todir="${basedir}/build/deploy" overwrite="true" verbose="true">
+			<fileset dir="${basedir}/build/lib">
+				<include name="*.jar"/>
+				<include name="*.war"/>
+			</fileset>
+		</copy>
+
+		<taskdef name="generateDeployProperties"
+		         classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask"
+			     classpathref="deploy.classpath" />
+
+		<echo>${ant.project.name}: Preparing Deployment Properties file</echo>
+		<generateDeployProperties depends="compile"
+			mode="development" 
+			outputPath="${basedir}/build/deploy" 
+			generateForInstallers="${generate.for.installers}"
+			dbPassword="${db.password}" 
+			dbUsername="${db.username}" 
+			dbDriverUrl="${db.url.build}" 
+			dbDriverClass="com.mysql.cj.jdbc.Driver" 
+			deployFiles="${basedir}/build/deploy/${product}.jar" 
+			toolJarFileName="${product}.jar"
+			toolSignature="${signature}"
+			toolVersion="${tool.version}"
+			hideTool="${tool.hide}"
+			minServerVersionNumber="${min.server.version.number}"
+			toolTablesScriptPath="${basedir}/build/deploy/sql/${tool.build.sql.create}" 
+			toolActivityInsertScriptPath="${basedir}/build/deploy/sql/activity_insert.sql" 
+			toolLibraryInsertScriptPath="${basedir}/build/deploy/sql/library_insert.sql" 
+			toolInsertScriptPath="${basedir}/build/deploy/sql/tool_insert.sql" 
+			toolDBVersionScriptPath="${basedir}/build/deploy/sql/db_version_insert.sql"
+			toolApplicationContextPath="/${product.path.filesystem}/${tool.application.context.file}"
+			lamsEarPath="${server.home}/standalone/deployments/lams.ear"
+			toolContext="${toolContext}" 
+			toolWebUri="${product}.war"
+			languageFilesPackage="${product.path.java}">
+			
+			<!-- Language files go as a fileset.
+			     Not nice but can't work out how to embed them in a tag. -->
+			<fileset dir="${basedir}/build/deploy/language">
+				<include name="**/*.properties" />
+				<include name="**/*.txt" />
+			</fileset>
+
+		</generateDeployProperties>
+	</target>
+	
+	<target name="deploy-war" depends="_target-not-available"
+		    description="Deploys WAR." />
+	
+		
+	<target name="explode-war" depends="_target-not-available"
+		    description="Explodes deployed WAR to folder." />
+	
+	
+	<target name="explode-war-delete" depends="_target-not-available"
+		    description="Deletes exploded WAR folder." />
+	
+	
+	<target name="explode-war-synchronize" depends="_target-not-available"
+		    description="Copies web files into exploded WAR folder." />
 	
 </project>

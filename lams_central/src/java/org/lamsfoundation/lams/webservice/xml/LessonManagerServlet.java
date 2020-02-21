@@ -1266,7 +1266,6 @@ public class LessonManagerServlet extends HttpServlet {
 	for (ToolActivity activity : activities) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    hasNumericToolOutput |= CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
 		    || CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
 	}
 

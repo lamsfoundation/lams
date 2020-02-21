@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
@@ -51,7 +52,15 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.util.CellUtil;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -94,6 +103,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.UserMarkDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -123,6 +133,7 @@ import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -1640,119 +1651,114 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos, boolean showUserNames) {
-	List<ExcelSheet> sheets = new LinkedList<>();
+    public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
+	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
-	if (showUserNames) {
-	    ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
-	    sheets.add(summarySheet);
+	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
+	sheets.add(summarySheet);
 
-	    if (sessionDtos != null) {
-		for (SessionDTO sessionDTO : sessionDtos) {
-		    Long sessionId = sessionDTO.getSessionId();
+	if (sessionDtos != null) {
+	    for (SessionDTO sessionDTO : sessionDtos) {
+		Long sessionId = sessionDTO.getSessionId();
 
-		    summarySheet.addEmptyRow();
+		summarySheet.addEmptyRow();
 
-		    ExcelRow sessionTitleRow = summarySheet.initRow();
-		    sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
+		ExcelRow sessionTitleRow = summarySheet.initRow();
+		sessionTitleRow.addCell(sessionDTO.getSessionName(), true);
 
-		    List<AssessmentUserDTO> userDtos = new ArrayList<>();
-		    // in case of UseSelectLeaderToolOuput - display only one user
-		    if (assessment.isUseSelectLeaderToolOuput()) {
+		List<AssessmentUserDTO> userDtos = new ArrayList<>();
+		// in case of UseSelectLeaderToolOuput - display only one user
+		if (assessment.isUseSelectLeaderToolOuput()) {
 
-			AssessmentSession session = getSessionBySessionId(sessionId);
-			AssessmentUser groupLeader = session.getGroupLeader();
+		    AssessmentSession session = getSessionBySessionId(sessionId);
+		    AssessmentUser groupLeader = session.getGroupLeader();
 
-			if (groupLeader != null) {
+		    if (groupLeader != null) {
 
-			    float assessmentResult = getLastTotalScoreByUser(assessment.getUid(),
-				    groupLeader.getUserId());
+			float assessmentResult = getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
 
-			    AssessmentUserDTO userDto = new AssessmentUserDTO();
-			    userDto.setFirstName(groupLeader.getFirstName());
-			    userDto.setLastName(groupLeader.getLastName());
-			    userDto.setGrade(assessmentResult);
-			    userDtos.add(userDto);
-			}
-
-		    } else {
-			int countSessionUsers = sessionDTO.getNumberLearners();
-
-			// Get the user list from the db
-			userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
+			AssessmentUserDTO userDto = new AssessmentUserDTO();
+			userDto.setFirstName(groupLeader.getFirstName());
+			userDto.setLastName(groupLeader.getLastName());
+			userDto.setGrade(assessmentResult);
+			userDtos.add(userDto);
 		    }
 
-		    float minGrade = -9999999;
-		    float maxGrade = 0;
-		    for (AssessmentUserDTO userDto : userDtos) {
-			float grade = userDto.getGrade();
-			if (grade < minGrade || minGrade == -9999999) {
-			    minGrade = grade;
-			}
-			if (grade > maxGrade) {
-			    maxGrade = grade;
-			}
-		    }
-		    if (minGrade == -9999999) {
-			minGrade = 0;
-		    }
+		} else {
+		    int countSessionUsers = sessionDTO.getNumberLearners();
 
-		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
-			    10);
-		    // work out total marks so we can do percentages. need as float for the correct divisions
-		    int totalNumEntries = 0;
-		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-			totalNumEntries += entry.getValue();
-		    }
-
-		    // Mark Summary Min, Max + Grouped Percentages
-		    summarySheet.addEmptyRow();
-		    ExcelRow minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.number.learners"), true);
-		    minMaxRow.addCell(totalNumEntries);
-
-		    minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.lowest.mark"), true);
-		    minMaxRow.addCell((double) minGrade);
-
-		    minMaxRow = summarySheet.initRow();
-		    minMaxRow.addCell(getMessage("label.highest.mark"), true);
-		    minMaxRow.addCell((double) maxGrade);
-		    summarySheet.addEmptyRow();
-
-		    ExcelRow binSummaryRow = summarySheet.initRow();
-		    binSummaryRow.addCell(getMessage("label.authoring.basic.list.header.mark"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow.addCell(getMessage("label.number.learners"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    float totalNumEntriesAsFloat = totalNumEntries;
-		    for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
-			binSummaryRow = summarySheet.initRow();
-			binSummaryRow.addCell(entry.getKey());
-			binSummaryRow.addCell(entry.getValue());
-			binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
-		    }
-		    summarySheet.addEmptyRow();
-		    summarySheet.addEmptyRow();
-
-		    ExcelRow summaryTitleRow = summarySheet.initRow();
-		    summaryTitleRow.addCell(getMessage("label.export.user.id"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-		    summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
-			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-
-		    for (AssessmentUserDTO userDto : userDtos) {
-			ExcelRow userResultRow = summarySheet.initRow();
-			userResultRow.addCell(userDto.getLogin());
-			userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
-			userResultRow.addCell(userDto.getGrade());
-		    }
-		    summarySheet.addEmptyRow();
+		    // Get the user list from the db
+		    userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
 		}
+
+		float minGrade = -9999999;
+		float maxGrade = 0;
+		for (AssessmentUserDTO userDto : userDtos) {
+		    float grade = userDto.getGrade();
+		    if (grade < minGrade || minGrade == -9999999) {
+			minGrade = grade;
+		    }
+		    if (grade > maxGrade) {
+			maxGrade = grade;
+		    }
+		}
+		if (minGrade == -9999999) {
+		    minGrade = 0;
+		}
+
+		LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade,
+			10);
+		// work out total marks so we can do percentages. need as float for the correct divisions
+		int totalNumEntries = 0;
+		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
+		    totalNumEntries += entry.getValue();
+		}
+
+		// Mark Summary Min, Max + Grouped Percentages
+		summarySheet.addEmptyRow();
+		ExcelRow minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.number.learners"), true);
+		minMaxRow.addCell(totalNumEntries);
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.lowest.mark"), true);
+		minMaxRow.addCell((double) minGrade);
+
+		minMaxRow = summarySheet.initRow();
+		minMaxRow.addCell(getMessage("label.highest.mark"), true);
+		minMaxRow.addCell((double) maxGrade);
+		summarySheet.addEmptyRow();
+
+		ExcelRow binSummaryRow = summarySheet.initRow();
+		binSummaryRow.addCell(getMessage("label.authoring.basic.list.header.mark"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		binSummaryRow.addCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		binSummaryRow.addCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		float totalNumEntriesAsFloat = totalNumEntries;
+		for (Map.Entry<String, Integer> entry : markSummary.entrySet()) {
+		    binSummaryRow = summarySheet.initRow();
+		    binSummaryRow.addCell(entry.getKey());
+		    binSummaryRow.addCell(entry.getValue());
+		    binSummaryRow.addCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100));
+		}
+		summarySheet.addEmptyRow();
+		summarySheet.addEmptyRow();
+
+		ExcelRow summaryTitleRow = summarySheet.initRow();
+		summaryTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		summaryTitleRow.addCell(getMessage("label.monitoring.summary.user.name"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		summaryTitleRow.addCell(getMessage("label.monitoring.summary.total"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+
+		for (AssessmentUserDTO userDto : userDtos) {
+		    ExcelRow userResultRow = summarySheet.initRow();
+		    userResultRow.addCell(userDto.getLogin());
+		    userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
+		    userResultRow.addCell(userDto.getGrade());
+		}
+		summarySheet.addEmptyRow();
 	    }
 	}
 
@@ -1782,10 +1788,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionTitleRow.addCell(getMessage("label.monitoring.question.summary.default.mark"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	    if (showUserNames) {
-		questionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true,
-			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	    }
+	    questionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.date.attempted"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.attempted"), true,
@@ -1830,9 +1834,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    hedgeQuestionTitleRow.addCell(getMessage("label.authoring.basic.penalty.factor"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.question.summary.default.mark"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.user.id"), true);
-		    if (showUserNames) {
-			hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
-		    }
+		    hedgeQuestionTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.date.attempted"), true);
 		    hedgeQuestionTitleRow.addCell(getMessage("label.export.time.attempted"), true);
 		    for (QbOption option : options) {
@@ -1868,12 +1870,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			Float maxMark = (questionResult.getMaxMark() == null) ? 0
 				: Float.valueOf(questionResult.getMaxMark());
 			userResultRow.addCell(maxMark);
-			if (showUserNames) {
-			    userResultRow.addCell(questionResult.getUser().getLoginName());
-			    userResultRow.addCell(questionResult.getUser().getFullName());
-			} else {
-			    userResultRow.addCell(questionResult.getUser().getUserId());
-			}
+			userResultRow.addCell(questionResult.getUser().getLoginName());
+			userResultRow.addCell(questionResult.getUser().getFullName());
 
 			//date and time
 			ExcelCell dateCell = userResultRow.addCell(questionResult.getFinishDate());
@@ -1935,7 +1933,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		// Calculating the averages
 		ExcelRow averageRow = questionSummarySheet.initRow();
-		averageRow.addEmptyCells(showUserNames ? 8 : 7);
+		averageRow.addEmptyCells(8);
 		averageRow.addCell(getMessage("label.export.average"), true);
 		if (timeTakenTotal > 0) {
 		    averageRow.addCell(Long.valueOf(timeTakenTotal / timeTakenCount));
@@ -2044,23 +2042,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 		if (assessmentUsers != null) {
 		    for (AssessmentUser assessmentUser : assessmentUsers) {
-			if (showUserNames) {
 			    ExcelRow userTitleRow = userSummarySheet.initRow();
 			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
+			    userTitleRow.addCell(getMessage("label.learner"), true);
 			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
 			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
 			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
 			    userTitleRow.addCell(getMessage("label.export.mark"), true);
-
-			} else {
-			    ExcelRow userTitleRow = userSummarySheet.initRow();
-			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
-			    userTitleRow.addCell(getMessage("label.export.mark"), true);
-			}
 
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
@@ -2068,13 +2056,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    if (questionResults != null) {
 				for (AssessmentQuestionResult questionResult : questionResults) {
 				    ExcelRow userResultRow = userSummarySheet.initRow();
-				    if (showUserNames) {
-					userResultRow.addCell(assessmentUser.getLoginName());
-					userResultRow.addCell(assessmentUser.getFullName());
-				    } else {
-					userResultRow.addCell(assessmentUser.getUserId());
-				    }
-
+				    userResultRow.addCell(assessmentUser.getLoginName());
+				    userResultRow.addCell(assessmentUser.getFullName());
 				    userResultRow.addCell(assessmentResult.getStartDate());
 				    userResultRow.addCell(questionResult.getQbQuestion().getName());
 				    userResultRow.addCell(
@@ -2084,7 +2067,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 
 			    ExcelRow userTotalRow = userSummarySheet.initRow();
-			    userTotalRow.addEmptyCells(showUserNames ? 4 : 3);
+			    userTotalRow.addEmptyCells(4);
 			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
 			    userTotalRow.addCell(assessmentResult.getGrade());
 			    userSummarySheet.addEmptyRow();
@@ -2227,6 +2210,380 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	summaryTableRow.addPercentageCell(summaryNAPercentage);
 
 	return summaryTableRow;
+    }
+    
+    @Override
+    public byte[] exportMarksMcq(Assessment assessment, Set<AssessmentQuestion> questions) throws IOException {
+	int maxOptionsInQuestion = 0;
+	for (AssessmentQuestion question : questions) {
+	    if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
+		maxOptionsInQuestion = question.getQbQuestion().getQbOptions().size();
+	    }
+	}
+
+	int totalNumberOfUsers = getCountUsersByContentId(assessment.getContentId());
+	int numQuestions = questions.size();
+
+	//prepareDataForExportMcq
+	List<SessionDTO> sessionDtos = new LinkedList<>();
+	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(assessment.getContentId());
+	for (AssessmentSession session : sessions) {
+	    SessionDTO sessionDto = new SessionDTO(session.getSessionId(), session.getSessionName());
+
+	    List<UserMarkDTO> userMarkDtos = new LinkedList<>();
+	    for (AssessmentUser user: session.getAssessmentUsers()) {
+		UserMarkDTO userMarkDto = new UserMarkDTO();
+		userMarkDto.setFullName(user.getLastName() + " " + user.getFirstName());
+		userMarkDto.setUserGroupLeader(isUserGroupLeader(user.getUserId(), session.getSessionId()));
+		userMarkDto.setUserName(user.getLoginName());
+		userMarkDto.setQueUsrId(user.getUid().toString());
+		userMarkDto.setUserId(user.getUserId().toString());
+
+		// The marks for the user must be listed in the display order of the questionDescription.
+		// Other parts of the code assume that the questions will be in consecutive display
+		// order starting 1 (e.g. 1, 2, 3, not 1, 3, 4) so we set up an array and use
+		// the ( display order - 1) as the index (arrays start at 0, rather than 1 hence -1)
+		// The user must answer all questions, so we can assume that they will have marks
+		// for all questions or no questions.
+		// At present there can only be one answer for each questionDescription but there may be more
+		// than one in the future and if so, we don't want to count the mark twice hence
+		// we need to check if we've already processed this questionDescription in the total.
+		Float[] userMarks = new Float[numQuestions];
+		String[] answeredOptions = new String[numQuestions];
+		Date attemptTime = null;
+		AssessmentResult finalizedUserAttempt = getLastFinishedAssessmentResult(assessment.getUid(), user.getUserId());
+		Float totalMark = 0f;
+		if (finalizedUserAttempt != null) {
+		    for (AssessmentQuestionResult questionResult : finalizedUserAttempt.getQuestionResults()) {
+			Integer displayOrder = questionResult.getQbToolQuestion().getDisplayOrder();
+			int arrayIndex = (displayOrder != null) && (displayOrder.intValue() > 0)
+				? displayOrder.intValue() - 1
+				: 1;
+			if (userMarks[arrayIndex] == null) {
+			    Float mark = questionResult.getMark();
+			    userMarks[arrayIndex] = mark;
+			    totalMark += mark;
+
+			    // find out the answered option's sequential letter - A,B,C...
+			    String answeredOptionLetter = "";
+			    int optionCount = 1;
+			    for (QbOption qbOption : questionResult.getQbQuestion().getQbOptions()) {
+				for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
+				    if (optionAnswer.getAnswerBoolean()
+					    && optionAnswer.getOptionUid().equals(qbOption.getUid())) {
+					answeredOptionLetter = String.valueOf((char) ((optionCount + 'A') - 1));
+					break;
+				    }
+				}
+				optionCount++;
+			    }
+			    answeredOptions[arrayIndex] = answeredOptionLetter;
+			}
+			// get the attempt time, (NB all questions will have the same attempt time)
+			// Not efficient, since we assign this value for each attempt
+			attemptTime = questionResult.getFinishDate();
+		    }
+		}
+
+		userMarkDto.setMarks(userMarks);
+		userMarkDto.setAnsweredOptions(answeredOptions);
+		userMarkDto.setAttemptTime(attemptTime);
+		userMarkDto.setTotalMark(totalMark);
+
+		userMarkDtos.add(userMarkDto);
+	    }
+
+	    sessionDto.setUserMarkDtos(userMarkDtos);
+	    sessionDtos.add(sessionDto);
+	}
+
+	// create an empty excel file
+	HSSFWorkbook wb = new HSSFWorkbook();
+	HSSFCellStyle greenColor = wb.createCellStyle();
+	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
+	greenColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+	Font whiteFont = wb.createFont();
+	whiteFont.setColor(IndexedColors.WHITE.getIndex());
+	whiteFont.setFontName(ExcelUtil.DEFAULT_FONT_NAME);
+	greenColor.setFont(whiteFont);
+
+	short percentageFormat = wb.createDataFormat().getFormat("0%");
+
+	// ======================================================= Report by questionDescription IRA page
+	// =======================================
+
+	HSSFSheet sheet = wb.createSheet(messageService.getMessage("label.monitoring.summary.report.by.question"));
+
+	HSSFRow row;
+	HSSFCell cell;
+	int rowCount = 0;
+
+	row = sheet.createRow(rowCount++);
+	int count = 0;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.monitoring.question.summary.question"));
+	for (int optionCount = 0; optionCount < maxOptionsInQuestion; optionCount++) {
+	    cell = row.createCell(count++);
+	    cell.setCellValue(String.valueOf((char) (optionCount + 'A')));
+	}
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.not.available"));
+
+	for (AssessmentQuestion question : questions) {
+	    row = sheet.createRow(rowCount);
+	    count = 0;
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(rowCount);
+	    rowCount++;
+
+	    Double totalPercentage = 0d;
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
+		int optionAttemptCount = countAttemptsPerOption(assessment.getContentId(), option.getUid());
+		cell = row.createCell(count++);
+		Double percentage = (totalNumberOfUsers != 0) ? (double) optionAttemptCount / totalNumberOfUsers : 0d;
+		cell.setCellValue(percentage);
+		if (option.isCorrect()) {
+		    cell.setCellStyle(greenColor);
+		}
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+
+		totalPercentage += percentage;
+	    }
+	    cell = row.createCell(maxOptionsInQuestion + 1);
+	    cell.setCellValue((1 - totalPercentage));
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	}
+
+	rowCount++;
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.legend"));
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.denotes.correct.answer"));
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(1);
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(2);
+	cell.setCellStyle(greenColor);
+
+	// ======================================================= Report by student IRA page
+	// =======================================
+
+	sheet = wb.createSheet(messageService.getMessage("label.report.by.student"));
+	rowCount = 0;
+
+	row = sheet.createRow(rowCount++);
+	count = 2;
+	for (int questionCount = 1; questionCount <= questions.size(); questionCount++) {
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.monitoring.question.summary.question") + questionCount);
+	}
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.monitoring.summary.total"));
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.monitoring.summary.total") + " %");
+
+	row = sheet.createRow(rowCount++);
+	count = 1;
+	ArrayList<String> correctAnswers = new ArrayList<>();
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.correct.answer"));
+	for (AssessmentQuestion question : questions) {
+
+	    // find out the correct answer's sequential letter - A,B,C...
+	    String correctAnswerLetter = "";
+	    int answerCount = 1;
+	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
+		if (option.isCorrect()) {
+		    correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
+		    break;
+		}
+		answerCount++;
+	    }
+	    cell = row.createCell(count++);
+	    cell.setCellValue(correctAnswerLetter);
+	    correctAnswers.add(correctAnswerLetter);
+	}
+
+	row = sheet.createRow(rowCount++);
+	count = 0;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("monitoring.label.group"));
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.learner"));
+
+	ArrayList<Double> totalPercentList = new ArrayList<>();
+	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
+	for (SessionDTO sessionDto : sessionDtos) {
+	    for (UserMarkDTO userMarkDto : sessionDto.getUserMarkDtos()) {
+		row = sheet.createRow(rowCount++);
+		count = 0;
+		cell = row.createCell(count++);
+		cell.setCellValue(sessionDto.getSessionName());
+
+		cell = row.createCell(count++);
+		cell.setCellValue(userMarkDto.getFullName());
+
+		String[] answeredOptions = userMarkDto.getAnsweredOptions();
+		int numberOfCorrectlyAnsweredByUser = 0;
+		for (int i = 0; i < answeredOptions.length; i++) {
+		    String answeredOption = answeredOptions[i];
+		    cell = row.createCell(count++);
+		    cell.setCellValue(answeredOption);
+		    if (StringUtils.equals(answeredOption, correctAnswers.get(i))) {
+			cell.setCellStyle(greenColor);
+			numberOfCorrectlyAnsweredByUser++;
+			numberOfCorrectAnswersPerQuestion[count - 3]++;
+		    }
+		}
+
+		cell = row.createCell(count++);
+		cell.setCellValue(userMarkDto.getTotalMark());
+
+		Double totalPercents = questions.size() != 0
+			? (double) numberOfCorrectlyAnsweredByUser / questions.size()
+			: 0d;
+		totalPercentList.add(totalPercents);
+		cell = row.createCell(count++);
+		cell.setCellValue(totalPercents);
+		CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	    }
+
+	    rowCount++;
+	}
+
+	// ave
+	row = sheet.createRow(rowCount++);
+	count = 1;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.monitoring.question.summary.average.mark"));
+	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
+	    cell = row.createCell(count++);
+	    Double average = totalPercentList.size() == 0 ? 0d
+		    : (double) numberOfCorrectAnswers / totalPercentList.size();
+	    cell.setCellValue(average);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	}
+
+	// class mean
+	Double[] totalPercents = totalPercentList.toArray(new Double[0]);
+	Arrays.sort(totalPercents);
+	Double sum = 0d;
+	for (int i = 0; i < totalPercents.length; i++) {
+	    sum += totalPercents[i];
+	}
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(1);
+	cell.setCellValue(messageService.getMessage("label.class.mean"));
+	if (totalPercents.length != 0) {
+	    Double classMean = totalPercents.length == 0 ? 0d : sum / totalPercents.length;
+	    cell = row.createCell(questions.size() + 3);
+	    cell.setCellValue(classMean);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	}
+
+	// median
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(1);
+	cell.setCellValue(messageService.getMessage("label.median"));
+	if (totalPercents.length != 0) {
+	    Double median;
+	    int middle = totalPercents.length / 2;
+	    if ((totalPercents.length % 2) == 1) {
+		median = totalPercents[middle];
+	    } else {
+		median = ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
+	    }
+	    cell = row.createCell(questions.size() + 3);
+	    cell.setCellValue(median);
+	    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT, percentageFormat);
+	}
+
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.legend"));
+
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.denotes.correct.answer"));
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(1);
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(2);
+	cell.setCellStyle(greenColor);
+
+	// ======================================================= Marks page
+	// =======================================
+
+	sheet = wb.createSheet("Marks");
+
+	rowCount = 0;
+	count = 0;
+
+	row = sheet.createRow(rowCount++);
+	for (AssessmentQuestion question : questions) {
+	    cell = row.createCell(2 + count++);
+	    cell.setCellValue(messageService.getMessage("label.export.question.mark",
+		    new Object[] { count, question.getQbQuestion().getMaxMark() }));
+	}
+
+	for (SessionDTO sessionDto : sessionDtos) {
+	    String currentSessionName = sessionDto.getSessionName();
+
+	    row = sheet.createRow(rowCount++);
+
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageService.getMessage("monitoring.label.group"));
+
+	    cell = row.createCell(1);
+	    cell.setCellValue(currentSessionName);
+	    cell.setCellStyle(greenColor);
+
+	    rowCount++;
+	    count = 0;
+
+	    row = sheet.createRow(rowCount++);
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.learner"));
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.monitoring.user.summary.user.name"));
+
+	    cell = row.createCell(questions.size() + 2);
+	    cell.setCellValue(messageService.getMessage("label.monitoring.summary.total"));
+
+	    for (UserMarkDTO userMarkDto : sessionDto.getUserMarkDtos()) {
+		row = sheet.createRow(rowCount++);
+		count = 0;
+
+		cell = row.createCell(count++);
+		cell.setCellValue(userMarkDto.getFullName());
+
+		cell = row.createCell(count++);
+		cell.setCellValue(userMarkDto.getUserName());
+
+		Float[] marks = userMarkDto.getMarks();
+		for (int i = 0; i < marks.length; i++) {
+		    cell = row.createCell(count++);
+		    Float mark = (marks[i] == null) ? 0 : marks[i];
+		    cell.setCellValue(mark);
+		}
+
+		cell = row.createCell(count++);
+		cell.setCellValue(userMarkDto.getTotalMark());
+	    }
+
+	    rowCount++;
+	}
+
+	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	wb.write(bos);
+
+	byte[] data = bos.toByteArray();
+	return data;
     }
 
     /**

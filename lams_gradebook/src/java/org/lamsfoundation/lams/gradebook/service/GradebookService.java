@@ -121,7 +121,6 @@ public class GradebookService implements IGradebookFullService {
 
     private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
     public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
-    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     // Services
     private ILamsCoreToolService toolService;
@@ -1212,7 +1211,7 @@ public class GradebookService implements IGradebookFullService {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    //check whether toolActivity has a NumericToolOutput
 	    if (activity.getEvaluation() != null && (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature))) {
+		    || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature))) {
 		filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
 	    }
 	}

@@ -99,9 +99,7 @@ public class SearchQBController {
 	StringBuilder questionTypesAvailable = new StringBuilder();
 	//by default show MCQ type of questions (except for Q&A tool)
 	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE;
-	if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-
-	} else if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
 	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
 	    questionTypesAvailable.append(",");
 	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);

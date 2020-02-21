@@ -91,10 +91,8 @@ public class TblMonitoringController {
 	setupAvailableActivityTypes(request, lessonActivities);
 	boolean isScratchieAvailable = (request.getAttribute("isScratchieAvailable") != null)
 		&& ((Boolean) request.getAttribute("isScratchieAvailable"));
-	boolean isIraMcqAvailable = (request.getAttribute("isIraMcqAvailable") != null)
-		&& ((Boolean) request.getAttribute("isIraMcqAvailable"));
-	boolean isIraAssessmentAvailable = (request.getAttribute("isIraAssessmentAvailable") != null)
-		&& ((Boolean) request.getAttribute("isIraAssessmentAvailable"));
+	boolean isIraAvailable = (request.getAttribute("isIraAvailable") != null)
+		&& ((Boolean) request.getAttribute("isIraAvailable"));
 	Long iraToolActivityId = request.getAttribute("iraToolActivityId") == null ? null
 		: (Long) request.getAttribute("iraToolActivityId");
 	Long traToolActivityId = request.getAttribute("traToolActivityId") == null ? null
@@ -105,7 +103,7 @@ public class TblMonitoringController {
 	//get all mcq and assessment scores
 	List<GradebookUserActivity> iraGradebookUserActivities = new LinkedList<>();
 	List<GradebookUserActivity> traGradebookUserActivities = new LinkedList<>();
-	if (isIraMcqAvailable || isIraAssessmentAvailable) {
+	if (isIraAvailable) {
 	    iraGradebookUserActivities = gradebookService.getGradebookUserActivities(iraToolActivityId);
 	}
 	if (isScratchieAvailable) {
@@ -136,7 +134,7 @@ public class TblMonitoringController {
 			    groupDto.setGroupLeader(userDto);
 			}
 
-			if (isIraMcqAvailable || isIraAssessmentAvailable) {
+			if (isIraAvailable) {
 			    //find according iraGradebookUserActivity
 			    for (GradebookUserActivity iraGradebookUserActivity : iraGradebookUserActivities) {
 				if (iraGradebookUserActivity.getLearner().getUserId().equals(user.getUserId())) {
@@ -373,19 +371,13 @@ public class TblMonitoringController {
 		Long toolActivityId = toolActivity.getActivityId();
 		String toolTitle = toolActivity.getTitle();
 
-		//count only the first MCQ or Assessmnet as iRA
-		if (!iraPassed && (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)
-			|| isScratchieAvailable && CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature))) {
+		//count only the first Assessmnet as iRA
+		if (!iraPassed && isScratchieAvailable
+			&& CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
 		    iraPassed = true;
-		    if (CommonConstants.TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
-			request.setAttribute("isIraMcqAvailable", true);
-
-		    } else {
-			request.setAttribute("isIraAssessmentAvailable", true);
-		    }
+		    request.setAttribute("isIraAvailable", true);
 		    request.setAttribute("iraToolContentId", toolContentId);
 		    request.setAttribute("iraToolActivityId", toolActivityId);
-
 		    continue;
 		}
 

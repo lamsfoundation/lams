@@ -130,9 +130,6 @@ public abstract class LdTemplateController {
     protected static final String FORUM_ICON = "tool/lafrum11/images/icon_forum.swf";
     protected static final String LEADER_TOOL_SIGNATURE = "lalead11";
     protected static final String LEADER_ICON = "tool/lalead11/images/icon_leaderselection.swf";
-    protected static final String MCQ_TOOL_SIGNATURE = "lamc11";
-    protected static final String MCQ_ICON = "tool/lamc11/images/icon_mcq.swf";
-    protected static final String MCQ_TOOL_OUTPUT_DEFINITION = "learner.mark";
     protected static final String NOTEBOOK_TOOL_SIGNATURE = "lantbk11";
     protected static final String NOTEBOOK_ICON = "tool/lantbk11/images/icon_notebook.swf";
     protected static final String NOTICEBOARD_TOOL_SIGNATURE = "lanb11";
@@ -991,35 +988,6 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.QA_TOOL_SIGNATURE,
 		LdTemplateController.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Q&A", Activity.CATEGORY_RESPONSE);
-    }
-
-    /**
-     * Helper method to create a MCQ tool content. Title, instructions and questions are required (see tool for full
-     * details of questions). Other fields are optional.
-     */
-    protected Long createMCQToolContent(UserDTO user, String title, String instructions,
-	    boolean useSelectLeaderToolOuput, boolean enableConfidenceLevel, boolean prefixAnswersWithLetters,
-	    ArrayNode questions) throws IOException {
-
-	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, null, null, null, null);
-	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, useSelectLeaderToolOuput);
-	toolContentJSON.set(RestTags.QUESTIONS, questions);
-	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevel);
-	toolContentJSON.put("prefixAnswersWithLetters", prefixAnswersWithLetters);
-	return createToolContent(user, LdTemplateController.MCQ_TOOL_SIGNATURE, toolContentJSON);
-    }
-
-    /**
-     * Creates a MCQ activity's JSON details.
-     */
-    protected ObjectNode createMCQActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, Long toolContentID,
-	    String contentFolderID, Integer groupingUIID, Integer parentUIID, Integer parentActivityType,
-	    String activityTitle) {
-
-	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
-		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
-		Activity.CATEGORY_ASSESSMENT, LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
     }
 
     /**

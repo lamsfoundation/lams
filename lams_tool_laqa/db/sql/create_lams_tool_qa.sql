@@ -59,12 +59,7 @@ CREATE TABLE tl_laqa11_que_usr (
 
 CREATE TABLE tl_laqa11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , question MEDIUMTEXT
-     , feedback MEDIUMTEXT
-     , display_order INT(5) DEFAULT 1
      , qa_content_id BIGINT(20)
-     , answer_required TINYINT(1) NOT NULL DEFAULT 0
-     , min_words_limit int(11) DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)
@@ -72,21 +67,16 @@ CREATE TABLE tl_laqa11_que_content (
 );
 
 CREATE TABLE tl_laqa11_usr_resp (
-       response_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , answer MEDIUMTEXT
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , time_zone VARCHAR(255)
      , attempt_time DATETIME
      , que_usr_id BIGINT(20) NOT NULL
-     , qa_que_content_id BIGINT(20)
      , visible TINYINT(1) NOT NULL DEFAULT 1
      , answer_autosaved MEDIUMTEXT
-     , PRIMARY KEY (response_id)
+     , PRIMARY KEY (uid)
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_3 FOREIGN KEY (que_usr_id)
                   REFERENCES tl_laqa11_que_usr (uid) ON DELETE CASCADE ON UPDATE CASCADE
-     , INDEX (qa_que_content_id)
-     , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
-                  REFERENCES tl_laqa11_que_content (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE tl_laqa11_conditions (
@@ -117,7 +107,16 @@ ALTER TABLE tl_laqa11_session ADD CONSTRAINT FK_laqa11_session1 FOREIGN KEY (qa_
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date, lockWhenFinished)  VALUES (${default_content_id}, 'Q&A', 'Instructions', NOW() , 0);
 
--- data for content questions table
-INSERT INTO tl_laqa11_que_content (question, display_order, qa_content_id) VALUES ('Sample Question 1?',1,1);
+-- data for QB question table
+SET @max_question_id = COALESCE((SELECT MAX(question_id) FROM lams_qb_question),0) + 1;
+INSERT INTO `lams_qb_question` (`type`,`question_id`,`version`,`create_date`,`name`,`description`,`max_mark`,`content_folder_id`)
+	VALUES (6,@max_question_id,1,NOW(),'Sample Question 1?','Question description',1,'01234567-89ab-cdef-0123-4567890abcde');
+INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES (@max_question_id);
+INSERT INTO lams_qb_collection_question	SELECT 1, @max_question_id;
+
+-- data for tool question tables
+INSERT INTO lams_qb_tool_question (qb_question_uid,tool_content_id,display_order) VALUES ((SELECT MAX(uid) FROM lams_qb_question),${default_content_id},1);
+INSERT INTO tl_laqa11_que_content (uid,qa_content_id) VALUES ((SELECT MAX(tool_question_uid) FROM lams_qb_tool_question),1);
+
 
 SET FOREIGN_KEY_CHECKS=1;

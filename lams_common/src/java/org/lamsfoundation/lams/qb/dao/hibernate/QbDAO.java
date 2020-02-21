@@ -41,12 +41,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "LEFT JOIN tl_laasse10_option_answer AS aa ON a.answer_uid = aa.question_result_uid AND aa.answer_boolean = 1 "
 	    + "WHERE tq.qb_question_uid = :qbQuestionUid GROUP BY opt HAVING opt IS NOT NULL";
 
-    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(mcu.que_usr_id, su.user_id, au.user_id), "
+    private static final String FIND_ANSWERS_BY_ACTIVITY = "SELECT COALESCE(su.user_id, au.user_id), "
 	    + "COALESCE(a.qb_option_uid, aa.question_option_uid) AS opt "
 	    + "FROM lams_learning_activity AS act JOIN lams_qb_tool_question AS tq USING (tool_content_id) "
 	    + "JOIN lams_qb_tool_answer AS a USING (tool_question_uid) "
-	    + "LEFT JOIN tl_lamc11_usr_attempt AS mca ON a.answer_uid = mca.uid "
-	    + "LEFT JOIN tl_lamc11_que_usr AS mcu ON mca.que_usr_id = mcu.uid "
 	    + "LEFT JOIN tl_lascrt11_answer_log AS sa ON a.answer_uid = sa.uid "
 	    + "LEFT JOIN tl_lascrt11_session AS ss ON sa.session_id = ss.session_id "
 	    + "LEFT JOIN tl_lascrt11_user AS su ON ss.uid = su.session_uid "

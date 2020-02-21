@@ -65,7 +65,6 @@ public class AddCustomWebXmlContexts {
 	    defualtTools.add("lavote11");
 	    defualtTools.add("lasurv11");
 	    defualtTools.add("lascrb11");
-	    defualtTools.add("lamc11");
 	    defualtTools.add("lantbk11");
 	    defualtTools.add("lachat11");
 
