@@ -19,6 +19,7 @@ create table tl_lascrt11_scratchie (
    confidence_levels_activity_uiid INT(11),
    preset_marks varchar(255),
    show_scratchies_in_results TINYINT(1) DEFAULT 1,
+   activity_uuid_providing_vsa_answers INT(11),
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
 );
@@ -56,43 +57,20 @@ create table tl_lascrt11_user (
    CONSTRAINT FK_NEW_610529188_30113BFCEC0D3147 FOREIGN KEY (session_uid)
    		REFERENCES tl_lascrt11_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
+  
 create table tl_lascrt11_scratchie_item (
    uid bigint not null auto_increment,
-   title varchar(255),
-   description MEDIUMTEXT,
-   create_date datetime,
-   create_by_author TINYINT(1),
    scratchie_uid bigint,
-   session_uid bigint,
-   order_id integer,
    primary key (uid),
    CONSTRAINT FK_NEW_610529188_F52D1F9330E79035 FOREIGN KEY (scratchie_uid)
-   		REFERENCES tl_lascrt11_scratchie (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-   CONSTRAINT FK_NEW_610529188_F52D1F93EC0D3147 FOREIGN KEY (session_uid)
-   		REFERENCES tl_lascrt11_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-create table tl_lascrt11_scratchie_answer (
-   uid bigint not null auto_increment,
-   description MEDIUMTEXT,
-   correct TINYINT(1),
-   scratchie_item_uid bigint,
-   order_id integer,
-   primary key (uid),
-   CONSTRAINT FK_scratchie_answer_1 FOREIGN KEY (scratchie_item_uid)
-   		REFERENCES tl_lascrt11_scratchie_item (uid) ON DELETE CASCADE ON UPDATE CASCADE
+   		REFERENCES tl_lascrt11_scratchie (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 create table tl_lascrt11_answer_log (
    uid bigint not null auto_increment,
    access_date datetime,
-   scratchie_answer_uid bigint,
    session_id bigint,
    primary key (uid),
-   UNIQUE KEY FK_NEW_lascrt11_30113BFC309ED321 (scratchie_answer_uid,session_id),
-   CONSTRAINT FK_NEW_610529188_693580A438BF8DFE FOREIGN KEY (scratchie_answer_uid)
-   		REFERENCES tl_lascrt11_scratchie_answer (uid) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT sessionIdIndex FOREIGN KEY (session_id)
    		REFERENCES tl_lascrt11_session (session_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -133,27 +111,33 @@ CREATE TABLE tl_lascrt11_configuration (
 ALTER TABLE tl_lascrt11_session ADD CONSTRAINT FK_lalead11_session1 FOREIGN KEY (group_leader_uid)
    		REFERENCES tl_lascrt11_user (uid) ON DELETE SET NULL ON UPDATE CASCADE;
 
-   		
-INSERT INTO tl_lascrt11_scratchie (uid,title,
- instructions, define_later, content_id, reflect_on_activity, extra_point) VALUES
+-- data for content table
+INSERT INTO tl_lascrt11_scratchie (uid,title, instructions, define_later, content_id, reflect_on_activity, extra_point) VALUES
   (1,'Scratchie','Scenario explanation ',0,${default_content_id},0, 0);
+  
+-- data for QB question table
+SET @max_question_id = COALESCE((SELECT MAX(question_id) FROM lams_qb_question),0) + 1;
+INSERT INTO `lams_qb_question` (`type`,`question_id`,`version`,`create_date`,`name`,`description`,`max_mark`,`content_folder_id`)
+	VALUES (1,@max_question_id,1,NOW(),'Question Title','Question Description',1,'01234567-89ab-cdef-0123-4567890abcde');
+INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES (@max_question_id);
+SET @qb_question_uid = (SELECT MAX(uid) FROM lams_qb_question);
+INSERT INTO `lams_qb_option` (`qb_question_uid`,`display_order`,`name`,`max_mark`) VALUES (@qb_question_uid,1,'Question Answer A',1);
+INSERT INTO `lams_qb_option` (`qb_question_uid`,`display_order`,`name`,`max_mark`) VALUES (@qb_question_uid,2,'Question Answer B',0);
+INSERT INTO `lams_qb_option` (`qb_question_uid`,`display_order`,`name`,`max_mark`) VALUES (@qb_question_uid,3,'Question Answer C',0);
+INSERT INTO `lams_qb_option` (`qb_question_uid`,`display_order`,`name`,`max_mark`) VALUES (@qb_question_uid,4,'Question Answer D',0);
+INSERT INTO lams_qb_collection_question	SELECT 1, @max_question_id;
 
-INSERT INTO tl_lascrt11_scratchie_item (uid, title, description, create_date, create_by_author, scratchie_uid, order_id) VALUES 
-  (1, 'Question Title','Question Description',NOW(),1,1,1);
+-- data for tool question tables
+INSERT INTO lams_qb_tool_question (qb_question_uid,tool_content_id,display_order) VALUES (@qb_question_uid,${default_content_id},1);
+INSERT INTO tl_lascrt11_scratchie_item (uid,scratchie_uid) VALUES ((SELECT MAX(tool_question_uid) FROM lams_qb_tool_question),1);
+
   
-INSERT INTO tl_lascrt11_scratchie_answer (uid, description, correct, scratchie_item_uid, order_id) VALUES 
-  (1, 'Question Answer A',1,1,0);
-INSERT INTO tl_lascrt11_scratchie_answer (uid, description, correct, scratchie_item_uid, order_id) VALUES 
-  (2, 'Question Answer B',0,1,1);
-INSERT INTO tl_lascrt11_scratchie_answer (uid, description, correct, scratchie_item_uid, order_id) VALUES 
-  (3, 'Question Answer C',0,1,2);
-INSERT INTO tl_lascrt11_scratchie_answer (uid, description, correct, scratchie_item_uid, order_id) VALUES 
-  (4, 'Question Answer D',0,1,3);
-  
-  
+
 INSERT INTO tl_lascrt11_configuration (config_key, config_value) VALUES
   ('isEnabledExtraPointOption',	'true');
 INSERT INTO tl_lascrt11_configuration (config_key, config_value) VALUES
   ('presetMarks', '4,2,1,0');
+INSERT INTO `tl_lascrt11_configuration` (`config_key`, `config_value`) VALUES 
+  ('hideTitles', 'false');
   
 SET FOREIGN_KEY_CHECKS=1;

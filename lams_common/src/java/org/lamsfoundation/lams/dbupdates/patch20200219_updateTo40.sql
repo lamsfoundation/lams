@@ -1,3 +1,57 @@
+SET AUTOCOMMIT = 0;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- This patch contains files patch20190119.sql to patch20200204.sql
+-- It should upgrade this tool to version 4.0
+
+-- LDEV-4755 Add configuratio settings for ClamAV antivirus
+INSERT INTO lams_configuration VALUES
+('AntivirusEnable', 'false',     'config.av.enable', 'config.header.antivirus', 'BOOLEAN', 1),
+('AntivirusHost',   'localhost', 'config.av.host',   'config.header.antivirus', 'STRING',  0),
+('AntivirusPort',   '3310',      'config.av.port',   'config.header.antivirus', 'LONG',    0);
+
+-- LDEV-4587 Direction (asc/desc) of ordered branching. NULL means it is non-ordered tool-based branching
+ALTER TABLE lams_learning_activity
+ADD COLUMN branching_ordered_asc TINYINT(1);
+
+-- LDEV-4767 Add new event types for log in and log out
+
+INSERT INTO lams_log_event_type VALUES (24, 'TYPE_LOGIN',  'SECURITY'), 
+									   (25, 'TYPE_LOGOUT', 'SECURITY');
+									   
+-- LDEV-4778 Add new event type for sysadmin configuration change
+
+INSERT INTO lams_log_event_type VALUES (26, 'TYPE_CONFIG_CHANGE',  'SECURITY');
+
+-- LDEV-4788 Remove reference to organisation in learning outcomes. They are all global now.
+
+ALTER TABLE lams_outcome_scale DROP FOREIGN KEY FK_lams_outcome_scale_1,
+						 	   DROP KEY code_2,
+						 	   DROP COLUMN organisation_id,
+						 	   DROP COLUMN content_folder_id;
+						 
+ALTER TABLE lams_outcome DROP FOREIGN KEY FK_lams_outcome_1,
+						 DROP KEY code_2,
+						 DROP COLUMN organisation_id,
+						 DROP COLUMN content_folder_id;
+						 
+-- SP-2 Add logout URL to integrated servers
+
+ALTER TABLE lams_ext_server_org_map
+ADD COLUMN logout_url TEXT AFTER lesson_finish_url;
+
+-- LDEV-4813 Add an index to process event log faster
+
+ALTER TABLE lams_log_event ADD KEY event_log_date_and_type (occurred_date_time, log_event_type_id);
+
+-- LDEV-4819 Add configuration setting for disabling Learning Outcome quick add by authors
+INSERT INTO lams_configuration VALUES
+('LearningOutcomeQuickAddEnable', 'true', 'config.learning.outcome.add.enable', 'config.header.features', 'BOOLEAN', 1);
+
+
+
+
+
 -- LDEV-4746 Create Question Bank table structure and migrate existing data
 
 -- AUTO COMMIT stays ON because there is so many ALTER TABLE statements which are committed immediately anyway, that it does not make a difference
@@ -811,3 +865,173 @@ DROP TABLE tmp_question,
 CREATE TABLE lams_sequence_generator (lams_qb_question_question_id INT);
 CREATE UNIQUE INDEX IDX_lams_qb_question_question_id ON lams_sequence_generator(lams_qb_question_question_id);
 INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES ((SELECT MAX(question_id) FROM lams_qb_question));
+
+
+
+
+-- LDEV-4827 Add configuration settings for Question Bank
+INSERT INTO lams_configuration VALUES
+('QbQtiEnable', 				'true',     'config.qb.qti.enable', 			   'config.header.qb', 'BOOLEAN', 1),
+('QbWordEnable', 				'true',     'config.qb.word.enable', 			   'config.header.qb', 'BOOLEAN', 1),
+('QbCollectionsCreateEnable', 	'true',     'config.qb.collections.create.enable', 'config.header.qb', 'BOOLEAN', 1),
+('QbMonitorsReadOnly', 			'false',    'config.qb.monitors.read.only', 	   'config.header.qb', 'BOOLEAN', 1),
+('QbStatsMinParticipants',   	'2',      	'config.qb.stats.min.participants',    'config.header.qb', 'LONG', 1),
+('QbStatsGroupSize',   			'27',      	'config.qb.stats.group.size',   	   'config.header.qb', 'LONG', 1);
+
+-- LDEV-4828 Add tables for QB collections
+CREATE TABLE lams_qb_collection (`uid` BIGINT AUTO_INCREMENT, 
+							     `name` VARCHAR(255),
+							     `user_id` BIGINT,
+							     `personal` TINYINT(1) NOT NULL DEFAULT 0,
+							     PRIMARY KEY (uid),
+							     INDEX (personal),
+							     CONSTRAINT FK_lams_qb_collection_1 FOREIGN KEY (user_id) REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+							    );
+							    
+CREATE TABLE lams_qb_collection_question (`collection_uid`  BIGINT NOT NULL,
+									      `qb_question_id` INT NOT NULL,
+									   	  CONSTRAINT FK_lams_qb_collection_question_1 FOREIGN KEY (collection_uid) REFERENCES lams_qb_collection (uid)
+											ON DELETE CASCADE ON UPDATE CASCADE,
+									   	  CONSTRAINT FK_lams_qb_collection_question_2 FOREIGN KEY (qb_question_id) REFERENCES lams_qb_question (question_id)
+											ON DELETE CASCADE ON UPDATE CASCADE
+									  );
+							   				    
+							    
+CREATE TABLE lams_qb_collection_organisation (`collection_uid`  BIGINT NOT NULL,
+									  		  `organisation_id` BIGINT NOT NULL,
+									  		  CONSTRAINT FK_lams_qb_collection_share_1 FOREIGN KEY (collection_uid) REFERENCES lams_qb_collection (uid)
+												ON DELETE CASCADE ON UPDATE CASCADE,
+									   		  CONSTRAINT FK_lams_qb_collection_share_2 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id)
+												ON DELETE CASCADE ON UPDATE CASCADE
+									  		  );
+
+INSERT INTO lams_qb_collection VALUES (1, 'Public questions', NULL, false);
+
+INSERT INTO lams_qb_collection_question
+	SELECT 1, question_id FROM lams_qb_question;
+	
+INSERT INTO lams_configuration VALUES
+('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);
+
+-- LDEV-4834 Add Learning Outcomes to QB questions
+ALTER TABLE lams_outcome_mapping ADD COLUMN qb_question_id INT;
+
+-- LDEV-4589 Add column for LTI Membership service
+ALTER TABLE lams_ext_server_org_map ADD COLUMN `membership_url` text COLLATE utf8mb4_unicode_ci;
+
+-- LDEV-4844 Add a Question Bank event for merging questions 
+INSERT INTO lams_log_event_type VALUES (27, 'TYPE_QUESTIONS_MERGED', 'QUESTION_BANK');
+
+-- LDEV-4827 Add configuration settings for Question Bank
+INSERT INTO lams_configuration VALUES
+('QbMergeEnable',	'true',	'config.qb.merge.enable',	'config.header.qb', 'BOOLEAN', 1);
+
+-- LDEV-4875 Add VSA question type to Assessment and Scratchie
+ALTER TABLE lams_qb_question ADD COLUMN autocomplete_enabled TINYINT(1) DEFAULT 0;
+
+-- LDEV-4876 Ability for LTI servers to get userId from another request parameter name
+ALTER TABLE lams_ext_server_org_map ADD COLUMN `use_alternative_user_id_parameter_name` tinyint(1) DEFAULT '0';
+
+--  LDEV-4874 Restrict displaying names for students that are not within student's group
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('RestrictedGroupUserNames','true', 'config.restricted.displaying.user.names.in.groupings', 'config.header.privacy.settings', 'BOOLEAN', 0);
+
+-- LDEV-4884 Allow pre-filling QB question UUID, for example when it gets imported
+DROP TRIGGER IF EXISTS before_insert_qb_question;
+			
+CREATE TRIGGER before_insert_qb_question
+  BEFORE INSERT ON lams_qb_question
+  FOR EACH ROW
+  SET new.uuid = IF(new.uuid IS NULL, UUID_TO_BIN(UUID()), new.uuid);
+  
+--  LDEV-4914 Do not allow NULLs in Lesson settings
+
+-- set any null values to default value of 0
+UPDATE lams_lesson SET
+	learner_presence_avail = IFNULL(learner_presence_avail, 0),
+    learner_im_avail = IFNULL(learner_im_avail, 0),
+    live_edit_enabled = IFNULL(live_edit_enabled, 0),
+    enable_lesson_notifications = IFNULL(enable_lesson_notifications, 0),
+    locked_for_edit = IFNULL(locked_for_edit, 0),
+    marks_released = IFNULL(marks_released, 0),
+    enable_lesson_intro = IFNULL(enable_lesson_intro, 0),
+    display_design_image = IFNULL(display_design_image, 0),
+    force_restart = IFNULL(force_restart, 0),
+    allow_restart = IFNULL(allow_restart, 0),
+    gradebook_on_complete = IFNULL(gradebook_on_complete, 0);
+
+
+ALTER TABLE lams_lesson
+	MODIFY COLUMN learner_presence_avail TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN learner_im_avail TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN live_edit_enabled TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN enable_lesson_notifications TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN locked_for_edit TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN marks_released TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN enable_lesson_intro TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN display_design_image TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN force_restart TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN allow_restart TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN gradebook_on_complete TINYINT(1) NOT NULL DEFAULT 0;
+	
+--  LDEV-4918 Collapsible subcourses
+
+CREATE TABLE `lams_user_organisation_collapsed` (
+  `uid` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organisation_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `collapsed` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`uid`),
+  KEY `organisation_id` (`organisation_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_1` FOREIGN KEY (`organisation_id`) REFERENCES `lams_organisation` (`organisation_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_2` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Add "Enable collapsing subcourses" to system settings and organisation
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required)
+VALUES ('EnableCollapsingSubcourses','false', 'config.enable.collapsing.subcourses', 'config.header.features', 'BOOLEAN', 0);
+
+--  LDEV-4846 Fix missin QB question content folder IDs
+
+UPDATE lams_qb_question SET content_folder_id = '01234567-89ab-cdef-0123-4567890abcde' WHERE content_folder_id IS NULL;
+
+ALTER TABLE lams_qb_question MODIFY COLUMN content_folder_id char(36) NOT NULL;
+
+--  LDEV-4959 Prevent leader and non-leader from creating two GradebookUserLessons at the same time
+
+--Take care about potential duplicates. For this move all entries to tmp table first.
+CREATE TABLE tmp_table SELECT * FROM lams_gradebook_user_lesson;
+TRUNCATE TABLE lams_gradebook_user_lesson;
+--Change key to unique
+ALTER TABLE `lams_gradebook_user_lesson` 
+	DROP FOREIGN KEY `FK_lams_gradebook_user_lesson_1`,
+	DROP INDEX `lesson_id`;
+ALTER TABLE `lams_gradebook_user_lesson` 
+	ADD UNIQUE INDEX `lesson_id` (`lesson_id`,`user_id`),
+	ADD CONSTRAINT `FK_lams_gradebook_user_lesson_1` FOREIGN KEY (`lesson_id`) REFERENCES `lams_lesson` (`lesson_id`);
+--Move entries back to lams_gradebook_user_lesson
+INSERT IGNORE INTO lams_gradebook_user_lesson SELECT * from tmp_table;
+DROP TABLE tmp_table;
+
+--  LDEV-4962 Use complex UUIDs for user portraits 
+
+ALTER TABLE lams_cr_node ADD COLUMN portrait_uuid BINARY(16) AFTER node_id,
+						 ADD UNIQUE INDEX IDX_portrait_uuid (portrait_uuid);
+
+UPDATE lams_cr_node AS n JOIN lams_user AS u ON n.node_id = u.portrait_uuid
+SET n.portrait_uuid = UUID_TO_BIN(UUID());
+
+ALTER TABLE lams_user ADD COLUMN temp BINARY(16) AFTER portrait_uuid;
+
+UPDATE lams_cr_node AS n JOIN lams_user AS u ON n.node_id = u.portrait_uuid
+SET u.temp = n.portrait_uuid;
+
+ALTER TABLE lams_user DROP COLUMN portrait_uuid;
+ALTER TABLE lams_user RENAME COLUMN temp TO portrait_uuid;
+
+-- If there were no errors, commit and restore autocommit to on
+COMMIT;
+SET AUTOCOMMIT = 1;
+SET FOREIGN_KEY_CHECKS=1;
