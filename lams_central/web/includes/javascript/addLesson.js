@@ -99,7 +99,7 @@ function initClassTab(){
 								
 								// copy selected users
 								var helperContainer = $('<div />');
-								$(this).siblings('.draggableSelected').andSelf().each(function(){
+								$(this).siblings('.draggableSelected').addBack().each(function(){
 									$(this).clone().appendTo(helperContainer);
 								});
 								return helperContainer;
@@ -112,7 +112,7 @@ function initClassTab(){
 			
 			if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
 				// clear current selection
-				$(this).siblings().andSelf().removeClass('draggableSelected');
+				$(this).siblings().addBack().removeClass('draggableSelected');
 				
 				// find range of users to select
 				var lastSelectedIndex = $(lastSelectedUser).index();
@@ -121,12 +121,12 @@ function initClassTab(){
 				var startingElem = lastSelectedIndex > index ? this : lastSelectedUser;
 				var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
 				
-				$(startingElem).nextUntil(endingElem).andSelf().add(endingElem)
+				$(startingElem).nextUntil(endingElem).addBack().add(endingElem)
 					.addClass('draggableSelected');
 			} else {
 				if (!event.ctrlKey) {
 					// clear current sleection
-					$(this).siblings().andSelf().removeClass('draggableSelected');
+					$(this).siblings().addBack().removeClass('draggableSelected');
 				}
 				
 				if (wasSelected && !event.shiftKey){
@@ -467,7 +467,7 @@ function loadLearningDesignSVG(ldId) {
 			
 			// iframe just to load Authoring for a single purpose, generate the SVG
 			var frame = $('<iframe />').appendTo('body').css('visibility', 'hidden');
-			frame.load(function(){
+			frame.on('load', function(){
 				// disable current onload handler as closing the dialog reloads the iframe
 				frame.off('load');
 				

@@ -198,7 +198,7 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 			
 				if(url.indexOf('TB_inline') != -1){	
 					$("#TB_ajaxContent").append($('#' + params['inlineId']).children());
-					$("#TB_window").unload(function () {
+					$("#TB_window").on('unload', function () {
 						$('#' + params['inlineId']).append( $("#TB_ajaxContent").children() ); // move elements back when you're finished
 					});
 					$("#TB_load").remove();

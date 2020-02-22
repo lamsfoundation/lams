@@ -83,7 +83,7 @@
 				image.css('visibility', 'visible');
 			}
 			
-			image.load(function(){
+			image.on('load', function(){
 	    		var image = $(this).off("load");
 	    		// show static image after animation
 	    		setTimeout(

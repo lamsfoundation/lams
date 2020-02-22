@@ -141,7 +141,7 @@ function fillGroup(users, container) {
 								
 								// copy selected users
 								var helperContainer = $('<div />');
-								$(this).siblings('.draggableSelected').andSelf().each(function(){
+								$(this).siblings('.draggableSelected').addBack().each(function(){
 									$(this).clone().appendTo(helperContainer);
 								});
 								return helperContainer;
@@ -156,7 +156,7 @@ function fillGroup(users, container) {
 						
 						if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
 							// clear current selection
-							$(this).siblings().andSelf().removeClass('draggableSelected');
+							$(this).siblings().addBack().removeClass('draggableSelected');
 							
 							// find range of users to select
 							var lastSelectedIndex = $(lastSelectedUser).index();
@@ -165,12 +165,12 @@ function fillGroup(users, container) {
 							var startingElem = lastSelectedIndex > index ? this : lastSelectedUser;
 							var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
 							
-							$(startingElem).nextUntil(endingElem).andSelf().add(endingElem)
+							$(startingElem).nextUntil(endingElem).addBack().add(endingElem)
 								.addClass('draggableSelected');
 						} else {
 							if (!event.ctrlKey) {
 								// clear current sleection
-								$(this).siblings().andSelf().removeClass('draggableSelected');
+								$(this).siblings().addBack().removeClass('draggableSelected');
 							}
 							
 							if (wasSelected && !event.shiftKey){
