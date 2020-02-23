@@ -99,7 +99,7 @@
   					'Question',
   					"<fmt:message key="label.monitoring.user.summary.response" />",
   					<c:if test="${enableConfidenceLevels}">
-						"<fmt:message key="label.confidence" />",
+						"<fmt:message key="label.what.is.your.confidence.level" />",
 					</c:if>
   					"<fmt:message key="label.monitoring.user.summary.grade" />"
   				],   

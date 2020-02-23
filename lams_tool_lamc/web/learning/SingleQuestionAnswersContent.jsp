@@ -58,7 +58,7 @@
 						                <tr>
 						                  <td colspan="2">
 						                  	<div class="question-type">
-												<fmt:message key="label.what.is.your.confidence.level" />
+												<fmt:message key="label.confidence" />
 											</div>
 						
 											<div>
