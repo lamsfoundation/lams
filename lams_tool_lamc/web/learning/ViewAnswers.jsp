@@ -194,7 +194,7 @@
 														<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">colspan="2"</c:if>
 													>
 														<div class="question-type">
-															<fmt:message key="label.confidence" />
+															<fmt:message key="label.what.is.your.confidence.level" />
 														</div>
 														
 														<div class="loffset10">
