@@ -47,9 +47,11 @@
 						'url'  : '<lams:WebAppURL />monitoring/' 
 								  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
 								  + '.do',
+						'type': 'POST',
 						'data' : {
 							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
-							'toolContentID' : $('#selected-content-id').val()
+							'toolContentID' : $('#selected-content-id').val(),
+							'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 						}
 					}).done(function(){
 						// disable the button after click
