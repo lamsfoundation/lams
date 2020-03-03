@@ -46,18 +46,18 @@ public class EmailAnalysisBuilder {
     private IPeerreviewService service;
     private MessageService messageService;
 
-    // same across the whole lesson 
+    // same across the whole lesson
     private String htmlCriteriaTableStart;
     private String htmlCriteriaTableEnd;
     private String htmlOverallResultsTable;
     // htmlORTHighlightedCellReplacementText used to highlight the correct cell in the final table. This allows the table to be generated once for the session and then
     // updated for each user
-    private String htmlORTHighlightedCellReplacementText = "%%%%REPLACESTYLEWITHHIGHLIGHT%%%%"; 
-    
+    private String htmlORTHighlightedCellReplacementText = "%%%%REPLACESTYLEWITHHIGHLIGHT%%%%";
+
     // Criterias to report on in the top table. Does not include comments. Always use this for the criteria table so that the order is the same and the data matches the heading!
-    private List<RatingCriteria> criteriaForCriteriaTable = new ArrayList<RatingCriteria>();
-    private Map<Long, LearnerData> learnerDataMap = new TreeMap<Long, LearnerData>(); // lams user id, learner data
-    private Map<Long, Double> groupAveragePerCriteria = new HashMap<Long, Double>(); // key activity id, session wide average of the learner's averages (peerRatingIncSelf)
+    private List<RatingCriteria> criteriaForCriteriaTable = new ArrayList<>();
+    private Map<Long, LearnerData> learnerDataMap = new TreeMap<>(); // lams user id, learner data
+    private Map<Long, Double> groupAveragePerCriteria = new HashMap<>(); // key activity id, session wide average of the learner's averages (peerRatingIncSelf)
     private Double averageOfAverages; // Average of individualCriteriaAverage across all activities
     private int countNonCommentCriteria = 0;
 
@@ -87,7 +87,7 @@ public class EmailAnalysisBuilder {
 	this.messageService = messageService;
 
 	criterias = ratingService.getCriteriasByToolContentId(peerreview.getContentId());
-	preGenerateBoilerplate(); 
+	preGenerateBoilerplate();
 	selfRatingString = getLocalisedMessage("email.self.rating");
 	peerRatingString = getLocalisedMessage("email.peers.rating");
 
@@ -95,7 +95,7 @@ public class EmailAnalysisBuilder {
 
     public Map<Long, String> generateHTMLEmailsForSession() {
 
-	HashMap<Long, String> emailMap = new HashMap<Long, String>();
+	HashMap<Long, String> emailMap = new HashMap<>();
 	generateTeamData();
 	for (Map.Entry<Long, LearnerData> entry : learnerDataMap.entrySet()) {
 	    emailMap.put(entry.getKey(), buildEmail(entry.getKey()));
@@ -147,9 +147,9 @@ public class EmailAnalysisBuilder {
 	}
 
 	public String name;
-	public Map<Long, SingleCriteriaData> criteriaDataMap = new HashMap<Long, SingleCriteriaData>(); // Criteria id as key
+	public Map<Long, SingleCriteriaData> criteriaDataMap = new HashMap<>(); // Criteria id as key
 	public Double individualCriteriaAverage; // average of peerRatingIncSelf across all activities
-	public List<StyledCriteriaRatingDTO> commentDTOs = new ArrayList<StyledCriteriaRatingDTO>();
+	public List<StyledCriteriaRatingDTO> commentDTOs = new ArrayList<>();
 	private Double spa = null;
 	private Double sapa = null;
 
@@ -157,16 +157,18 @@ public class EmailAnalysisBuilder {
 	    this.name = name;
 	}
 
-	protected void addCriteraDataRow(Long criteraId, Double selfRating,
-		Double peerRatingExcSelf, Double peerRatingIncSelf) {
-	    criteriaDataMap.put(criteraId,
-		    new SingleCriteriaData(selfRating, peerRatingExcSelf, peerRatingIncSelf));
+	protected void addCriteraDataRow(Long criteraId, Double selfRating, Double peerRatingExcSelf,
+		Double peerRatingIncSelf) {
+	    criteriaDataMap.put(criteraId, new SingleCriteriaData(selfRating, peerRatingExcSelf, peerRatingIncSelf));
 	}
 
 	// must not be called until data analysis calculations are done - needs averageOfAverages
 	protected Double getSPAFactor() {
 	    if (spa == null) {
-		spa = (averageOfAverages > 0 && individualCriteriaAverage != null) ? individualCriteriaAverage / averageOfAverages : 0D;
+		spa = (averageOfAverages > 0 && individualCriteriaAverage != null)
+			// round twice for consistency with Spreadsheet export
+			? roundTo2Places(roundTo2Places(individualCriteriaAverage) / roundTo2Places(averageOfAverages))
+			: 0D;
 	    }
 	    return spa;
 	}
@@ -179,7 +181,7 @@ public class EmailAnalysisBuilder {
 		    sumSelfRatings += criteriaData.selfRating;
 		    sumPeerRatings += criteriaData.peerRatingExcSelf;
 		}
-		sapa = sumPeerRatings > 0 ? Math.sqrt(sumSelfRatings / sumPeerRatings) : 0d;
+		sapa = sumPeerRatings > 0 ? roundTo2Places(Math.sqrt(sumSelfRatings / sumPeerRatings)) : 0d;
 	    }
 	    return sapa;
 	}
@@ -195,14 +197,18 @@ public class EmailAnalysisBuilder {
 	}
     }
 
-    private String roundTo2Places(Double d) {
-	if (d == null || Double.isNaN(d))
-	    return "0";
+    private String roundTo2PlacesAsString(Double d) {
+	return NumberUtil.formatLocalisedNumberForceDecimalPlaces(roundTo2Places(d), (Locale) null, 2);
+    }
+
+    private double roundTo2Places(double d) {
+	if (Double.isNaN(d)) {
+	    return 0D;
+	}
 
 	BigDecimal bd = new BigDecimal(d);
 	bd = bd.setScale(2, RoundingMode.HALF_UP);
-
-	return NumberUtil.formatLocalisedNumberForceDecimalPlaces(bd.doubleValue(), (Locale) null, 2);
+	return bd.doubleValue();
     }
 
     /* Only needs to be called once for the session - works out all the basic data for the whole team */
@@ -214,8 +220,8 @@ public class EmailAnalysisBuilder {
 		    new LearnerData(StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName())));
 	}
 
-	Map<Long, Double> criteriaMarkSumMap = new HashMap<Long, Double>();
-	Map<Long, Integer> criteriaMarkCountMap = new HashMap<Long, Integer>();
+	Map<Long, Double> criteriaMarkSumMap = new HashMap<>();
+	Map<Long, Integer> criteriaMarkCountMap = new HashMap<>();
 	double averageOfAveragesSum = 0d;
 	int averageOfAveragesCount = 0;
 
@@ -223,13 +229,13 @@ public class EmailAnalysisBuilder {
 	HashMap<Long, HashMap<Long, SummingData>> tally = processRawRatingData();
 
 	// Now calculate the averages / self values and store ready for output
-	for ( Map.Entry<Long, HashMap<Long, SummingData>> itemEntry : tally.entrySet()) {
+	for (Map.Entry<Long, HashMap<Long, SummingData>> itemEntry : tally.entrySet()) {
 	    Long itemId = itemEntry.getKey();
 	    HashMap<Long, SummingData> itemMap = itemEntry.getValue();
 	    Double userMarkSum = 0D;
 	    LearnerData learnerData = learnerDataMap.get(itemId);
 
-	    for ( Map.Entry<Long, SummingData> criteriaEntry : itemMap.entrySet() ) {
+	    for (Map.Entry<Long, SummingData> criteriaEntry : itemMap.entrySet()) {
 
 		Long criteriaId = criteriaEntry.getKey();
 		SummingData sd = criteriaEntry.getValue();
@@ -273,27 +279,28 @@ public class EmailAnalysisBuilder {
     }
 
     class SummingData {
- 	float selfRating = 0f;
- 	float peerRatingExcSelf = 0f;
- 	int numRatingsExcSelf = 0;
- 	float peerRatingIncSelf = 0f;
- 	int numRatingsIncSelf = 0;
-     }
+	float selfRating = 0f;
+	float peerRatingExcSelf = 0f;
+	int numRatingsExcSelf = 0;
+	float peerRatingIncSelf = 0f;
+	int numRatingsIncSelf = 0;
+    }
 
-    /** 
+    /**
      * tally: hashmap<item id, hashmap<criteria id, summingData>>
      * tallying done in Java as the code to do three calcs in one SQL is complex (and hence risks errors)
-     * and hopefully we are only dealing with small numbers of users in each session. The code that gets the existing data
+     * and hopefully we are only dealing with small numbers of users in each session. The code that gets the existing
+     * data
      * does a lot of processing that is not needed for the SPA/SAPA calculations so getting the raw data
      * avoids that processing.
      */
     @SuppressWarnings("unchecked")
     private HashMap<Long, HashMap<Long, SummingData>> processRawRatingData() {
-	Collection<Long> criteriaIds = new ArrayList<Long>();
+	Collection<Long> criteriaIds = new ArrayList<>();
 	for (RatingCriteria criteria : criteriaForCriteriaTable) {
 	    criteriaIds.add(criteria.getRatingCriteriaId());
 	}
-	HashMap<Long, HashMap<Long, SummingData>> tally = new HashMap<Long, HashMap<Long, SummingData>>();
+	HashMap<Long, HashMap<Long, SummingData>> tally = new HashMap<>();
 	if (criteriaIds.size() > 0) {
 	    List<Object> rawRatingsForSession = ratingService.getRatingsByCriteriasAndItems(criteriaIds,
 		    learnerDataMap.keySet());
@@ -303,7 +310,7 @@ public class EmailAnalysisBuilder {
 		Long itemId = rating.getItemId();
 		HashMap<Long, SummingData> itemMap = tally.get(itemId);
 		if (itemMap == null) {
-		    itemMap = new HashMap<Long, SummingData>();
+		    itemMap = new HashMap<>();
 		    sd = new SummingData();
 		    itemMap.put(rating.getRatingCriteria().getRatingCriteriaId(), sd);
 		    tally.put(itemId, itemMap);
@@ -348,7 +355,7 @@ public class EmailAnalysisBuilder {
 	htmlText.append(htmlCriteriaTableStart).append("<tr><td style=\"").append(tableBorderedStyle).append("\">")
 		.append(learnerData.name).append("</td>");
 	for (RatingCriteria criteria : criteriaForCriteriaTable) {
-	    String criteriaComparison = roundTo2Places(
+	    String criteriaComparison = roundTo2PlacesAsString(
 		    learnerData.getCriteriaComparison(criteria.getRatingCriteriaId()));
 	    htmlText.append("<td style=\"").append(tableBorderedStyle).append(centeredStyle).append("\">")
 		    .append(criteriaComparison).append("</td>");
@@ -361,14 +368,14 @@ public class EmailAnalysisBuilder {
     private void generateSelfPeerTable(StringBuilder htmlText, LearnerData learnerData) {
 	boolean spaDone = false;
 	boolean evenRow = false;
-	String spaFactor = roundTo2Places(learnerData.getSPAFactor());
-	String sapaFactor = roundTo2Places(learnerData.getSAPAFactor());
+	String spaFactor = roundTo2PlacesAsString(learnerData.getSPAFactor());
+	String sapaFactor = roundTo2PlacesAsString(learnerData.getSAPAFactor());
 	htmlText.append("<table style=\"border-collapse:collapse;").append(width100pc).append("\">");
 	for (RatingCriteria criteria : criteriaForCriteriaTable) {
 	    SingleCriteriaData criteriaData = learnerData.criteriaDataMap.get(criteria.getRatingCriteriaId());
 	    if (criteriaData != null) {
-		String selfRating = roundTo2Places(criteriaData.selfRating);
-		String peerRatingExcSelf = roundTo2Places(criteriaData.peerRatingExcSelf);
+		String selfRating = roundTo2PlacesAsString(criteriaData.selfRating);
+		String peerRatingExcSelf = roundTo2PlacesAsString(criteriaData.peerRatingExcSelf);
 		htmlText.append("<tr><td rowspan=\"3\" style=\"width:25%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append(criteria.getTitle())
 			.append("</span></td><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
@@ -399,7 +406,7 @@ public class EmailAnalysisBuilder {
 		htmlText.append("</tr>\n<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			.append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
 			.append("</span></td><td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
-			.append(roundTo2Places(criteriaData.peerRatingIncSelf)).append("</td>");
+			.append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf)).append("</td>");
 		htmlText.append("</tr>\n");
 		evenRow = !evenRow;
 	    } else {
@@ -459,45 +466,50 @@ public class EmailAnalysisBuilder {
 
     private void generateSAPASPAExplanation(StringBuilder htmlText, double rawSPA, double rawSAPA) {
 
-	// The SPA/SAPA comparisons are based on values rounded to 1 decimal place. So a value of 0.98 or 1.02 is considered 1, 
-	// while 1.06 is considered > 1.
-	double spa = new BigDecimal(rawSPA).setScale(1, RoundingMode.HALF_UP).doubleValue();
-	double sapa = new BigDecimal(rawSAPA).setScale(1, RoundingMode.HALF_UP).doubleValue();
-		
+	// The SPA/SAPA comparisons are based on values rounded to 2 decimal places
+	double spa = new BigDecimal(rawSPA).setScale(2, RoundingMode.HALF_UP).doubleValue();
+	double sapa = new BigDecimal(rawSAPA).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
 	int cellToHighlight;
 	if (sapa < 1.0) {
-	    if (spa < 1.0)
+	    if (spa < 1.0) {
 		cellToHighlight = 1;
-	    else if (spa > 1.0)
+	    } else if (spa > 1.0) {
 		cellToHighlight = 3;
-	    else
+	    } else {
 		cellToHighlight = 2;
+	    }
 	} else if (sapa > 1.0) {
-	    if (spa < 1.0)
+	    if (spa < 1.0) {
 		cellToHighlight = 7;
-	    else if (spa > 1.0)
+	    } else if (spa > 1.0) {
 		cellToHighlight = 9;
-	    else
+	    } else {
 		cellToHighlight = 8;
+	    }
 	} else {
-	    if (spa < 1.0)
+	    if (spa < 1.0) {
 		cellToHighlight = 4;
-	    else if (spa > 1.0)
+	    } else if (spa > 1.0) {
 		cellToHighlight = 6;
-	    else
+	    } else {
 		cellToHighlight = 5;
+	    }
 	}
-	
-	String customisedtableTextToModify = htmlOverallResultsTable.replace(htmlORTHighlightedCellReplacementText+cellToHighlight, highlightBackgroundStyle);
-	for ( int i=1; i<10; i++ ) {
-	    if ( i != cellToHighlight )
-		customisedtableTextToModify = customisedtableTextToModify.replaceAll(htmlORTHighlightedCellReplacementText+i, "");
+
+	String customisedtableTextToModify = htmlOverallResultsTable
+		.replace(htmlORTHighlightedCellReplacementText + cellToHighlight, highlightBackgroundStyle);
+	for (int i = 1; i < 10; i++) {
+	    if (i != cellToHighlight) {
+		customisedtableTextToModify = customisedtableTextToModify
+			.replaceAll(htmlORTHighlightedCellReplacementText + i, "");
+	    }
 	}
 
 	htmlText.append(customisedtableTextToModify);
     }
-    
-    // only needs to be run once for a session 
+
+    // only needs to be run once for a session
     private void preGenerateBoilerplate() {
 
 	int numCol = 1;
@@ -529,16 +541,17 @@ public class EmailAnalysisBuilder {
 
 	// SPA / SAPA comparison results table
 	tempBuffer = new StringBuilder();
-	
+
 	tempBuffer.append("<table style=\"").append(tableBorderedStyle).append("\">\n");
-	tempBuffer.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"").append(tableBorderedStyle)
-		.append(headerBackgroundStyle).append(centeredStyle).append("\">&nbsp;</td><td style=\"")
-		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SPA.less.one")).append("</td><td style=\"")
-		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SPA.one")).append("</td><td style=\"")
-		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SPA.greater.one")).append("</td>");
+	tempBuffer.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
+		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle)
+		.append("\">&nbsp;</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
+		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.less.one"))
+		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
+		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.one"))
+		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
+		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.greater.one"))
+		.append("</td>");
 
 	tempBuffer.append("</tr>\n<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
