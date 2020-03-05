@@ -53,7 +53,7 @@
 						'data' : {
 							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
 							'toolContentID' : $('#selected-content-id').val(),
-							'<csrf:tokenname/>' : '<csrf:tokenvalue/>',
+							'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 						}
 					}).done(function(){
 						// disable the button after click
