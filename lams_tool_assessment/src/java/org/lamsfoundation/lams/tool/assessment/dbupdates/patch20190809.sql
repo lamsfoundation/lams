@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 -- Put all sql statements below here
 
---LDEV-4845 Bump version so content version filter kicks in
+-- LDEV-4845 Bump version so content version filter kicks in
 
 UPDATE lams_tool SET tool_version='20190809' WHERE tool_signature='laasse10';
 

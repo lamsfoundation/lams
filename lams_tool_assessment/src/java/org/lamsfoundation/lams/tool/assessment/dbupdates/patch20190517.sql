@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 -- Put all sql statements below here
 
---LDEV-4821 remove obsolete hash field
+-- LDEV-4821 remove obsolete hash field
 ALTER TABLE tl_laasse10_assessment_question DROP COLUMN question_hash;
 
 UPDATE lams_tool SET tool_version='20190517' WHERE tool_signature='laasse10';
