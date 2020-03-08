@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -213,23 +214,34 @@ public class LearningController {
 	// set toolSessionID in request
 	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());
 
-	if (mode.isAuthor() || !zoom.isStartInMonitor()) {
-	    // start a meeting just like a monitor would
-	    MultiValueMap<String, String> errorMap = ZoomUtil.startMeeting(zoomService, messageService, zoom, request);
-	    if (!errorMap.isEmpty()) {
+	MultiValueMap<String, String> errorMap = null;
+	try {
+	    if (mode.isAuthor() || !zoom.isStartInMonitor()) {
+		// start a meeting just like a monitor would
+		errorMap = ZoomUtil.startMeeting(zoomService, messageService, zoom, request);
+		if (!errorMap.isEmpty()) {
+		    request.setAttribute("errorMap", errorMap);
+		}
+	    }
+	    if (!mode.isAuthor() && (errorMap == null || errorMap.isEmpty())) {
+		// register a learner for the meeting
+		String meetingURL = user.getMeetingJoinUrl();
+		if (meetingURL == null && zoom.getMeetingId() != null) {
+		    meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
+		}
+		// if start in monitor is not set, this overwrites the URL set in ZoomUtil.startMeeting() above
+		request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
+	    }
+
+	} catch (Exception e) {
+	    logger.error("Exception while entering a Zoom meeting", e);
+	    if (errorMap == null) {
+		errorMap = new LinkedMultiValueMap<>();
 		request.setAttribute("errorMap", errorMap);
 	    }
+	    errorMap.add("GLOBAL", e.getMessage());
+	    request.setAttribute("skipContent", true);
 	}
-	if (!mode.isAuthor()) {
-	    // register a learner for the meeting
-	    String meetingURL = user.getMeetingJoinUrl();
-	    if (meetingURL == null && zoom.getMeetingId() != null) {
-		meetingURL = zoomService.registerUser(zoom.getUid(), user.getUid(), session.getSessionName());
-	    }
-	    // if start in monitor is not set, this overwrites the URL set in ZoomUtil.startMeeting() above
-	    request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
-	}
-
 	return "pages/learning/learning";
     }
 }

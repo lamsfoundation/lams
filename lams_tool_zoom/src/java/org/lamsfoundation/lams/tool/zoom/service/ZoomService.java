@@ -24,11 +24,13 @@
 package org.lamsfoundation.lams.tool.zoom.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +46,7 @@ import java.util.TreeMap;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -147,7 +150,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<String, ToolOutput>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -157,14 +160,14 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return new ArrayList<>();
     }
 
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -334,7 +337,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	return new TreeMap<String, ToolOutputDefinition>();
+	return new TreeMap<>();
     }
 
     @Override
@@ -450,7 +453,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -470,7 +473,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomUser getUserByUserIdAndSessionId(Integer userId, Long toolSessionId) {
-	Map<String, Object> map = new HashMap<String, Object>();
+	Map<String, Object> map = new HashMap<>();
 	map.put("userId", userId);
 	map.put("zoomSession.sessionId", toolSessionId);
 	List<ZoomUser> list = zoomDAO.findByProperties(ZoomUser.class, map);
@@ -602,7 +605,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    return null;
 	}
 	ZoomApi chosenApi = null;
-	TreeMap<String, ZoomApi> liveApis = new TreeMap<String, ZoomApi>();
+	TreeMap<String, ZoomApi> liveApis = new TreeMap<>();
 	for (ZoomApi api : apis) {
 	    String meetingListURL = "users/" + api.getEmail() + "/meetings?type=live";
 	    HttpURLConnection connection = ZoomService.getZoomConnection(meetingListURL, "GET", null, api);
@@ -678,7 +681,14 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (user.getMeetingJoinUrl() != null) {
 	    return user.getMeetingJoinUrl();
 	}
+
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
+	if (zoom.getApi() == null) {
+	    Boolean apiOK = chooseApi(zoomUid);
+	    if (apiOK == null || !apiOK) {
+		throw new ZoomException("Can not join the meeting. Problem with Zoom API.");
+	    }
+	}
 
 	ObjectNode bodyJSON = JsonNodeFactory.instance.objectNode();
 	String lastName = user.getLastName();
@@ -707,8 +717,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     public void saveApis(List<ZoomApi> apis) {
 	List<ZoomApi> existingApis = getApis();
-	Set<Long> delete = new HashSet<Long>();
-	Set<String> saved = new HashSet<String>();
+	Set<Long> delete = new HashSet<>();
+	Set<String> saved = new HashSet<>();
 	for (ZoomApi existingApi : existingApis) {
 	    boolean found = false;
 	    for (ZoomApi api : apis) {
@@ -744,7 +754,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	HttpURLConnection connection = ZoomService.getZoomConnection("users/email?email=" + api.getEmail(), "GET", null,
 		api);
 	ObjectNode resultJSON = ZoomService.getReponse(connection);
-	return resultJSON != null && JsonUtil.optBoolean(resultJSON, "existed_email");
+	return resultJSON != null && JsonUtil.optBoolean(resultJSON, "existed_email", false);
     }
 
     private static String generateJWT(ZoomApi api) {
@@ -836,19 +846,29 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	try {
 	    connection.connect();
 	    int code = connection.getResponseCode();
+	    String responseMessage = connection.getResponseMessage();
 	    String response = null;
+	    InputStream responseStream = code < 300 ? connection.getInputStream() : connection.getErrorStream();
 
-	    if (code < 300) {
+	    if (responseStream != null) {
 		StringWriter writer = new StringWriter();
-		IOUtils.copy(connection.getInputStream(), writer);
+		IOUtils.copy(responseStream, writer, Charset.defaultCharset());
 		response = writer.toString();
 		if (response != null && response.startsWith("{")) {
 		    responseJSON = JsonUtil.readObject(response);
+		    if (code >= 300) {
+			String errorCode = JsonUtil.optString(responseJSON, "code");
+			if (StringUtils.isNotBlank(errorCode) && errorCode.equals("200")) {
+			    throw new ZoomException("API can only be used with a paid account");
+			}
+		    }
 		}
 	    }
 
 	    if (logger.isDebugEnabled()) {
-		logger.debug("Server response: " + code + " " + connection.getResponseMessage() + " " + response);
+		logger.debug("Server response: " + code
+			+ (responseMessage == null ? "" : " " + connection.getResponseMessage())
+			+ (response == null ? "" : " " + response));
 	    }
 	} finally {
 	    connection.disconnect();
