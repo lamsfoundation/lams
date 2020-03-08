@@ -610,6 +610,8 @@ public class ScratchieServiceImpl
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
 	scratchieSessionDao.saveObject(session);
+
+	recalculateMarkForSession(toolSessionId, false);
     }
 
     @Override
@@ -821,8 +823,9 @@ public class ScratchieServiceImpl
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
 	    String[] presetMarks) {
 
-	int mark = 0;
-	// add mark only if an item was unraveled
+	// get lowest mark by default
+	int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
+	// add mark only if an item was unravelled
 	if (isItemUnraveled(item, userLogs)) {
 
 	    int itemAttempts = calculateItemAttempts(userLogs, item);

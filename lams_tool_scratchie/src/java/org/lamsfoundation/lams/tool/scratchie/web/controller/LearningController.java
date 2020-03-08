@@ -73,7 +73,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -398,8 +397,7 @@ public class LearningController {
      */
     @RequestMapping("/launchTimeLimit")
     @ResponseStatus(HttpStatus.OK)
-    private void launchTimeLimit(HttpServletRequest request)
-	    throws ScratchieApplicationException, SchedulerException {
+    private void launchTimeLimit(HttpServletRequest request) throws ScratchieApplicationException, SchedulerException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -448,6 +446,10 @@ public class LearningController {
 	int score = toolSession.getMark();
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	if (percentage < 0) {
+	    // if lowest score for questions is negative, percentage can also be negative
+	    percentage = 0;
+	}
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
 
 	// display other groups' BurningQuestions
