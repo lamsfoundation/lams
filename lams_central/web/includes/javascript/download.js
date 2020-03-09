@@ -40,7 +40,7 @@ function downloadFile(downloadUrl, spinnerDiv, resultsMsg, resultsMsgDiv, button
 	
 	//dynamically create a form and submit it
 	var form = $('<form method="post" action="' + downloadUrl + '"></form>');
-    var hiddenInput = $('<input type="hidden" name="downloadTokenValue" value=' + token + '"></input>');
+    var hiddenInput = $('<input type="hidden" name="downloadTokenValue" value=' + token + '></input>');
     form.append(hiddenInput);
     $(document.body).append(form);
     form.submit();
