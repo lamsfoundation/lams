@@ -227,6 +227,17 @@
 
 		<lams:LeaderDisplay username="${sessionMap.groupLeaderName}" userId="${sessionMap.groupLeaderUserId}"/>
 
+		<c:if test="${sessionMap.userFinished && (mode == 'teacher')}">
+			<div class="voffset10">
+				<lams:Alert id="score" type="info" close="false">
+					<fmt:message key="label.you.ve.got">
+						<fmt:param>${score}</fmt:param>
+						<fmt:param>${scorePercentage}</fmt:param>
+					</fmt:message>
+				</lams:Alert>
+			</div>
+		</c:if>
+
 		<div class="panel">
 			<c:out value="${scratchie.instructions}" escapeXml="false" />
 		</div>

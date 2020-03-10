@@ -83,10 +83,12 @@
 			</tr>
 		</c:forEach>
 	</table>
-	
-	<p class="item-score">
-		<fmt:message key="label.score" />&nbsp;${item.mark}
-	</p>
+
+	<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
+		<p class="item-score">
+			<fmt:message key="label.score" />&nbsp;${item.mark}
+		</p>
+	</c:if>
 	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">

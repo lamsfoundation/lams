@@ -199,7 +199,8 @@ public class LearningController {
 	    }
 	}
 
-	storeItemsToSessionMap(toolSessionID, scratchie, sessionMap, mode.isTeacher());
+	Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionID, scratchie, sessionMap,
+		mode.isTeacher());
 
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	// calculate max score
@@ -272,6 +273,15 @@ public class LearningController {
 		}
 	    }
 
+	    if (mode.isTeacher()) {
+		scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionID);
+		// get updated score from ScratchieSession
+		int score = toolSession.getMark();
+		request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
+		int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+		request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
+	    }
+	    
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
 	    // make non-leaders wait for notebook to be submitted, if required
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
