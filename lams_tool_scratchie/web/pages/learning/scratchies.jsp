@@ -84,6 +84,10 @@
 		</c:forEach>
 	</table>
 	
+	<p class="item-score">
+		<fmt:message key="label.score" />&nbsp;${item.mark}
+	</p>
+	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 		<div class="form-group burning-question-container">

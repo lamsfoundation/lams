@@ -82,6 +82,8 @@ public class ScratchieItem implements Cloneable {
     private boolean isUnraveled;
     @Transient
     private String burningQuestion;
+    @Transient
+    private int mark;
 
     @Override
     public Object clone() {
@@ -121,7 +123,7 @@ public class ScratchieItem implements Cloneable {
     public void setUid(Long userID) {
 	this.uid = userID;
     }
-    
+
     public String getTitle() {
 	return title;
     }
@@ -185,4 +187,13 @@ public class ScratchieItem implements Cloneable {
     public void setBurningQuestion(String burningQuestion) {
 	this.burningQuestion = burningQuestion;
     }
+
+    public int getMark() {
+	return mark;
+    }
+
+    public void setMark(int mark) {
+	this.mark = mark;
+    }
+
 }

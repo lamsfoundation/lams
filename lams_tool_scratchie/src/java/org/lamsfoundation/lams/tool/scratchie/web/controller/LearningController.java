@@ -284,8 +284,8 @@ public class LearningController {
     /**
      * Stores into session map all data needed to display scratchies and answers
      */
-    private void storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie, SessionMap<String, Object> sessionMap,
-	    boolean showOrder) {
+    private Collection<ScratchieItem> storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie,
+	    SessionMap<String, Object> sessionMap, boolean showOrder) {
 	// set scratched flag for display purpose
 	Collection<ScratchieItem> items = scratchieService.getItemsWithIndicatedScratches(toolSessionId);
 
@@ -341,6 +341,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
+	return items;
     }
 
     /**
@@ -444,13 +445,10 @@ public class LearningController {
 
 	// get updated score from ScratchieSession
 	int score = toolSession.getMark();
+	request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
-	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
-	if (percentage < 0) {
-	    // if lowest score for questions is negative, percentage can also be negative
-	    percentage = 0;
-	}
-	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
+	int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
 
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
@@ -484,7 +482,8 @@ public class LearningController {
 	}
 
 	if (scratchie.isShowScrachiesInResults()) {
-	    storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SHOW_RESULTS, true);
 	}
 

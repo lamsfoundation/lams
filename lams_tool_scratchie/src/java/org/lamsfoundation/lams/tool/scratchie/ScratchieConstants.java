@@ -136,6 +136,8 @@ public class ScratchieConstants {
     public static final String ATTR_ITEM = "item";
 
     public static final String ATTR_SCORE = "score";
+    
+    public static final String ATTR_SCORE_PERCENTAGE = "scorePercentage";
 
     public static final String ATTR_MAX_SCORE = "maxScore";
 
