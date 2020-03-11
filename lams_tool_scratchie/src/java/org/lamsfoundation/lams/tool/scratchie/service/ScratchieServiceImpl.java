@@ -461,18 +461,16 @@ public class ScratchieServiceImpl
      */
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 	ScratchieSession session = this.getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	String[] presetMarks = getPresetMarks(scratchie);
+
+	populateScratchieItemsWithMarks(scratchie, scratchie.getScratchieItems(), sessionId);
 
 	// calculate mark
 	int mark = 0;
-	if (!items.isEmpty()) {
-	    for (ScratchieItem item : items) {
-		mark += getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
-	    }
+	for (ScratchieItem item : items) {
+	    mark += item.getMark();
 	}
 
 	// change mark for all learners in a group
@@ -810,37 +808,30 @@ public class ScratchieServiceImpl
 	return isItemUnraveled;
     }
 
-    /**
-     *
-     * @param scratchie
-     * @param item
-     * @param userLogs
-     *            uses list of logs to reduce number of queries to DB
-     * @param presetMarks
-     *            presetMarks to reduce number of queries to DB
-     * @return
-     */
-    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs,
-	    String[] presetMarks) {
+    @Override
+    public void populateScratchieItemsWithMarks(Scratchie scratchie, Collection<ScratchieItem> items, long sessionId) {
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+	String[] presetMarks = getPresetMarks(scratchie);
 
-	// get lowest mark by default
-	int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
-	// add mark only if an item was unravelled
-	if (isItemUnraveled(item, userLogs)) {
+	for (ScratchieItem item : items) {
+	    // get lowest mark by default
+	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
+	    // add mark only if an item was unravelled
+	    if (isItemUnraveled(item, userLogs)) {
 
-	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
-		    : presetMarks[presetMarks.length - 1];
-	    mark = Integer.parseInt(markStr);
+		int itemAttempts = calculateItemAttempts(userLogs, item);
+		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+			: presetMarks[presetMarks.length - 1];
+		mark = Integer.parseInt(markStr);
 
-	    // add extra point if needed
-	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
-		mark++;
+		// add extra point if needed
+		if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
+		    mark++;
+		}
+
 	    }
-
+	    item.setMark(mark);
 	}
-
-	return mark;
     }
 
     /**
@@ -1662,8 +1653,6 @@ public class ScratchieServiceImpl
     private List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
 
-	String[] presetMarks = getPresetMarks(scratchie);
-
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -1674,6 +1663,8 @@ public class ScratchieServiceImpl
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
 	    List<ScratchieAnswerVisitLog> answerLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+
+	    populateScratchieItemsWithMarks(scratchie, sortedItems, sessionId);
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
@@ -1695,7 +1686,7 @@ public class ScratchieServiceImpl
 		    numberOfAttempts = itemAttempts.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, answerLogs, presetMarks);
+		    mark = (numberOfAttempts == 0) ? -1 : item.getMark();
 
 		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1) && isItemUnraveled(item, answerLogs);
 

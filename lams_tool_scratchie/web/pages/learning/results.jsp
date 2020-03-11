@@ -57,6 +57,10 @@
 			overflow:auto; 
 			margin-top: -20px;
 		}
+		
+		.item-score {
+			font-weight: bold;
+		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -345,7 +349,8 @@
 
 		<lams:Alert id="score" type="info" close="false">
 			<fmt:message key="label.you.ve.got">
-				<strong><fmt:param>${score}%</fmt:param></strong>
+				<fmt:param>${score}</fmt:param>
+				<fmt:param>${scorePercentage}</fmt:param>
 			</fmt:message>
 		</lams:Alert>
 <!--	

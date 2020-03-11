@@ -73,6 +73,11 @@ public interface IScratchieService extends ICommonToolService {
 	    Collection<ScratchieItem> items);
 
     /**
+     * Calculates and sets a mark in each item.
+     */
+    void populateScratchieItemsWithMarks(Scratchie scratchie, Collection<ScratchieItem> items, long sessionId);
+
+    /**
      * Returns all activities that precede specified activity and produce confidence levels.
      *
      * @param toolContentId
