@@ -18,7 +18,9 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-
+	
+	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/circle.css" />
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
 	<style type="text/css">
@@ -56,6 +58,10 @@
 		.scroll-down-to-bq {
 			overflow:auto; 
 			margin-top: -20px;
+		}
+		
+		.item-score {
+			font-weight: bold;
 		}
 	</style>
 
@@ -364,7 +370,8 @@
 
 		<lams:Alert id="score" type="info" close="false">
 			<fmt:message key="label.you.ve.got">
-				<strong><fmt:param>${score}%</fmt:param></strong>
+				<fmt:param>${score}</fmt:param>
+				<fmt:param>${scorePercentage}</fmt:param>
 			</fmt:message>
 		</lams:Alert>
 <!--	

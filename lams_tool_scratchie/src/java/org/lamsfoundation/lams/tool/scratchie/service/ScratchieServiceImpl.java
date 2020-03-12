@@ -484,16 +484,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	String[] presetMarks = getPresetMarks(scratchie);
+
+	populateScratchieItemsWithMarks(scratchie, scratchie.getScratchieItems(), sessionId);
 
 	// calculate mark
 	int mark = 0;
 	for (ScratchieItem item : items) {
-	    mark += ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
+	    mark += item.getMark();
 	}
 
 	// change mark for all learners in a group
@@ -627,6 +627,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
 	scratchieSessionDao.saveObject(session);
+
+	recalculateMarkForSession(toolSessionId, false);
     }
 
     @Override
@@ -1012,34 +1014,29 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return false;
     }
 
-    /**
-     *
-     * @param scratchie
-     * @param item
-     * @param userLogs
-     *            uses list of logs to reduce number of queries to DB
-     * @param presetMarks
-     *            presetMarks to reduce number of queries to DB
-     * @return
-     */
-    private static int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item,
-	    List<ScratchieAnswerVisitLog> userLogs, String[] presetMarks) {
+    @Override
+    public void populateScratchieItemsWithMarks(Scratchie scratchie, Collection<ScratchieItem> items, long sessionId) {
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+	String[] presetMarks = getPresetMarks(scratchie);
 
-	int mark = 0;
-	// add mark only if an item was unraveled
-	if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
-	    int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
-	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
-		    : presetMarks[presetMarks.length - 1];
-	    mark = Integer.parseInt(markStr);
+	for (ScratchieItem item : items) {
+	    // get lowest mark by default
+	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
+	    // add mark only if an item was unravelled
+	    // add mark only if an item was unraveled
+	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
+		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
+		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+			: presetMarks[presetMarks.length - 1];
+		mark = Integer.parseInt(markStr);
 
-	    // add extra point if needed
-	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
-		mark++;
+		// add extra point if needed
+		if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
+		    mark++;
+		}
 	    }
+	    item.setMark(mark);
 	}
-
-	return mark;
     }
 
     /**
@@ -1946,8 +1943,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     @Override
     public List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
-	String[] presetMarks = getPresetMarks(scratchie);
-
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -1957,6 +1952,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 	    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+
+	    populateScratchieItemsWithMarks(scratchie, sortedItems, sessionId);
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
@@ -1980,8 +1977,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    numberOfAttempts = visitLogs.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1
-			    : ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, logs, presetMarks);
+		    mark = (numberOfAttempts == 0) ? -1 : item.getMark();
 
 		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
 			    && ScratchieServiceImpl.isItemUnraveled(item, logs);

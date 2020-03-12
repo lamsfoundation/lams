@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,10 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
@@ -50,10 +46,8 @@ import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
@@ -61,7 +55,6 @@ import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -101,7 +94,7 @@ public class TblMonitorController {
 
 	if (attemptedLearnersNumber != 0) {
 	    List<GroupSummary> groupSummaries = scratchieService.getSummaryByTeam(scratchie, items);
-	    
+
 	    //calculate what is the percentage of first choice events in each session
 	    for (GroupSummary summary : groupSummaries) {
 		int numberOfFirstChoiceEvents = 0;
@@ -110,11 +103,11 @@ public class TblMonitorController {
 			numberOfFirstChoiceEvents++;
 		    }
 		}
-		
+
 		Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
 		summary.setTotalPercentage(percentage.toString());
 	    }
-	    
+
 	    request.setAttribute("groupSummaries", groupSummaries);
 	}
 
@@ -159,7 +152,7 @@ public class TblMonitorController {
 		itemDto.setOptionDtos(optionDtos);
 		i++;
 	    }
-	    
+
 	    //calculate what is the percentage of first choice events in each session
 	    int numberOfFirstChoiceEvents = 0;
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
@@ -168,8 +161,12 @@ public class TblMonitorController {
 		}
 	    }
 	    summary.setMark(numberOfFirstChoiceEvents);
-	    Double percentage = (items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size();
-	    summary.setTotalPercentage(percentage.toString());
+
+	    // round the percentage cell
+	    String totalPercentage = String.valueOf(
+		    Math.round((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size()));
+	    summary.setTotalPercentage(totalPercentage);
+
 	}
 
 	request.setAttribute("sessionDtos", groupSummaries);

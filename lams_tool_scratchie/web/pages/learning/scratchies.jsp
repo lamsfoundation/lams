@@ -12,13 +12,19 @@
 	<div class="panel-body-sm">
 		<c:out value="${item.qbQuestion.description}" escapeXml="false" />
 	</div>
+	
+	<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
+		<div class="panel-footer item-score">
+			<fmt:message key="label.score" />&nbsp;${item.mark}
+		</div>
+	</c:if>
 
 	<c:choose>
 	<c:when test="${item.qbQuestion.type == 1}">
 		<table class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 				<tr id="tr${optionDto.qbOptionUid}">
-					<td style="width: 40px;">
+					<td style="width: 40px;vertical-align: top;">
 						<c:choose>
 							<c:when test="${optionDto.scratched && optionDto.correct}">
 								<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
@@ -104,7 +110,7 @@
 						</c:if>
 					</td>
 	
-					<td class="answer-with-confidence-level-portrait">
+					<td class="answer-with-confidence-level-portrait" style="vertical-align: top;">
 						<div class="answer-description">
 							<c:out value="${optionDto.answer}" escapeXml="true" />
 						</div>
