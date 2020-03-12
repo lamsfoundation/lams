@@ -122,7 +122,7 @@ public class TblMonitorController {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
-	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
 	request.setAttribute("items", items);
 
@@ -171,7 +171,9 @@ public class TblMonitorController {
 		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
 		groupSummary.setMark(total);
 
-		String totalPercentage = groupRow.getCell(itemDtos.size() + 2).toString();
+		// round the percentage cell
+		String totalPercentage = String
+			.valueOf(Math.round(Double.valueOf(groupRow.getCell(itemDtos.size() + 2).toString())));
 		groupSummary.setTotalPercentage(totalPercentage);
 	    }
 
