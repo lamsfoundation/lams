@@ -6,10 +6,16 @@
 		<c:out value="${item.description}" escapeXml="false" />
 	</div>
 
+	<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
+		<div class="panel-footer item-score">
+			<fmt:message key="label.score" />&nbsp;${item.mark}
+		</div>
+	</c:if>
+
 	<table id="scratches" class="table table-hover">
 		<c:forEach var="answer" items="${item.answers}" varStatus="status">
 			<tr id="tr${answer.uid}">
-				<td style="width: 40px;">
+				<td style="width: 40px;vertical-align: top;">
 					<c:choose>
 						<c:when test="${answer.scratched && answer.correct}">
 							<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
@@ -43,7 +49,7 @@
 
 				<td
 					<c:if test="${fn:length(answer.confidenceLevelDtos) > 0}">class="answer-with-confidence-level-portrait"</c:if>
-				>
+				 style="vertical-align: top;">
 					<div class="answer-description">
 						<c:out value="${answer.description}" escapeXml="false" />
 					</div>
@@ -84,11 +90,6 @@
 		</c:forEach>
 	</table>
 
-	<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
-		<p class="item-score">
-			<fmt:message key="label.score" />&nbsp;${item.mark}
-		</p>
-	</c:if>
 	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
