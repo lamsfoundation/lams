@@ -359,7 +359,7 @@
 												    pk : mappingId,
 												    // a trick to send extra param to the server
 												    name : userID,
-												    url : '<lams:LAMSURL/>outcome.do?method=outcomeSetResult',
+												    url : '<lams:LAMSURL/>outcome/outcomeSetResult.do',
 												    mode : 'inline',
 												    showbuttons : false,
 												    source : outcomeValues[mappingId],
