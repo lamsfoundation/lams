@@ -1886,8 +1886,9 @@ GeneralLib = {
 						case 4: var gateType = gateType || 'schedule';
 						case 5: var gateType = gateType || 'permission';
 						case 9: var gateType = gateType || 'system';
-						case 14:
-							var gateType = gateType || 'condition';
+						case 14: var gateType = gateType || 'condition';
+						case 16:
+							var gateType = gateType || 'password';
 							activity = new ActivityDefs.GateActivity(
 								activityData.activityID,
 								activityData.activityUIID,
@@ -1898,7 +1899,8 @@ GeneralLib = {
 								activityData.readOnly || activitiesReadOnly,
 								gateType,
 								activityData.gateStartTimeOffset,
-								activityData.gateActivityCompletionBased);
+								activityData.gateActivityCompletionBased,
+								activityData.gatePassword);
 							
 							if (gateType == 'system'){
 								systemGate = activity;
@@ -2590,6 +2592,7 @@ GeneralLib = {
 						break;
 						
 					case 'permission' : activityTypeID = 5; break;
+					case 'password'   : activityTypeID = 16; break;
 					case 'system' 	  : activityTypeID = 9; systemGate = activity; break;
 					case 'condition'  :
 						activityTypeID = 14;
@@ -2721,6 +2724,7 @@ GeneralLib = {
 				'gateStartTimeOffset'	 : activity.gateType == 'schedule' ?
 											activity.offsetDay*24*60 + activity.offsetHour*60 + activity.offsetMinute : null,
 				'gateActivityCompletionBased' : gateActivityCompletionBased,
+				'gatePassword'			 : activity.gateType == 'password' ? activity.password : null,
 				'gateActivityLevelID'    : activity instanceof ActivityDefs.GateActivity ? 1 : null,
 				'minOptions'			 : activity.minOptions || null,
 				'maxOptions'			 : activity.maxOptions || null,

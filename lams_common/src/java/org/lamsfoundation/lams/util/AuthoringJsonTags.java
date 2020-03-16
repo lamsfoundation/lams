@@ -88,6 +88,7 @@ public interface AuthoringJsonTags {
     public static final String GATE_START_OFFSET = "gateStartTimeOffset";
     public static final String GATE_END_OFFSET = "gateEndTimeOffset";
     public static final String GATE_ACTIVITY_COMPLETION_BASED = "gateActivityCompletionBased";
+    public static final String GATE_PASSWORD = "gatePassword";
 
     /** Grouping Activity specific tags */
     public static final String CREATE_GROUPING_ID = "createGroupingID";
@@ -173,7 +174,7 @@ public interface AuthoringJsonTags {
     public static final String END_YCOORD = "endYCoord";
     public static final String COLOR = "color";
     public static final String SIZE = "size";
-    
+
     /** Branch Mapping and Tool Condition Tags */
     public static final String BRANCH_ACTIVITY_ENTRY_ID = "entryID";
     public static final String BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";

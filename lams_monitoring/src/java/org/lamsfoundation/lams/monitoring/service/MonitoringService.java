@@ -47,6 +47,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -1290,6 +1292,17 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
+    public PasswordGateActivity changeGatePassword(Long gateId, String key) {
+	if (StringUtils.isBlank(key)) {
+	    throw new IllegalArgumentException("Password Gate password must not be blank");
+	}
+	PasswordGateActivity gate = (PasswordGateActivity) activityDAO.getActivityByActivityId(gateId);
+	gate.setGatePassword(key);
+	baseDAO.update(gate);
+	return gate;
+    }
+
+    @Override
     public GateActivity closeGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	gate.setGateOpen(new Boolean(false));
@@ -1459,7 +1472,7 @@ public class MonitoringService implements IMonitoringFullService {
 
 	    } else if (activity.isGateActivity()) {
 		GateActivity gate = (GateActivity) activity;
-		GateActivityDTO dto = learnerService.knockGate(gate, learner, false);
+		GateActivityDTO dto = learnerService.knockGate(gate, learner, false, null);
 		if (dto.getAllowToPass()) {
 		    // the gate is opened, continue to next activity to complete
 		    learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());

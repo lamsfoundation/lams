@@ -43,11 +43,9 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
-import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.learningdesign.SynchGateActivity;
-import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.util.HelpUtil;
 
@@ -179,6 +177,8 @@ public class AuthoringActivityDTO extends BaseDTO {
     private Date gateEndDateTime;
 
     private Boolean gateActivityCompletionBased;
+
+    private String gatePassword;
 
     private Boolean applyGrouping;
 
@@ -425,7 +425,7 @@ public class AuthoringActivityDTO extends BaseDTO {
 	}
 
 	if (toolActivity.getEvaluation() != null) {
-	    evaluation = new ArrayList<String>();
+	    evaluation = new ArrayList<>();
 	    ActivityEvaluation eval = toolActivity.getEvaluation();
 	    evaluation.add(eval.getToolOutputDefinition());
 	    if (eval.getWeight() != null) {
@@ -439,22 +439,17 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
-	if (activity instanceof SynchGateActivity) {
-	    addSynchGateActivityAttributes((SynchGateActivity) activity);
-	} else if (activity instanceof PermissionGateActivity) {
-	    addPermissionGateActivityAttributes((PermissionGateActivity) activity);
-	} else if (activity instanceof ConditionGateActivity) {
+	if (activity instanceof ConditionGateActivity) {
 	    addConditionGateActivityAttributes((ConditionGateActivity) activity, branchMappings);
-	} else if (activity instanceof SystemGateActivity) {
-	    addSystemGateActivityAttributes((SystemGateActivity) activity);
-	} else {
+	} else if (activity instanceof PasswordGateActivity) {
+	    addPasswordGateActivityAttributes((PasswordGateActivity) activity);
+	} else if (activity instanceof ScheduleGateActivity) {
 	    addScheduleGateActivityAttributes((ScheduleGateActivity) activity);
 	}
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivityLevelID = gateActivity.getGateActivityLevelId();
 	gateOpen = gateActivity.getGateOpen();
 	adminURL = gateActivity.getSystemTool().getAdminUrl();
-
     }
 
     private void addConditionGateActivityAttributes(ConditionGateActivity activity,
@@ -468,13 +463,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 	}
     }
 
-    private void addSynchGateActivityAttributes(SynchGateActivity activity) {
-    }
-
-    private void addPermissionGateActivityAttributes(PermissionGateActivity activity) {
-    }
-
-    private void addSystemGateActivityAttributes(SystemGateActivity activity) {
+    private void addPasswordGateActivityAttributes(PasswordGateActivity activity) {
+	gatePassword = activity.getGatePassword();
     }
 
     private void addScheduleGateActivityAttributes(ScheduleGateActivity activity) {
@@ -591,6 +581,14 @@ public class AuthoringActivityDTO extends BaseDTO {
 
     public void setGateActivityCompletionBased(Boolean gateActivityCompletionBased) {
 	this.gateActivityCompletionBased = gateActivityCompletionBased;
+    }
+
+    public String getGatePassword() {
+	return gatePassword;
+    }
+
+    public void setGatePassword(String gatePassword) {
+	this.gatePassword = gatePassword;
     }
 
     /**

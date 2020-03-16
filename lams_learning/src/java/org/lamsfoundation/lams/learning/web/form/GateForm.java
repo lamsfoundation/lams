@@ -17,6 +17,7 @@ public class GateForm {
     private Long remainTime;
     private Long startOffset;
     private Boolean previewLesson;
+    private String key;
 
 //    used for updating the the progress bar
     private Integer version;
@@ -135,4 +136,11 @@ public class GateForm {
 	this.monitorCanOpenGate = monitorCanOpenGate;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 }

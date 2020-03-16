@@ -132,9 +132,11 @@ public interface ILearnerFullService extends ILearnerService {
      *            the learner who wants to go through the gate.
      * @param forceGate
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
+     * @param key 
+     * 		  additional information provided by user to open gate, for example password
      * @return Updated gate details
      */
-    GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate);
+    GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate, Object key);
 
     /**
      *

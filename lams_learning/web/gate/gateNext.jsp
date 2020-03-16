@@ -12,7 +12,16 @@
 	</div>
 </c:if>
 
-<form:form action="${formAction}" modelAttribute="gateForm" target="_self">
+<script>
+	function submitGateForm(){
+		if (typeof customSubmitGateForm == 'function') {
+			return customSubmitGateForm();
+		}
+		return true;
+	}
+</script>
+<form:form action="${formAction}" modelAttribute="gateForm" target="_self" onSubmit="javascript:submitGateForm()" method="post">
+	<form:hidden path="key" />
 	<div class="voffset10 pull-right">
 		<button class="btn btn-default">
 			<fmt:message key="label.next.button" />

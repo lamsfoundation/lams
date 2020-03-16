@@ -80,22 +80,10 @@ public class GateController {
     private ILearnerFullService learnerService;
     @Autowired
     private ActivityMapping activityMapping;
-    
-    // ---------------------------------------------------------------------
-    // Instance variables
-    // ---------------------------------------------------------------------
-    // private static Logger log = Logger.getLogger(GateAction.class);
-
-    // ---------------------------------------------------------------------
-    // Class level constants - Struts forward
-    // ---------------------------------------------------------------------
-    private static final String VIEW_PERMISSION_GATE = "permissionGate";
-    private static final String VIEW_SCHEDULE_GATE = "scheduleGate";
-    private static final String VIEW_SYNCH_GATE = "synchGate";
-    private static final String VIEW_CONDITION_GATE = "conditionGate";
 
     /** Input parameter. Boolean value */
     public static final String PARAM_FORCE_GATE_OPEN = "force";
+    public static final String PARAM_GATE_KEY = "key";
 
     // ---------------------------------------------------------------------
     // Struts Dispatch Method
@@ -117,6 +105,8 @@ public class GateController {
 	Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
+	String key = WebUtil.readStrParam(request, PARAM_GATE_KEY, true);
+
 	// initialize service object
 	Activity activity = learnerService.getActivity(activityId);
 	User learner = LearningWebUtil.getUser(learnerService);
@@ -126,7 +116,7 @@ public class GateController {
 
 	if (activity != null) {
 	    // knock the gate
-	    GateActivityDTO gateDTO = learnerService.knockGate(activityId, learner, forceGate);
+	    GateActivityDTO gateDTO = learnerService.knockGate(activityId, learner, forceGate, key);
 
 	    if (gateDTO == null) {
 		throw new LearnerServiceException("Gate missing. gate id [" + activityId + "]");
@@ -209,6 +199,9 @@ public class GateController {
 	    return "gate/conditionGateContent";
 	} else if (gate.isPermissionGate() || gate.isSystemGate()) {
 	    return "gate/permissionGateContent";
+	} else if (gate.isPasswordGate()) {
+	    gateForm.setMonitorCanOpenGate(false);
+	    return "gate/passwordGateContent";
 	} else {
 	    throw new LearnerServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");

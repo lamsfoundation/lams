@@ -130,7 +130,7 @@ ActivityDefs = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, uiid, x, y, title, description, readOnly, gateType, startTimeOffset, gateActivityCompletionBased) {
+	GateActivity : function(id, uiid, x, y, title, description, readOnly, gateType, startTimeOffset, gateActivityCompletionBased, password) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title;
@@ -146,6 +146,9 @@ ActivityDefs = {
 			
 			this.gateActivityCompletionBased = gateActivityCompletionBased;
 		};
+		if (gateType == 'password') {
+			this.password = password;
+		}
 		// mapping between tool output and gate states ("branches"), if applicable
 		this.conditionsToBranches = [];
 		this.transitions = {
