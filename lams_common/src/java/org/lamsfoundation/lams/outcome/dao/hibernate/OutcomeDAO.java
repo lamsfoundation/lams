@@ -69,8 +69,8 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Outcome> getOutcomesSortedByName(Integer organisationId) {
-	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replace("?",
-		organisationId == null ? "" : "OR o.organisation.organisationId = " + organisationId + ")");
+	String queryString = FIND_OUTCOMES_SORTED_BY_NAME.replace("?", organisationId == null ? "o.organisation IS NULL"
+		: " o.organisation IS NULL OR o.organisation.organisationId = " + organisationId + ")");
 	return find(queryString);
     }
 
@@ -87,7 +87,6 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
 	}
 	queryString = queryString.replace("?", "");
 
-
 	Query<Outcome> query = getSession().createQuery(queryString);
 	if (organisationIds != null && !organisationIds.isEmpty()) {
 	    query.setParameterList("organisationIds", organisationIds);
@@ -102,7 +101,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeMapping> getOutcomeMappings(Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("lessonId", lessonId);
 	}
@@ -135,7 +134,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<OutcomeResult> getOutcomeResults(Integer userId, Long lessonId, Long toolContentId, Long itemId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	if (lessonId != null) {
 	    properties.put("mapping.outcome.lessonId", lessonId);
 	}
@@ -154,7 +153,7 @@ public class OutcomeDAO extends LAMSBaseDAO implements IOutcomeDAO {
     @Override
     @SuppressWarnings("unchecked")
     public OutcomeResult getOutcomeResult(Integer userId, Long mappingId) {
-	Map<String, Object> properties = new HashMap<String, Object>();
+	Map<String, Object> properties = new HashMap<>();
 	properties.put("user.userId", userId);
 	properties.put("mapping.mappingId", mappingId);
 	List<OutcomeResult> result = findByProperties(OutcomeResult.class, properties);
