@@ -25,8 +25,8 @@ package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -65,6 +64,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -82,12 +82,12 @@ public class MonitoringController {
     private IScratchieService scratchieService;
 
     @RequestMapping("/summary")
-    private String summary(HttpServletRequest request) {
+    private String summary(HttpServletRequest request, Model model) {
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	model.addAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	List<GroupSummary> summaryList = scratchieService.getMonitoringSummary(contentId, true);
@@ -102,8 +102,8 @@ public class MonitoringController {
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
-	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+	    model.addAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    model.addAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
@@ -130,6 +130,9 @@ public class MonitoringController {
 	    List<ReflectDTO> reflections = scratchieService.getReflectionList(contentId);
 	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
+
+	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
+	model.addAllAttributes(modelAttributes);
 
 	return "pages/monitoring/monitoring";
     }
@@ -212,7 +215,7 @@ public class MonitoringController {
      */
     @RequestMapping(path = "/exportExcel", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    private void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void exportExcel(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);

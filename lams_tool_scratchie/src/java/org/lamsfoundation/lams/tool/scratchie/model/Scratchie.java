@@ -86,7 +86,7 @@ public class Scratchie implements Cloneable {
     @OneToMany(cascade = CascadeType.ALL)
     @OrderBy("order_id ASC")
     @JoinColumn(name = "scratchie_uid")
-    private Set<ScratchieItem> scratchieItems = new HashSet<>();;
+    private Set<ScratchieItem> scratchieItems = new HashSet<>();
 
     @Column(name = "extra_point")
     private boolean extraPoint;

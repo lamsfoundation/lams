@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -420,4 +421,5 @@ public interface IScratchieService extends ICommonToolService {
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
 
+    Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
 }

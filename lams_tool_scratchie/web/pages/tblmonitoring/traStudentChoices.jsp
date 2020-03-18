@@ -6,75 +6,88 @@
 	}
 
 	/*----  fixed first column ----*/
-	table {
+	#questions-data {
 	  position: relative;
 	}
 	
-	thead th {
+	#questions-data thead th {
 	  position: -webkit-sticky; /* for Safari */
 	  position: sticky;
 	  top: 0;
 	  background: #FFF;
 	}
 	
-	thead th:first-child {
+	#questions-data thead th:first-child {
 	  left: 0;
 	  z-index: 1;
 	}
 	
-	tbody th {
+	#questions-data tbody th {
 	  position: -webkit-sticky; /* for Safari */
 	  position: sticky;
 	  left: 0;
 	  background: #FFF;
 	}
+	
+	span.user-response {
+	  padding: 1px 3px;
+	  color: white;
+	  border-radius: 3px; }
+	
+	span.successful-response {
+	  background-color: #5cb85c; }
+	
+	span.wrong-response {
+	  background-color: #d9534f; }
 </style>
 
-<script>
-	function exportExcel(){
-		//dynamically create a form and submit it
-		var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
-		var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
-	    var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
-	    form.append(hiddenInput);
-	    $(document.body).append(form);
-	    form.submit();
-	};
-</script>
-
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
-			<fmt:message key="label.tra.questions.marks"/>
-		</h3>
-	</div>
-</div>
-<!-- End header -->
-
-<!-- Notifications -->  
-<div class="row">
-	<div class="col-md-6 col-lg-4 ">
-	</div>
+<c:if test="${not showStudentChoicesTableOnly}">
+	<script>
+		function exportExcel(){
+			//dynamically create a form and submit it
+			var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+			var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+		    var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
+		    form.append(hiddenInput);
+		    $(document.body).append(form);
+		    form.submit();
+		};
+	</script>
 	
-	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
-		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-				onclick="javascript:loadTab('tra'); return false;">
-			<i class="fa fa-undo"></i>
-			<fmt:message key="label.hide.students.choices"/>
-		</a>
-		<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-print"></i>
-			<fmt:message key="label.print"/>
-		</a>
-		<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
-			<i class="fa fa-file"></i>
-			<fmt:message key="label.export.excel"/>
-		</a>
+	<!-- Header -->
+	<div class="row no-gutter">
+		<div class="col-xs-12 col-md-12 col-lg-8">
+			<h3>
+				<fmt:message key="label.tra.questions.marks"/>
+			</h3>
+		</div>
 	</div>
-</div>
-<br>
-<!-- End notifications -->
+	<!-- End header -->
+	
+	<!-- Notifications -->  
+	<div class="row">
+		<div class="col-md-6 col-lg-4 ">
+		</div>
+		
+		<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
+					onclick="javascript:loadTab('tra'); return false;">
+				<i class="fa fa-undo"></i>
+				<fmt:message key="label.hide.students.choices"/>
+			</a>
+			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+				<i class="fa fa-print"></i>
+				<fmt:message key="label.print"/>
+			</a>
+			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-sm btn-default buttons_column">
+				<i class="fa fa-file"></i>
+				<fmt:message key="label.export.excel"/>
+			</a>
+		</div>
+	</div>
+	<br>
+	<!-- End notifications -->
+</c:if>
 
 <!-- Table --> 
 <div class="row no-gutter">
@@ -122,16 +135,20 @@
 				<td class="text-center"></td>
 			</tr>
 			
-			<tr>
-				<th colspan="0" style="font-weight: bold;">
-					<fmt:message key="label.teams.notuppercase"/>
-				</th> 
-			</tr>
+			<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
+				<tr>
+					<th colspan="0" style="font-weight: bold;">
+						<fmt:message key="label.teams.notuppercase"/>
+					</th> 
+				</tr>
+			</c:if>
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="i">
 				<tr>
 					<th class="text-center">
-						${sessionDto.sessionName}
+						<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
+							${sessionDto.sessionName}
+						</c:if>
 					</th>
 					
 					<c:choose>
