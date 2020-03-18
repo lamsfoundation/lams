@@ -1,4 +1,4 @@
-<%@ include file="/common/taglibs.jsp"%>%>
+<%@ include file="/common/taglibs.jsp"%>
 <%-- Option page for the Assessment Multiple Choice question. Creates the output ${containingDivName}assmcq${questionNumber}option${optionNumber} --%>
 
 		<c:set scope="request" var="qnon">${containingDivName}assmcq${questionNumber}option${optionNumber}</c:set>
