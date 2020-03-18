@@ -38,6 +38,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		#passwordField {
 			margin-left: 10px;
 		}
+		#incorrectKey {
+			color: red;
+		}
 	</style>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script>
@@ -52,6 +55,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:Page type="learner" title="${title}">
 
 		<%@ include file="gateDescription.jsp"%>
+		
+		<c:if test="${gateForm.incorrectKey}">
+			<p id="incorrectKey">
+				<fmt:message key="label.password.gate.incorrect.password" />
+			</p>
+		</c:if>
 		
 		<div class="voffset5">
 			<fmt:message key="label.password.gate.message" />

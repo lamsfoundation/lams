@@ -33,6 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.form.GateForm;
@@ -201,6 +202,9 @@ public class GateController {
 	    return "gate/permissionGateContent";
 	} else if (gate.isPasswordGate()) {
 	    gateForm.setMonitorCanOpenGate(false);
+	    if (StringUtils.isNotBlank(gateForm.getKey()) && !gateDTO.getAllowToPass()) {
+		gateForm.setIncorrectKey(true);
+	    }
 	    return "gate/passwordGateContent";
 	} else {
 	    throw new LearnerServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()

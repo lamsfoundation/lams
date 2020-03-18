@@ -18,6 +18,7 @@ public class GateForm {
     private Long startOffset;
     private Boolean previewLesson;
     private String key;
+    private boolean incorrectKey;
 
 //    used for updating the the progress bar
     private Integer version;
@@ -142,5 +143,13 @@ public class GateForm {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public boolean isIncorrectKey() {
+        return incorrectKey;
+    }
+
+    public void setIncorrectKey(boolean incorrectKey) {
+        this.incorrectKey = incorrectKey;
     }
 }
