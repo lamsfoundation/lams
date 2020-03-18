@@ -284,6 +284,9 @@
 		<div class="voffset5 help-block" id="messageArea"></div>
 	
 	</div>
+	
+	<c:set var="showStudentChoicesTableOnly" value="true" />
+	<%@ include file="studentChoices.jsp"%>
 
 	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
@@ -296,28 +299,14 @@
 		</select>
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 	</div>
-	<div class="form-group">
-		<!-- Dropdown menu for choosing user -->
-		<label for="userid-dropdown"><h4><fmt:message key="label.monitoring.summary.report.by.user" /></h4></label>
-		<select id="userid-dropdown" class="form-control">
-			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-   			<c:forEach var="learner" items="${sessionMap.learners}">
-				<option value="${learner.userId}" alt="${learner.session.sessionId}"><c:out value="${learner.firstName} ${learner.lastName} (${learner.session.sessionName})" escapeXml="true"/></option>
-		   	</c:forEach>
-		</select>
-	</div>
 
-	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<H4>${summaryTitle}</H4>
-	</c:if>
-	
 	<fmt:message key="label.monitoring.summary.select.student" />
 
+	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
 	<c:forEach var="summary" items="${summaryList}" varStatus="status">
 
 		<c:if test="${sessionMap.isGroupedActivity}">
-			<c:set var="summaryTitle"><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}</c:set>
+			<c:set var="summaryTitle"><strong><fmt:message key="monitoring.label.group" /></strong> ${summary.sessionName}</c:set>
 		</c:if>
 		
 	    <div class="panel panel-default" >

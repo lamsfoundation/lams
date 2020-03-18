@@ -1636,6 +1636,71 @@ public class ScratchieServiceImpl
 	return newDto;
     }
 
+    @Override
+    public Map<String, Object> prepareStudentChoicesData(Scratchie scratchie) {
+	Map<String, Object> model = new HashMap<>();
+
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+	model.put("items", items);
+
+	//find second page in excel file
+	List<ExcelSheet> sheets = exportExcel(scratchie.getContentId());
+	ExcelSheet secondPageData = sheets.get(1);
+
+	//correct answers
+	ExcelRow correctAnswersRow = secondPageData.getRow(4);
+	model.put("correctAnswers", correctAnswersRow);
+
+	//prepare data for displaying user answers table
+	int groupsSize = countSessionsByContentId(scratchie.getContentId());
+	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
+	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
+	    ExcelRow groupRow = secondPageData.getRows().get(6 + groupCount);
+
+	    GroupSummary groupSummary = new GroupSummary();
+	    String sessionName = groupRow.getCell(0).toString();
+	    groupSummary.setSessionName(sessionName);
+
+	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
+	    for (int i = 1; i <= items.size(); i++) {
+		ScratchieItemDTO itemDto = new ScratchieItemDTO();
+		String answersSequence = groupRow.getCell(i).toString();
+		String[] answerLetters = answersSequence.split(", ");
+
+		Set<ScratchieAnswer> answers = new LinkedHashSet<>();
+		for (int j = 0; j < answerLetters.length; j++) {
+		    String answerLetter = answerLetters[j];
+		    String correctAnswerLetter = correctAnswersRow.getCell(i).toString();
+
+		    ScratchieAnswer answer = new ScratchieAnswer();
+		    answer.setDescription(answerLetter);
+		    answer.setCorrect(correctAnswerLetter.equals(answerLetter));
+
+		    answers.add(answer);
+		}
+
+		itemDto.setAnswers(answers);
+		itemDtos.add(itemDto);
+	    }
+	    groupSummary.setItemDtos(itemDtos);
+
+	    if (!itemDtos.isEmpty()) {
+		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
+		groupSummary.setMark(total);
+
+		// round the percentage cell
+		String totalPercentage = String
+			.valueOf(Math.round(Double.valueOf(groupRow.getCell(itemDtos.size() + 2).toString())));
+		groupSummary.setTotalPercentage(totalPercentage);
+	    }
+
+	    sessionDtos.add(groupSummary);
+	}
+	model.put("sessionDtos", sessionDtos);
+	return model;
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************

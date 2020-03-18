@@ -379,20 +379,6 @@ div#sequenceCanvas svg {
 	background-color: $brand-success;
 } 
 
-span.user-response {
-	padding: 1px 3px;
-    color: white;
-    border-radius: 3px;
-} 
-
-span.successful-response {
-	background-color: $brand-success;
-} 
-
-span.wrong-response {
-	background-color: $brand-danger;
-} 
-
 #closeBranchingButton {
 	font-weight: inherit !important;
 	margin-left: 7px;

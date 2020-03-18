@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -44,10 +44,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -62,8 +59,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -118,71 +117,15 @@ public class TblMonitorController {
      * Shows tra StudentChoices page
      */
     @RequestMapping("/traStudentChoices")
-    public String traStudentChoices(HttpServletRequest request) throws IOException, ServletException {
-	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+    public String traStudentChoices(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    Model model) throws IOException, ServletException {
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 
-	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
-	items.addAll(scratchie.getScratchieItems());
-	request.setAttribute("items", items);
+	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
+	model.addAllAttributes(modelAttributes);
 
-	//find second page in excel file
-	List<ExcelSheet> sheets = scratchieService.exportExcel(toolContentId);
-	ExcelSheet secondPageData = sheets.get(1);
-
-	//correct answers
-	ExcelRow correctAnswersRow = secondPageData.getRow(4);
-	request.setAttribute("correctAnswers", correctAnswersRow);
-
-	//prepare data for displaying user answers table
-	int groupsSize = scratchieService.countSessionsByContentId(toolContentId);
-	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
-	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
-	    ExcelRow groupRow = secondPageData.getRows().get(6 + groupCount);
-
-	    GroupSummary groupSummary = new GroupSummary();
-	    String sessionName = groupRow.getCell(0).toString();
-	    groupSummary.setSessionName(sessionName);
-
-	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
-	    for (int i = 1; i <= items.size(); i++) {
-		ScratchieItemDTO itemDto = new ScratchieItemDTO();
-		String answersSequence = groupRow.getCell(i).toString();
-		String[] answerLetters = answersSequence.split(", ");
-
-		Set<ScratchieAnswer> answers = new LinkedHashSet<>();
-		for (int j = 0; j < answerLetters.length; j++) {
-		    String answerLetter = answerLetters[j];
-		    String correctAnswerLetter = correctAnswersRow.getCell(i).toString();
-
-		    ScratchieAnswer answer = new ScratchieAnswer();
-		    answer.setDescription(answerLetter);
-		    answer.setCorrect(correctAnswerLetter.equals(answerLetter));
-
-		    answers.add(answer);
-		}
-
-		itemDto.setAnswers(answers);
-		itemDtos.add(itemDto);
-	    }
-	    groupSummary.setItemDtos(itemDtos);
-
-	    if (!itemDtos.isEmpty()) {
-		int total = (Integer) groupRow.getCell(itemDtos.size() + 1);
-		groupSummary.setMark(total);
-
-		// round the percentage cell
-		String totalPercentage = String
-			.valueOf(Math.round(Double.valueOf(groupRow.getCell(itemDtos.size() + 2).toString())));
-		groupSummary.setTotalPercentage(totalPercentage);
-	    }
-
-	    sessionDtos.add(groupSummary);
-	}
-	request.setAttribute("sessionDtos", sessionDtos);
-
-	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	return "pages/tblmonitoring/traStudentChoices";
+	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	return "pages/monitoring/studentChoices";
     }
 
     /**
