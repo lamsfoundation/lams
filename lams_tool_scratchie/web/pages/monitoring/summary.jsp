@@ -286,7 +286,7 @@
 	</div>
 	
 	<c:set var="showStudentChoicesTableOnly" value="true" />
-	<%@ include file="../tblmonitoring/traStudentChoices.jsp"%>
+	<%@ include file="studentChoices.jsp"%>
 
 	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
