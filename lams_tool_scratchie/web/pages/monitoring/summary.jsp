@@ -286,6 +286,7 @@
 	</div>
 	
 	<c:set var="showStudentChoicesTableOnly" value="true" />
+	<h4><fmt:message key="monitoring.tab.summary" /></h4>
 	<%@ include file="studentChoices.jsp"%>
 
 	<div class="form-group">
@@ -300,6 +301,7 @@
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 	</div>
 
+	<h4 style="padding-top: 10px"><fmt:message key="label.report.by.team.tra" /></h4>
 	<fmt:message key="label.monitoring.summary.select.student" />
 
 	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
@@ -329,7 +331,7 @@
 
 	<!-- Display burningQuestionItemDtos -->
 	<c:if test="${scratchie.burningQuestionsEnabled}">
-		<div class="panel-group" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
+		<div class="panel-group" style="padding-top: 10px" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
 		    <div class="panel panel-default" >
 		        <div class="panel-heading collapsable-icon-left" id="headingBurning">
 		        	<span class="panel-title">
