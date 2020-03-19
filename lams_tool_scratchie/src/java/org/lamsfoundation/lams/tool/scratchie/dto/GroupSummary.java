@@ -36,6 +36,7 @@ public class GroupSummary {
     private int mark;
     private int totalAttempts;
     private String totalPercentage;
+    private Long leaderUid;
 
     private Collection<ScratchieUser> users;
     private Collection<ScratchieItemDTO> itemDtos;
@@ -97,6 +98,14 @@ public class GroupSummary {
 
     public void setTotalPercentage(String totalPercentage) {
 	this.totalPercentage = totalPercentage;
+    }
+
+    public Long getLeaderUid() {
+        return leaderUid;
+    }
+
+    public void setLeaderUid(Long leaderUid) {
+        this.leaderUid = leaderUid;
     }
 
     public Collection<ScratchieUser> getUsers() {

@@ -55,20 +55,31 @@
 					"<fmt:message key="label.monitoring.summary.user.name" />",
 					"<fmt:message key="label.monitoring.summary.attempts" />",
 					"<fmt:message key="label.monitoring.summary.mark" />",
-					'portraitId'
+					'portraitId',
+					'isLeader'
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:570, formatter:userNameFormatter},
-			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
-			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}},
+			   		{name:'userName', index:'userName', width:570, formatter:userNameFormatter,	cellattr: leaderRowFormatter},
+			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sortable: false, cellattr: leaderRowFormatter},
+			   		{name:'mark', index:'mark', width:100, align:"right", sortable: false, editoptions: {size:4, maxlength: 4}, cellattr: leaderRowFormatter,
+				   	       editable: function (options) {
+				               var row = $(this).jqGrid("getLocalRow", options.rowid);
+				               return row.isLeader == 'true';
+				           }
+			   		},
 			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
+			   		{name:'isLeader', index:'isLeader', width:0, hidden: true},
 			   	],
 			   	ondblClickRow: function(rowid) {
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+			   		var jqGrid = $("#list${summary.sessionId}");
+			   		if (jqGrid.getCell(rowid, 'isLeader') != 'true') {
+			   			return;
+			   		}
+			   		var userId = jqGrid.getCell(rowid, 'userId');
+			   		var toolSessionId = jqGrid.getCell(rowid, 'sessionId');
 
 			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
 					launchPopup(userSummaryUrl, "MonitoringReview");		
@@ -103,12 +114,13 @@
    	   	     		userId:"${user.userId}",
    	   	     		sessionId:"${user.session.sessionId}",
    	   	     		userName:"${user.lastName}, ${user.firstName}",
-   	   				totalAttempts:"${summary.totalAttempts}",
-   	   				mark:"<c:choose><c:when test='${summary.totalAttempts == 0}'>-</c:when><c:otherwise>${summary.mark}</c:otherwise></c:choose>",
-   	   				portraitId:"${user.portraitId}"
+   	   				totalAttempts:"${summary.leaderUid eq user.uid ? summary.totalAttempts : ''}",
+   	   				mark:"${summary.leaderUid eq user.uid ? (summary.totalAttempts == 0 ? '-' : summary.mark) : ''}",
+   	   				portraitId:"${user.portraitId}",
+   	   				isLeader : "${summary.leaderUid eq user.uid}"
    	   	   	    });
 	        </c:forEach>
-			
+
 		</c:forEach>
 
 		initializePortraitPopover('<lams:LAMSURL/>');
@@ -196,8 +208,14 @@
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
         function userNameFormatter (cellvalue, options, rowObject) {
-    			return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
-    		}
+    		return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    	}
+        
+        function leaderRowFormatter (rowID, val, rawObject, cm, rdata) {
+			if (rdata.isLeader == 'true') {
+				return 'class="info"';
+			}
+		}
     	
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
