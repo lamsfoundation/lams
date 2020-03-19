@@ -34,14 +34,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><c:out value="${title}" /></title>
 	
 	<lams:css />
-	<style>
-		#passwordField {
-			margin-left: 10px;
-		}
-		#incorrectKey {
-			color: red;
-		}
-	</style>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script>
 		function customSubmitGateForm(){
@@ -57,15 +49,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<%@ include file="gateDescription.jsp"%>
 		
 		<c:if test="${gateForm.incorrectKey}">
+        <lams:Alert id="incorrectKey" type="danger" close="false">
+            <fmt:message key="label.password.gate.incorrect.password">
+            </fmt:message>
+        </lams:Alert>		
 			<p id="incorrectKey">
-				<fmt:message key="label.password.gate.incorrect.password" />
 			</p>
 		</c:if>
-		
-		<div class="voffset5">
-			<fmt:message key="label.password.gate.message" />
-			<input id="passwordField" type="text" maxlength="32" /><br><br>
-			<fmt:message key="label.password.gate.refresh" />
+		<div class="panel">
+			<div class="panel-body">
+				<div class="form-group">
+					<input type="text" class="form-control" id="passwordField" maxlength="32" autocomplete="off" placeholder="<fmt:message key="label.password.gate.message"/>"/>
+  				</div>
+			</div>
 		</div>
 
 		<%@ include file="../gate/gateNext.jsp"%>
