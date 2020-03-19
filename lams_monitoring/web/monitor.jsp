@@ -144,6 +144,8 @@
 				LIVE_EDIT_CONFIRM : decoderDiv.html('<c:out value="${LIVE_EDIT_CONFIRM_VAR}" />').text(),
 				<fmt:message key="lesson.task.gate" var="CONTRIBUTE_GATE_VAR"/>
 				CONTRIBUTE_GATE : '<c:out value="${CONTRIBUTE_GATE_VAR}" />',
+				<fmt:message key="lesson.task.gate.password" var="CONTRIBUTE_GATE_PASSWORD_VAR"/>
+				CONTRIBUTE_GATE_PASSWORD : '<c:out value="${CONTRIBUTE_GATE_PASSWORD_VAR}" />',
 				<fmt:message key="lesson.task.grouping" var="CONTRIBUTE_GROUPING_VAR"/>
 				CONTRIBUTE_GROUPING : '<c:out value="${CONTRIBUTE_GROUPING_VAR}" />',
 				<fmt:message key="lesson.task.branching" var="CONTRIBUTE_BRANCHING_VAR"/>
@@ -515,7 +517,7 @@
 							<div id="chartDiv" class="panel-body"></div>
 						</div>
 					</div>
-					
+					safdsd
 					<!-- Required tasks -->
 					<div id="requiredTasks" class="panel panel-warning" style="display: none;">
 						<div class="panel-heading">
@@ -525,7 +527,7 @@
 							<span id="contributeHeader"></span>
 						</div>
 					</div>
-				
+					
 					<table id="tabLessonTable" class="table table-striped">
 						<tr id="contributeHeader">
 							<td colspan="2" class="active">
@@ -551,6 +553,9 @@
 												</c:when>
 												<c:when test="${entry.contributionType eq 9}">
 													<fmt:message key="lesson.task.branching"/>
+												</c:when>
+												<c:when test="${entry.contributionType eq 12}">
+													<fmt:message key="lesson.task.gate.password"/>
 												</c:when>
 											</c:choose>
 											<a href="#" class="btn btn-sm btn-default"

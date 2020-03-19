@@ -102,6 +102,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public static final int OPTIONS_WITH_SEQUENCES_TYPE = 13;
     public static final int CONDITION_GATE_ACTIVITY_TYPE = 14;
     public static final int FLOATING_ACTIVITY_TYPE = 15;
+    public static final int PASSWORD_GATE_ACTIVITY_TYPE = 16;
     /** *************************************************************** */
 
     /***************************************************************************
@@ -269,14 +270,14 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     @ManyToMany
     @JoinTable(name = "lams_input_activity", joinColumns = @JoinColumn(name = "activity_id"), inverseJoinColumns = @JoinColumn(name = "input_activity_id"))
     @OrderBy("activity_id")
-    private Set<Activity> inputActivities = new HashSet<Activity>();
+    private Set<Activity> inputActivities = new HashSet<>();
 
     /**
      * The BranchActivityEntries that map conditions to this Activity; bi-directional association required (e.g.
      * LDEV-1910)
      */
     @OneToMany(mappedBy = "branchingActivity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BranchActivityEntry> branchActivityEntries = new HashSet<BranchActivityEntry>();
+    private Set<BranchActivityEntry> branchActivityEntries = new HashSet<>();
 
     // ---------------------------------------------------------------------
     // Object constructors
@@ -404,6 +405,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 		break;
 	    case FLOATING_ACTIVITY_TYPE:
 		activity = new FloatingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case PASSWORD_GATE_ACTIVITY_TYPE:
+		activity = new PasswordGateActivity();
 		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    default:
@@ -764,7 +769,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * @return the set of all tool activities.
      */
     public Set<ToolActivity> getAllToolActivities() {
-	SortedSet<ToolActivity> toolActivities = new TreeSet<ToolActivity>(new ActivityOrderComparator());
+	SortedSet<ToolActivity> toolActivities = new TreeSet<>(new ActivityOrderComparator());
 	getToolActivitiesInActivity(toolActivities);
 	return toolActivities;
     }
@@ -863,7 +868,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 		|| (getActivityTypeId().intValue() == Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 		|| (getActivityTypeId().intValue() == Activity.SYNCH_GATE_ACTIVITY_TYPE)
 		|| (getActivityTypeId().intValue() == Activity.SYSTEM_GATE_ACTIVITY_TYPE)
-		|| (getActivityTypeId().intValue() == Activity.CONDITION_GATE_ACTIVITY_TYPE);
+		|| (getActivityTypeId().intValue() == Activity.CONDITION_GATE_ACTIVITY_TYPE
+			|| (getActivityTypeId().intValue() == Activity.PASSWORD_GATE_ACTIVITY_TYPE));
     }
 
     /**
@@ -904,6 +910,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      */
     public boolean isSystemGate() {
 	return getActivityTypeId().intValue() == Activity.SYSTEM_GATE_ACTIVITY_TYPE;
+    }
+
+    public boolean isPasswordGate() {
+	return getActivityTypeId().intValue() == Activity.PASSWORD_GATE_ACTIVITY_TYPE;
     }
 
     /**
@@ -983,7 +993,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      */
     public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings,
 	    String languageCode) {
-	Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());
+	Set<AuthoringActivityDTO> dtoSet = new TreeSet<>(new ActivityDTOOrderComparator());
 	dtoSet.add(new AuthoringActivityDTO(this, branchMappings, languageCode));
 	return dtoSet;
     }
@@ -1054,7 +1064,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * Get the input activity UIIDs in a format suitable for Authoring. See also getToolInputActivityID
      */
     public ArrayList<Integer> getInputActivityUIIDs() {
-	ArrayList<Integer> list = new ArrayList<Integer>();
+	ArrayList<Integer> list = new ArrayList<>();
 	if ((getInputActivities() != null) && (getInputActivities().size() > 0)) {
 	    Iterator<Activity> iter = getInputActivities().iterator();
 	    while (iter.hasNext()) {

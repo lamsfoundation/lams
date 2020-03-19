@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -106,7 +107,8 @@ public class GateController {
      * there won't be casting exception occur if the activity id is not a gate by chance.
      */
     @RequestMapping("/viewGate")
-    public String viewGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response) {
+    public String viewGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 	// if this is the initial call then activity id will be in the request, otherwise
 	// get it from the form (if being called from openGate.jsp
 	Long gateIdLong = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
@@ -130,7 +132,8 @@ public class GateController {
      * Open the gate if is closed.
      */
     @RequestMapping(path = "/openGate", method = RequestMethod.POST)
-    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request, HttpServletResponse response) {
+    public String openGate(@ModelAttribute GateForm gateForm, HttpServletRequest request,
+	    HttpServletResponse response) {
 	GateActivity gate = monitoringService.openGate(gateForm.getActivityId(), getUserId());
 
 	return findViewByGateType(gateForm, gate);
@@ -152,6 +155,18 @@ public class GateController {
 	    }
 	}
 	GateActivity gate = monitoringService.openGateForSingleUser(gateIdLong, userIds.toArray(new Integer[] {}));
+	return findViewByGateType(gateForm, gate);
+    }
+
+    /**
+     * Allows a single learner to pass the gate.
+     */
+    @RequestMapping(path = "/changeGatePassword", method = RequestMethod.POST)
+    public String changeGatePassword(@ModelAttribute GateForm gateForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long gateIdLong = gateForm.getActivityId();
+
+	GateActivity gate = monitoringService.changeGatePassword(gateIdLong, gateForm.getKey());
 	return findViewByGateType(gateForm, gate);
     }
 
@@ -210,7 +225,7 @@ public class GateController {
 	    Integer waitingLearnerCount = lessonService.getCountLearnersInCurrentActivity(gate);
 	    gateForm.setWaitingLearners(waitingLearnerCount);
 	    return viewScheduleGate(gateForm, (ScheduleGateActivity) gate);
-	} else if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate()) {
+	} else if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate() || gate.isPasswordGate()) {
 	    List<User> waitingLearnersList = monitoringService.getLearnersAttemptedActivity(gate);
 	    gateForm.setWaitingLearners(waitingLearnersList.size());
 	    gateForm.setWaitingLearnerList(waitingLearnersList);
@@ -225,6 +240,9 @@ public class GateController {
 	    gateForm.setForbiddenLearnerList(forbiddenUsers);
 	    if (gate.isConditionGate()) {
 		return "gate/conditionGateContent";
+	    } else if (gate.isPasswordGate()) {
+		gateForm.setKey(((PasswordGateActivity) gate).getGatePassword());
+		return "gate/passwordGateContent";
 	    }
 
 	    return "gate/permissionGateContent";

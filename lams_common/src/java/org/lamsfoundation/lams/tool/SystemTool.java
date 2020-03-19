@@ -58,6 +58,7 @@ public class SystemTool implements Serializable {
     public static final Long SEQUENCE = 9L;
     public static final Long CONDITION_GATE = 10L;
     public static final Long FLOATING_ACTIVITIES = 11L;
+    public static final Long PASSWORD_GATE = 12L;
 
     @Id
     @Column(name = "system_tool_id")

@@ -163,9 +163,11 @@ public interface ILearnerService {
      *            the learner who wants to go through the gate.
      * @param forceGate
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
+     * @param key 
+     * 		  additional information provided by user to open gate, for example password
      * @return Updated gate details
      */
-    GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
+    GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate, Object key);
 
     Set<Group> getGroupsForGate(GateActivity gate);
 

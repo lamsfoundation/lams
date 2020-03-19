@@ -30,6 +30,8 @@ public class GateForm {
     private String userId;
 
     private String scheduleDate;
+    
+    private String key;
 
     public GateActivity getGate() {
 	return gate;
@@ -127,4 +129,11 @@ public class GateForm {
 	this.scheduleDate = scheduleDate;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 }

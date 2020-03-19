@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 public class ContributionTypes {
@@ -42,4 +41,5 @@ public class ContributionTypes {
     public static final Integer CONDITION_GATE = new Integer(10);
     // Tool activity was opened for editing but not closed properly
     public static final Integer CONTENT_EDITED = new Integer(11);
+    public static final Integer PASSWORD_GATE = 12;
 }

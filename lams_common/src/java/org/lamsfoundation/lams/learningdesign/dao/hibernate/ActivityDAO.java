@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -76,7 +77,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	Activity act = (Activity) super.find(Activity.class, activityId);
 	return getNonCGLibActivity(act);
     }
-    
+
     @Override
     public ToolActivity getToolActivityByToolContentId(Long toolContentId) {
 
@@ -128,6 +129,8 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 			return getActivityByActivityId(activityId, OptionsWithSequencesActivity.class);
 		    case Activity.FLOATING_ACTIVITY_TYPE:
 			return getActivityByActivityId(activityId, FloatingActivity.class);
+		    case Activity.PASSWORD_GATE_ACTIVITY_TYPE:
+			return getActivityByActivityId(activityId, PasswordGateActivity.class);
 		    default:
 			break;
 		}
@@ -177,7 +180,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 
     /**
      * Get all the grouping activities for this learning design.
-     * 
+     *
      * @param learningDesignId
      *            The id of the learningDesign
      * @return List of GroupingActivity objects
@@ -217,7 +220,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 
     /*
      * @see org.lamsfoundation.lams.learningdesign.dao.IActivityDAO#getActivityByUIID(java.lang.Integer,
-     *      org.lamsfoundation.lams.learningdesign.LearningDesign)
+     * org.lamsfoundation.lams.learningdesign.LearningDesign)
      */
     @Override
     public Activity getActivityByUIID(Integer id, LearningDesign design) {

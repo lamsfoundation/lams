@@ -46,6 +46,7 @@ public class ValidationErrorDTO {
     public static final String FLOATING_ACTIVITY_MAX_ERROR_KEY = "validation.error.FloatingActivity.maximum"; // FLA
     public static final String SCHEDULE_GATE_ERROR_TYPE1_KEY = "validation.error.illegalScheduleGateOffsetsType1"; // SG
     public static final String SCHEDULE_GATE_ERROR_TYPE2_KEY = "validation.error.illegalScheduleGateOffsetsType2";
+    public static final String PASSWORD_GATE_BLANK_ERROR_KEY = "validation.error.blankPasswordGatePassword"; // SG
     public static final String CONDITION_GATE_ACTVITY_CONDITION = "validation.error.conditionGateMustHaveACondition"; // CGC
     public static final String CONDITION_GATE_ACTVITY_TOOLINPUT = "validation.error.conditionGateMustHaveAnInputToolActivity"; // CGI
     public static final String GROUPING_ACTIVITY_MISSING_GROUPING_KEY = "validation.error.grouping.missing"; // GM
@@ -76,6 +77,7 @@ public class ValidationErrorDTO {
     public static final String FLOATING_ACTIVITY_ERROR_CODE = "FLA";
     public static final String FLOATING_ACTIVITY_MAX_ERROR_CODE = "FAMX";
     public static final String SCHEDULE_GATE_ERROR_CODE = "SG1";
+    public static final String PASSWORD_GATE_ERROR_CODE = "PG";
     public static final String CONDITION_GATE_ACTVITY_CONDITION_ERROR_CODE = "CGC";
     public static final String CONDITION_GATE_ACTVITY_TOOLINPUT_ERROR_CODE = "CGI";
     public static final String GROUPING_ACTIVITY_MISSING_GROUPING_ERROR_CODE = "GM";
@@ -90,7 +92,7 @@ public class ValidationErrorDTO {
     public static final String BRANCHING_ACTVITY_TOOLCONDITION_ERROR_CODE = "BTC";
     public static final String FIRST_ACTIVITY_ERROR_CODE = "FIA";
     public static final String TITLE_CHARACTERS_ERROR_CODE = "TCH";
-
+    
     private Integer UIID;
     private String message; //the validation message explaining what the problem is
     private String code; // unique code representing the validation error message

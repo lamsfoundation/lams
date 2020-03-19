@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
@@ -63,6 +64,7 @@ import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouper;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
@@ -593,8 +595,8 @@ public class LearnerService implements ILearnerFullService {
 	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("CompleteToolSession() for tool session id " + toolSessionId + " learnerId "
-		    + learnerId + " url is " + returnURL);
+	    log.debug("CompleteToolSession() for tool session id " + toolSessionId + " learnerId " + learnerId
+		    + " url is " + returnURL);
 	}
 
 	return returnURL;
@@ -607,12 +609,12 @@ public class LearnerService implements ILearnerFullService {
 
 	if (currentActivity == null) {
 	    progress = joinLesson(learnerId, lesson.getLessonId());
-	    
+
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
 	    // recalculate activity mark and pass it to gradebook
 	    updateGradebookMark(currentActivity, progress);
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
-	    
+
 	} else {
 	    completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
 	}
@@ -678,7 +680,7 @@ public class LearnerService implements ILearnerFullService {
     private void updateGradebookMark(Activity activity, LearnerProgress progress) {
 	User learner = progress.getUser();
 	Lesson lesson = progress.getLesson();
-	
+
 	if ((learner == null) || (lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
 		|| (((ToolActivity) activity).getEvaluation() == null)) {
 	    return;
@@ -687,16 +689,16 @@ public class LearnerService implements ILearnerFullService {
 	if (toolSession == null) {
 	    return;
 	}
-	
+
 	//in case this is a leader - update marks for all users in the group, otherwise update marks only for the specified user
 	List<User> learnersRequiringMarkUpdate = new ArrayList<>();
 	if (lamsCoreToolService.isUserLeaderInActivity(toolSession, learner)) {
 	    learnersRequiringMarkUpdate.addAll(toolSession.getLearners());
-	    
+
 	} else {
 	    learnersRequiringMarkUpdate.add(learner);
 	}
-	
+
 	for (User learnerRequiringMarksUpdate : learnersRequiringMarkUpdate) {
 	    gradebookService.updateGradebookUserActivityMark(lesson, activity, learnerRequiringMarksUpdate);
 	}
@@ -836,10 +838,10 @@ public class LearnerService implements ILearnerFullService {
      *      org.lamsfoundation.lams.usermanagement.User)
      */
     @Override
-    public GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate) {
+    public GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate, Object key) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateActivityId, GateActivity.class);
 	if (gate != null) {
-	    return knockGate(gate, knocker, forceGate);
+	    return knockGate(gate, knocker, forceGate, key);
 	}
 
 	String error = "Gate activity " + gateActivityId + " does not exist. Cannot knock on gate.";
@@ -852,7 +854,7 @@ public class LearnerService implements ILearnerFullService {
      *      org.lamsfoundation.lams.usermanagement.User)
      */
     @Override
-    public GateActivityDTO knockGate(GateActivity gate, User knocker, boolean forceGate) {
+    public GateActivityDTO knockGate(GateActivity gate, User knocker, boolean forceGate, Object key) {
 	boolean gateOpen = false;
 
 	if (forceGate) {
@@ -881,8 +883,11 @@ public class LearnerService implements ILearnerFullService {
 	    // normal case - knock the gate.
 	    gateOpen = gate.shouldOpenGateFor(knocker, expectedLearnerCount, waitingLearnerCount);
 	    if (!gateOpen) {
-		// only for a condition gate
-		gateOpen = determineConditionGateStatus(gate, knocker);
+		if (gate instanceof ConditionGateActivity) {
+		    gateOpen = determineConditionGateStatus((ConditionGateActivity) gate, knocker);
+		} else if (gate instanceof PasswordGateActivity) {
+		    gateOpen = determinePasswordGateStatus((PasswordGateActivity) gate, knocker, (String) key);
+		}
 	    }
 	}
 
@@ -1054,18 +1059,18 @@ public class LearnerService implements ILearnerFullService {
 	// If no conditions match, use the branch that is the "default" branch for this branching activity.
 	if (matchedBranch != null) {
 	    if (log.isDebugEnabled()) {
-		log.debug("Found branch " + matchedBranch.getActivityId() + ":"
-			+ matchedBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
-			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
+		log.debug("Found branch " + matchedBranch.getActivityId() + ":" + matchedBranch.getTitle()
+			+ " for branching activity " + branchingActivity.getActivityId() + ":"
+			+ branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
 	    }
 	    return matchedBranch;
 
 	} else if (defaultBranch != null) {
 	    if (log.isDebugEnabled()) {
-		log.debug("Using default branch " + defaultBranch.getActivityId() + ":"
-			+ defaultBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
-			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
+		log.debug("Using default branch " + defaultBranch.getActivityId() + ":" + defaultBranch.getTitle()
+			+ " for branching activity " + branchingActivity.getActivityId() + ":"
+			+ branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
 	    }
 	    // have to convert it to a real activity of the correct type, as it could be a cglib value
@@ -1106,10 +1111,10 @@ public class LearnerService implements ILearnerFullService {
 
 	    if (sequenceActivity != null) {
 		if (log.isDebugEnabled()) {
-		    log.debug("Found branch " + sequenceActivity.getActivityId() + ":"
-			    + sequenceActivity.getTitle() + " for branching activity "
-			    + branchingActivity.getActivityId() + ":" + branchingActivity.getTitle() + " for learner "
-			    + learner.getUserId() + ":" + learner.getLogin());
+		    log.debug("Found branch " + sequenceActivity.getActivityId() + ":" + sequenceActivity.getTitle()
+			    + " for branching activity " + branchingActivity.getActivityId() + ":"
+			    + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
+			    + learner.getLogin());
 		}
 	    }
 
@@ -1127,53 +1132,60 @@ public class LearnerService implements ILearnerFullService {
      *            learner who is knocking to the gate
      * @return <code>true</code> if learner satisfied any of the conditions and is allowed to pass
      */
-    private boolean determineConditionGateStatus(GateActivity gate, User learner) {
+    private boolean determineConditionGateStatus(ConditionGateActivity conditionGate, User learner) {
 	boolean shouldOpenGate = false;
-	if (gate instanceof ConditionGateActivity) {
-	    ConditionGateActivity conditionGate = (ConditionGateActivity) gate;
 
-	    // Work out the tool session appropriate for this user and gate activity. We expect there to be only one at
-	    // this point.
-	    ToolSession toolSession = null;
-	    for (Activity inputActivity : conditionGate.getInputActivities()) {
-		toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
-	    }
+	// Work out the tool session appropriate for this user and gate activity. We expect there to be only one at
+	// this point.
+	ToolSession toolSession = null;
+	for (Activity inputActivity : conditionGate.getInputActivities()) {
+	    toolSession = lamsCoreToolService.getToolSessionByLearner(learner, inputActivity);
+	}
 
-	    if (toolSession != null) {
+	if (toolSession != null) {
 
-		// Go through each condition until we find one that passes and that opens the gate.
-		// Cache the tool output so that we aren't calling it over an over again.
-		Map<String, ToolOutput> toolOutputMap = new HashMap<>();
-		for (BranchActivityEntry entry : conditionGate.getBranchActivityEntries()) {
-		    BranchCondition condition = entry.getCondition();
-		    String conditionName = condition.getName();
-		    ToolOutput toolOutput = toolOutputMap.get(conditionName);
+	    // Go through each condition until we find one that passes and that opens the gate.
+	    // Cache the tool output so that we aren't calling it over an over again.
+	    Map<String, ToolOutput> toolOutputMap = new HashMap<>();
+	    for (BranchActivityEntry entry : conditionGate.getBranchActivityEntries()) {
+		BranchCondition condition = entry.getCondition();
+		String conditionName = condition.getName();
+		ToolOutput toolOutput = toolOutputMap.get(conditionName);
+		if (toolOutput == null) {
+		    toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession, learner.getUserId());
 		    if (toolOutput == null) {
-			toolOutput = lamsCoreToolService.getOutputFromTool(conditionName, toolSession,
-				learner.getUserId());
-			if (toolOutput == null) {
-			    log.warn("Condition " + condition + " refers to a tool output "
-				    + conditionName
-				    + " but tool doesn't return any tool output for that name. Skipping this condition.");
-			} else {
-			    toolOutputMap.put(conditionName, toolOutput);
-			}
+			log.warn("Condition " + condition + " refers to a tool output " + conditionName
+				+ " but tool doesn't return any tool output for that name. Skipping this condition.");
+		    } else {
+			toolOutputMap.put(conditionName, toolOutput);
 		    }
+		}
 
-		    if ((toolOutput != null) && condition.isMet(toolOutput)) {
-			shouldOpenGate = entry.getGateOpenWhenConditionMet();
-			if (shouldOpenGate) {
-			    // save the learner to the "allowed to pass" list so we don't check the conditions over and
-			    // over
-			    // again (maybe we should??)
-			    conditionGate.getAllowedToPassLearners().add(learner);
-			}
-			break;
+		if ((toolOutput != null) && condition.isMet(toolOutput)) {
+		    shouldOpenGate = entry.getGateOpenWhenConditionMet();
+		    if (shouldOpenGate) {
+			// save the learner to the "allowed to pass" list so we don't check the conditions over and
+			// over
+			// again (maybe we should??)
+			conditionGate.getAllowedToPassLearners().add(learner);
 		    }
+		    break;
 		}
 	    }
 	}
 	return shouldOpenGate;
+    }
+
+    /**
+     * Checks if learner provided correct password for the gate.
+     */
+    private boolean determinePasswordGateStatus(PasswordGateActivity gate, User learner,
+	    String learnerProvidedPassword) {
+	if (StringUtils.isNotBlank(learnerProvidedPassword) && learnerProvidedPassword.equals(gate.getGatePassword())) {
+	    gate.getAllowedToPassLearners().add(learner);
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -1255,9 +1267,9 @@ public class LearnerService implements ILearnerFullService {
 	    groupingDAO.update(grouping);
 
 	    if (log.isDebugEnabled()) {
-		log.debug("Found branch " + selectedBranch.getActivityId() + ":"
-			+ selectedBranch.getTitle() + " for branching activity " + branchingActivity.getActivityId()
-			+ ":" + branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
+		log.debug("Found branch " + selectedBranch.getActivityId() + ":" + selectedBranch.getTitle()
+			+ " for branching activity " + branchingActivity.getActivityId() + ":"
+			+ branchingActivity.getTitle() + " for learner " + learner.getUserId() + ":"
 			+ learner.getLogin());
 	    }
 

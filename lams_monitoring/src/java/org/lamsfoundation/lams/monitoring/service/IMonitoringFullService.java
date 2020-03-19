@@ -3,7 +3,6 @@ package org.lamsfoundation.lams.monitoring.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -12,6 +11,7 @@ import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
@@ -19,16 +19,15 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
  * Contains methods intended for internal usage by lams_monitoring.
- * 
+ *
  * @author Andrey Balan
  */
 public interface IMonitoringFullService extends IMonitoringService {
-    
+
     /** Get the message service, which gives access to the I18N text */
     MessageService getMessageService();
 
@@ -58,7 +57,7 @@ public interface IMonitoringFullService extends IMonitoringService {
 
     /** Set whether or not to display the gradebook activity scores at the end of a lesson */
     Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete);
-    
+
     String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent);
 
@@ -81,7 +80,8 @@ public interface IMonitoringFullService extends IMonitoringService {
     void unarchiveLesson(long lessonId, Integer userId);
 
     /**
-     * Suspend lesson now! A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
+     * Suspend lesson now! A lesson can only be suspended if it is started. The purpose of suspending is to hide the
+     * lesson from learners
      * temporarily.
      *
      * @param lessonId
@@ -89,11 +89,12 @@ public interface IMonitoringFullService extends IMonitoringService {
      * @param userId
      *            checks that the user is a staff member for this lesson
      * @param clearScheduleDetails
-     * 		  should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if user suspending right now,
-     * 		  false if this is being called by the trigger
+     *            should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if
+     *            user suspending right now,
+     *            false if this is being called by the trigger
      */
     void suspendLesson(long lessonId, Integer userId, boolean removeTriggers) throws UserAccessDeniedException;
-    
+
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson back to its previous state.
      * Otherwise an exception will be thrown.
@@ -124,6 +125,11 @@ public interface IMonitoringFullService extends IMonitoringService {
     GateActivity openGateForSingleUser(Long gateId, Integer[] userIds);
 
     /**
+     * Changes a Password Gate password.
+     */
+    PasswordGateActivity changeGatePassword(Long gateId, String key);
+
+    /**
      * Set the gate to closed.
      *
      * @param gate
@@ -133,7 +139,7 @@ public interface IMonitoringFullService extends IMonitoringService {
 
     /** Update the schedule gate date/time */
     GateActivity scheduleGate(Long gateId, Date schedulingDatetime, Integer userId);
-    
+
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
      *
@@ -244,8 +250,9 @@ public interface IMonitoringFullService extends IMonitoringService {
     /**
      * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another group.
      */
-    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins) throws LessonServiceException;
-    
+    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins)
+	    throws LessonServiceException;
+
     /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
      *
@@ -335,7 +342,7 @@ public interface IMonitoringFullService extends IMonitoringService {
 
     /** Get the record of the learner's progress for a particular lesson */
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
-    
+
     List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 
 }
