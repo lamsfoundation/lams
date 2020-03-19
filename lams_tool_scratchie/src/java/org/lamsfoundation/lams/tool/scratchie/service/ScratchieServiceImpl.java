@@ -1926,6 +1926,61 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return newDto;
     }
 
+    @Override
+    public Map<String, Object> prepareStudentChoicesData(Scratchie scratchie) {
+	Map<String, Object> model = new HashMap<>();
+
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+	model.put("items", items);
+
+	//correct answers row
+	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
+	model.put("correctAnswerLetters", correctAnswerLetters);
+
+	List<GroupSummary> groupSummaries = getSummaryByTeam(scratchie, items);
+	for (GroupSummary summary : groupSummaries) {
+	    //prepare OptionDtos to display
+	    int i = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		String optionSequence = itemDto.getOptionsSequence();
+		String[] optionLetters = optionSequence.split(", ");
+
+		List<OptionDTO> optionDtos = new LinkedList<>();
+		for (int j = 0; j < optionLetters.length; j++) {
+		    String optionLetter = optionLetters[j];
+		    String correctOptionLetter = correctAnswerLetters.get(i);
+
+		    OptionDTO optionDto = new OptionDTO();
+		    optionDto.setAnswer(optionLetter);
+		    optionDto.setCorrect(correctOptionLetter.equals(optionLetter));
+		    optionDtos.add(optionDto);
+		}
+
+		itemDto.setOptionDtos(optionDtos);
+		i++;
+	    }
+
+	    //calculate what is the percentage of first choice events in each session
+	    int numberOfFirstChoiceEvents = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
+		    numberOfFirstChoiceEvents++;
+		}
+	    }
+	    summary.setMark(numberOfFirstChoiceEvents);
+
+	    // round the percentage cell
+	    String totalPercentage = String.valueOf(
+		    Math.round((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size()));
+	    summary.setTotalPercentage(totalPercentage);
+
+	}
+
+	model.put("sessionDtos", groupSummaries);
+	return model;
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
