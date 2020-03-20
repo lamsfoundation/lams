@@ -1641,7 +1641,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
@@ -2031,13 +2031,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 		if (assessmentUsers != null) {
 		    for (AssessmentUser assessmentUser : assessmentUsers) {
-			    ExcelRow userTitleRow = userSummarySheet.initRow();
-			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.user.summary.user.name"), true);
-			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
-			    userTitleRow.addCell(getMessage("label.export.mark"), true);
+			ExcelRow userTitleRow = userSummarySheet.initRow();
+			userTitleRow.addCell(getMessage("label.export.user.id"), true);
+			userTitleRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
+			userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
+			userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
+			userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
+			if (assessment.isEnableConfidenceLevels()) {
+			    userTitleRow.addCell(getMessage("label.confidence"), true);
+			}
+			userTitleRow.addCell(getMessage("label.export.mark"), true);
 
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
@@ -2051,12 +2054,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				    userResultRow.addCell(questionResult.getQbQuestion().getName());
 				    userResultRow.addCell(
 					    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
+				    if (assessment.isEnableConfidenceLevels()) {
+					String confidenceLevel = null;
+
+					switch (assessment.getConfidenceLevelsType()) {
+					    case 2:
+						confidenceLevel = new String[] { getMessage("label.not.confident"),
+							getMessage("label.confident"),
+							getMessage("label.very.confident") }[questionResult
+								.getConfidenceLevel() / 5];
+						break;
+					    case 3:
+						confidenceLevel = new String[] { getMessage("label.not.sure"),
+							getMessage("label.sure"),
+							getMessage("label.very.sure") }[questionResult
+								.getConfidenceLevel() / 5];
+						break;
+					    default:
+						confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
+					}
+
+					userResultRow.addCell(confidenceLevel);
+				    }
 				    userResultRow.addCell(questionResult.getMark());
 				}
 			    }
 
 			    ExcelRow userTotalRow = userSummarySheet.initRow();
-			    userTotalRow.addEmptyCells(4);
+			    userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
 			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
 			    userTotalRow.addCell(assessmentResult.getGrade());
 			    userSummarySheet.addEmptyRow();
