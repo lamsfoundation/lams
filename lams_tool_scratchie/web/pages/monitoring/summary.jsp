@@ -208,7 +208,16 @@
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
         function userNameFormatter (cellvalue, options, rowObject) {
-    		return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		var name = definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		if (rowObject.isLeader == 'true') {
+    			var leaderIcon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    			if (rowObject.portraitId == '') {
+    				name += leaderIcon;
+    			} else {
+    				name = name.replace('</a>', leaderIcon + '</a>');
+    			}
+    		}
+    		return name;
     	}
         
         function leaderRowFormatter (rowID, val, rawObject, cm, rdata) {
