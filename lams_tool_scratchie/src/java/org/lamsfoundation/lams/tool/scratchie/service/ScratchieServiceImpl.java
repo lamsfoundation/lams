@@ -699,7 +699,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
-    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
+    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean addPortraits) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
@@ -717,15 +717,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    for (ScratchieUser user : sessionUsers) {
 
 		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
-		// include only leaders in case isUserGroupLeader is ON, include all otherwise
-		if (isIncludeOnlyLeaders && isUserGroupLeader) {
+		if (isUserGroupLeader) {
+		    groupSummary.setLeaderUid(user.getUid());
+		}
+
+		if (addPortraits) {
 		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
 		    user.setPortraitId(
 			    systemUser.getPortraitUuid() == null ? null : systemUser.getPortraitUuid().toString());
-		    usersToShow.add(user);
-		} else if (!isIncludeOnlyLeaders) {
-		    usersToShow.add(user);
 		}
+		usersToShow.add(user);
 	    }
 
 	    groupSummary.setUsers(usersToShow);

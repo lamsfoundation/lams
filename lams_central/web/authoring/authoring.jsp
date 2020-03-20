@@ -801,6 +801,7 @@
 					 	<option value="sync"><fmt:message key="authoring.fla.page.prop.gate.type.sync" /></option>
 					 	<option value="schedule"><fmt:message key="authoring.fla.page.prop.gate.type.schedule" /></option>
 					 	<option value="permission"><fmt:message key="authoring.fla.page.prop.gate.type.permission" /></option>
+					 	<option value="password"><fmt:message key="authoring.fla.page.prop.gate.type.password" /></option>
 					 </select>
 				</td>
 			</tr>
@@ -837,13 +838,21 @@
 					 <input class="propertiesContentFieldActivityCompletionBased" type="checkbox">
 				</td>
 			</tr>
-			<tr class="propertiesContentRowConditions">
+			<tr class="propertiesContentRowGatePassword">
+				<td>
+					<fmt:message key="authoring.fla.page.prop.password" />
+				</td>
 				<td colspan="3">
+					 <input class="propertiesContentFieldPassword" type="text" maxlength="32">
+				</td>
+			</tr>
+			<tr class="propertiesContentRowConditions">
+				<td colspan="4">
 					<div class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
-				<td colspan="3">
+				<td colspan="4">
 					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></button>
 				</td>
 			</tr>

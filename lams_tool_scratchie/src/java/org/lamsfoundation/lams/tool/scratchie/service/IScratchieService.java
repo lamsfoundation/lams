@@ -314,7 +314,7 @@ public interface IScratchieService extends ICommonToolService {
      *            if true - return Summaries only for leader, all users in a group otherwise
      * @return
      */
-    List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
+    List<GroupSummary> getMonitoringSummary(Long contentId, boolean addPortraits);
 
     List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid);
 

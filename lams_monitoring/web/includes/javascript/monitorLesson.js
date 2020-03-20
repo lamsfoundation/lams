@@ -653,6 +653,7 @@ function updateContributeActivities(contributeActivities) {
 					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
 					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
+					case 12 : entryContent = LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
 				entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
 							 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP

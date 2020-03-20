@@ -54,7 +54,7 @@ public class ContributeActivityDTO {
 	if (activity.getParentActivity() != null) {
 	    this.parentActivityID = activity.getParentActivity().getActivityId();
 	}
-	this.contributeEntries = new Vector<ContributeEntry>();
+	this.contributeEntries = new Vector<>();
     }
 
     /**
@@ -134,6 +134,7 @@ public class ContributeActivityDTO {
 	public void setContributionType(Integer contributionType) {
 	    this.contributionType = contributionType;
 	    boolean isReq = (contributionType != null) && (contributionType.equals(ContributionTypes.PERMISSION_GATE)
+		    || contributionType.equals(ContributionTypes.PASSWORD_GATE)
 		    || contributionType.equals(ContributionTypes.CHOSEN_GROUPING)
 		    || contributionType.equals(ContributionTypes.CHOSEN_BRANCHING)
 		    || contributionType.equals(ContributionTypes.CONTENT_EDITED)
