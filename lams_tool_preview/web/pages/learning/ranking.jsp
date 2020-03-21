@@ -153,14 +153,14 @@
 		<input type="hidden" name="next" id="next" value=""/>
 
 		<div class="row voffset10" id="drag-area">
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<strong><fmt:message key="label.ranked"></fmt:message></strong>
 				<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
-					<div class="row"><div class="col-sm-1 divrankxlabel">${index}:</div><div class="col-sm-5 divrankx ${rowdrop}" id="divrank${index}" ></div></div>
+					<div class="row"><div class="col-md-1 divrankxlabel">${index}:</div><div class="col-md-5 divrankx ${rowdrop}" id="divrank${index}" ></div></div>
 				</c:forEach>
 			</div>
 			
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<div class="${rowdrop}" id="unranked"><strong><fmt:message key="label.unranked"></fmt:message></strong></div>
 				<div id="learners">
 					${itemDivs}

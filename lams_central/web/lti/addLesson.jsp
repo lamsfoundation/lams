@@ -34,7 +34,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/addLesson.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>	
@@ -204,15 +204,15 @@
 		
 			<%-- Preview and Author Buttons --%>			    
 			<div class="pull-right">
-				<a id="preview-button" class="btn btn-default" href="javascript:openPreview();" title="<fmt:message key="authoring.fla.preview.lesson.default.title" />">
+				<a id="preview-button" class="btn btn-secondary" href="javascript:openPreview();" title="<fmt:message key="authoring.fla.preview.lesson.default.title" />">
 					<fmt:message key="authoring.fla.preview.lesson.default.title" />
 				</a>
 				
-				<a class="btn btn-default" href="javascript:showAuthoringDialog();" title="<fmt:message key="label.author.sequence" />">
+				<a class="btn btn-secondary" href="javascript:showAuthoringDialog();" title="<fmt:message key="label.author.sequence" />">
 					<fmt:message key="label.author.sequence" />
 				</a>
 				
-				<a class="btn btn-default" href="javascript:window.location.reload();" title="<fmt:message key="authoring.fla.refresh.button" />">
+				<a class="btn btn-secondary" href="javascript:window.location.reload();" title="<fmt:message key="authoring.fla.refresh.button" />">
 					<fmt:message key="authoring.fla.refresh.button" />
 				</a>
 			</div>

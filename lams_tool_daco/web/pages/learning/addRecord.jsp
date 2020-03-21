@@ -221,22 +221,22 @@
 							</c:if>
 								<div class="form-horizontal">
 									<div class="form-group  no-gutter">
-									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.longitude" /></label>
-									<div class="col-sm-2">
+									<label class="col-md-2 control-label"><fmt:message key="label.learning.longlat.longitude" /></label>
+									<div class="col-md-2">
 									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control "/>
 									</div>
-									<div class="col-sm-1">
+									<div class="col-md-1">
 									<p class="form-control-static"><fmt:message key="label.learning.longlat.longitude.unit" /></p>
 									</div>								
 									</div>
 									<c:set var="answerIndex" value="${answerIndex+1}" />
 												
 									<div class="form-group  no-gutter">
-									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.latitude" /></label>
-									<div class="col-sm-2">
+									<label class="col-md-2 control-label"><fmt:message key="label.learning.longlat.latitude" /></label>
+									<div class="col-md-2">
 									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 									</div>
-									<div class="col-sm-1">
+									<div class="col-md-1">
 									<p class="form-control-static"><fmt:message key="label.learning.longlat.latitude.unit" /></p>
 									</div>
 									</div>

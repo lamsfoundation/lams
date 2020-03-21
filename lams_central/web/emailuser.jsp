@@ -24,7 +24,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/instantedit.js"></script>
-<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
 <script type="text/javascript">
 	var returnUrl = '${param.returnUrl}';
 
@@ -80,7 +80,7 @@
 <div style="clear: both;"></div>
 <body class="stripes">
 	<div
-		class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+		class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<fmt:message key="email.compose.mail" />
@@ -109,7 +109,7 @@
 					</div>
 					<div id="cc-email-area" class="form-group">
 						<span id="cc-email-address"><lams:user property="email" /></span>
-						<a href="javascript:;" class="btn btn-sm btn-default"
+						<a href="javascript:;" class="btn btn-sm btn-secondary"
 							id="edit-email-address"> <fmt:message key="label.edit" />
 						</a>
 					</div>
@@ -127,12 +127,12 @@
 
 					<div class="pull-right">
 						<a href="#" onclick="javascript:closeDialog()"
-							class="btn btn-sm btn-default"> <fmt:message
+							class="btn btn-sm btn-secondary"> <fmt:message
 								key="button.cancel" />
 						</a>
 						<c:if test="${not sendDisabled}">
 							<a href="#" onclick="javascript:sendEmail()"
-								class="btn btn-sm btn-default"> <fmt:message
+								class="btn btn-sm btn-secondary"> <fmt:message
 									key="email.send" />
 							</a>
 						</c:if>

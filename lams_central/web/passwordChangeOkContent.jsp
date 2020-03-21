@@ -11,15 +11,15 @@
 
 	<div class="container">
 		<div class="row vertical-center-row">
-			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+			<div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 				<div class="panel voffset20">
 					<div class="panel-body">
-					<div class="col-xs-12 text-center">
+					<div class="col-12 text-center">
 						<fmt:message key="msg.password.changed"/>
 					</div>
 					
-					<div class="col-xs-12 text-center voffset10">
-						<a class="btn btn-sm btn-default"
+					<div class="col-12 text-center voffset10">
+						<a class="btn btn-sm btn-secondary"
 								href="<lams:LAMSURL/>${empty redirectURL ? 'index.do' : redirectURL}" role="button">
 							Ok
 						</a>

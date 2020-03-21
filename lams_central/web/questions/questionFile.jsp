@@ -65,7 +65,7 @@
 				<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 				<lams:WaitingSpinner id="itemAttachment_Busy"/>
 				<div class="pull-right voffset5" id="buttonsDiv">
-					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
+					<input class="btn btn-sm btn-secondary" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:window.close()" />
 					<button class="btn btn-sm btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
 						<fmt:message key="button.import" />

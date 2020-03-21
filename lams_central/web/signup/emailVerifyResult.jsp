@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
-<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
 
 <div class="panel-heading text-center">
 	<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" class="img-center" width="200px"></img>

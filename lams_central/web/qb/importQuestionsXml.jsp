@@ -14,7 +14,7 @@
 	<lams:css/>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
 	<script type="text/javascript">
@@ -84,7 +84,7 @@
 				<lams:WaitingSpinner id="itemAttachment_Busy"/>
 			
 				<div class="pull-right voffset10" id="buttonsDiv">
-					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
+					<input class="btn btn-sm btn-secondary" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:self.parent.tb_remove();" />
 
 					<a href="#nogo" class="btn btn-sm btn-primary" onclick="javascript:verifyAndSubmit();">

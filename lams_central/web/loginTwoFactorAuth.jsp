@@ -51,12 +51,12 @@
 	<body>
 	
     <!-- Fixed navbar -->
-	<nav class="navbar navbar-default navbar-login">
+	<nav class="navbar navbar-light navbar-login">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand navbar-brand-login" href="#"><%=Configuration.get(ConfigurationKeys.SITE_NAME)%></a>
 			</div>
-			<div class="navbar-collapse collapse navbar-right">
+			<div class="navbar-collapse collapse ml-auto">
 				<div class="pull-right login-logo" title="LAMS - Learning Activity Management System"></div>
 			</div>
 		</div>
@@ -89,7 +89,7 @@
 					</div>
 		
 					<div class="form-group voffset10">
-						<div class="col-sm-12 controls">
+						<div class="col-md-12 controls">
 							<a id="loginButton" href="javascript:submitForm()"  class="btn btn-primary btn-block" tabindex="2" />
 								<fmt:message key="button.login" />
 							</a>

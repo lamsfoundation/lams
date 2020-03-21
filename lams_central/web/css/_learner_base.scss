@@ -485,7 +485,7 @@ nav.navbar-heading {
 
 
 @media (min-width: 0px) and (max-width: 767px) {
-  .btn-primary, .btn-default, .btn-success, .btn-info, .btn-danger {
+  .btn-primary, .btn-secondary, .btn-success, .btn-info, .btn-danger {
     padding:4px 9px 2px;
   }
 }
@@ -763,33 +763,17 @@ section{
 // CSS to make the footer stick to the bottom see http://cssreset.com/how-to-keep-footer-at-bottom-of-page-with-css/ 
 // Height of footer set to match the navbar at the top for visual reasons - it may be changed. 
 .login-logo {
-  background: url($login_logo) no-repeat center right;
-  background-size: $login_logo_size;
-  width:$login-logo_div_width;
-  height:50px;
+  background: url($login_logo) no-repeat center top;
+  background-size: auto $login_logo_size;
+  height:$login_logo_size;
+  margin-bottom: 35px;
 }
 
-.login-body {
-	margin:0;
-	padding:0;
-	height:100%;
-}
-.login-content{
-	min-height:100%;
-	position:relative;
-	padding-bottom:50px;
-	background: $body-bg;
-}
 .login-footer {
-	width: 100%;
-	background-color: $gray-lightest;
-	font-size: 85%;
-	padding-top: 15px;
+	padding-top: 10px;
 	border-top: $border-thin-default-light;
 	height:50px;
-	position:absolute;
-	bottom:0;
-	left:0;
+	margin: 60px auto -35px;
 }
 
 /* fontawesome icon x-small */

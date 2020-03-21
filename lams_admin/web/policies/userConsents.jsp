@@ -14,7 +14,7 @@
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		
@@ -91,7 +91,7 @@
 
 <body>
 <div class="row no-gutter no-margin">
-<div class="col-xs-12">
+<div class="col-12">
 <div class="container" id="content">
 
 	<h5>

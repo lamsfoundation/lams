@@ -214,7 +214,7 @@
             noneSelectedText : "Display all collections",
             selectAllText:"Select all",
             deselectAllText:"Deselect all",
-            style:"btn btn-sm btn-default",
+            style:"btn btn-sm btn-secondary",
             <c:if test="${fn:length(userCollections) > 10}">liveSearch: true</c:if>
        	});
     	//workaround for $('#collections-select').selectpicker('selectAll'); throwing exception 
@@ -231,7 +231,7 @@
             noneSelectedText : "Display all question types",
             selectAllText:"Select all",
             deselectAllText:"Deselect all",
-            style:"btn btn-sm btn-default"
+            style:"btn btn-sm btn-secondary"
        	});
     	//workaround for $('#types-select-select').selectpicker('selectAll'); throwing exception 
     	$("#types-select option").prop("selected", "selected");
@@ -256,7 +256,7 @@
 	<input type="text" id="filter-questions" class="form-control" placeholder="Contains text" 
 		onkeydown="doSearch(arguments[0]||event)" />
 		
-	<a href="#nogo" class="btn btn-default btn-sm loffset10" id="advanced-search-button">  
+	<a href="#nogo" class="btn btn-secondary btn-sm loffset10" id="advanced-search-button">  
 		<i class="fa fa-lg fa-question-circle" aria-hidden="true" title="Advanced search"></i>
 		Advanced search
 	</a>
@@ -318,10 +318,10 @@
 </div>
 
 <div id="grid-container">
-	<div class="grid-holder col-xs-12 col-sm-4">
+	<div class="grid-holder col-12 col-md-4">
 		<table id="questions-grid" class="scroll"></table>
 		<div id="questions-grid-pager" class="scroll"></div>
 	</div>
 				
-	<div id="question-detail-area" class="col-xs-12 col-sm-8"></div>
+	<div id="question-detail-area" class="col-12 col-md-8"></div>
 </div>

@@ -40,7 +40,7 @@
 	<input type="hidden" id="userId" name="userId" />
 			
 	<div class="row">
-		<div class="col-sm-4">				   
+		<div class="col-md-4">				   
 			<p class="text-danger text-center column-heading"> <input id="all-select-forbidden" onClick="javascript:selectUnselectAll('forbidden');" type="checkbox"  class="pull-left" />
 			<strong><fmt:message key="label.gate.list.all.learners"/></strong></p>
 			<div class="panel panel-default gateLearners" id="forbidden">
@@ -55,7 +55,7 @@
 				   onclick="javascript:allowUsers('forbidden')"/>	
 		</div>
 		
-		<div class="col-sm-4">
+		<div class="col-md-4">
 			<p class="text-center column-heading"> <input id="all-select-waiting" onClick="javascript:selectUnselectAll('waiting');" type="checkbox"  class="pull-left" />
 			<strong><fmt:message key="label.gate.list.waiting.learners"/></strong></p>
 			<div class="panel panel-default gateLearners" id="waiting">
@@ -70,7 +70,7 @@
 				   onclick="javascript:allowUsers('waiting')"/>
 		</div>
 				
-		<div class="col-sm-4">
+		<div class="col-md-4">
 			<p class="text-success text-center"><strong><fmt:message key="label.gate.list.allowed.learners"/></strong></p>
 			<div class="panel panel-default gateLearners">
 				<c:forEach var="learner" items="${gateForm.allowedToPassLearnerList}">

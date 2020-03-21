@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -200,6 +201,26 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	Object value = query.uniqueResult();
 	return ((Number) value).intValue();
     }
+    
+    @Override
+    public Map<Long, Integer> getCountLearnersByOrganisationLessons(Integer organisationId) {
+	final String COUNT_USERS_BY_ORGANISATION_LESSONS = "SELECT lesson.lessonId, COUNT(lesson) FROM Lesson AS lesson "
+		+ "INNER JOIN lesson.lessonClass AS lessonClass INNER JOIN lessonClass.groups AS groups "
+		+ "INNER JOIN groups.users AS users WHERE lesson.organisation.organisationId = :organisationId AND lessonClass.staffGroup != groups "
+		+ "GROUP BY lesson.lessonId";
+
+	List<Object[]> resultQuery = getSession().createQuery(COUNT_USERS_BY_ORGANISATION_LESSONS)
+		.setParameter("organisationId", organisationId).list();
+	Map<Long, Integer> result = new TreeMap<Long, Integer>();
+	// update only the existing ones
+	for (Object[] entry : resultQuery) {
+	    // for some reason entry can be null
+	    if (entry != null) {
+		result.put((Long) entry[0], ((Long) entry[1]).intValue());
+	    }
+	}
+	return result;
+    }
 
     /**
      * Saves or Updates a Lesson.
@@ -291,7 +312,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
      *      boolean)
      */
     @Override
-    public List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole) {
+    public List<Object> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole) {
 
 	String queryName;
 	if (Role.ROLE_MONITOR.equals(userRole)) {

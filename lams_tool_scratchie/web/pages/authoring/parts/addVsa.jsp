@@ -143,11 +143,11 @@
 					</div>
 					
 					<div class="form-group row form-inline">
-						<label for="caseSensitive" class="col-sm-3 voffset10">
+						<label for="caseSensitive" class="col-md-3 voffset10">
 							<fmt:message key="label.case.sensitivity" />
 						</label>
 						
-						<div class="col-sm-9">
+						<div class="col-md-9">
 							<form:select path="caseSensitive" id="caseSensitive" cssClass="form-control input-sm">
 								<form:option value="false"><fmt:message key="label.no.case.unimportant" /></form:option>
 								<form:option value="true"><fmt:message key="label.yes.case.must.match" /></form:option>

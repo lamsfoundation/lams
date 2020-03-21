@@ -19,7 +19,7 @@
 <c:choose>
 	<c:when test='${(msgDto.level <= 1)}'>
 		<div class="row no-gutter voffset5">
-			<div class="col-xs-12" id="outermsg${msgDto.message.uid}">
+			<div class="col-12" id="outermsg${msgDto.message.uid}">
 	</c:when>
 	<c:otherwise>
 		<div class="no-gutter voffset2">

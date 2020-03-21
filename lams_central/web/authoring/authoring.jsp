@@ -16,7 +16,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/learning-design-treeview.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
@@ -297,129 +298,151 @@
 	<div id="toolbar" class="buttons btn-group-sm">
 	
 		<div class="btn-group btn-group-sm">
-			<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
+			<button id="newButton" class="btn btn-light desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
 				<i class="fa fa-plus"></i> 
 				<span><fmt:message key="authoring.fla.page.menu.new" /></span>
 			</button>
-			<button id="newDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="newDropButton" type="button" class="btn btn-light desktopButton dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu dropdown-menu-right desktopButton">
-				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
-			</ul>
+			<div class="dropdown-menu dropdown-menu-right desktopButton">
+				<a id="useTemplate" class="dropdown-item" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()" href="#">
+					<fmt:message key="authoring.fla.page.menu.new.template" />
+				</a>
+			</div>
 		</div>
 		
 		<div class="btn-group btn-group-sm">
-			<button id="openButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
+			<button id="openButton" type="button" class="btn btn-light" onClick="javascript:MenuLib.openLearningDesign()">
 				<i class="fa fa-folder-open-o"></i>
 				<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 			</button>
-			<button id="openDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="openDropButton" type="button" class="btn btn-light desktopButton dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu desktopButton">
-				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import" /></a></li>
-				<li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import.part" /></a></li>
-			</ul>
+			<div class="dropdown-menu dropdown-menu-right desktopButton">
+				<a id="importSequenceButton" class="dropdown-item" onClick="javascript:MenuLib.importLearningDesign()" href="#">
+					<fmt:message key="authoring.fla.page.menu.import" />
+				</a>
+				<a id="importPartSequenceButton" class="dropdown-item" onClick="javascript:MenuLib.importPartLearningDesign()" href="#">
+					<fmt:message key="authoring.fla.page.menu.import.part" />
+				</a>
+			</div>
 		</div>
 
 		<div class="btn-group btn-group-sm">
-			<button id="saveButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()"
+			<button id="saveButton" type="button" class="btn btn-light" onClick="javascript:MenuLib.saveLearningDesign()"
 					data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.page.menu.save' /></span>">
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
-			<button id="saveDropButton" type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button id="saveDropButton" type="button" class="btn btn-light desktopButton dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu desktopButton">
-				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
-				<li id="exportLamsButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
-			</ul>
+			<div class="dropdown-menu dropdown-menu-right desktopButton">
+				<a id="saveAsButton" class="dropdown-item" onClick="javascript:MenuLib.saveLearningDesign(true)" href="#">
+					<fmt:message key="authoring.fla.page.menu.saveas" />
+				</a>
+				<a id="exportLamsButton" class="dropdown-item" onClick="javascript:MenuLib.exportLearningDesign(1)" href="#">
+					<fmt:message key="authoring.fla.page.menu.export.lams" />
+				</a>
+			</div>
 		</div>
 		
-		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()"
+		<button id="cancelLiveEditButton" class="btn btn-light" onClick="javascript:GeneralLib.cancelLiveEdit()"
 				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='authoring.fla.cancel.button' /></span>">
 			<i class="fa fa-ban"></i> 
 			<span><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
+		<div class="btn-group btn-group-sm desktopButton">
+		<button id="copyButton" class="btn btn-light" onClick="javascript:MenuLib.copyActivity()">
 			<i class="fa fa-copy"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
 		</button>
-		<button id="pasteButton" class="btn btn-default" onClick="javascript:MenuLib.pasteActivity()">
+		<button id="pasteButton" class="btn btn-light" onClick="javascript:MenuLib.pasteActivity()">
 			<i class="fa fa-paste"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.paste" /></span>
 		</button>
 		</div>	
 		
-		<button id="transitionButton" class="btn btn-default" onClick="javascript:MenuLib.addTransition()">
+		<button id="transitionButton" class="btn btn-light" onClick="javascript:MenuLib.addTransition()">
 			<i class="fa fa-long-arrow-right"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
 
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		<div class="btn-group btn-group-sm desktopButton">
+		  <button class="btn btn-light dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-check-square-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.optional" /></span>
 		    <span class="caret"></span>
 		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="optionalButton">
-		    <li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.activity" /></a></li>
-		    <li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.support" /></a></li>
-		  </ul>
+		  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="optionalButton">
+		    <a id="optionalActivityButton" class="dropdown-item" onClick="javascript:MenuLib.addOptionalActivity()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.optional.activity" />
+		    </a>
+		    <a id="floatingActivityButton" class="dropdown-item" onClick="javascript:MenuLib.addFloatingActivity()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.optional.support" />
+		    </a>
+		  </div>
 		</div>
 
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		<div class="btn-group btn-group-sm desktopButton">
+		  <button class="btn btn-light dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-map-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
 		    <span class="caret"></span>
 		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="flowButton">
-		    <li id="gateButton" onClick="javascript:MenuLib.addGate()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.gate" /></a></li>
-		    <li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.branch" /></a></li>
-		  </ul>
+		  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="flowButton">
+		    <a id="gateButton" class="dropdown-item" onClick="javascript:MenuLib.addGate()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.flow.gate" />
+		    </a>
+		    <a id="branchingButton" class="dropdown-item" onClick="javascript:MenuLib.addBranching()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.flow.branch" />
+		    </a>
+		  </div>
 		</div>
 		
-		<button id="groupButton" class="btn btn-default" onClick="javascript:MenuLib.addGrouping()">
+		<button id="groupButton" class="btn btn-light" onClick="javascript:MenuLib.addGrouping()">
 			<i class="fa fa-group"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
 		</button>
 		
-		<div class="btn-group btn-group-sm desktopButton" role="group">
-		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		<div class="btn-group btn-group-sm desktopButton">
+		  <button class="btn btn-light dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-font"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
 		    <span class="caret"></span>
 		  </button>
-		  <ul class="dropdown-menu" aria-labelledby="annotateButton">
-		    <li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.label" /></a></li>
-		    <li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.region" /></a></li>
-		  </ul>
+		  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="annotateButton">
+		    <a id="annotateLabelButton" class="dropdown-item" onClick="javascript:MenuLib.addAnnotationLabel()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.annotate.label" />
+		    </a>
+		    <a id="annotateRegionButton" class="dropdown-item" onClick="javascript:MenuLib.addAnnotationRegion()" href="#">
+		    	<fmt:message key="authoring.fla.page.menu.annotate.region" />
+		    </a>
+		  </div>
 		</div>
 		
-		<button id="weightButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openWeights()">
+		<button id="weightButton" class="btn btn-light desktopButton" onClick="javascript:MenuLib.openWeights()">
 			<i class="fa fa-balance-scale"></i> 
 			<span><fmt:message key="authoring.fla.weights.menu" /></span>
 		</button>	
 		
-		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
+		<button id="arrangeButton" class="btn btn-light desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
 				
-		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()"
+		<button id="previewButton" class="btn btn-light" onClick="javascript:MenuLib.openPreview()"
 				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
 			<i class="fa fa-search-plus"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.preview" /></span>
 		</button>
 
-		<a id="helpButton" class="btn btn-xs btn-default pull-right" target="_blank" href="<%=Configuration.get(ConfigurationKeys.HELP_URL)%>/authoring"><i class="fa fa-question-circle text-primary"></i></a>
+		<a id="helpButton" class="btn btn-xs btn-light pull-right" target="_blank" href="<%=Configuration.get(ConfigurationKeys.HELP_URL)%>/authoring"><i class="fa fa-question-circle text-primary"></i></a>
 	</div>
 	
 	<table id="authoringTable">
@@ -490,7 +513,7 @@
 								</option>
 							</c:forEach>
 						</select>
-						<button id="ldDescriptionLicenseButton" class="btn btn-default btn-xs"><span><fmt:message key="label.view"/></span></button>
+						<button id="ldDescriptionLicenseButton" class="btn btn-light btn-xs"><span><fmt:message key="label.view"/></span></button>
 						<div id="ldDescriptionLicenseTextContainer">
 							<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license.info" /></div>
 							<textarea id="ldDescriptionLicenseText" rows="5"></textarea>
@@ -532,32 +555,32 @@
 				<td id="ldStoreDialogButtonCell" colspan="2">
 					<div class="container-fluid">
 						<div id="ldStoreDialogLeftButtonContainer" class="buttonsbar btn-group-sm">
-							<button id="ldStoreDialogNewFolderButton" class="btn btn-default">
+							<button id="ldStoreDialogNewFolderButton" class="btn btn-light">
 								<i class="fa fa-folder"></i> 
 								<span><fmt:message key="authoring.fla.new.folder.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogCopyButton" class="btn btn-default">
+							<button id="ldStoreDialogCopyButton" class="btn btn-light">
 								<i class="fa fa-copy"></i> 
 								<span><fmt:message key="authoring.fla.copy.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogCutButton" class="btn btn-default">
+							<button id="ldStoreDialogCutButton" class="btn btn-light">
 								<i class="fa fa-cut"></i> 
 								<span><fmt:message key="authoring.fla.cut.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogPasteButton" class="btn btn-default">
+							<button id="ldStoreDialogPasteButton" class="btn btn-light">
 								<i class="fa fa-paste"></i> 
 								<span><fmt:message key="authoring.fla.paste.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogDeleteButton" class="btn btn-default">
+							<button id="ldStoreDialogDeleteButton" class="btn btn-light">
 								<i class="fa fa-trash-o"></i> 
 								<span><fmt:message key="authoring.fla.delete.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogRenameButton" class="btn btn-default">
+							<button id="ldStoreDialogRenameButton" class="btn btn-light">
 								<i class="fa fa-font"></i> 
 								<span><fmt:message key="authoring.fla.rename.button" /></span>
 							</button>
@@ -575,7 +598,7 @@
 						
 						<div id="ldStoreDialogRightButtonContainer" class="action-buttons pull-right">
 
-							<button id="ldStoreDialogCancelButton" class="btn btn-sm btn-default">
+							<button id="ldStoreDialogCancelButton" class="btn btn-sm btn-light">
 								<i class="fa fa-ban"></i> 
 								<span><fmt:message key="authoring.fla.cancel.button" /></span>
 							</button>
@@ -625,8 +648,8 @@
 				<td class="branchMappingFreeItemCell branchMappingListCell"></td>
 				<td class="branchMappingFreeBranchCell branchMappingListCell"></td>
 				<td>
-					<button class="btn btn-default branchMappingAddButton branchMappingButton"><i class="fa fa-chevron-right"></i></button>
-					<button class="btn btn-default branchMappingRemoveButton branchMappingButton"><i class="fa fa-chevron-left"></i></button>
+					<button class="btn btn-light branchMappingAddButton branchMappingButton"><i class="fa fa-chevron-right"></i></button>
+					<button class="btn btn-light branchMappingRemoveButton branchMappingButton"><i class="fa fa-chevron-left"></i></button>
 				</td>
 				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
 				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
@@ -640,8 +663,8 @@
 			<tr>
 				<td colspan="5">
 					<div class="container-fluid">
-						<div class="pull-right btn-group btn-group-sm" role="group">
-							<button class="branchMappingOKButton btn btn-default">
+						<div class="pull-right btn-group btn-group-sm">
+							<button class="branchMappingOKButton btn btn-light">
 								<i class="fa fa-check"></i> 
 								<span><fmt:message key="authoring.fla.ok.button" /></span>
 							</button>
@@ -766,7 +789,7 @@
 			</tr>
 			<tr>
 				<td colspan="2">
-					<button class="btn btn-default propertiesContentFieldNameGroups"><fmt:message key="authoring.fla.page.prop.groups.name" /></button>
+					<button class="btn btn-light propertiesContentFieldNameGroups"><fmt:message key="authoring.fla.page.prop.groups.name" /></button>
 				</td>
 			</tr>
 		</table>
@@ -839,12 +862,12 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<div class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
+					<div class="btn btn-light propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></button>
+					<button class="btn btn-light propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></button>
 				</td>
 			</tr>
 		</table>
@@ -892,17 +915,17 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<button class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></button>
+					<button class="btn btn-light propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></button>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.branching.conditions.match" /></button>
+					<button class="btn btn-light propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.branching.conditions.match" /></button>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<button class="btn btn-default propertiesContentFieldMatchGroups"><fmt:message key="authoring.fla.page.prop.branching.groups.match" /></button>
+					<button class="btn btn-light propertiesContentFieldMatchGroups"><fmt:message key="authoring.fla.page.prop.branching.groups.match" /></button>
 				</td>
 			</tr>
 			<tr>
@@ -1032,13 +1055,13 @@
 	<div id="propertiesContentGroupNaming" class="dialogContents">
 		<div id="groupNamingGroups"></div>
 		<div class="container-fluid">
-			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button id="groupNamingOKButton" class="btn btn-default">
+			<div class="btn-group btn-group-sm pull-right">
+				<button id="groupNamingOKButton" class="btn btn-light">
 					<i class="fa fa-check"></i> 
 					<span><fmt:message key="authoring.fla.ok.button" /></span>
 				</button>
 				
-				<button id="groupNamingCancelButton" class="btn btn-default">
+				<button id="groupNamingCancelButton" class="btn btn-light">
 					<i class="fa fa-ban"></i> 
 					<span><fmt:message key="authoring.fla.cancel.button" /></span>
 				</button>
@@ -1064,7 +1087,7 @@
 			 	<fmt:message key="authoring.fla.page.dialog.cond.range.from" /> <input id="multiRangeFromSpinner" class="spinner" type="number" />
 			 	<fmt:message key="authoring.fla.page.dialog.cond.range.to" /> <input id="multiRangeToSpinner" class="spinner" type="number" />
 			 </div>
-			 <button id="rangeAddButton" class="btn btn-default">
+			 <button id="rangeAddButton" class="btn btn-light">
 			 	<i class="fa fa-plus"></i>
 			 	<span><fmt:message key="authoring.fla.page.dialog.cond.add" /></span>
 			 </button>
@@ -1080,26 +1103,26 @@
 		 	</tr>
 		 </table>
 		 <div class="container-fluid">
-		 	<div class="btn-group btn-group-sm pull-right" role="group">
-				<button id="outputConditionsOKButton" class="btn btn-default">
+		 	<div class="btn-group btn-group-sm pull-right">
+				<button id="outputConditionsOKButton" class="btn btn-light">
 					<i class="fa fa-check"></i> 
 					<span><fmt:message key="authoring.fla.ok.button" /></span>
 				</button>
 				
-				<button id="outputConditionsCancelButton" class="btn btn-default">
+				<button id="outputConditionsCancelButton" class="btn btn-light">
 					<i class="fa fa-ban"></i> 
 					<span><fmt:message key="authoring.fla.cancel.button" /></span>
 				</button>
 
 			</div>
 			
-			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button id="outputConditionsClearAllButton" class="btn btn-default outputSelectDependent rangeOutputButton">
+			<div class="btn-group btn-group-sm pull-right">
+				<button id="outputConditionsClearAllButton" class="btn btn-light outputSelectDependent rangeOutputButton">
 					<i class="fa fa-remove"></i> 
 					<span><fmt:message key="authoring.fla.clear.all.button" /></span>
 				</button>
 				
-				<button id="outputConditionsRemoveButton" class="btn btn-default outputSelectDependent rangeOutputButton">
+				<button id="outputConditionsRemoveButton" class="btn btn-light outputSelectDependent rangeOutputButton">
 					<i class="fa fa-remove"></i> 
 					<span><fmt:message key="authoring.fla.remove.condition.button" /></span>
 				</button>
@@ -1146,7 +1169,7 @@
 	<div id="infoDialogContents" class="dialogContents">
 		<div id="infoDialogBody"></div>
 		<div id="infoDialogButtons">
-			<button id="infoDialogOKButton" class="btn btn-default pull-right">
+			<button id="infoDialogOKButton" class="btn btn-light pull-right">
 				<span><fmt:message key="authoring.fla.ok.button" /></span>
 			</button>
 		</div>

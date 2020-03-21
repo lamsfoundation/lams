@@ -31,7 +31,7 @@
 	</style>	
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
@@ -185,7 +185,7 @@
 
 	<lams:Page title="${title}" type="admin" formID="emailNotificationsForm">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-md-12">
 				<div class="btn-group pull-right">
 					<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?lessonID=${lesson.lessonId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
@@ -199,7 +199,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
 				<form:form action="emailUsers.do" method="post" modelAttribute="emailNotificationsForm" id="emailNotificationsForm" >	
@@ -244,7 +244,7 @@
 				
 				</form:form>			
 			</div>
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<div id="emailTextareaDiv">
 					<h4><fmt:message key="email.notifications.message.header"/></h4>
 					<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home/learner.do?lessonID=${lesson.lessonId}</fmt:param></fmt:message>

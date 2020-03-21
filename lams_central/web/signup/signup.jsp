@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function(){
 			var selectedTab = (${(signupOrganisation != null) && signupOrganisation.loginTabActive}) ? 1 : 0;
@@ -65,7 +65,7 @@
 			</c:if>
 		</div>
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-lg-12">
 				<div class="panel with-nav-tabs panel-default">
 					<div class="panel-heading" style="height: 51px">
 						<ul class="nav nav-tabs">

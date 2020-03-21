@@ -26,7 +26,7 @@
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
@@ -211,7 +211,7 @@
 		
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.sequence.diagram"/>
 		</h3>
@@ -222,7 +222,7 @@
 <!-- Notifications -->  
 <c:if test="${(lesson.lessonStateId == 3) || (lesson.lessonStateId == 4) }">
 	<div class="row no-gutter">
-		<div class="col-xs-6 col-md-4 col-lg-4 ">
+		<div class="col-6 col-lg-4 col-xl-4 ">
 			<button type="button" id="disable-sequence-button" class="btn btn-sm btn-default">
 				<span id="disable-sequence-label">
 					<c:choose>
@@ -243,7 +243,7 @@
 
 <!-- Tables -->
 	<div class="row no-gutter">
-	<div class="col-xs-12">
+	<div class="col-12">
 	<div class="panel panel-success">
 	
 	<div id="tabSequence">

@@ -9,7 +9,7 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
@@ -34,26 +34,26 @@
 
 	<div class="outcomeContainer">
 		<div class="row">
-			<div class="col-xs-5">
+			<div class="col-5">
 				<fmt:message key='outcome.manage.add.name' />
 			</div>
-			<div class="col-xs-3">
+			<div class="col-3">
 				<fmt:message key='outcome.manage.add.code' />
 			</div>
-			<div class="col-xs-1">
+			<div class="col-1">
 			</div>
-			<div class="col-xs-1">
+			<div class="col-1">
 			</div>
 		</div>
 		<c:forEach var="scale" items="${scales}">
 			<div class="row">
-				<div class="col-xs-5">
+				<div class="col-5">
 					<c:out value="${scale.name}" />
 				</div>
-				<div class="col-xs-3">
+				<div class="col-3">
 					<c:out value="${scale.code}" />
 				</div>
-				<div class="col-xs-1">
+				<div class="col-1">
 					<c:choose>
 						<c:when test="${scale.scaleId != 1}">
 							<i class="manageButton fa fa-pencil" title="<fmt:message key='scale.manage.edit' />"
@@ -67,7 +67,7 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-				<div class="col-xs-1">
+				<div class="col-1">
 					<c:if test="${scale.scaleId != 1}">
 						<i class="manageButton fa fa-remove" title="<fmt:message key='scale.manage.remove' />"
 					   	   onClick="javascript:removeScale(${scale.scaleId})" >
@@ -76,14 +76,14 @@
 				</div>
 			</div>
 		</c:forEach>
-		<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome(true)"
+		<div id="exportButton" class="btn btn-secondary pull-left" onClick="javascript:exportOutcome(true)"
 			 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
 			<i class="fa fa-download"></i>
 			<span class="hidden-xs">
 				<fmt:message key="outcome.export" />
 			</span>
 		</div> 
-		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+		<div id="importButton" class="btn btn-secondary pull-left" onClick="javascript:$('#importInput').click()">
 			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 		</div>
 		<form id="importForm" action="scaleImport.do" method="post" enctype="multipart/form-data">

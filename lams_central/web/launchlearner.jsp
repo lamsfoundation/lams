@@ -69,7 +69,7 @@
 		</p>
 		
 		<c:if test="${button}">
-			<a href='javascript:openLearnerShortenedUrl(<c:out value="${lessonID}"/>)' class='btn btn-default'>
+			<a href='javascript:openLearnerShortenedUrl(<c:out value="${lessonID}"/>)' class='btn btn-secondary'>
 				<fmt:message key="label.open.lesson"/>
 			</a>
 		</c:if>

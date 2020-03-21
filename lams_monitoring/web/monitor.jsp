@@ -212,7 +212,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
@@ -306,7 +306,7 @@
 			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="label.basic">
 					<div class="row">
-						<div class="col-xs-12">
+						<div class="col-12">
 							<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
 							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
 							
@@ -324,7 +324,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-9 col-xs-7">
+						<div class="col-md-9 col-7">
 						
 							<!-- Lesson details -->
 							<dl id="lessonDetails" class="dl-horizontal">
@@ -348,8 +348,8 @@
 										<div id="lessonScheduler">
 											<form class="form-horizontal">
 												<div class="form-group" id="lessonStartApply">
-													<label for="scheduleDatetimeField" class="col-sm-1"><fmt:message key="lesson.start"/></label>
-													<div class="col-sm-8">
+													<label for="scheduleDatetimeField" class="col-md-1"><fmt:message key="lesson.start"/></label>
+													<div class="col-md-8">
 													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 														   onClick="javascript:scheduleLesson()"
@@ -364,8 +364,8 @@
 													</div>
 												</div>
 												<div class="form-group" id="lessonDisableApply">
-													<label for="disableDatetimeField" class="col-sm-1"><fmt:message key="lesson.end"/></label>
-													<div class="col-sm-8">
+													<label for="disableDatetimeField" class="col-md-1"><fmt:message key="lesson.end"/></label>
+													<div class="col-md-8">
 														<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
 														<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 															   onClick="javascript:scheduleDisableLesson()"
@@ -749,7 +749,7 @@
 	<div id="classDialogContents" class="dialogContainer">
 		<div id="classDialogTable">
 			<div class="row no-margin">
-				<div id="leftLearnerTable" class="col-xs-6">
+				<div id="leftLearnerTable" class="col-6">
 					<table id="classLearnerTable" class="table table-condensed">
 						<tr class="active">
 							<td class="dialogTitle" colspan="6"><fmt:message
@@ -804,7 +804,7 @@
 						</tr>
 					</table>
 				</div>
-				<div id="rightMonitorTable" class="col-xs-6">
+				<div id="rightMonitorTable" class="col-6">
 					<table id="classMonitorTable" class="table table-condensed">
 						<tr class="active">
 							<td class="dialogTitle" colspan="6"><fmt:message
@@ -876,7 +876,7 @@
 	<div id="emailProgressDialogContents" class="dialogContainer">
 		<div id="emailProgressDialogTable">
 			<div class="row">
-				<div class="col-xs-12">
+				<div class="col-12">
 					<table id="emailProgressTable" class="table table-condensed">
 						<tr class="active">
 							<td class="dialogTitle" colspan="6"><fmt:message key="progress.email.will.be.sent.on"/></td>
@@ -888,21 +888,21 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-6">
+				<div class="col-6">
 					<div class="form-group">
 						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label><input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value=""/>
 					</div>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-6">
+				<div class="col-6">
 					<button id="addEmailProgressDateButton"
 						class="btn btn-sm btn-default pull-left"
 						onClick="javascript:addEmailProgressDate()">
 						<fmt:message key="progress.email.add.date"/>
 					</button>
 				</div>
-				<div class="col-xs-6">
+				<div class="col-6">
 					<button id="addEmailProgressSeriesButton"
 						class="btn btn-sm btn-default pull-right"
 						onClick="javascript:addEmailProgressSeries(true)">

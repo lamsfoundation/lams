@@ -171,7 +171,7 @@
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
 		<div id="thread${commentDto.comment.uid}" class="clearfix">
-		<table id="${messageTablename}" class="col-xs-12">
+		<table id="${messageTablename}" class="col-12">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
 	</c:when>
 	<c:otherwise>
@@ -198,7 +198,7 @@
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
 	<div class="text-center">
 	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
-	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
+	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-secondary"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>
 

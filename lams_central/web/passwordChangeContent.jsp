@@ -93,7 +93,7 @@
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
-			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+			<div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 				<div class="panel voffset20">
 					<lams:errors/>
 					<div class="panel-body">
@@ -105,7 +105,7 @@
  							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
 						</div>
 							
-						<div class="col-xs-12">
+						<div class="col-12">
 							<lams:Alert type="info"  id="passwordConditions" close="false">
 								<strong><fmt:message key='label.password.must.contain'/>:</strong> 
 								 
@@ -145,7 +145,7 @@
 						</div>
 							
 						<div class="form-group" align="right">
-							<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+							<button type="button" id="cancelButton" class="btn btn-sm btn-secondary voffset5" onclick="history.go(-1);">
 								<fmt:message key="button.cancel"/>
 							</button>
 							&nbsp;&nbsp;

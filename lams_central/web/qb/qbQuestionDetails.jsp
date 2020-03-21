@@ -8,7 +8,7 @@
 	<!-- hide import button in case of VSA which is not compatible with TBL -->
 	<c:choose>
 		<c:when test="${(question.type != 3) || !isScratchie || isVsaAndCompatibleWithTbl}">
-			<a id="import-button" class="btn btn-xs btn-default pull-right button-add-item" href="#nogo"
+			<a id="import-button" class="btn btn-xs btn-secondary pull-right button-add-item" href="#nogo"
 				title="Import question from the question bank">
 				<fmt:message key="button.import"/>
 			</a>
@@ -20,7 +20,7 @@
 		</c:otherwise>
 	</c:choose>
 	
-	<a class="btn btn-xs btn-default pull-right loffset5" href="#nogo" onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${question.uid}", "_blank")' title='Show stats'>
+	<a class="btn btn-xs btn-secondary pull-right loffset5" href="#nogo" onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${question.uid}", "_blank")' title='Show stats'>
 		<i class='fa fa-bar-chart'></i>&nbsp;
 		Stats
 	</a>
@@ -28,18 +28,18 @@
 	<div class="pull-right">
 		<c:choose>
 			<c:when test="${fn:length(otherVersions) == 1}">
-				<button class="btn btn-default btn-xs dropdown-toggle2" disabled="disabled">
+				<button class="btn btn-secondary btn-xs dropdown-toggle2" disabled="disabled">
 				    <fmt:message key="label.version"/> &nbsp; ${question.version}
 				</button>
 			</c:when>
 
 			<c:otherwise>
 				<div class="dropdown">
-					<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<button class="btn btn-secondary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				    	Version ${question.version}&nbsp;<span class="caret"></span>
 					</button>
 					
-					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
 						<c:forEach items="${otherVersions}" var="otherVersion">
 				    		<li <c:if test="${question.version == otherVersion.version}">class="disabled"</c:if>>
 				    			<a href="#nogo" onclick="javascript:loadQuestionDetailsArea(${otherVersion.uid});">Version ${otherVersion.version}</a>

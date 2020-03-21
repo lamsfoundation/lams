@@ -38,12 +38,12 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-sm-6">' +
+		'	<div class="col-md-6">' +
 		'		<h3>Column 1</h3>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima expedita incidunt rerum.</p>' +
 		'	</div>' +
 	
-		'	<div class="col-sm-6">' +
+		'	<div class="col-md-6">' +
 		'		<h3>Column 2</h3>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate placeat suscipit maxime tenetur officiis asperiores quae molestias fugiat praesentium dolorum.</p>' +
 		'	</div>' +
@@ -56,17 +56,17 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-sm-4">' +
+		'	<div class="col-md-4">' +
 		'		<h3>Column 1</h3>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima expedita incidunt rerum.</p>' +
 		'	</div>' +
 	
-		'	<div class="col-sm-4">' +
+		'	<div class="col-md-4">' +
 		'		<h3>Column 2</h3>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate placeat suscipit maxime tenetur officiis asperiores quae molestias fugiat praesentium dolorum.</p>' +
 		'	</div>' +
 	
-		'	<div class="col-sm-4">' +
+		'	<div class="col-md-4">' +
 		'		<h3>Column 3</h3>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta, sunt rerum corporis. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta, sunt rerum corporis. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta.</p>' +
 		'	</div>' +
@@ -79,7 +79,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-md-6 col-md-offset-3">' +
+		'	<div class="col-lg-6 offset-lg-3">' +
 		'		<hr>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta, sunt rerum corporis. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta, sunt rerum corporis. Ab veniam aperiam numquam cupiditate maiores repudiandae ea dicta.</p>' +
 		'		<hr>' +
@@ -115,7 +115,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-md-8 col-md-offset-2 lead"><em>"It is the same with people as it is with riding a bike. Only when moving can one comfortably maintain one\'s balance."</em></div>' +
+		'	<div class="col-lg-8 offset-lg-2 lead"><em>"It is the same with people as it is with riding a bike. Only when moving can one comfortably maintain one\'s balance."</em></div>' +
 		'</div>' +
 		'<div class="row">' +
 		'	<div class="text-center">' +
@@ -129,7 +129,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		description: '',
 		css: 'panel_table.css',
 		html: 
-		'<div class="container"><div class="row"><div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">' +
+		'<div class="container"><div class="row"><div class="col-10 offset-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3">' +
 		'	 <div class="panel panel-default panel-table">' +
 		'	     <div class="panel-heading">' +
 		'	         <div class="tr">' +
@@ -220,7 +220,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		css: '',
 		html: 
-		'<div class="col-md-12">' +
+		'<div class="col-lg-12">' +
 			'<img class="img-responsive center-block" src="/lams/www/public/ckeditor-templates/images/centered_image.jpg">' +
 		'</div>'
 	},
@@ -231,7 +231,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="row">' +
-	    ' 	<div class="col-md-12" style="padding-left:0; padding-right:0;">' +
+	    ' 	<div class="col-lg-12" style="padding-left:0; padding-right:0;">' +
 	    '  		<img src="/lams/www/public/ckeditor-templates/images/image_full_width.jpg" class="img-responsive" style="width: 100%;"/>' +
 	    '	</div>' +
 	    '</div>'
@@ -243,11 +243,11 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="row">' +
-		'	<div class="col-md-4 col-sm-6">' +
+		'	<div class="col-lg-4 col-md-6">' +
 		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/sanfran.jpg">' +
 		'	</div>' +
 	
-		'	<div class="col-md-8 col-sm-6">' +
+		'	<div class="col-lg-8 col-md-6">' +
 		'		<h4>Heading</h4>' +
 		'		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>' +
 		'	</div>' +
@@ -260,7 +260,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="container">' +
-		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
+		'	<div class="col-12 col-md-9 offset-md-1">' +
 		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
@@ -274,7 +274,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		css: '',
 		html: 
-		'<div class="col-md-6">' +
+		'<div class="col-lg-6">' +
 		'	<div class="panel panel-default">' +
 		'		<div class="panel-heading">Image header</div>' +
 			
@@ -346,7 +346,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		html: 
 		'<div class="row">' +
-		'    <div class="col-md-6">' +
+		'    <div class="col-lg-6">' +
 		'	    <div class="thumbnail">' +
 		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/stairs.jpg" style="width:100%">' +
 		'	        <div class="caption">' +
@@ -354,7 +354,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	        </div>' +
 		'	    </div>' +
 		'	  </div>' +
-		'	  <div class="col-md-6">' +
+		'	  <div class="col-lg-6">' +
 		'	    <div class="thumbnail">' +
 		'	        <img alt="" src="/lams/www/public/ckeditor-templates/images/study.jpg" style="width:100%">' +
 		'	        <div class="caption">' +
@@ -371,7 +371,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		description: '',
 		html: 
 		'<div class="row">' +
-		'    <div class="col-md-4">' +
+		'    <div class="col-lg-4">' +
 		'	    <div class="thumbnail">' +
 		'	        <img src="/lams/www/public/ckeditor-templates/images/math.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
@@ -379,7 +379,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	        </div>' +
 		'	    </div>' +
 		'	  </div>' +
-		'	  <div class="col-md-4">' +
+		'	  <div class="col-lg-4">' +
 		'	    <div class="thumbnail">' +
 		'	        <img src="/lams/www/public/ckeditor-templates/images/ideas.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
@@ -387,7 +387,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		'	        </div>' +
 		'	    </div>' +
 		'	  </div>' +
-		'	  <div class="col-md-4">' +
+		'	  <div class="col-lg-4">' +
 		'	    <div class="thumbnail">' +
 		'	        <img src="/lams/www/public/ckeditor-templates/images/cogs.jpg" alt="" style="width:100%">' +
 		'	        <div class="caption">' +
@@ -416,7 +416,7 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 		'<h2>Responsive Embed</h2>' +
 		'<p>Create a responsive video and scale it nicely to the parent element with an 16:9 aspect ratio</p>' +
 
-		'<div class="col-lg-12">' +
+		'<div class="col-xl-12">' +
 		'	<div class="embed-responsive embed-responsive-16by9" data-oembed-url="https://www.youtube.com/embed/">' +
 		'		<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/nTFEUsudhfs"></iframe>' +
 		'	</div>' +
@@ -428,14 +428,14 @@ CKEDITOR.addSnippets( 'bootsnippets-multimedia', {
 		description: '',
 		css: '',
 		html: 
-		'        <div class="col-md-4">' +
+		'        <div class="col-lg-4">' +
 		'            <h4>Lorem Ipsum</h4>' +
 		'            <p>' +
 		'                Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.' +
 		'            </p>' +
 		'        </div>' +
 
-		'        <div class="col-md-8">' +
+		'        <div class="col-lg-8">' +
 		'            <div class="embed-responsive embed-responsive-16by9" data-oembed-url="https://www.youtube.com/embed/">' +
 		'                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/ghkQoJoipbM"></iframe>' +
 		'            </div>' +
@@ -468,7 +468,7 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 	        '		<h1 class="text-muted">Company Name</h1>' +
 	        '	</div>' +
 				
-				'<nav class="navbar navbar-default">' +
+				'<nav class="navbar navbar-light">' +
 				'	<div class="container-fluid">' +
 				'		<div class="navbar-header"><a class="navbar-brand" href="#" target="_blank">Text</a></div>' +
 	

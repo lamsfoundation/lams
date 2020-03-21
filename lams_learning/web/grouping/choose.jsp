@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
 </lams:head>
 <body class="stripes">
 	

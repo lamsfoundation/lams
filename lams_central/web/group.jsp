@@ -29,7 +29,9 @@
 <div class="j-course-contents">
 	<div class="sequence-list">
 		<div id="${orgBean.id}-lessons" class="lesson-table">
-			<%@ include file="groupContents.jsp"%>
+			<c:if test="${not empty org.lessons}">
+				<%@ include file="groupContents.jsp"%>
+			</c:if>
 		</div>
 	</div>
 	
@@ -49,20 +51,15 @@
 									<i class="fa fa-minus-square-o"></i>
 								</c:otherwise>
 							</c:choose>
-						
-							<strong><c:out value="${childOrg.name}" /></strong>
 						</a>
 					</c:when>
 					
 					<c:when test="${isCollapsingSubcoursesEnabled}">
 						<i class="fa" style="min-width:12px;"></i>
-						<strong><c:out value="${childOrg.name}" /></strong>
 					</c:when>
-					
-					<c:otherwise>
-						<strong><c:out value="${childOrg.name}" /></strong>
-					</c:otherwise>
 				</c:choose>
+						
+				<strong class="lead"><c:out value="${childOrg.name}" /></strong>
 				
 				<c:if test="${not empty childOrg.archivedDate}">
 					<small>(<fmt:message key="label.archived"/> <lams:Date value="${childOrg.archivedDate}"/>)</small>
@@ -72,9 +69,12 @@
 			<c:set var="org" value="${childOrg}" />
 			<%@ include file="groupHeader.jsp"%>
 			
-			<div id="${childOrg.id}-lessons" class="lesson-table subgroup-lesson-table panel-collapse collapse 
-				<c:if test="${!childOrg.collapsed}">in</c:if>">
-				<%@ include file="groupContents.jsp"%>
+			<div id="${childOrg.id}-lessons" class="lesson-table subgroup-lesson-table pt-2 collapse 
+				<c:if test="${!childOrg.collapsed}">show</c:if>">
+				
+				<c:if test="${not empty org.lessons}">
+					<%@ include file="groupContents.jsp"%>
+				</c:if>
 			</div>
 
 		</div>

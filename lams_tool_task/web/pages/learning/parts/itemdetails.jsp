@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div class="row">
-	<div class="col-xs-12">
+	<div class="col-12">
 		<div class="panel-body">${item.description}</div>
 		
 		<!-- Comments Part -->

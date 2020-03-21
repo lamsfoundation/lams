@@ -11,7 +11,7 @@
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/blockexportbutton.js"></script>
 

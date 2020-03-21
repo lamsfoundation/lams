@@ -100,7 +100,7 @@
 	</c:choose>
 	</div>
 	
-	<div id="${containingDivName}createAssessmentOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createAssessmentOption(${questionNumber},${maxOptionCount}, '${containingDivName}');" class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.option"/></a></div>
+	<div id="${containingDivName}createAssessmentOptionButton${questionNumber}" class="pull-right"><a href="#" onclick="javascript:createAssessmentOption(${questionNumber},${maxOptionCount}, '${containingDivName}');" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.option"/></a></div>
 	
 	</div>
 </div>

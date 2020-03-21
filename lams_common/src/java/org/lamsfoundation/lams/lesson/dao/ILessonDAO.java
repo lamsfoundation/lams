@@ -119,6 +119,11 @@ public interface ILessonDAO extends IBaseDAO {
      * Returns the count of all the learners that are a part of the lesson class.
      */
     Integer getCountLearnersByLesson(long lessonId, String searchPhrase);
+    
+    /**
+     * Returns the count of all the learners that are a part of the lesson class for all lessons in organisation.
+     */
+    Map<Long, Integer> getCountLearnersByOrganisationLessons(Integer organisationId);
 
     /**
      * Maps users from an organisation with the given role to a boolean value saying whether they participate in the
@@ -160,7 +165,7 @@ public interface ILessonDAO extends IBaseDAO {
      *
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
-    List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
+    List<Object> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
 
     /**
      * Gets all non-removed lessons for a user in a group including sub-groups

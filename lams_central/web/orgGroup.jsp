@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/orgGroup.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -115,12 +115,12 @@
 		/>
 		
 		<c:if test="${canEdit}">
-			<button class="pull-right btn btn-default btn-disable-on-downupload" onClick="javascript:saveGroups()">
+			<button class="pull-right btn btn-secondary btn-disable-on-downupload" onClick="javascript:saveGroups()">
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="button.save" /></span>
 			</button>
 		</c:if>
-		<button class="pull-right btn btn-default btn-disable-on-downupload" 
+		<button class="pull-right btn btn-secondary btn-disable-on-downupload" 
 		   onClick="javascript:window.parent.showOrgGroupingDialog(organisationId)"
 		>
 			<i class="fa fa-users"></i>
@@ -222,7 +222,7 @@
         		<div id="upload-group-file-settings">
 			<fmt:message key="label.import.groups.from.template.description" />
 			<div>
-				<button id="download-template" class="btn btn-sm btn-default btn-disable-on-downupload" onClick="javascript:downloadTemplate();">
+				<button id="download-template" class="btn btn-sm btn-secondary btn-disable-on-downupload" onClick="javascript:downloadTemplate();">
 					<i class="fa fa-save"></i>
 					<fmt:message key="label.download.template" />
 				</button>
@@ -257,10 +257,10 @@
 	</div>
 			
 	<div class="btn-group pull-right">
-		<button id="dialog-save-button" class="btn btn-default btn-disable-on-downupload roffset5 ">
+		<button id="dialog-save-button" class="btn btn-secondary btn-disable-on-downupload roffset5 ">
 			<fmt:message key="button.save" />
 		</button>
-		<button id="dialog-close-button" class="btn btn-default btn-disable-on-downupload">
+		<button id="dialog-close-button" class="btn btn-secondary btn-disable-on-downupload">
 			<fmt:message key="label.cancel" />
 		</button>
 	</div>

@@ -67,6 +67,7 @@
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="roleDAO"><ref bean="roleDAO"/></property>
 		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="favoriteLessonDAO"><ref bean="favoriteLessonDAO"/></property>
 		<property name="favoriteOrganisationDAO"><ref bean="favoriteOrganisationDAO"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
@@ -98,7 +99,7 @@
 				<prop key="remove*">PROPAGATION_REQUIRED</prop>
 				<prop key="save*">PROPAGATION_REQUIRED</prop>
 				<prop key="set*">PROPAGATION_REQUIRED</prop>
-				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 				<prop key="upload*">PROPAGATION_REQUIRED</prop>
 				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
@@ -645,6 +646,10 @@
 	</bean>
 	
 	<bean id="favoriteOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.FavoriteOrganisationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="favoriteLessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.FavoriteLessonDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

@@ -10,7 +10,7 @@
 	<lams:css webapp="monitoring" suffix="tblmonitor"/>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script>
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
@@ -265,7 +265,7 @@
 
 			<!-- Top bar -->
 			<div class="top-nav">
-				<div class="col-xs-5 col-md-3 col-lg-3">
+				<div class="col-5 col-lg-3 col-xl-3">
 					<a href="#">
 						<i class="fa fa-bars fa-lg" id="menu-toggle-bars"></i>
 					</a>

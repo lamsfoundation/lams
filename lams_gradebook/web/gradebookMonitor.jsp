@@ -799,7 +799,7 @@
 	<c:when test="${!isInTabs}">
 		<%-- replacement for Page type admin --%>
 		<div class="row no-gutter no-margin">
-		<div class="col-xs-12">
+		<div class="col-12">
 		<div class="container" id="content">
 
 		<div class="panel panel-default panel-admin-page">
@@ -869,7 +869,7 @@
 		</div> <!-- Closes buttons -->
 		
 			<div class="row">
-				 <div class="col-xs-12">
+				 <div class="col-12">
 				 <lams:WaitingSpinner id="markChartBusy"/>
  				 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
 				</div>
@@ -888,7 +888,7 @@
 						<c:if test="${weightCounter.index gt 0}"></div></c:if>
 						<div class="row">
 					</c:if>
-					<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
+					<div class="col-md-4">${weightArray[0]}: ${weightArray[2]}</div>
 				</c:forEach>
 				</div> <%-- close off row started in the loop --%>
 				</div>

@@ -289,6 +289,16 @@ public interface IMonitoringService {
      * Get number of learners whose first name, last name or login match any of the tokens from search phrase.
      */
     Integer getCountLearnersFromProgress(Long lessonId, String searchPhrase);
+    
+    /**
+     * Get number of learners that attempted lessons from the given organisation.
+     */
+    Map<Long, Integer> getCountAttemptedUsersByOrganisationLessons(Integer organisationId);
+    
+    /**
+     * Get number of learners that completed lessons from the given organisation.
+     */
+    Map<Long, Integer> getCountCompletedUsersByOrganisationLessons(Integer organisationId);
 
     /**
      * Get number of learners who are at the given activities at the moment.
@@ -341,4 +351,6 @@ public interface IMonitoringService {
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
+    
+    int getCountContributeActivities(Long lessonId);
 }

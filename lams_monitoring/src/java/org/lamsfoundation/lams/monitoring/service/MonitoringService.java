@@ -2036,6 +2036,21 @@ public class MonitoringService implements IMonitoringFullService {
 	}
 	return result;
     }
+    
+    @Override
+    public int getCountContributeActivities(Long lessonId) {
+	int contributeActivitiesCounter = 0;
+	List<ContributeActivityDTO> contributeActivities = getAllContributeActivityDTO(lessonId);
+	if (contributeActivities != null) {
+	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
+		if (contributeActivity.getContributeEntries() != null
+			&& !contributeActivity.getContributeEntries().isEmpty()) {
+		    contributeActivitiesCounter++;
+		}
+	    }
+	}
+	return contributeActivitiesCounter;
+    }
 
     @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
@@ -2629,6 +2644,16 @@ public class MonitoringService implements IMonitoringFullService {
     @Override
     public Integer getCountLearnersFromProgress(Long lessonId, String searchPhrase) {
 	return learnerProgressDAO.getNumUsersByLesson(lessonId, searchPhrase);
+    }
+    
+    @Override
+    public Map<Long, Integer> getCountAttemptedUsersByOrganisationLessons(Integer organisationId) {
+	return learnerProgressDAO.getCountAttemptedUsersByOrganisationLessons(organisationId);
+    }
+    
+    @Override
+    public Map<Long, Integer> getCountCompletedUsersByOrganisationLessons(Integer organisationId) {
+	return learnerProgressDAO.getCountCompletedUsersByOrganisationLessons(organisationId);
     }
 
     @Override

@@ -216,7 +216,7 @@
 
 	<lams:Page title="${title}" type="admin" formID="emailNotificationsForm">
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-md-12">
 				<div class="btn-group pull-right">
 					<a href="<c:url value='/emailNotifications/showScheduledEmails.do'/>?organisationID=${org.organisationId}"
 					   id="listEmailsHref" class="btn btn-default btn-sm">
@@ -230,7 +230,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
 				<form:form action="emailUsers.do" method="post" modelAttribute="emailNotificationsForm" id="emailNotificationsForm" >	
@@ -283,7 +283,7 @@
 				</form:form>
 			
 			</div>
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<div id="emailTextareaDiv">
 					<h4><fmt:message key="email.notifications.message.header"/></h4>
 					<c:set var="emailBody"><fmt:message key="email.notifications.course.email.body.header"/><br/><br/><fmt:message key="email.notifications.course.email.body.msg"/><br/><br/><br/>

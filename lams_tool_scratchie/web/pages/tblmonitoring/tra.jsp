@@ -45,7 +45,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.tra.questions.marks"/>
 		</h3>
@@ -55,7 +55,7 @@
 
 <!-- Notifications -->  
 <div class="row no-gutter">
-	<div class="col-xs-6 col-md-4 col-lg-4 ">
+	<div class="col-6 col-lg-4 col-xl-4 ">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">
@@ -67,7 +67,7 @@
 	</div>
 	
 	<c:if test="${attemptedLearnersNumber != 0}">
-		<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
+		<div class="col-6 col-lg-4 offset-lg-4 col-xl-4 offset-xl-2">
 			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 					onclick="javascript:loadTab('traStudentChoices'); return false;">
 				<i class="fa fa-file"></i>
@@ -81,7 +81,7 @@
 <!-- Tables -->
 <c:forEach var="item" items="${items}" varStatus="i">
 	<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-12">
+	<div class="col-12 col-lg-12 col-xl-12">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
@@ -122,7 +122,7 @@
 
 <!-- Chart -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-12">
+	<div class="col-12 col-lg-12 col-xl-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<fmt:message key="label.tra.results.by.team"/> <small>(<fmt:message key="label.average"/>)</small>

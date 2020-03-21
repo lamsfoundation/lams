@@ -139,12 +139,12 @@
 		<input type="hidden" name="next" id="next" value=""/>
 
 		<div class="row voffset10">
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<strong><fmt:message key="label.ranked"></fmt:message></strong>
 				<div id="ranked"><div id="lastEntry" class="${rowdrop}" style="padding-top:10px;padding-bottom:10px"><fmt:message key="label.addlearnerhere"></fmt:message></div></div>
 			</div>
 			
-			<div class="col-sm-6">
+			<div class="col-md-6">
 				<div  class="${rowdrop}" id="unranked"><strong><fmt:message key="label.unranked"></fmt:message></strong></div>
 				<div id="learners">
 					${itemDivs}

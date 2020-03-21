@@ -47,7 +47,7 @@ $(document).ready(function () {
 						
 						rows += '<td id="org-row-' + orgId +'"';
 						if (activeOrgId == orgId) {
-							rows += ' class="active"';
+							rows += ' class="active bg-secondary"';
 						}
 						rows += '>';
 						
@@ -105,9 +105,9 @@ $(document).ready(function () {
 	//collapse subcourse. (Doing it manually instead of using bootstrap collapse in order to prevent bootstrap choppiness)
     $(document).on('click', '.subcourse-title', function() { 
 		var orgId = $(this).data("groupid");
-		var collapsed = $("#" + orgId + "-lessons").hasClass("in");
+		var collapsed = $("#" + orgId + "-lessons").hasClass("show");
 		
-		$("#" + orgId + "-lessons").toggleClass("in");
+		$("#" + orgId + "-lessons").toggleClass("show");
 		$(this).toggleClass("collapsed");
 		$("i", $(this)).toggleClass("fa-minus-square-o fa-plus-square-o");
 
@@ -127,12 +127,12 @@ $(document).ready(function () {
 function selectOrganisation(newOrgId) {
 	//remove active CSS class from the old org
 	if (activeOrgId != null) {
-		$("#org-row-" + activeOrgId + ", #favorite-li-" + activeOrgId).removeClass("active");
+		$("#org-row-" + activeOrgId + ", #favorite-li-" + activeOrgId).removeClass("active bg-secondary");
 		$("#org-row-" + activeOrgId + " a>i").remove();
 	}	
 	
 	//add active CSS class
-	$("#org-row-" + newOrgId + ", #favorite-li-" + newOrgId).addClass("active");
+	$("#org-row-" + newOrgId + ", #favorite-li-" + newOrgId).addClass("active bg-secondary");
 	$("#org-row-" + newOrgId + " a").append( "<i class='fa fa-chevron-circle-right fa-lg pull-right'></i>" )
 	
 	activeOrgId = newOrgId;
@@ -160,6 +160,8 @@ function loadOrganisation() {
 				$("body").removeClass("offcanvas-hidden");
 				return;
 			}
+			
+			initDataTables();
 			
 			// if screen is smaller than 768px (i.e. offcanvas occupies 100%) and offcanvas is shown - then hide it on user selecting an organisation
 			if (window.matchMedia('(max-width: 768px)').matches && !$("body").hasClass("offcanvas-hidden")) {
@@ -189,6 +191,28 @@ function toggleFavoriteOrganisation(orgId) {
 	);	
 }
 
+function toggleFavoriteLesson(orgId, lessonId) {
+	$.ajax({
+		url : LAMS_URL + "index/toggleFavoriteLesson.do",
+		dataType : 'json',
+		cache : false,
+		data : {
+			'lessonId' : lessonId
+		},
+		complete : function(response) {
+			var star = $("#favorite-lesson-star-" + lessonId);
+			if (star.hasClass("fa-star-o")) {
+				star.switchClass("fa-star-o", "fa-star").attr('title', LABELS.REMOVE_LESSON_FAVORITE);
+			} else {
+				star.switchClass("fa-star", "fa-star-o").attr('title', LABELS.MARK_LESSON_FAVORITE);
+			}
+			
+			//update "favorite" column, so Stared order would work correctly
+			$("#lessons-table-" + orgId).DataTable().cell( $("#favorite-lesson-td-" + lessonId) ).data("" + star.hasClass("fa-star")).draw();
+		}
+	});
+}
+
 
 function showMyProfileDialog() {
 	showDialog("dialogMyProfile", {
@@ -212,80 +236,6 @@ function showMyProfileDialog() {
 			}
 		}
 	});
-}
-
-
-function makeOrgSortable() {
-	var org = jQuery("#org-container");
-	$(".lesson-table", org).each(function() {
-		makeSortable(this);
-	});
-	
-	//modify parent <li> element
-	$("i.sorting", org).parent().parent().attr({
-		"onClick" : "makeOrgUnsortable()",
-		"title"   : LABELS.SORTING_DISABLE
-	});
-	
-	//modify link's text
-	$("i.sorting", org).parent().contents().get(1).nodeValue = LABELS.SORTING_DISABLE;
-}
-
-function makeOrgUnsortable() {
-	var org = jQuery("#org-container");
-	$(".lesson-table", org).each(function() {
-		$(this).sortable('destroy');
-	});
-	
-	//modify parent <li> element
-	$("i.sorting", org).parent().parent().attr({
-		"onClick" : "makeOrgSortable()",
-		"title"   : LABELS.SORTING_ENABLE
-	});
-	
-	//modify link's text
-	$("i.sorting", org).parent().contents().get(1).nodeValue = LABELS.SORTING_ENABLE;
-}
-
-function makeSortable(element) {
-	$(element).sortable({
-		axis : "y",
-		delay : 100,
-		tolerance : 'pointer',
-		cursor : 'n-resize',
-		helper : function(e, tr) {
-			var $originals = tr.children();
-			var $helper = tr.clone();
-			$helper.children().each(function(index) {
-				// Set helper cell sizes to match the original
-				// sizes
-				$(this).width($originals.eq(index).width())
-			});
-			return $helper;
-		},
-		forceHelperSize : true,
-		forcePlaceholderSize : true,
-		containment : 'parent',
-		stop : function() {
-			var ids = $(this).sortable('toArray');
-			
-			var jLessonsId = $(this).attr("id");
-			var dashIndex = jLessonsId.indexOf("-");
-			var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
-					dashIndex) : jLessonsId);
-
-			$.ajax({
-				url : "servlet/saveLessonOrder",
-				data : {
-					orgId : orgId,
-					ids : ids.join(",")
-				},
-				error : function() {
-					//loadOrganisation();
-				}
-			});
-		}
-	}).disableSelection();
 }
 
 
@@ -471,11 +421,11 @@ function refreshPrivateNotificationCount(){
 		success : function(count) {
 			$('#notificationsPendingCount').text(count == 0 ? '0' : count);
 			
-			//#notificationsPendingCount will have .btn-primary class when there are some messages available and .btn-default otherwise
+			//#notificationsPendingCount will have .btn-primary class when there are some messages available and .btn-secondary otherwise
 			if (count == 0) {
-				$('#notificationsPendingCount').removeClass("btn-primary").addClass("btn-default");
+				$('#notificationsPendingCount').removeClass("btn-primary").addClass("btn-secondary");
 			} else {
-				$('#notificationsPendingCount').removeClass("btn-default").addClass("btn-primary");
+				$('#notificationsPendingCount').removeClass("btn-secondary").addClass("btn-primary");
 			}
 		}
 	});

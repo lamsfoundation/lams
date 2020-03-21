@@ -100,7 +100,7 @@
 				<fmt:message key="label.forgot.password" />
 			</h4>
 			
-			<div class="col-xs-12">
+			<div class="col-12">
 				<lams:Alert type="info" id="passwordConditions" close="false">
 					<strong><fmt:message key='label.password.must.contain' />:</strong>
 					<c:out value="${mustHaveUppercase}" />

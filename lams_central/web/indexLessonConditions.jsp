@@ -102,7 +102,7 @@
 							</select>
 						</div>
 						<div class="form-group pull-right">	
-							<input class="btn btn-sm btn-default" type="submit" value="<fmt:message key="index.addlesson"/>" />
+							<input class="btn btn-sm btn-secondary" type="submit" value="<fmt:message key="index.addlesson"/>" />
 						</div>
 					</form>
 				</c:otherwise>
@@ -167,7 +167,7 @@
 							</label>
 						</div>
 						<div class="form-group">
-							<input class="btn btn-sm btn-default pull-right" type="submit" value="<fmt:message key="label.set"/>" />
+							<input class="btn btn-sm btn-secondary pull-right" type="submit" value="<fmt:message key="label.set"/>" />
 						</div>								
 			</form>
 		</div>

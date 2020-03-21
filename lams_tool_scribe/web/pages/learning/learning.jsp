@@ -144,7 +144,7 @@
 				<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 		
 					<div class="row">
-						<div class="col-xs-12">
+						<div class="col-12">
 							<div class="panel panel-default">
 								<div class="panel-heading panel-title">
 									<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
@@ -165,7 +165,7 @@
 				</c:forEach>
 		
 				<div class="row">
-					<div class="col-xs-12" id="agreeButton">
+					<div class="col-12" id="agreeButton">
 						<button class="btn btn-success pull-left" onClick="javascript:submitApproval()">
 							<fmt:message key="button.agree" />
 						</button>

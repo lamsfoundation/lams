@@ -325,6 +325,46 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 		.uniqueResult();
 	return ((Number) value).intValue();
     }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<Long, Integer> getCountAttemptedUsersByOrganisationLessons(Integer organisationId) {
+	final String COUNT_USERS_BY_ORGANISATION_LESSONS = "SELECT prog.lesson.lessonId, COUNT(prog) "
+		+ "FROM LearnerProgress prog WHERE prog.lesson.organisation.organisationId = :organisationId "
+		+ "GROUP BY prog.lesson.lessonId";
+	
+	List<Object[]> resultQuery = getSession().createQuery(COUNT_USERS_BY_ORGANISATION_LESSONS)
+		.setParameter("organisationId", organisationId).list();
+	Map<Long, Integer> result = new TreeMap<Long, Integer>();
+	// update only the existing ones
+	for (Object[] entry : resultQuery) {
+	    // for some reason entry can be null
+	    if (entry != null) {
+		result.put((Long) entry[0], ((Long) entry[1]).intValue());
+	    }
+	}
+	return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<Long, Integer> getCountCompletedUsersByOrganisationLessons(Integer organisationId) {
+	final String COUNT_USERS_BY_ORGANISATION_LESSONS = "SELECT prog.lesson.lessonId, COUNT(prog) "
+		+ "FROM LearnerProgress prog WHERE prog.lesson.organisation.organisationId = :organisationId AND prog.lessonComplete > 0"
+		+ "GROUP BY prog.lesson.lessonId";
+	
+	List<Object[]> resultQuery = getSession().createQuery(COUNT_USERS_BY_ORGANISATION_LESSONS)
+		.setParameter("organisationId", organisationId).list();
+	Map<Long, Integer> result = new TreeMap<Long, Integer>();
+	// update only the existing ones
+	for (Object[] entry : resultQuery) {
+	    // for some reason entry can be null
+	    if (entry != null) {
+		result.put((Long) entry[0], ((Long) entry[1]).intValue());
+	    }
+	}
+	return result;
+    }
 
     @Override
     public Integer getNumUsersCompletedLesson(Long lessonId) {

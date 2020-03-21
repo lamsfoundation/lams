@@ -98,7 +98,7 @@
  
 		<c:if test="${instructions.total > 0}" >
 		<div class="row">
-			<div class="col-xs-12 ">
+			<div class="col-12 ">
 			<h4><fmt:message key="message.step.of">
 						<fmt:param value="${instructions.current}" />
 						<fmt:param value="${instructions.total}" />
@@ -109,7 +109,7 @@
 		</c:if>
 		
 		<div class="row">
-			<div class="col-xs-12 ">
+			<div class="col-12 ">
 				<c:if test="${instructions.instruction != null}">
 					<c:out value="${instructions.instruction.description}" escapeXml="false"/>
 				</c:if>

@@ -93,7 +93,7 @@
 			</p>
 
 			<div class="row">
-				<div class="col-xs-12">
+				<div class="col-12">
 					<div class="panel-body">
 
 						<div class="form-group">
@@ -123,7 +123,7 @@
 
 						<div class="form-group">
 							<button name="cancel"
-								class="btn btn-default roffset10" type="button"
+								class="btn btn-secondary roffset10" type="button"
 								onclick="javascript:toHome();">
 								<fmt:message key="button.cancel" />
 							</button>

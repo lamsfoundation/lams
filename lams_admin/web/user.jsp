@@ -209,7 +209,7 @@
 			
 					<div class="panel-body">
 					    <div class="row">
-						<div class="col-md-12">
+						<div class="col-xl-12">
 						
 							<c:if test="${empty userForm.userId}">
 							<lams:Alert type="info" id="passwordConditions" close="false">
@@ -248,18 +248,18 @@
 					<!--  Main panel. Do not show portrait area for new user. -->
 					<c:if test="${not empty userForm.userId}">
 				    <div class="row">
-					<div class="col-md-3">
+					<div class="col-xl-3">
 			    			<div class="text-center"><div id="portraitPicture" ></div></div>
 						<c:if test="${isSysadmin}">
 			    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
 			    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-primary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
 			    			</c:if>
 			    		</div>
-					<div class="col-md-9">
+					<div class="col-xl-9">
 					</c:if>
 					<c:if test="${empty userForm.userId}">
 				    <div class="row">
-					<div class="col-md-12">
+					<div class="col-xl-12">
 					</c:if>
 					
 						<table class="table table-condensed table-no-border">
@@ -490,7 +490,7 @@
 					</div>
 					
 					<div class="row">
-					<div class="col-md-12">
+					<div class="col-xl-12">
 						<c:if test="${not empty userForm.userId}">
 							<div class="pull-left">
 							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>

@@ -79,14 +79,11 @@ $main_singlelesson_hover_background: #F0F8FF;
 // Text & typography
 // $headings-default-color: $brand-primary-darker;
 
-$stripes_background: url('/lams/images/css/light-fabric.jpg');
+$stripes_background: ''; //url('/lams/images/css/light-fabric.jpg');
 $url_css_directory: "/lams/images/css/";
 $login_logo: "/lams/images/svg/lams_logo_black.svg";
-$login_logo_size: auto 20px;
-$login-logo_div_width: 100px;
-
-$offcanvas_logo: "/lams/images/svg/lams_logo_white.svg";
-$offcanvas_height: 31px;
+$login_logo_size: 25px;
+$main_logo_size: 26px;
 
 // generic portrait colors
 $portrait-color-0:#001f3f;

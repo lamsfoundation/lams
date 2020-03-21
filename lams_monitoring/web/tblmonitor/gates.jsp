@@ -10,7 +10,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.gates"/>
 		</h3>
@@ -20,7 +20,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-12 col-lg-12 col-xl-12">
 
 	<c:forEach var="permissionGate" items="${permissionGates}">
 			

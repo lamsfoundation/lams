@@ -10,7 +10,7 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript">
 		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
@@ -127,7 +127,7 @@
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
-				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
+				<button type="button" id="question-settings-link" class="btn btn-secondary btn-sm">
 					<fmt:message key="label.settings" />
 				</button>
 				
@@ -171,12 +171,12 @@
 	
 					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row form-inline">
-						    <label for="maxMark" class="col-sm-3">
+						    <label for="maxMark" class="col-md-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
 						    	<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
 						    
-						    <div class="col-sm-9">
+						    <div class="col-md-9">
 						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
 						    </div>
 						</div>
@@ -193,26 +193,26 @@
 					</div>
 					
 					<div class="form-group row form-inline" style="display: flex; align-items: center;">
-					    <label for="max-words-limit-checkbox" class="col-sm-3">
+					    <label for="max-words-limit-checkbox" class="col-lg-3">
 							<input type="checkbox" id="max-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.maxWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.maximum.number.words" />
 					    </label>
 					    
-					    <div class="col-sm-9">
+					    <div class="col-md-9">
 					   		<form:input path="maxWordsLimit" id="max-words-limit"/>
 					    	<label id="max-words-limit-error" class="alert alert-danger" for="max-words-limit" style="display: none;"></label>
 					    </div>
 					</div>
 					
 					<div class="form-group row form-inline" style="display: flex; align-items: center;">
-					    <label for="min-words-limit-checkbox" class="col-sm-3">
+					    <label for="min-words-limit-checkbox" class="col-md-3">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
 								<c:if test="${assessmentQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.minimum.number.words" />
 					    </label>
 					    
-					    <div class="col-sm-9">
+					    <div class="col-md-9">
 					    	<form:input path="minWordsLimit" id="min-words-limit"/>
 					    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
 					    </div>

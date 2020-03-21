@@ -24,7 +24,7 @@
 <div class="container">
 	<div class="row vertical-center-row">
 		<div
-			class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+			class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 			<div class="panel">
 				<div class="panel-body">
 					<div class="text-left">
@@ -38,9 +38,11 @@
 								
 								<ul>
 									<c:forEach var="lesson" items="${group.lessons}">
-										<li><a href="<c:out value="${lesson.url}"/>"
-											class="sequence-name-link"> <c:out value="${lesson.name}" />
-										</a></li>
+										<li>
+											<a href="<c:out value="${lesson.url}"/>">
+												<c:out value="${lesson.name}" />
+											</a>
+										</li>
 									</c:forEach>
 								</ul>
 								
@@ -49,10 +51,11 @@
 										<c:out value="${subgroup.name}" />
 										<ul>
 											<c:forEach var="s_lesson" items="${subgroup.lessons}">
-												<li><a href="<c:out value="${s_lesson.url}"/>"
-													class="sequence-name-link"> <c:out
-															value="${s_lesson.name}" />
-												</a></li>
+												<li>
+													<a href="<c:out value="${s_lesson.url}"/>"> 
+														<c:out value="${s_lesson.name}" />
+													</a>
+												</li>
 											</c:forEach>
 										</ul>
 									</c:forEach>
@@ -69,7 +72,7 @@
 					</div>
 					
 					<div align="center">
-						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+						<button type="button" class="btn btn-sm btn-secondary offset5" onclick="history.go(-1);">
 							<fmt:message key="label.return.to.myprofile" />
 						</button>
 					</div>

@@ -78,7 +78,7 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
@@ -419,7 +419,7 @@
 <lams:Page title="Collection" type="admin">
 	
 	<div>
-		<button class="btn btn-default btn-sm" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
+		<button class="btn btn-secondary btn-sm" onClick="javascript:document.location.href='<lams:LAMSURL />qb/collection/show.do'">
 			<i class="fa fa-angle-double-left"></i>
 			<fmt:message key="label.qb.collection.management" />
 		</button>
@@ -427,7 +427,7 @@
 	
 	<div id="collection-name-row" class="row h4">
 		
-		<div class="col-xs-12 col-sm-8">
+		<div class="col-12 col-md-8">
 			<span id="collection-name">
 				<strong>
 					<c:out value="${collection.name}" />
@@ -444,13 +444,13 @@
 			</c:if>
 		</div>
 		
-		<div class=" col-xs-12 col-sm-4">
+		<div class=" col-12 col-md-4">
 
 			<%-- Do not display button for public and private collections --%>
 			<c:if test="${not empty collection.userId and not collection.personal}">
 				<div class="btn-group-xs pull-right loffset10">
 					<c:if test="${not hasQuestions}">
-						<button class="btn btn-default" onClick="javascript:removeCollection()" title="Remove collection">
+						<button class="btn btn-secondary" onClick="javascript:removeCollection()" title="Remove collection">
 							<i class="fa fa-trash"></i>
 							<fmt:message key="label.qb.collection.remove" />
 						</button>
@@ -459,29 +459,29 @@
 			</c:if>
 		
 			<div class="btn-group btn-group-xs pull-right loffset10" role="group">
-				<a class="btn btn-default btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.xml" /></a>
+				<a class="btn btn-secondary btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.xml" /></a>
 			
-				<a class="btn btn-default btn-xs loffset5 thickbox" title="<fmt:message key="label.import.xml" />"
+				<a class="btn btn-secondary btn-xs loffset5 thickbox" title="<fmt:message key="label.import.xml" />"
 					href="<c:url value='/xmlQuestions/initImportQuestionsXml.do'/>?collectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true" >  
 					<i class="fa fa-upload"></i>
 				</a>
 				
 				<c:if test="${isQtiExportEnabled && hasQuestions}">
-					<a onclick="javascript:exportQuestionsXml();" class="btn btn-default btn-xs" title="<fmt:message key="label.export.xml" />">  
+					<a onclick="javascript:exportQuestionsXml();" class="btn btn-secondary btn-xs" title="<fmt:message key="label.export.xml" />">  
 						<i class="fa fa-download"></i>
 					</a>
 				</c:if>
 			</div>
 			
 			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
-				<a class="btn btn-default btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.qti" /></a>
+				<a class="btn btn-secondary btn-xs disabled" aria-disabled="true"><fmt:message key="label.qb.collection.qti" /></a>
 			
-				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" title="<fmt:message key='label.import.qti'/>">
+				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-secondary" title="<fmt:message key='label.import.qti'/>">
 					<i class="fa fa-upload"></i>
 				</a>
 				
 				<c:if test="${isQtiExportEnabled && hasQuestions}">
-					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default" title="<fmt:message key='label.export.qti'/>">
+					<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-secondary" title="<fmt:message key='label.export.qti'/>">
 						<i class="fa fa-download"></i>
 					</a>
 				</c:if>
@@ -499,7 +499,7 @@
 					<option><fmt:message key="label.question.type.mark.hedging" /></option>
 				</select>&nbsp;
 						
-				<a onclick="initLinkHref();return false;" href="" class="btn btn-default thickbox" id="create-question-href">  
+				<a onclick="initLinkHref();return false;" href="" class="btn btn-secondary thickbox" id="create-question-href">  
 					<i class="fa fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.create.question" />"></i>
 				</a>
 			</div>
@@ -540,7 +540,7 @@
 									<span class="label label-primary"><fmt:message key="label.qb.collection.shared" /></span>
 								</td>
 								<td width="30px;">
-									<button class="btn btn-default btn-xs" onClick="javascript:unshareCollection(${organisation.organisationId})">
+									<button class="btn btn-secondary btn-xs" onClick="javascript:unshareCollection(${organisation.organisationId})">
 										<fmt:message key="label.qb.collection.unshare" />
 									</button>
 								</td>
@@ -554,7 +554,7 @@
 									<c:out value="${organisation.name}" />
 								</td>
 								<td width="30px;" style="text-align: center;">
-									<button class="btn btn-default btn-xs" onClick="javascript:shareCollection(${organisation.organisationId})">
+									<button class="btn btn-secondary btn-xs" onClick="javascript:shareCollection(${organisation.organisationId})">
 										<fmt:message key="label.qb.collection.share" />
 									</button>
 								</td>

@@ -59,7 +59,7 @@
 			</c:if>
 
 			<div class="row">
-				<div class="col-xs12">
+				<div class="col-12">
 					<div id="revisitedContent" class="panel-body">
 
 

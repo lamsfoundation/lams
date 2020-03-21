@@ -22,139 +22,236 @@
 	
 		<%-- Optional Module Placeholder - do not remove --%>
 		
-		<lams:head>
-			<title><fmt:message key="title.login.window" /></title>
-			<lams:css/>
-			<link rel="icon" href="/lams/favicon.ico" type="image/x-icon" />
-			<link rel="shortcut icon" href="/lams/favicon.ico" type="image/x-icon" />
-			<script type="text/javascript" src="/lams/includes/javascript/browser_detect.js"></script>
-			<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
-			<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
-			<script type="text/javascript">
-				function submitForm() {
-					$('#loginButton').addClass('disabled');
-					$('#loginForm').submit();
-				}
+<lams:head>
+	<title><fmt:message key="title.login.window" /></title>
+	<link rel="icon" href="/lams/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="/lams/favicon.ico" type="image/x-icon" />
+	<lams:css/>
+	<link rel="stylesheet" href="/lams/css/login.css" type="text/css">
+	<style>
+	html,
+body {
+  height: 100%;
+}
 
-				function onEnter(event) {
-					intKeyCode = event.keyCode;
-					if (intKeyCode == 13) {
-						submitForm();
-					}
-				}
+body {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 420px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-label-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.form-label-group > input,
+.form-label-group > label {
+  height: 3.125rem;
+  padding: .75rem;
+}
+
+.form-label-group > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  margin-bottom: 0; /* Override default `<label>` margin */
+  line-height: 1.5;
+  color: #495057;
+  pointer-events: none;
+  cursor: text; /* Match the input under the label */
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  transition: all .1s ease-in-out;
+}
+
+.form-label-group input::-webkit-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input:-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-ms-input-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::-moz-placeholder {
+  color: transparent;
+}
+
+.form-label-group input::placeholder {
+  color: transparent;
+}
+
+.form-label-group input:not(:placeholder-shown) {
+  padding-top: 1.25rem;
+  padding-bottom: .25rem;
+}
+
+.form-label-group input:not(:placeholder-shown) ~ label {
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  font-size: 12px;
+  color: #777;
+}
+
+/* Fallback for Edge
+-------------------------------------------------- */
+@supports (-ms-ime-align: auto) {
+  .form-label-group > label {
+    display: none;
+  }
+  .form-label-group input::-ms-input-placeholder {
+    color: #777;
+  }
+}
+
+/* Fallback for IE
+-------------------------------------------------- */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .form-label-group > label {
+    display: none;
+  }
+  .form-label-group input:-ms-input-placeholder {
+    color: #777;
+  }
+}
+	</style>
+
+	<script type="text/javascript" src="/lams/includes/javascript/browser_detect.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
+	<script type="text/javascript">
+		function submitForm() {
+			$('#loginButton').addClass('disabled');
+			$('#loginForm').submit();
+		}
+
+		function onEnter(event) {
+			intKeyCode = event.keyCode;
+			if (intKeyCode == 13) {
+				submitForm();
+			}
+		}
 				
-				function isBrowserCompatible() {
-					return Modernizr.atobbtoa && Modernizr.checked && Modernizr.cookies && Modernizr.nthchild && Modernizr.opacity &&
-						   Modernizr.svg && Modernizr.todataurlpng && Modernizr.websockets && Modernizr.xhrresponsetypetext;
-					// Modernizr.datauri - should be included, it's a async test though
-					// Modernizr.time - should be included, fails in Chrome for an unknown reason (reported)
-					// Modernizr.xhrresponsetypejson - should be included, fails in IE 11 for an unknown reason (reported)
-				}
+		function isBrowserCompatible() {
+			return Modernizr.atobbtoa && Modernizr.checked && Modernizr.cookies && Modernizr.nthchild && Modernizr.opacity &&
+				   Modernizr.svg && Modernizr.todataurlpng && Modernizr.websockets && Modernizr.xhrresponsetypetext;
+			// Modernizr.datauri - should be included, it's a async test though
+			// Modernizr.time - should be included, fails in Chrome for an unknown reason (reported)
+			// Modernizr.xhrresponsetypejson - should be included, fails in IE 11 for an unknown reason (reported)
+		}
 
-				$(document).ready(function() {
-					$('html').addClass('login-body');
-					if (!isBrowserCompatible()) {
-						$('#browserNotCompatible').show();
-					}
-					$('#j_username').focus();
-					$('#news').load('/lams/www/news.html');
+		$(document).ready(function() {
+			//$('html').addClass('login-body');
+			if (!isBrowserCompatible()) {
+				$('#browserNotCompatible').show();
+			}
+			//$('#j_username').focus();
+			$('#news').load('/lams/www/news.html');
 
-					//make a POST call to ForgotPasswordRequest
-					$("#forgot-password-link").click(function() {
-						var $form=$(document.createElement('form'))
-							.css({display:'none'})
-							.attr("method","POST")
-							.attr("action","<lams:LAMSURL/>ForgotPasswordRequest?method=showForgotYourPasswordPage");
-						$("body").append($form);
-						$form.submit();
-					});
-				});
-			</script>
-		</lams:head>
-		<body class="login-body">
-		<div class="login-content">
-		
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-login">
-		<div class="container">
-	        <div class="navbar-header">
-	          <a class="navbar-brand navbar-brand-login" href="#"><%=Configuration.get(ConfigurationKeys.SITE_NAME)%></a>
-	        </div>
-			<div class="navbar-collapse collapse navbar-right">
-				<div class="pull-right login-logo" title="LAMS - Learning Activity Management System"></div>
-			</div>
-		</div>	
-    </nav>
-		<!-- Close navbar -->
+			//make a POST call to ForgotPasswordRequest
+			$("#forgot-password-link").click(function() {
+				var $form=$(document.createElement('form'))
+					.css({display:'none'})
+					.attr("method","POST")
+					.attr("action","<lams:LAMSURL/>ForgotPasswordRequest?method=showForgotYourPasswordPage");
+				$("body").append($form);
+				$form.submit();
+			});
+		});
+	</script>
+</lams:head>
+<body class="d-flex align-items-center min-vh-100">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-10 col-xl-9 mx-auto">
+				<div class="card card-signin flex-row my-5">
+					<div class="card-img-left d-none d-md-flex">
+						<!-- Background image for card set in CSS! -->
+					</div>
+          
+					<div class="card-body">
+						<div class="card-title text-center">
+							<div class="login-logo" title="LAMS - Learning Activity Management System"></div>
 
-		<!-- Start content  -->
-		<div class="container no-gutter">
-			<div id="news" class="col-sm-8 col-md-9 hidden-xs"></div>
-			<div id="login-panel" class="col-sm-4 col-md-3">
-      <div class="panel panel-default" >
-				<div class="panel-heading">
-				    <div class="panel-title"> <fmt:message key="button.login" /></div>
-				</div>     
-
-        <div class="panel-body" >
-            <div id="browserNotCompatible" class="panel panel-danger" style="display: none">
-                 <div class="panel-heading"><fmt:message key="msg.browser.compat"/></div>
-            </div>
+				          	<div class="voffset20">
+				          		<%=Configuration.get(ConfigurationKeys.SITE_NAME)%>
+				          	</div>
+            
+				            <div>
+				            	Welcome to LAMS 5.0
+				            </div>
+          				</div>
+          
+			            <div id="browserNotCompatible" class="card bg-danger text-white mb-3" style="display: none">
+			                 <div class="card-header"><fmt:message key="msg.browser.compat"/></div>
+			            </div>
 						<c:if test="${!empty param.failed}">
-						<div class="panel panel-danger">
-							<div class="panel-heading">
-								<fmt:message key="error.login" />
-							</div>
-						</div>
-						</c:if>
-						<c:if test="${!empty param.lockedOut}">
-						<div class="panel panel-danger">
-							<div class="panel-heading">
-								<fmt:message key="error.lockedout" />
-							</div>
-						</div>
-						</c:if>
-
-						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm" autocomplete="off">
-							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" 
-						  		 escapeXml="true" />' />
-             				 <div class="input-group">
-								<span class="input-group-addon"><i class="fa fa-user"></i></span>
-								<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
-              				</div>
-
-							<div class="input-group voffset5">
-								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2">
-							</div>
-							<div class="form-group voffset5" style="margin-bottom: 5px;">
-								<c:if test="${isForgotYourPasswordEnabled}">
-							   		<div class="col-md-12 control" style="font-size:75%">
-										<a id="forgot-password-link" href="#nogo"> <fmt:message key="label.forgot.password" /></a>
-							    	</div>
-							    </c:if>
-							    
-								<!-- Button -->
-								<div class="col-sm-12 controls voffset5">
-									<a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block" tabindex="3"><fmt:message key="button.login" /></a>
+							<div class="card bg-danger text-white mb-3">
+								<div class="card-header">
+									<fmt:message key="error.login" />
 								</div>
 							</div>
-						</form>     
-				</div>
-			</div>
-		</div>
-	</div>
-	<!--closes content-->
-
-	<div class="login-footer">
-		<p class="text-muted text-center">
-			<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
-		</p>
-	</div>
-
-		<!--closes page-->
-		</div> <!--  close login-content -->
-		</body>
+						</c:if>
+						<c:if test="${!empty param.lockedOut}">
+							<div class="card bg-danger text-white mb-3">
+								<div class="card-header">
+									<fmt:message key="error.lockedout" />
+								</div>
+							</div>
+						</c:if>
+           
+						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-signin" id="loginForm" autocomplete="off">
+           					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
+           	 
+			            	<div class="form-label-group">
+			              		<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" onkeypress="onEnter(event)" tabindex="1" required autofocus placeholder="aaaaa">
+			                	<label for="j_username">Username</label>
+			              	</div>
+			
+			              	<div class="form-label-group">
+			              		<input id="" type="password" class="form-control" name="j_password" onkeypress="onEnter(event)" tabindex="2" required>
+			                	<label for="j_password">Password</label>
+			              	</div>	
+			              
+			              	<a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block text-uppercase" tabindex="3">
+			              		<fmt:message key="button.login" />
+			              	</a>
+              
+            				<c:if test="${isForgotYourPasswordEnabled}">
+								<div class="text-center">
+									<a id="forgot-password-link" class="small" href="#nogo"> 
+										<fmt:message key="label.forgot.password" />
+									</a>
+							    </div>
+							</c:if>
+			
+							<div id="login-footer" class="text-center text-muted voffset20 login-footer small">
+								<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
+							</div>              
+           				</form>
+          			</div>
+        		</div>
+      		</div>
+    	</div>
+  	</div>
+</body>
 	</c:when>
 
 	<%-- This is version for integrations and LoginAs authentication. --%>

@@ -36,7 +36,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12">
+	<div class="col-12">
         <button type="button" id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right voffset20" data-expanded="false">
            	<i class="fa fa-plus-circle"></i> 
            	<span class="hidden-xs">
@@ -53,7 +53,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter voffset10">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-12 col-lg-12 col-xl-12">
 
 	<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 		<c:set var="burningQsCount" value="${fn:length(burningQuestionItemDto.burningQuestionDtos)}"/>

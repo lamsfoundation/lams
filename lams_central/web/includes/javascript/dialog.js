@@ -2,16 +2,18 @@ var dialogTemplate = $('<div class="modal fade dialogContainer" tabindex="-1" ro
 							'<div class="modal-dialog" role="document">' +
 								'<div class="modal-content">' +
 									'<div class="modal-header">' +
-										'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-											'<i class="fa fa-times" aria-hidden="true"></i>' +
-										'</button>' + 
-										'<button type="button" class="close dialogMaximise" aria-label="Maximise">' +
-											'<i class="fa fa-plus" aria-hidden="true"></i>' +
-										'</button>' +
-										'<button type="button" class="close dialogMinimise" aria-label="Minimise">' +
-											'<i class="fa fa-minus" aria-hidden="true"></i>' +
-										'</button>' +
-										'<h4 class="modal-title"></h4>' +
+										'<h5 class="modal-title"></h5>' +
+										'<div class="btn-group" role="group" aria-label="Basic example">' +
+											'<button type="button" class="close dialogMinimise" aria-label="Minimise">' +
+												'<i class="fa fa-minus" aria-hidden="true"></i>' +
+											'</button>' +
+											'<button type="button" class="close dialogMaximise" aria-label="Maximise">' +
+												'<i class="fa fa-plus" aria-hidden="true"></i>' +
+											'</button>' +
+											'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+												'<i class="fa fa-times" aria-hidden="true"></i>' +
+											'</button>' + 
+										'</div>' +
 									'</div>' +
 									'<div class="modal-body">' +
 										'<iframe></iframe>' +

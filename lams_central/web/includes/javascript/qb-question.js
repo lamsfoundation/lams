@@ -10,7 +10,7 @@ $(document).ready(function(){
 	    });
 
 		//toggle Settings button class
-		$(this).toggleClass("btn-default btn-primary");
+		$(this).toggleClass("btn-secondary btn-primary");
 	});
 });
 
@@ -37,7 +37,7 @@ function formValidationInvalidHandler(form, validator) {
         	showSettingsTab &= key == "maxMark" || key == "penaltyFactor";
         });
         if (showSettingsTab) {
-        	$("#question-settings-link.btn-default").trigger( "click" );
+        	$("#question-settings-link.btn-secondary").trigger( "click" );
         } else {
         	$("#question-settings-link.btn-primary").trigger( "click" );
 	    }

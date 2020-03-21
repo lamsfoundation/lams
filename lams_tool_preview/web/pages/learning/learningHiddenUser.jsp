@@ -26,7 +26,7 @@
 	
 		<div class="row no-gutter">
 			<div
-				class="col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
+				class="col-12 offset-md-1 col-md-10 offset-xl-2 col-xl-8">
 				<div class="alert alert-info">
 					<fmt:message key="label.removed.user.warning" />
 				</div>
@@ -34,7 +34,7 @@
 		</div>
 		
 		<div class="row no-gutter">
-			<div class="col-xs-12">
+			<div class="col-12">
 				
 			</div>
 		</div>

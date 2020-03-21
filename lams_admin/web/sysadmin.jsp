@@ -18,7 +18,7 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
 		<div class="row"> 
-			<div class="col-xs-12"> 
+			<div class="col-12"> 
 				<div class="alert alert-info text-center"> 
 					<img src="/lams/images/svg/lams_logo_black.svg" width="100px"><br> 
 					<fmt:message key="config.version" />&nbsp;${serverVersion}

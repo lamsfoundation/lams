@@ -27,13 +27,13 @@
 			<table id="topicTable" class="table table-hover table-condensed">
 				<thead>
 					<tr>
-						<th class="col-xs-6"><fmt:message key="lable.topic.title.subject" /></th>
-						<th class="col-xs-2"><fmt:message key="lable.topic.title.startedby" /></th>
-						<th class="col-xs-1 hidden-xs" class="hidden-xs"><fmt:message key="lable.topic.title.replies" /></th>
-						<th class="col-xs-1 hidden-xs"><fmt:message key="lable.topic.title.repliesnew" /></th>
-						<th class="col-xs-2"><fmt:message key="lable.topic.title.update" /></th>
+						<th class="col-6"><fmt:message key="lable.topic.title.subject" /></th>
+						<th class="col-2"><fmt:message key="lable.topic.title.startedby" /></th>
+						<th class="col-1 hidden-xs" class="hidden-xs"><fmt:message key="lable.topic.title.replies" /></th>
+						<th class="col-1 hidden-xs"><fmt:message key="lable.topic.title.repliesnew" /></th>
+						<th class="col-2"><fmt:message key="lable.topic.title.update" /></th>
 						<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
-							<th class="col-xs-2">&nbsp;</th>
+							<th class="col-2">&nbsp;</th>
 						</c:if>
 					</tr>
 				</thead>

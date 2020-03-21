@@ -13,7 +13,7 @@
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/orgGrouping.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/dialog.js"></script>
 	<script type="text/javascript">
@@ -67,7 +67,7 @@
 </c:forEach>
 
 <c:if test="${canEdit}">
-		<div id="addGroupingButton" class="btn btn-default" onClick="javascript:viewGroups()">
+		<div id="addGroupingButton" class="btn btn-secondary" onClick="javascript:viewGroups()">
 		<i class="fa fa-plus"></i>
 		<span><fmt:message key='label.course.groups.grouping.create' /></span>
 	</div>
@@ -102,8 +102,8 @@
 				<td class="branchMappingFreeItemCell branchMappingListCell"></td>
 				<td class="branchMappingFreeBranchCell branchMappingListCell"></td>
 				<td>
-					<button class="btn btn-default branchMappingAddButton branchMappingButton"><i class="fa fa-chevron-right"></i></button>
-					<button class="btn btn-default branchMappingRemoveButton branchMappingButton"><i class="fa fa-chevron-left"></i></button>
+					<button class="btn btn-secondary branchMappingAddButton branchMappingButton"><i class="fa fa-chevron-right"></i></button>
+					<button class="btn btn-secondary branchMappingRemoveButton branchMappingButton"><i class="fa fa-chevron-left"></i></button>
 				</td>
 				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
 				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
@@ -112,7 +112,7 @@
 				<td colspan="5">
 					<div class="container-fluid">
 						<div class="pull-right btn-group" role="group">
-							<button id="branchMappingOKButton" class="btn btn-default">
+							<button id="branchMappingOKButton" class="btn btn-secondary">
 								<i class="fa fa-check"></i> 
 								<span><fmt:message key="authoring.fla.ok.button" /></span>
 							</button>

@@ -223,7 +223,7 @@
 
                 <!-- Wiki main -->
                 <div class="row no-gutter">
-                  <div class="col-xs-12">
+                  <div class="col-12">
 
                     <div class="panel panel-default" id="view">
                       <div class="panel-heading">
@@ -401,7 +401,7 @@
 
                 <div id="add" style="display: none;">
                   <div class="row no-gutter">
-                    <div class="col-xs-12">
+                    <div class="col-12">
 
                       <div class="panel panel-default" id="view">
                         <div class="panel-heading">

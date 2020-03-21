@@ -131,7 +131,7 @@
 			<c:set var="refreshTopicURL"></c:set>
 				<!--  Button Panel -->
 				<div class="row no-gutter">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<a href="javascript:refreshTopic();" class="btn btn-sm btn-default voffset5  pull-left" role="button"> <fmt:message
 								key="label.refresh" />
 						</a>

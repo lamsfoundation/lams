@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
     <script>
 		$(document).ready(function(){	
 		    $("#consents-form").validate({

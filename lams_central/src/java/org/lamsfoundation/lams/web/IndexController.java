@@ -50,9 +50,11 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -78,7 +80,6 @@ public class IndexController {
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 	IndexController.setHeaderLinks(request);
 	setAdminLinks(request);
 	if (request.isUserInRole(Role.AUTHOR)) {
@@ -166,6 +167,11 @@ public class IndexController {
 		.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
+	
+	//star lesson feature is available only to organisation's monitors and authors
+	boolean isFavouriteLessonEnabled = request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.MONITOR)
+		|| request.isUserInRole(Role.GROUP_MANAGER);
+	request.setAttribute("isFavouriteLessonEnabled", isFavouriteLessonEnabled);
 
 	boolean isSysadmin = request.isUserInRole(Role.SYSADMIN);
 	int userCoursesCount = userManagementService.getCountActiveCoursesByUser(userDTO.getUserID(), isSysadmin, null);
@@ -273,6 +279,20 @@ public class IndexController {
 	request.setAttribute("activeOrgId", activeOrgId);
 
 	return "favoriteOrganisations";
+    }
+    
+    /**
+     * Toggles whether lesson is marked as favorite.
+     */
+    @RequestMapping("/toggleFavoriteLesson")
+    @ResponseStatus(HttpStatus.OK)
+    public void toggleFavoriteLesson(HttpServletRequest request) throws IOException, ServletException {
+	Long lessonId = WebUtil.readLongParam(request, "lessonId", false);
+	Integer userId = getUserId();
+
+	if (lessonId != null) {
+	    userManagementService.toggleLessonFavorite(lessonId, userId);
+	}
     }
 
     /**

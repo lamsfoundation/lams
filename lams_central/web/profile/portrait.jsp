@@ -32,7 +32,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/webrtc-capturestill.js"></script>
 	<script type="text/javascript">
@@ -129,7 +129,7 @@
 	
 	<div class="container">
 	<div class="row vertical-center-row">
-	<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+	<div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
 
 		<div class="currentPortrait text-center" style="margin:10px">
 			<fmt:message key="label.portrait.current" />:<br/>
@@ -168,7 +168,7 @@
 							    </video>
 							</div>
 							    
-							<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button" href="#nogo">
+							<a id="startbutton" class="btn btn-sm btn-file btn-secondary voffset5" role="button" href="#nogo">
 								<fmt:message key='label.portrait.take.snapshot' />
 							</a>
 							
@@ -178,7 +178,7 @@
 									<div id="photo" ></div> 
 								</div>
 								
-								<a class="btn btn-sm btn-default voffset10" id="upload-webcam">
+								<a class="btn btn-sm btn-secondary voffset10" id="upload-webcam">
 									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
 								</a>
 							</div>
@@ -201,7 +201,7 @@
 				    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 				    		<div class="panel-body">
 							<div class="form-group">
-								<label class="btn btn-default">
+								<label class="btn btn-secondary">
 									<input type="file" name="file" value="" id="upload-input" accept="image/*">
 								</label>
 								
@@ -210,7 +210,7 @@
 								</p>	
 								<div id="upload-croppie"></div>
 								
-								<a class="btn btn-sm btn-default offset5" id="save-upload-button" role="button">
+								<a class="btn btn-sm btn-secondary offset5" id="save-upload-button" role="button">
 									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
 								</a>
 							</div>
@@ -222,7 +222,7 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<button type="button" class="btn btn-sm btn-file btn-default offset5" onclick="history.go(-1);">
+				<button type="button" class="btn btn-sm btn-file btn-secondary offset5" onclick="history.go(-1);">
 					<fmt:message key="label.return.to.myprofile" />
 				</button>
 			</div>

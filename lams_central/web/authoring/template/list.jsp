@@ -20,7 +20,7 @@
 <tr><td><a id="tblLink" href="${lams}authoring/template/tbl/init.do"><fmt:message key="authoring.tbl.template.title"/></a> - <fmt:message key="authoring.tbl.template.description"/></td></tr>
 </table>
 <div class="button-group voffset10">
-<a href="#" id="cancelButton" class="btn btn-default btn-sm pull-left" onclick="javascript:closeWindow()"><span class="cancelIcon"><fmt:message key="button.cancel"/></span></a>
+<a href="#" id="cancelButton" class="btn btn-secondary btn-sm pull-left" onclick="javascript:closeWindow()"><span class="cancelIcon"><fmt:message key="button.cancel"/></span></a>
 </div>
 </lams:Page>
 

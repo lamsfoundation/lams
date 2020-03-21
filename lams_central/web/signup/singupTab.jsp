@@ -13,7 +13,7 @@
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
-<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
 <script type="text/javascript">
 	var mustHaveUppercase = ${mustHaveUppercase},
 	mustHaveNumerics  = ${mustHaveNumerics},
@@ -148,7 +148,7 @@
 		<div class="container">
 			<div class="row vertical-center-row">
 				<div
-					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+					class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
 					<div class="panel">
 						<div class="panel-body">
 
@@ -161,7 +161,7 @@
 										key="error.username.invalid.characters" /></span>
 							</div>
 
-							<div class="col-xs-12">
+							<div class="col-12">
 								<lams:Alert type="info" id="passwordConditions" close="false">
 									<strong><fmt:message key='label.password.must.contain' />:</strong>
 									<ul class="list-unstyled" style="line-height: 1.2">
@@ -272,7 +272,7 @@
 
 							<div class="form-group" align="right">
 								<button id="submitButton"
-										class="btn btn-sm btn-default voffset5"
+										class="btn btn-sm btn-secondary voffset5"
 									    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='login.submit' /></span>"
 									    onClick="javascript:$(this).button('loading');$('#SignupForm').submit()"
 								>

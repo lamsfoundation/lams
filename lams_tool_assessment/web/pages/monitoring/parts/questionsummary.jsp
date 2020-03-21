@@ -217,7 +217,7 @@
                 
             <c:out value="${questionDto.question}" escapeXml="false"/>
 
-            <div class="row"><div class="col-xs-12 col-sm-6">
+            <div class="row"><div class="col-12 col-md-6">
             <h5><fmt:message key="label.question.options"/></h5>    
 			<table class="table table-condensed table-striped">
 				<c:if test="${questionDto.type == 1}">
@@ -263,7 +263,7 @@
 				<br><br>
 				
 				<div class="row">
-					<div class="col-sm-4 text-center">
+					<div class="col-md-4 text-center">
 						<c:set var="option0" value="${questionDto.optionDtos.toArray()[0]}"/>
 						<h4>
 							<c:choose>
@@ -285,7 +285,7 @@
 						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>	
 					</div>
 					
-					<div class="col-sm-4 text-center">
+					<div class="col-md-4 text-center">
 		            	<h4><fmt:message key="label.answer.queue" /></h4>
 	            		(<fmt:message key="label.drag.and.drop" />)	
 	            		
@@ -299,7 +299,7 @@
 	            		</div>		
 					</div>
 					
-					<div class="col-sm-4 text-center">
+					<div class="col-md-4 text-center">
 						<c:set var="option1" value="${questionDto.optionDtos.toArray()[1]}"/>
 						<h4>
 							<c:choose>
@@ -328,7 +328,7 @@
 						<div class="row">
 					</c:if>
 				
-					<div class="col-sm-4 text-center">
+					<div class="col-md-4 text-center">
 						<h4>
 							<fmt:message key="label.authoring.basic.option.grade"/>: ${optionDto.maxMark}
 						</h4>

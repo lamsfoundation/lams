@@ -13,14 +13,14 @@
 <body>
 
     <!-- Fixed navbar -->
-	<nav class="navbar navbar-default navbar-login">
+	<nav class="navbar navbar-light navbar-login">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand navbar-brand-login" href="#">
 					<%=Configuration.get(ConfigurationKeys.SITE_NAME)%>
 				</a>
 			</div>
-			<div class="navbar-collapse collapse navbar-right">
+			<div class="navbar-collapse collapse ml-auto">
 				<div class="pull-right login-logo" title="LAMS - Learning Activity Management System"></div>
 			</div>
 		</div>
@@ -47,8 +47,8 @@
 					</div>
 		
 					<div class="form-group voffset10">
-						<div class="col-sm-12 controls">
-							<input type="submit" class="btn btn-default pull-right" value="Ok"
+						<div class="col-md-12 controls">
+							<input type="submit" class="btn btn-secondary pull-right" value="Ok"
 								onClick="javascript:document.location='<lams:LAMSURL/>index.do';" tabindex="1"/>
 						</div>	
 					</div>

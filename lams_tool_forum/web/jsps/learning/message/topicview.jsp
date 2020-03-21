@@ -93,7 +93,7 @@
 			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
 				<!--  start thread  -->
 				<div id="thread${msgDto.message.uid}" class="clearfix">
-				<table id="${messageTablename}" class="col-xs-12">
+				<table id="${messageTablename}" class="col-12">
 					<tr data-tt-id="${msgDto.message.uid}"><td>
 			</c:when>
 			<c:otherwise>

@@ -9,7 +9,7 @@
 	<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}">
 
 		<div class="row no-gutter">
-			<div class="col-xs-12">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="panel-title">

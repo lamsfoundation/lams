@@ -119,16 +119,16 @@
 					
 					<div>
 						<div class="row api">
-							<div class="col-xs-3">
+							<div class="col-3">
 								<input type="text" class="form-control email" placeholder="<fmt:message key='label.api.email'/>" onkeyup="javascript:validateApi(this)"/>
 							</div>
-							<div class="col-xs-3">
+							<div class="col-3">
 								<input type="text" class="form-control key" placeholder="<fmt:message key='label.api.key'/>" onkeyup="javascript:validateApi(this)"/>
 							</div>
-							<div class="col-xs-5">
+							<div class="col-5">
 								<input type="text" class="form-control secret" placeholder="<fmt:message key='label.api.secret'/>" onkeyup="javascript:validateApi(this)"/>
 							</div>
-				 			<div class="col-xs-1 control" title="<fmt:message key='label.api.remove' />" onclick="javascript:removeApi(this)">
+				 			<div class="col-1 control" title="<fmt:message key='label.api.remove' />" onclick="javascript:removeApi(this)">
 								<i class="fa fa-times"></i>
 				 			</div>
 						</div>

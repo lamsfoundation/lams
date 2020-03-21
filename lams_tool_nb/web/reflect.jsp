@@ -56,7 +56,7 @@
 
 	<!-- Comments: the extra div counteracts the float -->
 	<c:if test="${allowComments}">
-		<div class="row no-gutter"><div class="col-xs-12"></div></div>
+		<div class="row no-gutter"><div class="col-12"></div></div>
 		<lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
 			toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
 			pageSize="10" sortBy="1" />

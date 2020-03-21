@@ -45,7 +45,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.tra.questions.marks"/>
 		</h3>
@@ -55,10 +55,10 @@
 
 <!-- Notifications -->  
 <div class="row">
-	<div class="col-md-6 col-lg-4 ">
+	<div class="col-lg-6 col-xl-4 ">
 	</div>
 	
-	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+	<div class="col-12 col-lg-6 col-xl-4 offset-xl-2">
 		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 				onclick="javascript:loadTab('tra'); return false;">
 			<i class="fa fa-undo"></i>
@@ -79,7 +79,7 @@
 
 <!-- Table --> 
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-12 col-lg-12 col-xl-12">
 <div class="panel">
 <div class="panel-body">
 <div class="table-responsive">

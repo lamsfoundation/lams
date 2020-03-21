@@ -58,7 +58,7 @@
 		</tr>
 		</table>
 		<div class="row">
-		 <div class="col-xs-12"></div>
+		 <div class="col-12"></div>
 			 <div id="chartDiv" class="markChartDiv"></div>
 	</div>
 	</div>

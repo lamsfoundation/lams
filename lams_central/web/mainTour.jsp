@@ -112,7 +112,7 @@
 			  onEnd: resetCourses,
 			  debug: true,
 			  backdrop: false,
-			  template: '<div class="popover" role="tooltip"> <div class="arrow"></div> <h3 class="popover-title"></h3> <div class="popover-content"></div> <div class="popover-navigation"> <div class="btn-group"> <button class="btn btn-sm btn-default" data-role="prev">&laquo; <fmt:message key="tour.prev"/></button> <button class="btn btn-sm btn-default" data-role="next"><fmt:message key="tour.next"/> &raquo;</button> </div>  <button class="btn btn-sm btn-default" data-role="end"><fmt:message key="tour.end.tour"/></button> </div>'		  
+			  template: '<div class="popover" role="tooltip"> <div class="arrow"></div> <h3 class="popover-title"></h3> <div class="popover-content"></div> <div class="popover-navigation"> <div class="btn-group"> <button class="btn btn-sm btn-secondary" data-role="prev">&laquo; <fmt:message key="tour.prev"/></button> <button class="btn btn-sm btn-secondary" data-role="next"><fmt:message key="tour.next"/> &raquo;</button> </div>  <button class="btn btn-sm btn-secondary" data-role="end"><fmt:message key="tour.end.tour"/></button> </div>'		  
 			});
 
 		    tour.start(true);

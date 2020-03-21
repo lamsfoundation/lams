@@ -83,12 +83,12 @@
 		
 		<div class="voffset10 pull-right">
 	        <c:if test="${isMonitor}">
-	        	<a class="btn btn-default" href="javascript:openMonitorLesson(${lessonId});" title="<fmt:message key='label.open.monitor'/>">
+	        	<a class="btn btn-secondary" href="javascript:openMonitorLesson(${lessonId});" title="<fmt:message key='label.open.monitor'/>">
 					<fmt:message key="label.open.monitor" />
 				</a>
 	        </c:if>
 	        
-	        <a class="btn btn-default" href="javascript:openLearner(${lessonId});" title="<fmt:message key='label.open.lesson'/>">
+	        <a class="btn btn-secondary" href="javascript:openLearner(${lessonId});" title="<fmt:message key='label.open.lesson'/>">
 				<fmt:message key="label.open.lesson" />
 			</a>
         </div>

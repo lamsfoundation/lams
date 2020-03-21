@@ -74,12 +74,12 @@
 				</div>
 			
 					<div class="row">
-			  		<div class="col-sm-2"><strong><fmt:message key="label.number.of.replies" /></strong></div>
-					<div class="col-sm-3">${topic.message.replyNumber}</div>
+			  		<div class="col-md-2"><strong><fmt:message key="label.number.of.replies" /></strong></div>
+					<div class="col-md-3">${topic.message.replyNumber}</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-2"><strong><fmt:message key="lable.topic.title.mark" /></strong></div>
-					<div class="col-sm-3">
+					<div class="col-md-2"><strong><fmt:message key="lable.topic.title.mark" /></strong></div>
+					<div class="col-md-3">
 					<c:choose>
 					<c:when test="${empty topic.message.report.mark}">
 						<fmt:message key="message.not.avaliable" />
@@ -92,8 +92,8 @@
 				</div>
 				
 				<div class="row">
-					<div class="col-sm-2"><strong><fmt:message key="lable.topic.title.comment" /></strong></div>
-				  	<div class="col-sm-10">
+					<div class="col-md-2"><strong><fmt:message key="lable.topic.title.comment" /></strong></div>
+				  	<div class="col-md-10">
 					<c:choose>
 					<c:when test="${empty topic.message.report.comment}">
 						<fmt:message key="message.not.avaliable" />

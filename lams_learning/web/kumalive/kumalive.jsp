@@ -14,7 +14,7 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
@@ -76,7 +76,7 @@
 	</div>
 	<div id="mainDiv" class="container-fluid">
 		<div class="row">
-			<div id="actionCell" class="col-md-1">
+			<div id="actionCell" class="col-lg-1">
 				<div id="teacher" class="speaker">
 					<h3><fmt:message key="label.kumalive.teacher"/></h3>
 					<div class="profilePicture"></div>
@@ -102,7 +102,7 @@
 					<hr />
 				</div>
 			</div>
-			<div id="pollCell" class="col-md-1">
+			<div id="pollCell" class="col-lg-1">
 				<div id="pollSetup">
 					<h3><fmt:message key='button.kumalive.poll'/></h3>
 					<div id="pollSetupQuestionGroup" class="form-group">

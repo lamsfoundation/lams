@@ -94,7 +94,7 @@
 
 		<div class="container-fluid" id="instructions">
 		  <div class="row">
-			<div class="col-xs-12 ">
+			<div class="col-12 ">
 				<c:choose>
 					<c:when test="${reflectOn && runAuto}">
 						<input type="button" id="FinishInstruction" name="FinishInstruction"

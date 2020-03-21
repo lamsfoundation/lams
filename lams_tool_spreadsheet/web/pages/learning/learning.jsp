@@ -69,12 +69,12 @@
 		
 		<c:if test="${spreadsheet.markingEnabled}">
 		<div class="row no-gutter">
-			<div class="col-xs-12">
+			<div class="col-12">
 			<div class="panel panel-default">
 				<div class="panel-body">
 				<div class="row no-gutter">
-					<div class="col-sm-2"><fmt:message key="label.learning.comments" /></div>
-					<div class="col-sm-10">
+					<div class="col-md-2"><fmt:message key="label.learning.comments" /></div>
+					<div class="col-md-10">
 						<c:choose>
 							<c:when test="${mark == null}">
 								<fmt:message key="label.learning.not.available" />
@@ -86,8 +86,8 @@
 					</div>
 				</div>
 				<div class="row no-gutter">
-				<div class="col-sm-2"><fmt:message key="label.learning.marks" /></div>
-					<div class="col-sm-10">
+				<div class="col-md-2"><fmt:message key="label.learning.marks" /></div>
+					<div class="col-md-10">
 						<c:choose>
 							<c:when test="${mark == null}">
 								<fmt:message key="label.learning.not.available" />
@@ -106,7 +106,7 @@
 
 		
 		<div class="row no-gutter">
-			<div class="col-xs-12">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-body">
 					<iframe
@@ -130,7 +130,7 @@
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="row no-gutter">
-				<div class="col-xs-12">
+				<div class="col-12">
 					<div class="panel panel-default">
 						<div class="panel-heading panel-title">
 							<fmt:message key="title.reflection" />

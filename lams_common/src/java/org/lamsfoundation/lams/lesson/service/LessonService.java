@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.lesson.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -129,6 +130,11 @@ public class LessonService implements ILessonService {
     @Override
     public Integer getCountLessonLearners(Long lessonId, String searchPhrase) {
 	return lessonDAO.getCountLearnersByLesson(lessonId, searchPhrase);
+    }
+    
+    @Override
+    public Map<Long, Integer> getCountLearnersByOrganisationLessons(Integer organisationId) {
+	return lessonDAO.getCountLearnersByOrganisationLessons(organisationId);
     }
 
     @Override
@@ -621,25 +627,29 @@ public class LessonService implements ILessonService {
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
 	    Integer userRole) {
 	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
-	List list = lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, userRole);
+	List<Object> list = lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, userRole);
 	if (list != null) {
-	    Iterator iterator = list.iterator();
+	    Iterator<Object> iterator = list.iterator();
 	    while (iterator.hasNext()) {
 		Object[] tuple = (Object[]) iterator.next();
-		Long lessonId = (Long) tuple[0];
-		String lessonName = (String) tuple[1];
-		String lessonDescription = (String) tuple[2];
-		Integer lessonState = (Integer) tuple[3];
-		Boolean lessonCompleted = (Boolean) tuple[4];
+		int tupleIndex = 0;
+		Long lessonId = (Long) tuple[tupleIndex++];
+		String lessonName = (String) tuple[tupleIndex++];
+		String lessonDescription = (String) tuple[tupleIndex++];
+		Integer lessonState = (Integer) tuple[tupleIndex++];
+		Date lessonStartDate = (Date) tuple[tupleIndex++];
+		Boolean lessonStarted = (Boolean) tuple[tupleIndex++];
+		Boolean lessonCompleted = (Boolean) tuple[tupleIndex++];
 		lessonCompleted = lessonCompleted == null ? false : lessonCompleted.booleanValue();
-		Boolean enableLessonNotifications = (Boolean) tuple[5];
+		Boolean enableLessonNotifications = (Boolean) tuple[tupleIndex++];
 		enableLessonNotifications = enableLessonNotifications == null ? false
 			: enableLessonNotifications.booleanValue();
-		Boolean dependent = (Boolean) tuple[6];
+		Boolean dependent = (Boolean) tuple[tupleIndex++];
 		dependent = dependent == null ? false : dependent.booleanValue();
-		Boolean scheduledFinish = (Boolean) tuple[7];
+		Boolean scheduledFinish = (Boolean) tuple[tupleIndex++];
 		IndexLessonBean bean = new IndexLessonBean(lessonId, lessonName, lessonDescription, lessonState,
-			lessonCompleted, enableLessonNotifications, dependent, scheduledFinish);
+			lessonStartDate, lessonStarted, lessonCompleted, enableLessonNotifications, dependent,
+			scheduledFinish);
 		map.put(new Long(lessonId), bean);
 	    }
 	}

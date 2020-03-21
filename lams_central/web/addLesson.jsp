@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-treeview.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/learning-design-treeview.js" ></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/addLesson.js"></script>
 	<script type="text/javascript">
@@ -341,7 +341,7 @@
 
 <hr class="separator" />
 <div class="container-fluid">
-	<button id="previewButton" class="btn btn-default" href="#" onClick="javascript:previewLesson()"
+	<button id="previewButton" class="btn btn-secondary" href="#" onClick="javascript:previewLesson()"
 			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
 		<i class="fa fa-search-plus"></i>
 		<fmt:message key="authoring.fla.page.menu.preview" />

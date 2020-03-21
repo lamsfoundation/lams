@@ -104,7 +104,7 @@
 
 							rows += '<td class="username" width="20%"><div class="pull-left roffset5">';
 							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
-							rows += '</div><span class="portrait-sm-lineheight">';
+							rows += '</div><span class="portrait-md-lineheight">';
 							rows += userData["itemDescription"];
 							rows += '</span>'
 							rows += '</td>';
@@ -122,7 +122,7 @@
 								rows += '<div id="add-comment-area-' + itemId + '">';	
 								rows += '<div class="no-gutter">';
 								rows += '';
-								rows += '<div class="col-xs-12 col-sm-11 ">';										
+								rows += '<div class="col-12 col-md-11 ">';										
 								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control"';
 								<c:if test="${minRates ne 0 || maxRates ne 0}">
 									rows += ' onblur="return updatedComment(this);"';

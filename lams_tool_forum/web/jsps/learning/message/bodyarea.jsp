@@ -19,7 +19,7 @@
 	<c:if test="${sessionMap.allowAnonym || sessionMap.maxCharacters > 0 || sessionMap.minCharacters > 0}">
 	<div class="row voffset10">
 
-	<div class="col-xs-12 col-sm-6">
+	<div class="col-12 col-md-6">
 	
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
@@ -143,7 +143,7 @@
 	</c:if>
 	</div>
 	
-	<div class="col-xs-12 col-sm-6 text-right ">
+	<div class="col-12 col-md-6 text-right ">
 	<c:if test="${sessionMap.allowAnonym}">
 		<div class="checkbox form-control-inline">
 		<label for="isAnonymous"><form:checkbox

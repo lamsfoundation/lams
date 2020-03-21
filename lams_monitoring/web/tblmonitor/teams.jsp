@@ -172,7 +172,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.students.teams"/>
 		</h3>
@@ -182,7 +182,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-12 col-lg-12 col-xl-12">
 
 	<c:forEach var="groupDto" items="${groupDtos}">
 		<div class="panel panel-default">
@@ -223,7 +223,7 @@
 								<c:forEach var="userDto" items="${groupDto.userList}">
 								
 									<tr>
-										<td class="col-md-7">
+										<td class="col-lg-7">
 											<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">font-weight-bold</c:if>" 
 													data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
 												${userDto.lastName},&nbsp;${userDto.firstName} 
@@ -234,7 +234,7 @@
 										</td>
 										
 										<c:if test="${isIraAvailable}">
-											<td class="col-md-2 text-center">
+											<td class="col-lg-2 text-center">
 												<c:choose>
 													<c:when test="${userDto.iraScore != null}">
 														<a data-toggle="modal" href="#ira-modal"
@@ -251,7 +251,7 @@
 										</c:if>
 										
 										<c:if test="${isScratchieAvailable}">
-											<td class="col-md-2 text-center">
+											<td class="col-lg-2 text-center">
 												<a data-toggle="modal" href="#tra-modal"
 														data-user-id="${userDto.userID}"
 														data-tra-score="${groupDto.traScore}">
@@ -268,7 +268,7 @@
 	
 					<!-- Change leader and Compare buttons -->
 					<div class="row">
-						<div class="col-xs-12 col-md-12 col-lg-12">
+						<div class="col-12 col-lg-12 col-xl-12">
 							<c:if test="${(isIraAvailable) && isScratchieAvailable}">
 								<button href="#" data-toggle="modal" data-target="#comparison-modal" type="button" class="btn btn-sm btn-default pull-right"
 										data-ira-scores="

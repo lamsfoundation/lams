@@ -9,7 +9,7 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
@@ -33,37 +33,37 @@
 	
 	<div class="outcomeContainer">
 		<div class="row">
-			<div class="col-xs-5">
+			<div class="col-5">
 				<fmt:message key='outcome.manage.add.name' />
 			</div>
-			<div class="col-xs-3">
+			<div class="col-3">
 				<fmt:message key='outcome.manage.add.code' />
 			</div>
-			<div class="col-xs-1">
+			<div class="col-1">
 			</div>
-			<div class="col-xs-1">
+			<div class="col-1">
 			</div>
 		</div>
 		<c:forEach var="outcome" items="${outcomes}">
 			<div class="row">
-				<div class="col-xs-5">
+				<div class="col-5">
 					<c:out value="${outcome.name}" />
 				</div>
-				<div class="col-xs-3">
+				<div class="col-3">
 					<c:out value="${outcome.code}" />
 				</div>
-				<div class="col-xs-1">
+				<div class="col-1">
 					<i class="manageButton fa fa-pencil" title="<fmt:message key='outcome.manage.edit' />"
 				   	   onClick="javascript:openEditOutcomeDialog(${outcome.outcomeId})" >
 					</i>
 				</div>
-				<div class="col-xs-1">
+				<div class="col-1">
 					<csrf:form style="display: inline-block;" id="remove_${outcome.outcomeId}" method="post" action="outcomeRemove.do"><input type="hidden" name="outcomeId" value="${outcome.outcomeId}"/><button type="button" onClick="javascript:removeOutcome('remove_${outcome.outcomeId}')" class="btn btn-danger btn-xs"><i class="fa fa-trash" title="<fmt:message key='outcome.manage.remove' />"></i></button></csrf:form>
 				</div>
 			</div>
 		</c:forEach>
 		<c:if test="${not empty outcomes}">
-			<div id="exportButton" class="btn btn-default pull-left" onClick="javascript:exportOutcome()"
+			<div id="exportButton" class="btn btn-secondary pull-left" onClick="javascript:exportOutcome()"
 				 data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="outcome.export" /></span>">
 				<i class="fa fa-download"></i>
 				<span class="hidden-xs">
@@ -72,7 +72,7 @@
 			</div>
 		</c:if>
 		
-		<div id="importButton" class="btn btn-default pull-left" onClick="javascript:$('#importInput').click()">
+		<div id="importButton" class="btn btn-secondary pull-left" onClick="javascript:$('#importInput').click()">
 			<i class="fa fa-upload"></i> <fmt:message key="outcome.import" />
 		</div>
 		<form id="importForm" action="outcomeImport.do" method="post" enctype="multipart/form-data">

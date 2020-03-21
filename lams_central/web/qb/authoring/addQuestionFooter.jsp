@@ -2,12 +2,12 @@
 	
 <footer class="footer fixed-bottom">
 	<div class="panel-heading ">
-       	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
+       	<div class="col-12x col-lg-6x form-groupx rowx form-inlinex btn-group-md voffset5">
        		<%-- Hide if we edit it on QB collections page or if we edit in a tool but the question is not in users' collections  --%>
        		<span <c:if test="${empty assessmentQuestionForm.sessionMapID or empty assessmentQuestionForm.userCollections}">style="visibility: hidden;"</c:if>>
 	       		Collection
 	        		
-				<select class="btn btn-md btn-default" id="collection-uid-select">
+				<select class="btn btn-md btn-secondary" id="collection-uid-select">
 					<c:forEach var="collection" items="${assessmentQuestionForm.userCollections}">
 						<option value="${collection.uid}"
 							<c:if test="${collection.uid == assessmentQuestionForm.oldCollectionUid}">selected="selected"</c:if>>
@@ -17,11 +17,11 @@
 				</select>
 			</span>
 				
-        	<div class="pull-right col-xs-12x col-md-6x" style="margin-top: -5px;">
-			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
+        	<div class="pull-right col-12x col-lg-6x" style="margin-top: -5px;">
+			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-secondary loffset5">
 					<fmt:message key="label.cancel" />
 				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
+				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-secondary button-add-item">
 					<fmt:message key="button.save" />
 				</a>
 			</div>

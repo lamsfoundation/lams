@@ -83,17 +83,17 @@
 		<c:choose>
 	 	<c:when test="${sessionMap.anonymous}">
 	 	<%-- Post Anonymously? --%>
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-12 col-md-6">
 			<c:set var="anonymousCheckboxChecked" value=""/>
 			<c:set var="anonymousCheckboxName" value="commentAnonymousReply"/>
 			<%@include file="anonymouscheckbox.jsp" %>
 	 	</div>
 	
 		<%-- Cancel / Edit Buttons --%>
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-12 col-md-6">
 		</c:when>
 		<c:otherwise>
-		<div class="col-xs-12">
+		<div class="col-12">
 		</c:otherwise>
 		</c:choose>
 		<a href="#nogo" onclick="javascript:replyFormSubmit();"

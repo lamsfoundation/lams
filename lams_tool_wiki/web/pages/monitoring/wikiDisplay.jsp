@@ -53,7 +53,7 @@
 		
 		<div class="container" id="content">
 		  <div class="row no-gutter">
-		    <div class="col-xs-12">
+		    <div class="col-12">
 		      <div class="panel panel-default">
 				<!-- begin wiki main heading-->
 		        <div class="panel-heading  panel-learner-title">

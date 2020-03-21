@@ -45,18 +45,18 @@
 		
 		<div class="container-fluid">
 		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.login"/>:</div>
-		  <div class="col-xs-10"><c:out value="${login}" /></div>
+		  <div class="col-2"><fmt:message key="admin.user.login"/>:</div>
+		  <div class="col-10"><c:out value="${login}" /></div>
 		</div>
 		
 		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.name"/>:</div>
-		  <div class="col-xs-10"><c:out value="${fullName}" /></div>
+		  <div class="col-2"><fmt:message key="admin.user.name"/>:</div>
+		  <div class="col-10"><c:out value="${fullName}" /></div>
 		</div>
 		
 		<div class="row">
-		  <div class="col-xs-2"><fmt:message key="admin.user.roles"/>:</div>
-		  <div class="col-xs-10">            
+		  <div class="col-2"><fmt:message key="admin.user.roles"/>:</div>
+		  <div class="col-10">            
 		  	<c:forEach items="${rolelist}" var="role" varStatus="index">
 		    	<input type="checkbox" name="roles" value="${role.roleId}" 
 		    	<c:forEach items="${userRolesForm.roles}" var="userRole">

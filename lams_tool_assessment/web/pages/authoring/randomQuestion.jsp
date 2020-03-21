@@ -23,7 +23,7 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript">
 		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";

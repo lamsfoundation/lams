@@ -69,17 +69,17 @@
 
 				<div class="container-fluid no-gutter">
 					<div class="row">
-						<div class="col-xs-2" style="padding:0">
+						<div class="col-2" style="padding:0">
 							<strong><fmt:message key="label.learning.tableheader.questions" /></strong>
 						</div>
-						<div class="col-xs-9" style="padding-left:0">
+						<div class="col-9" style="padding-left:0">
 						<strong><fmt:message key="label.learning.tableheader.records" /></strong>
 						<c:if test="${fn:length(recordList) > 1}"><fmt:message key="label.scroll.hint"/></c:if>						
 						</div>
 					</div>
 
 					<div class="row">
-						<div class="col-xs-2" style="padding:0">
+						<div class="col-2" style="padding:0">
 							<table id="recordListTable" class="table table-striped table-bordered table-condensed">
 								<tr>
 								<td style="height:50px" style="padding-right:0"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
@@ -104,7 +104,7 @@
 							<c:param name="includeMode" value="${includeMode}" />
 						</c:url>
 
-						<div class="col-xs-10" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
+						<div class="col-10" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
 						<script type="text/javascript">
 							$("#${elementIdPrefix}horizontalRecordListFrame").load("${showRecordsUrl}");
 					    </script>

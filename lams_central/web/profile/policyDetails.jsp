@@ -66,7 +66,7 @@
 	</table>
 					
 	<div class="pull-right">
-		<input class="btn btn-default" type="button" value="<fmt:message key="label.authoring.close" />"
+		<input class="btn btn-secondary" type="button" value="<fmt:message key="label.authoring.close" />"
 				onclick="javascript:window.close();" />
 	</div>
 

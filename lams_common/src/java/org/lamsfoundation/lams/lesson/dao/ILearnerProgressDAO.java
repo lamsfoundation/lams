@@ -188,6 +188,16 @@ public interface ILearnerProgressDAO {
      * Get number of learners whose first name, last name or login match any of the tokens from search phrase.
      */
     Integer getNumUsersByLesson(Long lessonId, String searchPhrase);
+    
+    /**
+     * Get number of learners that attempted lessons from the given organisation.
+     */
+    Map<Long, Integer> getCountAttemptedUsersByOrganisationLessons(Integer organisationId);
+    
+    /**
+     * Get number of learners that completed lessons from the given organisation.
+     */
+    Map<Long, Integer> getCountCompletedUsersByOrganisationLessons(Integer organisationId);
 
     /**
      * Get number of learners who finished the given lesson.

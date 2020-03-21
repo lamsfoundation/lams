@@ -145,7 +145,7 @@
 					</div>
 				
 					<div class="form-group row form-inline" style="display: flex; align-items: center;">
-					    <label for="min-words-limit-checkbox" class="col-sm-4">
+					    <label for="min-words-limit-checkbox" class="col-md-4">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"
 								<c:if test="${newQuestionForm.minWordsLimit != 0}">checked="checked"</c:if>/>
 					    	<fmt:message key="label.minimum.number.words" >
@@ -153,7 +153,7 @@
 							</fmt:message>
 					    </label>
 						    
-					    <div class="col-sm-8">
+					    <div class="col-md-8">
 					    	<form:input path="minWordsLimit" id="min-words-limit"/>
 					    	<label id="min-words-limit-error" class="alert alert-danger" for="min-words-limit" style="display: none;"></label>
 					    </div>
@@ -173,7 +173,7 @@
 			
 		<footer class="footer fixed-bottom">
 			<div class="panel-heading ">
-		       	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
+		       	<div class="col-12 col-lg-6x form-groupx rowx form-inlinex btn-group-md voffset5">
 		       		<span>
 			       		Collection
 			        		
@@ -187,7 +187,7 @@
 						</select>
 					</span>
 						
-		        	<div class="pull-right col-xs-12x col-md-6x" style="margin-top: -5px;">
+		        	<div class="pull-right col-12x col-lg-6x" style="margin-top: -5px;">
 					    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 							<fmt:message key="label.cancel" />
 						</a>

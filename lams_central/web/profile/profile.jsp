@@ -25,7 +25,7 @@
 
 <div class="container">
 	<div class="row vertical-center-row">
-		<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3">
+		<div class="col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3">
 			<div class="panel voffset20">
 				<div class="panel-body">
 					<div class="text-center">
@@ -53,8 +53,8 @@
 					</div>
 					<hr>
 					<!-- Split button -->
-					<div class="col-xs-12 text-center">
-						<a class="btn btn-sm btn-default offset5"
+					<div class="col-12 text-center">
+						<a class="btn btn-sm btn-secondary offset5"
 								href="<lams:LAMSURL/>index.do?redirect=editprofile" role="button">
 							<i class="fa fa-fw fa-pencil"></i> 
 							<span class="hidden-xs">
@@ -67,7 +67,7 @@
 						</c:set>
 						<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 						<c:if test="${authenticationMethodId eq dbId}">
-							<a class="btn btn-sm btn-default offset5"
+							<a class="btn btn-sm btn-secondary offset5"
 									href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile" role="button">
 								<i class="fa fa-fw fa-lock"></i>
 								<span class="hidden-xs">
@@ -76,7 +76,7 @@
 							</a>
 						</c:if>
 
-						<a class="btn btn-sm btn-default offset5"
+						<a class="btn btn-sm btn-secondary offset5"
 								href="<lams:LAMSURL/>index.do?redirect=portrait" role="button">
 							<i class="fa fa-fw fa-camera"></i> 
 							<span class="hidden-xs">
@@ -84,7 +84,7 @@
 							</span>
 						</a>&nbsp;&nbsp;
 
-						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do" role="button">
+						<a class="btn btn-sm btn-secondary offset5" href="profile/policyConsents.do" role="button">
 							<i class="fa fa-fw fa-calendar-check-o"></i> 
 							<span class="hidden-xs">
 								<fmt:message key="label.policies.consents" />
@@ -92,7 +92,7 @@
 						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
-							<a class="btn btn-sm btn-default offset5"
+							<a class="btn btn-sm btn-secondary offset5"
 									href="<lams:LAMSURL/>index.do?redirect=lessons" role="button">
 								<i class="fa fa-fw fa-book"></i> 
 								<span class="hidden-xs">

@@ -23,7 +23,7 @@
   </c:choose>
 
   <div class="row no-gutter">
-    <div class="col-xs-12" style="margin-left:${indentSize}px;padding-right:${paddingRightSize}px">
+    <div class="col-12" style="margin-left:${indentSize}px;padding-right:${paddingRightSize}px">
       <div class="panel panel-default ${highlightClass} msg" id="msg${commentDto.comment.uid}">
         <div class="panel-heading">
           <h4 class="panel-title">

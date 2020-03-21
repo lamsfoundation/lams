@@ -60,7 +60,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>loadVars.jsp"></script>
@@ -155,11 +155,11 @@
 			<fmt:message key="label.qb.stats.question" />
 			
 			<div class="btn-group-xs pull-right">
-				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-default thickbox"> 
+				<a href="<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-secondary thickbox"> 
 					<i class="fa fa-pencil"	title="<fmt:message key="label.edit" />"></i>
 				</a>
 			
-				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+				<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-secondary">
 					<i class="fa fa-download" title="<fmt:message key='label.export.qti'/>"></i>
 				</a>
 			</div>
@@ -167,50 +167,50 @@
 		<div class="panel-body">
 			<div class="question-table">
 				<div class="row">
-					<div class="col-sm-1">
+					<div class="col-md-1">
 					 	UID:
  		            </div>
- 		           <div class="col-sm-11">
+ 		           <div class="col-md-11">
  		              <c:out value="${question.uid}" />
  		           </div>
  		        </div>
  	            <div class="row">
- 		        	<div class="col-sm-1">
+ 		        	<div class="col-md-1">
 						<fmt:message key="label.qb.stats.question.version" />:
 					</div>
-					<div class="col-sm-11">
+					<div class="col-lg-11">
 						<c:out value="${question.version}" />
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-1">
+					<div class="col-md-1">
 						<fmt:message key="label.qb.stats.question.title" />:
 					</div>
-					<div class="col-sm-11">
+					<div class="col-md-11">
 						<c:out value="${question.name}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-1">
+					<div class="col-md-1">
 						<fmt:message key="label.qb.stats.question.description" />:
 					</div>
-					<div class="col-sm-11">
+					<div class="col-md-11">
 						<c:out value="${question.description}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-1">
+					<div class="col-md-1">
 						<fmt:message key="label.qb.stats.question.feedback" />:
 					</div>
-					<div class="col-sm-11">
+					<div class="col-md-11">
 						<c:out value="${question.feedback}" escapeXml="false" />
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-1">
+					<div class="col-md-1">
 						<fmt:message key="label.qb.stats.question.mark" />:
 					</div>
-					<div class="col-sm-11">
+					<div class="col-md-11">
 						<c:out value="${question.maxMark}" />
 					</div>
 				</div>
@@ -446,10 +446,10 @@
 			<div class="container-fluid">			
 				<c:if test="${not empty availableCollections and transferAllowed}">
 					<div class="row">
-						<div class="col-xs-12 col-md-2 middle-cell">
+						<div class="col-12 col-lg-2 middle-cell">
 							<fmt:message key="label.qb.stats.collections.transfer" />
 						</div>
-						<div class="col-xs-12 col-md-6">
+						<div class="col-12 col-lg-6">
 							<select class="form-control" id="targetCollectionSelect">
 								<c:forEach var="target" items="${availableCollections}">
 									<option value="${target.uid}">
@@ -458,11 +458,11 @@
 								</c:forEach>
 							</select>
 						</div>
-						<div class="col-xs-12 col-md-4">
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(false)">
+						<div class="col-12 col-lg-4">
+							<button class="btn btn-secondary" onClick="javascript:addCollectionQuestion(false)">
 								<fmt:message key="label.qb.stats.collections.transfer.add" />
 							</button>
-							<button class="btn btn-default" onClick="javascript:addCollectionQuestion(true)">
+							<button class="btn btn-secondary" onClick="javascript:addCollectionQuestion(true)">
 								<fmt:message key="label.qb.stats.collections.transfer.copy" />
 							</button>
 						</div>
@@ -470,22 +470,22 @@
 				</c:if>
 				
 				<div class="row">
-					<div class="col-xs-0 col-md-2"></div>
-					<div class="col-xs-12 col-md-8 header-column">
+					<div class="col-0 col-lg-2"></div>
+					<div class="col-12 col-lg-8 header-column">
 						<fmt:message key="label.qb.stats.collections.existing" />
 					</div>
-					<div class="col-xs-0 col-md-2"></div>
+					<div class="col-0 col-lg-2"></div>
 				</div>
 				
 				<c:forEach var="collection" items="${existingCollections}">
 					<div class="row">
-						<div class="col-xs-0 col-md-2"></div>
-						<div class="col-xs-12 col-md-6 middle-cell">
+						<div class="col-0 col-lg-2"></div>
+						<div class="col-12 col-lg-6 middle-cell">
 							<c:out value="${collection.name}" />
 						</div>
-						<div class="col-xs-12 col-md-2">
+						<div class="col-12 col-lg-2">
 							<c:if test="${transferAllowed}">
-								<button class="btn btn-default" onClick="javascript:removeCollectionQuestion(${collection.uid})">
+								<button class="btn btn-secondary" onClick="javascript:removeCollectionQuestion(${collection.uid})">
 									<fmt:message key="label.qb.stats.collections.remove" />
 								</button>
 							</c:if>
@@ -513,20 +513,20 @@
 						<c:otherwise>
 							<div class="container-fluid">			
 								<div class="row">
-									<div class="col-xs-0 col-md-2"></div>
-									<div class="col-xs-12 col-md-8 header-column">
+									<div class="col-0 col-lg-2"></div>
+									<div class="col-12 col-lg-8 header-column">
 										<fmt:message key="label.qb.stats.outcomes.existing" />
 									</div>
-									<div class="col-xs-0 col-md-2"></div>
+									<div class="col-0 col-lg-2"></div>
 								</div>
 								
 								<c:forEach var="outcome" items="${outcomes}">
 									<div class="row">
-										<div class="col-xs-0 col-md-2"></div>
-										<div class="col-xs-12 col-md-8 middle-cell">
+										<div class="col-0 col-lg-2"></div>
+										<div class="col-12 col-lg-8 middle-cell">
 											<c:out value="${outcome}" />
 										</div>
-										<div class="col-xs-0 col-md-2">
+										<div class="col-0 col-lg-2">
 										</div>
 									</div>
 								</c:forEach>
@@ -546,15 +546,15 @@
 			<div class="panel-body">
 				<c:if test="${not empty mergeErrors}">
 					<div class="row">
-						<div class="col-xs-0 col-md-2"></div>
-						<div class="col-xs-12 col-md-8 alert alert-danger">
+						<div class="col-0 col-lg-2"></div>
+						<div class="col-12 col-lg-8 alert alert-danger">
 							<ul>
 								<c:forEach var="error" items="${mergeErrors}">
 									<li><c:out value="${error}" /></li>
 								</c:forEach>
 							</ul>
 						</div>
-						<div class="col-xs-0 col-md-2"></div>
+						<div class="col-0 col-lg-2"></div>
 					</div>
 				</c:if>
 
@@ -562,25 +562,25 @@
 					<form action="merge.do" method="post">
 						<input type="hidden" name="sourceQbQuestionUid" value="${question.uid}" />
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-						<div class="col-xs-0 col-md-2">
+						<div class="col-0 col-lg-2">
 							Question UID
 						</div>
-						<div class="col-xs-12 col-md-8 middle-cell">
+						<div class="col-12 col-lg-8 middle-cell">
 							<input type="text" name="targetQbQuestionUid" class="form-control" /> 
 						</div>
-						<div class="col-xs-0 col-md-2">
-							<button type="submit" class="btn btn-default">Merge now</button>
+						<div class="col-0 col-lg-2">
+							<button type="submit" class="btn btn-secondary">Merge now</button>
 						</div>
 					</form>
 				</div>
 				
 				<div class="row">
-					<div class="col-xs-0 col-md-2"></div>
-					<div class="col-xs-12 col-md-8">
+					<div class="col-0 col-lg-2"></div>
+					<div class="col-12 col-lg-8">
 						This will merge this question with the question UID you entered above.
 						Before you do this, make sure you know what are you doing as once merging is performed this cannot be undone. 
 					</div>
-					<div class="col-xs-0 col-md-2"></div>
+					<div class="col-0 col-lg-2"></div>
 				</div>
 			</div>
 		</div>

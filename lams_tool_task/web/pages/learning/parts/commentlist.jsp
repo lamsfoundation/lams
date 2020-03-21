@@ -15,7 +15,7 @@
 <c:forEach var="comment" items="${itemDTO.comments}">
 	<c:if test="${(sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 		<div class="row voffset5">
-			<div class="col-xs-12">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-heading-sm panel-title bg-warning">
 						<c:if test="${not empty comment.createBy.userId}">

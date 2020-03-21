@@ -58,7 +58,7 @@
 		<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 
 				<div class="row no-gutter">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<strong>
@@ -86,7 +86,7 @@
 								<!-- Feedback -->
 								<c:if test="${(questionEntry.value.feedback != '') && (questionEntry.value.feedback != null) }">
 									<div class="row no-gutter">
-										<div class="col-xs-12">
+										<div class="col-12">
 											<div class="panel panel-default voffset5" id="feedback${questionEntry.key}">
 												<div class="panel-heading panel-heading-sm panel-title">
 													<fmt:message key="label.feedback" />

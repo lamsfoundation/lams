@@ -131,7 +131,7 @@
 				<form:hidden path="newCollectionUid" id="new-collection-uid"/>
 				<form:hidden path="contentFolderID" id="contentFolderID"/>
 				
-				<button type="button" id="question-settings-link" class="btn btn-default btn-sm">
+				<button type="button" id="question-settings-link" class="btn btn-secondary btn-sm">
 					<fmt:message key="label.settings" />
 				</button>
 
@@ -182,34 +182,34 @@
 					
 					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row">
-						    <label for="maxMark" class="col-sm-3">
+						    <label for="maxMark" class="col-md-3">
 						    	<fmt:message key="label.authoring.basic.default.question.grade" />
 						    	<i class="fa fa-xs fa-asterisk text-danger" style="vertical-align: super;" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 						    </label>
 						    
-						    <div class="col-sm-9">
+						    <div class="col-md-9">
 						    	<form:input path="maxMark" cssClass="form-control short-input-text input-sm"/>
 						    </div>
 						</div>
 					</c:if>
 					    					
 					<div class="form-group row">
-					    <label for="penaltyFactor" class="col-sm-3"> 
+					    <label for="penaltyFactor" class="col-md-3"> 
 					    	<fmt:message key="label.authoring.basic.penalty.factor" />
 							<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 					    </label>
 					    
-					    <div class="col-sm-9">
+					    <div class="col-md-9">
 					    	<form:input path="penaltyFactor" cssClass="form-control short-input-text input-sm"/>
 					    </div>
 					</div>
 					
 					<div class="form-group row form-inline">
-						<label for="multipleAnswersAllowed" class="col-sm-3">
+						<label for="multipleAnswersAllowed" class="col-md-3">
 							<fmt:message key="label.authoring.choice.one.multiple.answers" />
 						</label>
 						
-						<div class="col-sm-9">
+						<div class="col-md-9">
 							<form:select path="multipleAnswersAllowed" id="multipleAnswersAllowed" cssClass="form-control input-sm">
 								<form:option value="false"><fmt:message key="label.authoring.choice.one.answer" /></form:option>
 								<form:option value="true"><fmt:message key="label.authoring.choice.multiple.answers" /></form:option>
@@ -283,7 +283,7 @@
 				<form id="optionForm" name="optionForm" class="form-group">
 					<%@ include file="optionlist.jsp"%>
 					
-					<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-default button-add-item pull-right">
+					<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-secondary button-add-item pull-right">
 						<fmt:message key="label.authoring.choice.add.option" /> 
 					</a>
 				</form>

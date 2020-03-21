@@ -15,7 +15,7 @@
 		<c:set var="title"><fmt:message key="label.monitoring.vieawallmarks.heading.marking"/></c:set>
 		<lams:Page type="learner" title="${title}">
 				<div class="row no-gutter">
-				<div class="col-xs-12">
+				<div class="col-12">
 
 				<c:forEach var="user" items="${userList}">
 						
@@ -25,8 +25,8 @@
 						</div>
 						<div class="panel-body">
 						<div class="row no-gutter">
-							<div class="col-sm-2"><fmt:message key="label.monitoring.vieawallmarks.spreadsheet.submitted" /></div>
-							<div class="col-sm-10">
+							<div class="col-md-2"><fmt:message key="label.monitoring.vieawallmarks.spreadsheet.submitted" /></div>
+							<div class="col-md-10">
 								<c:choose>
 								<c:when test="${user.userModifiedSpreadsheet != null}">
 									<fmt:message key="label.monitoring.vieawallmarks.true" />
@@ -38,8 +38,8 @@
 							</div>
 						</div>
 						<div class="row no-gutter">
-							<div class="col-sm-2"><fmt:message key="label.monitoring.vieawallmarks.marks" /></div>
-							<div class="col-sm-10">
+							<div class="col-md-2"><fmt:message key="label.monitoring.vieawallmarks.marks" /></div>
+							<div class="col-md-10">
 								<c:choose>
 									<c:when test="${(user.userModifiedSpreadsheet != null) && (user.userModifiedSpreadsheet.mark != null)}">
 										<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${user.userModifiedSpreadsheet.mark.marks}"/>
@@ -58,8 +58,8 @@
 							</div>
 						</div>
 						<div class="row no-gutter">
-							<div class="col-sm-2"><fmt:message key="label.monitoring.vieawallmarks.comments" /></div>
-							<div class="col-sm-10">
+							<div class="col-md-2"><fmt:message key="label.monitoring.vieawallmarks.comments" /></div>
+							<div class="col-md-10">
 								<c:choose>
 									<c:when test="${(user.userModifiedSpreadsheet != null) && (user.userModifiedSpreadsheet.mark != null)}">
 										<c:out value="${user.userModifiedSpreadsheet.mark.comments}" escapeXml="false" />

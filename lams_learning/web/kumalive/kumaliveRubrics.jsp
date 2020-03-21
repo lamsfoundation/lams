@@ -28,7 +28,7 @@
 		
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript">
 		var orgId = ${param.organisationID};
 		function removeRubric(elem) {
@@ -110,16 +110,16 @@
 		<div class="panel-body panel-admin-body">
 			<div>
 				<div class="row rubric">
-					<div class="col-xs-9">
+					<div class="col-9">
 						<input type="text" class="form-control" placeholder="<fmt:message key='label.kumalive.rubric.name'/>" onkeyup="javascript:validateRubric(this)"/>
 					</div>
-					<div class="col-xs-1 down control" title="<fmt:message key='label.kumalive.rubric.up'/>" onclick="javascript:downRubric(this)">
+					<div class="col-1 down control" title="<fmt:message key='label.kumalive.rubric.up'/>" onclick="javascript:downRubric(this)">
 						<lams:Arrow state="down" />
 		 			</div>
-		 			<div class="col-xs-1 up control" title="<fmt:message key='label.kumalive.rubric.up'/>" onclick="javascript:upRubric(this)">
+		 			<div class="col-1 up control" title="<fmt:message key='label.kumalive.rubric.up'/>" onclick="javascript:upRubric(this)">
 		 				<lams:Arrow state="up" />
 		 			</div> 
-		 			<div class="col-xs-1 control" title="<fmt:message key='label.kumalive.rubric.delete' />" onclick="javascript:removeRubric(this)">
+		 			<div class="col-1 control" title="<fmt:message key='label.kumalive.rubric.delete' />" onclick="javascript:removeRubric(this)">
 						<i class="fa fa-times"></i>
 		 			</div>
 				</div>

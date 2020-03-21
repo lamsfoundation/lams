@@ -344,7 +344,7 @@
 			<!-- Questions and answers -->
 			<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 				<div class="row no-gutter voffset20">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if> 
@@ -363,9 +363,9 @@
 								<c:if test="${userResponse != null}">
 									<div class="row no-gutter">
 										<!-- split if ratings are on -->
-										<c:set var="splitRow" value="col-xs-12" />
+										<c:set var="splitRow" value="col-12" />
 										<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-											<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-10 col-lg-10" />
+											<c:set var="splitRow" value="col-12 col-md-9 col-lg-10 col-xl-10" />
 										</c:if>
 										<div class="${splitRow}">
 											<div class="sbox">
@@ -380,7 +380,7 @@
 											</div>
 										</div>
 										<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-											<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 rate-answers-area">
+											<div class="col-12 col-md-3 col-lg-2 col-xl-2 rate-answers-area">
 												<h4 class="text-center">
 													<fmt:message key="label.learning.rating" />
 												</h4>
@@ -448,7 +448,7 @@
 			<!-- reflections -->
 			<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
 				<div class="row no-gutter">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div class="panel panel-default voffset10">
 							<div class="panel-heading panel-title">
 								<fmt:message key="label.reflection" />

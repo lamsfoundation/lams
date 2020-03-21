@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -163,6 +164,20 @@ public interface IUserManagementService {
      *            user performing toggling
      */
     void toggleOrganisationFavorite(Integer orgId, Integer userId);
+    
+    /**
+     * Return all lessons that were marked as favorite by the specified user
+     */
+    List<Long> getFavoriteLessonsByOrgAndUser(Integer organisationId, Integer userId);
+
+    /**
+     * Toggles whether organisation is marked as favorite
+     *
+     * @param lessonId
+     * @param user
+     *            user performing toggling
+     */
+    void toggleLessonFavorite(Long lessonId, Integer userId);
 
     Organisation getRootOrganisation();
 

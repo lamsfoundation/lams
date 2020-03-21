@@ -97,7 +97,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 			<c:if test="${finishedButton}">
 				<div class="row no-gutter">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div id="right-buttons" class="pull-right voffset10">
 							<a href="javascript:;" class="btn btn btn-primary na" id="finishButton" onclick="submitForm('finish')">
 								<span class="nextActivity"> 

@@ -144,7 +144,7 @@
 			</h4>
 			<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 				<div class="row">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
@@ -173,7 +173,7 @@
 		
 			<c:if test="${not scribeUserDTO.finishedActivity}">
 				<div class="row">
-					<div class="col-xs-12" id="submitReportBtn">
+					<div class="col-12" id="submitReportBtn">
 						<button class="btn btn-sm btn-default pull-right" onClick="javascript:submitReport()">
 							<fmt:message key="button.submitReport" />
 						</button>

@@ -2,7 +2,7 @@
 
 <footer class="footer fixed-bottom">
 	<div class="panel-heading ">
-       	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
+       	<div class="col-12x col-lg-6x form-groupx rowx form-inlinex btn-group-md voffset5">
        		<span>
 	       		Collection
 	        		
@@ -16,7 +16,7 @@
 				</select>
 			</span>
 				
-        	<div class="pull-right col-xs-12x col-md-6x" style="margin-top: -5px;">
+        	<div class="pull-right col-12x col-lg-6x" style="margin-top: -5px;">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.authoring.cancel.button" />
 				</a>

@@ -49,6 +49,9 @@ import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
+import org.lamsfoundation.lams.lesson.FavoriteLesson;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dao.IFavoriteLessonDAO;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
@@ -114,6 +117,8 @@ public class UserManagementService implements IUserManagementService {
     private IUserOrganisationDAO userOrganisationDAO;
 
     private IFavoriteOrganisationDAO favoriteOrganisationDAO;
+    
+    private IFavoriteLessonDAO favoriteLessonDAO;
 
     protected MessageService messageService;
 
@@ -286,6 +291,28 @@ public class UserManagementService implements IUserManagementService {
 	    //remove favoriteOrganisation if it existed
 	} else {
 	    delete(favoriteOrganisation);
+	}
+    }
+    
+    @Override
+    public List<Long> getFavoriteLessonsByOrgAndUser(Integer organisationId, Integer userId) {
+	return favoriteLessonDAO.getFavoriteLessonsByOrgAndUser(organisationId, userId);
+    }
+
+    @Override
+    public void toggleLessonFavorite(Long lessonId, Integer userId) {
+	FavoriteLesson favoriteLesson = favoriteLessonDAO.getFavoriteLesson(lessonId, userId);
+
+	//create new favoriteLesson if it doesn't exist
+	if (favoriteLesson == null) {
+	    User user = (User) findById(User.class, userId);
+	    Lesson lesson = (Lesson) findById(Lesson.class, lessonId);
+	    favoriteLesson = new FavoriteLesson(user, lesson);
+	    save(favoriteLesson);
+
+	    //remove favoriteLesson if it existed
+	} else {
+	    delete(favoriteLesson);
 	}
     }
 
@@ -1232,6 +1259,10 @@ public class UserManagementService implements IUserManagementService {
 
     public void setFavoriteOrganisationDAO(IFavoriteOrganisationDAO favoriteOrganisationDAO) {
 	this.favoriteOrganisationDAO = favoriteOrganisationDAO;
+    }
+    
+    public void setFavoriteLessonDAO(IFavoriteLessonDAO favoriteLessonDAO) {
+	this.favoriteLessonDAO = favoriteLessonDAO;
     }
 
     private ILogEventService getLogEventService() {

@@ -9,7 +9,7 @@
 
 <!-- Header -->
 <div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
+	<div class="col-12 col-lg-12 col-xl-8">
 		<h3>
 			<fmt:message key="label.forum"/>
 		</h3>
@@ -19,7 +19,7 @@
 
 <!-- Notifications -->  
 <div class="row no-gutter">
-	<div class="col-xs-6 col-md-4 col-lg-4 ">
+	<div class="col-6 col-lg-4 col-xl-4 ">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">
@@ -34,7 +34,7 @@
 
 <!-- Tables -->
 <div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
+<div class="col-12 col-lg-12 col-xl-12">
 
 <h4><fmt:message key="label.grouping.group.heading"/></h4>
 
