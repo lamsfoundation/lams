@@ -366,7 +366,6 @@ td.buttons-td {
 
 			            //toggle buttons
 			            $(".auxiliary-links-menu", $table).toggle();
-			            $(".lesson-actions .fa-exclamation-triangle", $table).parent().toggle();
 
 			            if (!isUserMonitor) {
 				            $("td.lesson-name", lessonsTable).toggleClass(" d-flex justify-content-between");

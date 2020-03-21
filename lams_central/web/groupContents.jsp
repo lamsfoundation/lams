@@ -146,7 +146,7 @@
 				</c:forEach>
 				
 				<c:if test="${not empty lesson.requiredTasksUrl}">
-					<a href="<c:out value='${lesson.requiredTasksUrl}'/>" style="padding-left: 10px; padding-right:10px; display:none;"
+					<a href="<c:out value='${lesson.requiredTasksUrl}'/>" style="padding-left: 10px; padding-right:10px;"
 							title="<fmt:message key='${lessonlink.tooltip}'/>">
 						<i style="transform: rotate(-180deg);" class="fa fa-fw fa-exclamation-triangle lesson-action-label" title="<fmt:message key='${lessonlink.name}'/>"></i>
 					</a>
