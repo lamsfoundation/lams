@@ -14,7 +14,7 @@
 			</c:if>>
 		<td>
 			${i.index}
-		</td>
+		</td>	
 		<td>
 			${lesson.startDate}
 		</td>
@@ -26,9 +26,6 @@
 		</td>
 		<td id="favorite-lesson-td-${lesson.id}" style="display:none;"
 			>${lesson.favorite}</td>
-		<td class="row-reorder text-center tour-sorting">
-			<i class="fa fa-sort"></i>
-		</td>
 		
 		<td class="lesson-image">
 			<c:if test="${not empty lesson.auxiliaryLinks}">
@@ -155,7 +152,11 @@
 			<c:set var="addTourClass" value="false" />
 			</c:if>
 	    </td>
-		
+
+		<!-- order -->
+		<td class="row-reorder text-center tour-sorting">
+			<i class="fa fa-sort"></i>
+		</td>	
 	</tr>
 	</c:forEach>
 	</tbody>

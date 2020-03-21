@@ -76,7 +76,7 @@ table:not(.cards):not(.user-monitor) .lesson-image {
 
 table:not(.cards).user-monitor .lesson-image {
     position: absolute;
-    right: 230px;
+    right: 270px;
     padding: 0;
     background-image: none;
 }
@@ -130,7 +130,7 @@ table:not(.cards) .progress {
 }
 .user-monitor:not(.cards) .learners-count {
 	position: absolute;
-    left: 68px;
+    left: 15px;
     margin-top: 20px;
 }
 
@@ -139,7 +139,8 @@ table:not(.cards) .progress {
 }
 
 td.row-reorder {
-	width: 30px;
+	width: 20px;
+	padding-left: .25rem
 }
 
 .chart-holder {
@@ -388,8 +389,7 @@ td.buttons-td {
 		        	{"visible": false},
 		        	//star lesson feature
 		        	{"visible": true},//we need to mark it as visible:true, but set manually display:none to be able to access it from toggleFavoriteLesson() method
-		        	//row-reordering feature
-		        	{"width": "20px", "visible": lessonsTable.data("row-reordering-enabled")},
+		        	//lesson image
 		            {
 		               'orderable': false,
 		               'className': 'text-center'
@@ -400,7 +400,9 @@ td.buttons-td {
 		            {
 		               'data': 'extn',
 		               "visible": lessonsTable.data("is-user-monitor")
-		            }
+		            },
+		        	//row-reordering feature
+		        	{"width": "20px", "visible": lessonsTable.data("row-reordering-enabled")},
 		         ]
 				})
 				.on( 'row-reorder', function ( e, diff, edit ) {
