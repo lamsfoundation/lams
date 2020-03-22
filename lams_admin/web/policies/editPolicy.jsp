@@ -17,6 +17,7 @@
 		$(document).ready(function(){
 			// validate signup form on keyup and submit
 			var validator = $("#policy-form").validate({
+				errorClass: 'text-danger form-text font-italic',
 				ignore: [],
 				rules: {
 					policyName: "required", 
@@ -59,100 +60,100 @@
 	</script>
 </lams:head>
 <body class="stripes">
-	<c:set var="title">${title}: <fmt:message key="admin.add.edit.policy"/></c:set>
+	<c:set var="title"><fmt:message key="admin.add.edit.policy"/></c:set>
 
 	<lams:Page type="admin" title="${title}" >
-		<div>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
-			</a>
-			<a href="../policyManagement/list.do" class="btn btn-default loffset5">
-				<fmt:message key="admin.policies.title" />
-			</a>
-		</div>
+
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/policyManagement/list.do"><fmt:message key="admin.policies.title" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.add.edit.policy"/></li>
+		  </ol>
+		</nav>
+
+
     <form:form action="../policyManagement/save.do" modelAttribute="policyForm" id="policy-form" cssClass="voffset20" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="policyUid" />
 			<form:hidden path="policyId" />
-			<table class="table table-condensed table-no-border">
-				<tr>
-					<td><fmt:message key="label.name" />&nbsp;&nbsp;*</td>
-					<td><form:input path="policyName" size="40" maxlength="255" cssClass="form-control" /></td>
-				</tr>
-				<tr>
-					<td style="width: 250px;"><fmt:message key="label.policy.type" />:</td>
-					<td>
-						<form:select path="policyTypeId" cssClass="form-control">
-							<form:option value="1"><fmt:message key="label.policy.type.site" /></form:option>
-							<form:option value="2"><fmt:message key="label.policy.type.privacy" /></form:option>
-							<form:option value="3"><fmt:message key="label.policy.type.third.party" /></form:option>
-							<form:option value="4"><fmt:message key="label.policy.type.other" /></form:option>
-						</form:select>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="label.version" /></td>
-					<td><form:input path="version" size="40" maxlength="255" cssClass="form-control"/></td>
-				</tr>
-				<tr>
-					<td><fmt:message key="label.summary" />&nbsp;&nbsp;*</td>
-					<td>
-					  <lams:CKEditor id="summary" 
-					     value="${policyForm.summary}" 
-					     contentFolderID="../public/policies">
-					  </lams:CKEditor>
-					  <span id="summary-error"></span>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="label.full.policy" />&nbsp;&nbsp;*</td>
-					<td>
-					  <lams:CKEditor id="fullPolicy" 
-					     value="${policyForm.fullPolicy}" 
-					     contentFolderID="../public/policies">
-					  </lams:CKEditor>
-					  <span id="full-policy-error"></span>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="label.policy.status" /></td>
-					<td>
-		                <div class="radio">
-		                    <label>
-		                    	<form:radiobutton path="policyStateId" value="1" />
-		                        <fmt:message key="label.policy.status.active" />
-		                    </label>
-		                </div>
-		                <div class="radio">
-		                    <label>
-		                    	<form:radiobutton path="policyStateId" value="2" />
-		                        <fmt:message key="label.policy.status.inactive" />
-		                    </label>
-		                    <span id="helpBlock" class="help-block"><fmt:message key="label.policy.status.hint" /></span>
-		                </div>
-					</td>
-				</tr>
-				
-				<c:if test="${policyForm.policyUid != null}">
-					<tr>
-						<td><fmt:message key="label.minor.change" /></td>
-						<td>
-		                    <div class="radio">
-		                        <form:checkbox path="minorChange" />
-		                        <span id="helpBlock" class="help-block"><fmt:message key="label.policy.minor.change.hint" /></span>
-		                    </div>
-		                </td>
-					</tr>
-				</c:if>
-				
-			</table>
+
+
+		<div class="form-group">
+		    <label for="policyName"><fmt:message key="label.name" /></label>&nbsp;<span class="text-danger">*</span>
+		    <input id="policyName" maxlength="40" name="policyName" value="${policyForm.policyName}" class="form-control form-control-sm" required/>
+
+		    <label for="policyTypeId"><fmt:message key="label.policy.type" /></label>
+			<form:select path="policyTypeId" cssClass="form-control form-control-sm">
+				<form:option value="1"><fmt:message key="label.policy.type.site" /></form:option>
+				<form:option value="2"><fmt:message key="label.policy.type.privacy" /></form:option>
+				<form:option value="3"><fmt:message key="label.policy.type.third.party" /></form:option>
+				<form:option value="4"><fmt:message key="label.policy.type.other" /></form:option>
+			</form:select>
+
+		    <label for="version"><fmt:message key="label.version" /></label>&nbsp;<span class="text-danger">*</span>
+		    <input id="version" maxlength="40" name="version" value="${policyForm.version}" class="form-control form-control-sm" required/>
+
+		    <label for="summary"><fmt:message key="label.summary" /></label>&nbsp;<span class="text-danger">*</span>
+			<lams:CKEditor id="summary" 
+			   value="${policyForm.summary}" 
+			   contentFolderID="../public/policies">
+			</lams:CKEditor>
+			<span id="summary-error"></span>
+
+		    <label for="fullPolicy"><fmt:message key="label.full.policy" /></label>&nbsp;<span class="text-danger">*</span>
+			<lams:CKEditor id="fullPolicy" 
+			   value="${policyForm.fullPolicy}" 
+			   contentFolderID="../public/policies">
+			</lams:CKEditor>
+			<span id="full-policy-error"></span>
+		</div>
+		
+		<div class="form-group">
+			<h2><fmt:message key="label.policy.status" /></h2>
+	    	<small id="policyStatusHelpBlock" class="form-text text-muted">
+				<fmt:message key="label.policy.status.hint" />
+			</small>
 			
-			<div class="pull-right">
-				<a href="<lams:LAMSURL/>admin/policyManagement/list.do" class="btn btn-default">
-					<fmt:message key="admin.cancel" />
-				</a>
-				<button type="submit" id="submitButton" class="btn btn-primary loffset5"><fmt:message key="admin.submit" /></button>
+			<div class="form-check">
+				<form:radiobutton path="policyStateId" value="1" id="policyStateId" name="policyStateId" cssClass="form-check-input"/>
+		    	<label class="form-check-label" for="policyStateId">
+		    		<fmt:message key="label.policy.status.active" />
+		    	</label>
 			</div>
+			
+			<div class="form-check">
+				<form:radiobutton path="policyStateId" value="2" id="policyStateId2" name="policyStateId" cssClass="form-check-input"/>
+		    	<label class="form-check-label" for="policyStateId2">
+		    		<fmt:message key="label.policy.status.inactive" />
+		    	</label>
+			</div>
+					
+		</div>
+		<c:if test="${policyForm.policyUid != null}">
+			<div class="form-group">
+				<div class="form-check">
+					<form:checkbox id="minorChange" path="minorChange" name="minorChange" cssClass="form-check-input"/>
+			    	<label class="form-check-label" for="disabled">
+			    		<fmt:message key="label.minor.change" />
+			    	</label>
+					<small id="policyMinorChangeHelpBlock" class="form-text text-muted">
+			    		<fmt:message key="label.policy.minor.change.hint" />
+			    	</small>
+			    </div>
+			</div>
+		</c:if>	
+			
+		<div class="pull-right">
+			<a href="<lams:LAMSURL/>admin/policyManagement/list.do" class="btn btn-outline-secondary btn-sm">
+				<fmt:message key="admin.cancel" />
+			</a>
+			<button type="submit" id="submitButton" class="btn btn-primary btn-sm loffset5"><fmt:message key="admin.submit" /></button>
+		</div>
 		
 		</form:form>
 	</lams:Page>

@@ -38,51 +38,48 @@
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				
 			<c:forEach items="${config}" var="group">
-				<div class="col-xl">
-					<h2 class="voffset20"><fmt:message key="${group.key}"/></h2>
+				<h2 class="voffset20"><fmt:message key="${group.key}"/></h2>
 
-									
-					<table class="table table-striped table-bordered" >
-						<c:forEach items="${group.value}" var="row">
-							<tr>
-								<td>
-									<label for="${row.key}"><fmt:message key="${row.descriptionKey}"/></label>
-									<c:if test="${row.required}">&nbsp;&nbsp;<span class="text-danger">*</span></c:if>
-								</td>
-								<td>
-									<input type="hidden" name="key" value="${row.key}"/>
-									<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
-									<c:choose>
-									<c:when test="${row.key == 'SMTPAuthSecurity'}">
-										<select name="value" class="form-control form-control-sm" id="${row.key}">
-											<c:forEach items="${smtpAuthTypes}" var="authType">
-												<option value="${authType.key}" ${authType.key == row.value ? 'selected="selected"' : '' }>
-													${authType.value}
-												</option>
-											</c:forEach>
-										</select>
-									</c:when>
-									<c:when test="${row.format==BOOLEAN}">
-										<select id="${row.key}" name="value" class="form-control form-control-sm">
-											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
-											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
-										</select>
-									</c:when>
-									<c:when test="${row.format==BOOLEAN}">
-										<select id="${row.key}" name="value" class="form-control form-control-sm">
-											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
-											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
-										</select>
-									</c:when>
-									<c:otherwise>
-										<input id="${row.key}" type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control" <c:if test="${row.required}">required</c:if>/>
-									</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-						</c:forEach>
-					</table>
-				</div>
+				<table class="table table-striped table-bordered" >
+					<c:forEach items="${group.value}" var="row">
+						<tr>
+							<td>
+								<label for="${row.key}"><fmt:message key="${row.descriptionKey}"/></label>
+								<c:if test="${row.required}">&nbsp;&nbsp;<span class="text-danger">*</span></c:if>
+							</td>
+							<td>
+								<input type="hidden" name="key" value="${row.key}"/>
+								<c:set var="BOOLEAN"><c:out value="<%= ConfigurationItem.BOOLEAN_FORMAT %>" /></c:set>
+								<c:choose>
+								<c:when test="${row.key == 'SMTPAuthSecurity'}">
+									<select name="value" class="form-control form-control-sm" id="${row.key}">
+										<c:forEach items="${smtpAuthTypes}" var="authType">
+											<option value="${authType.key}" ${authType.key == row.value ? 'selected="selected"' : '' }>
+												${authType.value}
+											</option>
+										</c:forEach>
+									</select>
+								</c:when>
+								<c:when test="${row.format==BOOLEAN}">
+									<select id="${row.key}" name="value" class="form-control form-control-sm">
+										<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
+										<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
+									</select>
+								</c:when>
+								<c:when test="${row.format==BOOLEAN}">
+									<select id="${row.key}" name="value" class="form-control form-control-sm">
+										<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
+										<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
+									</select>
+								</c:when>
+								<c:otherwise>
+									<input id="${row.key}" type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control" <c:if test="${row.required}">required</c:if>/>
+								</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+					</c:forEach>
+				</table>
 			</c:forEach>
 				
 			<div class="pull-right">

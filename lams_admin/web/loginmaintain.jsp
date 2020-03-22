@@ -24,7 +24,6 @@
 		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.loginpage"/></li>
 		  </ol>
 		</nav>
-		<div class="col-xl">
 		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="language"><lams:user property="localeLanguage"/></c:set>
@@ -39,7 +38,6 @@
 				<input type="submit" id="saveButton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 		</form:form>
-		</div>
 		
 	</lams:Page>
 </body>

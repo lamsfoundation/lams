@@ -36,7 +36,6 @@
 		  </ol>
 		</nav>
 
-		<div class="col-xl">
 		<c:if test="${not empty error}">
 			<lams:Alert type="warn" id="errorMessage" close="false">	
 				<c:out value="${error}" />
@@ -51,7 +50,7 @@
 				<th><fmt:message key="admin.lessons" /></th>
 				<th><fmt:message key="admin.staff" /></th>
 				<th><fmt:message key="admin.added.on"/></th>
-				<th><fmt:message key="admin.actions"/></th>
+				<th class="text-center"><fmt:message key="admin.actions"/></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -107,7 +106,6 @@
 			
 			<a href="<lams:LAMSURL/>admin/signupManagement/add.do" class="btn btn-primary btn-sm loffset5"><fmt:message key="admin.add.new.signup.page"/></a>
 
-		</div>
 		</div>
 	</lams:Page>
 

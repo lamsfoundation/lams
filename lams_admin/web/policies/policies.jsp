@@ -82,31 +82,39 @@
 		    <li class="breadcrumb-item">
 		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.policies.title"/></li>
+		    <c:choose>
+		    <c:when test="${viewPreviousVersions}">
+			    <li class="breadcrumb-item">
+			    	<a href="<lams:WebAppURL />policyManagement/list.do"><fmt:message key="admin.policies.title" /></a>
+			    </li>
+			    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="label.view.previous.versions"/></li>
+			</c:when>
+			<c:otherwise>
+				<li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.policies.title"/></li>
+			</c:otherwise>
+			</c:choose>
+
+
 		  </ol>
 		</nav>
 
-			<c:if test="${viewPreviousVersions}">
-				<a class="btn btn-default" href="<lams:WebAppURL />policyManagement/list.do">
-					<fmt:message key="admin.policies.title"/>
-				</a>
-			</c:if>
 		
 		<div id="policy-table">
 			<%@ include file="policyTable.jsp"%>
 		</div>
 		
-		<c:if test="${!viewPreviousVersions}">
 			<div class="pull-right">
-				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+				<a href="<lams:WebAppURL />policyManagement/list.do" class="btn btn-outline-secondary btn-sm">
 					<fmt:message key="admin.cancel"/>
 				</a>
+				<c:if test="${!viewPreviousVersions}">
 				
 				<a class="btn btn-primary btn-sm" href="<lams:WebAppURL />policyManagement/edit.do">
 					<fmt:message key="label.add.new.policy"/>
 				</a>
+				</c:if>
+				
 			</div>
-		</c:if>
 	</lams:Page>
 </body>
 </lams:html>

@@ -22,6 +22,7 @@
 		$(document).ready(function(){
 			// validate signup form on keyup and submit
 			var validator = $("#ltiConsumerForm").validate({
+				errorClass: 'text-danger form-text font-italic',
  				rules: {
 					serverid: "required", 
 					serverkey: "required",
@@ -41,88 +42,81 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm">
-		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
-			</a>
-					
-			<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default">
-				<fmt:message key="label.manage.tool.consumers" />
-			</a>
-		</p>
+	
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do"><fmt:message key="label.manage.tool.consumers" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.server.edit"/></li>
+		  </ol>
+		</nav>
 
+	
 		<lams:errors path="*"/>
 		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="sid" />
 						
-			<table class="table table-no-border">
-				<tr>
-					<td><fmt:message key="sysadmin.serverkey" />&nbsp;*</td>
-					<td>
-						<lams:errors path="serverid"/>
-						<form:input path="serverid" size="20" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.serversecret" />&nbsp;*</td>
-					<td>
-						<lams:errors path="serverkey"/>
-						<form:input path="serverkey" size="30" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.servername" />&nbsp;*</td>
-					<td>
-						<lams:errors path="servername"/>
-						<form:input path="servername" size="30" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td valign="top"><fmt:message key="sysadmin.serverdesc" />:</td>
-					<td>
-						<form:input path="serverdesc" cols="40" rows="3" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.prefix" />&nbsp;*</td>
-					<td>
-						<lams:errors path="prefix"/>
-						<form:input path="prefix" size="10" cssClass="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.disabled" />:</td>
-					<td>
-						<form:checkbox path="disabled" />
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
-					<td>
-						<form:hidden path="lessonFinishUrl"/>
-						<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
-					<td>
-						<form:input path="ltiToolConsumerMonitorRoles" size="30"/>
-					</td>
-				</tr>
-				<tr>
-					<td><fmt:message key="sysadmin.alternative.user.id.name" />:</td>
-					<td>
-						<form:checkbox path="useAlternativeUseridParameterName" />
-					</td>
-				</tr>
-			</table>
+		<div class="form-group">
+		    <label for="serverid"><fmt:message key="sysadmin.serverkey" /></label>&nbsp;<span class="text-danger">*</span>
+		    <input id="serverid" maxlength="20" name="serverid" value="${ltiConsumerForm.serverid}" class="form-control form-control-sm" required/>
+			<lams:errors path="serverid"/>
+			
+			<label for="serverkey"><fmt:message key="sysadmin.serversecret" /></label>&nbsp;<span class="text-danger">*</span>
+			<input id="serverkey" maxlength="20" name="serverkey" value="${ltiConsumerForm.serverkey}" class="form-control form-control-sm" required/>
+			<lams:errors path="serverkey"/>
+
+			<label for="servername"><fmt:message key="sysadmin.servername" /></label>&nbsp;<span class="text-danger">*</span>
+			<input id="servername" maxlength="20" name="servername" value="${ltiConsumerForm.servername}" class="form-control form-control-sm" required/>
+			<lams:errors path="servername"/>
+			
+			<label for="serverdesc"><fmt:message key="sysadmin.serverdesc" /></label>&nbsp;<span class="text-danger">*</span>
+			<input id="serverdesc" maxlength="20" name="serverdesc" value="${ltiConsumerForm.serverdesc}" class="form-control form-control-sm"/>
+			<lams:errors path="servername"/>
+
+			<label for="prefix"><fmt:message key="sysadmin.prefix" /></label>&nbsp;<span class="text-danger">*</span>
+			<input id="prefix" maxlength="10" name="prefix" value="${ltiConsumerForm.prefix}" class="form-control form-control-sm"/>
+			<lams:errors path="servername"/>
+		</div>
+		<div class="form-group">
+			<div class="form-check">
+				<form:checkbox id="disabled" path="disabled" name="disabled" cssClass="form-check-input"/>
+		    	<label class="form-check-label" for="disabled">
+		    		<fmt:message key="sysadmin.disabled" />
+		    	</label>
+		    </div>
+		</div>
+		<div class="form-group">
+			<label for="lessonFinishUrl"><fmt:message key="sysadmin.lessonFinishUrl" /></label>:
+			<form:hidden id="lessonFinishUrl" path="lessonFinishUrl"/>
+			<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
+		</div>
+
+		<div class="form-group">
+			<label for="ltiToolConsumerMonitorRoles"><fmt:message key="sysadmin.lti.consumer.monitor.roles" /></label>:
+			<form:input id="ltiToolConsumerMonitorRoles" path="ltiToolConsumerMonitorRoles" size="30"/>
+		</div>
+
+		<div class="form-group">
+			<div class="form-check">
+				<form:checkbox id="useAlternativeUseridParameterName" name="useAlternativeUseridParameterName" path="useAlternativeUseridParameterName" cssClass="form-check-input"/>
+		    	<label class="form-check-label" for="disabled">
+		    		<fmt:message key="sysadmin.alternative.user.id.name" />
+		    	</label>
+			</div>
+		</div>	
 				
 			<%@ include file="extLessonForm.jsp"%>
+			
+			<hr>
 					
 			<div class="pull-right">
-				<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-				<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+				<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do" class="btn btn-outline-secondary btn-sm"><fmt:message key="admin.cancel"/></a>
+				<input type="submit" name="submitbutton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 			
 		</form:form>

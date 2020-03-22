@@ -91,18 +91,18 @@
 								rows += '</td>';
 								
 								rows += '<td class="text-center">';
-								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash" title="<fmt:message key="admin.user.delete"/>"/></button></form>';
+								rows +=		'<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/remove.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-outline-danger btn-sm" type="submit"><i class="fa fa-trash" title="<fmt:message key="admin.user.delete"/>"/></button></form>';
 								rows += 	'&nbsp;';
-								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary btn-sm" type="submit"><i class="fa fa-pencil" title="<fmt:message key="admin.edit"/>"/></button></form>';
+								rows +=     '<form style="display: inline-block;" id="edit_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-pencil" title="<fmt:message key="admin.edit"/>"/></button></form>';
 								rows += 	'&nbsp;';
 								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
-								rows += 		'<button type="button" class="btn btn-primary btn-sm" title="<fmt:message key="label.login.as"/>"><i class="fa fa-sign-in"/></button>';
+								rows += 		'<button type="button" class="btn btn-outline-primary btn-sm" title="<fmt:message key="label.login.as"/>"><i class="fa fa-sign-in"/></button>';
 								rows += 	'</a>';
 								rows += 	'&nbsp;';
 	
 								if (${(useInternalSMTPServer || not empty smtpServer)} && orgData["email"] != null && orgData["email"] != "") {
 								rows += 	'<a title="<fmt:message key="label.email"/>" href="<lams:LAMSURL/>emailUser/composeMail.do?returnUrl=/lams/admin/usersearch.do&userID=' + orgData["userId"] + '">';
-								rows += 		'<button type="button" class="btn btn-primary btn-sm"><i class="fa fa-envelope"/> <span class="hidden-xs hidden-sm"><fmt:message key="label.email"/></span></button>';
+								rows += 		'<button type="button" class="btn btn-outline-primary btn-sm"><i class="fa fa-envelope"/> <span class="hidden-xs hidden-sm"><fmt:message key="label.email"/></span></button>';
 								rows += 	'</a>';
 								}
 								

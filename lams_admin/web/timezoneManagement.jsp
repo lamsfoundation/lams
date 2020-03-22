@@ -66,7 +66,6 @@
 			</fmt:message>
 		</p>
 
-		<div class="col-xl">			
 		<lams:errors/>
 			
         <form:form action="save.do" id="timezoneForm" modelAttribute="timezoneForm" method="post">
@@ -79,10 +78,10 @@
 						<!-- added this check box for the user to enable all available time zones -->
 						  <form:checkbox path="selected" value="currentSelectAllTZ" id="currentSelectAllTZ"/>
 						</th>
-						<th><fmt:message key="admin.timezone.time.zone.id" /></th>
+						<th class="text-center"><fmt:message key="admin.timezone.time.zone.id" /></th>
 						<th class="text-center"><fmt:message key="admin.timezone.raw.offset" /></th>
 						<th class="text-center"><fmt:message key="admin.timezone.dst.offset" /></th>
-						<th><fmt:message key="admin.timezone.display.name" /></th>
+						<th class="text-center"><fmt:message key="admin.timezone.display.name" /></th>
 					</tr>
 					</thead>
 					<tbody>
@@ -120,7 +119,6 @@
 				</p>
 				
 			</form:form>
-		</div>	
 		</lams:Page>
 </body>
 </lams:html>
