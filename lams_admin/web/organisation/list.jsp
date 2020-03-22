@@ -166,7 +166,7 @@
 			
 							<div class="btn-group btn-group-sm  pull-right">
 								<c:if test="${editGroup == true}">
-									<a href="organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="editCourse" class="btn btn-default"><i class="fa fa-edit"></i><span class="hidden-xs"> <fmt:message key="admin.edit" /></span></a> 
+									<a href="organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="editCourse" class="btn btn-default"><i class="fa fa-pencil"></i><span class="hidden-xs"> <fmt:message key="admin.edit" /></span></a> 
 								</c:if>
 								<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="btn btn-default"><i class="fa fa-users"></i> <span class="hidden-xs"><fmt:message key="admin.user.manage" /></span></a>
 								

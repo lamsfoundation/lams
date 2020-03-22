@@ -80,11 +80,19 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="themeForm">
-		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
-		</p>
+
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.themes.title"/></li>
+		  </ol>
+		</nav>
+	
 			
-			<table class="table table-striped table-condensed" >
+			<table class="table table-striped table-bordered" >
+				<thead class="thead-light">
 				<tr>
 					<th>
 						<fmt:message key="admin.themes.theme" />
@@ -98,28 +106,29 @@
 					<th>
 						<fmt:message key="admin.themes.defaultTheme" />
 					</th>
-					<th>
-					</th>
-					<th>
+					<th class="text-center">
+						<fmt:message key="admin.actions" />
 					</th>
 				</tr>
+				</thead>
+				<tbody>
 				<c:forEach var="theme" items="${themes}" >
 					<tr>
 						<td>
-							${theme.name}
+							<c:out value="${theme.name}" escapeXml="true"/>
 						</td>
 						<td>
-							${theme.description}
+							<c:out value="${theme.description}" escapeXml="true"/>
 						</td>
 						<td>
-							${theme.imageDirectory}
+							<c:out value="${theme.imageDirectory}" escapeXml="true"/>
 						</td>
-						<td align="center">
+						<td class="text-center">
 							<c:if test="${theme.currentDefaultTheme}">
-								<i class="fa fa-check"></i>
+								<i class="fa fa-check text-success"></i>
 							</c:if>
 						</td>
-						<td align="center">
+						<td class="text-center">
 			
 							<c:choose>
 								<c:when test="${not theme.notEditable}">
@@ -141,61 +150,41 @@
 						</td>	
 					</tr>
 				</c:forEach>
+				</tbody>
 			</table>
-			
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="panel-title"><fmt:message key="admin.themes.addNew" /></div>
-				</div>
-				
-				<div class="panel-body">
+			<hr>
+			<div class="voffset20">
+				<h2><fmt:message key="admin.themes.addNew" /></h2>
 				<form:form action="addOrEditTheme.do" method="post" modelAttribute="themeForm" id="themeForm">	
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="id" id="id" />
-				
-				<table class="table table-no-border" >
-					<tr>
-						<td>
-							* <fmt:message key="admin.themes.name" />:
-						</td>
-						<td>
-							<form:input path="name" id="name" size="40" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.themes.description" />:
-						</td>
-						<td>
-							<form:input path="description" id="description" size="40" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.themes.imageDir" />:
-						</td>
-						<td>
-							<form:input path="imageDirectory" id="imageDirectory" size="40" />
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="admin.themes.makeThemeDefault" />:
-						</td>
-						<td>
-							<form:checkbox path="currentDefaultTheme" id="currentDefaultTheme" />
-						</td>
-					</tr>
-				</table>
-				
-				<div class="pull-right">
-				<div id="normalSave">
-					<a href="javascript:checkAndSubmit()" class="btn btn-default"><fmt:message key="admin.save" /></a>
+				<div class="form-group">
+					<label for="name"><fmt:message key="admin.themes.name" /></label> <span class="text-danger">*</span>
+					<input class="form-control" id="name" name="name" type="text" value="" maxlength="40" required>
 				</div>
-				<div id="cancelEdit" style="display:none;">
-					<a href="javascript:cancelEdit()" class="btn btn-default"><fmt:message key="admin.cancel" /></a>
-					<a href="javascript:submitForm()" class="btn btn-default loffset5"><fmt:message key="admin.save" /></a>
+				<div class="form-group">
+					<label for="description"><fmt:message key="admin.themes.description" /></label>:
+					<form:input class="form-control" path="description" id="description" />
 				</div>
+				<div class="form-group">
+					<label class="form-check-label" for="imageDirectory"><fmt:message key="admin.themes.imageDir" /></label>:
+					<form:input class="form-control" path="imageDirectory" id="imageDirectory" size="40" />
+				</div>
+				<div class="form-check">
+					<form:checkbox class="form-check-input"  path="currentDefaultTheme" id="currentDefaultTheme" />
+					<label class="form-check-label" for="currentDefaultTheme"><fmt:message key="admin.themes.makeThemeDefault" /></label>
+				</div>
+				
+					
+					<div id="normalSave" class="pull-right">
+					<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+						<fmt:message key="admin.cancel"/>
+					</a>
+					<a href="javascript:checkAndSubmit()" class="btn btn-primary btn-sm loffset5"><fmt:message key="admin.save" /></a>
+					</div>
+				<div id="cancelEdit" style="display:none;" class="pull-right">
+					<a href="javascript:cancelEdit()" class="btn btn-outline-secondary btn-sm"><fmt:message key="admin.cancel" /></a>
+					<a href="javascript:submitForm()" class="btn btn-primary btn-sm loffset5"><fmt:message key="admin.save" /></a>
 				</div>
 				</form:form>
 				

@@ -1,6 +1,7 @@
 <%@ include file="/taglibs.jsp"%>
 
-<table class="table table-striped table-condensed" >
+<table class="table table-striped table-bordered" >
+	<thead class="thead-light">
 	<tr>
 		<th><fmt:message key="label.name" /></th>
 		<th><fmt:message key="label.policy.status" /></th>
@@ -10,21 +11,25 @@
 		<th><fmt:message key="label.consents"/></th>
 		<th colspan="3"><fmt:message key="admin.actions"/></th>
 	</tr>
+	</thead>
+	<tbody>
 	<c:forEach items="${policies}" var="policy">
 		<tr>
-			<td>
-				<c:out value="${policy.policyName}" />
+			<td class="text-left">
+				<a href="<lams:WebAppURL />policyManagement/edit.do?policyUid=${policy.uid}">
+					<c:out value="${policy.policyName}" escapeXml="true" />
+				</a>
 			</td>
 			<td>
 				<c:choose>
 					<c:when test="${policy.policyStateId == 1}">
 						<span class="label label-success">
-							<fmt:message key="label.policy.status.active"/>
+							<span class="badge badge-success"><fmt:message key="label.policy.status.active"/></span>
 						</span>
 					</c:when>
 					<c:otherwise>
 						<span class="label label-warning">
-							<fmt:message key="label.policy.status.inactive"/>
+							<span class="badge badge-warning"><fmt:message key="label.policy.status.inactive"/>
 						</span>
 					</c:otherwise>
 				</c:choose>
@@ -46,10 +51,10 @@
 				</c:choose>
 			</td>
 			<td>
-				<c:out value="${policy.version}" />
+				<c:out value="${policy.version}" escapeXml="true" />
 			</td>
 			<td>
-				<lams:Date value="${policy.lastModified}"/>
+				<lams:Date value="${policy.lastModified}" timeago="true"/>
 			</td>
 			<td>
 				<a href="#nogo" class="policy-consents-link" data-policy-uid="${policy.uid}">
@@ -60,14 +65,18 @@
 			<!-- Actions columns -->
 			<td>
 				<a href="<lams:WebAppURL />policyManagement/edit.do?policyUid=${policy.uid}">
-					<fmt:message key="admin.edit"/>
+					<button class="btn btn-outline-primary btn-sm" title="<fmt:message key="admin.edit"/>">
+						<i class="fa fa-pencil"></i>
+					</button>
 				</a>
 			</td>
 						
 			<td>
 				<c:if test="${!viewPreviousVersions && policy.hasPreviousVersions()}">
 					<a href="<lams:WebAppURL />policyManagement/viewPreviousVersions.do?policyId=${policy.policyId}">
-						<fmt:message key="label.view.previous.versions"/>
+						<button  title="<fmt:message key="label.view.previous.versions"/>" class="btn btn-outline-primary btn-sm" >
+							<i class="fa fa-code-fork fa-fw"></i>
+						</button>
 					</a>
 				</c:if>	
 			</td>
@@ -76,10 +85,13 @@
 				<a href="#nogo" class="change-status-link" data-policy-uid="${policy.uid}" data-policy-id="${policy.policyId}">
 					<c:choose>
 						<c:when test="${policy.policyStateId == 1}">
-							<fmt:message key="label.deactivate"/>
+							<button class="btn btn-outline-warning btn-sm" title="<fmt:message key="label.deactivate"/>"><i class="fa fa-pause"></i></button>
 						</c:when>
 						<c:otherwise>
-							<fmt:message key="label.activate"/>				
+							<button class="btn btn-outline-success btn-sm" title="<fmt:message key="label.activate"/>">
+								<i class="fa fa-power-off"></i>
+							</button>
+											
 						</c:otherwise>
 					</c:choose>
 				</a>
@@ -88,4 +100,5 @@
 				
 		</tr>
 	</c:forEach>
+	</tbody>
 </table>

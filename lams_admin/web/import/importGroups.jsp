@@ -57,7 +57,14 @@
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importForm">
 	
-	<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.import.groups.title"/></li>
+		  </ol>
+		</nav>		
 
 	<div id="main-page">
 	
@@ -121,8 +128,8 @@
 			<lams:WaitingSpinner id="fileUpload_Busy"/> 
 		
 		<div class="pull-right">
-		<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-		<input type="submit" id="importButton" class="btn btn-primary loffset5" value="<fmt:message key="label.import"/>" /> &nbsp; 	
+		<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm"><fmt:message key="admin.cancel"/></a>
+		<input type="submit" id="importButton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="label.import"/>" /> &nbsp; 	
 		</div>
 	
 	</form:form>

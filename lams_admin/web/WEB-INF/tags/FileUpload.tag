@@ -58,7 +58,7 @@
 
 <div class="input-group" id="addfile">
 	<span class="input-group-btn" style="font-size:inherit"> <%-- font-size:inherit needed for Share Resources authoring or the button is too small --%>
-		<button id="${fileButtonBrowse}" ${tabindexString} type="button" class="btn btn-sm btn-default">
+		<button id="${fileButtonBrowse}" ${tabindexString} type="button" class="btn btn-sm btn-outline-primary">
 			<i class="fa fa-upload"></i> <fmt:message key="${fileInputMessageKey}"/>
 		</button>
 	</span>
@@ -66,7 +66,9 @@
 	<input type="text" id="${fileInputNameFieldname}" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm file-input-name">
 </div>
 <c:if test="${uploadInfoMessageKey ne '-'}">
-<p class="help-block"><fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message></p>					
+	<small id="passwordHelpBlock" class="form-text text-muted">
+		<fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message>
+	</small>
 </c:if>
 <div id="${errorMsgDiv}" class="text-danger" style="display:none"></div>			
 

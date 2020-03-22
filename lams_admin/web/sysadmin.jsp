@@ -20,17 +20,15 @@
 		<div class="row"> 
 			<div class="col-12"> 
 				<div class="alert alert-info text-center"> 
-					<img src="/lams/images/svg/lams_logo_black.svg" width="100px"><br> 
+					<img src="/lams/images/svg/lams_logo_black.svg" width="100px" alt="LAMS logo"><br> 
 					<fmt:message key="config.version" />&nbsp;${serverVersion}
 				</div> 
    			</div> 
   		</div>
 	
 		<c:forEach items="${groupedLinks}" var="links">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="panel-title"><fmt:message key="${links[0]}"/></div>
-				</div>
+			<div class="container-fluid">
+				<h2 class="voffset20"><fmt:message key="${links[0]}"/></h2>
 				<div class="list-group">
 					<c:set var="linkBeans" value="${links[1]}"/>
 		 			<c:forEach items="${linkBeans}" var="linkBean">
@@ -43,6 +41,7 @@
 			 	</div>
 			</div>		
 		</c:forEach>
+		
 	</lams:Page>
 </body>
 </lams:html>

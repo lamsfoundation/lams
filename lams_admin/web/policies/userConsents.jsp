@@ -34,7 +34,7 @@
 			    sortorder: "asc", 
 			    sortname: "fullName", 
 			    pager: 'consents-grid-pager',
-			    rowList:[10,20,30,40,50,100],
+			    rowList:[10,50,100,500],
 			    rowNum:10,
 			    colNames:[
 			    	'',
@@ -90,16 +90,13 @@
 </lams:head>
 
 <body>
-<div class="row no-gutter no-margin">
-<div class="col-12">
-<div class="container" id="content">
+<c:set var="title"><c:out value='${policy.policyName}' escapeXml='true'/></c:set>
+<lams:Page type="admin" title="${title}" >
+	<h1>
+		
+	</h1>
 
-	<h5>
-		<c:out value="${policy.policyName}" />
-	</h5>
-
-	<fmt:message key="label.version" />: <c:out value="${policy.version}" />
-	<br/><br/>
+	<p><fmt:message key="label.version" />: <c:out value="${policy.version}" /></p>
 	
 	 <div class="grid-holder">
  		<table id="consents-grid" class="scroll"></table>
@@ -107,8 +104,6 @@
  		<div class="tooltip-lg" id="tooltip"></div>
 	</div>
 
-</div>
-</div>
-</div>
+</lams:Page>
 </body>
 </lams:html>

@@ -17,40 +17,50 @@
 	<c:set var="title">${title}: <fmt:message key="admin.list.disabled.users"/></c:set>
 	<lams:Page type="admin" title="${title}">
 	
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-		<table class="table table-striped table-condensed">
+		<table class="table table-striped table-bordered">
+		<thead class="thead-light">
 		<tr>
-			<th></th>
+			<th>ID</th>
 			<th><fmt:message key="admin.user.login"/></th>
-			<th><fmt:message key="admin.user.title"/></th>
 			<th><fmt:message key="admin.user.first_name"/></th>
 			<th><fmt:message key="admin.user.last_name"/></th>
-			<th></th>
+			<th class="text-center"><fmt:message key="admin.actions"/></th>
 		</tr>
+		</thead>
+		<tbody>
 		<c:forEach var="user" items="${users}">
 			<tr>
 				<td>
-					<c:out value="${user.userId}" />
+					<c:out value="${user.userId}" escapeXml="true"/>
 				</td>
 				<td>
-					<c:out value="${user.login}" />
+					<c:out value="${user.login}" escapeXml="true" />
 				</td>
 				<td>
-					<c:out value="${user.title}" />
+					<c:out value="${user.firstName}" escapeXml="true" />
 				</td>
 				<td>
-					<c:out value="${user.firstName}" />
+					<c:out value="${user.lastName}" escapeXml="true" />
 				</td>
-				<td>
-					<c:out value="${user.lastName}" />
-				</td>
-				<td>
-					<csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/user/enable.do"><input type="hidden" name="userId" value="${user.userId}"/><button type="submit" class="btn btn-primary btn-xs"><fmt:message key="admin.enable" /></button></csrf:form>
+				<td class="text-center">
+					<csrf:form style="display: inline-block;" id="enable_${ltiConsumer.sid}" method="post" action="/lams/admin/user/enable.do">
+						<input type="hidden" name="userId" value="${user.userId}"/>
+						<button type="submit" class="btn btn-outline-success btn-sm" title="<fmt:message key="admin.enable" />">
+							<i class="fa fa-power-off"></i>
+						</button>
+					</csrf:form>
 				</td>		
 			</tr>
 		</c:forEach>
+		</tbody>
 		</table>
+		
+		<div class="pull-right">
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+				<fmt:message key="admin.cancel"/>
+			</a>
+		</div>		
 	</lams:Page>
 
 </body>

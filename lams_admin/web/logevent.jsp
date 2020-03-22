@@ -233,16 +233,21 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
 	
-		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a>
-		</p>
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="label.event.log"/></li>
+		  </ol>
+		</nav>		
 
 		<div class="form form-inline">
-				<span><select id="areaMenu" class="form-control" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
-				<select id="typeMenu" class="form-control"></select></span>
-				<span class="pull-right"><fmt:message key="label.between.dates"/>&nbsp;<input type="text" class="form-control" name="startDatePicker" id="startDatePicker" value=""/>
+				<span><select id="areaMenu" class="form-control-sm" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
+				<select id="typeMenu" class="form-control-sm"></select></span>
+				<span class="pull-right px-4"><fmt:message key="label.between.dates"/>&nbsp;<input type="text" class="form-control" name="startDatePicker" id="startDatePicker" value=""/>
 				&nbsp;<input type="text" class="form-control" name="endDatePicker" id="endDatePicker" value=""/>
-				<a href="#" class="btn btn-default" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>
+				<a href="#" class="btn btn-primary btn-sm" onclick="javascript:getEvents()"><fmt:message key="admin.search"/></a>
 				</span>
 		</div>
 		
@@ -255,7 +260,13 @@
 					<th class="no-spinner"><fmt:message key="audit.remarks"/></th>
 			</lams:TSTable>
 		</div>
-			
+		<hr>
+		<div class="pull-right">
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+				<fmt:message key="admin.cancel"/>
+			</a>
+		</div>		
+
 	</lams:Page>
 </body>
 </lams:html>

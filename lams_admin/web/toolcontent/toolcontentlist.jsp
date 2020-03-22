@@ -36,26 +36,31 @@
 <body class="stripes">
 	
 	<lams:Page type="admin" title="${title}">
-				<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
-
-				<h1><fmt:message key="sysadmin.tool.management" /></h1>
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.tool.management" /></li>
+		  </ol>
+		</nav>
 				
-				<div class="panel">
-					<p>
-						<fmt:message key="msg.edit.tool.content.1" />
-						&nbsp;
-						<fmt:message key="msg.edit.tool.content.2" />
-					</p>
-					<p>
-						<fmt:message key="msg.edit.tool.content.3" />
-					</p>
-					
-					<a href="javascript:openToolGroups()" class="btn btn-default pull-right" 
-					   title="<fmt:message key='tool.groups.open.button.tooltip' />" ><fmt:message key="tool.groups.open.button" /></a>
-					<div class="clearfix"></div>
-					
-					<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
-				</div>	
+			<div class="panel">
+				<p>
+					<fmt:message key="msg.edit.tool.content.1" />
+					&nbsp;
+					<fmt:message key="msg.edit.tool.content.2" />
+				</p>
+				<p>
+					<fmt:message key="msg.edit.tool.content.3" />
+				</p>
+				
+				<a href="javascript:openToolGroups()" class="btn btn-outline-secondary btn-sm pull-right" 
+				   title="<fmt:message key='tool.groups.open.button.tooltip' />" ><fmt:message key="tool.groups.open.button" /></a>
+				<div class="clearfix"></div>
+				
+				<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
+			</div>	
 				
 				<c:set var="displayToolManagement" value="false" />
 				<c:forEach var="dto" items="${toolLibrary}">
@@ -64,19 +69,25 @@
 					</c:if>
 				</c:forEach>
 				
-				<table class="table table-striped table-condensed voffset10">
+				<table class="table table-striped table-bordered voffset10">
+					<thead class="thead-light">
 					<tr>
 						<th><fmt:message key="label.tool" /></th>
 						<th><fmt:message key="label.tool.version" /></th>
 						<th><fmt:message key="label.database.version" /></th>
-						<th style="padding-right: 15px"><fmt:message key="admin.user.actions" /></th>
+						<th class="text-center"><fmt:message key="admin.user.actions" /></th>
 					</tr>
+					</thead>
+					<tbody>
 					<c:forEach items="${toolLibrary}" var="dto">
 						<tr>
-							<td>
-								<strong><c:out value="${dto.activityTitle}" /></strong>
+							<td <c:if test="${learningLibraryValidity[dto.learningLibraryID] == 'false'}">class="table-danger"</c:if> >
+								<strong><c:out value="${dto.activityTitle}" escapeXml="true"/></strong>
+								<c:if test="${learningLibraryValidity[dto.learningLibraryID] == 'false'}">
+									<span class="badge badge-warning">Disabled</span> 
+								</c:if>
 								<br/>
-								<c:out value="${dto.description}" />
+								<c:out value="${dto.description}" escapeXml="true"/>
 							</td>
 							<td>
 								<c:out value="${toolVersions[dto.toolID]}" />
@@ -84,13 +95,25 @@
 							<td>
 								<c:out value="${dbVersions[dto.toolSignature]}" />
 							</td>
-							<td>
+							<td class="text-center d-flex">
 								<c:choose>
 									<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
-										<csrf:form style="display: inline-block;" id="disable${dto.activityTitle}" method="post" action="disable.do"><input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/><input type="hidden" name="disable" value="false"/><input type="submit" class="btn btn-xs btn-primary" value="<fmt:message key="admin.disable" />"/></csrf:form>
+										<csrf:form style="display: inline-block;" id="disable${dto.activityTitle}" method="post" action="disable.do">
+											<input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/>
+											<input type="hidden" name="disable" value="false"/>
+											<button type="submit" class="btn btn-sm btn-outline-secondary" title="<fmt:message key="admin.disable" />"/>
+												<i class="fa fa-eye-slash"></i>
+											</button>
+										</csrf:form>
 									</c:when>
 									<c:otherwise>
-										<csrf:form style="display: inline-block;" id="enable${dto.activityTitle}" method="post" action="enable.do"><input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/><input type="hidden" name="enable" value="false"/><input type="submit" class="btn btn-success btn-xs" value="<fmt:message key="admin.enable" />"/></csrf:form>
+										<csrf:form style="display: inline-block;" id="enable${dto.activityTitle}" method="post" action="enable.do">
+											<input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/>
+											<input type="hidden" name="enable" value="false"/>
+											<button type="submit" class="btn btn-sm btn-outline-success" title="<fmt:message key="admin.enable" />"/>
+												<i class="fa fa-eye"></i>
+											</button>
+										</csrf:form>
 										
 									</c:otherwise>
 								</c:choose>
@@ -99,15 +122,20 @@
 										<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=${dto.toolContentID}&contentFolderID=-1"
 									</c:set>
 									&nbsp;
-									<a class="btn btn-xs btn-default" id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank"><fmt:message key="sysadmin.edit.default.tool.content" /></a>
+									<a class="btn btn-sm btn-outline-primary" id="defaultContent${dto.activityTitle}" href="${editDefaultContentUrl}" target="_blank" title="<fmt:message key="sysadmin.edit.default.tool.content" />">
+										<i class="fa fa-pencil fa-wa"></i>
+									</a>
 									<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
 										&nbsp;
-										<a class="btn btn-xs btn-default" id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" ><fmt:message key="msg.tool.management" /></a>
+										<a title="<fmt:message key="msg.tool.management" />" class="btn btn-sm btn-outline-primary" id="toolManagement${dto.activityTitle}" href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />" >
+											<i class="fa fa-cog fa-wa"></i>
+										</a>
 									</c:if>
 								</c:if>
 							</td>
 						</tr>
 					</c:forEach>
+					</tbody>
 				</table>
 				</p>
 	</lams:Page>

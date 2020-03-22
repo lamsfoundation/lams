@@ -18,9 +18,16 @@
 <body class="stripes">
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm">
-		
-		<p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm" >
+	
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.config.settings.edit"/></li>
+		  </ol>
+		</nav>		
 
 		<c:if test="${not empty error}">
 			<lams:Alert type="danger" id="error-messages" close="false">
@@ -31,17 +38,16 @@
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				
 			<c:forEach items="${config}" var="group">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="panel-title"><fmt:message key="${group.key}"/></div>
-					</div>
+				<div class="col-xl">
+					<h2 class="voffset20"><fmt:message key="${group.key}"/></h2>
+
 									
-					<table class="table table-striped table-condensed" >
+					<table class="table table-striped table-bordered" >
 						<c:forEach items="${group.value}" var="row">
 							<tr>
 								<td>
-									<fmt:message key="${row.descriptionKey}"/>
-									<c:if test="${row.required}">&nbsp;&nbsp;*</c:if>
+									<label for="${row.key}"><fmt:message key="${row.descriptionKey}"/></label>
+									<c:if test="${row.required}">&nbsp;&nbsp;<span class="text-danger">*</span></c:if>
 								</td>
 								<td>
 									<input type="hidden" name="key" value="${row.key}"/>
@@ -57,19 +63,19 @@
 										</select>
 									</c:when>
 									<c:when test="${row.format==BOOLEAN}">
-										<select name="value" class="form-control form-control-sm">
+										<select id="${row.key}" name="value" class="form-control form-control-sm">
 											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
 											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
 										</select>
 									</c:when>
 									<c:when test="${row.format==BOOLEAN}">
-										<select name="value" class="form-control form-control-sm">
+										<select id="${row.key}" name="value" class="form-control form-control-sm">
 											<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>
 											<option value="false" ${row.value ? '' : 'selected="selected"' }>false&nbsp;&nbsp;</option>
 										</select>
 									</c:when>
 									<c:otherwise>
-										<input type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control"/>
+										<input id="${row.key}" type="text" id="${row.key}" name="value" value="${row.value}" size="50" maxlength="255" class="form-control" <c:if test="${row.required}">required</c:if>/>
 									</c:otherwise>
 									</c:choose>
 								</td>
@@ -80,10 +86,10 @@
 			</c:forEach>
 				
 			<div class="pull-right">
-				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
+				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
 					<fmt:message key="admin.cancel"/>
 				</a>
-				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+				<input type="submit" id="saveButton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 		</form:form>
 		

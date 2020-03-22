@@ -408,34 +408,33 @@
 
 	<c:otherwise>
 	<!-- Standard Screens  --> 
-		<div class="row no-gutter no-margin">
-		<div class="col-xs-12">
-		<div class="container" id="content">
-
+		<div class="container-xl">
+		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 		<c:choose>
 		<c:when test="${usePanel}">
-		<div class="panel panel-default panel-${type}-page">
 			<c:if test="${not empty title}">
-				<div class="panel-heading">
-					<div class="panel-title panel-${type}-title">
-						<c:out value="${title}" escapeXml="true" />
-						<c:if test="${not empty titleHelpURL}">
-							<span class="pull-right">${titleHelpURL}</span>
-						</c:if>
-					</div>
-					<c:if test="${not empty headingContent}">
-						<c:out value="${headingContent}" escapeXml="true" />
-					</c:if>
-				</div>
+				<c:if test="${not empty titleHelpURL}">
+					<span class="pull-right">${titleHelpURL}</span>
+				</c:if>
+				<c:if test="${not empty headingContent}">
+					<c:out value="${headingContent}" escapeXml="true" />
+				</c:if>
+			
+				<header>
+					<h1><c:out value="${title}" escapeXml="true" /></h1>
+				</header>
 			</c:if>
 			
-			<div class="panel-body panel-${type}-body">
+			<div id="content">
+			<main role="main">
 				<jsp:doBody />
+			</main>
 			</div>
 		</div>
 		</c:when>
 
 		<c:otherwise>
+		
 		<jsp:doBody />
 		</c:otherwise>
 		</c:choose>						

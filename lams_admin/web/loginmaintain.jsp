@@ -16,25 +16,30 @@
 <body class="stripes">
 	<lams:Page type="admin" title="${title}" formID="loginMaintainForm">
 		
-		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
-			</a>
-		</p>
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.loginpage"/></li>
+		  </ol>
+		</nav>
+		<div class="col-xl">
 		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="language"><lams:user property="localeLanguage"/></c:set>
-			<p class="help-block"><fmt:message key="sysadmin.login.text"/></p>
+			<p><fmt:message key="sysadmin.login.text"/></p>
 			
 			<lams:CKEditor id="news" value="${loginMaintainForm.news}" contentFolderID="../public" height="600px"></lams:CKEditor>
 			
 			<div class="pull-right voffset5">
-				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
+				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
 					<fmt:message key="admin.cancel"/>
 				</a>
-				<input type="submit" id="saveButton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
+				<input type="submit" id="saveButton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="admin.save" />" />
 			</div>
 		</form:form>
+		</div>
 		
 	</lams:Page>
 </body>

@@ -3,6 +3,7 @@
 
 <%@ attribute name="close" required="false" rtexprvalue="true"%>
 <%@ attribute name="id" required="false" rtexprvalue="true"%>
+<%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="type" required="false" rtexprvalue="true"%>
 
 <c:set var="idName" value="alert-${type}" />
@@ -27,20 +28,19 @@
 	</c:when>
 </c:choose>
 
-<div class="row no-gutter">
-	<div class="col-xs-12 col-sm-offset-2 col-sm-8">
-		<div id="${idName}" class="alert alert-${alertType}" style="margin-bottom: 10px; padding: 8px">
-			<div class="media">
-				<div class="media-left">
-					<i class="fa fa-lg fa-${iconType} text-muted"></i>
-				</div>
-				<div class="media-body">
-					<c:if test="${close}">
-							<a href="#" class="close pull-right" data-dismiss="alert" aria-label="close">&times;</a>
-					</c:if>
-					<jsp:doBody />
-				</div>
+<div class="container">
+	<div class="row justify-content-md-center">
+		<div class="col-md-auto">
+			<div id="${idName}" class="alert alert-${alertType}" role="alert">
+				<c:if test="${not empty title}">
+					<span class="fa fa-${iconType}"></span> <span class="alert-title font-weight-bold">${title}</span>
+					<hr class="alert-separator">
+				</c:if>
+
+				<jsp:doBody />
 			</div>
 		</div>
-	</div>
-</div>
+	</div>	
+</div></div>
+
+

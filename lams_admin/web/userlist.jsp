@@ -54,6 +54,16 @@
     
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
+
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page">${title}</li>
+		  </ol>
+		</nav>		
+
 				
 			<p>
 				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
@@ -198,6 +208,12 @@
 				<tbody>
 				</tbody>
 			</table> 
+		<hr>
+		<div class="pull-right">
+			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+				<fmt:message key="admin.cancel"/>
+			</a>
+		</div>		
 	</lams:Page>
 </body>
 </lams:html>

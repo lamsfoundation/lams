@@ -23,6 +23,13 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript">
+	    $(document).ready(function(){
+	        $("time.timeago").timeago();
+	    });
+    </script>
+	
 	<script type="text/javascript">
 		$(window).on('load', function(){
 			//dialog displaying user consents given for the specified policy
@@ -34,12 +41,11 @@
 				exists = dialog.length > 0
 				url = '<c:url value="/policyManagement/displayUserConsents.do"/>?policyUid=' + policyUid;
 				showDialog(id, {
-					//'resizable' : false,
 					'data' : {
 						'orgID'  : "orgID"
 					},
-					'height' : 500,
-					'width'  : 600,
+					'height' : 600,
+					'width'  : 1200,
 					'title'  : "<fmt:message key='label.user.consents'/>",
 					'open'   : function() {
 						$('iframe', this).attr('src', url);
@@ -70,25 +76,36 @@
 <body class="stripes">
 	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
-		<p>
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default">
-				<fmt:message key="sysadmin.maintain" />
-			</a>
+
+		<nav aria-label="breadcrumb" role="navigation">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item">
+		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+		    </li>
+		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.policies.title"/></li>
+		  </ol>
+		</nav>
+
 			<c:if test="${viewPreviousVersions}">
 				<a class="btn btn-default" href="<lams:WebAppURL />policyManagement/list.do">
 					<fmt:message key="admin.policies.title"/>
 				</a>
 			</c:if>
-		</p>
 		
 		<div id="policy-table">
 			<%@ include file="policyTable.jsp"%>
 		</div>
 		
 		<c:if test="${!viewPreviousVersions}">
-			<a class="btn btn-default pull-right" href="<lams:WebAppURL />policyManagement/edit.do">
-				<fmt:message key="label.add.new.policy"/>
-			</a>
+			<div class="pull-right">
+				<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+					<fmt:message key="admin.cancel"/>
+				</a>
+				
+				<a class="btn btn-primary btn-sm" href="<lams:WebAppURL />policyManagement/edit.do">
+					<fmt:message key="label.add.new.policy"/>
+				</a>
+			</div>
 		</c:if>
 	</lams:Page>
 </body>
