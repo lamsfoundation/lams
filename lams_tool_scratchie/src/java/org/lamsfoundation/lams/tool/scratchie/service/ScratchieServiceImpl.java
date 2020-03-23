@@ -681,7 +681,7 @@ public class ScratchieServiceImpl
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
-    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean addPortraits) {
+    public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
@@ -1322,7 +1322,7 @@ public class ScratchieServiceImpl
 	row.addCell(getMessage("label.mark"));
 	row.addCell(getMessage("label.group"));
 
-	List<GroupSummary> summaryList = getMonitoringSummary(contentId, false);
+	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
 		row = researchAndAnalysisSheet.initRow();
