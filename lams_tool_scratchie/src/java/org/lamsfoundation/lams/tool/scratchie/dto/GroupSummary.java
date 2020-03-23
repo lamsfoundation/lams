@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.Collection;
@@ -39,6 +38,7 @@ public class GroupSummary {
     private Long leaderUid;
 
     private Collection<ScratchieUser> users;
+    private Collection<Long> usersWhoReachedActivity;
     private Collection<ScratchieItemDTO> itemDtos;
     private Collection<ScratchieAnswer> answers;
 
@@ -91,7 +91,7 @@ public class GroupSummary {
     public void setTotalAttempts(int totalAttempts) {
 	this.totalAttempts = totalAttempts;
     }
-    
+
     public String getTotalPercentage() {
 	return totalPercentage;
     }
@@ -101,11 +101,11 @@ public class GroupSummary {
     }
 
     public Long getLeaderUid() {
-        return leaderUid;
+	return leaderUid;
     }
 
     public void setLeaderUid(Long leaderUid) {
-        this.leaderUid = leaderUid;
+	this.leaderUid = leaderUid;
     }
 
     public Collection<ScratchieUser> getUsers() {
@@ -131,4 +131,13 @@ public class GroupSummary {
     public void setAnswers(Collection<ScratchieAnswer> answers) {
 	this.answers = answers;
     }
+
+    public Collection<Long> getUsersWhoReachedActivity() {
+	return usersWhoReachedActivity;
+    }
+
+    public void setUsersWhoReachedActivity(Collection<Long> usersWhoReachedActivity) {
+	this.usersWhoReachedActivity = usersWhoReachedActivity;
+    }
+
 }

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -685,7 +686,10 @@ public class ScratchieServiceImpl
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
 	for (ScratchieSession session : sessions) {
+
 	    Long sessionId = session.getSessionId();
+
+	    Collection<User> groupUsers = toolService.getToolSession(sessionId).getLearners();
 
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
@@ -693,20 +697,29 @@ public class ScratchieServiceImpl
 	    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 	    groupSummary.setTotalAttempts(totalAttempts);
 
-	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
-	    List<ScratchieUser> usersToShow = new LinkedList<>();
-	    for (ScratchieUser user : sessionUsers) {
+	    Map<Long, ScratchieUser> sessionUsers = getUsersBySession(sessionId).stream()
+		    .collect(Collectors.toMap(ScratchieUser::getUserId, s -> s));
+	    groupSummary.setUsersWhoReachedActivity(sessionUsers.keySet());
 
-		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
-		if (isUserGroupLeader) {
-		    groupSummary.setLeaderUid(user.getUid());
+	    List<ScratchieUser> usersToShow = new LinkedList<>();
+	    for (User user : groupUsers) {
+		boolean isUserGroupLeader = false;
+		ScratchieUser scratchieUser = sessionUsers.get(user.getUserId().longValue());
+		if (scratchieUser == null) {
+		    scratchieUser = new ScratchieUser();
+		    scratchieUser.setFirstName(user.getFirstName());
+		    scratchieUser.setLastName(user.getLastName());
+		    scratchieUser.setLoginName(user.getLogin());
+		    scratchieUser.setUserId(user.getUserId().longValue());
+		} else {
+		    isUserGroupLeader = session.isUserGroupLeader(scratchieUser.getUid());
+		    if (isUserGroupLeader) {
+			groupSummary.setLeaderUid(scratchieUser.getUid());
+		    }
 		}
-		
-		if (addPortraits) {
-		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
-		    user.setPortraitId(systemUser.getPortraitUuid());
-		}
-		usersToShow.add(user);
+
+		scratchieUser.setPortraitId(user.getPortraitUuid());
+		usersToShow.add(scratchieUser);
 	    }
 
 	    groupSummary.setUsers(usersToShow);

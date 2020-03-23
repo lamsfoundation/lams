@@ -56,7 +56,8 @@
 					"<fmt:message key="label.monitoring.summary.attempts" />",
 					"<fmt:message key="label.monitoring.summary.mark" />",
 					'portraitId',
-					'isLeader'
+					'isLeader',
+					'reachedActivity'
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
@@ -72,6 +73,7 @@
 			   		},
 			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
 			   		{name:'isLeader', index:'isLeader', width:0, hidden: true},
+			   		{name:'reachedActivity', index:'reachedActivity', width:0, hidden: true},
 			   	],
 			   	ondblClickRow: function(rowid) {
 			   		var jqGrid = $("#list${summary.sessionId}");
@@ -112,12 +114,13 @@
    	     		jQuery("#list${summary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:"${i.index + 1}",
    	   	     		userId:"${user.userId}",
-   	   	     		sessionId:"${user.session.sessionId}",
+   	   	     		sessionId:"${empty user.session ? '' : user.session.sessionId}",
    	   	     		userName:"${user.lastName}, ${user.firstName}",
    	   				totalAttempts:"${summary.leaderUid eq user.uid ? summary.totalAttempts : ''}",
    	   				mark:"${summary.leaderUid eq user.uid ? (summary.totalAttempts == 0 ? '-' : summary.mark) : ''}",
    	   				portraitId:"${user.portraitId}",
-   	   				isLeader : "${summary.leaderUid eq user.uid}"
+   	   				isLeader : "${summary.leaderUid eq user.uid}",
+   	   				reachedActivity : "${summary.getUsersWhoReachedActivity().contains(user.userId)}"
    	   	   	    });
 	        </c:forEach>
 
@@ -209,20 +212,30 @@
 
         function userNameFormatter (cellvalue, options, rowObject) {
     		var name = definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		var icon = '';
+    		
     		if (rowObject.isLeader == 'true') {
-    			var leaderIcon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    			icon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    		} else if (rowObject.reachedActivity == 'true') {
+    			icon = '&nbsp;<i class="text-primary fa fa-check"></i>';
+    		}
+    		
+    		if (icon != '') {
     			if (rowObject.portraitId == '') {
-    				name += leaderIcon;
+    				name += icon;
     			} else {
-    				name = name.replace('</a>', leaderIcon + '</a>');
+    				name = name.replace('</a>', icon + '</a>');
     			}
     		}
+        
     		return name;
     	}
         
         function leaderRowFormatter (rowID, val, rawObject, cm, rdata) {
 			if (rdata.isLeader == 'true') {
 				return 'class="info"';
+			} else if (rdata.reachedActivity == 'true') {
+				return 'title="<fmt:message key="label.summary.reached.activity"/>"';
 			}
 		}
     	
