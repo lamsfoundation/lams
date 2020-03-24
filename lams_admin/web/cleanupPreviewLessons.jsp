@@ -72,18 +72,12 @@
 
 <body class="stripes">
 
-	<lams:Page type="admin" title="${title}">
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="sysadmin.batch.preview.lesson.delete"/></c:set>
+
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">	
 		
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.batch.preview.lesson.delete"/></li>
-		  </ol>
-		</nav>		
-
-
 		<fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
 		<div id="deletingBox" style="display: none">
 		<fmt:message key="label.cleanup.preview.lesson.progress" />

@@ -166,22 +166,14 @@
     
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
-	<lams:Page type="admin" title="${title}" formID="userForm">
-
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/usersearch.do"><fmt:message key="admin.user.management"/></a>
-		    </li>		    
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.user.edit"/></li>
-		  </ol>
-		</nav>		
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usersearch.do | <fmt:message key="admin.user.management"/></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.edit"/></c:set>	
+	
+	<lams:Page type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
 	
 	<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -633,7 +625,6 @@
 				</c:if>
 			
 			</form:form>
-	<hr>
 	</lams:Page>
 </body>
 </lams:html>
