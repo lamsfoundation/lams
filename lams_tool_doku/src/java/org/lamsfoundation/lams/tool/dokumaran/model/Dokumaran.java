@@ -63,6 +63,9 @@ public class Dokumaran implements Cloneable {
     private String title;
 
     @Column
+    private String description;
+
+    @Column
     private String instructions;
 
     // advance
@@ -161,14 +164,15 @@ public class Dokumaran implements Cloneable {
 	final Dokumaran genericEntity = (Dokumaran) o;
 
 	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
-		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
-		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+		.append(description, genericEntity.description).append(instructions, genericEntity.instructions)
+		.append(created, genericEntity.created).append(updated, genericEntity.updated)
+		.append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
-		.append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(description).append(instructions).append(created)
+		.append(updated).append(createdBy).toHashCode();
     }
 
     /**
@@ -259,6 +263,14 @@ public class Dokumaran implements Cloneable {
      */
     public void setTitle(String title) {
 	this.title = title;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
     }
 
     /**
