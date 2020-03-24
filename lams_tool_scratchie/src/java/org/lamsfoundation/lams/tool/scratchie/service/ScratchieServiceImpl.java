@@ -1705,7 +1705,7 @@ public class ScratchieServiceImpl
 
 		// round the percentage cell
 		String totalPercentage = String
-			.valueOf(Math.round(Double.valueOf(groupRow.getCell(itemDtos.size() + 2).toString())));
+			.valueOf(Math.round(Double.valueOf(groupRow.getCell(itemDtos.size() + 2).toString()) * 100));
 		groupSummary.setTotalPercentage(totalPercentage);
 	    }
 
