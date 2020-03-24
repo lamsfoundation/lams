@@ -208,6 +208,9 @@
 		</c:if>
 
 		<lams:errors/>
+		
+		<c:out value="${dokumaran.description}" escapeXml="false" />
+		
 
 		<div class='panel panel-default 
 				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			

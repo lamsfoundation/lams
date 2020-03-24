@@ -9,6 +9,12 @@
 </div>
 
 <div class="form-group">
+    <label for="dokumaran.description"><fmt:message key="label.authoring.basic.description" /></label>
+    <lams:CKEditor id="dokumaran.description" value="${mcAuthoringForm.description}" contentFolderID="${sessionMap.contentFolderID}"/>
+</div>
+
+
+<div class="form-group">
     <label for="dokumaran.instructions">
     	<fmt:message key="label.authoring.basic.instruction" />
     </label>
