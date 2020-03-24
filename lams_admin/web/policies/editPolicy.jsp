@@ -61,21 +61,14 @@
 </lams:head>
 <body class="stripes">
 	<c:set var="title"><fmt:message key="admin.add.edit.policy"/></c:set>
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.policy"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
 
-	<lams:Page type="admin" title="${title}" >
-
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/policyManagement/list.do"><fmt:message key="admin.policies.title" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.add.edit.policy"/></li>
-		  </ol>
-		</nav>
-
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 
     <form:form action="../policyManagement/save.do" modelAttribute="policyForm" id="policy-form" cssClass="voffset20" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>

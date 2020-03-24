@@ -140,20 +140,14 @@
     
 <body class="stripes">
 
-	<lams:Page type="admin" title="${title}">
+	<%-- Build the breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
+	<c:set var="breadcrumbActive">. | ${title}</c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>
 
 
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page">${title}</li>
-		  </ol>
-		</nav>		
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 	
 			
 		<p><input class="btn btn-primary btn-sm" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />

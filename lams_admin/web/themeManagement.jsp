@@ -79,17 +79,13 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}" formID="themeForm">
 
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.themes.title"/></li>
-		  </ol>
-		</nav>
-	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.themes.title"/></c:set>
+
+
+	<lams:Page type="admin" title="${title}" formID="themeForm" breadcrumbItems="${breadcrumbItems}">	
 			
 			<table class="table table-striped table-bordered" >
 				<thead class="thead-light">
@@ -160,15 +156,15 @@
 				<form:hidden path="id" id="id" />
 				<div class="form-group">
 					<label for="name"><fmt:message key="admin.themes.name" /></label> <span class="text-danger">*</span>
-					<input class="form-control" id="name" name="name" type="text" value="" maxlength="40" required>
+					<input class="form-control form-control-sm" id="name" name="name" type="text" value="" maxlength="40" required>
 				</div>
 				<div class="form-group">
 					<label for="description"><fmt:message key="admin.themes.description" /></label>:
-					<form:input class="form-control" path="description" id="description" />
+					<form:input class="form-control form-control-sm" path="description" id="description" />
 				</div>
 				<div class="form-group">
 					<label class="form-check-label" for="imageDirectory"><fmt:message key="admin.themes.imageDir" /></label>:
-					<form:input class="form-control" path="imageDirectory" id="imageDirectory" size="40" />
+					<form:input class="form-control form-control-sm" path="imageDirectory" id="imageDirectory" size="40" />
 				</div>
 				<div class="form-check">
 					<form:checkbox class="form-check-input"  path="currentDefaultTheme" id="currentDefaultTheme" />

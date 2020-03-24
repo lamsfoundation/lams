@@ -15,7 +15,12 @@
     
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.list.disabled.users"/></c:set>
-	<lams:Page type="admin" title="${title}">
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.list.disabled.users"/></c:set>
+	
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 	
 
 		<table class="table table-striped table-bordered">

@@ -75,28 +75,24 @@
 
 <body class="stripes">
 	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}">
 
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <c:choose>
-		    <c:when test="${viewPreviousVersions}">
-			    <li class="breadcrumb-item">
-			    	<a href="<lams:WebAppURL />policyManagement/list.do"><fmt:message key="admin.policies.title" /></a>
-			    </li>
-			    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="label.view.previous.versions"/></li>
-			</c:when>
-			<c:otherwise>
-				<li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.policies.title"/></li>
-			</c:otherwise>
-			</c:choose>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+    <c:choose>
+    <c:when test="${viewPreviousVersions}">
+    	<c:set var="breadcrumbChild1"><lams:WebAppURL />policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
+    	<c:set var="breadcrumbActive">. | <fmt:message key="label.view.previous.versions"/></c:set>
+    		<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>	
+    	
+	</c:when>
+	<c:otherwise>
+		<c:set var="breadcrumbActive">. | <fmt:message key="admin.policies.title"/></c:set>
+			<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
+	</c:otherwise>
+	</c:choose>
 
-
-		  </ol>
-		</nav>
+	
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
 
 		
 		<div id="policy-table">

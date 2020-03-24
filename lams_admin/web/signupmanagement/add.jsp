@@ -14,20 +14,16 @@
     
 <body class="stripes">
 	<c:set var="title"><fmt:message key="admin.add.edit.signup.page"/></c:set>
-	<lams:Page type="admin" title="${title}" formID="signupForm">
 	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/signupManagement/start.do"><fmt:message key="admin.signup.title"/></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.add.edit.signup.page"/></li>
-		  </ol>
-		</nav>			
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/signupManagement/start.do | <fmt:message key="admin.signup.title"/></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.signup.page"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>
+
 	
+	<lams:Page type="admin" title="${title}" formID="signupForm" breadcrumbItems="${breadcrumbItems}">
+		
 		<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="signupOrganisationId" />

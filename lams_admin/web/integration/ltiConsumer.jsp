@@ -41,20 +41,15 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm">
-	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/ltiConsumerManagement/start.do"><fmt:message key="label.manage.tool.consumers" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.server.edit"/></li>
-		  </ol>
-		</nav>
 
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/ltiConsumerManagement/start.do | <fmt:message key="label.manage.tool.consumers" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.maintain.server.edit"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
+
+
+	<lams:Page type="admin" title="${title}" formID="ltiConsumerForm" breadcrumbItems="${breadcrumbItems}">
 	
 		<lams:errors path="*"/>
 		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">

@@ -30,17 +30,12 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | ${title}</c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.session"/></li>
-		  </ol>
-		</nav>		
-
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 		
 		<div class="alert alert-info">${fn:length(sessions)}&nbsp;<fmt:message key="sysadmin.maintain.session.count" /></div>
 

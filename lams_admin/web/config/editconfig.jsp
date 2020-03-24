@@ -18,17 +18,15 @@
 <body class="stripes">
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="configForm" >
 	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.config.settings.edit"/></li>
-		  </ol>
-		</nav>		
+	<%-- Build the breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.config.settings.edit"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
+	
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}"  breadcrumbItems="${breadcrumbItems}" formID="configForm" >
+	
 		<c:if test="${not empty error}">
 			<lams:Alert type="danger" id="error-messages" close="false">
 				<c:out value="${error}" />

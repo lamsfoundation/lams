@@ -14,16 +14,15 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}" formID="loginMaintainForm">
+
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.maintain.loginpage"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
+
+
+	<lams:Page type="admin" title="${title}" formID="loginMaintainForm" breadcrumbItems="${breadcrumbItems}">
 		
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.loginpage"/></li>
-		  </ol>
-		</nav>
 		<form:form action="./loginsave.do" modelAttribute="loginMaintainForm" id="loginMaintainForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<c:set var="language"><lams:user property="localeLanguage"/></c:set>

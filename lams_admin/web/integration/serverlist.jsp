@@ -19,17 +19,13 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
 
-		<nav aria-label="breadcrumb">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item" aria-current="page">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.external.servers"/></li>
-		  </ol>
-		</nav>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.maintain.external.servers"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 
 			<table class="table table-striped table-bordered">
 				<thead class="thead-light">

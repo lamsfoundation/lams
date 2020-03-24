@@ -45,16 +45,13 @@
 <body class="stripes">
 	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="timezoneForm">
-
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="admin.timezone.title"/></li>
-		  </ol>
-		</nav>		
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="admin.timezone.title"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
+	
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}" formID="timezoneForm">
 		
 		<p>
 			<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >

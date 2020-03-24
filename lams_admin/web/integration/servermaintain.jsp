@@ -59,20 +59,16 @@
 	
 	<c:set var="help"><fmt:message key="Integrations"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="extServerForm">
 	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/extserver/serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.maintain.server.edit"/></li>
-		  </ol>
-		</nav>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/extserver/serverlist.do| <fmt:message key="sysadmin.maintain.external.servers" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.maintain.server.edit"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
 	
+	
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="extServerForm" breadcrumbItems="${breadcrumbItems}">
+		
 	<lams:errors/>
     <form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>

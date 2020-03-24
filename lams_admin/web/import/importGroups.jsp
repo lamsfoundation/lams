@@ -55,17 +55,15 @@
 
 	<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importForm">
-	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="sysadmin.import.groups.title"/></li>
-		  </ol>
-		</nav>		
 
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.import.groups.title"/></c:set>
+	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
+
+	
+	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" formID="importForm" breadcrumbItems="${breadcrumbItems}">
+	
 	<div id="main-page">
 	
 	<c:if test="${not empty results}">

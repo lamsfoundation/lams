@@ -231,17 +231,13 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
-	
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page"><fmt:message key="label.event.log"/></li>
-		  </ol>
-		</nav>		
 
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="label.event.log"/></c:set>
+
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	
 		<div class="form form-inline">
 				<span><select id="areaMenu" class="form-control-sm" onchange="javascript:configureTypeDropdown(this.value)"></select>&nbsp;
 				<select id="typeMenu" class="form-control-sm"></select></span>
