@@ -40,6 +40,7 @@ public class GroupSummary {
     private int numberColumns;
 
     private Collection<ScratchieUser> users;
+    private Collection<Long> usersWhoReachedActivity;
     private Collection<ScratchieItemDTO> itemDtos;
     private Collection<OptionDTO> optionDtos;
 
@@ -140,4 +141,13 @@ public class GroupSummary {
     public void setOptionDtos(Collection<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
     }
+
+    public Collection<Long> getUsersWhoReachedActivity() {
+	return usersWhoReachedActivity;
+    }
+
+    public void setUsersWhoReachedActivity(Collection<Long> usersWhoReachedActivity) {
+	this.usersWhoReachedActivity = usersWhoReachedActivity;
+    }
+
 }

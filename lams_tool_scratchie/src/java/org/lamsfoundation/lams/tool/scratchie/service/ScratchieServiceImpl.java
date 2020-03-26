@@ -699,12 +699,15 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
-    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean addPortraits) {
+    public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
 	for (ScratchieSession session : sessions) {
+
 	    Long sessionId = session.getSessionId();
+
+	    Collection<User> groupUsers = toolService.getToolSession(sessionId).getLearners();
 
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
@@ -712,21 +715,29 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 	    groupSummary.setTotalAttempts(totalAttempts);
 
-	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
+	    Map<Long, ScratchieUser> sessionUsers = getUsersBySession(sessionId).stream()
+		    .collect(Collectors.toMap(ScratchieUser::getUserId, s -> s));
+	    groupSummary.setUsersWhoReachedActivity(sessionUsers.keySet());
+
 	    List<ScratchieUser> usersToShow = new LinkedList<>();
-	    for (ScratchieUser user : sessionUsers) {
-
-		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
-		if (isUserGroupLeader) {
-		    groupSummary.setLeaderUid(user.getUid());
+	    for (User user : groupUsers) {
+		boolean isUserGroupLeader = false;
+		ScratchieUser scratchieUser = sessionUsers.get(user.getUserId().longValue());
+		if (scratchieUser == null) {
+		    scratchieUser = new ScratchieUser();
+		    scratchieUser.setFirstName(user.getFirstName());
+		    scratchieUser.setLastName(user.getLastName());
+		    scratchieUser.setLoginName(user.getLogin());
+		    scratchieUser.setUserId(user.getUserId().longValue());
+		} else {
+		    isUserGroupLeader = session.isUserGroupLeader(scratchieUser.getUid());
+		    if (isUserGroupLeader) {
+			groupSummary.setLeaderUid(scratchieUser.getUid());
+		    }
 		}
 
-		if (addPortraits) {
-		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
-		    user.setPortraitId(
-			    systemUser.getPortraitUuid() == null ? null : systemUser.getPortraitUuid().toString());
-		}
-		usersToShow.add(user);
+		scratchieUser.setPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
+		usersToShow.add(scratchieUser);
 	    }
 
 	    groupSummary.setUsers(usersToShow);
@@ -1549,7 +1560,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	row.addCell(getMessage("label.mark"));
 	row.addCell(getMessage("label.group"));
 
-	List<GroupSummary> summaryList = getMonitoringSummary(contentId, false);
+	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
 		row = researchAndAnalysisSheet.initRow();

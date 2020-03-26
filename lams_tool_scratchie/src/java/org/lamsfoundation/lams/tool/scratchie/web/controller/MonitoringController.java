@@ -98,7 +98,7 @@ public class MonitoringController {
 	model.addAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = scratchieService.getMonitoringSummary(contentId, true);
+	List<GroupSummary> summaryList = scratchieService.getMonitoringSummary(contentId);
 
 	Scratchie scratchie = scratchieService.getScratchieByContentId(contentId);
 	Set<ScratchieUser> learners = scratchieService.getAllLeaders(contentId);
