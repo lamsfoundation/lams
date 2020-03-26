@@ -36,5 +36,6 @@
         <archive path="/lams_build/lib/batik/batik-dom.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
         <archive path="/lams_build/lib/batik/batik-svggen.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
         <archive path="/lams_build/lib/batik/batik-awt-util.jar" source="/3rdParty_sources/basiclti-util/src/main/java/org"/>
+        <archive path="/lams_build/lib/pad/etherpad_lite_client-1.2.13.jar" source="/3rdParty_sources/etherpad"/>
     </library>
 </eclipse-userlibraries>

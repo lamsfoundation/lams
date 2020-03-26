@@ -21,6 +21,8 @@ batik             batik-1.7.jar                         1.7                    A
 csrfguard		  csrfguard-3.1.0-custom-2020.01.07.jar custom build		   BSD License 					 OWASP							  prevents CSRF attacks
 														based on 3.1.0																		  master from 2020.01.07 with a custom modification in CsrfGuard.java
 
+etherpad		  etherpad_lite_client-1.2.13.jar		1.2.13					Apache License 2.0			 Nils Fredrik Gjerull			  Client for Etherpad
+
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
 
 googleauth        googleauth-1.1.1.jar                  1.1.1				   Public Domain				 Enrico M. Crisostomo             Java server library that implements the Time-based One-time Password (TOTP) algorithm
