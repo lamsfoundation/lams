@@ -485,6 +485,16 @@
 			  file="lib/clamav/kotlin.logging.module.xml" overwrite="true" verbose="true" />
 			
 		
+		
+		<copy todir="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client" overwrite="true" verbose="true">
+			<fileset dir="lib/etherpad">
+				<include name="etherpad_lite_client-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/module.xml"
+			  file="lib/etherpad/etherpad.module.xml" overwrite="true" verbose="true" />
+		
+		
 			
 		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/fckeditor">
@@ -572,7 +582,7 @@
 			  file="lib/mysql/mysql-connector-java.module.xml" overwrite="true" verbose="true" />
 		
 		
-		
+
 		<copy todir="${server.home}/modules/system/layers/base/org/quartz/main" overwrite="true" verbose="true">
 			<fileset dir="lib/quartz">
 				<include name="quartz-*.jar" />
