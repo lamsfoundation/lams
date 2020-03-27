@@ -46,11 +46,6 @@
 	margin-top: 10px;
 	float: left;
 }
-@media (max-width: 575.98px) { 
-	.dataTables_filter {
-		width: 100%;
-	}
-}
 
 .lesson-image {
     background-size: cover;
@@ -369,7 +364,7 @@ time.timeago {
 			            selector: 'td.row-reorder'
 			        },
 		         	'dom':
-		            	"<'row'<'col-sm-12'<'float-sm-right ml-2'B>f>>" +
+		            	"<'row'<'col-sm-12'<'float-right ml-2'B>f>>" +
 		            	"<'row'<'col-sm-12'tr>>" ,
 		         	'buttons': [
 			         {
@@ -393,7 +388,7 @@ time.timeago {
 			            }
 			        }, 
 			        {
-		            'text': '<i class="fa fa-table fa-fw" aria-hidden="true"></i> <span class="card-view-label">Card view</span><span class="list-view-label">List view</span>',
+		            'text': '<i class="fa fa-table fa-fw" aria-hidden="true"></i> <span class="card-view-label"><span class="d-none d-sm-inline">Card view</span></span><span class="list-view-label"><span class="d-none d-sm-inline">List view</span></span>',
 		            'action': function (e, dt, node) {
 			            var $table = $(dt.table().node());
 			            var isUserMonitor = eval(lessonsTable.data("is-user-monitor"))
