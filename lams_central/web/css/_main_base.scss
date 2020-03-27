@@ -15,16 +15,10 @@ html {
 	background: $main_offcanvas_background;
     color: #8c8a8a;
 }
-.courses-title {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-weight: 300;
-    font-size: 23px;
-    width: 100%;
-    margin-left: 0 !important;
-    line-height: 49px;
-    margin: 0;
-    padding-left: 25px;
+.offcanvas-header {
+	padding: 15px 0 10px 25px;
+    text-transform: uppercase;
+    font-size: 1.05rem;
 }
 #page-wrapper {
 	margin: 0 0 0 220px;
@@ -40,6 +34,9 @@ html {
 	.icon-remove {
 		display: none !important;
 	}
+#org-container {
+	padding: 17px 10px;
+}
 }
 @media (max-width: 768px) {
 	#offcanvas {
@@ -57,9 +54,7 @@ html {
 	}
 }
 
-#org-container {
-	padding: 17px 10px 17px 25px;
-}
+
 
 /*FOOTER*/
 footer {
@@ -91,7 +86,7 @@ a:hover, a:focus {
 .pagesize:hover,
 .tablesorter a:hover,
 .tablesorter a:focus {
-  background-color: $brand-primary-darkest;
+  background-color: #adadad;
   color: white;
 }
 .tablesorter a {
@@ -110,9 +105,6 @@ a:hover, a:focus {
 #offcanvas td.active {
     border-right: 10px solid $brand-primary-bright;
     background: $main_offcanvas_link;
-}
-.offcanvas-header {
-	padding: 15px 0px 0px 0px;
 }
 .offcanvas-search {
 	padding: 15px 19px 15px;
@@ -180,7 +172,7 @@ a:hover, a:focus {
 
 /*TOP HEADER*/
 .top-nav {
-    border-bottom: 1px solid $main_dropdown_border;
+    border-bottom: 1px solid #efefef;
     height: 53px;
 }
 @media (min-width: 502px) {

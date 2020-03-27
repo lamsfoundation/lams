@@ -30,7 +30,7 @@
 				<div class="btn-group">
 					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-light btn-sm ${addTourClass?'tour-add-lesson':''}">
 						<i class="${link.style}" title="<fmt:message key="index.addlesson" />"></i>
-						<span class="hidden-xs"><fmt:message key="index.addlesson" /></span>
+						<span class="d-none d-sm-inline"><fmt:message key="index.addlesson" /></span>
 					</button>
 					
 					<button type="button" class="btn btn-light btn-sm dropdown-toggle dropdown-toggle-split ${addTourClass?'tour-add-single-lesson':''}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
@@ -55,7 +55,7 @@
 				<div class="btn-group" title="<fmt:message key="${link.tooltip}" />">
 					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-light btn-sm">
 						<i class="${link.style}"></i>
-						<span class="hidden-xs"><fmt:message key="index.kumalive" /></span>
+						<span class="d-none d-md-inline"><fmt:message key="index.kumalive" /></span>
 					</button>
 					
 					<button type="button" class="btn btn-light btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
@@ -95,7 +95,7 @@
                     </c:if>    
                 >
 					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
-					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
+					<span class="d-none d-md-inline"><fmt:message key="${link.name}" /></span>
 				</a>
 			</div>
 		</c:when>
@@ -108,7 +108,7 @@
                  	</c:if>
                 >
 					<i class="${link.style}" title="<fmt:message key="${link.name}" />"></i>
-					<span class="hidden-xs"><fmt:message key="${link.name}" /></span>
+					<span class="d-none d-md-inline"><fmt:message key="${link.name}" /></span>
 				</button>
 			</div>
 		</c:otherwise>

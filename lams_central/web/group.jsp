@@ -27,12 +27,10 @@
 
 <!-- Group contents -->
 <div class="j-course-contents">
-	<div class="sequence-list">
-		<div id="${orgBean.id}-lessons" class="lesson-table">
-			<c:if test="${not empty org.lessons}">
-				<%@ include file="groupContents.jsp"%>
-			</c:if>
-		</div>
+	<div id="${orgBean.id}-lessons" class="lesson-table">
+		<c:if test="${not empty org.lessons}">
+			<%@ include file="groupContents.jsp"%>
+		</c:if>
 	</div>
 	
 	<!-- Child organisations -->

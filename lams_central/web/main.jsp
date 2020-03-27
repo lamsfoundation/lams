@@ -15,10 +15,15 @@
 	<link rel="stylesheet" href="/lams/css/bootstrap-tourist.min.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/datatables.css">
 	<style>
-	
+
+@media (max-width: 810px) { 
+	.cards tbody {
+		text-align: center;
+	}
+}
 .cards tbody tr {
-   float: left;
-   width: 26rem;
+   display: inline-block;
+   width: 23rem;
    margin: 0.5rem;
    border: 0.0625rem solid rgba(0, 0, 0, .125);
    border-radius: .25rem;
@@ -33,21 +38,6 @@
    display: none;
 }
 
-.cards td:before {
-   content: attr(data-label);
-   position: relative;
-   float: left;
-   color: #808080;
-   min-width: 4rem;
-   margin-left: 0;
-   margin-right: 1rem;
-   text-align: left;   
-}
-
-tr.selected td:before {
-   color: #CCC;
-}
-
 .table.cards td, .table.cards th {
     border-top: 0; /* Overwrite bootstrap rule */
 }
@@ -56,42 +46,92 @@ tr.selected td:before {
 	margin-top: 10px;
 	float: left;
 }
+@media (max-width: 575.98px) { 
+	.dataTables_filter {
+		width: 100%;
+	}
+}
 
 .lesson-image {
-	min-height: 200px;
-	background-image: url(http://localhost:8080/lams/css/images/trianglify.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
 }
-.user-monitor .lesson-image{
-	background-image: linear-gradient( rgba(255, 255, 255, .5), rgba(255, 255, 255, 0.5) ), url(http://localhost:8080/lams/css/images/trianglify.png);
+.cards .lesson-image {
+	min-height: 170px;
 }
-
-table:not(.cards):not(.user-monitor) .lesson-image {
-	display: none;
-}
-
-/* display chart for list view */
-
-table:not(.cards).user-monitor .lesson-image {
-    position: absolute;
-    right: 270px;
-    padding: 0;
+table:not(.cards) .lesson-image {
     background-image: none;
+}
+
+.lesson-image-1 {
+	background-image: url(css/images/trianglify_1.png);
+}
+.user-monitor .lesson-image-1{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_1.png);
+}
+.lesson-image-2 {
+	background-image: url(css/images/trianglify_2.png);
+}
+.user-monitor .lesson-image-2{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_2.png);
+}
+.lesson-image-3 {
+	background-image: url(css/images/trianglify_3.png);
+}
+.user-monitor .lesson-image-3{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_3.png);
+}
+.lesson-image-4 {
+	background-image: url(css/images/trianglify_4.png);
+}
+.user-monitor .lesson-image-4{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_4.png);
+}
+.lesson-image-5 {
+	background-image: url(css/images/trianglify_5.png);
+}
+.user-monitor .lesson-image-5{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_5.png);
+}
+.lesson-image-6 {
+	background-image: url(css/images/trianglify_6.png);
+}
+.user-monitor .lesson-image-6{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_6.png);
+}
+.lesson-image-7 {
+	background-image: url(css/images/trianglify_7.png);
+}
+.user-monitor .lesson-image-7{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_7.png);
+}
+.lesson-image-8 {
+	background-image: url(css/images/trianglify_8.png);
+}
+.user-monitor .lesson-image-8{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_8.png);
+}
+.lesson-image-9 {
+	background-image: url(css/images/trianglify_9.png);
+}
+.user-monitor .lesson-image-9{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_9.png);
+}
+.lesson-image-10 {
+	background-image: url(css/images/trianglify_10.png);
+}
+.user-monitor .lesson-image-10{
+	background-image: linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) ), url(css/images/trianglify_10.png);
 }
 
 table:not(.cards).user-monitor tr {
 	height: 100px !important;
 }
-table:not(.cards).user-monitor .chart-holder {
-	padding-top: 0;
-}
-
-/*  */
 
 .auxiliary-links-menu {
 	float: right;
+	margin-top: -3px;
 }
 .auxiliary-links-menu button{
 	background-color: rgba(0,0,0,.03);
@@ -107,31 +147,14 @@ table:not(.cards).user-monitor .chart-holder {
 	display: block;
 }
 
-.progress-bar span {
-	color: #000;
-    position: absolute;
-    margin-left: 6px;
-}
-.progress {
-	height: 1.3rem;
-}
-.cards .progress {
-	margin-top: 10px;
-}
-table:not(.cards) .progress {
-	width: 50%;
+.lesson-name {
+	font-size: .9rem;
+	max-height: 170px;
+    overflow: hidden;
 }
 
-.cards:not(.user-monitor) .lesson-name {
-	min-height: 60px;
-}
-.user-monitor:not(.cards) .lesson-name {
-	padding-bottom: 40px;
-}
-.user-monitor:not(.cards) .learners-count {
-	position: absolute;
-    left: 15px;
-    margin-top: 20px;
+.cards .learners-count {
+    padding: .75rem;
 }
 
 .cards td.row-reorder, .cards .auxiliary-links {
@@ -143,15 +166,62 @@ td.row-reorder {
 	padding-left: .25rem
 }
 
-.chart-holder {
-    width: 200px;
-    float: right;
-    clear: both;
-    padding-top: 70px;
+.buttons-td {
+    height: 20px;
+}
+.cards .buttons-td{
+    background-color: #fff!important;
+}
+table:not(.cards) .buttons-td{
+	width: 170px;
+	padding: 0;
 }
 
-td.buttons-td {
-    height: 20px;
+td.chart-td {
+	padding: 0;
+}
+table:not(.cards) .chart-td {
+	width: 60px;
+}
+
+.chart-holder {
+	width: 150px;
+}
+
+.cards .chart-holder {
+	float: right;
+    margin-top: -90px;
+    margin-right: -20px;    
+}
+
+/* Learner's card*/
+.cards:not(.user-monitor) .lesson-name {
+	max-height: 150px;
+}
+.cards:not(.user-monitor) .lesson-image {
+	display: grid;
+}
+.learner-bottom-card {
+	align-self: flex-end;
+}
+table:not(.cards) .learner-bottom-card {
+	padding-top: 10px;
+}
+.progress-bar span {
+	color: #000;
+    position: absolute;
+    margin-left: 6px;
+}
+.progress {
+	height: 1.3rem;
+}
+table:not(.cards) .progress {
+	width: 50%;
+}
+time.timeago {
+    opacity: .7;
+    font-size: 80%;
+    font-weight: 400;
 }
 
 	</style>
@@ -175,6 +245,7 @@ td.buttons-td {
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.slimscroll.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/main.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/chart.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',	
 			decoderDiv = $('<div />'),
@@ -298,9 +369,8 @@ td.buttons-td {
 			            selector: 'td.row-reorder'
 			        },
 		         	'dom':
-		            	"<'row'<'col-sm-12'<'float-xl-right ml-2'B>f>>" +
-		            	"<'row'<'col-sm-12'tr>>" +
-		            	"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+		            	"<'row'<'col-sm-12'<'float-sm-right ml-2'B>f>>" +
+		            	"<'row'<'col-sm-12'tr>>" ,
 		         	'buttons': [
 			         {
 			            'text': '<select class="custom-select" onchange="orderDatatable(this, \'' + lessonsTable.attr('id') + '\')">' +
@@ -368,10 +438,6 @@ td.buttons-td {
 			            //toggle buttons
 			            $(".auxiliary-links-menu", $table).toggle();
 
-			            if (!isUserMonitor) {
-				            $("td.lesson-name", lessonsTable).toggleClass(" d-flex justify-content-between");
-				        }
-
 		                dt.draw('page');
 		            },
 		            'className': 'btn-sm btn-light',
@@ -382,21 +448,31 @@ td.buttons-td {
 		         select: false,
 		         paging: false,
 		         info: false,
+		         responsive:true,
 		         'columns': [
 		        	{"visible": false},
 		        	{"visible": false},
 		        	{"visible": false},
 		        	{"visible": false},
 		        	//star lesson feature
-		        	{"visible": true},//we need to mark it as visible:true, but set manually display:none to be able to access it from toggleFavoriteLesson() method
+		        	{"visible": true, className: "none"},//we need to mark it as visible:true, but set manually display:none to be able to access it from toggleFavoriteLesson() method
 		        	//lesson image
 		            {
 		               'orderable': false,
-		               'className': 'text-center'
+		               className: "text-left"
 		            },
+		          	//learners number
 		            {
-		               'data': 'name'
-		            },
+			           'orderable': false,
+			           "visible": lessonsTable.data("is-user-monitor")
+			           //className: "d-none d-md-inline"
+			        },
+		          	//chart
+		            {
+			           'orderable': false,
+			           "visible": lessonsTable.data("is-user-monitor")
+			        },
+			        //buttons
 		            {
 		               'data': 'extn',
 		               "visible": lessonsTable.data("is-user-monitor")
@@ -439,27 +515,20 @@ td.buttons-td {
 								'rgb(199, 234, 70)',//green
 								'rgb(252, 226, 5)',//yellow
 								'rgb(255, 146, 140)'//red
-							],
-							label: 'Dataset 1'
-						}],
-						labels: [
-							'Completed',
-							'Attempted',
-							'Not Started'
-						]
+							]
+						}]
 					},
 					options: {
 						responsive: true,
-						legend: {
-							position: 'left',
-						}
+						legend: false
 					}
 				});
 			});
+
+		    $("time.timeago").timeago();
 		}
 	
 		<%@ include file="mainTour.jsp" %>
-
 	</script>
 </lams:head>
 <body <c:if test="${not empty activeOrgId}">class="offcanvas-hidden"</c:if>>
@@ -581,12 +650,10 @@ td.buttons-td {
 	<!-- /header -->
 
 <!-- Offcanvas Bar -->
-    <nav id="offcanvas" role="navigation" class="bg-dark">
+    <nav id="offcanvas" role="navigation" class="bg-light">
         <div class="offcanvas-scroll-area">
-			<div class="offcanvas-header">
-				<span class="courses-title ">
-					<i class="fa fa-table"></i>&nbsp;<fmt:message key="organisations" />
-				</span>
+			<div class="offcanvas-header lead">
+				<fmt:message key="organisations" />
 			</div>
         
 			<%@ include file="favoriteOrganisations.jsp"%>
