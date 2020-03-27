@@ -433,6 +433,10 @@ time.timeago {
 			            //toggle buttons
 			            $(".auxiliary-links-menu", $table).toggle();
 
+			            if (isUserMonitor) {
+				            $("td.chart-td", lessonsTable).toggleClass("d-none d-sm-table-cell");
+				        }
+
 		                dt.draw('page');
 		            },
 		            'className': 'btn-sm btn-light',
