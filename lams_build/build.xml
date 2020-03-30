@@ -388,7 +388,6 @@
 		 </antcall> 
 	</target>
 
-
 	<target name="_deploy-resources">
 		<!-- Internal target: Deploys third party JARs and cofiguration files -->
 		<echo>${ant.project.name}: Deploying libraries as WildFly modules</echo>
@@ -408,6 +407,14 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
 			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/tika/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-tika">
+				<include name="tika-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/tika/main/module.xml"
+			  file="lib/apache-tika/tika.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
 			<fileset dir="lib/batik">
