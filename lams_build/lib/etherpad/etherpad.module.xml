@@ -26,4 +26,7 @@
   <resources>
     <resource-root path="etherpad_lite_client-1.2.13.jar"/>
   </resources>
+  <dependencies>
+  	<module name="org.json.simple" />
+  </dependencies>
 </module>

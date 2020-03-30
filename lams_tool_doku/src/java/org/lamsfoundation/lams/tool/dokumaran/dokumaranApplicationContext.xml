@@ -29,11 +29,6 @@
             <ref bean="coreSessionFactory"/>
         </property>
     </bean>
-    <bean id="dokumaranConfigItemDAO" class="org.lamsfoundation.lams.tool.dokumaran.dao.hibernate.DokumaranConfigItemDAOHibernate">
-        <property name="sessionFactory">
-            <ref bean="coreSessionFactory"/>
-        </property>
-    </bean>
     <bean id="dokumaranOutputFactory" class="org.lamsfoundation.lams.tool.dokumaran.service.DokumaranOutputFactory">  
     	<property name="toolMessageService"><ref bean="dokumaranMessageService"/></property>  
 	</bean> 
@@ -56,20 +51,17 @@
         <property name="dokumaranSessionDao">
             <ref bean="dokumaranSessionDao"/>
         </property>
-        <property name="dokumaranConfigItemDAO">
-            <ref bean="dokumaranConfigItemDAO"/>
-        </property>        
         <property name="dokumaranToolContentHandler">
             <ref bean="dokumaranToolContentHandler"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>
-   		<property name="logEventService">
-   			<ref bean="logEventService"/>
-   		</property>
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="etherpadService">
+   			<ref bean="etherpadService"/>
    		</property>
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>

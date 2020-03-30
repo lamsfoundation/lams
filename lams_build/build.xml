@@ -486,12 +486,12 @@
 			
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/main" overwrite="true" verbose="true">
 			<fileset dir="lib/etherpad">
 				<include name="etherpad_lite_client-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/module.xml"
+		<copy tofile="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/main/module.xml"
 			  file="lib/etherpad/etherpad.module.xml" overwrite="true" verbose="true" />
 		
 		

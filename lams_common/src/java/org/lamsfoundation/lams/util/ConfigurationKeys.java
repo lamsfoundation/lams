@@ -316,4 +316,8 @@ public class ConfigurationKeys {
     public static String WORKFLOW_AUTOMATION_INTEGRATED_SERVER = "WorkflowAutomationIntServer";
     public static String WORKFLOW_AUTOMATION_SYNC_PERIOD_MINUTES = "WorkflowAutomationSyncPeriod";
     public static String WORKFLOW_AUTOMATION_SYNC_TIME = "WorkflowAutomationSyncTime";
+
+    // LDEV-4997 Etherpad as service
+    public static String ETHERPAD_SERVER_URL = "EtherpadServerUrl";
+    public static String ETHERPAD_API_KEY = "EtherpadApiKey";
 }
