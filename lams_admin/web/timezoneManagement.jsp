@@ -47,9 +47,9 @@
 	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	
 	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="admin.timezone.title"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.timezone.title"/></c:set>
+
 	
 	<lams:Page type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}" formID="timezoneForm">
 		

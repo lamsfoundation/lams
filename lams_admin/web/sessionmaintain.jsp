@@ -31,9 +31,9 @@
     
 <body class="stripes">
 	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | ${title}</c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | ${title}</c:set>
+
 
 	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 		

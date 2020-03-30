@@ -141,10 +141,9 @@
 <body class="stripes">
 
 	<%-- Build the breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
-	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
-	<c:set var="breadcrumbActive">. | ${title}</c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
+	<c:set var="breadcrumbItems">${breadcrumbItems},. | ${title}</c:set>
 
 
 	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">

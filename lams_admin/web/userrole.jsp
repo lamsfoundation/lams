@@ -15,7 +15,28 @@
     
 <body class="stripes">
 	<c:set var="title">${title}: <fmt:message key="admin.user.assign.roles"/></c:set>
-	<lams:Page type="admin" title="${title}" formID="userRolesForm">
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /> </c:set>
+
+	<c:if test="${not empty pOrgId}">
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${parentName}" escapeXml="true"/> </c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userRolesForm.orgId} |<c:out value="${orgName}" escapeXml="true"/></c:set>
+	</c:if>
+	<c:if test="${empty pOrgId}">
+		<c:if test="${userRolesForm.orgId != 1}">
+			<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userRolesForm.orgId} | <c:out value="${orgName}" escapeXml="true"/></c:set>
+		</c:if>
+		<c:if test="${userRolesForm.orgId == 1}">
+			<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userRolesForm.orgId} | <fmt:message key="admin.global.roles.manage" />  </c:set>
+		</c:if>
+		
+	</c:if>
+	
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.assign.roles"/></c:set>
+	
+	
+	<lams:Page type="admin" title="${title}"  breadcrumbItems="${breadcrumbItems}"  formID="userRolesForm">
 	
 		<form:form action="/lams/admin/userrolessave.do" modelAttribute="userRolesForm" id="userRolesForm" method="post">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -43,15 +64,15 @@
 		<lams:errors/>
 		<lams:errors path="roles"/>
 		
-		<div class="container-fluid">
+		<div class="container">
 		<div class="row">
 		  <div class="col-2"><fmt:message key="admin.user.login"/>:</div>
-		  <div class="col-10"><c:out value="${login}" /></div>
+		  <div class="col-10"><c:out value="${login}" escapeXml="true"/></div>
 		</div>
 		
 		<div class="row">
 		  <div class="col-2"><fmt:message key="admin.user.name"/>:</div>
-		  <div class="col-10"><c:out value="${fullName}" /></div>
+		  <div class="col-10"><c:out value="${fullName}" escapeXml="true"/></div>
 		</div>
 		
 		<div class="row">
@@ -72,8 +93,7 @@
 		</div>
 		
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-			<input type="reset" class="btn btn-default" value="<fmt:message key="admin.reset" />" />
+			<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userRolesForm.orgId}" />" class="btn btn-outline-secondary"><fmt:message key="admin.cancel"/></a>
 			<input type="submit" name="submitbutton" class="btn btn-primary loffset5" value="<fmt:message key="admin.save" />" />
 		</div>
 		

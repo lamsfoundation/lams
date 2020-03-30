@@ -53,17 +53,23 @@
 </lams:head>
     
 <body class="stripes">
-	<lams:Page type="admin" title="${title}">
 
-		<nav aria-label="breadcrumb" role="navigation">
-		  <ol class="breadcrumb">
-		    <li class="breadcrumb-item">
-		    	<a href="<lams:LAMSURL/>admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-		    </li>
-		    <li class="breadcrumb-item active" aria-current="page">${title}</li>
-		  </ol>
-		</nav>		
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>/admin/orgmanage.do?org=1| <fmt:message key="admin.course.manage" /> </c:set>
+	
 
+	<c:if test="${orgType == 2}">
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} | <c:out value="${userManageForm.orgName}" escapeXml="true" /> </c:set>
+	</c:if>
+	<c:if test="${orgType == 3}">
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${pOrgName}" escapeXml="true"/></c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} | <c:out value="${userManageForm.orgName}" escapeXml="true"/></c:set>
+	</c:if>
+
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.management"/></c:set>
+
+
+	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}" >
 				
 			<p>
 				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>

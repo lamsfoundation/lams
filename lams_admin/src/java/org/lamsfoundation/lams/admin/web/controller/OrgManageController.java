@@ -133,6 +133,7 @@ public class OrgManageController {
 
 	    // display parent org breadcrumb link
 	    request.setAttribute("parentGroupName", pOrg.getName());
+	    request.setAttribute("parentCode", pOrg.getCode());
 	    request.setAttribute("parentGroupId", pOrg.getOrganisationId());
 	} else {
 	    request.setAttribute("orgManageForm", orgManageForm);
