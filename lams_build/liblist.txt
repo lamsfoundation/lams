@@ -5,7 +5,11 @@ Folder            Library                               Version                L
 apache-poi        poi-4.0.1.jar           				4.0.1                  Apache License 2.0            Apache                           the Java API for Microsoft Documents
                   poi-ooxml-4.0.1.jar
                   poi-ooxml-schemas-4.0.1.jar
+                  poi-scratchpad-4.0.1.jar
                   xmlbeans-3.0.2.jar					3.0.2
+
+apache-tika       tika-core-1.24.jar             		1.24                   Apache License 2.0            Apache                           a content analysis toolkit that detects and extracts metadata and text from over a thousand different file types
+                  tika-parsers-1.24.jar
 
 autopatch		  autopatch-1.4.2-lams.jar			    1.4.2-lams		       Apache License				 Tacit Knowledge				  automated Java patching system
 				  discovery-1.0.5-lams.jar				1.0.5-lams				  

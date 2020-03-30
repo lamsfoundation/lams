@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
+import org.lamsfoundation.lams.questions.QuestionWordParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -30,7 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Runs extraction of chosen IMS QTI zip file and prepares form for user to manually choose interesting question.
+ * Runs extraction of the chosen IMS QTI zip file or .docx file. Prepares form for user to manually choose interesting
+ * question.
  */
 @Controller
 public class QuestionsController {
@@ -44,8 +46,9 @@ public class QuestionsController {
 
     @RequestMapping("/questions")
     public String execute(@RequestParam String tmpFileUploadId, @RequestParam String returnURL,
-	    @RequestParam("limitType") String limitTypeParam, @RequestParam String callerID,
-	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
+	    @RequestParam("limitType") String limitTypeParam, @RequestParam(required = false) String importType,
+	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
+	    HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String packageName = null;
@@ -71,13 +74,17 @@ public class QuestionsController {
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 
+	boolean isWordInput = "word".equals(importType);
+	request.setAttribute("importType", importType);
+
 	if (collectionChoice != null && collectionChoice) {
 	    // in the view a drop down with collections will be displayed
 	    request.setAttribute("collections", qbService.getUserCollections(QuestionsController.getUserId()));
 	}
 
 	// user did not choose a file
-	if (file == null || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
+	if (file == null || (isWordInput ? !packageName.endsWith(".docx")
+		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml")))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
 	}
 
@@ -102,11 +109,18 @@ public class QuestionsController {
 
 	InputStream uploadedFileStream = new FileInputStream(file);
 
-	Question[] questions = packageName.endsWith(".xml")
-		? QuestionParser.parseQTIFile(uploadedFileStream, null, limitType)
-		: QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	Question[] questions;
+	if (packageName.endsWith(".xml")) {
+	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
+
+	} else if (packageName.endsWith(".docx")) {
+	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName);
+
+	} else {
+	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	}
 	request.setAttribute("questions", questions);
-	
+
 	FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
 
 	return "questions/questionChoice";

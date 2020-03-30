@@ -76,8 +76,7 @@ public class ZipFileUtil {
     }
 
     /**
-     * Create a temporary directory in which the zip file contents will go. This method is protected (rather than
-     * private) so that it may be called by the junit tests for this class.
+     * Create a temporary directory in which the zip file contents will go. 
      *
      * @param zipFileName
      * @return name of the new directory
@@ -85,7 +84,7 @@ public class ZipFileUtil {
      *             if the java io temp directory is not defined, or we are unable to calculate a unique name for the
      *             expanded directory, or an IOException occurs.
      */
-    protected static String prepareTempDirectory(String zipFileName) throws ZipFileUtilException {
+    public static String prepareTempDirectory(String zipFileName) throws ZipFileUtilException {
 	int dotIndex = zipFileName.indexOf(".");
 	String shortZipName = dotIndex > -1 ? zipFileName.substring(0, dotIndex) : zipFileName;
 
