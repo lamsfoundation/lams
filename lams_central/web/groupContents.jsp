@@ -115,7 +115,7 @@
 				    	<i class="fa fa-ellipsis-h" title="<fmt:message key="label.completed"/>"></i>
 					</button>
 					
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 						<c:forEach var="lessonlink" items="${lesson.auxiliaryLinks}">
 							<a href="<c:out value='${lessonlink.url}'/>" style="padding-left: 5px; padding-right:5px;" class="dropdown-item"
 								<c:if test="${not empty lessonlink.tooltip}">

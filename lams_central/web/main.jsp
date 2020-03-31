@@ -24,9 +24,10 @@
 .cards tbody tr {
    display: inline-block;
    width: 23rem;
+   height: auto;
    margin: 0.5rem;
    border: 0.0625rem solid rgba(0, 0, 0, .125);
-   border-radius: .25rem;
+   border-radius: .3rem;
    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
 }
 
@@ -54,6 +55,8 @@
 }
 .cards .lesson-image {
 	min-height: 170px;
+	border-top-left-radius: .3rem;
+    border-top-right-radius: .3em;
 }
 table:not(.cards) .lesson-image {
     background-image: none;
@@ -126,7 +129,7 @@ table:not(.cards).user-monitor tr {
 
 .auxiliary-links-menu {
 	float: right;
-	margin-top: -3px;
+	margin: -3px 0 10px 7px;
 }
 .auxiliary-links-menu button{
 	background-color: rgba(0,0,0,.03);
@@ -345,10 +348,12 @@ time.timeago {
 			var selectedOrderId = $(button).val();
 
 			//hide row-reorder if non-default order is selected
-			if (selectedOrderId == 0) {
-				$("table:not(.cards) td.row-reorder", $("#" + tableId)).show();
-			} else {
-				$("table:not(.cards) td.row-reorder", $("#" + tableId)).hide();
+			if ( !$("#" + tableId).hasClass("cards")) {
+				if (selectedOrderId == 0) {
+					$("td.row-reorder", $("#" + tableId)).show();
+				} else {
+					$("td.row-reorder", $("#" + tableId)).hide();
+				}
 			}
 			
 			var orderDirection = selectedOrderId == 0 ? 'asc':'desc';
@@ -399,40 +404,11 @@ time.timeago {
 		                //toggle button's icon
 		                $('.fa', node).toggleClass(['fa-table', 'fa-id-badge']);
 			            $('.list-view-label,.card-view-label', node).toggle();
-			            
-			            if ($table.hasClass('cards')) {
-			               // Create an array of labels containing all table headers
-			               var labels = [];
-			               $('thead th', $table).each(function () {
-			                  labels.push($(this).text());
-			               });
 
-			               // Add data-label attribute to each cell
-			               $('tbody tr', $table).each(function () {
-			                  $(this).find('td').each(function (column) {
-			                     $(this).attr('data-label', labels[column]);
-			                  });
-			               });
-
-			               var max = 0;
-			               $('tbody tr', $table).each(function () {
-			                  max = Math.max($(this).height(), max);
-			               }).height(max);
-
-			            } else {
-			               // Remove data-label attribute from each cell
-			               $('tbody td', $table).each(function () {
-			                  $(this).removeAttr('data-label');
-			               });
-
-			               $('tbody tr', $table).each(function () {
-			                  $(this).height('auto');
-			               });
-			        	}
-
-			            //toggle buttons
+			            //toggle auxiliary buttons
 			            $(".auxiliary-links-menu", $table).toggle();
 
+			            //hide charts for smaller devices
 			            if (isUserMonitor) {
 				            $("td.chart-td", lessonsTable).toggleClass("d-none d-sm-table-cell");
 				        }
@@ -515,7 +491,12 @@ time.timeago {
 								'rgb(252, 226, 5)',//yellow
 								'rgb(255, 146, 140)'//red
 							]
-						}]
+						}],
+						labels: [
+							'Completed',
+							'Attempted',
+							'Not Started'
+						]
 					},
 					options: {
 						responsive: true,

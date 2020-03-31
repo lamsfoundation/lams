@@ -47,7 +47,7 @@ $(document).ready(function () {
 						
 						rows += '<td id="org-row-' + orgId +'"';
 						if (activeOrgId == orgId) {
-							rows += ' class="active bg-secondary"';
+							rows += ' class="active"';
 						}
 						rows += '>';
 						
@@ -127,12 +127,12 @@ $(document).ready(function () {
 function selectOrganisation(newOrgId) {
 	//remove active CSS class from the old org
 	if (activeOrgId != null) {
-		$("#org-row-" + activeOrgId + ", #favorite-li-" + activeOrgId).removeClass("active bg-secondary");
+		$("#org-row-" + activeOrgId + ", #favorite-li-" + activeOrgId + " a").removeClass("active");
 		$("#org-row-" + activeOrgId + " a>i").remove();
 	}	
 	
 	//add active CSS class
-	$("#org-row-" + newOrgId + ", #favorite-li-" + newOrgId).addClass("active bg-secondary");
+	$("#org-row-" + newOrgId + ", #favorite-li-" + newOrgId + " a").addClass("active");
 	$("#org-row-" + newOrgId + " a").append( "<i class='fa fa-chevron-circle-right fa-lg pull-right'></i>" )
 	
 	activeOrgId = newOrgId;

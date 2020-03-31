@@ -434,7 +434,7 @@ public class DisplayGroupController {
 
 	    // Adding lesson notifications links if enabled
 	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
-		lessonLinks.addFirst(new IndexLinkBean("index.emailnotifications",
+		auxiliaryLessonLinks.addFirst(new IndexLinkBean("index.emailnotifications",
 			"javascript:showNotificationsDialog(null," + lessonId + ")", "fa fa-fw fa-bullhorn",
 			"index.emailnotifications.tooltip"));
 	    }

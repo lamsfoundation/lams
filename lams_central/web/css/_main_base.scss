@@ -73,8 +73,7 @@ a:hover, a:focus {
 
 /*OFFCANVAS BAR*/
 #favorite-organisations {
-    border-top: 1px solid rgba(255, 255, 255, 0.16);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+	border-bottom: 1px solid #efefef;
 }
 #favorite-organisations > li > a, .tablesorter a {
 	color: $main_fav_org_link;
@@ -96,14 +95,15 @@ a:hover, a:focus {
 }
 /*#offcanvas .active > a,*/
 #offcanvas .active > a:hover,
-#offcanvas .active > a:focus {
+#offcanvas .active > a:focus,
+#offcanvas a.active {
 	background: $main_offcanvas_link;
 }
-#offcanvas .active > a {
+#offcanvas .active > a,#offcanvas a.active {
     color: $main_offcanvas_link_color;
 }
 #offcanvas td.active {
-    border-right: 10px solid $brand-primary-bright;
+    border-right: 10px solid #8c8c8c;
     background: $main_offcanvas_link;
 }
 .offcanvas-search {
@@ -277,8 +277,11 @@ ul.dropdown-usermenu li a:focus, ul.dropdown-usermenu li a:hover, .top-nav .nav 
 .lesson-actions {
 	float: right;
 	font-size: 1.2em;
-	opacity: 0.3;
 	/* filter: alpha(opacity = 10); msie */
+}
+
+.lesson-actions, .auxiliary-links-menu button i {
+	opacity: 0.4;
 }
 
 .lesson-actions a {
