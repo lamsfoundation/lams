@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -65,6 +66,8 @@ public class QbService implements IQbService {
     private IUserManagementService userManagementService;
 
     private ILogEventService logEventService;
+
+    private ILamsToolService toolService;
 
     public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = Comparator
 	    .comparing(QbCollection::getName);
@@ -679,6 +682,12 @@ public class QbService implements IQbService {
 	return answersChanged;
     }
 
+    public boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature) {
+	long defaultContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
+	Collection<QbQuestion> qbQuestions = qbDAO.getQuestionsByToolContentId(defaultContentId);
+	return qbQuestions.stream().anyMatch(q -> q.getUid().equals(qbQuestionUid));
+    }
+
     private static Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -703,5 +712,9 @@ public class QbService implements IQbService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
+    }
+
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
     }
 }

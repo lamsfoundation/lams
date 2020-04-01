@@ -144,4 +144,6 @@ public interface IQbService {
     void prepareQuestionForExport(QbQuestion qbQuestion);
 
     int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid);
+
+    boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature);
 }
