@@ -564,6 +564,7 @@
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>
+        <property name="toolService"><ref bean="lamsToolService"/></property>
 	</bean>
 	
 	<bean id="qbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
