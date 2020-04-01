@@ -10,7 +10,7 @@
 
 <div class="form-group">
     <label for="dokumaran.description"><fmt:message key="label.authoring.basic.description" /></label>
-    <lams:CKEditor id="dokumaran.description" value="${mcAuthoringForm.description}" contentFolderID="${sessionMap.contentFolderID}"/>
+    <lams:CKEditor id="dokumaran.description" value="${authoringForm.dokumaran.description}" contentFolderID="${sessionMap.contentFolderID}"/>
 </div>
 
 
