@@ -543,11 +543,11 @@ public class AuthoringController {
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion || !newCollectionUid.equals(oldCollectionUid)) {
+	if (isAddingQuestion || (newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
 	}
 	//remove from the old collection, if needed
-	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
+	if (!isAddingQuestion && newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
 		    false);
 	}

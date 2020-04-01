@@ -107,14 +107,13 @@ public class AuthoringController implements QaAppConstants {
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	return readDatabaseData(form, request, mode);
     }
-    
+
     /**
      * Set the defineLater flag so that learners cannot use content while we are editing. This flag is released when
      * updateContent is called.
      */
     @RequestMapping(path = "/definelater", method = RequestMethod.POST)
-    public String definelater(@ModelAttribute("authoringForm") QaAuthoringForm form,
-	    HttpServletRequest request) {
+    public String definelater(@ModelAttribute("authoringForm") QaAuthoringForm form, HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	qaService.setDefineLater(toolContentID, true);
 
@@ -317,7 +316,7 @@ public class AuthoringController implements QaAppConstants {
 	    @RequestParam String sessionMapID, @RequestParam Long qbQuestionUid) {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	SortedSet<QaQueContent> qaQuestions = getQuestions(sessionMap);
-	
+
 	//check whether this QB question is a duplicate
 	for (QaQueContent qaQuestion : qaQuestions) {
 	    if (qbQuestionUid.equals(qaQuestion.getQbQuestion().getUid())) {
@@ -342,7 +341,7 @@ public class AuthoringController implements QaAppConstants {
 
 	return "authoring/itemlist";
     }
-    
+
     /**
      * Shows "This question has already been added" error message in a browser.
      */
@@ -439,11 +438,11 @@ public class AuthoringController implements QaAppConstants {
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion || !newCollectionUid.equals(oldCollectionUid)) {
+	if (isAddingQuestion || (newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
 	}
 	//remove from the old collection, if needed
-	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
+	if (!isAddingQuestion && newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
 		    false);
 	}
