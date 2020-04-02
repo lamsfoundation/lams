@@ -52,7 +52,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/etherpad.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};

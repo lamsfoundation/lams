@@ -399,6 +399,15 @@
 		<div id="questionListArea">
 			<%@ include file="questionlist.jsp"%>
 		</div>
+		
+		<%-- ETHERPAD TEST --%>
+		<lams:Etherpad groupId="scratchie-first-${toolSessionID}" />
+
+		<lams:Etherpad groupId="scratchie-second-${toolSessionID}" showControls="true" showChat="true">
+			Initial Etherpad text
+		</lams:Etherpad>
+		
+		
 
 		<div id="footer"></div>
 	</lams:Page>
