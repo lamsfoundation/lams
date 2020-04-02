@@ -125,6 +125,8 @@ public interface IQbService {
 
     boolean removeQuestionPossibleByQuestionId(int qbQuestionId);
 
+    void removeAnswersByToolContentId(long toolContentId);
+
     QbCollection getCollection(long collectionUid);
 
     int getCountQuestionActivitiesByUid(long qbQuestionUid);

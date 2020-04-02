@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -55,8 +54,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class QbService implements IQbService {
-    private static Logger log = Logger.getLogger(QbService.class);
-
     private IQbDAO qbDAO;
 
     private IGradebookService gradebookService;
@@ -427,6 +424,11 @@ public class QbService implements IQbService {
     }
 
     @Override
+    public void removeAnswersByToolContentId(long toolContentId) {
+	qbDAO.removeAnswersByToolContentId(toolContentId);
+    }
+
+    @Override
     public Organisation shareCollection(long collectionUid, int organisationId) {
 	QbCollection collection = qbDAO.find(QbCollection.class, collectionUid);
 	if (collection.getUserId() == null || collection.isPersonal()) {
@@ -682,6 +684,7 @@ public class QbService implements IQbService {
 	return answersChanged;
     }
 
+    @Override
     public boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature) {
 	long defaultContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	Collection<QbQuestion> qbQuestions = qbDAO.getQuestionsByToolContentId(defaultContentId);

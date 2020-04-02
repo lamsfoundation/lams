@@ -472,6 +472,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
+	
+	qbService.removeAnswersByToolContentId(toolContentId);
 
 	qaDAO.removeQa(toolContentId);
     }

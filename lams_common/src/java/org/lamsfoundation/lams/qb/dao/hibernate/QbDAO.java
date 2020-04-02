@@ -117,6 +117,9 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "JOIN tl_laasse10_option_answer AS aa ON aa.question_option_uid = os.uid "
 	    + "SET aa.question_option_uid = ot.uid";
 
+    private static final String REMOVE_ANSWERS_BY_TOOL_CONTENT_ID = "DELETE a FROM lams_qb_tool_answer AS a JOIN lams_qb_tool_question AS tq "
+	    + "USING (tool_question_uid) WHERE tq.tool_content_id = :toolContentId";
+
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
 	return this.find(QbQuestion.class, qbQuestionUid);
@@ -441,6 +444,12 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		.setParameter("targetQbQuestionUid", targetQbQuestionUid).executeUpdate();
 
 	return result;
+    }
+
+    @Override
+    public void removeAnswersByToolContentId(long toolContentId) {
+	getSession().createNativeQuery(REMOVE_ANSWERS_BY_TOOL_CONTENT_ID).setParameter("toolContentId", toolContentId)
+		.executeUpdate();
     }
 
     private Query prepareCollectionQuestionsQuery(long collectionUid, String orderBy, String orderDirection,
