@@ -328,12 +328,12 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DokumaranUser getUserByLoginAndContent(String login, long contentId) {
 	List<User> user = dokumaranUserDao.findByProperty(User.class, "login", login);
 	return user.isEmpty() ? null
-		: dokumaranUserDao.getUserByUserIDAndContentID(user.get(0).getUserId().longValue(), contentId);
+		: dokumaranUserDao.getUserByUserIDAndContentIDViaSession(user.get(0).getUserId().longValue(),
+			contentId);
     }
 
     @Override

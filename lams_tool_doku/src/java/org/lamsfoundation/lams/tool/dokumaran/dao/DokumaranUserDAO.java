@@ -33,11 +33,14 @@ public interface DokumaranUserDAO extends DAO {
 
     DokumaranUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
+    DokumaranUser getUserByUserIDAndContentIDViaSession(Long userId, Long contentId);
+
     List<DokumaranUser> getBySessionID(Long sessionId);
-    
+
     /**
-     * Get the list of all leaders in the specified session. This method is applicable only in case allowMultipleLeaders option is ON.
-     * 
+     * Get the list of all leaders in the specified session. This method is applicable only in case allowMultipleLeaders
+     * option is ON.
+     *
      * @param sessionId
      * @return
      */
