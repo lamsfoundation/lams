@@ -57,8 +57,10 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -395,6 +397,9 @@ public class MonitoringService implements IMonitoringFullService {
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
 		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish,
 		precedingLesson);
+	
+	//updates lesson's hasContributeActivities flag
+	calculateContributeActivities(initializedLesson.getLessonId(), false);
 
 	logLessonStateChange(LogEvent.TYPE_TEACHER_LESSON_CREATE, initializedLesson, userID, null,
 		initializedLesson.getLessonStateId());
@@ -2023,48 +2028,75 @@ public class MonitoringService implements IMonitoringFullService {
 
 	return (GroupingActivity) activity;
     }
-
-    @Override
-    public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID) {
-	List<ContributeActivityDTO> result = null;
-	Lesson lesson = lessonDAO.getLesson(lessonID);
-	if (lesson != null) {
-	    ContributeActivitiesProcessor processor = new ContributeActivitiesProcessor(lesson.getLearningDesign(),
-		    lessonID, activityDAO, lamsCoreToolService);
-	    processor.parseLearningDesign();
-	    result = processor.getMainActivityList();
-	}
-	return result;
-    }
     
     @Override
-    public int getCountContributeActivities(Long lessonId) {
-	int contributeActivitiesCounter = 0;
-	List<ContributeActivityDTO> contributeActivities = getAllContributeActivityDTO(lessonId);
-	if (contributeActivities != null) {
-	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
-		if (contributeActivity.getContributeEntries() != null
-			&& !contributeActivity.getContributeEntries().isEmpty()) {
-		    contributeActivitiesCounter++;
+    @SuppressWarnings("unchecked")
+    public List<ContributeActivityDTO> calculateContributeActivities(Long lessonId, boolean skipCompletedBranching) {
+	Lesson lesson = lessonDAO.getLesson(lessonId);
+
+	List<ContributeActivityDTO> resultContributeActivities = new ArrayList<>();
+	if (lesson != null) {
+	    ContributeActivitiesProcessor processor = new ContributeActivitiesProcessor(lesson.getLearningDesign(),
+		    lessonId, activityDAO, lamsCoreToolService);
+	    processor.parseLearningDesign();
+	    List<ContributeActivityDTO> contributeActivities = processor.getMainActivityList();
+
+	    if (contributeActivities != null) {
+		for (ContributeActivityDTO contributeActivity : contributeActivities) {
+		    if (contributeActivity.getContributeEntries() != null) {
+			Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity
+				.getContributeEntries().iterator();
+			while (entryIterator.hasNext()) {
+			    ContributeActivityDTO.ContributeEntry contributeEntry = entryIterator.next();
+
+			    // extra filtering for chosen branching: do not show in Sequence tab if all users were assigned
+			    if (skipCompletedBranching && ContributionTypes.CHOSEN_BRANCHING
+				    .equals(contributeEntry.getContributionType())) {
+				Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
+				ChosenBranchingActivity branching = (ChosenBranchingActivity) getActivityById(
+					contributeActivity.getActivityID());
+				for (SequenceActivity branch : (Set<SequenceActivity>) (Set<?>) branching
+					.getActivities()) {
+				    Group group = branch.getSoleGroupForBranch();
+				    if (group != null) {
+					learners.removeAll(group.getUsers());
+				    }
+				}
+				contributeEntry.setIsComplete(learners.isEmpty());
+			    }
+
+			    if (!contributeEntry.getIsRequired() || contributeEntry.getIsComplete()) {
+				entryIterator.remove();
+			    }
+			}
+
+			if (!contributeActivity.getContributeEntries().isEmpty()) {
+			    resultContributeActivities.add(contributeActivity);
+			}
+		    }
 		}
 	    }
+		
+	    //updates lesson's hasContributeActivities flag
+	    lesson.setHasContributeActivities(!resultContributeActivities.isEmpty());
+	    lessonDAO.saveLesson(lesson);
 	}
-	return contributeActivitiesCounter;
+
+	return resultContributeActivities.isEmpty() ? null : resultContributeActivities;
     }
 
     @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException {
 	securityService.isLessonMonitor(lessonID, requestingUserId, "get learner activity URL", true);
-	Lesson lesson = lessonDAO.getLesson(lessonID);
 
 	Activity activity = activityDAO.getActivityByActivityId(activityID);
 	User learner = (User) baseDAO.find(User.class, learnerUserID);
 
 	String url = null;
 	if ((activity == null) || (learner == null)) {
-	    MonitoringService.log.error("getLearnerActivityURL activity or user missing. Activity ID " + activityID
-		    + " activity " + activity + " userID " + learnerUserID + " user " + learner);
+	    log.error("getLearnerActivityURL activity or user missing. Activity ID " + activityID + " activity "
+		    + activity + " userID " + learnerUserID + " user " + learner);
 	} else if (activity.isToolActivity()) {
 	    url = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity, learner);
 	} else if (activity.isOptionsActivity() || activity.isParallelActivity()) {
@@ -2074,7 +2106,7 @@ public class MonitoringService implements IMonitoringFullService {
 	} else if (activity.isSystemToolActivity()) {
 	    url = lamsCoreToolService.getToolLearnerProgressURL(lessonID, activity, learner);
 	}
-	MonitoringService.log.debug("url: " + url);
+	log.debug("url: " + url);
 	return url;
     }
 

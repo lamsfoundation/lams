@@ -390,6 +390,16 @@ public interface ILessonService {
      * @return learner's progress or null
      */
     LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId);
+    
+    /**
+     * Gets the learner's progress details for all lessons in organisation. 
+     *
+     * @param learnerId
+     *            user's id
+     * @param organisationId
+     *            organisation's id
+     */
+    List<LearnerProgress> getUserProgressByOrgAndLearner(Integer learnerId, Integer organisationId);
 
     /**
      * Gets the progresses for learners in a particular lesson.

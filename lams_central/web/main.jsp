@@ -10,7 +10,7 @@
 	
 	<lams:css/>
 	<lams:css suffix="main"/>
-	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap.css">
+	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap4.css">
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/bootstrap-tourist.min.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/datatables.css">
@@ -25,8 +25,7 @@
    display: inline-block;
    width: 23rem;
    height: auto;
-   margin: 0.5rem;
-   border: 0.0625rem solid rgba(0, 0, 0, .125);
+   margin: 0.7rem;
    border-radius: .3rem;
    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
 }

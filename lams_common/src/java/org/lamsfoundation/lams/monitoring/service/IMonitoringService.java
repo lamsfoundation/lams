@@ -351,6 +351,4 @@ public interface IMonitoringService {
      * Get list of users who completed the given lesson.
      */
     List<User> getUsersCompletedLesson(Long lessonId, Integer limit, Integer offset, boolean orderAscending);
-    
-    int getCountContributeActivities(Long lessonId);
 }

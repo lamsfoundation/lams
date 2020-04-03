@@ -141,9 +141,17 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     @Override
     public LearnerProgress getLearnerProgressByLearner(Integer learnerId, Long lessonId) {
-
 	return (LearnerProgress) getSession().createQuery(LearnerProgressDAO.LOAD_PROGRESS_BY_LEARNER)
-		.setInteger("learnerId", learnerId).setLong("lessonId", lessonId).uniqueResult();
+		.setParameter("learnerId", learnerId).setParameter("lessonId", lessonId).uniqueResult();
+    }
+    
+    @Override
+    public List<LearnerProgress> getLearnerProgressByOrgAndLearner(Integer learnerId, Integer organisationId) {
+	final String LOAD_PROGRESS_BY_ORG_AND_LEARNER = "from LearnerProgress p where p.user.id = :learnerId "
+		    + "and p.lesson.organisation.organisationId = :organisationId";
+	
+	return getSession().createQuery(LOAD_PROGRESS_BY_ORG_AND_LEARNER, LearnerProgress.class)
+		.setParameter("learnerId", learnerId).setParameter("organisationId", organisationId).list();
     }
 
     @Override

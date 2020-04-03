@@ -644,12 +644,14 @@ public class LessonService implements ILessonService {
 		Boolean enableLessonNotifications = (Boolean) tuple[tupleIndex++];
 		enableLessonNotifications = enableLessonNotifications == null ? false
 			: enableLessonNotifications.booleanValue();
+		Boolean hasContributeActivities = (Boolean) tuple[tupleIndex++];
 		Boolean dependent = (Boolean) tuple[tupleIndex++];
 		dependent = dependent == null ? false : dependent.booleanValue();
 		Boolean scheduledFinish = (Boolean) tuple[tupleIndex++];
+
 		IndexLessonBean bean = new IndexLessonBean(lessonId, lessonName, lessonDescription, lessonState,
-			lessonStartDate, lessonStarted, lessonCompleted, enableLessonNotifications, dependent,
-			scheduledFinish);
+			lessonStartDate, lessonStarted, lessonCompleted, enableLessonNotifications,
+			hasContributeActivities, dependent, scheduledFinish);
 		map.put(new Long(lessonId), bean);
 	    }
 	}
@@ -671,6 +673,11 @@ public class LessonService implements ILessonService {
     @Override
     public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId) {
 	return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
+    }
+    
+    @Override
+    public List<LearnerProgress> getUserProgressByOrgAndLearner(Integer learnerId, Integer organisationId) {
+	return learnerProgressDAO.getLearnerProgressByOrgAndLearner(learnerId, organisationId);
     }
 
     @Override

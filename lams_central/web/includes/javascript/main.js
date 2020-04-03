@@ -9,6 +9,7 @@ $(document).ready(function () {
 	
 	var $tablesorter = $(".tablesorter").tablesorter({
 		theme: 'bootstrap',
+		widthFixed: true,
 		headerTemplate : '{content} {icon}',
 		widgets: ["filter"],
 	    widgetOptions : {
@@ -148,7 +149,11 @@ function selectOrganisation(newOrgId) {
 }
 
 
-function loadOrganisation() {	
+function loadOrganisation() {
+	//display loading animation
+	$("#page-wrapper>footer").hide();
+	$("#org-container").html('<div class="text-center m-5"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>');
+	
 	$("#org-container").load(
 		"displayGroup.do",
 		{
@@ -160,6 +165,9 @@ function loadOrganisation() {
 				$("body").removeClass("offcanvas-hidden");
 				return;
 			}
+			
+			//display footer back
+			$("#page-wrapper>footer").show();
 			
 			initDataTables();
 			

@@ -63,6 +63,7 @@
 			<props>
 				<prop key="add*">PROPAGATION_REQUIRED</prop>
 				<prop key="*archive*">PROPAGATION_REQUIRED</prop>
+				<prop key="calculate*">PROPAGATION_REQUIRED</prop>
 				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="cloneLesson*">PROPAGATION_REQUIRED</prop>
 				<prop key="closeGate">PROPAGATION_REQUIRED</prop>

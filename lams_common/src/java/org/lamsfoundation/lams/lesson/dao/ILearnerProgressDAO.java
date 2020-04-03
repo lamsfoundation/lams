@@ -58,6 +58,17 @@ public interface ILearnerProgressDAO {
      * @return the user's progress data
      */
     LearnerProgress getLearnerProgressByLearner(Integer learnerId, Long lessonId);
+    
+    /**
+     * Retrieves the learner progress object for user in all lessons in specified organisation.
+     *
+     * @param learnerId
+     *            the user who owns the learner progress data.
+     * @param organisationId
+     *            lessons belong to this organisation
+     * @return the user's progress datas
+     */
+    List<LearnerProgress> getLearnerProgressByOrgAndLearner(Integer learnerId, Integer organisationId);
 
     /**
      * Saves or Updates learner progress data.

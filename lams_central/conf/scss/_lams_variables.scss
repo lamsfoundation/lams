@@ -7,7 +7,7 @@ $gray-light-mid:  lighten($gray-base, 86.5%); // #dddddd
 $gray-lightest:  lighten($gray-base, 96%); // #f5f5f5 or whitesmoke
 
 // Primary colour shades
-$brand-primary-darkest: #072B57; // used for main page offcanvas course list
+$brand-primary-darkest: #5d5d5d; // used for main page offcanvas course list
 $brand-primary-darker: #164276;  // used for main page offcanvas course list
 $brand-primary-mid: lighten($brand-primary, 12%); // #5798d0
 $brand-primary-light: lighten($brand-primary, 45%); // #dbe9f5
@@ -63,7 +63,7 @@ $main_offcanvas_link_color: $body-bg;
 $main_offcanvas_background: $brand-primary-darker;
 $main_offcanvas_color: $gray-lighter;
 $main_offcanvas_logo_background: $brand-primary-darkest;
-$main_offcanvas_search_background: $brand-primary-darkest;
+$main_offcanvas_search_background: #adadad;
 $main_dropdown_border: #D9DEE4;
 $main_navbar_link: #515356;
 $main_singlelesson_hover_border: #9be0f9;

@@ -336,6 +336,14 @@ public interface IMonitoringFullService extends IMonitoringService {
     /** Get the record of the learner's progress for a particular lesson */
     LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
     
-    List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
+    /**
+     * Returns list of contributed activities, and null if none available. Besides, it also updates lesson's
+     * hasContributeActivities flag.
+     * 
+     * @param lessonId
+     * @param skipCompletedBranching
+     * @return
+     */
+    List<ContributeActivityDTO> calculateContributeActivities(Long lessonId, boolean skipCompletedBranching);
 
 }

@@ -172,7 +172,7 @@ public class TblMonitoringController {
 
 	List<PermissionGateDTO> permissionGates = new ArrayList<>();
 
-	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+	List<ContributeActivityDTO> contributeActivities = monitoringService.calculateContributeActivities(lessonId, true);
 	if (contributeActivities != null) {
 	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
 

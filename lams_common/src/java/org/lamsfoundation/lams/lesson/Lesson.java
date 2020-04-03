@@ -77,7 +77,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 		+ " JOIN lams_group AS g ON ging.grouping_id = g.grouping_id AND g.group_id != ging.staff_group_id"
 		+ " JOIN lams_user_group AS ug ON ug.user_id = :userId AND g.group_id = ug.group_id"),
 	@NamedNativeQuery(name = "learnerLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, l.start_date_time,"
-		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications, l.has_contribute_activities,"
 		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
 		+ "  l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
 		+ "  FROM lams_lesson AS l JOIN lams_learning_design AS ld ON l.organisation_id = :orgId"
@@ -90,7 +90,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 		+ "  LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id"
 		+ "  AND lp.lesson_id = l.lesson_id"),
 	@NamedNativeQuery(name = "staffLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, l.start_date_time,"
-		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications, l.has_contribute_activities,"
 		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
 		+ "  l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
 		+ " FROM lams_lesson AS l JOIN lams_learning_design AS ld ON l.organisation_id = :orgId"
@@ -102,7 +102,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 		+ " LEFT JOIN lams_learner_progress AS lp ON lp.user_id = ug.user_id"
 		+ " AND lp.lesson_id = l.lesson_id"),
 	@NamedNativeQuery(name = "allLessonsByOrgAndUserWithCompletedFlag", resultSetMapping = "lessonsByOrgAndUserWithCompletedFlag", query = "SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, l.start_date_time,"
-		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications,"
+		+ " NOT ISNULL(lp.learner_progress_id) AS lesson_started_flag, lp.lesson_completed_flag, l.enable_lesson_notifications, l.has_contribute_activities,"
 		+ " (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent,"
 		+ " l.schedule_end_date_time IS NOT NULL OR l.scheduled_number_days_to_lesson_finish IS NOT NULL AS scheduledFinish"
 		+ " FROM lams_lesson AS l JOIN lams_learning_design AS ld ON ld.copy_type_id != 3"
@@ -124,6 +124,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 	@ColumnResult(name = "lesson_started_flag", type = Boolean.class),
 	@ColumnResult(name = "lesson_completed_flag", type = Boolean.class),
 	@ColumnResult(name = "enable_lesson_notifications", type = Boolean.class),
+	@ColumnResult(name = "has_contribute_activities", type = Boolean.class),
 	@ColumnResult(name = "dependent", type = Boolean.class),
 	@ColumnResult(name = "scheduledFinish", type = Boolean.class) }))
 @Entity
@@ -262,6 +263,12 @@ public class Lesson implements Serializable {
      */
     @Column(name = "gradebook_on_complete")
     private boolean gradebookOnComplete = false;
+    
+    /**
+     * Whether lesson has any contribute activities requiring teacher action.
+     */
+    @Column(name = "has_contribute_activities")
+    private boolean hasContributeActivities = false;
 
     /**
      * For lesson conditional release
@@ -702,5 +709,13 @@ public class Lesson implements Serializable {
 
     public void setGradebookOnComplete(boolean gradebookOnComplete) {
 	this.gradebookOnComplete = gradebookOnComplete;
+    }
+    
+    public boolean hasContributeActivities() {
+	return hasContributeActivities;
+    }
+
+    public void setHasContributeActivities(boolean hasContributeActivities) {
+	this.hasContributeActivities = hasContributeActivities;
     }
 }

@@ -1133,7 +1133,7 @@ public class MonitoringController {
 		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
+	List<ContributeActivityDTO> contributeActivities = monitoringService.calculateContributeActivities(lessonId, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
@@ -1203,7 +1203,7 @@ public class MonitoringController {
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
+	List<ContributeActivityDTO> contributeActivities = monitoringService.calculateContributeActivities(lessonId, true);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
@@ -1627,50 +1627,6 @@ public class MonitoringController {
 	}
 
 	return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
-	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
-	Lesson lesson = lessonService.getLesson(lessonId);
-
-	if (contributeActivities != null) {
-	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<>();
-	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
-		if (contributeActivity.getContributeEntries() != null) {
-		    Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity
-			    .getContributeEntries().iterator();
-		    while (entryIterator.hasNext()) {
-			ContributeActivityDTO.ContributeEntry contributeEntry = entryIterator.next();
-
-			// extra filtering for chosen branching: do not show in Sequence tab if all users were assigned
-			if (skipCompletedBranching
-				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
-			    Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
-			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
-				    .getActivityById(contributeActivity.getActivityID());
-			    for (SequenceActivity branch : (Set<SequenceActivity>) (Set<?>) branching.getActivities()) {
-				Group group = branch.getSoleGroupForBranch();
-				if (group != null) {
-				    learners.removeAll(group.getUsers());
-				}
-			    }
-			    contributeEntry.setIsComplete(learners.isEmpty());
-			}
-
-			if (!contributeEntry.getIsRequired() || contributeEntry.getIsComplete()) {
-			    entryIterator.remove();
-			}
-		    }
-
-		    if (!contributeActivity.getContributeEntries().isEmpty()) {
-			resultContributeActivities.add(contributeActivity);
-		    }
-		}
-	    }
-	    return resultContributeActivities;
-	}
-	return null;
     }
 
     private static int getActivityCoordinate(Integer coord) {

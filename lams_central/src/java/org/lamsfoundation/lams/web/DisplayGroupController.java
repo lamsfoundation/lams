@@ -309,6 +309,7 @@ public class DisplayGroupController {
 	    }
 	}
 
+	List<LearnerProgress> learnerProgresses = lessonService.getUserProgressByOrgAndLearner(userId, orgId);
 	for (IndexLessonBean bean : map.values()) {
 	    LinkedList<IndexLinkBean> lessonLinks = new LinkedList<>();
 	    String url = null;
@@ -318,48 +319,16 @@ public class DisplayGroupController {
 	    if (roles.contains(Role.ROLE_LEARNER)
 		    && (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE))) {
 		url = "javascript:openLearner(" + lessonId + ")";
-		
-		//calculate learner progress. for all other lesson states, progress will be displayed as 0
-		LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
-		if (learnerProgress != null) {
-		    int progressAsLearner = learnerProgress.isComplete() ? 100
-			    : learnerProgress.getCompletedActivities().size() * 100
-				    / learnerProgress.getLesson().getLearningDesign().getActivities().size();
-		    bean.setProgressAsLearner(progressAsLearner);
-		}
-	    }
-	    
-//	    public sdtatic final Integer CREATED = 1;
-//	    /** The state for lessons that have been scheduled. */
-//	    public static final Integer NOT_STARTED_STATE = 2;
-//	    /** The state for started lesson */
-//	    public static final Integer STARTED_STATE = 3;
-//	    /**
-//	     * The state for lessons that have been suspended by the teacher. The lesson can be seen on the staff interface but
-//	     * not on the learning interface
-//	     */
-//	    public static final Integer SUSPENDED_STATE = 4;
-//	    /**
-//	     * The state for lessons that have been finished. A finished lesson is shown as inactive on the staff interface, and
-//	     * is shown on the learner interface but the learner is to only see the overall progress and be able to export data
-//	     * - they should not be able to iteract with the tools
-//	     */
-//	    public static final Integer FINISHED_STATE = 5;
-//	    /**
-//	     * The state for lesssons that are shown as inactive on the staff interface but no longer visible to the learners.
-//	     */
-//	    public static final Integer ARCHIVED_STATE = 6;
-//	    /** The state for lesssons that are removed and never can be accessed again */
-//	    public static final Integer REMOVED_STATE = 7;
-	    
 
-	    
-	    if (roles.contains(Role.ROLE_LEARNER)) {
-		int progressAsLearner = 0;
-		if (Lesson.STARTED_STATE.equals(lessonStateId)) {
-		    
+		//calculate learner progress. for all other lesson states, progress will be displayed as 0
+		for (LearnerProgress learnerProgress : learnerProgresses) {
+		    if (lessonId.equals(learnerProgress.getLesson().getLessonId())) {
+			int progressAsLearner = learnerProgress.isComplete() ? 100
+				: learnerProgress.getCompletedActivities().size() * 100
+					/ learnerProgress.getLesson().getLearningDesign().getActivities().size();
+			bean.setProgressAsLearner(progressAsLearner);
+		    }
 		}
-		
 	    }
 
 	    if ((lessonLinks.size() > 0) || (url != null)) {
@@ -425,9 +394,8 @@ public class DisplayGroupController {
 		lessonLinks.addFirst(new IndexLinkBean("index.monitor",
 			showMonitor, "fa fa-fw fa-heartbeat", null));
 
-		//check whether there are any required tasks for this lesson
-		int contributeActivitiesCounter = monitoringService.getCountContributeActivities(lessonId);
-		if (contributeActivitiesCounter != 0) {
+		//in case there are required tasks for this lesson, show monitor URL
+		if (bean.hasContributeActivities()) {
 		    bean.setRequiredTasksUrl(showMonitor);    
 		}
 	    }

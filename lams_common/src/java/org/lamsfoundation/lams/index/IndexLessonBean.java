@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.index;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  *          <p>
@@ -52,6 +51,7 @@ public class IndexLessonBean implements Comparable {
     private int countTotalLearners;
     private int countAttemptedLearners;
     private int countCompletedLearners;
+    private boolean hasContributeActivities = false;
     
     private int progressAsLearner;
 
@@ -65,8 +65,9 @@ public class IndexLessonBean implements Comparable {
 	this.url = url;
     }
 
-    public IndexLessonBean(Long id, String name, String description, Integer state, Date startDate, boolean started, boolean completed,
-	    boolean enableLessonNotifications, boolean dependent, boolean scheduledFinish) {
+    public IndexLessonBean(Long id, String name, String description, Integer state, Date startDate, boolean started,
+	    boolean completed, boolean enableLessonNotifications, boolean hasContributeActivities, boolean dependent,
+	    boolean scheduledFinish) {
 	this.id = id;
 	this.name = name;
 	this.description = description;
@@ -75,6 +76,7 @@ public class IndexLessonBean implements Comparable {
 	this.started = started;
 	this.completed = completed;
 	this.enableLessonNotifications = enableLessonNotifications;
+	this.hasContributeActivities = hasContributeActivities;
 	this.dependent = dependent;
 	this.scheduledFinish = scheduledFinish;
     }
@@ -266,5 +268,13 @@ public class IndexLessonBean implements Comparable {
 
     public void setCountCompletedLearners(int countCompletedLearners) {
 	this.countCompletedLearners = countCompletedLearners;
+    }
+    
+    public boolean hasContributeActivities() {
+	return hasContributeActivities;
+    }
+
+    public void setHasContributeActivities(boolean hasContributeActivities) {
+	this.hasContributeActivities = hasContributeActivities;
     }
 }
