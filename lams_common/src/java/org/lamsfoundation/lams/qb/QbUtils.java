@@ -39,7 +39,8 @@ public class QbUtils {
     public static void fillFormWithUserCollections(IQbService qbService, String toolSignature, QbQuestionForm form,
 	    Long qbQuestionUid) {
 	final boolean isRequestCameFromTool = StringUtils.isNotBlank(form.getSessionMapID());
-	boolean isDefaultQuestion = qbService.isQuestionDefaultInTool(qbQuestionUid, toolSignature);
+	boolean isDefaultQuestion = qbQuestionUid == null ? false
+		: qbService.isQuestionDefaultInTool(qbQuestionUid, toolSignature);
 	Integer userId = QbUtils.getUserId();
 
 	if (isRequestCameFromTool && !isDefaultQuestion && qbQuestionUid != null) {
