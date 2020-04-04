@@ -111,6 +111,8 @@ public interface IUserManagementService {
      */
     List findByProperty(Class clazz, String name, Object value);
 
+    <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values);
+
     /**
      * @param properties
      *            a map of property names and values
@@ -173,7 +175,7 @@ public interface IUserManagementService {
      * @return true or false
      */
     boolean isUserInRole(Integer userId, Integer orgId, String roleName);
-    
+
     /**
      * @param organisationId
      * @return organisation by its id
@@ -224,10 +226,10 @@ public interface IUserManagementService {
      * @return a list of UserOrganisationRoles
      */
     List<UserOrganisationRole> getUserOrganisationRoles(Integer orgId, String login);
-    
+
     /**
      * Returns list of UserOrganisationCollapsed, indicating which sub-courses was collapsed by the given user.
-     * 
+     *
      * @param parentOrganisationId
      * @param userId
      * @return
@@ -279,7 +281,7 @@ public interface IUserManagementService {
      * @return UserOrganisation
      */
     UserOrganisation getUserOrganisation(Integer userId, Integer orgId);
-    
+
     /**
      * @param userId
      * @param orgId
@@ -338,6 +340,18 @@ public interface IUserManagementService {
      * @param rolesList
      */
     void setRolesForUserOrganisation(User user, Integer organisationId, List<String> rolesList);
+
+    /**
+     * Set the roles for the specified user and organisation using the roleIds in rolesList. If userOrganisation
+     * exists,
+     * will also remove roles that are not in rolesList.
+     *
+     * @param checkGroupManagerRoles
+     *            whether check if user is a group manager, he should also have other roles in organisation; can be
+     *            false to avoid extra check if we know that user can not be a group manager
+     */
+    void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList,
+	    boolean checkGroupManagerRoles);
 
     void setRolesForUserOrganisation(Integer userId, Integer organisationId, Set<Integer> roleIDList);
 
@@ -410,6 +424,7 @@ public interface IUserManagementService {
     void logPasswordChanged(User user, User modifiedBy);
 
     void logUserCreated(User user, User createdBy);
+
     void logUserCreated(User user, UserDTO createdBy);
 
     Integer getCountUsers();

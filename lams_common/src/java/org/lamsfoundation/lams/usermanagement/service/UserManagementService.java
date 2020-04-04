@@ -223,6 +223,11 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
+    public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values) {
+	return baseDAO.findByPropertyValues(clazz, name, values);
+    }
+
+    @Override
     public List findByProperties(Class clazz, Map<String, Object> properties) {
 	return baseDAO.findByProperties(clazz, properties);
     }
@@ -306,7 +311,7 @@ public class UserManagementService implements IUserManagementService {
 	}
 	return true;
     }
-    
+
     @Override
     public Organisation getOrganisationById(Integer organisationId) {
 	return (Organisation) findById(Organisation.class, organisationId);
@@ -342,8 +347,8 @@ public class UserManagementService implements IUserManagementService {
 	return baseDAO.findByProperties(UserOrganisationRole.class, properties);
     }
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public Map<Integer, Set<Integer>> getRolesForUser(Integer userId) {
 	return ((List<UserOrganisation>) findByProperty(UserOrganisation.class, "user.userId", userId)).stream()
 		.collect(Collectors.toMap(userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
@@ -371,7 +376,7 @@ public class UserManagementService implements IUserManagementService {
 	properties.put("organisation.parentOrganisation.organisationId", parentOrgId);
 	return baseDAO.findByProperties(UserOrganisation.class, properties);
     }
-    
+
     @Override
     public UserOrganisationCollapsed getUserOrganisationCollapsed(Integer userId, Integer orgId) {
 	Map<String, Object> properties = new HashMap<>();
@@ -380,9 +385,10 @@ public class UserManagementService implements IUserManagementService {
 	List<UserOrganisationCollapsed> results = baseDAO.findByProperties(UserOrganisationCollapsed.class, properties);
 	return results.isEmpty() ? null : (UserOrganisationCollapsed) results.get(0);
     }
-    
+
     @Override
-    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId) {
+    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId,
+	    Integer userId) {
 	return organisationDAO.getChildOrganisationsCollapsedByUser(parentOrganisationId, userId);
     }
 
@@ -649,10 +655,12 @@ public class UserManagementService implements IUserManagementService {
 	// access the org.UserOrganisations set
 	// if org has come from the web layer.
 	Organisation org = (Organisation) findById(Organisation.class, organisationId);
-	setRolesForUserOrganisation(user, org, rolesList);
+	setRolesForUserOrganisation(user, org, rolesList, true);
     }
 
-    private void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList) {
+    @Override
+    public void setRolesForUserOrganisation(User user, Organisation org, List<String> rolesList,
+	    boolean checkGroupManagerRoles) {
 
 	// The private version of setRolesForUserOrganisation can pass around
 	// the org safely as we are within
@@ -674,7 +682,7 @@ public class UserManagementService implements IUserManagementService {
 	// course also if not already
 	if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)
 		&& (getUserOrganisation(user.getUserId(), org.getParentOrganisation().getOrganisationId()) == null)) {
-	    setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList);
+	    setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList, checkGroupManagerRoles);
 	}
 
 	List<String> rolesCopy = new ArrayList<>();
@@ -722,8 +730,11 @@ public class UserManagementService implements IUserManagementService {
 	    uo.setUserOrganisationRoles(uors);
 	    save(uo);
 	}
-	// make sure group managers have monitor and learner in each subgroup
-	checkGroupManager(user, org);
+
+	if (checkGroupManagerRoles) {
+	    // make sure group managers have monitor and learner in each subgroup
+	    checkGroupManager(user, org);
+	}
     }
 
     private void checkGroupManager(User user, Organisation org) {

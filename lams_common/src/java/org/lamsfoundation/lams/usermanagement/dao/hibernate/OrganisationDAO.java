@@ -20,10 +20,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -42,7 +42,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 
-
     private static final String GET_PAGED_COURSES = "SELECT o FROM Organisation o WHERE o.organisationType.organisationTypeId =:typeId "
 	    + "AND o.organisationState.organisationStateId =:stateId AND o.parentOrganisation.organisationId =:parentOrgId "
 	    + "AND (o.name LIKE CONCAT('%', :searchString, '%')) ORDER BY ";
@@ -52,6 +51,8 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	    + " AND o.organisationType.organisationTypeId =:typeId "
 	    + " AND o.organisationState.organisationStateId =:stateId "
 	    + " AND (o.name LIKE CONCAT('%', :searchString, '%')) ";
+
+    private static final String GET_COURSES_BY_CODES = "FROM Organisation WHERE code IN (:codes)";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -64,12 +65,11 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) ORDER BY o.name";
 
 	final String GET_ACTIVE_COURSE_IDS_BY_USER = "SELECT uo.organisation.organisationId, uo.organisation.name"
-	    + " FROM UserOrganisation uo "
-	    + " WHERE uo.organisation.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " AND uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
-	    + " AND uo.user.userId = :userId "
-	    + " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%')) ORDER BY uo.organisation.name";
-	
+		+ " FROM UserOrganisation uo " + " WHERE uo.organisation.organisationType.organisationTypeId = "
+		+ OrganisationType.COURSE_TYPE + " AND uo.organisation.organisationState.organisationStateId = "
+		+ OrganisationState.ACTIVE + " AND uo.user.userId = :userId "
+		+ " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%')) ORDER BY uo.organisation.name";
+
 	String queryStr = isSysadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
 	Query query = getSession().createQuery(queryStr);
 	// support for custom search from a toolbar
@@ -81,8 +81,8 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
-	
-	List<OrganisationDTO> orgDtos = new ArrayList<OrganisationDTO>();
+
+	List<OrganisationDTO> orgDtos = new ArrayList<>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
 
@@ -97,22 +97,23 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 
 	return orgDtos;
     }
-    
+
     @Override
-    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId, Integer userId) {
+    public List<UserOrganisationCollapsed> getChildOrganisationsCollapsedByUser(Integer parentOrganisationId,
+	    Integer userId) {
 	final String GET_USER_ORGANISATION_COLLAPSED_BY_USER_AND_PARENT_ORGANISATION = "SELECT uoc FROM UserOrganisationCollapsed uoc "
-		    + " WHERE uoc.organisation.organisationType.organisationTypeId = " + OrganisationType.CLASS_TYPE
-		    + " AND uoc.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
-		    + " AND uoc.organisation.parentOrganisation.organisationId = :organisationId "
-		    + " AND uoc.user.userId = :userId ";
-	
+		+ " WHERE uoc.organisation.organisationType.organisationTypeId = " + OrganisationType.CLASS_TYPE
+		+ " AND uoc.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+		+ " AND uoc.organisation.parentOrganisation.organisationId = :organisationId "
+		+ " AND uoc.user.userId = :userId ";
+
 	Query<UserOrganisationCollapsed> query = getSession().createQuery(
 		GET_USER_ORGANISATION_COLLAPSED_BY_USER_AND_PARENT_ORGANISATION, UserOrganisationCollapsed.class);
 	query.setInteger("organisationId", parentOrganisationId);
 	query.setInteger("userId", userId);
 	return query.list();
     }
-    
+
     @Override
     public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
 
@@ -182,5 +183,11 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	query.setString("searchString", searchString);
 
 	return ((Number) query.uniqueResult()).intValue();
+    }
+
+    @Override
+    public List<Organisation> getOrganisationsByCodes(Collection<String> codes) {
+	return getSession().createQuery(GET_COURSES_BY_CODES, Organisation.class).setParameter("codes", codes)
+		.getResultList();
     }
 }
