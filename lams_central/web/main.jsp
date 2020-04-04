@@ -452,10 +452,7 @@ time.timeago {
 		            },
 		        	//row-reordering feature
 		        	{"width": "20px", "visible": lessonsTable.data("row-reordering-enabled")},
-		         ],
-		         	"initComplete": function(settings, json) {
-		         		$("#page-wrapper").finish().fadeIn();
-		       	  	}
+		         ]
 				})
 				.on( 'row-reorder', function ( e, diff, edit ) {
 					//store new lesson order in DB
@@ -663,7 +660,6 @@ time.timeago {
 		<div class="row no-gutter">
 			<div class="col-12">
 	        	<div id="org-container" class="tour-org-container"></div>
-	        	<div id="org-container-temp" style="display: none;"></div>
 			</div>
 		</div>
 	</div>

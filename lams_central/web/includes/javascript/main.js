@@ -151,7 +151,8 @@ function selectOrganisation(newOrgId) {
 
 function loadOrganisation() {
 	$("#page-wrapper").finish().fadeOut(200, function() {
-		$("#org-container").load(
+		$(this).html('<div class="text-center m-5"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>').show()
+		.load(
 			"displayGroup.do",
 			{
 				orgId   : activeOrgId
@@ -170,11 +171,6 @@ function loadOrganisation() {
 					//do it with a small delay so it will be understood that the new organisation is selected indeed
 					$("body").addClass('offcanvas-hidden', 300);
 				}
-					
-    			//in case there is no lessons-table, show page back (instead of doing it in datatables init event)
-    			if ($('.lessons-table').length == 0) {
-    				$("#page-wrapper").finish().fadeTo(400, 1);
-    			}
 			}
 		);    
 	});
