@@ -11,7 +11,7 @@ html {
 	position: fixed;
 	width: 220px;
 	z-index: 10;
-	height: 100%;
+	height: calc(100% - 53px);
 	background: $main_offcanvas_background;
     color: #8c8a8a;
 }
@@ -106,6 +106,7 @@ a:hover, a:focus {
     color: $main_offcanvas_link_color;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 #offcanvas td.active {
     border-right: 10px solid #8c8c8c;
@@ -122,7 +123,7 @@ a:hover, a:focus {
 	line-height: 1;
 	border: 1px solid rgba(221, 226, 232, 0.49);
 	background: $main_offcanvas_search_background; 
-	color: $main_fav_org_link;
+	color: white;
 }
 .offcanvas-search .form-control::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color: $gray-light-mid;
@@ -181,6 +182,9 @@ a:hover, a:focus {
 @media (min-width: 502px) {
 	.top-nav {
 		height: 63px;
+	}
+	#offcanvas {
+		height: calc(100% - 63px);
 	}
 }
 

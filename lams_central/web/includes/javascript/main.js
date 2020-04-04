@@ -55,7 +55,7 @@ $(document).ready(function () {
 						rows += 	'<a data-id="' + orgId + '" href="#" onClick="javascript:selectOrganisation(' + orgId + ')">';
 						rows += 		orgData["name"];						
 						if (activeOrgId == orgId) {
-							rows +=     '<i class="fa fa-chevron-circle-right fa-lg pull-right"></i>';
+							rows +=     '<i class="fa fa-chevron-circle-right fa-lg pull-right mr-n1"></i>';
 						}
 						rows += 	'</a>';
 						rows += '</td>';
@@ -134,7 +134,7 @@ function selectOrganisation(newOrgId) {
 	
 	//add active CSS class
 	$("#org-row-" + newOrgId + ", #favorite-li-" + newOrgId + " a").addClass("active");
-	$("#org-row-" + newOrgId + " a").append( "<i class='fa fa-chevron-circle-right fa-lg pull-right'></i>" )
+	$("#org-row-" + newOrgId + " a").append( "<i class='fa fa-chevron-circle-right fa-lg pull-right mr-n1'></i>" )
 	
 	activeOrgId = newOrgId;
 	loadOrganisation();
@@ -150,35 +150,34 @@ function selectOrganisation(newOrgId) {
 
 
 function loadOrganisation() {
-	//display loading animation
-	$("#page-wrapper>footer").hide();
-	$("#org-container").html('<div class="text-center m-5"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>');
-	
-	$("#org-container").load(
-		"displayGroup.do",
-		{
-			orgId   : activeOrgId
-		},
-		function( response, status, xhr ) {
-			//in case of any server error - open offcanvas bar so user can select another course
-			if ( status == "error" ) {
-				$("body").removeClass("offcanvas-hidden");
-				return;
+	$("#page-wrapper").finish().fadeOut(200, function() {
+		$("#org-container").load(
+			"displayGroup.do",
+			{
+				orgId   : activeOrgId
+			},
+			function( response, status, xhr ) {
+				//in case of any server error - open offcanvas bar so user can select another course
+				if ( status == "error" ) {
+					$("body").removeClass("offcanvas-hidden");
+					return;
+				}
+					
+				initDataTables();
+					
+				// if screen is smaller than 768px (i.e. offcanvas occupies 100%) and offcanvas is shown - then hide it on user selecting an organisation
+				if (window.matchMedia('(max-width: 768px)').matches && !$("body").hasClass("offcanvas-hidden")) {
+					//do it with a small delay so it will be understood that the new organisation is selected indeed
+					$("body").addClass('offcanvas-hidden', 300);
+				}
+					
+    			//in case there is no lessons-table, show page back (instead of doing it in datatables init event)
+    			if ($('.lessons-table').length == 0) {
+    				$("#page-wrapper").finish().fadeTo(400, 1);
+    			}
 			}
-			
-			//display footer back
-			$("#page-wrapper>footer").show();
-			
-			initDataTables();
-			
-			// if screen is smaller than 768px (i.e. offcanvas occupies 100%) and offcanvas is shown - then hide it on user selecting an organisation
-			if (window.matchMedia('(max-width: 768px)').matches && !$("body").hasClass("offcanvas-hidden")) {
-				//do it with a small delay so it will be understood that the new organisation is selected indeed
-				$("body").addClass('offcanvas-hidden', 300);
-			}
-			
-		}
-	);
+		);    
+	});
 }
 
 
