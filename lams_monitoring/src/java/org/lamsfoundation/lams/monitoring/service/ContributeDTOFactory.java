@@ -83,7 +83,7 @@ public class ContributeDTOFactory {
 	if (!contributionType.isEmpty()) {
 	    dto = new ContributeActivityDTO(activity);
 	    for (Integer contributionTypeEntry : contributionType) {
-		String url = "";// ContributeDTOFactory.getURL(lessonID, activity, contributionTypeEntry, toolService);
+		String url = ContributeDTOFactory.getURL(lessonID, activity, contributionTypeEntry, toolService);
 		if (ContributionTypes.CONTRIBUTION.equals(contributionTypeEntry) && url == null) {
 		    continue;
 		}
