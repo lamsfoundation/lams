@@ -182,7 +182,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		// map of course code -> subcourse code -> subcourse
 		Map<String, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
-			.parallelStream()
+			.parallelStream().filter(o -> o.getParentOrganisation() != null)
 			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getCode(),
 				Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
 
