@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -109,6 +110,7 @@ public class OrgManageController {
 		: userManagementService.getUsersFromOrganisation(orgId).size();
 	String key = org == rootOrganisation ? "label.users.in.system" : "label.users.in.group";
 	request.setAttribute("numUsers", messageService.getMessage(key, new String[] { String.valueOf(numUsers) }));
+	request.setAttribute("totalUsers", numUsers); 
 
 	// Set OrgManageForm
 	if (orgManageForm == null) {

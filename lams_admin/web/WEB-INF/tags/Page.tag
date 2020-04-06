@@ -410,7 +410,9 @@
 
 	<c:otherwise>
 	<!-- Standard Screens  --> 
-		<div class="container-xl">
+		<div class="container-fluid" style="max-width: 1600px">
+
+		
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 		<c:choose>
 		<c:when test="${usePanel}">

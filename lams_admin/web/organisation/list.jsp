@@ -29,6 +29,8 @@
 	</style>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/popper.js"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
@@ -38,9 +40,8 @@
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 				headerTemplate : '{content} {icon}',
-				dateFormat : "mmddyyyy",
 				widgets: ["uitheme","zebra", "filter"],
-				headers: { 0: { filter: false }, 2: { filter: false }, 3: { filter: false, dateFormat: "ddmmyyyy" } },
+				headers: { 0: { filter: false }, 2: { filter: false }, 3: { filter: false} },
 			    widgetOptions : {
 			        // include column filters
 			        filter_columnFilters: true,
@@ -73,6 +74,8 @@
 				    		
 							for (i = 0; i < data.rows.length; i++){
 								var orgData = data.rows[i];
+							
+								var formattedDate = new Date(orgData["createDate"]);
 								
 								rows += '<tr>';
 								
@@ -90,8 +93,8 @@
 								rows += 	orgData["code"];
 								rows += '</td>';
 	
-								rows += '<td>';
-								rows += 	orgData["createDate"];
+								rows += '<td class="text-right">';
+								rows += 	formattedDate
 								rows += '</td>';
 								
 								rows += '</tr>';
@@ -170,124 +173,272 @@
 				</form:form>
 		</c:if>
 			
-		<c:if test="${orgManageForm.type == 2}">			
-				<div class="card" >
-					<div class="card-header">
-
-						<span class="font-weight-bold" id="courseName"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></span>
+		<c:if test="${orgManageForm.type == 2}">
 		
-						<div class="btn-group  pull-right">
-							<c:if test="${editGroup == true}">
-								<a href="organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="editCourse" class="btn btn-outline-secondary btn-sm"><i class="fa fa-pencil"></i><span class="hidden-xs"> <fmt:message key="admin.edit" /></span></a> 
-							</c:if>
-							<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="btn btn-outline-secondary btn-sm"><i class="fa fa-users"></i> <span class="hidden-xs"><fmt:message key="admin.user.manage" /></span></a>
-							
-							<c:if test="${pageContext.request.isUserInRole('SYSADMIN')}">
-							<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-outline-secondary btn-sm"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
-								<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" class="btn btn-outline-secondary btn-sm"><i class="fa fa-bomb"></i><span class="hidden-xs"> <fmt:message key="admin.delete.lessons" /></span></a>
-							</c:if>
-						</div>
-					</div>
-					<div class="card-body">
-					<div class="row">
-						<div class="col-sm-4">
-							<div class="card">
-								<div class="header">
-								<span class="badge badge-success">Active</span>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-4">
-<div class="card text-white bg-gradient-primary">
-<div class="card-body card-body pb-0 d-flex justify-content-between align-items-start">
-<div>
-<div class="text-value-lg">9.823</div>
-<div>Members online</div>
-</div>
-<div class="btn-group">
-<button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<svg class="c-icon">
-<use xlink:href="vendors/@coreui/icons/svg/free.svg#cil-settings"></use>
-</svg>
-</button>
-<div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
-</div>
-</div>
-<div class="c-chart-wrapper mt-3 mx-3" style="height:70px;"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
-<canvas class="chart chartjs-render-monitor" id="card-chart1" height="70" width="223" style="display: block;"></canvas>
-</div>
-</div>						
-						</div>
-						<div class="col-sm-4">3</div>
-					</div>
-					
-					<ul role="tablist" class="nav nav-tabs flex-column flex-sm-row">
-          <li class="nav-item"><a data-toggle="tab" href="#description" role="tab" class="nav-link active" aria-selected="true">Description</a></li>
-          <li class="nav-item"><a data-toggle="tab" href="#additional-information" role="tab" class="nav-link" aria-selected="false">Additional Information</a></li>
-          <li class="nav-item"><a data-toggle="tab" href="#reviews" role="tab" class="nav-link" aria-selected="false">Reviews</a></li>
-        </ul>
+		
+		<section id="courseDetails" class="pl-3 pr-3">	
+			<div class="row bg-light p-2">
 			
-					<table class="table table-striped table-bordered">
-						<tr>
-							<td width="50%"><fmt:message key="admin.organisation.code"/>:</td>
-							<td><c:out value="${org.code}" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.organisation.description"/>:</td>
-							<td><c:out value="${org.description}" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.organisation.status"/>:</td>
-							<td id="courseStatus"><c:out value="${org.organisationState.description}" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.organisation.create.date"/>:</td>
-							<td class="text-right"><lams:Date value="${org.createDate}"/></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.can.add.user"/>:</td>
-							<td><c:out value="${org.courseAdminCanAddNewUsers}" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.can.browse.user"/>:</td>
-							<td><c:out value="${org.courseAdminCanBrowseAllUsers}" /></td>
-						</tr>
-						<tr>
-							<td><fmt:message key="admin.can.change.status"/>:</td>
-							<td><c:out value="${org.courseAdminCanChangeStatusOfCourse}" /></td>
-						</tr>
-						<tr>
-							<td colspan="2"><c:out value="${numUsers}"/></td>
-						</tr>
-					</table>
-					</div>		
+				<div class="col-lg-9">
+
+					<div class="dropdown ml-4 mr-1 pull-right">
+						<a class="btn btn-sm btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-label="configure" aria-expanded="false">
+						  <i class="fa fa-lg fa-cog" aria-hidden="true"></i>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+						<c:if test="${editGroup == true}">
+						<a href="organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="editCourse" class="dropdown-item"><i class="fa fa-edit" aria-hidden="true"></i> <fmt:message key="admin.edit" /></a>
+						</c:if>	
+						
+						<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="dropdown-item"><i class="fa fa-users" aria-hidden="true"></i> <fmt:message key="admin.user.manage" /></a>
+						
+						<a onclick="javascript:document.location='organisation/create.do?typeId=3&parentId=${orgManageForm.parentId}'"   class="dropdown-item" id="createNewSubcourse"><i class="fa fa-plus" aria-hidden="true"></i> <fmt:message key="admin.class.add"/></a>
+						
+						<c:if test="${pageContext.request.isUserInRole('SYSADMIN')}">
+							<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" id="cloneLesson" class="dropdown-item"><i class="fa fa-clone" aria-hidden="true"></i> <fmt:message key="title.clone.lessons" /></a>
+								<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="deleteAllLessons" class="dropdown-item"><i class="fa fa-bomb" aria-hidden="true"></i> <fmt:message key="admin.delete.lessons" /></a>
+						</c:if>
+						
+						</div>
+					</div>
+				
+					<span title="<fmt:message key="admin.organisation.status"/>" class="badge badge-success py-2 px-2 pull-right text-uppercase">Active</span>
+					
+					<h2 id="courseName" class="font-weight-bolder"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></h2>
+					
+					<label title="<fmt:message key="admin.organisation.create.date"/>" style="position:relative;top:-1rem;font-size: x-small;"><lams:Date value="${org.createDate}"/></label>
+					
+				    <div class="row mt-1">
+				        <div class="col-lg-4">
+
+			                <c:set var="title"><fmt:message key="heading.users"/></c:set>
+							<lams:Widget type="123" style="warning" shadow="shadow" icon="fa-3x fa-users text-white" title="${title}" titleAlignment="text-right" bodyText="${totalUsers}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+			                
+
+				        </div>
+				        <div class="col-lg-4">
+
+			                <c:set var="title"><fmt:message key='admin.statistics.lessons'/></c:set>
+			                <lams:Widget type="123" style="danger" shadow="shadow" icon="fa-3x fa-book text-white" title="${title}" titleAlignment="text-right" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				        <div class="col-lg-4">
+				        
+				        	<c:set var="title"><fmt:message key="label.subgroups"/></c:set>
+				        	<lams:Widget type="123" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right text-capitalize" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+				        
+				        </div>
+				    </div>		
+    			
+				
+				
+				</div>
+				<div class="col-lg-3">
+					<div class="card shadow-sm"  >
+						<div class="card-body">
+							<p class="border-bottom"">
+								<i class="fa fa-sliders">&nbsp;</i> <strong>Course settings</strong>
+							</p>
+							<p>
+							Course managers can:
+							</p>
+							<p>
+							Add new users
+							<c:choose>
+								<c:when test="${org.courseAdminCanAddNewUsers}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							
+							<br/>
+							Browse all users
+							<c:choose>
+								<c:when test="${org.courseAdminCanBrowseAllUsers}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							<br/>
+							Change course status
+							<c:choose>
+								<c:when test="${org.courseAdminCanChangeStatusOfCourse}">
+									<i class="fa text-success fa-toggle-on pull-right mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							</p>
+
+						</div>
+					</div>
 				</div>
 				
-				<form>
-				<div class="pull-right">
-					<c:url var="createSubgroupLink" value="organisation/create.do">
-						<c:param name="typeId" value="3" />
-						<c:param name="parentId" value="${orgManageForm.parentId}" />
-					</c:url>
-					<input id="createNewSubcourse" class="btn btn-default" type="button" value="<fmt:message key="admin.class.add"/>" onclick=javascript:document.location='<c:out value="${createSubgroupLink}"/>' />
+			</div>
+
+			<c:if test="${not empty org.description}">
+	
+				<!--  Description if any -->
+				<div class="row bg-light pl-3 pr-3">
+					<div class="col-sm-12">
+							<hr>
+					
+							<dl class="row">
+								<dt class="col-sm-2"><fmt:message key="admin.organisation.description"/></dt>
+								<dd class="col-sm-10"><c:out value="${org.description}" /></dd>
+							</dl>	
+
+						<hr>
+					</div>
 				</div>
-				</form>
-			
-				<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
-					<input type="hidden" name="org" value="<c:out value="${orgManageForm.parentId}"/>" />
-					<fmt:message key="label.show"/>&nbsp;
-					<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline input-sm">
-						<form:option value="1"><fmt:message key="organisation.state.ACTIVE"/></form:option>
-						<form:option value="2"><fmt:message key="organisation.state.HIDDEN"/></form:option>
-						<form:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></form:option>
-					</form:select> &nbsp;
-					<fmt:message key="label.subgroups"/>:
-				</form:form>
+
+			</c:if>		
+
+	</section>
+
+			<h3 class="mt-2"><span class="text-capitalize"><fmt:message key="label.subgroups"/></span></h3>
+			<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
+				<input type="hidden" name="org" value="<c:out value="${orgManageForm.parentId}"/>" />
+				<fmt:message key="label.show"/>&nbsp;
+				<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline form-control-sm">
+					<form:option value="1"><fmt:message key="organisation.state.ACTIVE"/></form:option>
+					<form:option value="2"><fmt:message key="organisation.state.HIDDEN"/></form:option>
+					<form:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></form:option>
+				</form:select> &nbsp;
+				
+			</form:form>
 		</c:if>
 			
 		<c:if test="${orgManageForm.type == 3}">
+		
+		<section id="courseDetails">	
+		<div class="container">
+			<div class="row p-3">
+				<div class="col-lg-9 bg-light">
+
+					<div class="dropdown ml-4 mr-1 pull-right">
+						<a class="btn btn-sm btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-label="configure" aria-expanded="false">
+						  <i class="fa fa-lg fa-cog" aria-hidden="true"></i>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+						<c:if test="${editGroup == true}">
+						<a href="organisation/edit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="editCourse" class="dropdown-item"><i class="fa fa-edit" aria-hidden="true"></i> <fmt:message key="admin.edit" /></a>
+						</c:if>	
+						
+						<a href="usermanage.do?org=<c:out value="${orgManageForm.parentId}"/>" id="manageUsers" class="dropdown-item"><i class="fa fa-users" aria-hidden="true"></i> <fmt:message key="admin.user.manage" /></a>
+						
+						<c:if test="${pageContext.request.isUserInRole('SYSADMIN')}">
+							<a href="clone/start.do?groupId=<c:out value="${orgManageForm.parentId}"/>" id="cloneLesson" class="dropdown-item"><i class="fa fa-clone" aria-hidden="true"></i> <fmt:message key="title.clone.lessons" /></a>
+								<a href="organisation/deleteAllLessonsInit.do?orgId=<c:out value="${orgManageForm.parentId}"/>" id="deleteAllLessons" class="dropdown-item"><i class="fa fa-bomb" aria-hidden="true"></i> <fmt:message key="admin.delete.lessons" /></a>
+						</c:if>
+						
+						</div>
+					</div>
 				
-				<div class="panel panel-default voffset5" >
+					<span title="<fmt:message key="admin.organisation.status"/>" class="badge badge-success py-2 px-2 pull-right text-uppercase">Active</span>
+					
+					<h2 id="courseName" class="font-weight-bolder"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></h2>
+					
+					<label title="<fmt:message key="admin.organisation.create.date"/>" style="position:relative;top:-1rem;font-size: x-small;"><lams:Date value="${org.createDate}"/></label>
+					
+				    <div class="row mt-4">
+				        <div class="col-lg-4">
+
+			                <c:set var="title"><fmt:message key="heading.users"/></c:set>
+							<lams:Widget type="123" style="warning" shadow="shadow" icon="fa-3x fa-users text-white" title="${title}" titleAlignment="text-right" bodyText="${totalUsers}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+			                
+
+				        </div>
+				        <div class="col-lg-4">
+
+			                <c:set var="title"><fmt:message key='admin.statistics.lessons'/></c:set>
+			                <lams:Widget type="123" style="danger" shadow="shadow" icon="fa-3x fa-book text-white" title="${title}" titleAlignment="text-right" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				        <div class="col-lg-4">
+				        
+				        	<c:set var="title"><fmt:message key="label.subgroups"/></c:set>
+				        	<lams:Widget type="123" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right text-capitalize" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+				        
+				        </div>
+				    </div>		
+    			
+				
+				
+				</div>
+				<div class="col-lg-3">
+					<div class="card "  style="background-color: #f5f5f5;">
+						<div class="card-body">
+							<p class="border-bottom"">
+								<i class="fa fa-sliders">&nbsp;</i> <strong>Course settings</strong>
+							</p>
+							<p>
+							Course managers can:
+							</p>
+							<p>
+							Add new users
+							<c:choose>
+								<c:when test="${org.courseAdminCanAddNewUsers}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							
+							<br/>
+							Browse all users
+							<c:choose>
+								<c:when test="${org.courseAdminCanBrowseAllUsers}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							<br/>
+							Change course status
+							<c:choose>
+								<c:when test="${org.courseAdminCanChangeStatusOfCourse}">
+									<i class="fa text-success fa-toggle-on pull-right mt-1" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							</p>
+
+						</div>
+					</div>
+				</div>
+				
+			</div>
+
+			<c:if test="${not empty org.description}">
+	
+				<!--  Description if any -->
+				<div class="row bg-light pl-3 pr-3">
+					<div class="col-sm-12">
+							<hr>
+					
+							<dl class="row">
+								<dt class="col-sm-2"><fmt:message key="admin.organisation.description"/></dt>
+								<dd class="col-sm-10"><c:out value="${org.description}" /></dd>
+							</dl>	
+
+						<hr>
+					</div>
+				</div>
+
+			</c:if>		
+		</div>
+	</section>				
+				<div class="card panel-default" >
 					<div class="panel-heading">
 						<div class="panel-title">
 							<span><c:out value="${orgManageForm.parentName}"/></span>
@@ -351,7 +502,7 @@
 			
 		<c:if test="${orgManageForm.type != 3}">
 			
-				<div class="voffset10">
+		<div class="mt-2">
 				<lams:TSTable numColumns="4"> 
 		<th width="3%" id="idsorter" class="filter-false">
 						Id
@@ -362,7 +513,7 @@
 					<th width="10%" align="center">
 						<fmt:message key="admin.organisation.code"/>
 					</th>
-					<th width="20%" align="center">
+					<th width="20%" align="center" class="sorter-shortDate dateFormat-ddmmyyyy">
 						<fmt:message key="admin.organisation.create.date"/>
 					</th>
 				</lams:TSTable>
