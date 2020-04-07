@@ -355,7 +355,7 @@ time.timeago {
 		<%@ include file="mainTour.jsp" %>
 	</script>
 </lams:head>
-<body class="h-100 <c:if test="${not empty activeOrgId}">offcanvas-hidden</c:if>">
+<body class="<c:if test="${not empty activeOrgId}">offcanvas-hidden</c:if>" >
 
 	<!-- header -->
 	<div class="top-nav navbar navbar-light bg-light sticky-top">
