@@ -45,6 +45,15 @@
 .dataTables_filter {
 	margin-top: 10px;
 	float: left;
+	font-size: .875rem;
+	padding-left: .5rem;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+	justify-content: center!important;
+}
+.page-item.active .page-link {
+	background-color: lightgrey !important;
+    border-color: #dee2e6;
 }
 
 .lesson-image {
@@ -220,7 +229,6 @@ time.timeago {
     font-size: 80%;
     font-weight: 400;
 }
-
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
@@ -306,7 +314,8 @@ time.timeago {
 				<fmt:message key="outcome.manage.title" var="OUTCOME_COURSE_MANAGE_TITLE_VAR"/>
 				OUTCOME_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_COURSE_MANAGE_TITLE_VAR}" />'
 			},
-			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
+			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>
+			isFavouriteLessonEnabled = ${isFavouriteLessonEnabled};
 
 		$(document).ready(function(){
 			<%-- If it's the user's first login, show tour --%>
@@ -342,178 +351,14 @@ time.timeago {
   		    } 
 		    </c:if>
 		});
-
-		function orderDatatable(button, tableId){
-			var selectedOrderId = $(button).val();
-
-			//hide row-reorder if non-default order is selected
-			if ( !$("#" + tableId).hasClass("cards")) {
-				if (selectedOrderId == 0) {
-					$("td.row-reorder", $("#" + tableId)).show();
-				} else {
-					$("td.row-reorder", $("#" + tableId)).hide();
-				}
-			}
-			
-			var orderDirection = selectedOrderId == 0 ? 'asc':'desc';
-			$("#" + tableId).DataTable().order([selectedOrderId, orderDirection]).draw();
-		}
-
-		function initDataTables() {
-		    $('.lessons-table').each(function(i, obj) {
-		    	var lessonsTable = $(this);
-			    
-		    	lessonsTable.DataTable({
-			    	rowReorder: {
-			            selector: 'td.row-reorder'
-			        },
-		         	'dom':
-		            	"<'row'<'col-sm-12'<'float-right ml-2'B>f>>" +
-		            	"<'row'<'col-sm-12'tr>>" ,
-		         	'buttons': [
-			         {
-			            'text': '<select class="custom-select" onchange="orderDatatable(this, \'' + lessonsTable.attr('id') + '\')">' +
-			            	 		' <option value="0" selected>Default order</option>' +
-			            	 		' <option value="1">Date</option>' +
-			            	 		' <option value="2">In progress</option>' +
-			            	 		' <option value="3">Completed</option>' +
-			            	 		<c:if test="${isFavouriteLessonEnabled}">
-			            	 		' <option value="4">Stared</option>' +
-			            	 		</c:if>
-			            		'</select>',
-			            'action': function (e, dt, node) {
-			            	//dt.table().order([1, 'asc']).draw(); 
-			            	//console.log("aaa" + e.type);
-			            	//$(dt.table().node()).data("table-id", dt.table().node().id);
-			            },
-			            'className': 'btn-sm btn-light mr-3',
-			            'attr': {
-			               'title': 'Change views',
-			            }
-			        }, 
-			        {
-		            'text': '<i class="fa fa-table fa-fw" aria-hidden="true"></i> <span class="card-view-label"><span class="d-none d-sm-inline">Card view</span></span><span class="list-view-label"><span class="d-none d-sm-inline">List view</span></span>',
-		            'action': function (e, dt, node) {
-			            var $table = $(dt.table().node());
-			            var isUserMonitor = eval(lessonsTable.data("is-user-monitor"))
-			            
-			        	//add "cards" class
-			        	var toggleClasses = isUserMonitor ? 'cards table-striped table-hover' : 'cards table-hover';
-		                $table.toggleClass(toggleClasses);
-		                //toggle button's icon
-		                $('.fa', node).toggleClass(['fa-table', 'fa-id-badge']);
-			            $('.list-view-label,.card-view-label', node).toggle();
-
-			            //toggle auxiliary buttons
-			            $(".auxiliary-links-menu", $table).toggle();
-
-			            //hide charts for smaller devices
-			            if (isUserMonitor) {
-				            $("td.chart-td", lessonsTable).toggleClass("d-none d-sm-table-cell");
-				        }
-
-		                dt.draw('page');
-		            },
-		            'className': 'btn-sm btn-light',
-		            'attr': {
-		               'title': 'Change views',
-		            }
-		         }],
-		         select: false,
-		         paging: false,
-		         info: false,
-		         'columns': [
-		        	{"visible": false},
-		        	{"visible": false},
-		        	{"visible": false},
-		        	{"visible": false},
-		        	//star lesson feature
-		        	{"visible": true, className: "none"},//we need to mark it as visible:true, but set manually display:none to be able to access it from toggleFavoriteLesson() method
-		        	//lesson image
-		            {
-		               'orderable': false,
-		               className: "text-left"
-		            },
-		          	//learners number
-		            {
-			           'orderable': false,
-			           "visible": lessonsTable.data("is-user-monitor")
-			           //className: "d-none d-md-inline"
-			        },
-		          	//chart
-		            {
-			           'orderable': false,
-			           "visible": lessonsTable.data("is-user-monitor")
-			        },
-			        //buttons
-		            {
-		               'data': 'extn',
-		               "visible": lessonsTable.data("is-user-monitor")
-		            },
-		        	//row-reordering feature
-		        	{"width": "20px", "visible": lessonsTable.data("row-reordering-enabled")},
-		         ]
-				})
-				.on( 'row-reorder', function ( e, diff, edit ) {
-					//store new lesson order in DB
-					var orgId = lessonsTable.data("orgid");
-					var lessonIds = $("tbody tr", lessonsTable).map(function() { 
-					    return $(this).data("lessonid"); 
-					}).get().join(',');
-					$.ajax({
-						url : "servlet/saveLessonOrder",
-						data : {
-							orgId : orgId,
-							ids : lessonIds
-						},
-						error : function() {
-							alert("There was an error trying to save new lesson order.");
-						}
-					});
-			    });
-			});
-
-		    $(".chart-area").each(function() {
-			    var chart = $(this);
-				new Chart(chart.get(0).getContext('2d'), {
-					type: 'doughnut',
-					data: {
-						datasets: [{
-							data: [
-								chart.data("count-completed-learners"),
-								chart.data("count-attempted-learners"),
-								chart.data("count-not-started-learners")
-							],
-							backgroundColor: [
-								'rgb(199, 234, 70)',//green
-								'rgb(252, 226, 5)',//yellow
-								'rgb(255, 146, 140)'//red
-							]
-						}],
-						labels: [
-							'Completed',
-							'Attempted',
-							'Not Started'
-						]
-					},
-					options: {
-						responsive: true,
-						legend: false
-					}
-				});
-			});
-
-		    $("time.timeago").timeago();
-		}
 	
 		<%@ include file="mainTour.jsp" %>
 	</script>
 </lams:head>
-<body <c:if test="${not empty activeOrgId}">class="offcanvas-hidden"</c:if>>
+<body class="h-100 <c:if test="${not empty activeOrgId}">offcanvas-hidden</c:if>">
 
 	<!-- header -->
 	<div class="top-nav navbar navbar-light bg-light sticky-top">
-	
 
 		<button class="navbar-toggler offcanvas-toggle" type="button">
 	    	<span class="navbar-toggler-icon"></span>
@@ -627,7 +472,7 @@ time.timeago {
 	</div>
 	<!-- /header -->
 
-<!-- Offcanvas Bar -->
+	<!-- Offcanvas Bar -->
     <nav id="offcanvas" role="navigation" class="bg-light">
         <div class="offcanvas-scroll-area">
 			<div class="offcanvas-header lead">
@@ -638,7 +483,7 @@ time.timeago {
             
             <c:if test="${isCourseSearchOn}">
 				<div class="form-group offcanvas-search">
-					<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="<fmt:message key="label.search.for.courses" />..."
+					<input type="text" id="offcanvas-search-input" class="form-control-sm w-100" placeholder="Search..."
 							data-column="1" type="search">
 				</div>
 			</c:if>
@@ -647,41 +492,31 @@ time.timeago {
 				<lams:TSTable numColumns="2">
 				</lams:TSTable>
 			</div>
-			
         </div>
     </nav>
-<!-- /Offcanvas Bar -->
+	<!-- /Offcanvas Bar -->
 
-<div id="page-wrapper">
-	<!-- content -->      
-	<div class="content">
-		<div id="messageCell"></div>
-		
-		<div class="row no-gutter">
-			<div class="col-12">
-	        	<div id="org-container" class="tour-org-container"></div>
-			</div>
+	<div id="page-wrapper" class="d-flex flex-column sticky-footer-wrapper">
+		<!-- content -->      
+		<div class="flex-fill">
+			<div id="messageCell"></div>
+			
+		    <div id="org-container" class="tour-org-container"></div>
 		</div>
-	</div>
-	<!-- /content -->
-	        
-	<!-- footer -->
-	<footer>
-		<div class="">
+		<!-- /content -->
+		
+		<!-- footer -->
+		<footer>
 			<p class="text-muted text-center">
 				<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
 					&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
 				</a>
 				<span class="text-danger text-center" id="timezoneWarning"></span>
 			</p>
-		</div>
-		<div class="clearfix"></div>
-	</footer>
-	<!-- /footer -->
+		</footer>
+		<!-- /footer -->
+	</div>
 
-</div>
-
-<csrf:form id="csrf-form" method="post" action=""></csrf:form>
-
+	<csrf:form id="csrf-form" method="post" action=""></csrf:form>
 </body>
 </lams:html>
