@@ -181,9 +181,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 			.findByPropertyValues(Organisation.class, "code", allExistingSubOrganisationCodes);
 
 		// map of course code -> subcourse code -> subcourse
-		Map<String, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
+		Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
 			.parallelStream().filter(o -> o.getParentOrganisation() != null)
-			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getCode(),
+			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getOrganisationId(),
 				Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
 
 		// load all ext courses and subcourses from DB which are present in the output file
@@ -259,7 +259,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
 	    } finally {
-		HibernateSessionManager.closeSession();
+		try {
+		    HibernateSessionManager.closeSession();
+		} catch (Exception e) {
+		    logger.error("Error while closing Hibernate session", e);
+		}
 	    }
 	}).start();
 
@@ -374,15 +378,16 @@ public class SPEnrolmentServlet extends HttpServlet {
     private Set<User> assignUsers(Organisation course, Map<String, Map<String, List<String>>> mappings,
 	    ExtServer extServer, Integer creatorId, Set<User> allUsersParsed, Map<String, Integer> userIDs,
 	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles,
-	    Map<String, ConcurrentMap<String, Organisation>> allExistingSubcourses,
+	    Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses,
 	    Map<Integer, ExtCourseClassMap> allExistingExtCourses, Map<String, User> allExistingUsers,
 	    boolean isStaffMode, AtomicInteger mappingsProcessed) throws UserInfoValidationException {
 	Set<User> allUsersInSubcourses = new HashSet<>();
 	String courseCode = course.getCode();
+	Integer courseId = course.getOrganisationId();
 	// go through each subcourse
 	for (Entry<String, List<String>> subcourseEntry : mappings.get(courseCode).entrySet()) {
 	    String subcourseCode = subcourseEntry.getKey();
-	    ConcurrentMap<String, Organisation> existingSubcourses = allExistingSubcourses.get(courseCode);
+	    ConcurrentMap<String, Organisation> existingSubcourses = allExistingSubcourses.get(courseId);
 	    Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
 
 	    // create subcourse
@@ -395,7 +400,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		if (existingSubcourses == null) {
 		    existingSubcourses = new ConcurrentHashMap<>();
-		    allExistingSubcourses.put(course.getCode(), existingSubcourses);
+		    allExistingSubcourses.put(courseId, existingSubcourses);
 		}
 		existingSubcourses.put(subcourse.getCode(), subcourse);
 		allExistingExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
