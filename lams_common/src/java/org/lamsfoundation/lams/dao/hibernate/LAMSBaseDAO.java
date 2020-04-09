@@ -266,6 +266,15 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return doFind(queryString, value);
     }
 
+    @Override
+    public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values) {
+	if (values == null || values.isEmpty()) {
+	    return new ArrayList<>();
+	}
+	String queryString = "FROM " + clazz.getCanonicalName() + " WHERE " + name + " IN (:param)";
+	return getSession().createQuery(queryString, clazz).setParameterList("param", values).getResultList();
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -332,7 +341,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 
     @Override
     public List searchByStringProperties(Class clazz, Map<String, String> properties) {
-	Map<String, Object> p = new HashMap<String, Object>();
+	Map<String, Object> p = new HashMap<>();
 	for (Map.Entry<String, String> entry : properties.entrySet()) {
 	    p.put(entry.getKey(), entry.getValue());
 	}
@@ -372,7 +381,7 @@ public class LAMSBaseDAO implements IBaseDAO {
 	StringBuilder queryString = new StringBuilder(operation).append(clazzName).append(SPACE).append(objName)
 		.append(WHERE);
 	Field[] fields = obj.getClass().getDeclaredFields();
-	List<Object> values = new ArrayList<Object>();
+	List<Object> values = new ArrayList<>();
 	for (int i = 0; i < fields.length; i++) {
 	    String name = fields[i].getName();
 	    Method readMethod = getReadMethod(fields[i], name, obj.getClass());

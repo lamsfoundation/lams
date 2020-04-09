@@ -36,8 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,6 +63,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -105,6 +109,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 		// start interacting with DB
 		HibernateSessionManager.openSession();
 
+		ExtServer extServer = integrationService.getExtServer(INTEGRATED_SERVER_NAME);
+		if (extServer == null) {
+		    throw new ServletException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
+		}
+
 		// split each line into list of trimmed pieces
 		List<List<String>> lines = Files.readAllLines(fileInput).parallelStream().unordered()
 			.map(line -> Arrays.stream(line.split(DELIMITER)).map(elem -> elem.trim())
@@ -134,8 +143,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 						elem -> elem.get(6).equals(ROLE_STAFF) ? elem.get(3) : elem.get(5),
 						Collectors.toList()))));
 
-		// map of user login -> course ID -> role IDs
-		Map<String, Map<Integer, Set<Integer>>> existingRoles = new HashMap<>();
 		// map of user login -> user ID
 		Map<String, Integer> userIDs = new HashMap<>();
 
@@ -143,27 +150,86 @@ public class SPEnrolmentServlet extends HttpServlet {
 		Organisation rootOrganisation = userManagementService.getRootOrganisation();
 		Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
 
-		ExtServer extServer = integrationService.getExtServer(INTEGRATED_SERVER_NAME);
-		if (extServer == null) {
-		    throw new ServletException("Integrated server not found: " + INTEGRATED_SERVER_NAME);
-		}
+		Integer extServerSid = extServer.getSid();
+		// load all users from DB which are present in the output file
+		// map of user login -> user
+		Map<String, User> allExistingUsers = userManagementService
+			.findByPropertyValues(User.class, "login", users.keySet()).parallelStream()
+			.collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
+		// load all ext users from DB which are present in the output file
+		// map of user login -> extUser
+		Map<String, ExtUserUseridMap> allExistingExtUsers = userManagementService
+			.findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingUsers.keySet())
+			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
+			.collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
+		// create users and ext users
+		Set<User> allUsersParsed = createUsers(extServer, creatorId, users, userIDs, allExistingUsers,
+			allExistingExtUsers);
 
-		// create users
-		Set<User> allUsersParsed = createUsers(extServer, creatorId, users, userIDs, existingRoles);
+		// load all organisations from DB which are present in the output file, by code
+		// map of code -> organisation
+		Map<String, Organisation> allExistingOrganisations = userManagementService
+			.findByPropertyValues(Organisation.class, "code", courses.keySet()).parallelStream()
+			.collect(Collectors.toConcurrentMap(Organisation::getCode, o -> o));
+
+		// prepare codes of all suborganisations disregarding which organisation is their parent
+		Set<String> allExistingSubOrganisationCodes = mappings.values().stream()
+			.flatMap(e -> e.keySet().stream()).collect(Collectors.toSet());
+
+		// load all suborganisations from DB which are present in the output file
+		List<Organisation> allExistingSubcourseObjects = userManagementService
+			.findByPropertyValues(Organisation.class, "code", allExistingSubOrganisationCodes);
+
+		// map of course code -> subcourse code -> subcourse
+		Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
+			.parallelStream().filter(o -> o.getParentOrganisation() != null)
+			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getOrganisationId(),
+				Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
+
+		// load all ext courses and subcourses from DB which are present in the output file
+		Map<Integer, ExtCourseClassMap> allExistingExtCourses = userManagementService
+			.findByPropertyValues(ExtCourseClassMap.class, "classid", Stream
+				// merge IDs of organisations and suborganisations
+				.concat(allExistingOrganisations.values().stream().map(Organisation::getOrganisationId),
+					allExistingSubcourseObjects.stream().map(Organisation::getOrganisationId))
+				.collect(Collectors.toSet()))
+			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
+			.collect(Collectors.toConcurrentMap(e -> e.getOrganisation().getOrganisationId(), e -> e));
+
+		// map of user login -> course ID -> role IDs
+		// for all users which are present in the output file
+		Map<String, Map<Integer, Set<Integer>>> allExistingRoles = userManagementService
+			.findByPropertyValues(UserOrganisation.class, "user.userId",
+				allExistingUsers.values().parallelStream()
+					.collect(Collectors.mapping(User::getUserId, Collectors.toSet())))
+			.stream()
+			.collect(Collectors.groupingBy(uo -> uo.getUser().getLogin(),
+				Collectors.toMap(
+					userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
+					userOrganisation -> userOrganisation.getUserOrganisationRoles().stream()
+						.map(userOrganisationRole -> userOrganisationRole.getRole().getRoleId())
+						.collect(Collectors.toSet()))));
+
 		Set<User> allUsersinCourses = new HashSet<>();
 		// go through each course
+		AtomicInteger mappingsProcessed = new AtomicInteger();
+		logger.info("Processing courses and assigments");
 		for (Entry<String, String> courseEntry : courses.entrySet()) {
 		    String courseCode = courseEntry.getKey();
 		    // create or get existing course
 		    Organisation course = getCourse(courseCode, courseEntry.getValue(), extServer, creatorId,
-			    rootOrganisation);
+			    rootOrganisation, allExistingOrganisations, allExistingExtCourses);
 
 		    // collect learners from all subcourses of this course
 		    Set<User> allUsersInSubcourses = assignUsers(course, mappings, extServer, creatorId, allUsersParsed,
-			    userIDs, existingRoles, isStaffMode);
+			    userIDs, allExistingRoles, allExistingSubcourses, allExistingExtCourses, allExistingUsers,
+			    isStaffMode, mappingsProcessed);
 		    allUsersinCourses.addAll(allUsersInSubcourses);
+
+		    logger.info("Processed " + mappingsProcessed.get() + " entries");
 		}
 
+		logger.info("Disabling users");
 		// users who are part of courses but are not in the file anymore are eligible for disabling
 		allUsersinCourses.removeAll(allUsersParsed);
 		for (User user : allUsersinCourses) {
@@ -193,7 +259,11 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
 	    } finally {
-		HibernateSessionManager.closeSession();
+		try {
+		    HibernateSessionManager.closeSession();
+		} catch (Exception e) {
+		    logger.error("Error while closing Hibernate session", e);
+		}
 	    }
 	}).start();
 
@@ -201,13 +271,15 @@ public class SPEnrolmentServlet extends HttpServlet {
     }
 
     private Set<User> createUsers(ExtServer extServer, Integer creatorId, Map<String, String[]> users,
-	    Map<String, Integer> userIDs, Map<String, Map<Integer, Set<Integer>>> existingRoles)
+	    Map<String, Integer> userIDs, Map<String, User> allExistingUsers,
+	    Map<String, ExtUserUseridMap> allExistingExtUsers)
 	    throws UserInfoValidationException, UserInfoFetchException {
 	Set<User> allUsersParsed = new HashSet<>();
+	logger.info("Creating users");
 	for (Entry<String, String[]> userEntry : users.entrySet()) {
 	    // email servers as login
 	    String login = userEntry.getKey();
-	    User user = userManagementService.getUserByLogin(login);
+	    User user = allExistingUsers.get(login);
 	    if (user == null) {
 		String salt = HashUtil.salt();
 		String password = HashUtil.sha256(RandomPasswordGenerator.nextPassword(10), salt);
@@ -218,18 +290,23 @@ public class SPEnrolmentServlet extends HttpServlet {
 			salt, firstName, ".", email);
 		user = userMap.getUser();
 
+		allExistingUsers.put(login, user);
+		allExistingExtUsers.put(login, userMap);
+
 		String message = "User created with login \"" + login + "\" and ID " + user.getUserId();
 		logger.info(message);
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			"SPEnrolment: " + message);
 	    } else {
-		ExtUserUseridMap userMap = integrationService.getExistingExtUserUseridMap(extServer, login);
+		ExtUserUseridMap userMap = allExistingExtUsers.get(login);
 		if (userMap == null) {
 		    userMap = new ExtUserUseridMap();
 		    userMap.setExtServer(extServer);
 		    userMap.setUser(user);
 		    userMap.setExtUsername(login);
 		    userManagementService.save(userMap);
+
+		    allExistingExtUsers.put(login, userMap);
 
 		    String message = "External user created for existing user with login \"" + login + "\" and ID "
 			    + user.getUserId();
@@ -245,7 +322,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    }
 
 	    // fill data for later usage
-	    existingRoles.put(login, userManagementService.getRolesForUser(user.getUserId()));
 	    userIDs.put(login, user.getUserId());
 	    // add user to a collection of all users in the parsed file
 	    allUsersParsed.add(user);
@@ -254,13 +330,12 @@ public class SPEnrolmentServlet extends HttpServlet {
 	return allUsersParsed;
     }
 
-    @SuppressWarnings("unchecked")
     private Organisation getCourse(String courseCode, String courseName, ExtServer extServer, Integer creatorId,
-	    Organisation rootOrganisation) throws UserInfoValidationException {
-	Organisation course = null;
-	List<Organisation> organisations = userManagementService.findByProperty(Organisation.class, "code", courseCode);
+	    Organisation rootOrganisation, Map<String, Organisation> allExistingOrganisations,
+	    Map<Integer, ExtCourseClassMap> allExistingExtCourses) throws UserInfoValidationException {
+	Organisation course = allExistingOrganisations.get(courseCode);
 	// create course
-	if (organisations.isEmpty()) {
+	if (course == null) {
 	    String name = courseName;
 	    ExtCourseClassMap extOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId, name, name,
 		    rootOrganisation.getOrganisationId().toString(), false);
@@ -268,22 +343,26 @@ public class SPEnrolmentServlet extends HttpServlet {
 	    course.setCode(courseCode);
 	    userManagementService.save(course);
 
+	    allExistingOrganisations.put(courseCode, course);
+	    allExistingExtCourses.put(extOrgMap.getOrganisation().getOrganisationId(), extOrgMap);
+
 	    String message = "Course created with code \"" + courseCode + "\" and name \"" + name + "\" and ID "
 		    + course.getOrganisationId();
 	    logger.info(message);
 	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 		    "SPEnrolment: " + message);
 	} else {
-	    course = organisations.get(0);
 	    String name = course.getName();
 
-	    ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), name);
+	    ExtCourseClassMap extOrgMap = allExistingExtCourses.get(course.getOrganisationId());
 	    if (extOrgMap == null) {
 		extOrgMap = new ExtCourseClassMap();
 		extOrgMap.setCourseid(name);
 		extOrgMap.setExtServer(extServer);
 		extOrgMap.setOrganisation(course);
 		userManagementService.save(extOrgMap);
+
+		allExistingExtCourses.put(course.getOrganisationId(), extOrgMap);
 
 		String message = "External course created for existing course with code \"" + courseCode
 			+ "\" and name \"" + name + "\" and ID " + course.getOrganisationId();
@@ -298,28 +377,33 @@ public class SPEnrolmentServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     private Set<User> assignUsers(Organisation course, Map<String, Map<String, List<String>>> mappings,
 	    ExtServer extServer, Integer creatorId, Set<User> allUsersParsed, Map<String, Integer> userIDs,
-	    Map<String, Map<Integer, Set<Integer>>> existingRoles, boolean isStaffMode)
-	    throws UserInfoValidationException {
+	    Map<String, Map<Integer, Set<Integer>>> allExistingRoles,
+	    Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses,
+	    Map<Integer, ExtCourseClassMap> allExistingExtCourses, Map<String, User> allExistingUsers,
+	    boolean isStaffMode, AtomicInteger mappingsProcessed) throws UserInfoValidationException {
 	Set<User> allUsersInSubcourses = new HashSet<>();
 	String courseCode = course.getCode();
+	Integer courseId = course.getOrganisationId();
 	// go through each subcourse
 	for (Entry<String, List<String>> subcourseEntry : mappings.get(courseCode).entrySet()) {
-	    Organisation subcourse = null;
 	    String subcourseCode = subcourseEntry.getKey();
-
-	    Map<String, Object> queryParams = new HashMap<>();
-	    queryParams.put("code", subcourseCode);
-	    queryParams.put("parentOrganisation.organisationId", course.getOrganisationId());
-	    List<Organisation> organisations = userManagementService.findByProperties(Organisation.class, queryParams);
+	    ConcurrentMap<String, Organisation> existingSubcourses = allExistingSubcourses.get(courseId);
+	    Organisation subcourse = existingSubcourses == null ? null : existingSubcourses.get(subcourseCode);
 
 	    // create subcourse
-	    if (organisations.isEmpty()) {
-
+	    if (subcourse == null) {
 		ExtCourseClassMap extSubOrgMap = integrationService.createExtCourseClassMap(extServer, creatorId,
 			subcourseCode, subcourseCode, course.getOrganisationId().toString(), false);
 		subcourse = extSubOrgMap.getOrganisation();
 		subcourse.setCode(subcourseCode);
 		userManagementService.save(subcourse);
+
+		if (existingSubcourses == null) {
+		    existingSubcourses = new ConcurrentHashMap<>();
+		    allExistingSubcourses.put(courseId, existingSubcourses);
+		}
+		existingSubcourses.put(subcourse.getCode(), subcourse);
+		allExistingExtCourses.put(extSubOrgMap.getOrganisation().getOrganisationId(), extSubOrgMap);
 
 		String message = "Subcourse created with code and name \"" + courseCode + "\" and ID "
 			+ subcourse.getOrganisationId();
@@ -327,10 +411,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			"SPEnrolment: " + message);
 	    } else {
-		subcourse = organisations.get(0);
 		String name = subcourse.getName();
 
-		ExtCourseClassMap extOrgMap = integrationService.getExtCourseClassMap(extServer.getSid(), name);
+		ExtCourseClassMap extOrgMap = allExistingExtCourses.get(subcourse.getOrganisationId());
 		if (extOrgMap == null) {
 		    extOrgMap = new ExtCourseClassMap();
 		    extOrgMap.setCourseid(name);
@@ -338,8 +421,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    extOrgMap.setOrganisation(subcourse);
 		    userManagementService.save(extOrgMap);
 
-		    String message = "External subcourse created for existing subcourse with code \"" + courseCode
-			    + "\" and name \"" + name + "\" and ID " + course.getOrganisationId();
+		    String message = "External subcourse created for existing subcourse with code \"" + subcourseCode
+			    + "\" and name \"" + name + "\" and ID " + subcourse.getOrganisationId();
 		    logger.info(message);
 		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			    "SPEnrolment: " + message);
@@ -356,6 +439,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 	    // go through each user
 	    for (String login : subcourseEntry.getValue()) {
+		mappingsProcessed.incrementAndGet();
 
 		// check if the user is already a learner/staff member in the subcourse
 		// if so, there is nothing to do
@@ -376,7 +460,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 
 		// the user is not a learner/staff member yet, so assign him the role and add him to lessons
-		Set<Integer> existingSubcourseRoles = existingRoles.get(login).get(subcourseId);
+		Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(login);
+		Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
+			: allExistingRoles.get(login).get(subcourseId);
 		if (existingSubcourseRoles == null) {
 		    existingSubcourseRoles = new HashSet<>();
 		}
@@ -386,7 +472,9 @@ public class SPEnrolmentServlet extends HttpServlet {
 		} else {
 		    existingSubcourseRoles.add(Role.ROLE_LEARNER);
 		}
-		userManagementService.setRolesForUserOrganisation(userId, subcourseId, existingSubcourseRoles);
+		User user = allExistingUsers.get(login);
+		userManagementService.setRolesForUserOrganisation(user, subcourse,
+			existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
 
 		for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
 		    if (isStaffMode) {
@@ -405,7 +493,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 	    // user is a learner/staff member, but he should not; remove him role from subcourse and lessons
 	    for (User user : subcourseUsers) {
-		Map<Integer, Set<Integer>> existingSubcoursesRoles = existingRoles.get(user.getLogin());
+		Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(user.getLogin());
 		Set<Integer> existingSubcourseRoles = existingSubcoursesRoles == null ? null
 			: existingSubcoursesRoles.get(subcourseId);
 		if (existingSubcourseRoles != null) {
@@ -438,122 +526,6 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 	return allUsersInSubcourses;
     }
-
-//    @SuppressWarnings("unchecked")
-//    private Set<User> assignTeachers(Organisation course, List<String> logins, ExtServer extServer, Integer creatorId,
-//	    Set<User> allUsersParsed, Map<String, Integer> userIDs,
-//	    Map<String, Map<Integer, Set<Integer>>> existingRoles) throws UserInfoValidationException {
-//	// this is for detecting which users should be disabled
-//	Set<User> allUsersInCourse = new HashSet<>();
-//
-//	Integer courseId = course.getOrganisationId();
-//
-//	// get existing teachers for given course
-//	Collection<User> courseTeachers = userManagementService.getUsersFromOrganisationByRole(courseId, Role.MONITOR,
-//		true);
-//	// add users to set containing all users in any course which is processed
-//	allUsersInCourse.addAll(courseTeachers);
-//
-//	// go through each user
-//	for (String login : logins) {
-//	    // check if user is alread a teacher in this course
-//	    boolean userAlreadyStaff = false;
-//	    Integer userId = userIDs.get(login);
-//	    User user = null;
-//	    Iterator<User> courseTeacherIterator = courseTeachers.iterator();
-//	    while (courseTeacherIterator.hasNext()) {
-//		User nextUser = courseTeacherIterator.next();
-//		if (userId.equals(nextUser.getUserId())) {
-//		    user = nextUser;
-//		    // IMPORTANT: if we found a matching existing teacher, we get remove him from this collection
-//		    // so after this loop he does not get removed from the course
-//		    courseTeacherIterator.remove();
-//		    userAlreadyStaff = true;
-//		    break;
-//		}
-//	    }
-//
-//	    // if user is not a teacher, add him
-//	    if (!userAlreadyStaff) {
-//		// the user is not a teacher in course yet, so assign him roles
-//		Set<Integer> existingCourseRoles = existingRoles.get(login).get(courseId);
-//		if (existingCourseRoles == null) {
-//		    existingCourseRoles = new HashSet<>();
-//		}
-//		// we modify existing role collection, as he can be also a course admin and/or learner
-//		existingCourseRoles.add(Role.ROLE_AUTHOR);
-//		existingCourseRoles.add(Role.ROLE_MONITOR);
-//		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
-//
-//		String message = "Teacher \"" + login + "\" added to course " + courseId;
-//		logger.info(message);
-//		logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-//			"SPEnrolment: " + message);
-//	    }
-//
-//	    // now go through each subcourse and make sure the user is also a teacher there and in its lessons
-//	    for (Organisation subcourse : course.getChildOrganisations()) {
-//		if (user == null) {
-//		    user = (User) userManagementService.findById(User.class, userId);
-//		}
-//		Integer subcourseId = subcourse.getOrganisationId();
-//		Set<Integer> existingSubcourseRoles = userManagementService.getUserOrganisationRoles(subcourseId, login)
-//			.stream().collect(Collectors.mapping(r -> r.getRole().getRoleId(), Collectors.toSet()));
-//		userAlreadyStaff = existingSubcourseRoles.contains(Role.ROLE_MONITOR);
-//		if (!userAlreadyStaff) {
-//		    // we modify existing role collection, as he can be also a learner
-//		    existingSubcourseRoles.add(Role.ROLE_AUTHOR);
-//		    existingSubcourseRoles.add(Role.ROLE_MONITOR);
-//		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, existingSubcourseRoles);
-//
-//		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
-//			lessonService.addStaffMember(lesson.getLessonId(), userId);
-//		    }
-//
-//		    String message = "Teacher \"" + login + "\" added to subcourse " + subcourseId + " and its lessons";
-//		    logger.info(message);
-//		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-//			    "SPEnrolment: " + message);
-//		}
-//	    }
-//	}
-//
-//	// user is a staff member, but he should not; remove all roles from course and lessons
-//	for (User user : courseTeachers) {
-//	    Map<Integer, Set<Integer>> existingCoursesRoles = existingRoles.get(user.getLogin());
-//	    Set<Integer> existingCourseRoles = existingCoursesRoles == null ? null : existingCoursesRoles.get(courseId);
-//	    if (existingCourseRoles != null) {
-//		Integer userId = user.getUserId();
-//
-//		existingCourseRoles.remove(Role.ROLE_AUTHOR);
-//		existingCourseRoles.remove(Role.ROLE_MONITOR);
-//		userManagementService.setRolesForUserOrganisation(userId, courseId, existingCourseRoles);
-//
-//		for (Organisation subcourse : course.getChildOrganisations()) {
-//		    boolean isLearner = userManagementService.hasRoleInOrganisation(user, Role.ROLE_MONITOR, subcourse);
-//		    Integer subcourseId = subcourse.getOrganisationId();
-//		    Set<Integer> subcourseRoles = new HashSet<>();
-//		    if (isLearner) {
-//			// there are no course admins in subcourses, so either user looses all roles or he stays just a learner
-//			subcourseRoles.add(Role.ROLE_LEARNER);
-//		    }
-//		    userManagementService.setRolesForUserOrganisation(userId, subcourseId, subcourseRoles);
-//
-//		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
-//			lessonService.addStaffMember(lesson.getLessonId(), userId);
-//		    }
-//		}
-//	    }
-//
-//	    String message = "Teacher \"" + user.getLogin() + "\" removed from course " + courseId
-//		    + ", its subcourses and its lessons";
-//	    logger.info(message);
-//	    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-//		    "SPEnrolment: " + message);
-//	}
-//
-//	return allUsersInCourse;
-//    }
 
     @Override
     public void init() throws ServletException {

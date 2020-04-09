@@ -221,6 +221,8 @@ public interface IBaseDAO {
      */
     public List findByProperty(Class clazz, String name, Object value);
 
+    public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values);
+
     /**
      * @param properties
      *            a map of property names and values
