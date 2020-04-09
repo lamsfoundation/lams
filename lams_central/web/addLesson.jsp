@@ -74,6 +74,9 @@
 						<tr>
 							<td id="learningDesignTreeCell" rowspan="3">
 								<div id="learningDesignTree"></div>
+								<div id="accessDiv">
+									<div id="accessTitle"><fmt:message key="authoring.fla.page.dialog.access" /></div>
+								</div>
 							</td>
 							<td id="canvasControlCell">
 								<a id="toggleCanvasResizeLink" href="#"></a>
