@@ -331,7 +331,7 @@
 								<c:if test="${not empty lesson.lessonDescription}">
 									<dt><fmt:message key="lesson.description"/></dt>
 									<dd id="tabLessonLessonDescription">
-										<div id="description">
+										<div id="description" style="overflow: hidden;">
 											<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
 										</div>
 									</dd>

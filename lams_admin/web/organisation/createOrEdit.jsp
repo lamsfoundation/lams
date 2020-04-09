@@ -94,7 +94,8 @@
 				<label for="code">
 					<fmt:message key="admin.organisation.description"/>
 				</label>
-				<form:input path="description" cols="50" rows="3" cssClass="form-control form-control-sm" id="description"/>
+				
+				<form:textarea path="description" cols="50" rows="3" cssClass="form-control form-control-sm" id="description"/>
 				
 				<label for="stateId">
 					<fmt:message key="admin.organisation.status"/>
