@@ -20,7 +20,9 @@
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery.tablesorter.pager.css" rel="stylesheet">
 
 	<style >
-		
+		.switch {
+			font-size: larger;
+		}
 
 	</style>
 	
@@ -34,6 +36,11 @@
 
 	<script>
 	  	$(document).ready(function(){
+	  		
+	  		$('#extendedCourseSettings').readmore({
+				speed: 500,
+				collapsedHeight: 75
+			});
 
 	  		<c:if test="${not empty org.description}">
 			$('#description').readmore({
@@ -147,12 +154,17 @@
 		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${parentGroupId}"/> | <c:out value="${parentCode}" escapeXml="true"/> : <c:out value="${parentGroupName}" escapeXml="true"/></c:set>
 		<c:set var="breadcrumbItems">${breadcrumbItems}, . | <c:out value="${org.code}" escapeXml="true" /> : <c:out value="${org.name}" escapeXml="true"/></c:set>
 	</c:if>	
+	
+	<%-- Only show Header if root organisation --%>
+	<c:if test="${orgManageForm.type == 1}">
+		<c:set var="headerTitle">${title}</c:set>
+	</c:if>	
 
-	<lams:Page type="admin" title="${title}" formID="orgManageForm" breadcrumbItems="${breadcrumbItems}">
+	<lams:Page type="admin" title="${headerTitle}" formID="orgManageForm" breadcrumbItems="${breadcrumbItems}">
 		<c:if test="${orgManageForm.type == 1}">
 				<form>
 				
-				<div class="btn-group" role="group" >
+				<div class="btn-group pull-right" role="group" aria-label="${headerTitle}">
 					<c:if test="${createGroup == true}">
 					<a id="userCreate" class="btn btn-sm btn-outline-secondary" href="user/edit.do?orgId=1"><i class="fa fa-user-plus"></i> <fmt:message key="admin.user.create"/></a>
 					<a id="findUsers" class="btn btn-sm btn-outline-secondary" href="usersearch.do"><i class="fa fa-search"></i> <fmt:message key="admin.user.find"/></a>
@@ -172,16 +184,6 @@
 				<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
 				</form>
 			
-				<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
-					<input type="hidden" name="org" value="${orgManageForm.parentId}" />
-					<fmt:message key="label.show"/>&nbsp;
-					<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline form-control-sm">
-						<form:option value="1"><fmt:message key="organisation.state.ACTIVE"/></form:option>
-						<form:option value="2"><fmt:message key="organisation.state.HIDDEN"/></form:option>
-						<form:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></form:option>
-					</form:select> &nbsp;
-					<fmt:message key="label.groups"/>:
-				</form:form>
 		</c:if>
 			
 		<c:if test="${((orgManageForm.type == 2) || (orgManageForm.type == 3))}">
@@ -217,7 +219,7 @@
 				
 					<span title="<fmt:message key="admin.organisation.status"/>" class="badge badge-success py-2 px-2 pull-right text-uppercase">Active</span>
 					
-					<h2 id="courseName" class="font-weight-bolder"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></h2>
+					<h1 id="courseName" class="font-weight-bolder"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></h1>
 					
 					<label title="<fmt:message key="admin.organisation.create.date"/>" style="position:relative;top:-1rem;font-size: x-small;"><lams:Date value="${org.createDate}"/></label>
 					
@@ -250,42 +252,98 @@
 					<div class="card shadow-sm"  >
 						<div class="card-body">
 							<p class="border-bottom"">
-								<i class="fa fa-sliders">&nbsp;</i> <strong>Course settings</strong>
+								<i class="fa fa-sliders">&nbsp;</i> <strong><fmt:message key="admin.course.settings"/></strong>
 							</p>
-							<p>
-							Course managers can:
-							</p>
-							<p>
-							Add new users
+							<p id="extendedCourseSettings" style="overflow: hidden;">
+							<c:if test="${orgManageForm.type == 2}">
+							<fmt:message key="admin.course.managers.can"/>
+							</br>
+							 - <fmt:message key="admin.can.add.user"/>
 							<c:choose>
 								<c:when test="${org.courseAdminCanAddNewUsers}">
-									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i> 
 								</c:when>
 								<c:otherwise>
-									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
 								</c:otherwise>
 							</c:choose> 
 							
 							<br/>
-							Browse all users
-							<c:choose>
+							 - <fmt:message key="admin.can.browse.user"/>
+							<c:choose> 
 								<c:when test="${org.courseAdminCanBrowseAllUsers}">
-									<i class="fa text-success fa-toggle-on pull-right  mt-1" aria-label="On"></i>
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
 								</c:when>
 								<c:otherwise>
-									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
 								</c:otherwise>
 							</c:choose> 
 							<br/>
-							Change course status
+							 - <fmt:message key="admin.can.change.status"/>
 							<c:choose>
 								<c:when test="${org.courseAdminCanChangeStatusOfCourse}">
-									<i class="fa text-success fa-toggle-on pull-right mt-1" aria-label="On"></i>
+									<i class="fa text-success fa-toggle-on pull-right mt-1 switch" aria-label="On"></i>
 								</c:when>
 								<c:otherwise>
-									<i class="fa  pull-right fa-toggle-off  mt-1" aria-label="Off"></i>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose>
+							</br> 
+							</br> 
+							
+							<fmt:message key="admin.enable.course.notifications"/>
+							<c:choose>
+								<c:when test="${org.enableCourseNotifications}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
 								</c:otherwise>
 							</c:choose> 
+							<br/>
+							 
+							<fmt:message key="admin.gradebook.learner.enable"/>
+							<c:choose>
+								<c:when test="${org.enableGradebookForLearners}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							<br/>
+							 
+							<fmt:message key="config.authoring.single.activity"/>
+							<c:choose>
+								<c:when test="${org.enableSingleActivityLessons}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							<br/>
+							</c:if>
+							<fmt:message key="config.live.edit"/>
+							<c:choose>
+								<c:when test="${org.enableLiveEdit}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							</br>
+							<fmt:message key="config.allow.kumalive"/>
+							<c:choose>
+								<c:when test="${org.enableKumalive}">
+									<i class="fa text-success fa-toggle-on pull-right  mt-1 switch" aria-label="On"></i>
+								</c:when>
+								<c:otherwise>
+									<i class="fa  pull-right fa-toggle-off  mt-1 switch" aria-label="Off"></i>
+								</c:otherwise>
+							</c:choose> 
+							<br/>
 							</p>
 
 						</div>
@@ -329,11 +387,14 @@
 				<div class="row bg-light pt-0 pb-2">
 				 <div class="col-12">
 		
-					<h3><span class="text-capitalize"><fmt:message key="label.subgroups"/></span></h3>
+					<%-- Only display this if it is for type 2 orgs --%>
+					<c:if test="${orgManageForm.type == 3}">
+					<h2><span class="text-capitalize"><fmt:message key="label.subgroups"/></span></h2>
+					</c:if>
 					<form:form cssClass="indentPad" action="orgmanage.do" modelAttribute="orgManageForm" id="orgManageForm" method="post">
 						<input type="hidden" name="org" value="<c:out value="${orgManageForm.parentId}"/>" />
-						<fmt:message key="label.show"/>&nbsp;
-						<form:select path="stateId" id="org-state-id" cssClass="form-control form-control-inline form-control-sm">
+						<label for="org-state-id"><fmt:message key="label.show"/></label>&nbsp;
+						<form:select path="stateId" id="org-state-id"  cssClass="form-control form-control-inline form-control-sm">
 							<form:option value="1"><fmt:message key="organisation.state.ACTIVE"/></form:option>
 							<form:option value="2"><fmt:message key="organisation.state.HIDDEN"/></form:option>
 							<form:option value="3"><fmt:message key="organisation.state.ARCHIVED"/></form:option>
@@ -343,17 +404,17 @@
 		
 					
 					<div class="mt-2">
-						<lams:TSTable numColumns="4"> 
-							<th  id="idsorter" class="filter-false">
+						<lams:TSTable numColumns="4" tableHeaderClass="thead-light" > 
+							<th scope="col" style="width: 10px" id="idsorter" class="filter-false">
 								Id
 							</th>
-							<th align="center"> 
+							<th scope="col" align="center"> 
 								<fmt:message key="admin.organisation.name"/>
 							</th>
-							<th  align="center">
+							<th scope="col" align="center">
 								<fmt:message key="admin.organisation.code"/>
 							</th>
-							<th  align="center" class="sorter-shortDate dateFormat-ddmmyyyy">
+							<th scope="col" align="center">
 								<fmt:message key="admin.organisation.create.date"/>
 							</th>
 						</lams:TSTable>

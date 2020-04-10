@@ -89,14 +89,16 @@
 					<fmt:message key="admin.organisation.code"/>
 				</label>
 				<form:input path="code" size="20" cssClass="form-control form-control-sm" maxlength="20"/>	
-
-
-				<label for="code">
+			</div>
+			<div class="form-group">
+				<label for="description">
 					<fmt:message key="admin.organisation.description"/>
 				</label>
 				
-				<form:textarea path="description" cols="50" rows="3" cssClass="form-control form-control-sm" id="description"/>
+				<form:textarea path="description" rows="3" cssClass="form-control form-control-sm" id="description"/>
+			</div>
 				
+			<div class="form-group">
 				<label for="stateId">
 					<fmt:message key="admin.organisation.status"/>
 				</label>
@@ -106,33 +108,35 @@
 						<form:option value="${state.organisationStateId}"><fmt:message key="organisation.state.${state.description}"/></form:option>
 					</c:forEach>
 				</form:select>
-				
 
-			</div>				
+			</div>
+			<h3><fmt:message key="admin.course.settings"/></h3>				
 			<div class="form-group">
 			<c:if test="${organisationForm.typeId == 2}">
 
-				<div class="form-check">
-					<form:checkbox path="courseAdminCanAddNewUsers" cssClass="form-check-input" id="course-admin-can-add-new-users" />
-			    	<label  class="form-check-label" for="course-admin-can-add-new-users">
-			    		<fmt:message key="admin.can.add.user"/>
-			    	</label>
+				<div class="form-group">
+					<div class=""><fmt:message key="admin.course.managers.can"/>:</div>
+					<div class="form-check ml-3">
+						<form:checkbox path="courseAdminCanAddNewUsers" cssClass="form-check-input" id="course-admin-can-add-new-users" />
+				    	<label  class="form-check-label" for="course-admin-can-add-new-users">
+				    		<fmt:message key="admin.can.add.user"/>
+				    	</label>
+					</div>
+					
+					<div class="form-check ml-3">
+						<form:checkbox path="courseAdminCanBrowseAllUsers" cssClass="form-check-input" id="course-admin-can-browse-all-users"/>
+				    	<label  class="form-check-label" for="course-admin-can-browse-all-users">
+				    		<fmt:message key="admin.can.browse.user"/>
+				    	</label>
+					</div>
+					
+					<div class="form-check ml-3">
+						<form:checkbox path="courseAdminCanChangeStatusOfCourse" cssClass="form-check-input" id="course-admin-can-change-status-of-course"/>
+				    	<label  class="form-check-label" for="course-admin-can-change-status-of-course">
+				    		<fmt:message key="admin.can.change.status"/>
+				    	</label>
+					</div>
 				</div>
-				
-				<div class="form-check">
-					<form:checkbox path="courseAdminCanBrowseAllUsers" cssClass="form-check-input" id="course-admin-can-browse-all-users"/>
-			    	<label  class="form-check-label" for="course-admin-can-browse-all-users">
-			    		<fmt:message key="admin.can.browse.user"/>
-			    	</label>
-				</div>
-				
-				<div class="form-check">
-					<form:checkbox path="courseAdminCanChangeStatusOfCourse" cssClass="form-check-input" id="course-admin-can-change-status-of-course"/>
-			    	<label  class="form-check-label" for="course-admin-can-change-status-of-course">
-			    		<fmt:message key="admin.can.change.status"/>
-			    	</label>
-				</div>
-				
 				<div class="form-check">
 					<form:checkbox path="enableCourseNotifications" id="enable-course-notifications" cssClass="form-check-input"/>
 			    	<label  class="form-check-label" for="enableCourseNotifications">

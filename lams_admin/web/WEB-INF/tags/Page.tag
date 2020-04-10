@@ -416,19 +416,6 @@
 		<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
 		<c:choose>
 		<c:when test="${usePanel}">
-			<c:if test="${not empty title}">
-				<c:if test="${not empty titleHelpURL}">
-					<span class="pull-right">${titleHelpURL}</span>
-				</c:if>
-				<c:if test="${not empty headingContent}">
-					<c:out value="${headingContent}" escapeXml="true" />
-				</c:if>
-			
-				<header>
-					<h1><c:out value="${title}" escapeXml="true" /></h1>
-				</header>
-			</c:if>
-
 			<%-- The Breadcrumb
 			
 				We need to build the breadcrumb in the tag rather than on the page jsp as it is easier to do 
@@ -478,7 +465,21 @@
 					  </ol>
 				</nav>						    
 				
-			</c:if>			
+			</c:if>
+
+			<c:if test="${not empty title}">
+				<c:if test="${not empty titleHelpURL}">
+					<span class="pull-right">${titleHelpURL}</span>
+				</c:if>
+				<c:if test="${not empty headingContent}">
+					<c:out value="${headingContent}" escapeXml="true" />
+				</c:if>
+			
+				<header>
+					<h1><c:out value="${title}" escapeXml="true" /></h1>
+				</header>
+			</c:if>
+						
 			
 			<div id="content">
 			<main role="main">
