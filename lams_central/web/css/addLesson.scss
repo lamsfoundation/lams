@@ -56,10 +56,34 @@ td#learningDesignTreeCell {
 
 div#learningDesignTree {
 	overflow: auto;
-	height: 510px;
+	height: 360px;
 	width: 250px;
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
+}
+
+div#accessDiv {
+	border-top: $border-thin-dotted;
+	overflow: auto;
+	height: 150px;
+	vertical-align: top;
+	padding: 5px 0px 5px 0px;
+}
+
+div#accessDiv > div#accessTitle {
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+}
+
+div#accessDiv .access {
+	cursor: pointer;
+	padding: 10px 15px;
+}
+
+div#accessDiv .access-selected {
+	background-color: #428bca;
+	color: #FFFFFF;
 }
 
 td#canvasControlCell {
