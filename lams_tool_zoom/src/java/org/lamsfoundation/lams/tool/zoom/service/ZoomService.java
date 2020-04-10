@@ -50,6 +50,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -320,7 +321,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	}
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
@@ -644,10 +645,10 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     @Override
-    public String createMeeting(Long zoomUid) throws IOException {
+    public Zoom createMeeting(Long zoomUid) throws IOException {
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
 	if (zoom.getMeetingId() != null) {
-	    return zoom.getMeetingStartUrl();
+	    return zoom;
 	}
 	if (zoom.getApi() == null) {
 	    throw new ZoomException("Can not create a meeting without API keys chosen");
@@ -672,7 +673,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Created meeting: " + meetingId);
 	}
-	return zoom.getMeetingStartUrl();
+	return zoom;
     }
 
     @Override
@@ -809,6 +810,10 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (zoom.getDuration() != null) {
 	    bodyJSON.put("duration", zoom.getDuration());
 	}
+	String password = RandomPasswordGenerator.nextPassword(6);
+	bodyJSON.put("password", password);
+	zoom.setMeetingPassword(password);
+
 	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId(), "PATCH",
 		bodyJSON.toString(), zoom.getApi());
 	ZoomService.getReponse(connection);

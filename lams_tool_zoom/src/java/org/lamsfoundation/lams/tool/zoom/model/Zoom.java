@@ -97,6 +97,9 @@ public class Zoom implements java.io.Serializable, Cloneable {
 
     @Column(name = "meeting_start_url")
     private String meetingStartUrl;
+    
+    @Column(name = "meeting_password")
+    private String meetingPassword;
 
     @OneToMany(mappedBy = "zoom")
     private Set<ZoomSession> zoomSessions;
@@ -227,6 +230,14 @@ public class Zoom implements java.io.Serializable, Cloneable {
 
     public void setMeetingStartUrl(String meetingStartUrl) {
 	this.meetingStartUrl = meetingStartUrl;
+    }
+    
+    public String getMeetingPassword() {
+        return meetingPassword;
+    }
+
+    public void setMeetingPassword(String meetingPassword) {
+        this.meetingPassword = meetingPassword;
     }
 
     public ZoomApi getApi() {

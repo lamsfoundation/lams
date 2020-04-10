@@ -52,11 +52,13 @@ public class ZoomUtil {
 		if (!apiOK) {
 		    errorMap.add("GLOBAL", messageService.getMessage("error.api.reuse"));
 		}
-		meetingURL = zoomService.createMeeting(zoom.getUid());
+		zoom = zoomService.createMeeting(zoom.getUid());
+		meetingURL = zoom.getMeetingStartUrl();
 	    }
 	}
 
 	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
+	request.setAttribute(ZoomConstants.ATTR_MEETING_PASSWORD, zoom.getMeetingPassword());
 	return errorMap;
     }
 }

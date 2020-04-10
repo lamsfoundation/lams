@@ -128,10 +128,8 @@ public interface IZoomService extends ICommonToolService {
 
     /**
      * Create a new Zoom meeting using API
-     *
-     * @return start URL for browser to call and start the meeting
      */
-    String createMeeting(Long zoomUid) throws IOException;
+    Zoom createMeeting(Long zoomUid) throws IOException;
 
     /**
      * Register user for a meeting. Use session name in last name if the activity is grouped.
