@@ -38,7 +38,7 @@
 			<c:forEach items="${config}" var="group">
 				<h2 class="voffset20"><fmt:message key="${group.key}"/></h2>
 
-				<table class="table table-striped table-bordered" >
+				<table class="table table-striped table-bordered" role="presentation">
 					<c:forEach items="${group.value}" var="row">
 						<tr>
 							<td>

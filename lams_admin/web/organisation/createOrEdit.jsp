@@ -139,14 +139,14 @@
 				</div>
 				<div class="form-check">
 					<form:checkbox path="enableCourseNotifications" id="enable-course-notifications" cssClass="form-check-input"/>
-			    	<label  class="form-check-label" for="enableCourseNotifications">
+			    	<label  class="form-check-label" for="enable-course-notifications">
 			    		<fmt:message key="admin.enable.course.notifications"/>
 			    	</label>
 				</div>
 
 				<div class="form-check">
 					<form:checkbox id="enableGradebookForLearners" path="enableGradebookForLearners" cssClass="form-check-input"/>
-			    	<label  class="form-check-label" for="enable-gradebook-for-learners">
+			    	<label  class="form-check-label" for="enableGradebookForLearners">
 			    		<fmt:message key="admin.gradebook.learner.enable"/>
 			    	</label>
 				</div>
@@ -169,7 +169,7 @@
 
 			<div class="form-check">
 				<form:checkbox path="enableKumalive" id="enable-kumalive" cssClass="form-check-input" />
-		    	<label  class="form-check-label" for="enable-live-edit">
+		    	<label  class="form-check-label" for="enable-kumalive">
 		    		<fmt:message key="config.kumalive.enable"/>
 		    	</label>
 			</div>

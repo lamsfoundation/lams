@@ -256,7 +256,7 @@
 					<div class="col-xl-12">
 					</c:if>
 					
-						<table class="table table-borderless">
+						<table class="table table-borderless" role="presentation">
 							<tr>
 								<td class="text-right">
 									<label for="login">

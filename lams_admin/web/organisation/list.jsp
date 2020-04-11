@@ -221,7 +221,7 @@
 					
 					<h1 id="courseName" class="font-weight-bolder"><c:out value="${orgManageForm.parentName}" escapeXml="true"/></h1>
 					
-					<label title="<fmt:message key="admin.organisation.create.date"/>" style="position:relative;top:-1rem;font-size: x-small;"><lams:Date value="${org.createDate}"/></label>
+					<span title="<fmt:message key="admin.organisation.create.date"/>" style="position:relative;top:-1rem;font-size: small;"><lams:Date value="${org.createDate}"/></span>
 					
 				    <div class="row mt-1">
 				        <div class="col-lg-4">
