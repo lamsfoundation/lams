@@ -11,7 +11,13 @@
 
 <lams:html>
 <lams:head>
-	<c:set var="title"><fmt:message key="admin.user.entry"/></c:set>
+	<c:if test="${not empty userForm.userId}">
+		<c:set var="title"><fmt:message key="admin.user.edit"/></c:set>
+	</c:if> 
+	<c:if test="${empty userForm.userId}">
+		<c:set var="title"><fmt:message key="admin.user.create"/></c:set>
+	</c:if>
+
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
@@ -165,7 +171,6 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title">${title}: <fmt:message key="admin.user.edit"/></c:set>
 	
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/sysadminstart.do | <fmt:message key="sysadmin.maintain" /></c:set>
@@ -196,366 +201,315 @@
 					</c:if>
 				</c:if>
 						
-				<c:if test="${not empty userForm.userId}">
-					<h2><fmt:message key="admin.user.edit" /></h2>
-				</c:if> 
-				<c:if test="${empty userForm.userId}">
-					<h2><fmt:message key="admin.user.create" /></h2>
-				</c:if>
-			    <div class="row">
-				<div class="col-xl-12">
 						
-							<c:if test="${empty userForm.userId}">
-							<lams:Alert type="info" id="passwordConditions" close="false">
-							<fmt:message key='label.password.must.contain' />:
-								<ul class="list-unstyled" style="line-height: 1.2">
-									<li><span class="fa fa-check"></span> <fmt:message
-											key='label.password.min.length'>
-											<fmt:param value='${minNumChars}' />
-										</fmt:message></li>
-				
-									<c:if test="${mustHaveUppercase}">
-										<li><span class="fa fa-check"></span> <fmt:message
-												key='label.password.must.ucase' /></li>
+				<c:if test="${empty userForm.userId}">
+					<lams:Alert type="info" id="passwordConditions" close="false">
+					<fmt:message key='label.password.must.contain' />:
+						<ul class="list-unstyled ml-2" style="line-height: 1.2">
+							<li><span class="fa fa-check"  aria-hidden="true"></span> <fmt:message
+									key='label.password.min.length'>
+									<fmt:param value='${minNumChars}' />
+								</fmt:message></li>
+		
+							<c:if test="${mustHaveUppercase}">
+								<li><span class="fa fa-check" aria-hidden="true"></span> <fmt:message
+										key='label.password.must.ucase' /></li>
+							</c:if>
+							<c:if test="${mustHaveLowercase}">
+										<li><span class="fa fa-check aria-hidden="true""></span> <fmt:message
+												key='label.password.must.lcase' /></li>
 									</c:if>
-									<c:if test="${mustHaveLowercase}">
-												<li><span class="fa fa-check"></span> <fmt:message
-														key='label.password.must.lcase' /></li>
-											</c:if>
-				
-									<c:if test="${mustHaveNumerics}">
-										<li><span class="fa fa-check"></span> <fmt:message
-												key='label.password.must.number' /></li>
-									</c:if>
-				
-				
-									<c:if test="${mustHaveSymbols}">
-										<li><span class="fa fa-check"></span> <fmt:message
-												key='label.password.must.symbol' /></li>
-									</c:if>
-								</ul>
-							</lams:Alert>
-						</c:if>
-					</div>
-					</div>
+		
+							<c:if test="${mustHaveNumerics}">
+								<li><span class="fa fa-check" aria-hidden="true"></span> <fmt:message
+										key='label.password.must.number' /></li>
+							</c:if>
+		
+		
+							<c:if test="${mustHaveSymbols}">
+								<li><span class="fa fa-check" aria-hidden="true"></span> <fmt:message
+										key='label.password.must.symbol' /></li>
+							</c:if>
+						</ul>
+					</lams:Alert>
+				</c:if>
 					
 					<!--  Main panel. Do not show portrait area for new user. -->
 					<c:if test="${not empty userForm.userId}">
 				    <div class="row">
-						<div class="col-xl-2">
+						<div class="col-md-5">
 				    			<div class="text-center"><div id="portraitPicture" ></div></div>
 							<c:if test="${isSysadmin}">
 				    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
 				    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-outline-secondary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
 				    			</c:if>
+							<div class="mt-3 text-center">
+							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-outline-secondary btn-sm"><fmt:message key="admin.user.changePassword" /></a>
+							</div>
+				    			
 				    	</div>
-					<div class="col-xl-10">
+					<div class="col-md-6">
+					
 					</c:if>
 					<c:if test="${empty userForm.userId}">
-				    <div class="row">
-					<div class="col-xl-12">
+				    <div class="row justify-content-center">
+					<div class="col-10 col-md-6">
 					</c:if>
 					
-						<table class="table table-borderless" role="presentation">
-							<tr>
-								<td class="text-right">
-									<label for="login">
-										<fmt:message key="admin.user.login" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><lams:errors path="login"/>
-								<form:input id="login" path="login"  maxlength="50"
-										cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<c:if test="${empty userForm.userId}">
-							<tr>
-								<td class="text-right">
-									<label for="password">
-										<fmt:message key="admin.user.password" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><lams:errors path="password"/>
-									<form:input type="password" path="password" 
-										maxlength="25" id="password" cssClass="form-control form-control-sm" /></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="password2">
-										<fmt:message key="admin.user.password.confirm" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><form:input type="password" path="password2" 
-										maxlength="25" id="password2" cssClass="form-control form-control-sm" /></td>
-							</tr>
-							</c:if>
-							<tr>
-								<td class="text-right">
-									<label for="authenticationMethodId">
-										<fmt:message key="admin.user.authentication.method" />
-									</label>:
-								</td>
-								<td><form:select id="authenticationMethodId" path="authenticationMethodId"
-										cssClass="form-control form-control-sm">
-										<c:forEach items="${authenticationMethods}" var="method">
-											<form:option value="${method.authenticationMethodId}">
-												<c:out value="${method.authenticationMethodName}" />
-											</form:option>
-										</c:forEach>
-									</form:select></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="title">
-										<fmt:message key="admin.user.title" />
-									</label>:
-								</td>
-								<td><form:input type="text" path="title" size="32" maxlength="32"
-										id="title" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="firstName">
-										<fmt:message key="admin.user.first_name" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><lams:errors path="firstName"/>
-									<form:input path="firstName" 
-										id="firstName" maxlength="128" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="lastName">
-										<fmt:message key="admin.user.last_name" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><lams:errors path="lastName"/>
-									<form:input path="lastName" 
-										id="lastName" maxlength="128" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="email">
-										<fmt:message key="admin.user.email" />
-									</label>:&nbsp;<span class="text-danger">*</span>
-								</td>
-								<td><lams:errors path="email"/>
-									<form:input path="email" maxlength="128" id="email"
-										cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="addressLine1">
-										<fmt:message key="admin.user.address_line_1" />
-									</label>:
-								</td>
-								<td><form:input path="addressLine1" 
-										maxlength="64" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="addressLine2">
-										<fmt:message key="admin.user.address_line_2" />
-									</label>:
-								</td>
-								<td><form:input path="addressLine2" 
-										maxlength="64" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="addressLine3">
-										<fmt:message key="admin.user.address_line_3" />
-									</label>:
-								</td>
-								<td><form:input path="addressLine3" 
-										maxlength="64" cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="city">
-										<fmt:message key="admin.user.city" />
-									</label>:
-								</td>
-								<td><form:input path="city"  maxlength="64"
-										cssClass="form-control form-control-sm"/></td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="postcode">
-										<fmt:message key="admin.user.postcode" />
-									</label>:
-								</td>
-								<td>
-									<form:input path="postcode" size="10" maxlength="10" cssClass="form-control form-control-sm"/>
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">	
-									<label for="state">
-										<fmt:message key="admin.user.state" />
-									</label>:
-								</td>
-								<td><form:input path="state"  maxlength="64"
-										cssClass="form-control form-control-sm" />
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="country">
-										<fmt:message key="admin.user.country" />
-									</label>:
-								</td>
-								<td>
-									<form:select path="country" cssClass="form-control form-control-sm">
-										<form:option value="0"><fmt:message key="label.select.country" /></form:option>
-										<c:forEach items="${countryCodes}" var="countryCode">
-											<form:option value="${countryCode.key}">
-												${countryCode.value}
-											</form:option>
-										</c:forEach>
-									</form:select>
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="dayPhone">
-										<fmt:message key="admin.user.day_phone" />
-									</label>:
-								</td>
-								<td>
-									<form:input path="dayPhone"  maxlength="64" cssClass="form-control form-control-sm"/>
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="eveningPhone">
-										<fmt:message key="admin.user.evening_phone" />
-									</label>:
-								</td>
-								<td>
-									<form:input path="eveningPhone" maxlength="64" cssClass="form-control form-control-sm"/>		
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="mobilePhone">
-										<fmt:message key="admin.user.mobile_phone" />
-									</label>:
-								</td>
-								<td>
-									<form:input path="mobilePhone" maxlength="64" cssClass="form-control form-control-sm"/>
-								</td>
-							</tr>
-							<tr>
-								<td class="text-right">
-									<label for="fax">
-										<fmt:message key="admin.user.fax" />
-									</label>:
-								</td>
-								<td>
-									<form:input path="fax" maxlength="64" cssClass="form-control form-control-sm"/>
-								</td>
-							</tr>
-			
-							<tr>
-								<td class="text-right">
-									<label for="localeId">
-										<fmt:message key="admin.organisation.locale" />
-									</label>:
-								</td>
-								<td>
-									<form:select path="localeId" cssClass="form-control form-control-sm">
-										<c:forEach items="${locales}" var="locale">
-											<form:option value="${locale.localeId}">
-												<c:out value="${locale.description}" />
-											</form:option>
-										</c:forEach>
-									</form:select>
-								</td>
-							</tr>
-			
-							<tr>
-								<td class="text-right">
-									<label for="timeZone">
-										<fmt:message key="admin.user.time.zone" />
-									</label>:
-								</td>
-								<td>
-									<form:select path="timeZone" cssClass="form-control form-control-sm">
-										<c:forEach items="${timezoneDtos}" var="timezoneDto">
-											<form:option value="${timezoneDto.timeZoneId}">
-												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-											</form:option>
-										</c:forEach>
-									</form:select>
-								</td>
-							</tr>
-			
-							<tr>
-								<td class="text-right">
-									<label for="userTheme">
-										<fmt:message key="label.theme" />
-									</label>:
-								</td>
-								<td>
-									<form:select path="userTheme" class="form-control form-control-sm">
-										<c:forEach items="${themes}" var="theme">
-											<form:option value="${theme.themeId}">${theme.name}</form:option>
-										</c:forEach>
-									</form:select>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="text-right">
-									<label for="changePassword">
-										<fmt:message key="admin.user.change.password" />
-									</label>:
-								</td>
-								<td>
-									<form:checkbox path="changePassword" value="true" id="changePassword"  />
-								</td>
-							</tr>
-							
-							<c:if test="${isSysadmin}">
-								<tr>
-									<td class="text-right">
-										<label for="twoFactorAuthenticationEnabled">
-											<fmt:message key="label.2FA.property.enable" /> 
-										</label>:
-									</td>
-									<td>
-										<form:checkbox id="twoFactorAuthenticationEnabled" path="twoFactorAuthenticationEnabled" value="true"  />
-									</td>
-								</tr>
-							</c:if>
-							
-							<c:if test="${not empty createDate}">
-								<tr>
-									<td class="text-right">
-										<label>
-											<fmt:message key="admin.user.create.date" />
-										</label>:
-									</td>
-									<td>
-										<lams:Date value="${createDate}"/>
-									</td>
-								</tr>
-							</c:if>
-				
-				
-						</table>
-					</div>
-					</div>
+						<div class="form-group">
+							<label for="login">
+								<fmt:message key="admin.user.login" />:&nbsp;<span class="text-danger">*</span>
+							</label>
+							<form:input id="login" path="login"  maxlength="50"
+									cssClass="form-control form-control-sm"/>
+							<small id="loginHelpBlock" class="form-text text-muted">
+								<lams:errors path="login"/>
+							</small>		
+						</div>	
 					
-					<div class="row">
-					<div class="col-xl-12">
-						<c:if test="${not empty userForm.userId}">
-							<div class="pull-left">
-							<a href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}" class="btn btn-outline-secondary btn-sm"><fmt:message key="admin.user.changePassword" /></a>
+						<c:if test="${empty userForm.userId}">
+
+							<div class="form-group">
+								<label for="password">
+									<fmt:message key="admin.user.password" />:&nbsp;<span class="text-danger">*</span>
+								</label>
+								<form:input type="password" path="password" 
+									maxlength="25" id="password" cssClass="form-control form-control-sm" />
+								<small id="passwordHelpBlock" class="form-text text-muted">
+									<lams:errors path="password"/>
+								</small>		
+							</div>
+							
+						
+							<div class="form-group">
+								<label for="password2">
+									<fmt:message key="admin.user.password.confirm" />:&nbsp;<span class="text-danger">*</span>
+								</label>
+								<form:input type="password" path="password2" 
+									maxlength="25" id="password2" cssClass="form-control form-control-sm" />
+							
 							</div>
 						</c:if>
 						
-						<div class="pull-right">
+						<div class="form-group">
+							<label for="authenticationMethodId">
+								<fmt:message key="admin.user.authentication.method" />:
+							</label>
+							<form:select id="authenticationMethodId" path="authenticationMethodId"
+								cssClass="form-control form-control-sm">
+								<c:forEach items="${authenticationMethods}" var="method">
+									<form:option value="${method.authenticationMethodId}">
+										<c:out value="${method.authenticationMethodName}" />
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</div>						
+					
+						<div class="form-group">
+							<label for="title">
+								<fmt:message key="admin.user.title" />:
+							</label>
+							<form:input type="text" path="title" size="32" maxlength="32"
+								id="title" cssClass="form-control form-control-sm"/>
+						</div>	
+						
+						<div class="form-group">
+							<label for="firstName">
+								<fmt:message key="admin.user.first_name" />:&nbsp;<span class="text-danger">*</span>
+							</label>
+							<form:input path="firstName" 
+								id="firstName" maxlength="128" cssClass="form-control form-control-sm"/>
+							<small id="firstNameHelpBlock" class="form-text text-muted">
+								<lams:errors path="firstName"/>
+							</small>	
+						</div>	
+									
+						<div class="form-group">
+							<label for="lastName">
+								<fmt:message key="admin.user.last_name" />:&nbsp;<span class="text-danger">*</span>
+							</label>
+							<form:input path="lastName" 
+								id="lastName" maxlength="128" cssClass="form-control form-control-sm"/>
+							<small id="lastNameHelpBlock" class="form-text text-muted">
+								<lams:errors path="lastName"/>
+							</small>	
+						</div>	
+
+						<div class="form-group">
+							<label for="email">
+								<fmt:message key="admin.user.email" />:&nbsp;<span class="text-danger">*</span>
+							</label>
+							<form:input path="email" maxlength="128" id="email"
+								cssClass="form-control form-control-sm"/>
+							<small id="emailHelpBlock" class="form-text text-muted">
+								<lams:errors path="email"/>
+							</small>	
+						</div>	
+
+
+						<div class="form-group">
+							<label for="addressLine1">
+								<fmt:message key="admin.user.address_line_1" />:
+							</label>
+							<form:input path="addressLine1" 
+								maxlength="64" cssClass="form-control form-control-sm"/>
+						</div>
+						
+						
+						<div class="form-group">
+							<label for="addressLine2">
+								<fmt:message key="admin.user.address_line_2" />:
+							</label>	
+							<form:input path="addressLine2" 
+								maxlength="64" cssClass="form-control form-control-sm"/>
+										
+						</div>
+						
+						<div class="form-group">
+							<label for="addressLine3">
+								<fmt:message key="admin.user.address_line_3" />:
+							</label>	
+							<form:input path="addressLine3" 
+								maxlength="64" cssClass="form-control form-control-sm"/>
+										
+						</div>
+						
+						<div class="form-group">
+							<label for="city">
+								<fmt:message key="admin.user.city" />:
+							</label>	
+							<form:input path="city" 
+								maxlength="64" cssClass="form-control form-control-sm"/>
+										
+						</div>
+
+						<div class="form-group">
+							<label for="postcode">
+								<fmt:message key="admin.user.postcode" />:
+							</label>	
+							<form:input path="postcode" 
+								maxlength="10" cssClass="form-control form-control-sm"/>
+										
+						</div>
+
+						<div class="form-group">
+							<label for="state">
+								<fmt:message key="admin.user.state" />:
+							</label>	
+							<form:input path="state" 
+								maxlength="64" cssClass="form-control form-control-sm"/>
+										
+						</div>
+						
+						<div class="form-group">
+							<label for="country">
+								<fmt:message key="admin.user.country" />:&nbsp;<span class="text-danger">*</span>
+							</label>	
+							<form:select path="country" cssClass="form-control form-control-sm">
+								<form:option value="0"><fmt:message key="label.select.country" /></form:option>
+								<c:forEach items="${countryCodes}" var="countryCode">
+									<form:option value="${countryCode.key}">
+										${countryCode.value}
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</div>
+						
+						<div class="form-group">
+							<label for="dayPhone">
+								<fmt:message key="admin.user.day_phone" />:
+							</label>	
+							<form:input path="dayPhone" maxlength="64" cssClass="form-control form-control-sm"/>
+						</div>
+
+						<div class="form-group">
+							<label for="eveningPhone">
+								<fmt:message key="admin.user.evening_phone" />:
+							</label>	
+							<form:input path="eveningPhone" maxlength="64" cssClass="form-control form-control-sm"/>
+						</div>
+
+						<div class="form-group">
+							<label for="mobilePhone">
+								<fmt:message key="admin.user.mobile_phone" />:
+							</label>	
+							<form:input path="mobilePhone" maxlength="64" cssClass="form-control form-control-sm"/>
+						</div>
+																								
+						<div class="form-group">
+							<label for="fax">
+								<fmt:message key="admin.user.fax" />:
+							</label>	
+							<form:input path="fax" maxlength="64" cssClass="form-control form-control-sm"/>
+						</div>
+
+						<div class="form-group">
+							<label for="localeId">
+								<fmt:message key="admin.organisation.locale" />:
+							</label>	
+							<form:select path="localeId" cssClass="form-control form-control-sm">
+								<c:forEach items="${locales}" var="locale">
+									<form:option value="${locale.localeId}">
+										<c:out value="${locale.description}" />
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</div>
+						
+						<div class="form-group">
+							<label for="timeZone">
+								<fmt:message key="admin.user.time.zone" />:
+							</label>
+							<form:select path="timeZone" cssClass="form-control form-control-sm">
+								<c:forEach items="${timezoneDtos}" var="timezoneDto">
+									<form:option value="${timezoneDto.timeZoneId}">
+										${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+									</form:option>
+								</c:forEach>
+							</form:select>
+						</div>
+						
+						<div class="form-group">
+							<label for="userTheme">
+								<fmt:message key="label.theme" />:
+							</label>
+							<form:select path="userTheme" class="form-control form-control-sm">
+								<c:forEach items="${themes}" var="theme">
+									<form:option value="${theme.themeId}">${theme.name}</form:option>
+								</c:forEach>
+							</form:select>
+						</div>
+						
+						<div class="form-group form-check ml-3">
+							<form:checkbox cssClass="form-check-input" path="changePassword" value="true" id="changePassword"  />
+							<label class="form-check-label"  for="changePassword">
+										<fmt:message key="admin.user.change.password" />
+							</label>
+						</div>
+												
+						
+						<c:if test="${isSysadmin}">
+							<div class="form-group form-check ml-3">
+							<form:checkbox cssClass="form-check-input" id="twoFactorAuthenticationEnabled" path="twoFactorAuthenticationEnabled" value="true"  />
+							<label class="form-check-label"  for="twoFactorAuthenticationEnabled">
+								<fmt:message key="label.2FA.property.enable" /> 
+							</label>:							
+							</div>
+						</c:if>	
+						
+						<c:if test="${not empty createDate}">
+							<div class="form-group">
+								<label>
+										<fmt:message key="admin.user.create.date" />
+									</label>: <lams:Date value="${createDate}"/>
+							</div> 
+						</c:if>
+
+					
+					<div class="row">
+					<div class="col-12">
+					<hr>
+						<div class="pull-right mb-3">
 							<a href="<lams:LAMSURL/>admin/usersearch.do" class="btn btn-outline-secondary btn-sm"> <fmt:message key="admin.cancel" /> </a>
 							<input type="submit" id="saveButton" class="btn btn-primary btn-sm loffset5" value="<fmt:message key="admin.save" />" />
 						</div>
@@ -565,7 +519,7 @@
 			
 				<c:if test="${not empty globalRoles || not empty userOrgRoles}">
 			
-					<h3 class="voffset20"><fmt:message key="admin.user.roles" /></h3>
+					<h2 class="voffset20"><fmt:message key="admin.user.roles" /></h2>
 
 
 						<c:if test="${not empty globalRoles}">
@@ -584,7 +538,7 @@
 			
 						<c:if test="${not empty userOrgRoles}">
 							<div class="ml-2">
-								<h4><fmt:message key="admin.organisation" /></h4>
+								<h3><fmt:message key="admin.organisation" /></h3>
 						
 								<table id="tableRoles" class="table table-striped table-bordered">
 									<thead class="thead-light">

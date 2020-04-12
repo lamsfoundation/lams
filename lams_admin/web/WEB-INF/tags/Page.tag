@@ -439,9 +439,9 @@
 			--%>
 			
 			
-
+			<header>
 			<c:if test="${not empty breadcrumbItems}">
-											
+
 				<nav aria-label="breadcrumb" role="navigation">
 				  <ol class="breadcrumb">
 
@@ -464,9 +464,10 @@
 					</c:forEach>
 					  </ol>
 				</nav>						    
-				
+			
 			</c:if>
-
+			</header>
+			
 			<c:if test="${not empty title}">
 				<c:if test="${not empty titleHelpURL}">
 					<span class="pull-right">${titleHelpURL}</span>
@@ -474,15 +475,12 @@
 				<c:if test="${not empty headingContent}">
 					<c:out value="${headingContent}" escapeXml="true" />
 				</c:if>
-			
-				<header>
-					<h1><c:out value="${title}" escapeXml="true" /></h1>
-				</header>
 			</c:if>
 						
 			
 			<div id="content">
 			<main role="main">
+				<c:if test="${not empty title}"><h1><c:out value="${title}" escapeXml="true" /></h1></c:if>
 				<jsp:doBody />
 			</main>
 			</div>

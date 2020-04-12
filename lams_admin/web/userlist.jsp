@@ -70,19 +70,8 @@
 
 
 	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}" >
-				
-			<p>
-				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-				<c:if test="${orgType == 2}">
-					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}" /></a>
-				</c:if>
-				<c:if test="${orgType == 3}">
-					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
-					: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userManageForm.orgId}" />" class="btn btn-default"><c:out value="${userManageForm.orgName}"/></a>
-				</c:if>
-			</p>
-			
-			<div class="panel panel-default voffset5" >
+							
+			<div class="panel panel-default mt-2" >
 				<div id="courseHeading" class="panel-heading">
 					<span class="panel-title">
 						<c:if test="${orgType == 1}">
@@ -158,32 +147,39 @@
 				<c:forEach var="userManageBean" items="${userManageForm.userManageBeans}">
 					<tr>
 						<td>
-							<c:out value="${userManageBean.login}" />
+							<c:out value="${userManageBean.login}" escapeXml="true"/>
 						</td>
 						<td>
-							<c:out value="${userManageBean.firstName}" />
+							<c:out value="${userManageBean.firstName}" escapeXml="true"/>
 						</td>
 						<td>
-							<c:out value="${userManageBean.lastName}" />
+							<c:out value="${userManageBean.lastName}" escapeXml="true"/>
 						</td>
 						<td>
 						    <small>
 						    <c:forEach var="role" items="${userManageBean.roles}">
-						        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message>&nbsp;
+						        <fmt:message>role.<lams:role role="${role.name}" /></fmt:message> &nbsp;
 						    </c:forEach>
 						    </small>
 						</td>
 						<td>
 							<c:if test="${userManageForm.canEditRole}">
-                            	<a title="<fmt:message key="admin.user.assign.roles"/>" href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-users"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.user.assign.roles"/></span></button></a>
+                            	
+                            	<a aria-label="<fmt:message key="admin.user.assign.roles"/>" title="<fmt:message key="admin.user.assign.roles"/>" href="<lams:LAMSURL/>admin/userroles.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>" type="button" class="btn btn-outline-secondary btn-sm">
+                            		<i class="fa fa-users" aria-hidden="true"></i>
+                            	</a>
 								&nbsp;
 							</c:if>
 							<c:if test="${userManageForm.courseAdminCanAddNewUsers}">
-                            	<a title="<fmt:message key="admin.edit" />" href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit" /></span></button></a>
+                            	<a aria-label ="<fmt:message key="admin.edit" />" title="<fmt:message key="admin.edit" />" href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"  type="button" class="btn btn-outline-secondary btn-sm">
+                            		<i class="fa fa-pencil" aria-hidden="true"></i>
+                            	</a>
 								&nbsp;
 							</c:if>
 							<c:if test="${canDeleteUser}">
-                            	<a title="<fmt:message key="admin.user.delete"/>" href="<lams:LAMSURL/>admin/user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.user.delete"/></span></button></a>
+                            	<a aria-label="<fmt:message key="admin.user.delete"/>" title="<fmt:message key="admin.user.delete"/>" href="<lams:LAMSURL/>admin/user/remove.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>" type="button" class="btn btn-outline-danger btn-sm">
+                            		<i class="fa fa-trash" aria-hidden="true"></i>
+                            	</a>
 							</c:if>
 							<br/>
 						</td>		
@@ -193,13 +189,13 @@
 				<tfoot>
 					<tr>
 				    	<th colspan="5" class="ts-pager form-horizontal">
-				    	<form onsubmit="return false;">	    	
-					        <button type="button" class="btn btn-xs first"><i class="fa fa-step-backward"></i></button>
-					        <button type="button" class="btn btn-xs prev"><i class="fa fa-backward"></i></button>
+				    	<form onsubmit="return false;">
+				   	        <button type="button" class="btn btn-xs first" aria-label="first"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
+	        				<button type="button" class="btn btn-xs prev" aria-label="previous"><i class="fa fa-backward" aria-hidden="true"></i></button>
 					        <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-					        <button type="button" class="btn btn-xs next"><i class="fa fa-forward"></i></button>
-					        <button type="button" class="btn btn-xs last"><i class="fa fa-step-forward"></i></button>
-					        <select class="pagesize" title="Select page size">
+					        <button type="button" class="btn btn-xs next" aria-label="next"><i class="fa fa-forward aria-hidden="true""></i></button>
+					        <button type="button" class="btn btn-xs last" aria-label="last"><i class="fa fa-step-forward aria-hidden="true""></i></button>
+					        <select class="pagesize" aria-label="Select page size">
 					      		<option selected="selected" value="10">10</option>
 					      		<option value="20">20</option>
 					      		<option value="30">30</option>
