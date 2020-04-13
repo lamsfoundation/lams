@@ -183,24 +183,7 @@
 	<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<form:hidden path="orgId" />
-				<form:hidden path="userId" />
-
-				<c:if test="${not empty userForm.orgId}">
-					<c:if test="${not empty pOrgId}">
-						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
-							<c:out value="${parentName}" />
-						  </a>
-						: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
-							<c:out value="${orgName}" />
-						  </a>
-					</c:if>
-					<c:if test="${empty pOrgId}">
-						: <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${userForm.orgId}" />" class="btn btn-default">
-							<c:out value="${orgName}" />
-						  </a>
-					</c:if>
-				</c:if>
-						
+				<form:hidden path="userId" />						
 						
 				<c:if test="${empty userForm.userId}">
 					<lams:Alert type="info" id="passwordConditions" close="false">

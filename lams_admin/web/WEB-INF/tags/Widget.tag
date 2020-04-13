@@ -43,6 +43,9 @@
 	<c:set var="shadow">shadow-none</c:set>
 </c:if>
 
+<c:choose>
+	<c:when test="${type eq 'w1' }">
+
 	<div class="card mb-1 ${shadow}">
 	  <div class="row no-gutters">
 	    <div class="col-4 d-flex  bg-${style} border border-${style} align-items-center justify-content-center" style="border-bottom-left-radius: 0.25rem; border-top-left-radius: 0.25rem;">
@@ -59,3 +62,29 @@
 	    </div>
 	  </div>
 	</div>
+	</c:when>
+	
+	
+	<c:when test="${type eq 'w2' }">
+	
+	<div class="card mb-1 ${shadow}">
+		<div class="card-body">
+			<span class="card-title"></span>
+	  <div class="row no-gutters">
+	    <div class="col-4 d-flex  bg-${style} border border-${style} align-items-center justify-content-center" style="border-bottom-left-radius: 0.25rem; border-top-left-radius: 0.25rem;">
+	      <i class="fa ${icon}" aria-hidden="true"></i>
+	    </div>
+	    <div class="col-8">
+	      <div class="card-body m-0">
+	        <div class="card-text ${titleAlignment}">${title}</div>
+	        <div class="card-text ${bodyTextAlignment}" style="font-size: ${bodyTextFontSize}"><c:out value="${bodyText}" escapeXml="true" /></div>
+	      </div>
+	      <c:if test="{not empty footerText}">
+	      <div class="card-footer">${footerText}</div>
+	      </c:if>
+	    </div>
+	  </div>
+	</div>
+	</c:when>	
+	
+</c:choose>	

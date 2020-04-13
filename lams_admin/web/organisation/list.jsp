@@ -227,20 +227,20 @@
 				        <div class="col-lg-4">
 
 			                <c:set var="title"><fmt:message key="heading.users"/></c:set>
-							<lams:Widget type="123" style="warning" shadow="shadow" icon="fa-3x fa-users text-white" title="${title}" titleAlignment="text-right" bodyText="${totalUsers}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+							<lams:Widget type="w1" style="warning" shadow="shadow" icon="fa-3x fa-users text-white" title="${title}" titleAlignment="text-right" bodyText="${totalUsers}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
 			                
 
 				        </div>
 				        <div class="col-lg-4">
 
 			                <c:set var="title"><fmt:message key='admin.statistics.lessons'/></c:set>
-			                <lams:Widget type="123" style="danger" shadow="shadow" icon="fa-3x fa-book text-white" title="${title}" titleAlignment="text-right" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+			                <lams:Widget type="w1" style="danger" shadow="shadow" icon="fa-3x fa-book text-white" title="${title}" titleAlignment="text-right" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
 
 				        </div>
 				        <div class="col-lg-4">
 				        
 				        	<c:set var="title"><fmt:message key="label.subgroups"/></c:set>
-				        	<lams:Widget type="123" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right text-capitalize" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+				        	<lams:Widget type="w1" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right text-capitalize" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
 				        
 				        </div>
 				    </div>		

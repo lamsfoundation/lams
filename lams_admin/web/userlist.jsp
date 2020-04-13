@@ -71,76 +71,90 @@
 
 	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}" >
 							
-			<div class="panel panel-default mt-2" >
-				<div id="courseHeading" class="panel-heading">
-					<span class="panel-title">
+		<section id="userDetails" class="pl-3 pr-3">	
+			<div class="row bg-light text-dark pt-2 pb-2">
+				<div class="col-12">
+				
+				<div class="pull-right btn-group btn-group-sm">
+					<a id="addRemoveUsers" class="btn btn-outline-secondary btn-sm" type="button" href="<lams:LAMSURL/>admin/userorg.do?orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.add"/></a>
+					<c:if test="${((userManageForm.canResetOrgPassword == true) && (orgType != 1))}">
+						<a id="passwordReset" class="btn  btn-outline-secondary btn-sm" href="<lams:LAMSURL/>admin/orgPasswordChange/start.do?organisationID=${userManageForm.orgId}"><fmt:message key='admin.org.password.change.button'/></a>
+					</c:if>
+					<c:if test="${userManageForm.courseAdminCanAddNewUsers == true}">
+						<a class="btn btn-outline-secondary btn-sm" type="button" href="<lams:LAMSURL/>admin/user/edit.do?orgId=<c:out value="${userManageForm.orgId}"/>"><fmt:message key="admin.user.create"/></a>
+					</c:if>
+				</div>
+				<h2>
 						<c:if test="${orgType == 1}">
 							<fmt:message key="admin.global.roles.manage" />
 						</c:if>
 						<c:if test="${orgType != 1}">
 							<c:out value="${heading}" />
 						</c:if>
-					</span>
-					<div class="pull-right btn-group btn-group-sm">
-						<input id="addRemoveUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.add"/>" onclick="javascript:document.location='<lams:LAMSURL/>admin/userorg.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
-						<c:if test="${userManageForm.canResetOrgPassword == true}">
-							<a class="btn btn-default" href="<lams:LAMSURL/>admin/orgPasswordChange/start.do?organisationID=${userManageForm.orgId}"><fmt:message key='admin.org.password.change.button'/></a>
-						</c:if>
-						<c:if test="${userManageForm.courseAdminCanAddNewUsers == true}">
-							<input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='<lams:LAMSURL/>admin/user/edit.do?orgId=<c:out value="${userManageForm.orgId}"/>'" />
-						</c:if>
-					</div>
+				</h2>
+				
+				<c:choose>
+					<c:when test="${orgType != 1 }">
+
+				    <div class="row mt-5">
+				        <div class="col-md-6 col-lg-3">
+
+			                <c:set var="title"><fmt:message key='label.learners'/></c:set>
+			                <lams:Widget type="w1" style="info" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right" bodyText="${LEARNER}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				        <div class="col-md-6 col-lg-3">
+
+			                <c:set var="title"><fmt:message key='label.authors'/></c:set>
+			                <lams:Widget type="w1" style="success" shadow="shadow" icon="fa-3x fa-pencil text-white" title="${title}" titleAlignment="text-right" bodyText="${AUTHOR}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				        <div class="col-md-6 col-lg-3">
+
+			                <c:set var="title"><fmt:message key='label.monitors'/></c:set>
+			                <lams:Widget type="w1" style="warning" shadow="shadow" icon="fa-3x fa-thermometer-full text-white" title="${title}" titleAlignment="text-right" bodyText="${MONITOR}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				        <div class="col-md-6 col-lg-3">
+
+			                <c:set var="title"><fmt:message key='label.group.managers'/></c:set>
+			                <lams:Widget type="w1" style="danger" shadow="shadow" icon="fa-3x fa-user-secret text-white" title="${title}" titleAlignment="text-right" bodyText="${GROUP_MANAGER}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+
+				        </div>
+				    </div>	
+				    <div class="row m-3 font-weight-bold">
+				    	<c:out value="${numUsers}"/>
+				    </div>
+					</c:when>
+					<c:otherwise>
+					  <div class="row mt-5 mb-5 justify-content-center">
+					    <div class="col-4 text-center">
+					      	<c:set var="title"><fmt:message key="label.sysadmins"/></c:set>
+			                <lams:Widget type="w1" style="primary" shadow="shadow" icon="fa-3x fa-user-secret text-white" title="${title}" titleAlignment="text-right" bodyText="${SYSADMIN}" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+					      
+					    </div>
+					  </div>					
+					</c:otherwise>
+				</c:choose>				    	
+				
 				</div>
+			</div>		
+
 			
-				<c:if test="${orgType != 1}">
-				<table class="table table-condensed table-striped">
+			<div class="row">
+				<div class="col mt-5">
+				
+				<h3><fmt:message key="heading.users"/></h3>
+				
+				
+			<table class="tablesorter ">
+				<thead class="thead-light">
 					<tr>
-						<td width="30%"><fmt:message key="label.learners"/>:</td>
-						<td><c:out value="${LEARNER}"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="label.group.managers"/>:</td>
-						<td><c:out value="${GROUP_MANAGER}"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="label.monitors"/>:</td>
-						<td><c:out value="${MONITOR}"/></td>
-					</tr>
-					<tr>
-						<td><fmt:message key="label.authors"/>:</td>
-						<td><c:out value="${AUTHOR}"/></td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<c:out value="${numUsers}"/>
-						</td>
-					</tr>
-				</table>
-				</c:if>
-					
-				<c:if test="${orgType == 1}">
-				<table class="table table-condensed table-striped">
-					<tr>
-						<td width="30%"><fmt:message key="label.sysadmins"/>:</td>
-						<td><c:out value="${SYSADMIN}"/></td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<c:out value="${numUsers}"/>
-						</td>
-					</tr>
-				</table>
-				</c:if>
-			</div>
-			
-			<table class="tablesorter">
-				<thead>
-					<tr>
-						<th><fmt:message key="admin.user.login"/></th>
-						<th><fmt:message key="admin.user.first_name"/></th>
-						<th><fmt:message key="admin.user.last_name"/></th>
-						<th><fmt:message key="admin.user.roles"/></th>
-						<th><fmt:message key="admin.user.actions"/></th>
+						<th scope="col"><fmt:message key="admin.user.login"/></th>
+						<th scope="col"><fmt:message key="admin.user.first_name"/></th>
+						<th scope="col"><fmt:message key="admin.user.last_name"/></th>
+						<th scope="col"><fmt:message key="admin.user.roles"/></th>
+						<th scope="col"><fmt:message key="admin.user.actions"/></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -209,13 +223,17 @@
 				</tfoot>
 				<tbody>
 				</tbody>
-			</table> 
+			</table>
+				</div>
+			</div>
+			 
 		<hr>
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+			<a href="javascript:history.go(-1)" class="btn btn-outline-secondary btn-sm">
 				<fmt:message key="admin.cancel"/>
 			</a>
-		</div>		
+		</div>
+		</section>				
 	</lams:Page>
 </body>
 </lams:html>

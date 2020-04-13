@@ -31,7 +31,7 @@
 <div class="container">
 	<div class="row justify-content-md-center">
 		<div class="col-md-auto">
-			<div id="${idName}" class="alert alert-${alertType}" role="alert">
+			<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
 				<c:if test="${not empty title}">
 					<span class="fa fa-${iconType}"></span> <span class="alert-title font-weight-bold">${title}</span>
 					<hr class="alert-separator">
