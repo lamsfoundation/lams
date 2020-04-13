@@ -40,7 +40,7 @@ public class ScratchieConstants {
     public static final String ERROR = "error";
 
     public static final String DEFINE_LATER = "definelater";
-    
+
     public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
 
     // for parameters' name
@@ -87,6 +87,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
+    public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
+
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
 
     public static final String ATTR_DELETED_OPTION_LIST = "deleteOptionList";
@@ -97,6 +99,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
     
+    public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
+
     public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
     public static final String ATTR_LEARNERS = "learners";
@@ -124,7 +128,7 @@ public class ScratchieConstants {
     public static final String ATTR_ITEM = "item";
 
     public static final String ATTR_SCORE = "score";
-    
+
     public static final String ATTR_SCORE_PERCENTAGE = "scorePercentage";
 
     public static final String ATTR_MAX_SCORE = "maxScore";
@@ -136,9 +140,9 @@ public class ScratchieConstants {
     public static final String ATTR_REFLECTION_ON = "reflectOn";
 
     public static final String ATTR_IS_BURNING_QUESTIONS_ENABLED = "isBurningQuestionsEnabled";
-    
+
     public static final String ATTR_IS_PRESET_MARKS_OVERWRITTEN = "isPresetMarksOverwritten";
-    
+
     public static final String ATTR_DEFAULT_PRESET_MARKS = "defaultPresetMarks";
 
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
@@ -160,11 +164,11 @@ public class ScratchieConstants {
     public static final String ATTR_GROUP_LEADER_USER_ID = "groupLeaderUserId";
 
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
-    
+
     public static final String ATTR_IS_TIME_LIMIT_ENABLED = "isTimeLimitEnabled";
-    
+
     public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
-    
+
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
@@ -172,15 +176,15 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String ATTR_OPTION_UIDS = "optionUids";
-    
+
     public static final String ATTR_ACTIVITIES_PROVIDING_CONFIDENCE_LEVELS = "activitiesProvidingConfidenceLevels";
-    
+
     public static final String ATTR_ACTIVITIES_PROVIDING_VSA_ANSWERS = "activitiesProvidingVsaAnswers";
 
     public static final String LEARNER_MARK = "learner.mark";
 
     public static final String ERROR_MSG_REQUIRED_FIELDS_MISSING = "error.required.fields.missing";
     public static final String ERROR_MSG_ENTERED_MARKS_NOT_COMMA_SEPARATED_INTEGERS = "error.entered.marks.not.comma.separates";
-    
+
     public static final String ATTR_SHOW_RESULTS = "showResults";
 }

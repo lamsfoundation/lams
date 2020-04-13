@@ -694,6 +694,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchieUserDao.saveObject(user);
     }
 
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+
     @Override
     /*
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
@@ -707,7 +711,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    Long sessionId = session.getSessionId();
 
-	    Collection<User> groupUsers = toolService.getToolSession(sessionId).getLearners();
+	    Collection<User> groupUsers = getAllGroupUsers(sessionId);
 
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);

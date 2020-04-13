@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,6 +69,8 @@ import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -298,6 +302,19 @@ public class LearningController {
 	    // make non-leaders wait for notebook to be submitted, if required
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
 		    isWaitingForLeaderToSubmitNotebook);
+
+	    boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled()
+		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	    request.setAttribute(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	    if (questionEtherpadEnabled) {
+		// get all users from the group, even if they did not reach the Scratchie yet
+		// order them by first and last name
+		Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()
+			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
+			.collect(Collectors.toList());
+		request.setAttribute(ScratchieConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
+	    }
+
 	    return "pages/learning/learning";
 	}
     }
