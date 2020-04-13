@@ -89,6 +89,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
+    public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
+
     public static final String ATTR_ANSWER_LIST = "answerList";
 
     public static final String ATTR_ANSWER_COUNT = "answerCount";
@@ -109,6 +111,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
     
+    public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
+
     public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
     public static final String ATTR_LEARNERS = "learners";
