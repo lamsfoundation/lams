@@ -178,7 +178,7 @@
 		</lams:TSTable>			
 		<hr>
 		<div class="pull-right">
-			<a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-outline-secondary btn-sm">
+			<a href="javascript:history.go(-1)" class="btn btn-outline-secondary btn-sm">
 				<fmt:message key="admin.cancel"/>
 			</a>
 		</div>		

@@ -445,7 +445,7 @@
 								</tr>
 							</tbody>
 						</table>
-						<div class="pull-right voffset20">
+						<div class="pull-right mt-3">
 							<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
 						</div>
 					</form:form>

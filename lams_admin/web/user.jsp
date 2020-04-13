@@ -179,12 +179,7 @@
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.edit"/></c:set>	
 	
 	<lams:Page type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
-	
-	<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
-				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-				<form:hidden path="orgId" />
-				<form:hidden path="userId" />						
-						
+							
 				<c:if test="${empty userForm.userId}">
 					<lams:Alert type="info" id="passwordConditions" close="false">
 					<fmt:message key='label.password.must.contain' />:
@@ -223,7 +218,7 @@
 						<div class="col-md-5">
 				    			<div class="text-center"><div id="portraitPicture" ></div></div>
 							<c:if test="${isSysadmin}">
-				    			<div id="portraitButton" class="text-center voffset10" style="display:none; margin-bottom: 5px;">
+				    			<div id="portraitButton" class="text-center mt-2" style="display:none; margin-bottom: 5px;">
 				    			<a href="#" onclick="javascript:deletePortrait();" class="btn btn-outline-secondary btn-sm"><fmt:message key="label.delete.portrait" /></a></div>
 				    			</c:if>
 							<div class="mt-3 text-center">
@@ -238,6 +233,11 @@
 				    <div class="row justify-content-center">
 					<div class="col-10 col-md-6">
 					</c:if>
+
+					<form:form id="userForm" action="../usersave/saveUserDetails.do" modelAttribute="userForm" method="post">
+								<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+								<form:hidden path="orgId" />
+								<form:hidden path="userId" />						
 					
 						<div class="form-group">
 							<label for="login">
@@ -498,16 +498,20 @@
 						</div>
 					</div>
 					</div>
-								
-			
+				</form:form>
+				
+					</div>
+					</div>
 				<c:if test="${not empty globalRoles || not empty userOrgRoles}">
 			
-					<h2 class="voffset20"><fmt:message key="admin.user.roles" /></h2>
+				<div class="row">
+					<div class="col-md-6 offset-md-3">
+					<h2 class="mt-3"><fmt:message key="admin.user.roles" /></h2>
 
 
 						<c:if test="${not empty globalRoles}">
 							<div class="ml-2">
-								<h4><fmt:message key="label.global.roles" /></h4>
+								<h3><fmt:message key="label.global.roles" /></h3>
 									<ul style="text-indent: 2em;">
 										<c:forEach var="role" items="${globalRoles.roles}">
 											<li><fmt:message>role.<lams:role role="${role}" />
@@ -559,9 +563,11 @@
 								</table>
 							</div>
 						</c:if>
+					</div>
+					</div>	
 				</c:if>
 			
-			</form:form>
+
 	</lams:Page>
 </body>
 </lams:html>
