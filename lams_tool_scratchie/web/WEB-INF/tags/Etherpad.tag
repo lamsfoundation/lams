@@ -33,10 +33,9 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		// If there are mutliple Etherpads on a single page, there is a race condition while setting session ID cookie.
-		// One of pads usually responds with "access denied". It is better to wait 3 seconds and initialise the other pad.
-		// If there is only one pad, initialisation starts immediately.
-		var isOtherPadInitialising = typeof lamsEtherpadTagInitialising == 'undefined' ? false : lamsEtherpadTagInitialising;
-		lamsEtherpadTagInitialising = true;
+		// One of pads usually responds with "access denied". It is better to wait 1.5 seconds and initialise the next pad.
+		var delayBeforeInitialise = typeof lamsEtherpadTagInitialiseDelay == 'undefined' ? 0 : lamsEtherpadTagInitialiseDelay;
+		lamsEtherpadTagInitialiseDelay = delayBeforeInitialise + 1500;
 		
 		window.setTimeout(function(){
 			$.ajax({
@@ -67,7 +66,7 @@
 				}
 			});
 			// wait for other pad on the page to initialise
-		}, isOtherPadInitialising ? 3000 : 0);
+		}, delayBeforeInitialise);
 	});
 </script>
 
