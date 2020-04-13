@@ -15,8 +15,8 @@ public class EtherpadUtil {
      * If Etherpad intial content is not well formed, Etherpad server throws an exception.
      */
     public static String preparePadContent(String rawContent) {
-	return rawContent == null ? null
-		: "<html><body>" + rawContent.trim().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
-			+ "</body></html>";
+	String cleanContent = rawContent == null ? ""
+		: rawContent.trim().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "");
+	return "<html><body>" + cleanContent + "</body></html>";
     }
 }

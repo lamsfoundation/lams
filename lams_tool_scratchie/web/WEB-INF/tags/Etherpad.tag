@@ -13,6 +13,7 @@
 <%@ attribute name="groupId" required="true" rtexprvalue="true" %>
 <%@ attribute name="showControls" required="false" rtexprvalue="true" %>
 <%@ attribute name="showChat" required="false" rtexprvalue="true" %>
+<%@ attribute name="height" required="false" rtexprvalue="true" %>
 
 <%@ tag  import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ tag  import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -58,9 +59,9 @@
 							'padId': padId,
 							'host':'${etherpadServerUrl}',
 							'lang':'${fn:toLowerCase(localeLanguage)}',
-							'showControls':'${empty showControls ? false : showControls}',
-							'showChat':'${empty showChat ? false : showChat}',
-							'height':'' + ($(window).height() - 200)
+							'showControls':${empty showControls ? false : showControls},
+							'showChat': ${empty showChat ? false : showChat},
+							'height': ${empty height ? '+$(window).height() - 200' : height}
 							<c:if test="${showControls}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
 						});
 					}
@@ -76,6 +77,6 @@
 <%-- If content was provided, put it into a hidden div so new lines will not break JavaScript --%>
 <c:if test="${not empty content.trim()}">
 	<span class="etherpad-initial-content" id="etherpad-initial-content-${groupId}">
-		<c:out value="${content}" />
+		${content}
 	</span>
 </c:if>

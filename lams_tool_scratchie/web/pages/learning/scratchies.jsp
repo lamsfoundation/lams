@@ -1,5 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:if test="${isQuestionEtherpadEnabled}">
+	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
+	<c:set var="questionEtherpadContent">
+		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" /> <c:out value="${user.lastName}" />:<br />
+	<br />
+	<br />
+	<br /></c:forEach>
+	</c:set>
+</c:if>
+
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
 	
 	<div class="lead" id="questionTitle${questionNumber.count}">
@@ -128,7 +138,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-
+		
 		<c:if test="${!sessionMap.userFinished && !item.unraveled && isUserLeader && (mode != 'teacher') && !showResults}">
 			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;"
 				class="<c:if test='${item.qbQuestion.answerRequired}'>item-required</c:if>">
@@ -149,6 +159,22 @@
 		</c:if>
 	</c:otherwise>
 	</c:choose>
+	
+	<c:if test="${isQuestionEtherpadEnabled}">
+		<%--Display Etherpad for each question --%>
+		<div class="panel panel-default question-etherpad">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<fmt:message key="label.etherpad.discussion" />
+				</div>
+			</div>
+			<div class="panel-body">
+				<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
+				   showControls="${mode eq 'teacher'}" showChat="false" height="200"
+				>${questionEtherpadContent}</lams:Etherpad>
+			</div>
+		</div>
+	</c:if>
 	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
