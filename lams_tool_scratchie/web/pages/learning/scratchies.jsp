@@ -159,18 +159,22 @@
 	</c:otherwise>
 	</c:choose>
 	
+		
+	<%--Display Etherpad for each question --%>
 	<c:if test="${isQuestionEtherpadEnabled}">
-		<%--Display Etherpad for each question --%>
-		<div class="panel panel-default question-etherpad">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<fmt:message key="label.etherpad.discussion" />
+		<div class="form-group question-etherpad-container">
+			<a data-toggle="collapse" data-target="#question-etherpad-${item.uid}" href="#qe${item.uid}" class="collapsed">
+				<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+  				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+				<fmt:message key="label.etherpad.discussion" />
+			</a>
+			
+			<div id="question-etherpad-${item.uid}" class="collapse">
+				<div class="panel panel-default question-etherpad">
+					<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
+					   showControls="${mode eq 'teacher'}" showChat="false" height="200"
+					>${questionEtherpadContent}</lams:Etherpad>
 				</div>
-			</div>
-			<div class="panel-body">
-				<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
-				   showControls="${mode eq 'teacher'}" showChat="false" height="200"
-				>${questionEtherpadContent}</lams:Etherpad>
 			</div>
 		</div>
 	</c:if>
