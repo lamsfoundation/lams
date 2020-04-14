@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.admin.web.form;
 public class UserOrgForm {
 
     private Integer orgId;
+    
+    private String orgCode;
 
     private String orgName;
 
@@ -52,6 +54,14 @@ public class UserOrgForm {
 
     public void setUserIds(String[] userIds) {
 	this.userIds = userIds;
+    }
+
+    public String getOrgCode() {
+	return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+	this.orgCode = orgCode;
     }
 
 }

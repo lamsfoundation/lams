@@ -59,17 +59,17 @@
 	
 
 	<c:if test="${orgType == 2}">
-		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} | <c:out value="${userManageForm.orgName}" escapeXml="true" /> </c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} | <c:out value="${userManageForm.orgCode}" escapeXml="true" /> :  <c:out value="${userManageForm.orgName}" escapeXml="true" /> </c:set>
 	</c:if>
 	<c:if test="${orgType == 3}">
-		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${pOrgName}" escapeXml="true"/></c:set>
-		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} | <c:out value="${userManageForm.orgName}" escapeXml="true"/></c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${pOrgCode}" escapeXml="true"/> : <c:out value="${pOrgName}" escapeXml="true"/></c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userManageForm.orgId} |  <c:out value="${userManageForm.orgCode}" escapeXml="true" /> : <c:out value="${userManageForm.orgName}" escapeXml="true"/></c:set>
 	</c:if>
 
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.management"/></c:set>
 
 
-	<lams:Page type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}" >
+	<lams:Page type="admin" breadcrumbItems="${breadcrumbItems}" >
 							
 		<section id="userDetails" class="pl-3 pr-3">	
 			<div class="row bg-light text-dark pt-2 pb-2">

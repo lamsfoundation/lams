@@ -90,7 +90,8 @@
 							<fmt:message key="admin.organisation.name"/> 
 						</label>&nbsp;<span class="text-danger">*</span>
 						<input id="name" maxlength="40" name="name" value="${organisationForm.name}" class="form-control form-control-sm" maxlength="240" required/>			
-		
+					</div>	
+					<div class="form-group">
 						<label for="code">
 							<fmt:message key="admin.organisation.code"/>
 						</label>

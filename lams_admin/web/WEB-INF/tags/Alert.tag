@@ -28,19 +28,19 @@
 	</c:when>
 </c:choose>
 
-<div class="container">
-	<div class="row justify-content-md-center">
-		<div class="col-md-auto">
-			<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
-				<c:if test="${not empty title}">
-					<span class="fa fa-${iconType}"></span> <span class="alert-title font-weight-bold">${title}</span>
-					<hr class="alert-separator">
-				</c:if>
-
-				<jsp:doBody />
-			</div>
+<div class="row justify-content-md-center">
+	<div class="col-md-auto">
+		<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
+			<c:if test="${not empty title}">
+				<span class="fa fa-${iconType} "></span> <span class="alert-heading font-weight-bold">${title}</span>
+				<hr>
+			</c:if>
+			<p class="mb-0">
+			<jsp:doBody />
+			</p>
 		</div>
-	</div>	
-</div></div>
+	</div>
+</div>	
+
 
 

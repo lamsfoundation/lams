@@ -79,12 +79,14 @@ public class UserManageController {
 	if (organisation == null) {
 	    return forwardError(request, "error.org.invalid");
 	}
+	String orgCode = organisation.getCode();
 	String orgName = organisation.getName();
 	log.debug("orgName: " + orgName);
 
 	Organisation pOrg = organisation.getParentOrganisation();
 	if (pOrg != null) {
 	    request.setAttribute("pOrgId", pOrg.getOrganisationId());
+	    request.setAttribute("pOrgCode", pOrg.getCode());
 	    request.setAttribute("pOrgName", pOrg.getName());
 	}
 	OrganisationType orgType = organisation.getOrganisationType();
@@ -116,6 +118,7 @@ public class UserManageController {
 	userManageForm.setCanResetOrgPassword(request.isUserInRole(Role.SYSADMIN));
 
 	userManageForm.setOrgId(orgId);
+	userManageForm.setOrgCode(orgCode);
 	userManageForm.setOrgName(orgName);
 	List<UserManageBean> userManageBeans = userManagementService.getUserManageBeans(orgId);
 	Collections.sort(userManageBeans);

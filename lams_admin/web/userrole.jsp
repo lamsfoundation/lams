@@ -21,11 +21,11 @@
 
 	<c:if test="${not empty pOrgId}">
 		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${parentName}" escapeXml="true"/> </c:set>
-		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userRolesForm.orgId} |<c:out value="${orgName}" escapeXml="true"/></c:set>
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userRolesForm.orgId} | <c:out value="${orgName}" escapeXml="true"/></c:set>
 	</c:if>
 	<c:if test="${empty pOrgId}">
 		<c:if test="${userRolesForm.orgId != 1}">
-			<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userRolesForm.orgId} | <c:out value="${orgName}" escapeXml="true"/></c:set>
+			<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${userRolesForm.orgId} |  <c:out value="${orgName}" escapeXml="true"/></c:set>
 		</c:if>
 		<c:if test="${userRolesForm.orgId == 1}">
 			<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userRolesForm.orgId} | <fmt:message key="admin.global.roles.manage" />  </c:set>

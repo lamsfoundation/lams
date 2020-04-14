@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<style>
+	
 		.listBoundingBox {
 			border:thin solid #c1c1c1;
 			margin-left:5px;
@@ -150,70 +151,71 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="title">${title}: <fmt:message key="admin.user.add"/></c:set>
-	<lams:Page type="admin" title="${title}">
-				<p>
-					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
-				    <c:if test="${not empty pOrgId}">
-				        : <a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="pOrgId" />" class="btn btn-default"><c:out value="${pOrgName}"/></a>
-				    </c:if>
-				    <c:if test="${userOrgForm.orgId != 1}">
-						: <a href="<lams:LAMSURL/>admin/<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=<c:out value="${userOrgForm.orgId}" />" class="btn btn-default">
-						<c:out value="${userOrgForm.orgName}"/></a>
-					</c:if>
-					<c:if test="${userOrgForm.orgId == 1}">
-						: <a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value="${userOrgForm.orgId}" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
-					</c:if>
-				</p>
-				
-				<h3><fmt:message key="admin.user.add"/></h3>
-				
-				<div align="center">
-				</div>
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/orgmanage.do?org=1" | <fmt:message key="admin.course.manage" /></c:set>
+    <c:if test="${not empty pOrgId}">
+    	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=${pOrgId} | <c:out value="${pOrgCode}" escapeXml="true"/> : <c:out value="${pOrgName}" escapeXml="true"/></c:set>
+    </c:if>
+    <c:if test="${userOrgForm.orgId != 1}">
+    	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/<c:if test="${orgType == 3}">user</c:if><c:if test="${orgType != 3}">org</c:if>manage.do?org=${userOrgForm.orgId} | <c:out value="${userOrgForm.orgCode}" escapeXml="true"/> : <c:out value="${userOrgForm.orgName}" escapeXml="true"/></c:set>
+    	<c:set var="breadcrumbItems">${breadcrumbItems}, javascript:history.go(-1) | <fmt:message key="admin.user.management"/></c:set>
+    	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.add"/></c:set>
+	</c:if>
+	<c:if test="${userOrgForm.orgId == 1}">
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=${userOrgForm.orgId} | <fmt:message key="admin.global.roles.manage" /></c:set>
+	</c:if>	
+
+
+	<lams:Page type="admin" breadcrumbItems="${breadcrumbItems}">
+		<div class="row">
+			<div class="col bg-light ml-3 mr-3 p-4">
+
+
+				<h1><c:out value="${userOrgForm.orgName}" escapeXml="true"/>: <fmt:message key="admin.user.add"/></h1>
 				
 				<c:if test="${orgType == 2}">
 					<lams:Alert id="subgroup-warning" type="info" close="false">
 						<fmt:message key="msg.remove.from.subgroups"/>
 					</lams:Alert>
 				</c:if>
+
 				
-				<h4><fmt:message key="heading.users"/></h4>
+				<h2><fmt:message key="heading.users"/></h2>
 				<div class="pull-right"><span id="totalUsers"><c:out value="${numExistUsers}"/></span></div>
 				<p>
 					 <fmt:message key="msg.click.remove.user"/>
 				</p>
-				<div class="listBoundingBox">
+				<div class="listBoundingBox border-success bg-white">
 					<div id="existing" class="listScrollable">
 					</div>
 				</div>
 				
-				<p>&nbsp;</p>
 				
-				<h4><fmt:message key="heading.potential.users"/></h4>
+				<h2 class="mt-3"><fmt:message key="heading.potential.users"/></h2>
 				<p>
 					<fmt:message key="msg.click.add.user"/>
 				</p>
 				<div class="pull-right"><span id="potentialUsers"><c:out value="${numPotentialUsers}"/></span></div>
 				<form onsubmit="return loadSearchResults(0);">
 					<p>
-						<fmt:message key="admin.search"/>: <input id="term" type="text"/> or <a onclick="loadSearchResults(1);"><fmt:message key="msg.show.all.potential.users"/></a>
+						<label for="term"><fmt:message key="admin.search"/></label>: <input id="term" class="form-control-inline form-control-sm" type="text"/> or <a onclick="loadSearchResults(1);" ><fmt:message key="msg.show.all.potential.users"/></a>
 					</p>
 				</form>
-				<div class="listBoundingBox">
+				<div class="listBoundingBox border-secondary bg-white">
 					<div id="potential" class="listScrollable">
 					</div>
 				</div>
-				
-				<p>&nbsp;</p>
-				
-				<div id="form" class="pull-right">
+								
+				<div id="form" class="pull-right mt-3 mb-1">
 					<form:form action="./userorgsave.do" modelAttribute="userOrgForm" id="userOrgForm" method="post">
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<form:hidden path="orgId" />
-						<a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
-						<input type="submit" id="nextButton" class="btn btn-primary loffset5" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />
+						<a href="javascript:history.go(-1)" class="btn btn-default"><fmt:message key="admin.cancel"/></a>
+						<input type="submit" id="nextButton" class="btn btn-primary ml-2" onclick="return populateForm();" value="<fmt:message key="label.next"/>" />
 					</form:form>
 				</div>
+			</div>
+		</div>				
 	</lams:Page>
 
 </body>
