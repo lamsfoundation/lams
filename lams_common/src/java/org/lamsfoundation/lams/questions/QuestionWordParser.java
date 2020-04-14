@@ -61,6 +61,7 @@ public class QuestionWordParser {
     private static Logger log = Logger.getLogger(QuestionWordParser.class);
 
     private final static String QUESTION_BREAK = "{question}";
+    private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
 
     /**
      * Extracts questions from IMS QTI zip file.
@@ -190,7 +191,11 @@ public class QuestionWordParser {
 
 			} else {
 			    if (StringUtils.isBlank(question.getTitle())) {
-				question.setTitle(formattedText);
+				//remove "[IMAGE: ]" tags
+				String title = text.replaceAll(QuestionWordParser.CUSTOM_IMAGE_TAG_REGEX, "");
+				//trim to 200 characters while preserving the last full word
+				title =  title.replaceAll("(?<=.{200})\\b.*", "...");
+				question.setTitle(title);
 			    }
 
 			    //add question description that goes before all options
