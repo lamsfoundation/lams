@@ -294,7 +294,7 @@ public class LearningController {
 	    boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled()
 		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	    request.setAttribute(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
-	    if (questionEtherpadEnabled) {
+	    if (questionEtherpadEnabled && scratchieService.isGroupedActivity(scratchie.getContentId())) {
 		// get all users from the group, even if they did not reach the Scratchie yet
 		// order them by first and last name
 		Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()

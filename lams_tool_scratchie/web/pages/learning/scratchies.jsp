@@ -1,8 +1,8 @@
 
-<c:if test="${isQuestionEtherpadEnabled}">
+<c:if test="${isQuestionEtherpadEnabled and not empty allGroupUsers}">
 	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
 	<c:set var="questionEtherpadContent">
-		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" /> <c:out value="${user.lastName}" />:<br />
+		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />:<br />
 	<br />
 	<br /></c:forEach>
 	</c:set>
