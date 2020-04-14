@@ -101,7 +101,9 @@ public class EtherpadService implements IEtherpadService {
 	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
 
 	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
-	etherpadSessionCookie.setDomain(topLevelDomain);
+	if (!topLevelDomain.equals("localhost")) {
+	    etherpadSessionCookie.setDomain(topLevelDomain);
+	}
 	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
 	// exits. A zero value causes the cookie to be deleted.
 	etherpadSessionCookie.setMaxAge(-1);
