@@ -35,7 +35,7 @@
 	padding-top: 5px;
 }
 
-.burning-question-container {
+.burning-question-container, .question-etherpad-container {
 	padding: 0 15px;
 }
 .answer-description {
@@ -91,6 +91,6 @@ box-shadow:none;
 	font-weight: bold;
 }
 
-.question-etherpad .panel-body {
+.question-etherpad {
 	padding: 0;
 }
