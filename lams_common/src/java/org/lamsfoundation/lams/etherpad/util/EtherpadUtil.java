@@ -16,7 +16,7 @@ public class EtherpadUtil {
      */
     public static String preparePadContent(String rawContent) {
 	String cleanContent = rawContent == null ? ""
-		: rawContent.trim().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "");
+		: rawContent.trim().replaceAll("[\n\r\f]", "");
 	return "<html><body>" + cleanContent + "</body></html>";
     }
 }
