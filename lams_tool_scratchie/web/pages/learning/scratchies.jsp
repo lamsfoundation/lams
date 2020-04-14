@@ -4,7 +4,6 @@
 	<c:set var="questionEtherpadContent">
 		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" /> <c:out value="${user.lastName}" />:<br />
 	<br />
-	<br />
 	<br /></c:forEach>
 	</c:set>
 </c:if>
