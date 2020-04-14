@@ -367,6 +367,11 @@
 			});
 		}
 
+	    function importWordQuestions(){
+	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?importType=word',
+				'QuestionFile','width=500,height=240,scrollbars=yes');
+	    }
+
 	    function importQTI(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
 				'QuestionFile','width=500,height=240,scrollbars=yes');
@@ -485,6 +490,16 @@
 						<i class="fa fa-download"></i>
 					</a>
 				</c:if>
+			</div>
+			
+			<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
+				<a class="btn btn-default btn-xs disabled" aria-disabled="true">
+					<fmt:message key='label.qb.collection.word'/>
+				</a>
+			
+				<a href="#nogo" onClick="javascript:importWordQuestions()" class="btn btn-default" title="<fmt:message key='label.import.word'/>">
+					<i class="fa fa-upload"></i>
+				</a>
 			</div>
 				
 			<div class="btn-group-xs pull-right" style="display: flex;">

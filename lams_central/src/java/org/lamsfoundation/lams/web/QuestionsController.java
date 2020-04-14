@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
+import org.lamsfoundation.lams.questions.QuestionWordParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Runs extraction of chosen IMS QTI zip file and prepares form for user to manually choose interesting question.
+ * Runs extraction of the chosen IMS QTI zip file or .docx file. Prepares form for user to manually choose interesting question.
  */
 @Controller
 public class QuestionsController {
@@ -44,8 +45,8 @@ public class QuestionsController {
     @RequestMapping("/questions")
     public String execute(@RequestParam(name = "file", required = false) MultipartFile file,
 	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,
-	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
-	    HttpServletRequest request) throws Exception {
+	    @RequestParam(required = false) String importType, @RequestParam String callerID,
+	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
 
 	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 	File tempDir = new File(tempDirName);
@@ -54,9 +55,9 @@ public class QuestionsController {
 	}
 
 	InputStream uploadedFileStream = null;
-	String packageName = null;
+	String fileName = null;
 	if (file != null) {
-	    packageName = file.getOriginalFilename().toLowerCase();
+	    fileName = file.getOriginalFilename().toLowerCase();
 	    uploadedFileStream = file.getInputStream();
 	}
 
@@ -68,14 +69,18 @@ public class QuestionsController {
 
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
+	
+	boolean isWordInput = "word".equals(importType); 
+	request.setAttribute("importType", importType);
 
 	if (collectionChoice != null && collectionChoice) {
 	    // in the view a drop down with collections will be displayed
 	    request.setAttribute("collections", qbService.getUserCollections(QuestionsController.getUserId()));
 	}
 
-	// user did not choose a file
-	if ((uploadedFileStream == null) || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
+	// user did not choose a file, or uploaded it with a wrong file format
+	if ((uploadedFileStream == null) || !(fileName.endsWith(".zip") || fileName.endsWith(".xml")) && !isWordInput
+		|| !fileName.endsWith(".docx") && isWordInput) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
 	    request.setAttribute("errorMap", errorMap);
@@ -89,9 +94,16 @@ public class QuestionsController {
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
 
-	Question[] questions = packageName.endsWith(".xml")
-		? QuestionParser.parseQTIFile(uploadedFileStream, null, limitType)
-		: QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	Question[] questions;
+	if (fileName.endsWith(".xml")) {
+	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
+	    
+	} else if (fileName.endsWith(".docx")) {
+	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, fileName);
+	    
+	} else {
+	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	}
 	request.setAttribute("questions", questions);
 
 	return "questions/questionChoice";
