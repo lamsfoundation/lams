@@ -1,6 +1,9 @@
 Modifications required to be done for Etherpad server (version #1.6.1):
-* Copy the folder /lams_tool_doku/conf/etherpad-lite/src/ over to /${etherpad-lite-server-folder}/src/ 
-(it will copy three files /src/node/utils/Settings.js, /src/static/js/pad.js and /src/static/js/pad_userlist.js).
+* Install ep_resize plugin
+https://github.com/tiblu/ep_resize
+
+* Copy the folder /lams_tool_doku/conf/etherpad-lite/ over to /${etherpad-lite-server-folder}/
+It customises Etherpad and the plugin
 
 * In order to hide Etherpad index page make the following file empty: /${etherpad-lite-server-folder}/src/templates/index.html.
 Besides, one can turn on "editOnly" option in /${etherpad-lite-server-folder}/settings.json. This option's description: "Users may edit pads but not create new ones. Pad creation is only via the API. This applies both to group pads and regular pads."

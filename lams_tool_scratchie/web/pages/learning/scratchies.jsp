@@ -172,7 +172,7 @@
 			<div id="question-etherpad-${item.uid}" class="collapse">
 				<div class="panel panel-default question-etherpad">
 					<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
-					   showControls="${mode eq 'teacher'}" showChat="false" height="200"
+					   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
 					>${questionEtherpadContent}</lams:Etherpad>
 				</div>
 			</div>
