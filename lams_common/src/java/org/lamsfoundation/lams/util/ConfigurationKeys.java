@@ -293,4 +293,5 @@ public class ConfigurationKeys {
     // LDEV-4997 Etherpad as service
     public static String ETHERPAD_SERVER_URL = "EtherpadServerUrl";
     public static String ETHERPAD_API_KEY = "EtherpadApiKey";
+    public static String ETHERPAD_INSTANCE_ID = "EtherpadInstanceID";
 }
