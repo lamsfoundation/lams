@@ -33,7 +33,12 @@ public class EtherpadService implements IEtherpadService {
 	Map<String, Object> result = new HashMap<>();
 	result.put("client", client);
 
-	// create Etherpad Group assossiated with this session
+	// add Etherpad instance ID so we can group LAMS instances to share Etherpads
+	String instanceID = Configuration.get(ConfigurationKeys.ETHERPAD_INSTANCE_ID);
+	if (StringUtils.isNotBlank(instanceID)) {
+	    groupIdentifier = instanceID + "-" + groupIdentifier;
+	}
+	// create Etherpad Group associated with this session
 	Map<String, Object> map = client.createGroupIfNotExistsFor(groupIdentifier);
 	String groupId = (String) map.get("groupID");
 	result.put("groupId", groupId);
