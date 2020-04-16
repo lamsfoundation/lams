@@ -472,7 +472,7 @@ var paduserlist = (function()
 
       $("#otheruserstable tr").remove();
 
-      //*LAMS* commented out the following paragraph
+	  //*LAMS* commented out the following paragraph
       /*
       if (pad.getUserIsGuest())
       {
@@ -492,7 +492,7 @@ var paduserlist = (function()
           }, 0);
         });
       }
-      */
+	  */
 
       // color picker
       $("#myswatchbox").click(showColorPicker);
@@ -812,6 +812,7 @@ function closeColorPicker(accept)
 function showColorPicker()
 {
   previousColorId = myUserInfo.colorId;
+  $.farbtastic('#colorpicker').setColor(myUserInfo.colorId)
 
   if (!colorPickerOpen)
   {

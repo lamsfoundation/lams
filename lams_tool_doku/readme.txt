@@ -1,8 +1,8 @@
-Modifications required to be done for Etherpad server (version #1.6.1):
+Modifications required to be done for Etherpad server (version #1.8.0 - develop branch, snapshot made on 2020-04-16):
 * Install ep_resize plugin
 https://github.com/tiblu/ep_resize
 
-* Copy the folder /lams_tool_doku/conf/etherpad-lite/ over to /${etherpad-lite-server-folder}/
+* Copy contents of folder /lams_tool_doku/conf/etherpad-lite/ over to /${etherpad-lite-server-folder}/
 It customises Etherpad and the plugin
 
 * In order to hide Etherpad index page make the following file empty: /${etherpad-lite-server-folder}/src/templates/index.html.
