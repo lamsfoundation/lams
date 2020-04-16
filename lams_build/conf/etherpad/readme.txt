@@ -1,3 +1,5 @@
+Etherpad is required for Dokumaran tool and for Etherpad tag
+
 Modifications required to be done for Etherpad server (version #1.8.0 - develop branch, snapshot made on 2020-04-16):
 * Install ep_resize plugin
 https://github.com/tiblu/ep_resize
