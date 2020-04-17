@@ -20,8 +20,6 @@ import net.gjerull.etherpad.client.EPLiteException;
 
 public class EtherpadService implements IEtherpadService {
 
-    private EPLiteClient client = null;
-
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> createPad(String groupIdentifier) throws EtherpadException {
@@ -65,18 +63,15 @@ public class EtherpadService implements IEtherpadService {
 
     @Override
     public EPLiteClient getClient() throws EtherpadException {
-	if (client == null) {
-	    // get the API key from the configuration and create EPLiteClient using it
-	    String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
-	    String etherpadApiKey = Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY);
-	    if (StringUtils.isBlank(etherpadServerUrl) || StringUtils.isBlank(etherpadApiKey)) {
-		throw new EtherpadException("Etherpad is not configured in sysadmin console");
-	    }
-
-	    // create EPLiteClient
-	    client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
+	// get the API key from the configuration and create EPLiteClient using it
+	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
+	String etherpadApiKey = Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY);
+	if (StringUtils.isBlank(etherpadServerUrl) || StringUtils.isBlank(etherpadApiKey)) {
+	    throw new EtherpadException("Etherpad is not configured in sysadmin console");
 	}
-	return client;
+
+	// create EPLiteClient
+	return new EPLiteClient(etherpadServerUrl, etherpadApiKey);
     }
 
     /**
