@@ -342,9 +342,10 @@ function Ace2Inner(){
 
   function setUpTrackingCSS()
   {
-    if (dynamicCSS)
-    {
+
       /* *LAMS* Prevent highlighted line overlapping. This code sets padding too high.
+   if (dynamicCSS)
+    {
       var backgroundHeight = lineMetricsDiv.offsetHeight;
       var lineHeight = textLineHeight();
       var extraBodding = 0;
