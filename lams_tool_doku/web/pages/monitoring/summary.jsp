@@ -4,8 +4,12 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
+
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
+	
 <style media="screen,projection" type="text/css">
 	#countdown {
 		width: 150px; 
@@ -51,6 +55,9 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>  
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -177,7 +184,77 @@
 	        
 	        return false;
 		});
+		
+		
+		// marks table for each group
+		$(".tablesorter").tablesorter({
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
+		    sortInitialOrder: 'asc',
+		    sortList: [[0]],
+		    widgets: [ "uitheme", "resizable" ],
+		    headers: { 0: { sorter: true}, 1: { sorter: true}, 2: { sorter: false}  }, 
+		    sortList : [[0,1]],
+		    showProcessing: true,
+		    widgetOptions: {
+		    	resizable: true
+		    }
+		});
 
+		$(".tablesorter").each(function() {
+			var toolSessionId = $(this).attr('toolSessionId');
+			
+			$(this).tablesorterPager({
+				processAjaxOnInit: true,
+				initialRows: {
+			        total: 10,
+			        filtered: 10
+			      },
+			    savePages: false, 
+			    container: $(this).find(".ts-pager"),
+		        output: '{startRow} to {endRow} ({totalRows})',
+		        cssPageDisplay: '.pagedisplay',
+		        cssPageSize: '.pagesize',
+		        cssDisabled: 'disabled',
+				ajaxUrl : "<c:url value='/monitoring/getLearnerMarks.do?{sortList:column}&page={page}&size={size}&toolSessionId='/>" + toolSessionId,
+				ajaxProcessing: function (data, table) {
+			    	if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+			    		
+						for (i = 0; i < data.rows.length; i++){
+							var userData = data.rows[i];
+							
+							rows += '<tr>';
+
+							rows += '<td>';
+							rows += 	userData['firstName'];
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	userData['lastName'];
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	0;
+							rows += '</td>';
+
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			            
+			    	}
+				}
+		  	})
+		   .bind('pagerInitialized pagerComplete', function(event, options){
+			  if ( options.totalRows == 0 ) {
+				  $.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
+			  }
+			});
+		});
 	});
 	
 	function displayCountdown() {		
@@ -297,6 +374,19 @@
 			<div id="etherpad-container-${groupSummary.sessionId}"></div>		
 		</c:otherwise>
 	</c:choose>
+	
+
+	<!-- Editable marsk section -->
+	<div class="voffset10">	
+		<h4>
+		   <fmt:message key="label.monitoring.learner.marks.header"/>
+		</h4>
+		<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
+			<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
+			<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
+			<th><fmt:message key="label.monitoring.learner.marks.mark"/></th>
+		</lams:TSTable>
+	</div>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
