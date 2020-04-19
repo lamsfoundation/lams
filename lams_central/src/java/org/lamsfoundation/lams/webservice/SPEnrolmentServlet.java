@@ -299,6 +299,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    }
 		}
 
+		logger.info("SP enrolments provisioning completed successfully");
+
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
 	    } finally {
