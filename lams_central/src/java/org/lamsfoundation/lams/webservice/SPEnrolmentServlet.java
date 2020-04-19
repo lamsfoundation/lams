@@ -548,8 +548,8 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    } else {
 			existingSubcourseRoles.remove(Role.ROLE_LEARNER);
 		    }
-		    userManagementService.setRolesForUserOrganisation(user.getUserId(), subcourseId,
-			    existingSubcourseRoles);
+		    userManagementService.setRolesForUserOrganisation(user, subcourse,
+			    existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
 
 		    for (Lesson lesson : lessonService.getLessonsByGroup(subcourseId)) {
 			if (isStaffMode) {
