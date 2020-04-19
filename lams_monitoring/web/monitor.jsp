@@ -517,7 +517,6 @@
 							<div id="chartDiv" class="panel-body"></div>
 						</div>
 					</div>
-					safdsd
 					<!-- Required tasks -->
 					<div id="requiredTasks" class="panel panel-warning" style="display: none;">
 						<div class="panel-heading">
