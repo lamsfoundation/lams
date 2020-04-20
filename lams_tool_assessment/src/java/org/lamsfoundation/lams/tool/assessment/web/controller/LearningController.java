@@ -390,7 +390,9 @@ public class LearningController {
 		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
 	    }
 
+	    // display Etherpads after each question
 	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
+		    && assessment.isQuestionEtherpadEnabled()
 		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	    request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	    if (questionEtherpadEnabled) {
