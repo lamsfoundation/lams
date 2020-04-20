@@ -138,6 +138,9 @@ public class Assessment implements Cloneable {
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
+    @Column(name = "question_etherpad_enabled")
+    private boolean questionEtherpadEnabled;
+
     // general information
 
     @Column(name = "create_date")
@@ -547,7 +550,7 @@ public class Assessment implements Cloneable {
     public void setEnableConfidenceLevels(boolean enableConfidenceLevels) {
 	this.enableConfidenceLevels = enableConfidenceLevels;
     }
-    
+
     public Integer getConfidenceLevelsType() {
 	return confidenceLevelsType;
     }
@@ -649,5 +652,13 @@ public class Assessment implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isQuestionEtherpadEnabled() {
+	return questionEtherpadEnabled;
+    }
+
+    public void setQuestionEtherpadEnabled(boolean questionEtherpadEnabled) {
+	this.questionEtherpadEnabled = questionEtherpadEnabled;
     }
 }
