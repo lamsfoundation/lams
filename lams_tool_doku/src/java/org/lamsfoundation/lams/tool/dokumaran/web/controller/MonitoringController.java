@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -38,6 +39,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -47,14 +52,18 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -74,6 +83,16 @@ public class MonitoringController {
 
     @Autowired
     private IDokumaranService dokumaranService;
+
+    @Autowired
+    private IGradebookService gradebookService;
+
+    @Autowired
+    @Qualifier("lamsCoreToolService")
+    private ILamsCoreToolService toolService;
+
+    @Autowired
+    private ISecurityService securityService;
 
     @RequestMapping("/summary")
     private String summary(HttpServletRequest request, HttpServletResponse response)
@@ -139,7 +158,7 @@ public class MonitoringController {
 
     @RequestMapping("/getLearnerMarks")
     @ResponseBody
-    public String getLearnerMarks(HttpServletRequest request, HttpServletResponse response)
+    private String getLearnerMarks(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
@@ -177,17 +196,38 @@ public class MonitoringController {
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", users.size());
 
+	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
+	Map<Integer, Double> gradebookUserActivities = gradebookService
+		.getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
+		.filter(g -> g.getMark() != null)
+		.collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
+
 	for (DokumaranUser user : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
+	    responseRow.put("userId", user.getUserId());
 	    responseRow.put("firstName", user.getFirstName());
 	    responseRow.put("lastName", user.getLastName());
+	    Double mark = gradebookUserActivities.get(user.getUserId().intValue());
+	    responseRow.put("mark", mark == null ? "" : String.valueOf(mark));
 
 	    rows.add(responseRow);
 	}
+
 	responsedata.set("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	return responsedata.toString();
+    }
+
+    @RequestMapping(path = "/updateLearnerMark", method = RequestMethod.POST)
+    private void updateLearnerMark(@RequestParam long toolSessionId, @RequestParam int userId,
+	    @RequestParam Double mark) {
+	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
+	long lessonId = toolSession.getLesson().getLessonId();
+	securityService.isLessonMonitor(lessonId, userId, "update Doku learner mark", true);
+
+	gradebookService.updateGradebookUserActivityMark(mark, null, userId, toolSessionId, true);
+
     }
 
     @RequestMapping("/fixFaultySession")
@@ -240,4 +280,9 @@ public class MonitoringController {
 
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }
