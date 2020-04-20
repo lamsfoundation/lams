@@ -32,6 +32,14 @@
 		.slider.slider-horizontal {
 			margin-left: 40px;
 		}
+		
+		.question-etherpad {
+			padding: 0;
+		}
+		
+		[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
+  			display: none;
+  		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>

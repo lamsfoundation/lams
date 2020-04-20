@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -40,7 +41,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +51,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.Configuration;
@@ -198,7 +199,7 @@ public class LearningController {
 	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	questionReferences.addAll(assessment.getQuestionReferences());
 	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<>();
-	
+
 	//add non-random questions
 	for (QuestionReference questionReference : questionReferences) {
 	    if (!questionReference.isRandomQuestion()) {
@@ -206,7 +207,7 @@ public class LearningController {
 		questionToReferenceMap.put(questionReference.getUid(), question);
 	    }
 	}
-	
+
 	// init random pool questions
 	List<AssessmentQuestion> availableRandomQuestions = new ArrayList<>();
 	for (AssessmentQuestion question : assessment.getQuestions()) {
@@ -218,7 +219,7 @@ public class LearningController {
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
 	for (QuestionReference questionReference : questionReferences) {
 	    if (questionReference.isRandomQuestion()) {
-		
+
 		//find random question that will be shown to the user
 		AssessmentQuestion randomQuestion = null;
 		if (lastResult == null) {
@@ -387,6 +388,18 @@ public class LearningController {
 	    // set attempt started
 	    if (hasEditRight) {
 		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
+	    }
+
+	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
+		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	    request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	    if (questionEtherpadEnabled) {
+		// get all users from the group, even if they did not reach the Scratchie yet
+		// order them by first and last name
+		Collection<User> allGroupUsers = service.getAllGroupUsers(toolSessionId).stream()
+			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
+			.collect(Collectors.toList());
+		request.setAttribute(AssessmentConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
 	    }
 
 	    return "pages/learning/learning";
@@ -609,6 +622,7 @@ public class LearningController {
     /**
      * User pressed Resubmit button.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/resubmit")
     public String resubmit(HttpServletRequest request) throws ServletException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -618,7 +632,7 @@ public class LearningController {
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	
+
 	Long userId = assessmentUser.getUserId();
 	service.unsetSessionFinished(toolSessionId, userId);
 
@@ -704,7 +718,7 @@ public class LearningController {
 
 	service.launchTimeLimit(assessmentUid, userId);
     }
-    
+
     @RequestMapping("/vsaAutocomplete")
     @ResponseBody
     public String vsaAutocomplete(HttpServletRequest request, HttpServletResponse response) {
@@ -712,15 +726,15 @@ public class LearningController {
 	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 	QbQuestion qbQuestion = question.getQbQuestion();
-	
+
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	if (StringUtils.isNotBlank(userAnswer)) {
 	    userAnswer = userAnswer.trim();
 	    userAnswer = qbQuestion.isCaseSensitive() ? userAnswer : userAnswer.toLowerCase();
-	    
+
 	    for (QbOption option : qbQuestion.getQbOptions()) {
 
-		//filter out options not starting with 'term' and containing '*'		
+		//filter out options not starting with 'term' and containing '*'
 		String optionTitle = qbQuestion.isCaseSensitive() ? option.getName() : option.getName().toLowerCase();
 		int i = 0;
 		for (String optionAnswer : optionTitle.split("\\r\\n")) {
@@ -991,9 +1005,8 @@ public class LearningController {
 			break;
 
 		    } else {
-			boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(
-				questionDto.getAnswer(), questionDto.getMinWordsLimit(),
-				questionDto.isAllowRichEditor());
+			boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(questionDto.getAnswer(),
+				questionDto.getMinWordsLimit(), questionDto.isAllowRichEditor());
 			// check min words limit is reached
 			if (!isMinWordsLimitReached) {
 			    isAllQuestionsReachedMinWordsLimit = false;
@@ -1040,7 +1053,7 @@ public class LearningController {
 			    questionDto.setMark(questionResult.getMark());
 			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 			    questionDto.setPenalty(questionResult.getPenalty());
-			    
+
 			    //question feedback
 			    questionDto.setQuestionFeedback(null);
 			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
@@ -1104,8 +1117,7 @@ public class LearningController {
 	    // if answers are going to be disclosed, prepare data for the table in results page
 	    if (assessment.isAllowDiscloseAnswers()) {
 		// such entities should not go into session map, but as request attributes instead
-		SortedSet<AssessmentSession> sessions = new TreeSet<>(
-			new AssessmentSessionComparator());
+		SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
 		request.setAttribute("sessions", sessions);
 
