@@ -344,6 +344,10 @@
        <name>OutcomeAuthor</name>
        <path>/WEB-INF/tags/OutcomeAuthor.tag</path>
    	</tag-file>  
+   	<tag-file>
+       <name>Etherpad</name>
+       <path>/WEB-INF/tags/Etherpad.tag</path>
+   	</tag-file> 
 	<tag-file>
 	    <name>errors</name>
 		<path>/WEB-INF/tags/Errors.tag</path>
