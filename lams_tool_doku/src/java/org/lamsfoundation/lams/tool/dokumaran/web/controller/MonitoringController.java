@@ -26,7 +26,11 @@ package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -35,22 +39,36 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
+import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -58,8 +76,23 @@ public class MonitoringController {
 
     public static Logger log = Logger.getLogger(MonitoringController.class);
 
+    public static final int LEARNER_MARKS_SORTING_FIRST_NAME_ASC = 0;
+    public static final int LEARNER_MARKS_SORTING_FIRST_NAME_DESC = 1;
+    public static final int LEARNER_MARKS_SORTING_LAST_NAME_ASC = 2;
+    public static final int LEARNER_MARKS_SORTING_LAST_NAME_DESC = 3;
+
     @Autowired
     private IDokumaranService dokumaranService;
+
+    @Autowired
+    private IGradebookService gradebookService;
+
+    @Autowired
+    @Qualifier("lamsCoreToolService")
+    private ILamsCoreToolService toolService;
+
+    @Autowired
+    private ISecurityService securityService;
 
     @RequestMapping("/summary")
     private String summary(HttpServletRequest request, HttpServletResponse response)
@@ -123,6 +156,80 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
+    @RequestMapping("/getLearnerMarks")
+    @ResponseBody
+    private String getLearnerMarks(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
+
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSortFirstName = WebUtil.readIntParam(request, "column[0]", true);
+	Integer isSortLastName = WebUtil.readIntParam(request, "column[1]", true);
+
+	// identify sorting type
+	int sorting = LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
+	if (isSortFirstName != null) {
+	    sorting = isSortFirstName.equals(1) ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
+		    : LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
+	} else if (isSortLastName != null) {
+	    sorting = isSortLastName.equals(1) ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
+		    : LEARNER_MARKS_SORTING_LAST_NAME_ASC;
+	}
+
+	// get all session users and sort them according to the parameter from tablesorter
+	List<DokumaranUser> users = dokumaranService.getUsersBySession(toolSessionId).stream()
+		.sorted(Comparator.comparing(sorting <= 1 ? DokumaranUser::getFirstName : DokumaranUser::getLastName))
+		.collect(Collectors.toList());
+	// reverse if sorting is descending
+	if (sorting == LEARNER_MARKS_SORTING_FIRST_NAME_DESC || sorting == LEARNER_MARKS_SORTING_LAST_NAME_DESC) {
+	    Collections.reverse(users);
+	}
+
+	// paging
+	int endIndex = (page + 1) * size;
+	users = users.subList(page * size, users.size() > endIndex ? endIndex : users.size());
+
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
+	responsedata.put("total_rows", users.size());
+
+	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
+	Map<Integer, Double> gradebookUserActivities = gradebookService
+		.getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
+		.filter(g -> g.getMark() != null)
+		.collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
+
+	for (DokumaranUser user : users) {
+	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
+
+	    responseRow.put("userId", user.getUserId());
+	    responseRow.put("firstName", user.getFirstName());
+	    responseRow.put("lastName", user.getLastName());
+	    Double mark = gradebookUserActivities.get(user.getUserId().intValue());
+	    responseRow.put("mark", mark == null ? "" : String.valueOf(mark));
+
+	    rows.add(responseRow);
+	}
+
+	responsedata.set("rows", rows);
+	response.setContentType("application/json;charset=utf-8");
+	return responsedata.toString();
+    }
+
+    @RequestMapping(path = "/updateLearnerMark", method = RequestMethod.POST)
+    private void updateLearnerMark(@RequestParam long toolSessionId, @RequestParam int userId,
+	    @RequestParam Double mark) {
+	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
+	long lessonId = toolSession.getLesson().getLessonId();
+	securityService.isLessonMonitor(lessonId, userId, "update Doku learner mark", true);
+
+	gradebookService.updateGradebookUserActivityMark(mark, null, userId, toolSessionId, true);
+
+    }
+
     @RequestMapping("/fixFaultySession")
     private void fixFaultySession(HttpServletRequest request, HttpServletResponse response)
 	    throws DokumaranConfigurationException, ServletException, IOException {
@@ -148,7 +255,7 @@ public class MonitoringController {
 
     /**
      * Stores date when user has started activity with time limit
-     * 
+     *
      * @throws IOException
      * @throws JSONException
      */
@@ -161,7 +268,7 @@ public class MonitoringController {
 
     /**
      * Stores date when user has started activity with time limit
-     * 
+     *
      * @throws IOException
      * @throws JSONException
      */
@@ -173,4 +280,9 @@ public class MonitoringController {
 
     }
 
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return user != null ? user.getUserID() : null;
+    }
 }
