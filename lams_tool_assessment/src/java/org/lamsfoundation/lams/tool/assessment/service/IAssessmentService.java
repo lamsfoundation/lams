@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +47,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
@@ -230,7 +230,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param assessmentResult
      */
     void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);
-    
+
     void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    Long singleMarkHedgingQuestionUid)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
@@ -248,7 +248,7 @@ public interface IAssessmentService extends ICommonToolService {
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
-    
+
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**
@@ -353,7 +353,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     int getAssessmentResultCount(Long assessmentUid, Long userId);
-    
+
     /**
      * Checks whether anyone has attempted this assessment.
      */
@@ -529,4 +529,5 @@ public interface IAssessmentService extends ICommonToolService {
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
 
+    Collection<User> getAllGroupUsers(Long toolSessionId);
 }

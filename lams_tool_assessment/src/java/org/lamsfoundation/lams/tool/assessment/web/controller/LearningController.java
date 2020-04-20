@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +49,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -69,8 +69,11 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.AlphanumComparator;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -323,11 +326,11 @@ public class LearningController {
 	}
 
 	//paging
-	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<Set<QuestionDTO>>();
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
 		? assessment.getQuestionsPerPage()
 		: questionDtos.size();
-	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<>();
 	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
 	for (QuestionDTO questionDto : questionDtos) {
@@ -357,6 +360,18 @@ public class LearningController {
 	    // set attempt started
 	    if (hasEditRight) {
 		service.setAttemptStarted(assessment, user, toolSessionId);
+	    }
+
+	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
+		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	    request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	    if (questionEtherpadEnabled) {
+		// get all users from the group, even if they did not reach the Scratchie yet
+		// order them by first and last name
+		Collection<User> allGroupUsers = service.getAllGroupUsers(toolSessionId).stream()
+			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
+			.collect(Collectors.toList());
+		request.setAttribute(AssessmentConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
 	    }
 
 	    return "pages/learning/learning";
@@ -765,12 +780,13 @@ public class LearningController {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
-			String answerString = request.getParameter(
-				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
+			String answerString = request
+				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 			answerBoolean = !StringUtils.isBlank(answerString);
-			
+
 		    } else {
-			String optionUidSelectedStr = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+			String optionUidSelectedStr = request
+				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 			if (optionUidSelectedStr != null) {
 			    Long optionUidSelected = Long.parseLong(optionUidSelectedStr);
 			    answerBoolean = optionDto.getUid().equals(optionUidSelected);
@@ -1010,7 +1026,7 @@ public class LearningController {
 	    result.setTimeTaken(timeTaken);
 	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
 		int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
-		ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<AssessmentOverallFeedback>(
+		ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<>(
 			assessment.getOverallFeedbacks());
 		int lastBorder = 0;
 		for (int i = overallFeedbacks.size() - 1; i >= 0; i--) {
@@ -1035,7 +1051,7 @@ public class LearningController {
 	    // if answers are going to be disclosed, prepare data for the table in results page
 	    if (assessment.isAllowDiscloseAnswers()) {
 		// such entities should not go into session map, but as request attributes instead
-		SortedSet<AssessmentSession> sessions = new TreeSet<AssessmentSession>(
+		SortedSet<AssessmentSession> sessions = new TreeSet<>(
 			new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
 		request.setAttribute("sessions", sessions);

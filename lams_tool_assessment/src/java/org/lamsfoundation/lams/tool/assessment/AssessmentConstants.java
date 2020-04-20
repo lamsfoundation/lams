@@ -265,4 +265,8 @@ public class AssessmentConstants {
     public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 
     public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
+
+    public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
+    
+    public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
 }

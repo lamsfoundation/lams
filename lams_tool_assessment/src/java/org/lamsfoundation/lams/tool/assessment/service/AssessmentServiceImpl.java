@@ -418,7 +418,7 @@ public class AssessmentServiceImpl
     @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
 	//update questions' hashes in case questions' titles or descriptions got changed
-	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
+	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    String newHash = question.getQuestion() == null ? null : HashUtil.sha1(question.getQuestion());
 	    question.setQuestionHash(newHash);
 	}
@@ -569,8 +569,7 @@ public class AssessmentServiceImpl
 
 	return questionResult;
     }
-    
-    
+
     @Override
     public void storeSingleMarkHedgingQuestion(Assessment assessment, Long userId,
 	    List<Set<QuestionDTO>> pagedQuestions, Long singleMarkHedgingQuestionUid)
@@ -592,10 +591,10 @@ public class AssessmentServiceImpl
 		}
 	    }
 	}
-	
+
 	AssessmentQuestionResult questionResult = storeUserAnswer(result, questionDto);
 	questionResult.setFinishDate(new Date());
-	
+
 	float mark = 0;
 	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 	    if (optionDto.isCorrect()) {
@@ -608,7 +607,7 @@ public class AssessmentServiceImpl
 	questionResult.setMark(mark);
 	questionResult.setMaxMark((float) questionDto.getGrade());
 	assessmentResultDao.saveObject(questionResult);
-	
+
 	//for displaying purposes calculate mark and set it to questionDto
 	questionDto.setMark(mark);
     }
@@ -716,10 +715,10 @@ public class AssessmentServiceImpl
 	if (assessment.isEnableConfidenceLevels()) {
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
-	
+
 	return questionResult;
     }
-    
+
     /**
      *
      * @return grade that user scored by answering that question
@@ -870,12 +869,12 @@ public class AssessmentServiceImpl
 		}
 	    }
 	}
-	    
+
 	//total mark can't be more than maxMark
 	if (mark > maxMark) {
 	    mark = maxMark;
 
-	// in case options have negative grades (<0), their total mark can't be less than -maxMark
+	    // in case options have negative grades (<0), their total mark can't be less than -maxMark
 	} else if (mark < -maxMark) {
 	    mark = -maxMark;
 	}
@@ -883,8 +882,8 @@ public class AssessmentServiceImpl
 	// calculate penalty
 	if (mark > 0) {
 	    // calculate number of wrong answers
-	    int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
-		    userId, questionDto.getUid());
+	    int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid, userId,
+		    questionDto.getUid());
 
 	    // calculate penalty itself
 	    float penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
@@ -903,7 +902,7 @@ public class AssessmentServiceImpl
 	questionResult.setMark(mark);
 	questionResult.setMaxMark(maxMark);
     }
-    
+
     @Override
     public void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos) {
 	//get the latest result (it can be unfinished one)
@@ -938,7 +937,7 @@ public class AssessmentServiceImpl
 	    }
 	}
     }
-    
+
     /**
      * Loads up all information from questionResult into questionDto.
      */
@@ -1078,7 +1077,7 @@ public class AssessmentServiceImpl
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
-    
+
     @Override
     public boolean isAssessmentAttempted(Long assessmentUid) {
 	return assessmentResultDao.isAssessmentAttempted(assessmentUid);
@@ -1163,7 +1162,7 @@ public class AssessmentServiceImpl
 		//finish non-leader
 		sessionUser.setSessionFinished(true);
 		assessmentUserDao.saveObject(user);
-		
+
 		//copy answers from leader to non-leaders
 		copyAnswersFromLeader(sessionUser, session.getGroupLeader());
 	    });
@@ -1307,7 +1306,7 @@ public class AssessmentServiceImpl
 
 		//otherwise show only questions from the question list
 	    } else {
-		for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+		for (QuestionReference reference : assessment.getQuestionReferences()) {
 		    questions.add(reference.getQuestion());
 		}
 	    }
@@ -1388,7 +1387,7 @@ public class AssessmentServiceImpl
 	    sessionIdToUsersMap.put(sessionId, users);
 	}
 
-	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
+	for (AssessmentQuestion question : assessment.getQuestions()) {
 	    Long questionUid = question.getUid();
 	    QuestionSummary questionSummary = new QuestionSummary();
 	    questionSummary.setQuestion(question);
@@ -1448,7 +1447,7 @@ public class AssessmentServiceImpl
 
     @Override
     public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
@@ -1599,8 +1598,8 @@ public class AssessmentServiceImpl
 
 	    for (AssessmentQuestion question : questions) {
 		ExcelRow questionTitle = questionSummarySheet.initRow();
-		questionTitle.addCell(
-			getMessage("label.monitoring.question.summary.question") + " " + questionNumber++, true);
+		questionTitle.addCell(getMessage("label.monitoring.question.summary.question") + " " + questionNumber++,
+			true);
 
 		// set up the summary table data for the top of the question area.
 		boolean doSummaryTable = question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
@@ -1872,8 +1871,8 @@ public class AssessmentServiceImpl
 	return sheets;
     }
 
-    private ExcelRow startSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
-	    Long trueKey, Long falseKey) {
+    private ExcelRow startSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers, Long trueKey,
+	    Long falseKey) {
 	ExcelRow summaryTableRow;
 	int i = 0;
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
@@ -1978,16 +1977,16 @@ public class AssessmentServiceImpl
 		    optionCell.setColor(IndexedColors.GREEN);
 		}
 	    }
-	    
+
 	} else {
 	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null ? 0
 		    : (double) summaryOfAnswers.get(trueKey) / total;
 	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
-	    
+
 	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null ? 0
 		    : (double) summaryOfAnswers.get(falseKey) / total;
 	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
-	    
+
 	    if (question.getCorrectAnswer()) {
 		correctCell.setColor(IndexedColors.GREEN);
 	    } else {
@@ -1997,7 +1996,7 @@ public class AssessmentServiceImpl
 
 	Double summaryNAPercentage = total == 0 ? 0 : (double) summaryNACount / total;
 	summaryTableRow.addPercentageCell(summaryNAPercentage);
-	    
+
 	return summaryTableRow;
     }
 
@@ -2091,7 +2090,7 @@ public class AssessmentServiceImpl
 	// create list of modified questions
 	List<AssessmentQuestion> modifiedQuestions = new ArrayList<>();
 	for (AssessmentQuestion oldQuestion : oldQuestions) {
-	    
+
 	    if (AssessmentConstants.QUESTION_TYPE_ESSAY == oldQuestion.getType()
 		    || AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS == oldQuestion.getType()) {
 		continue;
@@ -2103,7 +2102,7 @@ public class AssessmentServiceImpl
 		    boolean isQuestionModified = false;
 
 		    // title or question is different - do nothing. Also question grade can't be changed
-		    
+
 		    //AssessmentConstants.QUESTION_TYPE_TRUE_FALSE
 		    if (oldQuestion.getCorrectAnswer() != newQuestion.getCorrectAnswer()) {
 			isQuestionModified = true;
@@ -2182,7 +2181,7 @@ public class AssessmentServiceImpl
 		    float assessmentMark = assessmentResult.getGrade();
 		    int assessmentMaxMark = assessmentResult.getMaximumGrade();
 		    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
-		    
+
 		    // [+] if the question is modified
 		    for (AssessmentQuestionResult questionResult : questionResults) {
 			AssessmentQuestion question = questionResult.getAssessmentQuestion();
@@ -2198,18 +2197,18 @@ public class AssessmentServiceImpl
 				loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
 				calculateAnswerMark(assessmentUid, user.getUserId(), questionResult, questionDto);
 				assessmentQuestionResultDao.saveObject(questionResult);
-				
+
 				float newQuestionAnswerMark = questionResult.getMark();
 				assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
 				break;
 			    }
 			}
 		    }
-		    
+
 		    // [+] if the question reference mark is modified
-		    for (AssessmentQuestionResult questionResult:questionResults) {
+		    for (AssessmentQuestionResult questionResult : questionResults) {
 			Long questionUid = questionResult.getAssessmentQuestion().getUid();
-			
+
 			for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
 			    if (!modifiedReference.isRandomQuestion()
 				    && questionUid.equals(modifiedReference.getQuestion().getUid())) {
@@ -2316,7 +2315,7 @@ public class AssessmentServiceImpl
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -2532,8 +2531,7 @@ public class AssessmentServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(newUserUid.longValue(),
-		    toolContentId);
+	    AssessmentUser user = assessmentUserDao.getUserCreatedAssessment(newUserUid.longValue(), toolContentId);
 	    if (user == null) {
 		user = new AssessmentUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
@@ -2716,7 +2714,7 @@ public class AssessmentServiceImpl
 
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
-	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<ConfidenceLevelDTO>();
+	List<ConfidenceLevelDTO> confidenceLevelDtos = new ArrayList<>();
 	if (toolSessionId == null) {
 	    return confidenceLevelDtos;
 	}
@@ -2737,7 +2735,7 @@ public class AssessmentServiceImpl
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		AssessmentQuestion question = questionResult.getAssessmentQuestion();
 
-		List<String> answers = new LinkedList<String>();
+		List<String> answers = new LinkedList<>();
 
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 
@@ -2802,16 +2800,16 @@ public class AssessmentServiceImpl
 	    return;
 	}
 	Assessment assessment = session.getAssessment();
-	
+
 	AssessmentUser assessmentUser = getUserByIDAndSession(userId, toolSessionId);
 	// create user if he hasn't accessed this activity yet
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser(user.getUserDTO(), session);
 	    createUser(assessmentUser);
-	    
+
 	    setAttemptStarted(assessment, assessmentUser, toolSessionId);
 	}
-	
+
 	//finalize the latest result, if it's still active
 	AssessmentResult lastAssessmentResult = getLastAssessmentResult(assessment.getUid(), userId);
 	if (lastAssessmentResult != null && lastAssessmentResult.getFinishDate() == null) {
@@ -2832,7 +2830,7 @@ public class AssessmentServiceImpl
 		//copy answers from leader to non-leaders
 		copyAnswersFromLeader(sessionUser, groupLeader);
 	    });
-	    
+
 	} else {
 	    assessmentUser.setSessionFinished(true);
 	    assessmentUserDao.saveObject(user);
@@ -3131,7 +3129,7 @@ public class AssessmentServiceImpl
     @Override
     public void notifyLearnersOnAnswerDisclose(long toolContentId) {
 	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
-	Set<Integer> userIds = new HashSet<Integer>();
+	Set<Integer> userIds = new HashSet<>();
 	for (AssessmentSession session : sessions) {
 	    for (AssessmentUser user : session.getAssessmentUsers()) {
 		userIds.add(user.getUserId().intValue());
@@ -3141,5 +3139,10 @@ public class AssessmentServiceImpl
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("hookTrigger", "assessment-results-refresh-" + toolContentId);
 	learnerService.createCommandForLearners(toolContentId, userIds, jsonCommand.toString());
+    }
+
+    @Override
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
     }
 }
