@@ -704,8 +704,10 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (meetingJoinURL == null) {
 	    throw new ZoomException("Could not register user " + user.getUid() + " for meeting " + zoom.getMeetingId());
 	}
-	// strip URL from password so users need to provide it manually
-	meetingJoinURL = meetingJoinURL.replaceFirst("&pwd=[^&]+", "");
+	if (zoom.isEnableMeetingPassword()) {
+	    // strip URL from password so users need to provide it manually
+	    meetingJoinURL = meetingJoinURL.replaceFirst("&pwd=[^&]+", "");
+	}
 	user.setMeetingJoinUrl(meetingJoinURL);
 	zoomDAO.update(user);
 	if (logger.isDebugEnabled()) {
@@ -816,9 +818,11 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	if (zoom.getDuration() != null) {
 	    bodyJSON.put("duration", zoom.getDuration());
 	}
-	String password = RandomPasswordGenerator.nextPassword(6);
-	bodyJSON.put("password", password);
-	zoom.setMeetingPassword(password);
+	if (zoom.isEnableMeetingPassword()) {
+	    String password = RandomPasswordGenerator.nextPassword(6);
+	    bodyJSON.put("password", password);
+	    zoom.setMeetingPassword(password);
+	}
 
 	HttpURLConnection connection = ZoomService.getZoomConnection("meetings/" + zoom.getMeetingId(), "PATCH",
 		bodyJSON.toString(), zoom.getApi());

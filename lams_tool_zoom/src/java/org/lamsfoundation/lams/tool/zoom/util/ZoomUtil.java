@@ -58,7 +58,9 @@ public class ZoomUtil {
 	}
 
 	request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
-	request.setAttribute(ZoomConstants.ATTR_MEETING_PASSWORD, zoom.getMeetingPassword());
+	if (zoom.isEnableMeetingPassword()) {
+	    request.setAttribute(ZoomConstants.ATTR_MEETING_PASSWORD, zoom.getMeetingPassword());
+	}
 	return errorMap;
     }
 }

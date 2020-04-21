@@ -231,7 +231,9 @@ public class LearningController {
 		}
 		// if start in monitor is not set, this overwrites the URL set in ZoomUtil.startMeeting() above
 		request.setAttribute(ZoomConstants.ATTR_MEETING_URL, meetingURL);
-		request.setAttribute(ZoomConstants.ATTR_MEETING_PASSWORD, zoom.getMeetingPassword());
+		if (zoom.isEnableMeetingPassword()) {
+		    request.setAttribute(ZoomConstants.ATTR_MEETING_PASSWORD, zoom.getMeetingPassword());
+		}
 	    }
 
 	} catch (Exception e) {

@@ -3,8 +3,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 
 -- LDEV-5006 Password protect Zoom meetings
-ALTER TABLE tl_lazoom10_zoom ADD COLUMN meeting_password CHAR(6);
-
+ALTER TABLE tl_lazoom10_zoom ADD COLUMN enable_meeting_password TINYINT(1) DEFAULT 0,
+							 ADD COLUMN meeting_password CHAR(6);
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
