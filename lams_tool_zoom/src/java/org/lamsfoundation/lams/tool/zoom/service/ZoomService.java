@@ -701,11 +701,17 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 		"POST", bodyJSON.toString(), zoom.getApi());
 	ObjectNode responseJSON = ZoomService.getReponse(connection);
 	String meetingJoinURL = JsonUtil.optString(responseJSON, "join_url");
+	if (meetingJoinURL == null) {
+	    throw new ZoomException("Could not register user " + user.getUid() + " for meeting " + zoom.getMeetingId());
+	}
+	// strip URL from password so users need to provide it manually
+	meetingJoinURL = meetingJoinURL.replaceFirst("&pwd=[^&]+", "");
 	user.setMeetingJoinUrl(meetingJoinURL);
 	zoomDAO.update(user);
 	if (logger.isDebugEnabled()) {
 	    logger.debug("Registerd user with UID: " + user.getUid() + " for meeting: " + zoom.getMeetingId());
 	}
+
 	return meetingJoinURL;
     }
 
