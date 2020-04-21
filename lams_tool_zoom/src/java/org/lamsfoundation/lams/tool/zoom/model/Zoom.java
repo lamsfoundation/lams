@@ -98,6 +98,12 @@ public class Zoom implements java.io.Serializable, Cloneable {
     @Column(name = "meeting_start_url")
     private String meetingStartUrl;
 
+    @Column(name = "meeting_password")
+    private String meetingPassword;
+
+    @Column(name = "enable_meeting_password")
+    private boolean enableMeetingPassword;
+
     @OneToMany(mappedBy = "zoom")
     private Set<ZoomSession> zoomSessions;
 
@@ -229,6 +235,22 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	this.meetingStartUrl = meetingStartUrl;
     }
 
+    public boolean isEnableMeetingPassword() {
+	return enableMeetingPassword;
+    }
+
+    public void setEnableMeetingPassword(boolean enableMeetingPassword) {
+	this.enableMeetingPassword = enableMeetingPassword;
+    }
+
+    public String getMeetingPassword() {
+	return meetingPassword;
+    }
+
+    public void setMeetingPassword(String meetingPassword) {
+	this.meetingPassword = meetingPassword;
+    }
+
     public ZoomApi getApi() {
 	return api;
     }
@@ -246,7 +268,7 @@ public class Zoom implements java.io.Serializable, Cloneable {
 	    zoom.setUid(null);
 
 	    // create an empty set for the zoomSession
-	    zoom.zoomSessions = new HashSet<ZoomSession>();
+	    zoom.zoomSessions = new HashSet<>();
 
 	} catch (CloneNotSupportedException cnse) {
 	    logger.error("Error cloning " + Zoom.class);
