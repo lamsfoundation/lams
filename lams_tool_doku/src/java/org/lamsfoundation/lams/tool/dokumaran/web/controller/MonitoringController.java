@@ -224,7 +224,7 @@ public class MonitoringController {
 	    @RequestParam Double mark) {
 	ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
 	long lessonId = toolSession.getLesson().getLessonId();
-	securityService.isLessonMonitor(lessonId, userId, "update Doku learner mark", true);
+	securityService.isLessonMonitor(lessonId, getUserId(), "update Doku learner mark", true);
 
 	gradebookService.updateGradebookUserActivityMark(mark, null, userId, toolSessionId, true);
 
