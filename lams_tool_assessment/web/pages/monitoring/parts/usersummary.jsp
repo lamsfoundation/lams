@@ -10,6 +10,15 @@
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+		<style>
+			.question-etherpad {
+				padding: 0;
+			}
+			
+			[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
+	  			display: none;
+	  		}
+		</style>
 
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
@@ -213,6 +222,25 @@
 					<table id="user${userSummaryItem.question.uid}"></table>
 					</div>
 				</div>
+				
+				<%--Display Etherpad for each question --%>
+				<c:if test="${isQuestionEtherpadEnabled}">
+					<div class="form-group question-etherpad-container">
+						<a data-toggle="collapse" data-target="#question-etherpad-${userSummaryItem.questionDto.uid}"
+							href="#qe${userSummaryItem.questionDto.uid}" class="collapsed">
+							<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+				 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+							<fmt:message key="label.etherpad.discussion" />
+						</a>
+						
+						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="collapse">
+							<div class="panel panel-default question-etherpad">
+								<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${userSummaryItem.questionDto.uid}" 
+								   showControls="true" showChat="false" heightAutoGrow="true" />
+							</div>
+						</div>
+					</div>
+				</c:if>
 			</c:forEach>
 
 			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset20 pull-right">
