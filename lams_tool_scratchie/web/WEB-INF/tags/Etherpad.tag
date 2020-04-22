@@ -29,7 +29,7 @@
 	}
 </style>
 
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<%-- THIS TAG REQUIRES JQUERY --%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/etherpad.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
