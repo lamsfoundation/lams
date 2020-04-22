@@ -3,8 +3,6 @@
 
 <script lang="javascript">
 	$(document).ready(function(){
-		$('#questionEtherpadEnabled').prop('disabled', ${!assessmentForm.assessment.useSelectLeaderToolOuput});
-		
 		$("#attemptsAllowedRadio").change(function() {
 			$("#passingMark").val("0");
 			$("#passingMark").prop("disabled", true);
@@ -39,10 +37,12 @@
 			if ($(this).prop('checked')) {
 				$("#display-summary").prop("checked", true).prop("disabled", true);
 				$('#display-summary-area').show('slow');
-				$('#allowDiscloseAnswers, #questionEtherpadEnabled').prop('disabled', false);
+				$('#questionEtherpadEnabled').closest('.checkbox').show('slow');
+				$('#allowDiscloseAnswers').prop('disabled', false);
 			} else {
 				$("#display-summary").prop("disabled", false);
-				$('#allowDiscloseAnswers, #questionEtherpadEnabled').prop("checked", false).prop('disabled', true).change();
+				$('#questionEtherpadEnabled').prop("checked", false).closest('.checkbox').hide('slow');
+				$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
 			}		
 		});
 
@@ -70,6 +70,13 @@
 	<label for="useSelectLeaderToolOuput">
 		<form:checkbox path="assessment.useSelectLeaderToolOuput" value="1" id="useSelectLeaderToolOuput"/>
 		<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</div>
+
+<div class="checkbox" <c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
+	<label for="questionEtherpadEnabled">
+		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"/>
+		<fmt:message key="label.authoring.advance.question.etherpad" />
 	</label>
 </div>
 </lams:SimplePanel>
@@ -207,13 +214,6 @@
 	</div>
 </div>
 
-<div class="checkbox">
-	<label for="questionEtherpadEnabled">
-		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled" />
-		<fmt:message key="label.authoring.advance.question.etherpad" />
-	</label>
-</div>
-	
 <div class="checkbox">
 	<label for="allowOverallFeedbackAfterQuestion">
 		<form:checkbox path="assessment.allowOverallFeedbackAfterQuestion" id="allowOverallFeedbackAfterQuestion"/>
