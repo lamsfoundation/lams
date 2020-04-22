@@ -3,6 +3,8 @@
 
 <script lang="javascript">
 	$(document).ready(function(){
+		$('#questionEtherpadEnabled').prop('disabled', ${!assessmentForm.assessment.useSelectLeaderToolOuput});
+		
 		$("#attemptsAllowedRadio").change(function() {
 			$("#passingMark").val("0");
 			$("#passingMark").prop("disabled", true);
@@ -36,7 +38,7 @@
 		$("#useSelectLeaderToolOuput").change(function() {
 			if ($(this).prop('checked')) {
 				$("#display-summary").prop("checked", true).prop("disabled", true);
-				$('#display-summary-area, #questionEtherpadEnabled').show('slow');
+				$('#display-summary-area').show('slow');
 				$('#allowDiscloseAnswers, #questionEtherpadEnabled').prop('disabled', false);
 			} else {
 				$("#display-summary").prop("disabled", false);
@@ -205,9 +207,9 @@
 	</div>
 </div>
 
-<div class="checkbox" <c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
+<div class="checkbox">
 	<label for="questionEtherpadEnabled">
-		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"/>
+		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled" />
 		<fmt:message key="label.authoring.advance.question.etherpad" />
 	</label>
 </div>
