@@ -156,9 +156,12 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 
 		for (String role : Mode.getAllRoles()) {
-		    logger.info("Processing \"" + role + "\" role");
-
 		    List<List<String>> lines = linesByMode.get(role);
+		    if (lines == null) {
+			continue;
+		    }
+		    
+		    logger.info("Processing \"" + role + "\" role");
 
 		    // it is easier to detect whether we process managers or staff or learners just once
 		    // than for each user - they do not come together anyway
