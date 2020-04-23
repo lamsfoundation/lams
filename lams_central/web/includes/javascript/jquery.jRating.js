@@ -23,7 +23,11 @@
 			type : 'big', // can be set to 'small' or 'big'
 
 			/** Boolean vars **/
-			step:false, // if true,  mouseover binded star by star,
+			
+			/** customized by LAMS **/
+			step:false, // original: "if true, mouseover binded star by star"
+						// custom: step value, for example 0.5 to have mouse jump every half a star
+			
 			isDisabled:false,
 			showRateInfo: true,
 			canRateAgain : false,
@@ -131,7 +135,9 @@
 				mousemove : function(e){
 					var realOffsetLeft = findRealLeft(this);
 					var relativeX = e.pageX - realOffsetLeft;
-					if(opts.step) newWidth = Math.floor(relativeX/starWidth)*starWidth + starWidth;
+					/** customized by LAMS **/
+					if(opts.step) newWidth = Math.min(opts.rateMax * starWidth,
+											 Math.floor(relativeX/(opts.step*starWidth))*(opts.step*starWidth) + opts.step*starWidth);
 					else newWidth = relativeX;
 					average.width(newWidth);					
 					if (opts.showRateInfo)
@@ -193,7 +199,9 @@
 					var xPos = e.originalEvent.touches[0].pageX;
 					var relativeX = xPos - realOffsetLeft;
 					//Taken from mousemove
-					if(opts.step) newWidth = Math.floor(relativeX/starWidth)*starWidth + starWidth;
+					/** customized by LAMS **/
+					if(opts.step) newWidth = Math.min(opts.rateMax * starWidth,
+							 				 Math.floor(relativeX/(opts.step*starWidth))*(opts.step*starWidth) + opts.step*starWidth);
 					else newWidth = relativeX;
 					
 					/*set vars*/
