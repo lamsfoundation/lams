@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -47,13 +48,13 @@ import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
-import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
-import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -95,8 +96,7 @@ public class MonitoringController {
     private ISecurityService securityService;
 
     @RequestMapping("/summary")
-    private String summary(HttpServletRequest request, HttpServletResponse response)
-	    throws DokumaranConfigurationException, URISyntaxException {
+    private String summary(HttpServletRequest request, HttpServletResponse response) throws EtherpadException {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -134,12 +134,11 @@ public class MonitoringController {
 	sessionMap.put(DokumaranConstants.ATTR_IS_GROUPED_ACTIVITY, dokumaranService.isGroupedActivity(contentId));
 
 	// get the API key from the config table and add it to the session
-	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService
-		.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
-	if (etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
+	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
+	String etherpadApiKey = Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY);
+	if (StringUtils.isBlank(etherpadServerUrl) || StringUtils.isBlank(etherpadApiKey)) {
 	    return "pages/learning/notconfigured";
 	}
-	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 
 	HttpSession ss = SessionManager.getSession();
@@ -232,7 +231,7 @@ public class MonitoringController {
 
     @RequestMapping("/fixFaultySession")
     private void fixFaultySession(HttpServletRequest request, HttpServletResponse response)
-	    throws DokumaranConfigurationException, ServletException, IOException {
+	    throws ServletException, IOException {
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 

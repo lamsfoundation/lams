@@ -34,21 +34,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
-import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranApplicationException;
-import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -78,6 +80,8 @@ public class LearningController {
      * method run successfully.
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
+     * 
+     * @throws EtherpadException
      *
      * @throws DokumaranConfigurationException
      * @throws URISyntaxException
@@ -85,7 +89,7 @@ public class LearningController {
      */
     @RequestMapping("/start")
     private String start(HttpServletRequest request, HttpServletResponse response)
-	    throws DokumaranConfigurationException, DokumaranApplicationException, URISyntaxException {
+	    throws DokumaranApplicationException, EtherpadException {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -189,14 +193,11 @@ public class LearningController {
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 
 	// get the API key from the config table and add it to the session
-	DokumaranConfigItem etherpadServerUrlConfig = dokumaranService
-		.getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
-	DokumaranConfigItem apiKeyConfig = dokumaranService.getConfigItem(DokumaranConfigItem.KEY_API_KEY);
-	if (apiKeyConfig == null || apiKeyConfig.getConfigValue() == null || etherpadServerUrlConfig == null
-		|| etherpadServerUrlConfig.getConfigValue() == null) {
+	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
+	String etherpadApiKey = Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY);
+	if (StringUtils.isBlank(etherpadServerUrl) || StringUtils.isBlank(etherpadApiKey)) {
 	    return "pages/learning/notconfigured";
 	}
-	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 
 	//time limit

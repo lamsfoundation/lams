@@ -35,7 +35,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
+import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 
 /**
  * Dokumaran session
@@ -189,8 +189,6 @@ public class DokumaranSession {
     }
 
     public String getPadId() {
-	// HashUtil.sha1(DokumaranConstants.DEFAULT_PAD_NAME + sessionId);
-	return etherpadGroupId + "$" + DokumaranConstants.DEFAULT_PAD_NAME;
+	return EtherpadUtil.getPadId(etherpadGroupId);
     }
-
 }

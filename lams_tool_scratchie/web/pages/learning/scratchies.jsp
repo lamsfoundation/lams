@@ -1,5 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:if test="${isQuestionEtherpadEnabled and not empty allGroupUsers}">
+	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
+	<c:set var="questionEtherpadContent">
+		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />:<br />
+	<br />
+	<br /></c:forEach>
+	</c:set>
+</c:if>
+
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
 	
 	<div class="lead" id="questionTitle${questionNumber.count}">
@@ -128,7 +137,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-
+		
 		<c:if test="${!sessionMap.userFinished && !item.unraveled && isUserLeader && (mode != 'teacher') && !showResults}">
 			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;"
 				class="<c:if test='${item.qbQuestion.answerRequired}'>item-required</c:if>">
@@ -149,6 +158,26 @@
 		</c:if>
 	</c:otherwise>
 	</c:choose>
+	
+		
+	<%--Display Etherpad for each question --%>
+	<c:if test="${isQuestionEtherpadEnabled}">
+		<div class="form-group question-etherpad-container">
+			<a data-toggle="collapse" data-target="#question-etherpad-${item.uid}" href="#qe${item.uid}" class="collapsed">
+				<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+  				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+				<fmt:message key="label.etherpad.discussion" />
+			</a>
+			
+			<div id="question-etherpad-${item.uid}" class="collapse">
+				<div class="panel panel-default question-etherpad">
+					<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
+					   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
+					>${questionEtherpadContent}</lams:Etherpad>
+				</div>
+			</div>
+		</div>
+	</c:if>
 	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">

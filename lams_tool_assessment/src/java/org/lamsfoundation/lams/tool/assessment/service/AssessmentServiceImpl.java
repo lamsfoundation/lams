@@ -3598,4 +3598,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     public String getConfigValue(String key) {
 	return assessmentConfigDao.getConfigValue(key);
     }
+
+    @Override
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
+    }
 }

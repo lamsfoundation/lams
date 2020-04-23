@@ -50,6 +50,20 @@
 	</div>
 	
 	<div class="checkbox">
+		<label for="question-etherpad-enabled">
+			<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
+			<fmt:message key="label.authoring.advanced.question.etherpad" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="shuffle-items">
+			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
+			<fmt:message key="label.authoring.advanced.shuffle.items" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
 		<label for="show-scratchies-in-results">
 			<form:checkbox path="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
 			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />

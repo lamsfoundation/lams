@@ -27,6 +27,8 @@ Commons Validator 1.6
 
 CSRF Guard master from 2020.01.07 with a custom modification in CsrfGuard.java
 
+Etherpad Client 1.2.13
+
 Hibernate Core 5.3.6
 
 httpunit 1.7

@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.quartz.SchedulerException;
 
@@ -308,9 +309,8 @@ public interface IScratchieService extends ICommonToolService {
 
     ScratchieItem getScratchieItemByUid(Long itemUid);
 
-    /**
-     * @param contentId
-     */
+    Collection<User> getAllGroupUsers(Long toolSessionId);
+
     List<GroupSummary> getMonitoringSummary(Long contentId);
 
     List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid);
