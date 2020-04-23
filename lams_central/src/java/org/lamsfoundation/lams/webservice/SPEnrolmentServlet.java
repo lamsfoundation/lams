@@ -91,6 +91,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 	private String getRole() {
 	    return role;
 	}
+
+	private static List<String> getAllRoles() {
+	    return Arrays.asList(LEARNER.getRole(), STAFF.getRole(), MANAGER.getRole());
+	}
     };
 
     private static final long serialVersionUID = -5348322697437185394L;
@@ -129,178 +133,196 @@ public class SPEnrolmentServlet extends HttpServlet {
 		}
 
 		// split each line into list of trimmed pieces
-		List<List<String>> lines = Files.readAllLines(fileInput).parallelStream().unordered()
+		Map<String, List<List<String>>> linesByMode = Files.readAllLines(fileInput).parallelStream().unordered()
 			.map(line -> Arrays.stream(line.split(DELIMITER)).map(elem -> elem.trim())
 				.collect(Collectors.toList()))
 			// filter out malformed rows
-			.filter(row -> row.size() == 7).collect(Collectors.toList());
-		if (lines.isEmpty()) {
+			.filter(row -> {
+			    // there must be exactly 7 rows
+			    if (row.size() == 7) {
+				return true;
+			    }
+			    // check if role is one of predefined strings
+			    String role = row.get(6);
+			    if (Mode.getAllRoles().contains(role)) {
+				return true;
+			    }
+			    // throw an exception when a row is malformed rather than silently discard it
+			    throw new RuntimeException("Malformed row: " + String.join(DELIMITER, row));
+			}).collect(Collectors.groupingByConcurrent(row -> row.get(6)));
+
+		if (linesByMode.isEmpty()) {
 		    throw new ServletException("File is empty");
 		}
 
-		// it is easier to detect whether we process managers or staff or learners just once
-		// than for each user - they do not come together anyway
-		String roleColumn = lines.get(0).get(6);
-		final Mode mode = roleColumn.equals(Mode.STAFF.getRole()) ? Mode.STAFF
-			: (roleColumn.equals(Mode.MANAGER.getRole()) ? Mode.MANAGER : Mode.LEARNER);
+		for (String role : Mode.getAllRoles()) {
+		    List<List<String>> lines = linesByMode.get(role);
+		    if (lines == null) {
+			continue;
+		    }
+		    
+		    logger.info("Processing \"" + role + "\" role");
 
-		// map of course code (ID) -> course name
-		ConcurrentMap<String, String> courses = lines.parallelStream().unordered().collect(
-			Collectors.toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
+		    // it is easier to detect whether we process managers or staff or learners just once
+		    // than for each user - they do not come together anyway
+		    final Mode mode = role.equals(Mode.STAFF.getRole()) ? Mode.STAFF
+			    : (role.equals(Mode.MANAGER.getRole()) ? Mode.MANAGER : Mode.LEARNER);
 
-		// map of user login -> email, first name
-		// for learner email is login, for staff it is a different ID in email format
-		ConcurrentMap<String, String[]> users = lines.parallelStream().unordered()
-			.collect(Collectors.toConcurrentMap(
-				elem -> mode == Mode.STAFF || mode == Mode.MANAGER ? elem.get(3) : elem.get(5),
-				elem -> new String[] { elem.get(5), elem.get(4) }, (elem1, elem2) -> elem1));
+		    // map of course code (ID) -> course name
+		    ConcurrentMap<String, String> courses = lines.parallelStream().unordered().collect(Collectors
+			    .toConcurrentMap(elem -> elem.get(0), elem -> elem.get(1), (elem1, elem2) -> elem1));
 
-		// map of user login -> user ID
-		Map<String, Integer> userIDs = new HashMap<>();
+		    // map of user login -> email, first name
+		    // for learner email is login, for staff it is a different ID in email format
+		    ConcurrentMap<String, String[]> users = lines.parallelStream().unordered()
+			    .collect(Collectors.toConcurrentMap(
+				    elem -> mode == Mode.STAFF || mode == Mode.MANAGER ? elem.get(3) : elem.get(5),
+				    elem -> new String[] { elem.get(5), elem.get(4) }, (elem1, elem2) -> elem1));
 
-		// find sysadmin as he/she will be the creator of organisations
-		Organisation rootOrganisation = userManagementService.getRootOrganisation();
-		Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
+		    // map of user login -> user ID
+		    Map<String, Integer> userIDs = new HashMap<>();
 
-		Integer extServerSid = extServer.getSid();
-		// load all users from DB which are present in the output file
-		// map of user login -> user
-		Map<String, User> allExistingUsers = userManagementService
-			.findByPropertyValues(User.class, "login", users.keySet()).parallelStream()
-			.collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
-		// load all ext users from DB which are present in the output file
-		// map of user login -> extUser
-		Map<String, ExtUserUseridMap> allExistingExtUsers = userManagementService
-			.findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingUsers.keySet())
-			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
-			.collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
-		// CREATE USERS and ext users
-		Set<User> allUsersParsed = createUsers(extServer, creatorId, users, userIDs, allExistingUsers,
-			allExistingExtUsers);
+		    // find sysadmin as he/she will be the creator of organisations
+		    Organisation rootOrganisation = userManagementService.getRootOrganisation();
+		    Integer creatorId = rootOrganisation.getCreatedBy().getUserId();
 
-		// map of user login -> course ID -> role IDs
-		// for all users which are present in the output file
-		Map<String, Map<Integer, Set<Integer>>> allExistingRoles = userManagementService
-			.findByPropertyValues(UserOrganisation.class, "user.userId",
-				allExistingUsers.values().parallelStream()
-					.collect(Collectors.mapping(User::getUserId, Collectors.toSet())))
-			.stream()
-			.collect(Collectors.groupingBy(uo -> uo.getUser().getLogin(),
-				Collectors.toMap(
-					userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
-					userOrganisation -> userOrganisation.getUserOrganisationRoles().stream()
-						.map(userOrganisationRole -> userOrganisationRole.getRole().getRoleId())
-						.collect(Collectors.toSet()))));
-		// load all organisations from DB which are present in the output file, by code
-		// map of code -> organisation
-		Map<String, Organisation> allExistingOrganisations = userManagementService
-			.findByPropertyValues(Organisation.class, "code", courses.keySet()).parallelStream()
-			.collect(Collectors.toConcurrentMap(Organisation::getCode, o -> o));
+		    Integer extServerSid = extServer.getSid();
+		    // load all users from DB which are present in the output file
+		    // map of user login -> user
+		    Map<String, User> allExistingUsers = userManagementService
+			    .findByPropertyValues(User.class, "login", users.keySet()).parallelStream()
+			    .collect(Collectors.toConcurrentMap(User::getLogin, u -> u));
+		    // load all ext users from DB which are present in the output file
+		    // map of user login -> extUser
+		    Map<String, ExtUserUseridMap> allExistingExtUsers = userManagementService
+			    .findByPropertyValues(ExtUserUseridMap.class, "extUsername", allExistingUsers.keySet())
+			    .parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
+			    .collect(Collectors.toConcurrentMap(ExtUserUseridMap::getExtUsername, e -> e));
+		    // CREATE USERS and ext users
+		    Set<User> allUsersParsed = createUsers(extServer, creatorId, users, userIDs, allExistingUsers,
+			    allExistingExtUsers);
 
-		// When setting group managers, just process courses, not subcourses and lessons
-		if (mode == Mode.MANAGER) {
-		    // map of course code -> user logins
-		    Map<String, List<String>> mappings = lines.stream()
+		    // map of user login -> course ID -> role IDs
+		    // for all users which are present in the output file
+		    Map<String, Map<Integer, Set<Integer>>> allExistingRoles = userManagementService
+			    .findByPropertyValues(UserOrganisation.class, "user.userId",
+				    allExistingUsers.values().parallelStream()
+					    .collect(Collectors.mapping(User::getUserId, Collectors.toSet())))
+			    .stream()
+			    .collect(Collectors.groupingBy(uo -> uo.getUser().getLogin(), Collectors.toMap(
+				    userOrganisation -> userOrganisation.getOrganisation().getOrganisationId(),
+				    userOrganisation -> userOrganisation.getUserOrganisationRoles().stream()
+					    .map(userOrganisationRole -> userOrganisationRole.getRole().getRoleId())
+					    .collect(Collectors.toSet()))));
+		    // load all organisations from DB which are present in the output file, by code
+		    // map of code -> organisation
+		    Map<String, Organisation> allExistingOrganisations = userManagementService
+			    .findByPropertyValues(Organisation.class, "code", courses.keySet()).parallelStream()
+			    .collect(Collectors.toConcurrentMap(Organisation::getCode, o -> o));
+
+		    // When setting group managers, just process courses, not subcourses and lessons
+		    if (mode == Mode.MANAGER) {
+			// map of course code -> user logins
+			Map<String, List<String>> mappings = lines.stream()
+				.collect(Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
+					Collectors.mapping(elem -> elem.get(3), Collectors.toList())));
+
+			AtomicInteger mappingsProcessed = new AtomicInteger();
+			logger.info("Processing courses and assigments");
+			for (String courseCode : courses.keySet()) {
+			    Organisation course = allExistingOrganisations.get(courseCode);
+
+			    assignManagers(course, creatorId, mappings, allUsersParsed, userIDs, allExistingRoles,
+				    allExistingUsers, mappingsProcessed);
+
+			    logger.info("Processed " + mappingsProcessed.get() + " entries");
+			}
+			logger.info("Processing \"" + role + "\" role finished");
+
+			// END OF GROUP MANAGER PROCESSING!
+			return;
+		    }
+
+		    // START OF LEARNER / STAFF PROCESSING
+
+		    // map of course code -> subcourse code -> user logins
+		    Map<String, Map<String, List<String>>> mappings = lines.stream()
 			    .collect(Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
-				    Collectors.mapping(elem -> elem.get(3), Collectors.toList())));
+				    Collectors.groupingBy(elem -> elem.get(2), LinkedHashMap::new,
+					    Collectors.mapping(elem -> mode == Mode.STAFF ? elem.get(3) : elem.get(5),
+						    Collectors.toList()))));
 
+		    // prepare codes of all suborganisations disregarding which organisation is their parent
+		    Set<String> allExistingSubOrganisationCodes = mappings.values().stream()
+			    .flatMap(e -> e.keySet().stream()).collect(Collectors.toSet());
+
+		    // load all suborganisations from DB which are present in the output file
+		    List<Organisation> allExistingSubcourseObjects = userManagementService
+			    .findByPropertyValues(Organisation.class, "code", allExistingSubOrganisationCodes);
+
+		    // map of course code -> subcourse code -> subcourse
+		    Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
+			    .parallelStream().filter(o -> o.getParentOrganisation() != null)
+			    .collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getOrganisationId(),
+				    Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
+
+		    // load all ext courses and subcourses from DB which are present in the output file
+		    Map<Integer, ExtCourseClassMap> allExistingExtCourses = userManagementService
+			    .findByPropertyValues(ExtCourseClassMap.class, "classid", Stream
+				    // merge IDs of organisations and suborganisations
+				    .concat(allExistingOrganisations.values().stream()
+					    .map(Organisation::getOrganisationId),
+					    allExistingSubcourseObjects.stream().map(Organisation::getOrganisationId))
+				    .collect(Collectors.toSet()))
+			    .parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
+			    .collect(Collectors.toConcurrentMap(e -> e.getOrganisation().getOrganisationId(), e -> e));
+
+		    Set<User> allUsersinCourses = new HashSet<>();
+		    // go through each course
 		    AtomicInteger mappingsProcessed = new AtomicInteger();
 		    logger.info("Processing courses and assigments");
-		    for (String courseCode : courses.keySet()) {
-			Organisation course = allExistingOrganisations.get(courseCode);
-
-			assignManagers(course, creatorId, mappings, allUsersParsed, userIDs, allExistingRoles,
-				allExistingUsers, mappingsProcessed);
+		    for (Entry<String, String> courseEntry : courses.entrySet()) {
+			String courseCode = courseEntry.getKey();
+			// create or get existing course
+			Organisation course = getCourse(courseCode, courseEntry.getValue(), extServer, creatorId,
+				rootOrganisation, allExistingOrganisations, allExistingExtCourses);
+			// collect learners from all subcourses of this course
+			Set<User> allUsersInSubcourses = assignLearnersOrStaff(course, mappings, extServer, creatorId,
+				allUsersParsed, userIDs, allExistingRoles, allExistingSubcourses, allExistingExtCourses,
+				allExistingUsers, mode == Mode.STAFF, mappingsProcessed);
+			allUsersinCourses.addAll(allUsersInSubcourses);
 
 			logger.info("Processed " + mappingsProcessed.get() + " entries");
 		    }
-		    logger.info("SP enrolments provisioning completed successfully");
 
-		    // END OF GROUP MANAGER PROCESSING!
-		    return;
-		}
+		    logger.info("Disabling users");
+		    // users who are part of courses but are not in the file anymore are eligible for disabling
+		    allUsersinCourses.removeAll(allUsersParsed);
+		    for (User user : allUsersinCourses) {
+			// make a flat set of roles from all subcourses
+			Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
+				.collect(HashSet::new, Set::addAll, Set::addAll);
+			if (mode == Mode.STAFF) {
+			    // check if the user is learner in any course
+			    roles.remove(Role.ROLE_MONITOR);
+			    roles.remove(Role.ROLE_AUTHOR);
+			} else {
+			    // check if the user is staff in any course
+			    roles.remove(Role.ROLE_LEARNER);
+			}
+			if (roles.isEmpty()) {
+			    // he is only a learner or this is staff mode, so disable
+			    userManagementService.disableUser(user.getUserId());
 
-		// START OF LEARNER / STAFF PROCESSING
-
-		// map of course code -> subcourse code -> user logins
-		Map<String, Map<String, List<String>>> mappings = lines.stream()
-			.collect(
-				Collectors.groupingBy(elem -> elem.get(0), LinkedHashMap::new,
-					Collectors.groupingBy(elem -> elem.get(2), LinkedHashMap::new,
-						Collectors.mapping(
-							elem -> mode == Mode.STAFF ? elem.get(3) : elem.get(5),
-							Collectors.toList()))));
-
-		// prepare codes of all suborganisations disregarding which organisation is their parent
-		Set<String> allExistingSubOrganisationCodes = mappings.values().stream()
-			.flatMap(e -> e.keySet().stream()).collect(Collectors.toSet());
-
-		// load all suborganisations from DB which are present in the output file
-		List<Organisation> allExistingSubcourseObjects = userManagementService
-			.findByPropertyValues(Organisation.class, "code", allExistingSubOrganisationCodes);
-
-		// map of course code -> subcourse code -> subcourse
-		Map<Integer, ConcurrentMap<String, Organisation>> allExistingSubcourses = allExistingSubcourseObjects
-			.parallelStream().filter(o -> o.getParentOrganisation() != null)
-			.collect(Collectors.groupingByConcurrent(o -> o.getParentOrganisation().getOrganisationId(),
-				Collectors.toConcurrentMap(Organisation::getCode, o -> o)));
-
-		// load all ext courses and subcourses from DB which are present in the output file
-		Map<Integer, ExtCourseClassMap> allExistingExtCourses = userManagementService
-			.findByPropertyValues(ExtCourseClassMap.class, "classid", Stream
-				// merge IDs of organisations and suborganisations
-				.concat(allExistingOrganisations.values().stream().map(Organisation::getOrganisationId),
-					allExistingSubcourseObjects.stream().map(Organisation::getOrganisationId))
-				.collect(Collectors.toSet()))
-			.parallelStream().filter(e -> e.getExtServer().getSid().equals(extServerSid))
-			.collect(Collectors.toConcurrentMap(e -> e.getOrganisation().getOrganisationId(), e -> e));
-
-		Set<User> allUsersinCourses = new HashSet<>();
-		// go through each course
-		AtomicInteger mappingsProcessed = new AtomicInteger();
-		logger.info("Processing courses and assigments");
-		for (Entry<String, String> courseEntry : courses.entrySet()) {
-		    String courseCode = courseEntry.getKey();
-		    // create or get existing course
-		    Organisation course = getCourse(courseCode, courseEntry.getValue(), extServer, creatorId,
-			    rootOrganisation, allExistingOrganisations, allExistingExtCourses);
-		    // collect learners from all subcourses of this course
-		    Set<User> allUsersInSubcourses = assignLearnersOrStaff(course, mappings, extServer, creatorId,
-			    allUsersParsed, userIDs, allExistingRoles, allExistingSubcourses, allExistingExtCourses,
-			    allExistingUsers, mode == Mode.STAFF, mappingsProcessed);
-		    allUsersinCourses.addAll(allUsersInSubcourses);
-
-		    logger.info("Processed " + mappingsProcessed.get() + " entries");
-		}
-
-		logger.info("Disabling users");
-		// users who are part of courses but are not in the file anymore are eligible for disabling
-		allUsersinCourses.removeAll(allUsersParsed);
-		for (User user : allUsersinCourses) {
-		    // make a flat set of roles from all subcourses
-		    Set<Integer> roles = userManagementService.getRolesForUser(user.getUserId()).values().stream()
-			    .collect(HashSet::new, Set::addAll, Set::addAll);
-		    if (mode == Mode.STAFF) {
-			// check if the user is learner in any course
-			roles.remove(Role.ROLE_MONITOR);
-			roles.remove(Role.ROLE_AUTHOR);
-		    } else {
-			// check if the user is staff in any course
-			roles.remove(Role.ROLE_LEARNER);
+			    String message = "User \"" + user.getLogin() + "\" disabled";
+			    logger.info(message);
+			    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
+				    "SPEnrolment: " + message);
+			}
 		    }
-		    if (roles.isEmpty()) {
-			// he is only a learner or this is staff mode, so disable
-			userManagementService.disableUser(user.getUserId());
-
-			String message = "User \"" + user.getLogin() + "\" disabled";
-			logger.info(message);
-			logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
-				"SPEnrolment: " + message);
-		    }
+		    logger.info("Processing \"" + role + "\" role finished");
 		}
-
 		logger.info("SP enrolments provisioning completed successfully");
-
 	    } catch (Exception e) {
 		logger.error("Error while provisioning SP enrolments", e);
 	    } finally {

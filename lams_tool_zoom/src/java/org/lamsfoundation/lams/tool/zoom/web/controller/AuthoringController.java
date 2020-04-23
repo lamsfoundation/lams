@@ -83,7 +83,8 @@ public class AuthoringController {
      * updateContent is called.
      */
     @RequestMapping(path = "/definelater", method = RequestMethod.POST)
-    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request) throws ServletException {
+    public String definelater(@ModelAttribute AuthoringForm authoringForm, HttpServletRequest request)
+	    throws ServletException {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Zoom zoom = zoomService.getZoomByContentId(toolContentID);
 	zoom.setDefineLater(true);
@@ -94,7 +95,7 @@ public class AuthoringController {
 
 	return readDatabaseData(authoringForm, zoom, request, ToolAccessMode.TEACHER);
     }
-    
+
     /**
      * Common method for "unspecified" and "defineLater"
      */
@@ -102,7 +103,7 @@ public class AuthoringController {
 	    ToolAccessMode mode) throws ServletException {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	
+
 	// Set up the authForm.
 	copyProperties(authoringForm, zoom);
 
@@ -168,6 +169,7 @@ public class AuthoringController {
 	zoom.setReflectOnActivity(authForm.isReflectOnActivity());
 	zoom.setReflectInstructions(authForm.getReflectInstructions());
 	zoom.setStartInMonitor(authForm.isStartInMonitor());
+	zoom.setEnableMeetingPassword(authForm.isEnableMeetingPassword());
 	Integer duration = authForm.getDuration();
 	zoom.setDuration(duration != null && duration > 0 ? duration : null);
     }
@@ -199,7 +201,7 @@ public class AuthoringController {
     private SessionMap<String, Object> createSessionMap(Zoom zoom, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> map = new SessionMap<>();
 
 	map.put(ZoomConstants.KEY_MODE, mode);
 	map.put(ZoomConstants.KEY_CONTENT_FOLDER_ID, contentFolderID);
