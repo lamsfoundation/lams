@@ -6,12 +6,15 @@
 	
 <c:if test="${not empty lessons}">
 	<p><fmt:message key="message.check.to.clone.lesson" /></p>
-	<ul>
+	<div class="form-group">
 		<c:forEach items="${lessons}" var="lesson">
-			<li><input id="lessons" name="lessons" type="checkbox" value="<c:out value="${lesson.lessonId}" />" checked="checked" />
-				<a class="lessonNameLink" id="<c:out value="${lesson.lessonId}" />"><c:out value="${lesson.lessonName}" /></a> 
+			<div class="form-check"><input id="lessons" name="lessons" type="checkbox" value="<c:out value="${lesson.lessonId}" />" checked="checked" />
+				<label class="form-check-label" for="<c:out value="${lesson.lessonId}" />">
+			<a class="lessonNameLink" id="<c:out value="${lesson.lessonId}" />"><c:out value="${lesson.lessonName}" /></a> 
+				</label>
+			</div>
 		</c:forEach>
-	</ul>
+	</div>
 	
 	<c:forEach items="${lessons}" var="lesson">
 		<div id="lessonDialog-<c:out value="${lesson.lessonId}" />" title="<c:out value="${lesson.lessonName}" />" style="display:none;">
