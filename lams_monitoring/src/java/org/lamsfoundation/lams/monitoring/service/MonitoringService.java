@@ -397,6 +397,8 @@ public class MonitoringService implements IMonitoringFullService {
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
 		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish,
 		precedingLesson);
+	//flush session to make activityIds available in the next method
+	baseDAO.flush();
 	
 	//updates lesson's hasContributeActivities flag
 	calculateContributeActivities(initializedLesson.getLessonId(), false);
