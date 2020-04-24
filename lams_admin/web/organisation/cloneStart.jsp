@@ -125,23 +125,20 @@
 </lams:head>
     
 <body class="stripes">
-
 	<c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
+	
+	<%-- Build breadcrumb --%>
+	<c:set var="breadcrumbItems"><lams:LAMSURL/>/admin/orgmanage.do?org=1| <fmt:message key="admin.course.manage" /> </c:set>
+	<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
+		<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />"| <c:out value="${org.parentOrganisation.name}" escapeXml="true"/></c:set>
+	</c:if>
+	
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}"/></fmt:message></c:set>
 
-	<lams:Page type="admin" title="${title}" formID="cloneForm">
-			
-			<p><a href="<lams:LAMSURL/>admin/orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> :
-				<c:if test="${org.organisationType.organisationTypeId eq classTypeId}">
-					<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.parentOrganisation.organisationId}" />" class="btn btn-default">
-						<c:out value="${org.parentOrganisation.name}" />
-					</a> :
-				</c:if>
-				<a href="<lams:LAMSURL/>admin/orgmanage.do?org=<c:out value="${org.organisationId}" />" class="btn btn-default">
-					<c:out value="${org.name}" />
-				</a>
-			</p>
-			
-			<h4><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h4>
+
+	<lams:Page type="admin" breadcrumbItems="${breadcrumbItems}" formID="cloneForm">
+						
+			<h1><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h1>
 			
 			<c:if test="${not empty errors}">
 				<lams:Alert type="danger" id="errorKey" close="false">			
@@ -151,26 +148,25 @@
 				</lams:Alert>
 			</c:if>
 			
-			<div class="panel panel-default voffset5" >
-				<div class="panel-heading">
-					<span class="panel-title">
-						<fmt:message key="title.choose.group" />
-					</span>
-				</div>
-				<div class="panel-body">
+			<div class="card pt-10" >
+				<div class="card-header">
+						<div class="lead"><fmt:message key="title.choose.group" /></div>
+				</div>	
+
+				<div class="card-body">
 					<div class="form-group">
-						<fmt:message key="admin.course" />:
+						<label for="sourceGroupId"><fmt:message key="admin.course" /></label>
 						<select id="sourceGroupId" class="form-control">
 							<option value="">...</option>
 						</select>
 					</div>
 					<div class="form-group">
-						<fmt:message key="admin.class" />:
+						<label for="sourceSubgroupId"><fmt:message key="admin.class" /></label>
 						<select id="sourceSubgroupId" class="form-control">
 						</select>
 					</div>
 					<div class="form-group">
-						<input type="submit" class="btn btn-default" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
+						<input type="submit" class="btn btn-sm btn-primary float-right" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
 					</div>
 				</div>
 			</div>
@@ -192,40 +188,38 @@
 				<input type="hidden" name="staff">
 				<input type="hidden" name="learners">
 			
-				<div style="display:none;" id="cloneOptionsDiv">
+				<div style="display:none;" class="mt-3" id="cloneOptionsDiv">
 				
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="title.select.lessons" />
-						</span>
-					</div>
-					<div class="panel-body">
-						<p id="availableLessons"></p>
-					</div>
-					</div>
-				
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="title.select.staff" />
-						</span>
-					</div>
-					<div class="panel-body">
-						<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <fmt:message key="message.add.all.monitors" />
-						<a onclick="staffDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.staff" /></a>
-					</div>
+					<div class="card" >
+						<div class="card-header">
+							<div class="lead">
+								<fmt:message key="title.select.lessons" />
+							</div>
+						</div>
+						<div class="card-body">
+							<p id="availableLessons"></p>
+						</div>
+
 					</div>
 					
-					<div class="panel panel-default voffset5" >
-					<div class="panel-heading">
-						<span class="panel-title">
+					<div class="card m-3" >
+					<div class="card-body">
+						<span class="font-weight-bold">
+							<fmt:message key="title.select.staff" />
+						</span>	
+						<div class="form-group form-check">				
+							<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <label class="form-check-label" for="addAllStaff"><fmt:message key="message.add.all.monitors" /></label>
+							<a onclick="staffDialog();" class="btn btn-sm btn-outline-secondary pull-right"><fmt:message key="label.configure.staff" /></a>
+
+						</div>
+					
+						<span class="font-weight-bold">
 							<fmt:message key="title.select.learners" />
 						</span>
-					</div>
-					<div class="panel-body">
-						<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> <fmt:message key="message.add.all.learners" />
-						<a onclick="learnerDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.learners" /></a>
+						<div class="form-group form-check">			
+							<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked">  <label class="form-check-label" for="addAllLearners"><fmt:message key="message.add.all.learners" /></label>
+							<a onclick="learnerDialog();" class="btn btn-sm btn-outline-secondary pull-right"><fmt:message key="label.configure.learners" /></a>
+						</div>	
 					</div>
 					</div>
 			
