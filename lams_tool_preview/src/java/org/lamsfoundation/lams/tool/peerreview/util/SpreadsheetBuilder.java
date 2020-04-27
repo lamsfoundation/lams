@@ -193,23 +193,28 @@ public class SpreadsheetBuilder {
 		userRow.addCell(spa, true);
 
 		if (peerreview.isSelfReview()) {
-		    // calculate SAPA factor
-		    double sumSelfRatings = 0;
-		    double sumPeerRatings = 0;
-		    int peerRatingCount = 0;
+		    if (ratings.containsKey(user.getUserId())) {
+			// calculate SAPA factor
+			double sumSelfRatings = 0;
+			double sumPeerRatings = 0;
+			int peerRatingCount = 0;
 
-		    for (Entry<Long, Double> ratingEntry : ratings.get(user.getUserId()).entrySet()) {
-			if (ratingEntry.getKey().equals(user.getUserId())) {
-			    sumSelfRatings = ratingEntry.getValue();
-			} else {
-			    sumPeerRatings += ratingEntry.getValue();
-			    peerRatingCount++;
+			for (Entry<Long, Double> ratingEntry : ratings.get(user.getUserId()).entrySet()) {
+			    if (ratingEntry.getKey().equals(user.getUserId())) {
+				sumSelfRatings = ratingEntry.getValue();
+			    } else {
+				sumPeerRatings += ratingEntry.getValue();
+				peerRatingCount++;
+			    }
 			}
+
+			double sapa = sumPeerRatings > 0
+				? roundTo2Places(Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount)))
+				: 0d;
+			userRow.addCell(sapa, true);
+		    } else {
+			userRow.addCell("", false);
 		    }
-		    double sapa = sumPeerRatings > 0
-			    ? roundTo2Places(Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount)))
-			    : 0d;
-		    userRow.addCell(sapa, true);
 		}
 
 		userRow.addCell("", IndexedColors.YELLOW);
