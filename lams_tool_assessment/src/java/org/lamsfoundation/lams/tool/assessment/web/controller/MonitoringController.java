@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
@@ -132,7 +133,7 @@ public class MonitoringController {
 
 	    //show only questions from question list otherwise
 	} else {
-	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+	    for (QuestionReference reference : assessment.getQuestionReferences()) {
 		questionList.add(reference.getQuestion());
 	    }
 	}
@@ -156,6 +157,37 @@ public class MonitoringController {
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
+	// display student choices only if all questions are multiple choice
+	boolean displayStudentChoices = true;
+	int maxOptionsInQuestion = 0;
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+		int optionsInQuestion = question.getOptions().size();
+		if (optionsInQuestion > maxOptionsInQuestion) {
+		    maxOptionsInQuestion = optionsInQuestion;
+		}
+	    } else {
+		displayStudentChoices = false;
+		break;
+	    }
+	}
+
+	request.setAttribute("displayStudentChoices", displayStudentChoices);
+	if (displayStudentChoices) {
+	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
+
+	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		// build candidate dtos
+		for (AssessmentQuestionOption option : question.getOptions()) {
+		    int optionAttemptCount = service.countAttemptsPerOption(option.getUid());
+		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
+		    option.setPercentage(percentage);
+		}
+	    }
+	}
+
 	return "pages/monitoring/monitoring";
     }
 
@@ -602,12 +634,12 @@ public class MonitoringController {
 		    + " and question ID " + questionUid);
 	}
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-    } 
+    }
 
 }
