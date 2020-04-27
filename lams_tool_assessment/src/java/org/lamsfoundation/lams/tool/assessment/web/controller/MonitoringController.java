@@ -43,11 +43,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
@@ -166,6 +169,44 @@ public class MonitoringController {
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
+	// display student choices only if all questions are multiple choice
+	boolean displayStudentChoices = true;
+	int maxOptionsInQuestion = 0;
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+		int optionsInQuestion = question.getQbQuestion().getQbOptions().size();
+		if (optionsInQuestion > maxOptionsInQuestion) {
+		    maxOptionsInQuestion = optionsInQuestion;
+		}
+	    } else {
+		displayStudentChoices = false;
+		break;
+	    }
+	}
+
+	request.setAttribute("displayStudentChoices", displayStudentChoices);
+	if (displayStudentChoices) {
+	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
+
+	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
+	    
+	    Set<QuestionDTO> questionDtos = new TreeSet<>();
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		QuestionDTO questionDto = new QuestionDTO(question);
+		questionDtos.add(questionDto);
+
+		// build candidate dtos
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid());
+
+		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
+		    optionDto.setPercentage(percentage);
+		}
+	    }
+	    request.setAttribute("questions", questionDtos);
+	}
+
 	return "pages/monitoring/monitoring";
     }
 

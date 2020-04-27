@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -87,6 +88,10 @@ public class SpreadsheetBuilder {
 	    }
 	}
 	titleRow.addCell(service.getLocalisedMessage("label.average", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	if (peerreview.isSelfReview()) {
+	    titleRow.addCell(service.getLocalisedMessage("label.sa", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	}
+	titleRow.addCell(service.getLocalisedMessage("label.pa", null), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	titleRow.addCell(service.getLocalisedMessage("label.spa.factor", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	if (peerreview.isSelfReview()) {
@@ -168,17 +173,12 @@ public class SpreadsheetBuilder {
 		: 0D;
 	avgRow.addCell(finalGroupAverage, true);
 
-	Map<Long, Map<Long, Double>> ratings = null;
-	if (peerreview.isSelfReview()) {
-	    // prepare for SAPA calculation
-	    // the map is: itemId (who was rated) -> userId (who rated) -> sum of ratings from all categories
-	    ratings = ((List<Rating>) ratingService.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(),
-		    userNames.keySet()))
-			    .stream().filter(rating -> rating.getRating() != null)
-			    .collect(Collectors.groupingBy(Rating::getItemId,
-				    Collectors.groupingBy(rating -> rating.getLearner().getUserId().longValue(),
-					    Collectors.summingDouble(Rating::getRating))));
-	}
+	// the map is: itemId (who was rated) -> userId (who rated) -> rating from all categories
+	Map<Long, Map<Long, Set<Rating>>> ratings = ((List<Rating>) ratingService
+		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userNames.keySet())).stream()
+			.filter(rating -> rating.getRating() != null)
+			.collect(Collectors.groupingBy(Rating::getItemId, Collectors.groupingBy(
+				rating -> rating.getLearner().getUserId().longValue(), Collectors.toSet())));
 
 	// Combine rated rows with rows with users not yet rated, to make up complete list, and write out to rowList.
 	for (PeerreviewUser user : users) {
@@ -190,25 +190,50 @@ public class SpreadsheetBuilder {
 	    } else {
 		Double learnerAverage = (Double) userRow.getCell(userRow.getCells().size() - 1);
 		Double spa = countNonCommentCriteria > 0 ? roundTo2Places(learnerAverage / finalGroupAverage) : 0D;
-		userRow.addCell(spa, true);
+		Double sa = null;
+		Double pa = null;
+		Double sapa = null;
 
-		if (peerreview.isSelfReview()) {
+		if (ratings.containsKey(user.getUserId())) {
 		    // calculate SAPA factor
 		    double sumSelfRatings = 0;
 		    double sumPeerRatings = 0;
+		    int selfRatingCriteriaCount = 0;
+		    int peerRatingCriteriaCount = 0;
 		    int peerRatingCount = 0;
 
-		    for (Entry<Long, Double> ratingEntry : ratings.get(user.getUserId()).entrySet()) {
+		    for (Entry<Long, Set<Rating>> ratingEntry : ratings.get(user.getUserId()).entrySet()) {
+			double sumRatingFromAllCategories = ratingEntry.getValue().stream()
+				.collect(Collectors.summingDouble(Rating::getRating));
+			int countRatingFromAllCategories = ratingEntry.getValue().size();
 			if (ratingEntry.getKey().equals(user.getUserId())) {
-			    sumSelfRatings = ratingEntry.getValue();
+			    sumSelfRatings = sumRatingFromAllCategories;
+			    selfRatingCriteriaCount = countRatingFromAllCategories;
 			} else {
-			    sumPeerRatings += ratingEntry.getValue();
+			    sumPeerRatings += sumRatingFromAllCategories;
+			    peerRatingCriteriaCount += countRatingFromAllCategories;
 			    peerRatingCount++;
 			}
 		    }
-		    double sapa = sumPeerRatings > 0
-			    ? roundTo2Places(Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount)))
-			    : 0d;
+
+		    pa = peerRatingCriteriaCount == 0 ? null : roundTo2Places(sumPeerRatings / peerRatingCriteriaCount);
+		    if (peerreview.isSelfReview()) {
+			sa = selfRatingCriteriaCount == 0 ? null
+				: roundTo2Places(sumSelfRatings / selfRatingCriteriaCount);
+			sapa = sumPeerRatings > 0
+				? roundTo2Places(Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount)))
+				: 0;
+		    }
+		}
+
+		if (peerreview.isSelfReview()) {
+		    userRow.addCell(sa, true);
+		}
+		userRow.addCell(pa, true);
+
+		userRow.addCell(spa, true);
+
+		if (peerreview.isSelfReview()) {
 		    userRow.addCell(sapa, true);
 		}
 

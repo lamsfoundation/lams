@@ -19,7 +19,7 @@
 </div>
 
 
-<form action="/monitoring/startMeeting.do" target="zoomMonitor${dto.toolContentId}"
+<form action="startMeeting.do" target="zoomMonitor${dto.toolContentId}"
 	  onsubmit="window.open('', 'zoomMonitor${dto.toolContentId}', 'resizable=yes,scrollbars=yes')"> 
 	<input type="hidden" name="toolContentID" value="${dto.toolContentId}" />
 	<button type="submit" class="btn btn-primary"><fmt:message key="label.monitoring.startConference" /></button>

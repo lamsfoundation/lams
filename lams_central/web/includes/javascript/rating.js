@@ -1,6 +1,6 @@
 
 //Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, MAX_RATINGS_FOR_ITEM,
-//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE, SESSION_ID constants in parent document
+//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE, RATING_STEP, SESSION_ID constants in parent document
 
 //constant indicating there is rting limits set up
 var HAS_RATING_LIMITS;
@@ -44,6 +44,13 @@ function initializeJRating() {
 		canRateAgain = ALLOW_RERATE;
 	}
 	
+	var step; 
+	if ( typeof RATING_STEP === "undefined" || RATING_STEP === undefined ) {
+		step = false; 
+	} else {
+		step = RATING_STEP;
+	}
+	
 	// if SESSION_ID is not defined do not allow them to update ratings as the servlet will fail.
 	// But in monitoring we will do initializeJRating to display the ratings properly so then SESSION_ID is undefined.
 	var phpPathValue;
@@ -56,7 +63,8 @@ function initializeJRating() {
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
 		phpPath : phpPathValue,
 		rateMax : 5,
-		decimalLength : 1,
+        decimalLength : 1,
+        step: step,
 		canRateAgain : canRateAgain,
         nbRates : canRateAgain ? 100 : 0,
 		onSuccess : function(data, itemId){
