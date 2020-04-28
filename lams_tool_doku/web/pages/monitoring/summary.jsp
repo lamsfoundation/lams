@@ -345,6 +345,8 @@
 	    <c:out value="${sessionMap.dokumaran.title}" escapeXml="true"/>
 	</h4>
 	
+	<c:out value="${sessionMap.dokumaran.description}" escapeXml="false"/>
+	 
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			 <fmt:message key="message.monitoring.summary.no.session" />
