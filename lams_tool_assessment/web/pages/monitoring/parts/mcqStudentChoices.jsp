@@ -30,7 +30,7 @@
 					</td>
 					
 					<c:forEach var="option" items="${question.options}">
-						<td class="normal <c:if test='${option.grade == 1}'>success</c:if>">
+						<td class="text-right normal <c:if test='${option.grade == 1}'>success</c:if>">
 							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
 						</td>
 					</c:forEach>
