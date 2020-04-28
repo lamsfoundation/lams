@@ -45,6 +45,9 @@
 		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
 	function sendResults(sessionId) {
+		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
+			return;
+		}
 		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
 		$("#messageArea").html("");
 		$("#messageArea_Busy").show();
