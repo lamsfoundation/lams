@@ -329,7 +329,6 @@
 	<c:if test="${displayStudentChoices}">
 		<h5><fmt:message key="label.student.choices" /></h5>
 		
-		<c:set var="questions" value="${assessment.questions}" />
 		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
 	</c:if>
 	

@@ -29,13 +29,13 @@
 						</a>
 					</td>
 					
-					<c:forEach var="option" items="${question.options}">
-						<td class="text-right normal <c:if test='${option.grade == 1}'>success</c:if>">
+					<c:forEach var="option" items="${question.optionDtos}">
+						<td class="text-right normal <c:if test='${option.correct}'>success</c:if>">
 							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
 						</td>
 					</c:forEach>
 					
-					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.options)}" var="j">
+					<c:forEach begin="1" end="${maxOptionsInQuestion - fn:length(question.optionDtos)}" var="j">
 						<td class="normal"></td>
 					</c:forEach>
 				</tr>
@@ -65,14 +65,14 @@
 					<table class="table table-striped table-hover">
 						<tbody>
 						
-							<c:forEach var="option" items="${question.options}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${option.grade == 1}'>bg-success</c:if></c:set>
+							<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${option.correct}'>bg-success</c:if></c:set>
 								<tr>
 									<td width="5px" class="${cssClass}">
 										${ALPHABET[j.index]}.
 									</td>
 									<td class="${cssClass}">
-										<c:out value="${option.optionString}" escapeXml="false"/>
+										<c:out value="${option.name}" escapeXml="false"/>
 									</td>
 									<td class="${cssClass}">
 										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
