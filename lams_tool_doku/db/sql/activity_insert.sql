@@ -21,7 +21,7 @@ VALUES
 (
 NULL
 , 'Collaborative real-time document editor'
-, 'doKumaran'
+, 'doKu'
 , 1
 , 2
 , 0
