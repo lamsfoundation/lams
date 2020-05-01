@@ -47,7 +47,7 @@
 			</c:when>
 			<c:otherwise>
 				<c:if test="${not empty meetingPassword}">
-					<h4><fmt:message key="label.meeting.password" />&nbsp;${meetingPassword}</h4>
+					<h4><fmt:message key="label.meeting.password" />&nbsp;<code>${meetingPassword}</code></h4>
 				</c:if>
 				
 				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
