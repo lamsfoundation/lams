@@ -73,7 +73,7 @@
 	</label>
 </div>
 
-<div class="checkbox" <c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
+<div class="checkbox loffset20" <c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
 	<label for="questionEtherpadEnabled">
 		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"/>
 		<fmt:message key="label.authoring.advance.question.etherpad" />
