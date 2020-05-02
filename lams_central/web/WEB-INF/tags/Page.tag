@@ -25,7 +25,7 @@
 	<c:when test='${type == "navbar"}'>
 	<%-- Combined tab and navigation bar used in authoring and monitoring --%>
 		<div class="row no-gutter no-margin">
-		<div class="col-xs-12">
+		<div class="col-12">
 		<div class="container" id="content">
 			<jsp:doBody />
 		</div>
@@ -367,14 +367,14 @@
 
 		<div id="navcontent" class="content">
 			<div class="row no-gutter no-margin">
-			<div class="col-xs-12">
+			<div class="col-12">
 			<div class="container">
 				<c:choose>
 				<c:when test="${usePanel}">
-					<div class="panel panel-default panel-${type}-page">
+					<div class="card panel-default card-${type}-page">
 						<c:if test="${not empty title}">
-							<div class="panel-heading">
-								<div class="panel-title panel-${type}-title">
+							<div class="card-header">
+								<div class="card-title card-${type}-title">
 									<c:out value="${title}" escapeXml="true" />
 									<c:if test="${not empty titleHelpURL}">
 										<span class="pull-right">${titleHelpURL}</span>
@@ -386,7 +386,7 @@
 							</div>
 						</c:if>
 						
-						<div class="panel-body panel-${type}-body">
+						<div class="card-body card-${type}-body">
 							<jsp:doBody />
 						</div>
 					</div>
@@ -409,15 +409,15 @@
 	<c:otherwise>
 	<!-- Standard Screens  --> 
 		<div class="row no-gutter no-margin">
-		<div class="col-xs-12">
+		<div class="col-12">
 		<div class="container" id="content">
 
 		<c:choose>
 		<c:when test="${usePanel}">
-		<div class="panel panel-default panel-${type}-page">
+		<div class="card panel-default card-${type}-page">
 			<c:if test="${not empty title}">
-				<div class="panel-heading">
-					<div class="panel-title panel-${type}-title">
+				<div class="card-header">
+					<div class="card-title card-${type}-title">
 						<c:out value="${title}" escapeXml="true" />
 						<c:if test="${not empty titleHelpURL}">
 							<span class="pull-right">${titleHelpURL}</span>
@@ -429,7 +429,7 @@
 				</div>
 			</c:if>
 			
-			<div class="panel-body panel-${type}-body">
+			<div class="card-body card-${type}-body">
 				<jsp:doBody />
 			</div>
 		</div>

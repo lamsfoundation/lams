@@ -11,10 +11,10 @@
 	<c:set var="title"><fmt:message key="${titleKey}" /></c:set>
 </c:if>
 
-<div class="panel panel-default">
+<div class="card">
 	<c:if test="${not empty title or not empty titleHelpURL}">
-	<div class="panel-heading">
-		<div class="panel-title">
+	<div class="card-header">
+		<div class="card-title">
 		<c:out value="${title}" escapeXml="true" />
 		<c:if test="${not empty titleHelpURL}">
 			<a style="float: right" href="${titleHelpURL}" target="_new"><span class="help" style="margin: 0px"></span></a>
@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	</c:if>
-	<div class="panel-body ${panelBodyClass}">
+	<div class="card-body ${panelBodyClass}">
 		<jsp:doBody />
 	</div>
 </div>

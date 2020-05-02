@@ -183,11 +183,11 @@
 					</c:if>
 				
 					<div class="no-gutter">
-						<div class="col-xs-12 col-sm-11 ">
+						<div class="col-12 col-sm-11 ">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control"
 									placeholder="<fmt:message key="label.comment.textarea.tip"/>"/>
 						</div>
-						<div class="button add-comment add-comment-new col-xs-12 col-sm-1" 
+						<div class="button add-comment add-comment-new col-12 col-sm-1" 
 								data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}">
 						</div>
 					</div>
