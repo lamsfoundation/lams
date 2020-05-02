@@ -729,10 +729,10 @@
 	
 	<c:choose>
 	<c:when test="${!isInTabs}">
-		<c:set var="btnclass" value="btn btn-xs btn-default"/>
+		<c:set var="btnclass" value="btn btn-xs btn-light"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="btnclass" value="btn btn-sm btn-default"/>
+		<c:set var="btnclass" value="btn btn-sm btn-light"/>
 	</c:otherwise>
 	</c:choose>
 		
@@ -795,55 +795,55 @@
 		</c:set>
 	</c:if>
 	
-	<c:choose>
-	<c:when test="${!isInTabs}">
-		<%-- replacement for Page type admin --%>
-		<div class="row no-gutter no-margin">
-		<div class="col-12">
-		<div class="container" id="content">
-
-		<div class="panel panel-default panel-admin-page">
-		<div class="panel-body panel-admin-body">
-
-		<h4><fmt:message key="gradebook.title.lessonGradebook">
+	<div class="row no-gutters justify-content-between">
+		<c:choose>
+		<c:when test="${!isInTabs}">
+			<%-- replacement for Page type admin --%>
+			<div class="row no-gutter no-margin">
+			<div class="col-12">
+			<div class="container" id="content">
+	
+			<div class="panel panel-default panel-admin-page">
+			<div class="panel-body panel-admin-body">
+	
+			<h4>
+				<fmt:message key="gradebook.title.lessonGradebook">
 					<fmt:param>
 						<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
 					</fmt:param>
-				</fmt:message></h4>
-
-		<div class="gbTopButtonsContainer pull-right">
-			${chartButtonCode}
-			${weightButtonCode}
-			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
-				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
-			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
-		</div>
-
-		<div class="gbTopButtonsContainer pull-left" id="export-link-area">
-			${padlockCode}
-		
-	</c:when>
+				</fmt:message>
+			</h4>
 	
-	<c:otherwise>
-	 	
-		<div class="gbTopButtonsContainer pull-left">
-			${padlockCode}
-		</div>
-		
-		<div class="gbTopButtonsContainer pull-right" id="export-link-area">
-	 	
-	</c:otherwise>
-	</c:choose>
-
-			<div>
-				<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
-					<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
-					<fmt:message key="gradebook.export.excel" />
-					</span>
-				</a> 
+			<div class="gbTopButtonsContainer pull-right">
+				${chartButtonCode}
+				${weightButtonCode}
+				<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
+					   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
+				<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
 			</div>
+	
+			<div class="gbTopButtonsContainer pull-left" id="export-link-area">
+				${padlockCode}
+		</c:when>
+		
+		<c:otherwise>
+			<div class="gbTopButtonsContainer col-12 col-lg-3">
+				${padlockCode}
+			</div>
+			
+			<div class="gbTopButtonsContainer col-12 col-lg-6" id="export-link-area">
+		</c:otherwise>
+		</c:choose>
+
+		<div>
+			<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
+				<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
+				<fmt:message key="gradebook.export.excel" />
+				</span>
+			</a> 
+		</div>
 	 
-	 		<div id="tour-release-marks">
+	 	<div id="tour-release-marks">
 			<div id="marksNotReleased" style="display:none">
 				<a href="javascript:toggleRelease()" class="${btnclass}" 
 					title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
@@ -859,14 +859,15 @@
 					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" /></span>
 				</a> 
 			</div>
-			</div>
+		</div>
 
 		<c:if test="${isInTabs}">
 	 		${chartButtonCode}
 	 		${weightButtonCode}
 		</c:if>
 		
-		</div> <!-- Closes buttons -->
+	</div> 
+	</div><!-- Closes buttons -->
 		
 			<div class="row">
 				 <div class="col-12">

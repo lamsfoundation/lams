@@ -212,6 +212,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/popper.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 
@@ -222,7 +223,7 @@
 		$(document).bind("mobileinit", function(){
 			$.mobile.loadingMessage = false;
 			$.mobile.ignoreContentEnabled = true;
-			 $('body').attr('data-enhance', 'false');
+			$('body').attr('data-enhance', 'false');
 		});
 				
 		$(document).ready(function(){
@@ -231,6 +232,7 @@
 			initLearnersTab();
 			initGradebookTab();
 			refreshMonitor();
+			
 			<c:if test="${not empty lesson.lessonDescription}">
 				$('#description').readmore({
 					speed: 500,
@@ -240,42 +242,18 @@
 			
 			// remove "loading..." screen
 			$('#loadingOverlay').remove();
-		});
-			
-        function doSelectTab(tabId) {
-	        if ( tourInProgress )  {
-	        	alert(LABELS.TOUR_DISABLED_ELEMENT);
-	        	return;
-	        }
-	        actualDoSelectTab(tabId);
-        }
 
-        function actualDoSelectTab(tabId) {
-	    	selectTab(tabId);
+			//show info dialog
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
-	    	if ( tabId == '2' ) {
-				if (sequenceTabShowInfo) {
-					sequenceInfoDialog.modal("show");
-					sequenceTabShowInfo = false; // only show it once
-                }
-                
-			} else {
-				sequenceInfoDialog.modal("hide");
+			if (sequenceTabShowInfo) {
+				sequenceInfoDialog.modal("show");
+				sequenceTabShowInfo = false; // only show it once
             }
-            
-	    	if ( tabId == '4' ) {
-	    		updateGradebookTab();
-	    	}
-        }
 
-        function switchToTblMonitor() {
-        	$("#content").load(
-                LAMS_URL + 'monitoring/tblmonitor/start.do', 
-        		{
-        			lessonID: ${lesson.lessonID}
-        		}
-        	);
-        }
+			$('#gradebook-collapse').on('show.bs.collapse', function () {
+				updateGradebookTab();
+			})
+		});
         
     	<%@ include file="monitorTour.jsp" %> 
 	</script>
@@ -288,240 +266,78 @@
 		<i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
 	</div>
 	
-	<lams:Page type="navbar">
-		<c:if test="${isTBLSequence}">
-			<c:set var="tblMonitorButton">
-				<i class="fa fa fa-heartbeat" title="<fmt:message key="label.tbl.monitor" />"
-			 		onclick="javascript:switchToTblMonitor();" id="tbl-monitor-control">  <fmt:message key="label.tbl.monitor"/></i>
-			</c:set>
-		</c:if>
-	
-		<lams:Tabs control="true" extraControl="${tblMonitorButton}">
-			<lams:Tab id="1" key="tab.lesson" />
-			<lams:Tab id="2" key="tab.sequence" />
-			<lams:Tab id="3" key="tab.learners" />
-			<lams:Tab id="4" key="tab.gradebook" />
-		</lams:Tabs>
-		<lams:TabBodyArea>
-			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.basic">
-					<div class="row">
-						<div class="col-12">
-							<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
-							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
-							
-							<a id="tour-refresh-button" class="btn btn-sm btn-default pull-right roffset10" title="<fmt:message key='button.refresh.tooltip'/>"
-							   href="#" onClick="javascript:refreshMonitor('lesson')">
-							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>				
-							<p id="tabLessonLessonName">
-								<span class="lead">
-									<strong id="lesson-name-strong"><c:out value="${lesson.lessonName}" /></strong>
-									<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-								</span>
-								<br/>
-								<span class="text-muted"><small><c:out value="${lesson.organisationName}" escapeXml="true"/></small></span>
-							</p>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-9 col-7">
-						
-							<!-- Lesson details -->
-							<dl id="lessonDetails" class="dl-horizontal">
-								<c:if test="${not empty lesson.lessonDescription}">
-									<dt><fmt:message key="lesson.description"/></dt>
-									<dd id="tabLessonLessonDescription">
-										<div id="description" style="overflow: hidden;">
-											<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
-										</div>
-									</dd>
-								</c:if>
-								<dt><fmt:message key="lesson.state"/>
-								</dt>
-								<dd>
-									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
-								  	<div style="display:inline-block;vertical-align: middle;"><span id="lessonStartDateSpan" class="lessonManageField loffset5"></span>
-								  	<span id="lessonFinishDateSpan" class="lessonManageField loffset5"></span></div>
-								  	 
-									<!--  Change lesson status or start/schedule start -->
-									<div class="collapse offset10" id="changeState">
-										<div id="lessonScheduler">
-											<form class="form-horizontal">
-												<div class="form-group" id="lessonStartApply">
-													<label for="scheduleDatetimeField" class="col-md-1"><fmt:message key="lesson.start"/></label>
-													<div class="col-md-8">
-													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
-													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-														   onClick="javascript:scheduleLesson()"
-														   title='<fmt:message key="button.schedule.tooltip"/>'>
-													   <fmt:message key="button.schedule"/>
-													</a>
-													<a id="startLessonButton" class="btn btn-xs btn-default" href="#"
-														   onClick="javascript:startLesson()"
-														   title='<fmt:message key="button.start.now.tooltip"/>'>
-													   <fmt:message key="button.start.now"/>
-													</a>
-													</div>
-												</div>
-												<div class="form-group" id="lessonDisableApply">
-													<label for="disableDatetimeField" class="col-md-1"><fmt:message key="lesson.end"/></label>
-													<div class="col-md-8">
-														<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
-														<a id="scheduleDisableLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-															   onClick="javascript:scheduleDisableLesson()"
-															   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
-													   	<fmt:message key="button.schedule"/>
-														</a>
-														<a id="disableLessonButton" class="btn btn-xs btn-default" href="#"
-															   onClick="javascript:disableLesson()"
-															   title='<fmt:message key="button.disable.now.tooltip"/>'>
-														   <fmt:message key="button.disable.now"/>
-														</a>
-													</div>
-												</div>
-											</form>
-										</div>
-										
-										<div id="lessonStateChanger">
-											<select id="lessonStateField" class="btn btn-xs" onchange="lessonStateFieldChanged()">
-												<option value="-1"><fmt:message key="lesson.select.state"/></option>
-											</select>
-											<span id="lessonStateApply">
-												<button type="button" class="lessonManageField btn btn-xs btn-primary"
-														onClick="javascript:changeLessonState()"
-														title='<fmt:message key="lesson.change.state.tooltip"/>'>
-											   		<i class="fa fa-check"></i> 
-											   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
-										    	</button>
-										    </span>
-								    	</div>					
-									</div>
-								</dd>
-								
-								<dt><fmt:message key="lesson.learners"/>:</dt>
-								<dd title='<fmt:message key="lesson.ratio.learners.tooltip"/>' id="learnersStartedPossibleCell"></dd>
-								
-								<!--  lesson actions -->
-								<dt><fmt:message key="lesson.manage"/>:</dt>
-								<dd>
-									<div class="btn-group btn-group-xs" role="group" id="lessonActions">
-										<button id="viewLearnersButton" class="btn btn-default roffset10"
-												type="button"onClick="javascript:showLessonLearnersDialog()"
-												title='<fmt:message key="button.view.learners.tooltip"/>'>
-											<i class="fa fa-sm fa-users"></i>
-											<span class="hidden-xs"><fmt:message key="button.view.learners"/></span>
-										</button>
-										
-										<button id="editClassButton" class="btn btn-default roffset10"
-												type="button" onClick="javascript:showClassDialog()"
-												title='<fmt:message key="button.edit.class.tooltip"/>'>
-											<i class="fa fa-sm fa-user-times"></i>
-											<span class="hidden-xs"><fmt:message key="button.edit.class"/></span>
-										</button>
-										
-										<c:if test="${lesson.enabledLessonNotifications}">
-											<button id="notificationButton" class="btn btn-default roffset10"
-													type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})">
-												<i class="fa fa-sm fa-bullhorn"></i>
-												<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
-											</button>
-										</c:if>
-									</div>
-									
-									<div class="btn-group btn-group-xs" role="group" id="lessonActions2">
-										<c:if test="${lesson.enableLessonIntro}">
-											<button id="editIntroButton" class="btn btn-default roffset10"
-													type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
-												<i class="fa fa-sm fa-info"></i>
-												<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
-											</button>
-										</c:if>							  
-
-										<button id="gradebookOnCompleteButton" class="btn btn-default
-											<c:if test="${lesson.gradebookOnComplete}">
-												btn-success
-											</c:if>
-											">
-											<i class="fa fa-sm fa-list-ol"></i><span class="hidden-xs">&nbsp;<fmt:message key="label.display.activity.scores"/></span> 
- 										</button>
-									</div>
-										
-								</dd>
+	<lams:Page type="monitor" usePanel="false">
+		<div class="row mt-3 mb-3">
+			<div class="col-lg-4" title='<fmt:message key="lesson.ratio.learners.tooltip"/>'>
+				<c:set var="title"><fmt:message key="lesson.learners"/></c:set>
+				<lams:Widget type="w1" style="warning" shadow="shadow" icon="fa-3x fa-users text-white" title="${title}" titleAlignment="text-right" 
+						bodyText="<span id='learnersStartedPossibleCell'></span>" bodyTextFontSize="x-large" bodyTextAlignment="text-right" escapeXml="false"/>
+			</div>
+					        
+			<div class="col-lg-4">
+				<c:set var="title">Activities</c:set>
+				<lams:Widget type="w1" style="danger" shadow="shadow" icon="fa-3x fa-book text-white" title="${title}" titleAlignment="text-right" 
+					bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>
+			</div>
+			<div class="col-lg-4">
+				<c:set var="title">Avg Mark</c:set>
+				<lams:Widget type="w1" shadow="shadow" icon="fa-3x fa-graduation-cap text-white" title="${title}" titleAlignment="text-right text-capitalize" bodyText="#" bodyTextFontSize="x-large" bodyTextAlignment="text-right"/>        
+			</div>
+		</div>
 		
-								<!-- IM & Presence -->
-								<dt><fmt:message key="lesson.im"/>:</dt>
-								<dd>
-									<div class="btn-group btn-group-xs" role="group" id="tour-lesson-im">
-										<button id="presenceButton" class="btn btn-default roffset10
-											<c:if test="${lesson.learnerPresenceAvailable}">
-												btn-success
-											</c:if>
-											"><i class="fa fa-sm fa-wifi"></i>
-											<span class="hidden-xs"><fmt:message key="lesson.presence"/></span> 
-											<span id="presenceCounter" class="badge">0</span>
-										</button>
-	
-										<button id="imButton" class="btn btn-default roffset10
-											<c:if test="${lesson.learnerImAvailable}">
-												btn-success
-											</c:if>
-											"
-											<c:if test="${not lesson.learnerPresenceAvailable}">
-												style="display: none"
-											</c:if>
-										><i class="fa fa-sm fa-comments-o"></i>
-										 <span class="hidden-xs"><fmt:message key="lesson.im"/></span>
-										</button>
-										
-										<button id="openImButton" class="btn btn-default"
-											<c:if test="${not lesson.learnerImAvailable}">
-												style="display: none"
-											</c:if>
-										><i class="fa fa-sm fa-comments"></i>
-										 <span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
-										</button>
-									</div>
-								</dd>
-								
-								<!-- Progress Emails -->
-								<dt><fmt:message key="lesson.progress.email"/>:</dt>
-								<dd>
-									<div class="btn-group btn-group-xs" role="group">
-										<button id="sendProgressEmail" class="btn btn-default roffset10"
-											onClick="javascript:sendProgressEmail()"/>
-											<i class="fa fa-sm fa-envelope"></i>
-											<span class="hidden-xs"><fmt:message key="progress.email.send"/></span> 
-										</button>
-										<button id="configureProgressEmail" class="btn btn-default roffset10"
-											onClick="javascript:configureProgressEmail()"/>
-											<i class="fa fa-sm fa-cog"></i>
-											<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span> 
-										</button>
-									</div>
-								</dd>
+		<div id="lesson-name" class="hidden">
+			<span class="lead">
+				<strong id="lesson-name-strong"><c:out value="${lesson.lessonName}" /></strong>
+				<span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			</span>
+		</div>
+				
+					<span class="pull-left" style="display:none" id="liveEditWarning"></span>
+					
+					<div id="sequenceTopButtonsContainer" class="topButtonsContainer mb-4">
+						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-light pull-right roffset10 tour-button"> 
+						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
 
-								<!--  encodedLessonID -->
-								<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
-                                    <dt class="text-muted"><small><fmt:message key="lesson.learner.url"/></small></dt>
-									<dd class="text-muted">
-                                    <small><c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/></small>
-									</dd>
-								</c:if>
-								
-							</dl>	
-						</div>
-						<div class="panel panel-default pull-right">
-							<div class="panel-heading"><fmt:message key="lesson.chart.title"/></div>
-							<div id="chartDiv" class="panel-body"></div>
-						</div>
+						<a id="refreshButton" class="btn btn-sm btn-light" title="<fmt:message key='button.refresh.tooltip'/>"
+						   href="#" onClick="javascript:refreshMonitor('sequence')">
+							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
+						</a>
+						<a id="liveEditButton" class="btn btn-sm btn-light style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
+					       href="#" onClick="javascript:openLiveEdit()">
+							<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
+						</a>
+						<span id="sequenceSearchPhraseClear"
+							 class="fa fa-xs fa-times-circle"
+							 onClick="javascript:sequenceClearSearchPhrase(true)"
+							 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+						></span>
+						<input id="sequenceSearchPhrase"
+							   title="<fmt:message key='search.learner.textbox' />" />
+						<span id="sequenceSearchPhraseIcon"
+							  class="ui-icon ui-icon-search"
+							  title="<fmt:message key='search.learner.textbox' />"></span>
 					</div>
 					
+					<div class="btn-group-vertical" style="position: absolute;">
+	  					<button id="zoomIn" type="button" class="btn btn-sm btn-light mb-1">+</button>
+  						<button id="zoomOut" type="button" class="btn btn-sm btn-light">-</button>
+  					</div>
+					
+					<div id="sequenceCanvas"></div>
+					<div id="completedLearnersContainer" class="mt-4 mb-4" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
+						<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
+					</div>
+					<img id="sequenceCanvasLoading"
+					     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+					<img id="sequenceSearchedLearnerHighlighter"
+					     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
+					     
 					<!-- Required tasks -->
-					<div id="requiredTasks" class="panel panel-warning" style="display: none;">
-						<div class="panel-heading">
-							<div class="panel-title"><fmt:message key="lesson.required.tasks"/></div>
+					<div id="requiredTasks" class="card mb-4" style="display: none;">
+						<div class="card-header">
+							<fmt:message key="lesson.required.tasks"/>
 						</div>
-						<div class="panel-body">
+						<div class="card-body">
 							<span id="contributeHeader"></span>
 						</div>
 					</div>
@@ -553,7 +369,7 @@
 													<fmt:message key="lesson.task.branching"/>
 												</c:when>
 											</c:choose>
-											<a href="#" class="btn btn-sm btn-default"
+											<a href="#" class="btn btn-sm btn-light"
 											   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 648, 1152, true)"
 											   title='<fmt:message key="button.task.go.tooltip"/>'>
 											   <fmt:message key="button.task.go"/>
@@ -564,46 +380,17 @@
 							</c:forEach>
 						</c:forEach>
 					</table>
-				</lams:TabBody>
-				
-				<lams:TabBody id="2" titleKey="label.advanced">
-					<span class="pull-left" style="display:none" id="liveEditWarning"></span>
-					
-					<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
-						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
-						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
 
-						<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
-						   href="#" onClick="javascript:refreshMonitor('sequence')">
-							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
-						</a>
-						<a id="liveEditButton" class="btn btn-sm btn-default style="display:none" title="<fmt:message key='button.live.edit.tooltip'/>"
-					       href="#" onClick="javascript:openLiveEdit()">
-							<i class="fa fa-pencil"></i> <span class="hidden-xs"><fmt:message key='button.live.edit'/></span>
-						</a>
-						<span id="sequenceSearchPhraseClear"
-							 class="fa fa-xs fa-times-circle"
-							 onClick="javascript:sequenceClearSearchPhrase(true)"
-							 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
-						></span>
-						<input id="sequenceSearchPhrase"
-							   title="<fmt:message key='search.learner.textbox' />" />
-						<span id="sequenceSearchPhraseIcon"
-							  class="ui-icon ui-icon-search"
-							  title="<fmt:message key='search.learner.textbox' />"></span>
-					</div>
-					<div id="sequenceCanvas"></div>
-					<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
-						<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
-					</div>
-					<img id="sequenceCanvasLoading"
-					     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
-					<img id="sequenceSearchedLearnerHighlighter"
-					     src="<lams:LAMSURL/>images/pedag_down_arrow.gif" />
-				</lams:TabBody>
-				
-				<lams:TabBody id="3" titleKey="label.conditions">
-					<table id="tabLearnerControlTable">
+		<div class="card mb-3">
+			<div class="card-header" id="learners-header">
+		        <button class="btn btn-link" data-toggle="collapse" data-target="#learners-collapse" aria-expanded="false" aria-controls="learners-collapse">
+			    	<fmt:message key="tab.learners"/>
+		       </button>
+     		</div>
+						
+			<div id="learners-collapse" class="collapse" aria-labelledby="learners-header">
+				<div class="card-body">
+					<table id="tabLearnerControlTable" class="table table-striped">
 						<tr>
 							<td class="learnersHeaderCell">
 								<fmt:message key='learners.page' /><br />
@@ -637,13 +424,7 @@
 									   onChange="javascript:loadLearnerProgressPage()" />
 							</td>
 							<td class="topButtonsContainer">
-								<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
-								<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
-							
-								<a class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
-								   href="#" onClick="javascript:refreshMonitor('learners')">
-								   <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>
-								<a class="btn btn-sm btn-default" title="<fmt:message key='button.journal.entries.tooltip'/>"
+								<a class="btn btn-sm btn-light" title="<fmt:message key='button.journal.entries.tooltip'/>"
 						   		   href="#" id="journalButton"
 						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook/viewAllJournals.do?lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
 						           <i class="fa fa-book"></i> <span class="hidden-xs"><fmt:message key="button.journal.entries"/></span></a>
@@ -656,23 +437,25 @@
 							<table id="tabLearnersTable" class="table table-condensed table-responsive"></table>
 						</div>
 					</div>
-				</lams:TabBody>
-				
-				<lams:TabBody id="4" titleKey="label.gradebook">
-					<div id="gradebookTopButtonsContainer" class="topButtonsContainer pull-right">
-						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
-						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
-
-						<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
-						   href="#" onClick="javascript:refreshMonitor('gradebook')">
-							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
-						</a>
-					</div>
+					
+				</div>
+			</div>
+		</div>
+					
+		<div class="card mb-3">
+			<div class="card-header" id="gradebook-header">
+		        <button class="btn btn-link" data-toggle="collapse" data-target="#gradebook-collapse" aria-expanded="false" aria-controls="gradebook-collapse">
+		          	<fmt:message key="tab.gradebook"/>
+		        </button>
+     		</div>
+						
+			<div id="gradebook-collapse" class="collapse" aria-labelledby="gradebook-header">
+				<div class="card-body">
 					<div id="gradebookDiv"></div>
 					<img id="gradebookLoading" src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
-				</lams:TabBody>
-		    </lams:TabBodys>
-		 </lams:TabBodyArea>
+				</div>
+			</div>
+		</div>
 	 </lams:Page>
 	 
 	<!-- Inner dialog placeholders -->
@@ -731,16 +514,16 @@
 			</tr>
 		</table>
 		<div class="btn-group pull-right">
-			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-light roffset5">
 				<span><fmt:message key="button.force.complete" /></span>
 			</button>
-			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-light roffset5">
 				<span><fmt:message key="button.view.learner" /></span>
 			</button>
-			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-light roffset5">
 				<span><fmt:message key="button.email" /></span>
 			</button>
-			<button id="learnerGroupDialogCloseButton" class="btn btn-default">
+			<button id="learnerGroupDialogCloseButton" class="btn btn-light">
 				<span><fmt:message key="button.close" /></span>
 			</button>
 		</div>
@@ -796,7 +579,7 @@
 						<tr>
 							<td colspan="6">
 								<button id="addAllLearnersButton"
-									class="btn btn-sm btn-default pull-right"
+									class="btn btn-sm btn-light pull-right"
 									onClick="javascript:addAllLearners()">
 									<fmt:message key="button.edit.class.add.all" />
 								</button>
@@ -859,15 +642,15 @@
 		<div id="forceBackwardsMsg"></div>
         <div class="btn-group pull-right voffset10">
 
-               <button id="forceBackwardsRemoveContentNoButton" class="btn btn-default roffset5">
+               <button id="forceBackwardsRemoveContentNoButton" class="btn btn-light roffset5">
                        <span><fmt:message key="force.complete.remove.content.no"/></span>
                </button>
 
-               <button id="forceBackwardsRemoveContentYesButton" class="btn btn-default roffset5">
+               <button id="forceBackwardsRemoveContentYesButton" class="btn btn-light roffset5">
                        <span><fmt:message key="force.complete.remove.content.yes" /></span>
                </button>
 
-               <button id="forceBackwardsCloseButton" class="btn btn-default">
+               <button id="forceBackwardsCloseButton" class="btn btn-light">
                        <span><fmt:message key="button.close" /></span>
                </button>
        </div>
@@ -897,14 +680,14 @@
 			<div class="row">
 				<div class="col-6">
 					<button id="addEmailProgressDateButton"
-						class="btn btn-sm btn-default pull-left"
+						class="btn btn-sm btn-light pull-left"
 						onClick="javascript:addEmailProgressDate()">
 						<fmt:message key="progress.email.add.date"/>
 					</button>
 				</div>
 				<div class="col-6">
 					<button id="addEmailProgressSeriesButton"
-						class="btn btn-sm btn-default pull-right"
+						class="btn btn-sm btn-light pull-right"
 						onClick="javascript:addEmailProgressSeries(true)">
 						<fmt:message key="progress.email.generate.date.list"/>
 					</button>
@@ -914,5 +697,241 @@
 	</div>
 	
 	<div class="tooltip" id="tooltip"></div>
+	
+	<div class="monitor-sidebar">
+		<section class="monitor-sidebar-content">
+			<header class="monitor-sidebar-header d-flex p-0">
+            	<div class="monitor-sidebar-toggler">
+                	<div class="monitor-sidebar-spinner bg-secondary text-white">
+                    	<i class="fa fa-cog"></i>
+                    </div>
+                </div>
+                <dt style="padding-left: 15px; margin-top: 1rem;"><fmt:message key="lesson.manage"/></dt>
+            </header>
+                    
+            <div class="mt-3">
+				<!-- Lesson details -->
+				<dl id="lessonDetails">
+				
+					<c:if test="${not empty lesson.lessonDescription}">
+						<dt><fmt:message key="lesson.description"/></dt>
+						<dd id="tabLessonLessonDescription">
+							<div id="description" style="overflow: hidden;">
+								<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
+							</div>
+						</dd>
+					</c:if>
+								
+					<dd>
+						<div class="form-group">
+							<span class="mr-2"><fmt:message key="lesson.state"/></span>
+							
+							<h5 class="float-right">		
+								<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel" class="lessonManageField"></span>
+							</h5>
+							
+							<div style="display:inline-block;vertical-align: middle;">
+								<small id="lessonStartDateSpan" class="lessonManageField loffset5"></small>
+								<small id="lessonFinishDateSpan" class="lessonManageField loffset5"></small>
+							</div>
+								  	 
+									<!--  Change lesson status or start/schedule start -->
+									<div class="collapse pt-3" id="changeState">
+										<div id="lessonScheduler">
+											<form class="form-horizontal">
+												<div class="form-group btn-group-xs" id="lessonStartApply">
+													<label for="scheduleDatetimeField" class="col-md-1"><fmt:message key="lesson.start"/></label>
+													<div class="col-md-8">
+													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
+													<a id="scheduleLessonButton" class="btn btn-xs btn-light lessonManageField" href="#"
+														   onClick="javascript:scheduleLesson()"
+														   title='<fmt:message key="button.schedule.tooltip"/>'>
+													   <fmt:message key="button.schedule"/>
+													</a>
+													<a id="startLessonButton" class="btn btn-xs btn-light" href="#"
+														   onClick="javascript:startLesson()"
+														   title='<fmt:message key="button.start.now.tooltip"/>'>
+													   <fmt:message key="button.start.now"/>
+													</a>
+													</div>
+												</div>
+												<div class="form-group btn-group-xs" id="lessonDisableApply">
+													<label for="disableDatetimeField"><fmt:message key="lesson.end"/></label>
+													<input class="lessonManageField input-sm" id="disableDatetimeField" type="text"/>
+													<a id="scheduleDisableLessonButton" class="btn btn-xs btn-light lessonManageField" href="#"
+														   onClick="javascript:scheduleDisableLesson()"
+														   title='<fmt:message key="button.schedule.disable.tooltip"/>'>
+													   	<fmt:message key="button.schedule"/>
+													</a>
+													<a id="disableLessonButton" class="btn btn-xs btn-light" href="#"
+														   onClick="javascript:disableLesson()"
+														   title='<fmt:message key="button.disable.now.tooltip"/>'>
+													   <fmt:message key="button.disable.now"/>
+													</a>
+												</div>
+											</form>
+										</div>
+										
+										<div id="lessonStateChanger" class="float-right">
+											<select id="lessonStateField" class="btn btn-sm btn-light" onchange="lessonStateFieldChanged()">
+												<option value="-1"><fmt:message key="lesson.select.state"/></option>
+											</select>
+											<span id="lessonStateApply" class="btn-group-xs">
+												<button type="button" class="lessonManageField btn btn-xs btn-primary"
+														onClick="javascript:changeLessonState()"
+														title='<fmt:message key="lesson.change.state.tooltip"/>'>
+											   		<i class="fa fa-check"></i> 
+											   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
+										    	</button>
+										    </span>
+								    	</div>					
+									</div>
+						</div>
+						
+						<div class="btn-group btn-group-xs form-group" role="group" id="lessonActions2">
+							<c:if test="${lesson.enableLessonIntro}">
+								<button id="editIntroButton" class="btn btn-light roffset10"
+									type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
+								<i class="fa fa-sm fa-info"></i>
+									<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
+								</button>
+							</c:if>	
+										
+							<div class="custom-control custom-switch custom-control-right">
+								<input type="checkbox" class="custom-control-input" id="gradebookOnCompleteButton"
+								<c:if test="${lesson.gradebookOnComplete}">
+									checked="checked"
+								</c:if>>
+								<label class="custom-control-label" for="gradebookOnCompleteButton">
+									<fmt:message key="label.display.activity.scores"/>
+								</label>
+							</div>
+						</div>
+									
+						<!--  encodedLessonID -->
+						<c:if test="${ALLOW_DIRECT_LESSON_LAUNCH}">
+							<div class="form-group">
+                           		<fmt:message key="lesson.learner.url"/>
+                           		<small class="bg-light ml-2 float-right"><c:out value="${serverURL}r/${lesson.encodedLessonID}" escapeXml="true"/></small>
+							</div>
+						</c:if>
+						
+						<!--  lesson actions -->
+						<div class="btn-group btn-group-xs form-group" role="group" id="lessonActions">
+							<button id="viewLearnersButton" class="btn btn-light roffset10"
+									type="button"onClick="javascript:showLessonLearnersDialog()"
+									title='<fmt:message key="button.view.learners.tooltip"/>'>
+								<i class="fa fa-sm fa-users"></i>
+								<span class="hidden-xs"><fmt:message key="button.view.learners"/></span>
+							</button>
+										
+							<button id="editClassButton" class="btn btn-light roffset10"
+									type="button" onClick="javascript:showClassDialog()"
+									title='<fmt:message key="button.edit.class.tooltip"/>'>
+								<i class="fa fa-sm fa-user-times"></i>
+								<span class="hidden-xs"><fmt:message key="button.edit.class"/></span>
+							</button>
+										
+							<c:if test="${lesson.enabledLessonNotifications}">
+								<button id="notificationButton" class="btn btn-light"
+										type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})">
+									<i class="fa fa-sm fa-bullhorn"></i>
+									<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
+								</button>
+							</c:if>
+						</div>
+					</dd>
+		
+								<!-- IM & Presence -->
+								<dt><fmt:message key="lesson.im"/></dt>
+								<dd>
+									<div class="btn-group btn-group-xs form-group" role="group" id="tour-lesson-im">
+										<button id="presenceButton" class="btn roffset10
+												<c:choose>
+												<c:when test="${lesson.learnerPresenceAvailable}">
+													btn-secondary
+												</c:when>
+												<c:otherwise>
+													btn-light 
+												</c:otherwise>
+												</c:choose>">
+											<i class="fa fa-sm fa-wifi"></i>
+											<span class="hidden-xs"><fmt:message key="lesson.presence"/></span> 
+											<span id="presenceCounter" class="badge">0</span>
+										</button>
+	
+										<button id="imButton" class="btn roffset10
+												<c:choose>
+												<c:when test="${lesson.learnerImAvailable}">
+													btn-secondary
+												</c:when>
+												<c:otherwise>
+													btn-light 
+												</c:otherwise>
+												</c:choose>"
+												
+												<c:if test="${not lesson.learnerPresenceAvailable}">
+													style="display: none"
+												</c:if>>
+											<i class="fa fa-sm fa-comments-o"></i>
+										 	<span class="hidden-xs"><fmt:message key="lesson.im"/></span>
+										</button>
+										
+										<button id="openImButton" class="btn btn-light"
+												<c:if test="${not lesson.learnerImAvailable}">
+													style="display: none"
+												</c:if>>
+											<i class="fa fa-sm fa-comments"></i>
+											<span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
+										</button>
+									</div>
+								</dd>
+								
+								<!-- Progress Emails -->
+								<dt>
+									<fmt:message key="lesson.progress.email"/>
+								</dt>
+								<dd>
+									<div class="btn-group btn-group-xs" role="group">
+										<button id="sendProgressEmail" class="btn btn-light roffset10"
+											onClick="javascript:sendProgressEmail()"/>
+											<i class="fa fa-sm fa-envelope"></i>
+											<span class="hidden-xs"><fmt:message key="progress.email.send"/></span> 
+										</button>
+										<button id="configureProgressEmail" class="btn btn-light roffset10"
+											onClick="javascript:configureProgressEmail()"/>
+											<i class="fa fa-sm fa-cog"></i>
+											<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span> 
+										</button>
+									</div>
+								</dd>
+							</dl>	
+<%--
+						<div class="card panel-default pull-right">
+							<div class="card-header"><fmt:message key="lesson.chart.title"/></div>
+							<div id="chartDiv" class="card-body"></div>
+						</div>
+--%>
+			</div>
+		</section>
+	</div>
+	
+	<!-- Activity monitor modal -->
+	<div class="modal fade dialogContainer" id="activity-monitor-dialog" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+	  <div class="modal-dialog modal-dialog-scrollable" role="document" style="height: 100vh; margin: 0;min-width: 100%;     max-height: 100%;">
+	    <div class="modal-content" style="    border: none;     height: 100%; max-height: 100%;">
+	      <div class="modal-header" style="border-bottom: none;">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<iframe></iframe>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div id="activity-monitor-cover" class="activity-monitor-cover"></div>
 </body>
 </lams:html>

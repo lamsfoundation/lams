@@ -347,7 +347,7 @@ a.sorting {
 .course-header {
 	padding-bottom: 5px; 
 	margin-bottom: 12px;
-	border-bottom: 1px solid #d2d1d1;
+	border-bottom: 1px solid #e6e6e6;
 }
 
 a.subcourse-title {
@@ -363,17 +363,14 @@ a.subcourse-title {
     max-width: initial !important;
 }
 
-@media (max-width: 810px) { 
-	.cards tbody {
-		text-align: center;
-	}
+.cards tbody {
+	text-align: center;
 }
 .cards tbody tr {
    display: inline-block;
    width: 23rem;
    height: auto;
-   margin: 0.7rem;
-   border-radius: .3rem;
+   margin: 1rem;
    box-shadow: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.25);
 }
 
@@ -410,8 +407,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 }
 .cards .lesson-image {
 	min-height: 170px;
-	border-top-left-radius: .3rem;
-    border-top-right-radius: .3em;
 }
 table:not(.cards) .lesson-image {
     background-image: none;
@@ -498,16 +493,15 @@ table:not(.cards).user-monitor tr {
 }
 .cards .learners-count {
 	display: block;
+	padding: .75rem;
+	margin-top: .25rem;
+	opacity: .8;
 }
 
 .lesson-name {
 	font-size: 1rem;
 	max-height: 170px;
     overflow: hidden;
-}
-
-.cards .learners-count {
-    padding: .75rem;
 }
 
 .cards td.row-reorder, .cards .auxiliary-links {
@@ -575,4 +569,23 @@ time.timeago {
     opacity: .7;
     font-size: 80%;
     font-weight: 400;
+}
+
+/********** RENAME LESSON FEATURE **********/
+
+/* when item is editable - show pencil icon on hover */
+#lesson-name-strong:hover +span+ i {  /* when link is hovered select i */
+	visibility: visible;
+}
+#lesson-name-strong +span+ i { /* in all other case hide it */
+	visibility: hidden;
+}
+
+[id^="dialogMonitorLesson"] .modal-title {
+	cursor: auto;
+}
+
+/********** MONITOR MODAL **********/
+[id^="dialogMonitorLesson"] .modal-header {
+	border-bottom: none;
 }

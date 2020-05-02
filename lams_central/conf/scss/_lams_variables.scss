@@ -28,7 +28,7 @@ $contrast-light: #F6EEBF;
 // Borders in various colours
 // Grey or black
 $border-thin-black: thin solid black;
-$border-thin-dotted: thin dotted #AAAAAA; // admin, central, monitoring
+$border-thin-dotted: thin dotted rgb(218, 213, 213); // admin, central, monitoring
 $border-thin-dashed: thin dashed #AAAAAA; // only used in admin
 $border-thin-solid: thin solid #AAAAAA; // adming and monitoring
 $border-thin-body-bg: thin solid $body-bg; // white line

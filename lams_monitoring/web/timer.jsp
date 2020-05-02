@@ -185,7 +185,7 @@
 	<div id="flexDiv">
 
 	<div id="mainDiv" class="panel panel-default">
-	<div class="panel-body">
+	<div class="card-body">
 	<div id="enterTimeDiv" class="setup">
 		<span><fmt:message key='label.enter.countdown.time' /></span>
 		<form class="form-inline voffset20">

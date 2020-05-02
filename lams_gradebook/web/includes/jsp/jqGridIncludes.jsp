@@ -7,9 +7,12 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
  --%>
  
 <link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
+<c:if test="${!isInTabs}">
+	<!-- skip loading the following libraries into existing html document -->
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
+</c:if>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 

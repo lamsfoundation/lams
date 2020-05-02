@@ -28,7 +28,7 @@
 			<div class="panel-heading">
 			</div>
 			
-			<div class="panel-body">
+			<div class="card-body">
 				<c:out value="${permissionGate.title}" escapeXml="false"/>
 				<c:choose>
 					<c:when test="${permissionGate.complete}">

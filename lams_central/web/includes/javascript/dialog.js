@@ -91,6 +91,9 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (initParams.resizable) {
 		modalContent.resizable();
 	}
+	if (initParams.top) {
+		modalDialog.css("top", initParams.top);
+	}
 	
 	// disable draggable for Android and iPhone as it breaks the close buttons
 	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);

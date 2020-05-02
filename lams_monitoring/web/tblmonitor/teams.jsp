@@ -195,7 +195,7 @@
 			</div>
 	
 			<div id="collapse-${groupDto.groupID}" class="panel-collapse collapse in">
-				<div class="panel-body">
+				<div class="card-body">
 	
 					<div class="table-responsive">
 						<table class="table table-striped table-hover table-condensed">
@@ -412,7 +412,7 @@
 					</small>
 				</div>
 				
-				<div class="panel-body">
+				<div class="card-body">
 					<select class="select-picker" id="change-leader-select-${groupDto.groupID}">
 						<c:forEach var="userDto" items="${groupDto.userList}">
 							<option value="${userDto.userID}">${userDto.lastName},&nbsp;${userDto.firstName}</option>

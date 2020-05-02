@@ -414,25 +414,27 @@ function showMyProfileDialog() {
 
 
 function showMonitorLessonDialog(lessonID) {
-
-	var id = "dialogMonitorLesson" + lessonID,
-		dialog = showDialog(id, {
+	var dialog = showDialog(
+		"dialogMonitorLesson", 
+		{
 			'data' : {
 				'isMonitorDialog' : true,
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
-			'title' : LABELS.MONITORING_TITLE,
+			'height': $(window).height(),
+			'width' : "99.6%",
+			"top" : "-26px",
+			'title' : "",
+			'modal': true,
 			'open' : function() {
 				// load contents after opening the dialog
-				$('iframe', this).attr('src', LAMS_URL
-					+ 'home/monitorLesson.do?lessonID='
-					+ $(this).data('lessonID'));
+				$('iframe', this).attr('src', LAMS_URL + 'home/monitorLesson.do?lessonID=' + $(this).data('lessonID'));
 			},
-
-		}, true, true);
+		}, 
+		true, 
+		true
+	);
 	
 	// if it was just created
 	if (dialog) {
@@ -440,6 +442,8 @@ function showMonitorLessonDialog(lessonID) {
 		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
 		// initial resize
 		$('iframe', dialog).on('load', resizeSequenceCanvas);
+		//remove maximize button
+		$('.dialogMaximise', dialog).remove();
 		
 		dialog.modal('show');
 	}

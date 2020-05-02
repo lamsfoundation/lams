@@ -43,9 +43,43 @@ var originalSequenceCanvas = null,
  * Sets up lesson tab.
  */
 function initLessonTab(){
+	
+    $('.monitor-sidebar-toggler').click(() => {
+        $('.monitor-sidebar').toggleClass('monitor-sidebar-opened');
+    });
+
+	//set lesson name
+	$(".modal-title", window.parent.document).html($("#lesson-name"));
+	//turn to inline mode for x-editable.js
+	$.fn.editable.defaults.mode = 'inline';
+	//enable renaming of lesson title  
+	$('#lesson-name-strong', window.parent.document).editable({
+	    type: 'text',
+	    pk: lessonId,
+	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
+	    validate: function(value) {
+		    //close editing area on validation failure
+            if (!value.trim()) {
+                $('.editable-open').editableContainer('hide', 'cancel');
+                return 'Can not be empty!';
+            }
+        },
+	    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+	    success: function(response, newValue) {
+	        if(response.status == 'error') {
+	        	return response.msg; //msg will be shown in editable form
+	        }
+	    }
+    //hide and show pencil on showing and hiding editing widget
+	}).on('shown', function(e, editable) {
+		$(this).nextAll('i.fa-pencil').hide();
+	}).on('hidden', function(e, reason) {
+		$(this).nextAll('i.fa-pencil').show();
+	});
+	
 	// sets presence availability. buttons may be temporarily disable by the tour.
 	$('#presenceButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var checked = $(this).toggleClass('btn-secondary btn-light').hasClass('btn-secondary');
 		var data = {
 			'presenceAvailable' : checked,
 			'lessonID'      : lessonId
@@ -63,7 +97,7 @@ function initLessonTab(){
 					$('#imButton').prop('disabled', false);
 					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
-					$('#imButton').removeClass('btn-success').hide();
+					$('#imButton').removeClass('btn-secondary').hide();
 					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
@@ -72,7 +106,7 @@ function initLessonTab(){
 	
 	// sets instant messaging availability
 	$('#imButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var checked = $(this).toggleClass('btn-secondary btn-light').hasClass('btn-secondary');
 		var data = {
 			'presenceImAvailable' : checked,
 			'lessonID'      : lessonId
@@ -97,33 +131,6 @@ function initLessonTab(){
 	});
 	
 	$('#openImButton').click(openChatWindow);
-
-	//turn to inline mode for x-editable.js
-	$.fn.editable.defaults.mode = 'inline';
-	//enable renaming of lesson title  
-	$('#lesson-name-strong').editable({
-	    type: 'text',
-	    pk: lessonId,
-	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + $("#csrf-form", window.parent.document).serialize(),
-	    validate: function(value) {
-		    //close editing area on validation failure
-            if (!value.trim()) {
-                $('.editable-open').editableContainer('hide', 'cancel');
-                return 'Can not be empty!';
-            }
-        },
-	    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
-	    success: function(response, newValue) {
-	        if(response.status == 'error') {
-	        	return response.msg; //msg will be shown in editable form
-	        }
-	    }
-    //hide and show pencil on showing and hiding editing widget
-	}).on('shown', function(e, editable) {
-		$(this).nextAll('i.fa-pencil').hide();
-	}).on('hidden', function(e, reason) {
-		$(this).nextAll('i.fa-pencil').show();
-	});
 	
 	// sets up calendar for schedule date choice
 	$('#scheduleDatetimeField').datetimepicker({
@@ -203,7 +210,7 @@ function initLessonTab(){
 
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').click(function(){
-		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
+		var checked = $(this).is(':checked');
 		var data = {
 			'gradebookOnComplete' : checked,
 			'lessonID'      : lessonId
@@ -386,7 +393,7 @@ function updateLessonTab(){
 					break;
 				case 3:
 					label = LABELS.LESSON_STATE_STARTED;
-					labelColour = 'success';
+					labelColour = 'light';
 					break;
 				case 4:
 					label = LABELS.LESSON_STATE_SUSPENDED;
@@ -405,7 +412,7 @@ function updateLessonTab(){
 					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').attr('class', 'label label-' + labelColour).html(label + ' <i class="fa fa-angle-double-down"></i>');
+			$('#lessonStateLabel').attr('class', 'badge badge-' + labelColour).html(label + ' <i class="fa fa-angle-double-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');
@@ -603,7 +610,7 @@ function showEmailDialog(userId){
 
 
 function updatePresenceAvailableCount(){
-	var checked = $('#presenceButton').hasClass('btn-success'),
+	var checked = $('#presenceButton').hasClass('btn-secondary'),
 		counter = $('#presenceCounter');
 	if (checked) {
 		$.ajax({
@@ -1182,9 +1189,90 @@ function updateSequenceTab() {
 				if (activity.url) {
 					var activityGroup = $('g[id="' + activity.id + '"]');
 					activityGroup.css('cursor', 'pointer');
-					dblTap(activityGroup, function(){  
-						// double click on activity shape to open Monitoring for this activity
-						openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
+					
+					// double click on activity shape to open Monitoring for this activity
+					dblTap(activityGroup, function(event){
+						
+						//source from https://gist.github.com/CodeMyUI/60e668178a95a53cfb34eb9f4958f804
+						var cover = document.getElementById('activity-monitor-cover'),
+						  windowWidth = window.innerWidth,
+						  windowHeight = window.innerHeight;
+					
+					  // get the position of the clicked card
+					  var cardPosition = event.currentTarget.getBoundingClientRect();
+					  // get the style of the clicked card
+					  var cardColor = event.currentTarget.firstChild.getAttribute("fill");
+					  
+					  //setCoverPosition
+					  // style the cover so it is in exactly the same position as the card
+					  cover.style.left = cardPosition.left + 'px';
+					  cover.style.top = cardPosition.top + 'px';
+					  cover.style.width = cardPosition.width + 'px';
+					  cover.style.height = cardPosition.height + 'px';
+					  
+					  //setCoverColor
+					  // style the cover to be the same color as the card
+					  cover.style.backgroundColor = cardColor;
+					  
+					  //scaleCoverToFillWindow
+					  // calculate the scale and position for the card to fill the page,
+					  var scaleX = windowWidth / cardPosition.width;
+					  var scaleY = windowHeight / cardPosition.height;
+					  var offsetX = (windowWidth / 2 - cardPosition.width / 2 - cardPosition.left) / scaleX;
+					  var offsetY = (windowHeight / 2 - cardPosition.height / 2 - cardPosition.top) / scaleY;
+					  // set the transform on the cover - it will animate because of the transition set on it in the CSS
+					  cover.style.transform = 'scaleX('+scaleX+') scaleY('+scaleY+') translate3d('+(offsetX)+'px, '+(offsetY)+'px, 0px)';
+					  
+					  setTimeout(function() {
+							$('#activity-monitor-dialog')
+							.on('show.bs.modal', function(event){
+								var url = LAMS_URL + activity.url;
+								// load contents after opening the dialog
+								$('iframe', this).attr({'src' : url, 'id' : 'activityMonitorModal'});
+
+								//$('#activity-monitor-cover').html();
+							})
+							.on('hide.bs.modal', function(event){
+								$('iframe', this).attr('src', null);
+								  //setCoverPosition
+								  // style the cover so it is in exactly the same position as the card
+								  cover.style.left = cardPosition.left + 'px';
+								  cover.style.top = cardPosition.top + 'px';
+								  cover.style.width = cardPosition.width + 'px';
+								  cover.style.height = cardPosition.height + 'px';
+								
+								  //scaleCoverToFillWindow
+								  // calculate the scale and position for the card to fill the page,
+								  var scaleX = windowWidth / cardPosition.width;
+								  var scaleY = windowHeight / cardPosition.height;
+								  var offsetX = (windowWidth / 2 - cardPosition.width / 2 - cardPosition.left) / scaleX;
+								  var offsetY = (windowHeight / 2 - cardPosition.height / 2 - cardPosition.top) / scaleY;
+								  // set the transform on the cover - it will animate because of the transition set on it in the CSS
+								  cover.style.transform = 'scaleX('+scaleX+') scaleY('+scaleY+') translate3d('+(offsetX)+'px, '+(offsetY)+'px, 0px)';
+								  
+								  // animate scale back to the card size and position
+								  cover.style.transform = 'scaleX('+1+') scaleY('+1+') translate3d('+(0)+'px, '+(0)+'px, 0px)';
+								  setTimeout(function() {
+								    // style the cover to 0x0 so it is hidden
+								    cover.style.width = '0px';
+								    cover.style.height = '0px';
+								  }, 801);
+							})
+							.modal();
+					  }, 800);
+						
+
+					});
+					
+					//init onHover popover showing information about activity
+					activityGroup.popover({
+						trigger: 'hover',
+					    content: "Number of learners: " + activity.learnerCount,
+					    container: '#sequenceCanvas',
+					    title: activity.title ? activity.title : "Activity",
+					    delay: { 
+					        show: "500"
+					     },
 					});
 				}
 			});	
@@ -1205,21 +1293,21 @@ function updateLiveEdit() {
 	if ( liveEditEnabled ) {
 		if ( lockedForEdit ) {
 			if ( userId == lockedForEditUserId ) {
-				$("#liveEditButton").removeClass('btn-default');
+				$("#liveEditButton").removeClass('btn-light');
 				$("#liveEditButton").addClass('btn-primary');
 				$("#liveEditButton").show();
 				$("#liveEditWarning").hide();
 				$("#liveEditWarning").text("");
 			} else {
 				$("#liveEditButton").removeClass('btn-primary');
-				$("#liveEditButton").addClass('btn-default');
+				$("#liveEditButton").addClass('btn-light');
 				$("#liveEditButton").hide();
 				$("#liveEditWarning").text(LABELS.LIVE_EDIT_WARNING.replace("%0",lockedForEditUsername));
 				$("#liveEditWarning").show();
 			}
 		} else {
 			$("#liveEditButton").removeClass('btn-primary');
-			$("#liveEditButton").addClass('btn-default');
+			$("#liveEditButton").addClass('btn-light');
 			$("#liveEditButton").show();
 			$("#liveEditWarning").hide();
 			$("#liveEditWarning").text("");
@@ -1243,8 +1331,39 @@ function loadLearningDesignSVG() {
 		},
 		success : function(response) {
 			originalSequenceCanvas = response;
-			sequenceCanvas = $('#sequenceCanvas').removeAttr('style')
-						  						 .html(originalSequenceCanvas);
+			sequenceCanvas = $('#sequenceCanvas').removeAttr('style').html(originalSequenceCanvas);
+			
+			const svg = d3.select('#sequenceCanvas');
+				//g = d3.create("g");//svg.append('g');
+			//g.append(() => svg.node()) ;
+			//d3.select('#sequenceCanvas').append(g);
+			//svg.append('g');
+				//d3.create("svg")
+		      //.attr("viewBox", [0, 0, width, height])
+		      //.on("click", reset);
+			const zoom = d3.zoom().scaleExtent([1, 3]).on("zoom", function () {
+				svg.selectAll("g,image[id$='attention'],image[id$='learnerGroup'],image.ui-draggable.ui-draggable-handle,text[id$='learnerGroupText']").attr("transform", d3.event.transform);
+			});
+
+			svg.call(zoom);
+			//disable double click zoom 
+			//TODO check as it seamingly can cause problems with touch devices https://stackoverflow.com/questions/29128426/d3-behavior-zoom-disable-double-tap
+			svg.on("dblclick.zoom", null);
+
+			function reset() {
+				svg.transition().duration(750).call(
+						zoom.transform,
+						d3.zoomIdentity,
+						d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
+				);
+			}
+		  
+			$("#zoomIn").on("click", function() {
+				zoom.scaleBy(svg.transition().duration(750), 2);
+			});
+			$("#zoomOut").on("click", function() {
+				svg.transition().call(zoom.scaleBy, 0.5);
+			});
 		},
 		error : function(error) {
 			exit = true;
@@ -1597,7 +1716,7 @@ function addActivityIconsHandlers(activity) {
 		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
-			doSelectTab(1); 
+			//doSelectTab(1); 
 		});
 	}
 }
@@ -1949,7 +2068,7 @@ function openLiveEdit(){
  */
 function resizeSequenceCanvas(width, height){
 	// can the calculation it be done nicer?
-	var canvasHeight = height - $('.navbar').height() - $('#sequenceTopButtonsContainer').height()
+	var canvasHeight = height - $('#sequenceTopButtonsContainer').height()
 	  				   - Math.min(20, $('#completedLearnersContainer').height()),
 		canvasWidth = width,
 		svg = $('svg', sequenceCanvas),
@@ -1958,9 +2077,9 @@ function resizeSequenceCanvas(width, height){
 		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2 - 40);
 		
 		sequenceCanvas.css({
-			'padding-top'  : canvasPaddingTop + 'px',
+			//'padding-top'  : canvasPaddingTop + 'px',
 			'padding-left' : canvasPaddingLeft + 'px',
-			'height'  : canvasHeight - 70 + 'px'
+			//'height'  : canvasHeight - 70 + 'px'
 		});
 }
 
@@ -2097,9 +2216,9 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 		  '<tr><td class="active progressBarLabel" id="progressBarLabel;00;"><div id="portrait-;00;" class="roffset5"/><span class="portrait-sm-lineheight" style="font-weight: bold">;11;</span>';
 
 		learnerProgressCellsTemplate +=
-			'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
+			'<a class="btn btn-xs btn-light pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
 		+ LABELS.EMAIL_BUTTON
-		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
+		+ '</a><div class="progressBarCell" id="progressBar;00;"></div></td></tr>';
 	}
 	
 	// remove existing progress bars
@@ -2220,9 +2339,12 @@ function initGradebookTab() {
  */
 function updateGradebookTab() {
 	$("#gradebookLoading").show();
-	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isInTabs=true&lessonID=' + lessonId, function() {
-		  $("#gradebookLoading").hide();
-	});
+	$("#gradebookDiv").load(
+		LAMS_URL + 'gradebook/gradebookMonitoring.do?isInTabs=true&lessonID=' + lessonId, 
+		function() {
+			$("#gradebookLoading").hide();
+		}
+	);
 }
 
 //********** COMMON FUNCTIONS **********
@@ -2231,6 +2353,7 @@ function updateGradebookTab() {
  * Updates all changeable elements of monitoring screen.
  */
 function refreshMonitor(tabName, isAuto){
+	if (isAuto)	return;
 	if (autoRefreshIntervalObject && !isAuto) {
 		clearInterval(autoRefreshIntervalObject);
 		autoRefreshIntervalObject = null;

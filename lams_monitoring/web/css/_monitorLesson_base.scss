@@ -32,7 +32,7 @@ dd {
 	box-shadow: none;
 }
 
-#content .panel-monitor-page, #content .panel-monitor-body  {
+#content .card-monitor-page, #content .card-monitor-body  {
 	margin-bottom: 0;
 	padding-bottom: 0;
 }
@@ -44,6 +44,9 @@ input[type="checkbox"] {
 .modal-header button .fa {
     font-size: 16px;
     margin-left: 10px;
+}
+.modal-header {
+	border: none !important;
 }
 
 .ui-front {
@@ -134,6 +137,40 @@ span#learnerGroupMultiSelectLabel {
 	bottom: 0px;	
 }
 
+.dialogContainer{
+  pointer-events: none;
+  position: absolute;
+  width: calc(100% + 5px);
+  height: calc(100vh + 5px);
+  top: 0;
+  left: 0;
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+#tabLearnersTable {
+	display: inline-table;
+}
+
+.progressBarCell {
+	padding: 15px 0;
+}
+
+.btn-group-xs > .btn {
+  padding: .25rem .4rem;
+  font-size: .875rem;
+  line-height: .5;
+  border-radius: .2rem;
+}
+
+#changeState {
+	min-height: 40px;
+}
+
+.card div div.col-4 {
+    opacity: .3;
+}
+
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
 /*	height: 540px;*/
@@ -189,7 +226,7 @@ td.sectionHeader {
 	margin-bottom: 5px;
 }
 
-#lessonStateLabel, #lessonScheduler input {
+#lessonScheduler input {
 	font-size:13px; // Larger than buttons but smaller than the date text next to it.
 }
 
@@ -434,12 +471,124 @@ td.progressBarLabel {
     border-top: none;
 }
 
-/********** RENAME LESSON FEATURE **********/
+/********** SVG zoom **********/
 
-/* when item is editable - show pencil icon on hover */
-#lesson-name-strong:hover +span+ i {  /* when link is hovered select i */
-	visibility: visible;
+button#zoomOut, button#zoomIn {
+	opacity: 0.7;
 }
-#lesson-name-strong +span+ i { /* in all other case hide it */
-	visibility: hidden;
+
+/********** Monitor sidebar **********/
+
+$monitor-sidebar-width: 450px !default;
+$sidebar-transition-time: 0.3s !default;
+$sidebar-shadow-designated: -1px 0 8px rgba(0, 0, 0, 0.2);
+
+.monitor-sidebar {
+  width: $monitor-sidebar-width;
+  position: fixed;
+  right: -$monitor-sidebar-width;
+  top: 90px;
+  z-index: 100;
+  transition: right $sidebar-transition-time ease-in-out;
+
+  &.monitor-sidebar-opened {
+    right: 0;
+  }
+ 
+  dt {
+    font-size: 1.3rem;
+    font-weight: 500;
+    padding: 0;
+    margin: 1.75rem 0;
+    color: #48465b;
+    margin: 1.5rem 0px 1rem;
+  }
+
+  .monitor-sidebar-toggler {
+    width: 55px;
+    margin-left: -55px;
+    cursor: pointer;
+
+    i:first-of-type {
+      margin-left: .25rem;
+    }
+  }
+
+  .monitor-sidebar-spinner {
+    z-index: 200;
+    border-radius: 50% 0 0 50%;
+    padding: .8rem .5rem .8rem 1rem;
+    font-size: 1.75rem;
+    line-height: initial;
+    box-shadow: -1px 0 8px rgba(0,0,0,0.2);
+    opacity: 0.8;
+  }
+
+  .monitor-sidebar-content {
+    box-shadow: $sidebar-shadow-designated;
+    border-radius: 0;
+    position: relative;
+    margin-bottom: 40px;
+    padding: 20px 20px;
+    background: #fff;
+    border-radius: .25rem;
+    box-shadow: 4px 4px 30px 0px rgba(75,102,171,0.2);
+  }
+ 
+ .monitor-sidebar-content>header {
+    margin: -20px -20px;
+    padding: 20px 20px;
+}
+
+}
+
+/********** Place Custom Checkbox Icon to right of label Bootstrap 4 **********/
+div.custom-control-right {
+    padding-right: 24px;
+    padding-left: 0;
+    margin-left: 0;
+    margin-right: 0;
+    display: grid;
+    padding-right: 40px;
+}
+div.custom-control-right .custom-control-label::after{
+    right: -1.5rem;
+    left: auto;
+}
+div.custom-control-right .custom-control-label::before {
+    right: -2.35rem;
+    left: auto;
+}
+
+/********** OPEN ACTIVITY MONITOR MODAL TRANSITION **********/
+/*
+.modal.fade .modal-dialog {
+	-webkit-transform: scale(0.1);
+	-moz-transform: scale(0.1);
+	-ms-transform: scale(0.1);
+	transform: scale(0.1);
+	opacity: 0;
+	-webkit-transition: all 0.7s;
+	-moz-transition: all 0.7s;
+	transition: all 0.7s;
+}
+
+.modal.fade.show .modal-dialog {
+	-webkit-transform: scale(1);
+	-moz-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+	opacity: 1;
+}
+*/
+
+/* The cover (expanding background) for activity monitor page */
+.activity-monitor-cover {
+  position: fixed;
+  background: #EB5160;
+  z-index: 100;
+  transform-origin: 50% 50%;
+}
+.activity-monitor-cover {
+  transition: transform 800ms ease-in-out;
 }

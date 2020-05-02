@@ -46,7 +46,7 @@
 			</h4>
 		</div>
 		
-		<div class="panel-body">
+		<div class="card-body">
 			<div class="table-responsive">
 				<a href="/lams/tool/<%= CommonConstants.TOOL_SIGNATURE_FORUM %>/learning/viewForum.do?toolSessionID=${toolSession.toolSessionId}&mode=teacher&hideReflection=true" target="_blank" class="btn btn-default btn-sm">
 					<i class="fa fa-comments"></i> <fmt:message key="label.view.forum" />

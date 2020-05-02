@@ -26,6 +26,7 @@
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 <script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/popper.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tourist.min.js"></script> 

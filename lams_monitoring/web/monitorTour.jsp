@@ -296,19 +296,19 @@
 	}
 	
 	function switchToLesson() {
-		actualDoSelectTab(1);
+		//actualDoSelectTab(1);
 	}
 
 	function switchToSequence() {
-		actualDoSelectTab(2);
+		//actualDoSelectTab(2);
 	}
 
 	function switchToLearners() {
-		actualDoSelectTab(3);
+		//actualDoSelectTab(3);
 	}
 
 	function switchToGradebook() {
-		actualDoSelectTab(4);
+		//actualDoSelectTab(4);
 		var check = 0;
 	}
 	
