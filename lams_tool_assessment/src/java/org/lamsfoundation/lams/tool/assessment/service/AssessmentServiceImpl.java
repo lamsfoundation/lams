@@ -3397,6 +3397,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAllowWrongAnswersAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
+	assessment.setEnableConfidenceLevels(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
 	assessment.setAttemptsAllowed(JsonUtil.optInt(toolContentJSON, "attemptsAllows", 1));
 	assessment.setDefineLater(false);
 	assessment.setDisplaySummary(JsonUtil.optBoolean(toolContentJSON, "displaySummary", Boolean.FALSE));
@@ -3497,8 +3499,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			QbOption option = new QbOption();
 			option.setQbQuestion(qbQuestion);
 			option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-			Double grade = JsonUtil.optDouble(answerData, "grade");
-			option.setMaxMark(grade == null ? 0 : grade.floatValue());
+			Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
+			if (correct == null) {
+			    Double grade = JsonUtil.optDouble(answerData, "grade");
+			    option.setMaxMark(grade == null ? 0 : grade.floatValue());
+			} else {
+			    option.setMaxMark(correct ? 1 : 0);
+			}
 			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
 			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
 			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
