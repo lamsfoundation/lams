@@ -148,15 +148,16 @@ public class TBLTemplateController extends LdTemplateController {
 			activityTitle, activityTitle));
 	    }
 
-	    // iRA Test - MCQ
+	    // iRA Test - Assessment
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
-	    Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable, false,
+
+	    Long iRAToolContentId = createAssessmentToolContent(userDTO, activityTitle,
+		    data.getText("boilerplate.ira.instructions"), null, false, false, data.confidenceLevelEnable,
 		    testQuestionsArray);
-	    ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
-		    data.contentFolderID, groupingUIID, null, null, activityTitle);
+	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
+		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
 
 	    // Leader Selection
@@ -227,7 +228,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    assessmentNumber++;
 		}
 		Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
-			data.getText("boilerplate.ae.instructions"), null, true, false, questionsJSONArray);
+			data.getText("boilerplate.ae.instructions"), null, true, false, false, questionsJSONArray);
 		activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 
@@ -635,6 +636,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    ObjectNode question = testQuestions.get(questionDisplayOrder);
 	    if (question == null) {
 		question = JsonNodeFactory.instance.objectNode();
+		question.put("type", Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
 		question.set(RestTags.ANSWERS, JsonNodeFactory.instance.arrayNode());
 		question.put(RestTags.DISPLAY_ORDER, questionDisplayOrder);
 		testQuestions.put(questionDisplayOrder, question);

@@ -784,12 +784,13 @@ public abstract class LdTemplateController {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering, ArrayNode questions)
-	    throws IOException {
+	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
+	    boolean enableConfidenceLevels, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
+	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
 	toolContentJSON.put("numbered", enableNumbering);
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
 	toolContentJSON.put("allowDiscloseAnswers", Boolean.TRUE);
@@ -799,7 +800,7 @@ public abstract class LdTemplateController {
 	for (int i = 0; i < questions.size(); i++) {
 	    ObjectNode question = (ObjectNode) questions.get(i);
 	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
-	    Integer defaultGrade = question.get("defaultGrade").asInt();
+	    Integer defaultGrade = JsonUtil.optInt(question, "defaultGrade", 1);
 	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
 		    .put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
 	}
