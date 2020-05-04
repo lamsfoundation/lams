@@ -3439,6 +3439,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 	for (JsonNode questionJSONData : questions) {
+
 	    boolean addToCollection = false;
 
 	    AssessmentQuestion question = new AssessmentQuestion();
@@ -3483,7 +3484,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
 		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
 
+		// UUID normally gets generated in the DB, but we need it immediately,
+		// so we generate it programatically.
+		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
+		// not from DB where UUID is filed
+		qbQuestion.setUuid(UUID.randomUUID());
 		assessmentDao.insert(qbQuestion);
+
+		// Store it back into JSON so Scratchie can read it
+		// and use the same questions, not create new ones
+		uuid = qbQuestion.getUuid().toString(); 
+		ObjectNode questionData = (ObjectNode) questionJSONData;
+		questionData.put(RestTags.QUESTION_UUID, uuid);
 
 		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
 			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
