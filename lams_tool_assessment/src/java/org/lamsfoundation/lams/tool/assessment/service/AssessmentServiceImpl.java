@@ -3399,6 +3399,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		JsonUtil.optBoolean(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setEnableConfidenceLevels(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
+	if (assessment.isEnableConfidenceLevels()) {
+	    assessment.setConfidenceLevelsType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
+	}
 	assessment.setAttemptsAllowed(JsonUtil.optInt(toolContentJSON, "attemptsAllows", 1));
 	assessment.setDefineLater(false);
 	assessment.setDisplaySummary(JsonUtil.optBoolean(toolContentJSON, "displaySummary", Boolean.FALSE));
@@ -3493,7 +3496,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		// Store it back into JSON so Scratchie can read it
 		// and use the same questions, not create new ones
-		uuid = qbQuestion.getUuid().toString(); 
+		uuid = qbQuestion.getUuid().toString();
 		ObjectNode questionData = (ObjectNode) questionJSONData;
 		questionData.put(RestTags.QUESTION_UUID, uuid);
 
