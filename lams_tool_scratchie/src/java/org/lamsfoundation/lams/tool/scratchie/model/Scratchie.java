@@ -40,7 +40,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 /**
  * Scratchie
@@ -92,6 +91,9 @@ public class Scratchie implements Cloneable {
     @Column(name = "burning_questions_enabled")
     private boolean burningQuestionsEnabled;
 
+    @Column(name = "question_etherpad_enabled")
+    private boolean questionEtherpadEnabled;
+
     @Column(name = "shuffle_items")
     private boolean shuffleItems;
 
@@ -100,8 +102,7 @@ public class Scratchie implements Cloneable {
 
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
-    
-    
+
     @Column(name = "activity_uuid_providing_vsa_answers")
     private Integer activityUiidProvidingVsaAnswers;
 
@@ -339,6 +340,14 @@ public class Scratchie implements Cloneable {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
     }
 
+    public boolean isQuestionEtherpadEnabled() {
+	return questionEtherpadEnabled;
+    }
+
+    public void setQuestionEtherpadEnabled(boolean questionEtherpadEnabled) {
+	this.questionEtherpadEnabled = questionEtherpadEnabled;
+    }
+
     public boolean isShuffleItems() {
 	return shuffleItems;
     }
@@ -383,11 +392,11 @@ public class Scratchie implements Cloneable {
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
     }
-    
+
     public boolean isAnswersFetchingEnabled() {
 	return activityUiidProvidingVsaAnswers != null;
     }
-    
+
     /**
      * @return which preceding activity should be queried for VSA answers
      */

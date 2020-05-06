@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/etherpad.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			
@@ -208,6 +208,9 @@
 		</c:if>
 
 		<lams:errors/>
+		
+		<c:out value="${dokumaran.description}" escapeXml="false" />
+		
 
 		<div class='panel panel-default 
 				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			

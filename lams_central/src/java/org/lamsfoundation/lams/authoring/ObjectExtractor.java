@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -351,7 +352,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if (originalUserID == null) {
 		learningDesign.setOriginalUser(user);
 	    } else {
-		User originalUser = (User) getBaseDAO().find(User.class, originalUserID);
+		User originalUser = getBaseDAO().find(User.class, originalUserID);
 		learningDesign.setOriginalUser(originalUser);
 	    }
 	} else {
@@ -1214,8 +1215,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	    buildSystemGateActivity((SystemGateActivity) activity);
 	} else if (activity instanceof ConditionGateActivity) {
 	    buildConditionGateActivity((ConditionGateActivity) activity);
-	} else {
+	} else if (activity instanceof ScheduleGateActivity) {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
+	} else {
+	    buildPasswordGateActivity((PasswordGateActivity) activity, activityDetails);
 	}
 	GateActivity gateActivity = (GateActivity) activity;
 	gateActivity.setGateActivityLevelId(JsonUtil.optInt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
@@ -1233,10 +1236,16 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setSystemTool(getSystemTool(SystemTool.SYSTEM_GATE));
     }
 
+    private void buildPasswordGateActivity(PasswordGateActivity activity, ObjectNode activityDetails) {
+	activity.setGatePassword(JsonUtil.optString(activityDetails, AuthoringJsonTags.GATE_PASSWORD));
+	activity.setSystemTool(getSystemTool(SystemTool.PASSWORD_GATE));
+    }
+
     private void buildScheduleGateActivity(ScheduleGateActivity activity, ObjectNode activityDetails) {
 	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
 	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
-	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
+	Boolean isGateActivityCompletionBased = JsonUtil.optBoolean(activityDetails,
+		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED);
 	activity.setGateActivityCompletionBased(isGateActivityCompletionBased);
 	activity.setSystemTool(getSystemTool(SystemTool.SCHEDULE_GATE));
     }

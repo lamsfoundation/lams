@@ -564,11 +564,34 @@
 		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>
+        <property name="toolService"><ref bean="lamsToolService"/></property>
 	</bean>
 	
 	<bean id="qbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager"><ref bean="transactionManager"/></property>
 		<property name="target"><ref bean="qbServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	
+	
+	<bean id="etherpadServiceTarget" class="org.lamsfoundation.lams.etherpad.service.EtherpadService">
+
+	</bean>
+	
+	<bean id="etherpadService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="etherpadServiceTarget"/></property>
 		<property name="proxyTargetClass"><value>true</value></property> 
 		<property name="preInterceptors">
 			<list>

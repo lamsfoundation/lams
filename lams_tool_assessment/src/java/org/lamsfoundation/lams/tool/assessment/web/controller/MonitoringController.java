@@ -50,6 +50,8 @@ import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
@@ -65,6 +67,8 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -176,6 +180,44 @@ public class MonitoringController {
 	sessionMap.put(AssessmentConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
+	// display student choices only if all questions are multiple choice
+	boolean displayStudentChoices = true;
+	int maxOptionsInQuestion = 0;
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE) {
+		int optionsInQuestion = question.getQbQuestion().getQbOptions().size();
+		if (optionsInQuestion > maxOptionsInQuestion) {
+		    maxOptionsInQuestion = optionsInQuestion;
+		}
+	    } else {
+		displayStudentChoices = false;
+		break;
+	    }
+	}
+
+	request.setAttribute("displayStudentChoices", displayStudentChoices);
+	if (displayStudentChoices) {
+	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
+
+	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
+	    
+	    Set<QuestionDTO> questionDtos = new TreeSet<>();
+	    for (AssessmentQuestion question : assessment.getQuestions()) {
+		QuestionDTO questionDto = new QuestionDTO(question);
+		questionDtos.add(questionDto);
+
+		// build candidate dtos
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    int optionAttemptCount = service.countAttemptsPerOption(contentId, optionDto.getUid());
+
+		    float percentage = (float) (optionAttemptCount * 100) / totalNumberOfUsers;
+		    optionDto.setPercentage(percentage);
+		}
+	    }
+	    request.setAttribute("questions", questionDtos);
+	}
+
 	return "pages/monitoring/monitoring";
     }
 
@@ -228,9 +270,17 @@ public class MonitoringController {
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_SESSION_ID);
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 
+	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
+
+	Assessment assessment = service.getAssessmentByContentId(contentId);
+	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
+		&& assessment.isQuestionEtherpadEnabled()
+		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
+
 	return "pages/monitoring/parts/usersummary";
     }
 

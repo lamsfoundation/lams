@@ -52,7 +52,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private static final long serialVersionUID = -2824051249870361117L;
 
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
-    
+
     @Column(name = "scratchie_uid")
     private Long scratchieUid;
 
@@ -63,6 +63,8 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private String burningQuestion;
     @Transient
     private List<OptionDTO> optionDtos = null;
+    @Transient
+    private int mark;
 
     @Override
     public Object clone() {
@@ -80,7 +82,7 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     public List<OptionDTO> getOptionDtos() {
 	if (optionDtos == null) {
 	    optionDtos = new LinkedList<>();
-	    
+
 	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == this.qbQuestion.getType()) {
 		for (QbOption qbOption : qbQuestion.getQbOptions()) {
 		    OptionDTO optionDTO = new OptionDTO(qbOption);
@@ -109,6 +111,14 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 
     public void setBurningQuestion(String burningQuestion) {
 	this.burningQuestion = burningQuestion;
+    }
+
+    public int getMark() {
+	return mark;
+    }
+
+    public void setMark(int mark) {
+	this.mark = mark;
     }
 
 }

@@ -390,7 +390,7 @@
 	<div class="modal-content">
 	
 		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">ï¿½</button>
 			<h4 class="modal-title">
 				<fmt:message key="label.change.leader"/>
 			</h4>

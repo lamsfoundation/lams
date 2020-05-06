@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
+import java.util.Date;
+
 public class UserForm {
 
     private Integer orgId;
@@ -50,6 +52,7 @@ public class UserForm {
     private boolean tutorialsDisabled = false;
     private boolean firstLogin = true;
     private String timeZone;
+    private Date createDate;
     private Long userTheme;
     private boolean twoFactorAuthenticationEnabled = false;
     // <!-- Name different to real field to avoid overwriting in bean copies -->
@@ -261,6 +264,14 @@ public class UserForm {
 
     public void setTimeZone(String timeZone) {
 	this.timeZone = timeZone;
+    }
+
+    public Date getCreateDate() {
+	return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
     }
 
     public Long getUserTheme() {

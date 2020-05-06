@@ -68,6 +68,7 @@
 						height: "100%",
 						autowidth:true,
 						grouping:true,	
+						autoencode:false,
 						groupingView : {
 							groupField : ['criteriaId'],
 							groupColumnShow : [false]

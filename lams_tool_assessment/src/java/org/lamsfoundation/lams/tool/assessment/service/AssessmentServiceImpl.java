@@ -1652,7 +1652,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
-	List<ExcelSheet> sheets = new LinkedList<ExcelSheet>();
+	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
 	ExcelSheet summarySheet = new ExcelSheet(getMessage("label.export.summary"));
@@ -2042,13 +2042,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 		if (assessmentUsers != null) {
 		    for (AssessmentUser assessmentUser : assessmentUsers) {
-			    ExcelRow userTitleRow = userSummarySheet.initRow();
-			    userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			    userTitleRow.addCell(getMessage("label.learner"), true);
-			    userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-			    userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-			    userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
-			    userTitleRow.addCell(getMessage("label.export.mark"), true);
+			ExcelRow userTitleRow = userSummarySheet.initRow();
+			userTitleRow.addCell(getMessage("label.export.user.id"), true);
+			userTitleRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
+			userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
+			userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
+			userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
+			if (assessment.isEnableConfidenceLevels()) {
+			    userTitleRow.addCell(getMessage("label.confidence"), true);
+			}
+			userTitleRow.addCell(getMessage("label.export.mark"), true);
 
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
@@ -2062,12 +2065,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				    userResultRow.addCell(questionResult.getQbQuestion().getName());
 				    userResultRow.addCell(
 					    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
+				    if (assessment.isEnableConfidenceLevels()) {
+					String confidenceLevel = null;
+
+					switch (assessment.getConfidenceLevelsType()) {
+					    case 2:
+						confidenceLevel = new String[] { getMessage("label.not.confident"),
+							getMessage("label.confident"),
+							getMessage("label.very.confident") }[questionResult
+								.getConfidenceLevel() / 5];
+						break;
+					    case 3:
+						confidenceLevel = new String[] { getMessage("label.not.sure"),
+							getMessage("label.sure"),
+							getMessage("label.very.sure") }[questionResult
+								.getConfidenceLevel() / 5];
+						break;
+					    default:
+						confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
+					}
+
+					userResultRow.addCell(confidenceLevel);
+				    }
 				    userResultRow.addCell(questionResult.getMark());
 				}
 			    }
 
 			    ExcelRow userTotalRow = userSummarySheet.initRow();
-			    userTotalRow.addEmptyCells(4);
+			    userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
 			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
 			    userTotalRow.addCell(assessmentResult.getGrade());
 			    userSummarySheet.addEmptyRow();
@@ -2211,7 +2236,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	return summaryTableRow;
     }
-    
+
     @Override
     public byte[] exportMarksMcq(Assessment assessment, Set<AssessmentQuestion> questions) throws IOException {
 	int maxOptionsInQuestion = 0;
@@ -2231,7 +2256,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    SessionDTO sessionDto = new SessionDTO(session.getSessionId(), session.getSessionName());
 
 	    List<UserMarkDTO> userMarkDtos = new LinkedList<>();
-	    for (AssessmentUser user: session.getAssessmentUsers()) {
+	    for (AssessmentUser user : session.getAssessmentUsers()) {
 		UserMarkDTO userMarkDto = new UserMarkDTO();
 		userMarkDto.setFullName(user.getLastName() + " " + user.getFirstName());
 		userMarkDto.setUserGroupLeader(isUserGroupLeader(user.getUserId(), session.getSessionId()));
@@ -2251,7 +2276,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		Float[] userMarks = new Float[numQuestions];
 		String[] answeredOptions = new String[numQuestions];
 		Date attemptTime = null;
-		AssessmentResult finalizedUserAttempt = getLastFinishedAssessmentResult(assessment.getUid(), user.getUserId());
+		AssessmentResult finalizedUserAttempt = getLastFinishedAssessmentResult(assessment.getUid(),
+			user.getUserId());
 		Float totalMark = 0f;
 		if (finalizedUserAttempt != null) {
 		    for (AssessmentQuestionResult questionResult : finalizedUserAttempt.getQuestionResults()) {
@@ -3757,6 +3783,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAllowWrongAnswersAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowWrongAnswersAfterQuestion", Boolean.FALSE));
+	assessment.setEnableConfidenceLevels(
+		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_CONFIDENCE_LEVELS, Boolean.FALSE));
+	if (assessment.isEnableConfidenceLevels()) {
+	    assessment.setConfidenceLevelsType(ConfidenceLevelDTO.CONFIDENCE_LEVELS_TYPE_0_TO_100);
+	}
 	assessment.setAttemptsAllowed(JsonUtil.optInt(toolContentJSON, "attemptsAllows", 1));
 	assessment.setDefineLater(false);
 	assessment.setDisplaySummary(JsonUtil.optBoolean(toolContentJSON, "displaySummary", Boolean.FALSE));
@@ -3797,6 +3828,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 	for (JsonNode questionJSONData : questions) {
+
 	    boolean addToCollection = false;
 
 	    AssessmentQuestion question = new AssessmentQuestion();
@@ -3841,7 +3873,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
 		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
 
+		// UUID normally gets generated in the DB, but we need it immediately,
+		// so we generate it programatically.
+		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
+		// not from DB where UUID is filed
+		qbQuestion.setUuid(UUID.randomUUID());
 		assessmentDao.insert(qbQuestion);
+
+		// Store it back into JSON so Scratchie can read it
+		// and use the same questions, not create new ones
+		uuid = qbQuestion.getUuid().toString();
+		ObjectNode questionData = (ObjectNode) questionJSONData;
+		questionData.put(RestTags.QUESTION_UUID, uuid);
 
 		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
 			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
@@ -3857,8 +3900,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			QbOption option = new QbOption();
 			option.setQbQuestion(qbQuestion);
 			option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-			Double grade = JsonUtil.optDouble(answerData, "grade");
-			option.setMaxMark(grade == null ? 0 : grade.floatValue());
+			Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
+			if (correct == null) {
+			    Double grade = JsonUtil.optDouble(answerData, "grade");
+			    option.setMaxMark(grade == null ? 0 : grade.floatValue());
+			} else {
+			    option.setMaxMark(correct ? 1 : 0);
+			}
 			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
 			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
 			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
@@ -3957,5 +4005,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public String getConfigValue(String key) {
 	return assessmentConfigDao.getConfigValue(key);
+    }
+
+    @Override
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
     }
 }

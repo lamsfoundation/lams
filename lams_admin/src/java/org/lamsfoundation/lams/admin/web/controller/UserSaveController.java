@@ -189,6 +189,8 @@ public class UserSaveController {
 		log.debug("editing userId: " + userId);
 		// hash the new password if necessary, and audit the fact
 		userForm.setPassword(user.getPassword());
+		// retain original create date
+		userForm.setCreateDate(user.getCreateDate());
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);

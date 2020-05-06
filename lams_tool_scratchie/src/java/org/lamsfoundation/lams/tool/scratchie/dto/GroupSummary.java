@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.Collection;
@@ -35,11 +34,13 @@ public class GroupSummary {
     private int mark;
     private int totalAttempts;
     private String totalPercentage;
-    
+    private Long leaderUid;
+
     //used for itemSummary page
     private int numberColumns;
 
     private Collection<ScratchieUser> users;
+    private Collection<Long> usersWhoReachedActivity;
     private Collection<ScratchieItemDTO> itemDtos;
     private Collection<OptionDTO> optionDtos;
 
@@ -92,7 +93,7 @@ public class GroupSummary {
     public void setTotalAttempts(int totalAttempts) {
 	this.totalAttempts = totalAttempts;
     }
-    
+
     public String getTotalPercentage() {
 	return totalPercentage;
     }
@@ -100,13 +101,21 @@ public class GroupSummary {
     public void setTotalPercentage(String totalPercentage) {
 	this.totalPercentage = totalPercentage;
     }
-    
+
     public int getNumberColumns() {
 	return numberColumns;
     }
 
     public void setNumberColumns(int numberColumns) {
 	this.numberColumns = numberColumns;
+    }
+
+    public Long getLeaderUid() {
+	return leaderUid;
+    }
+
+    public void setLeaderUid(Long leaderUid) {
+	this.leaderUid = leaderUid;
     }
 
     public Collection<ScratchieUser> getUsers() {
@@ -132,4 +141,13 @@ public class GroupSummary {
     public void setOptionDtos(Collection<OptionDTO> optionDtos) {
 	this.optionDtos = optionDtos;
     }
+
+    public Collection<Long> getUsersWhoReachedActivity() {
+	return usersWhoReachedActivity;
+    }
+
+    public void setUsersWhoReachedActivity(Collection<Long> usersWhoReachedActivity) {
+	this.usersWhoReachedActivity = usersWhoReachedActivity;
+    }
+
 }

@@ -330,6 +330,12 @@
 
 <c:if test="${not empty sessionDtos}">
 	
+	<c:if test="${displayStudentChoices}">
+		<h5><fmt:message key="label.student.choices" /></h5>
+		
+		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
+	</c:if>
+	
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.summary.export.summary" />

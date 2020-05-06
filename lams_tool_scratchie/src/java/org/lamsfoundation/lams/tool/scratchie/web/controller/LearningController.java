@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,6 +69,8 @@ import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -211,7 +215,8 @@ public class LearningController {
 	    }
 	}
 
-	storeItemsToSessionMap(toolSessionID, scratchie, sessionMap, mode.isTeacher());
+	Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionID, scratchie, sessionMap,
+		mode.isTeacher());
 
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	// calculate max score
@@ -284,10 +289,32 @@ public class LearningController {
 		}
 	    }
 
+	    if (mode.isTeacher()) {
+		scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionID);
+		// get updated score from ScratchieSession
+		int score = toolSession.getMark();
+		request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
+		int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+		request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
+	    }
+
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
 	    // make non-leaders wait for notebook to be submitted, if required
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
 		    isWaitingForLeaderToSubmitNotebook);
+
+	    boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled()
+		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	    request.setAttribute(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+	    if (questionEtherpadEnabled && scratchieService.isGroupedActivity(scratchie.getContentId())) {
+		// get all users from the group, even if they did not reach the Scratchie yet
+		// order them by first and last name
+		Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()
+			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
+			.collect(Collectors.toList());
+		request.setAttribute(ScratchieConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
+	    }
+
 	    return "pages/learning/learning";
 	}
     }
@@ -295,8 +322,8 @@ public class LearningController {
     /**
      * Stores into session map all data needed to display scratchies and options
      */
-    private void storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie, SessionMap<String, Object> sessionMap,
-	    boolean showOrder) {
+    private Collection<ScratchieItem> storeItemsToSessionMap(Long toolSessionId, Scratchie scratchie,
+	    SessionMap<String, Object> sessionMap, boolean showOrder) {
 	// set scratched flag for display purpose
 	Collection<ScratchieItem> items = scratchieService.getItemsWithIndicatedScratches(toolSessionId);
 
@@ -352,6 +379,7 @@ public class LearningController {
 	}
 
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
+	return items;
     }
 
     /**
@@ -549,9 +577,10 @@ public class LearningController {
 
 	// get updated score from ScratchieSession
 	int score = toolSession.getMark();
+	request.setAttribute(ScratchieConstants.ATTR_SCORE, score);
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
-	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
-	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
+	int percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
+	request.setAttribute(ScratchieConstants.ATTR_SCORE_PERCENTAGE, percentage);
 
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
@@ -585,7 +614,8 @@ public class LearningController {
 	}
 
 	if (scratchie.isShowScrachiesInResults()) {
-	    storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionId, scratchie, sessionMap, true);
+	    scratchieService.populateScratchieItemsWithMarks(scratchie, items, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SHOW_RESULTS, true);
 	}
 

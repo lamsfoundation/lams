@@ -24,22 +24,19 @@
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 
+import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
-import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-
-import net.gjerull.etherpad.client.EPLiteClient;
 
 /**
  * @author Dapeng.Ni
@@ -133,28 +130,14 @@ public interface IDokumaranService extends ICommonToolService {
     boolean checkTimeLimitExceeded(Dokumaran dokumaran);
 
     Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
-	    throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException;
+	    throws DokumaranApplicationException, EtherpadException;
 
-    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId)
-	    throws DokumaranConfigurationException, URISyntaxException;
-
-    /**
-     * Creates EPLiteClient that will make calls to Etherpad server. Throws DokumaranConfigurationException tf the tool
-     * is not configured appropriately (either etherpadServerUrl or etherpadApiKey is missing).
-     *
-     * @return
-     * @throws DokumaranConfigurationException
-     */
-    EPLiteClient initializeEPLiteClient() throws DokumaranConfigurationException;
+    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws EtherpadException;
 
     /**
      * Creates pad on Etherpad server side.
-     *
-     * @param dokumaran
-     * @param session
-     * @throws DokumaranConfigurationException
      */
-    void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException;
+    void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranApplicationException;
 
     // ********** for user methods *************
     /**
@@ -188,10 +171,6 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     List<DokumaranUser> getUsersBySession(Long toolSessionId);
-
-    DokumaranConfigItem getConfigItem(String key);
-
-    void saveOrUpdateDokumaranConfigItem(DokumaranConfigItem item);
 
     /**
      * Save or update dokumaran into database.

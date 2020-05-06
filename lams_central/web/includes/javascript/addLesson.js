@@ -25,6 +25,9 @@ function initLessonTab(){
 	
 	ldTreeview.init('#learningDesignTree', 
 	   function(event, node) {
+			// deselect LD if highlighted in "recently used sequences" section 
+			$('div#accessDiv .access-selected').removeClass('access-selected');
+		
 			// hide existing LD image
 			$('.ldChoiceDependentCanvasElement').css('display', 'none');
 			
@@ -61,6 +64,8 @@ function initLessonTab(){
 	    	 addLesson();
 	    }
 	});
+	
+	loadRecentlyAccessedLearningDesigns();
 }
 
 //checks whether element is visible in the current viewport
@@ -293,7 +298,11 @@ function addLesson(learningDesignId, lessonName){
 	
 	if (!learningDesignId) {
 		var ldNode = tree.treeview('getSelected')[0];
-		learningDesignId = ldNode.learningDesignId;
+		if (ldNode == null) {
+			learningDesignId = +$('div#accessDiv .access-selected').data('learningDesignId');
+		} else {
+			learningDesignId = ldNode.learningDesignId;
+		}
 	}
 	
 	if (!learningDesignId) {
@@ -545,6 +554,61 @@ function toggleCanvasResize(mode) {
 		toggleCanvasResizeLink.css('display', 'inline');
 		resizeSequenceThumbnail(true);
 		break;
+	}
+}
+
+function loadRecentlyAccessedLearningDesigns(){
+	var access = null;
+	$.ajax({
+		cache : false,
+		async : false,
+		url : LAMS_URL + "authoring/getLearningDesignAccess.do",
+		dataType : 'json',
+		data : {
+		},
+		success : function(response) {
+			access = response;
+		}
+	});
+	
+	
+	if (access) {
+		var accessCell = $('#accessDiv');
+		accessCell.children('div.access').remove();
+		$.each(access, function(){
+			$('<div />').addClass('access')
+						.data({
+							'title'			   : this.title,
+							'learningDesignId' : this.learningDesignId,
+							'folderID'         : this.workspaceFolderId
+						})
+						.text(this.title)
+						.appendTo(accessCell)
+						.click(function(){
+							// deselect LD in main tree
+							var selectedNode = tree.treeview('getSelected')[0];
+							if (selectedNode != null) {
+								tree.treeview('unselectNode', selectedNode);
+							}
+							// deselect node in access list
+							$('.access-selected', accessCell).removeClass('access-selected');
+							
+							// select clicked node
+							var accessEntry = $(this).addClass('access-selected'),
+								learningDesignID = +accessEntry.data('learningDesignId');
+							
+							// hide existing LD image
+							$('.ldChoiceDependentCanvasElement').css('display', 'none');
+							
+							$('#lessonNameInput').val(accessEntry.data('title'));
+							//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
+							if (isElementInViewport($('#lessonNameInput'))) {
+								$('#lessonNameInput').focus();
+							}
+							// display "loading" animation and finally LD thumbnail
+							loadLearningDesignSVG(learningDesignID);
+						});
+		});
 	}
 }
 

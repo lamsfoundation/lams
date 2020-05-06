@@ -90,6 +90,7 @@ import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.McqImportContentVersionFilter;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
+import org.lamsfoundation.lams.learningdesign.PasswordGateActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
@@ -1946,6 +1947,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		((PermissionGateActivity) act).setGateOpen(false);
 		((PermissionGateActivity) act)
 			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+		break;
+	    case Activity.PASSWORD_GATE_ACTIVITY_TYPE:
+		((PasswordGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		((PasswordGateActivity) act).setGateOpen(false);
+
+		((PasswordGateActivity) act).setGatePassword(actDto.getGatePassword());
+		((PasswordGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PASSWORD_GATE));
 		break;
 	    case Activity.CONDITION_GATE_ACTIVITY_TYPE:
 		((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());

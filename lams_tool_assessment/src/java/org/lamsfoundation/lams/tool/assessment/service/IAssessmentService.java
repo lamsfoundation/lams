@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +48,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 /**
@@ -428,7 +430,7 @@ public interface IAssessmentService extends ICommonToolService {
 
     /**
      * Allocate learner's answer into one of the available answer groups.
-     * 
+     *
      * @param questionUid
      * @param targetOptionUid
      * @param previousOptionUid
@@ -436,7 +438,8 @@ public interface IAssessmentService extends ICommonToolService {
      * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
      *         another teacher working in parallel)
      */
-    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, Long questionResultUid);
+    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
+	    Long questionResultUid);
 
     /**
      * For export purposes
@@ -545,4 +548,6 @@ public interface IAssessmentService extends ICommonToolService {
     void setConfigValue(String key, String value);
 
     String getConfigValue(String key);
+
+    Collection<User> getAllGroupUsers(Long toolSessionId);
 }

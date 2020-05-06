@@ -266,6 +266,15 @@ public class LAMSBaseDAO implements IBaseDAO {
 	return doFind(queryString, value);
     }
 
+    @Override
+    public <T> List<T> findByPropertyValues(Class<T> clazz, String name, Collection<?> values) {
+	if (values == null || values.isEmpty()) {
+	    return new ArrayList<>();
+	}
+	String queryString = "FROM " + clazz.getCanonicalName() + " WHERE " + name + " IN (:param)";
+	return getSession().createQuery(queryString, clazz).setParameterList("param", values).getResultList();
+    }
+
     /*
      * (non-Javadoc)
      *

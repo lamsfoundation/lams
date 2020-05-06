@@ -214,15 +214,23 @@ var PropertyDefs = {
 				activity.description = $('.propertiesContentFieldDescription', content).val();
 				
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
+				
 				if (activity.gateType == 'schedule') {
 					// show inputs for setting delay before the gate is closed
-					$(".propertiesContentRowGateSchedule").show();
+					$(".propertiesContentRowGateSchedule", content).show();
 					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
 					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
 					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
-					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased').is(':checked');
+					activity.gateActivityCompletionBased = $('.propertiesContentFieldActivityCompletionBased', content).is(':checked');
 				} else {
-					$(".propertiesContentRowGateSchedule").hide();
+					$(".propertiesContentRowGateSchedule", content).hide();
+				}
+				
+				if (activity.gateType == 'password') {
+					$(".propertiesContentRowGatePassword", content).show();
+					activity.password = $('.propertiesContentFieldPassword', content).val();
+				} else {
+					$(".propertiesContentRowGatePassword", content).hide();
 				}
 				
 				// Gate can be input-based
@@ -270,6 +278,9 @@ var PropertyDefs = {
 			
 			$('.propertiesContentFieldActivityCompletionBased', content)
 				.attr('checked', activity.gateActivityCompletionBased? 'checked' : null);
+			
+			$('.propertiesContentFieldPassword', content)
+			  .val(activity.password);
 			
 			$('input, textarea, select', content).change(changeFunction);
 			PropertyLib.fillToolInputDropdown(activity, activity.input);

@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.quartz.SchedulerException;
 
@@ -83,6 +85,11 @@ public interface IScratchieService extends ICommonToolService {
 //     */
 //    void populateItemsWithVsaAnswers(Long userId, Long toolSessionId, Integer activityUiidProvidingVsaAnswers,
 //	    Collection<ScratchieItem> items);
+
+    /**
+     * Calculates and sets a mark in each item.
+     */
+    void populateScratchieItemsWithMarks(Scratchie scratchie, Collection<ScratchieItem> items, long sessionId);
 
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
@@ -302,13 +309,9 @@ public interface IScratchieService extends ICommonToolService {
 
     ScratchieItem getScratchieItemByUid(Long itemUid);
 
-    /**
-     * @param contentId
-     * @param isIncludeOnlyLeaders
-     *            if true - return Summaries only for leader, all users in a group otherwise
-     * @return
-     */
-    List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
+    Collection<User> getAllGroupUsers(Long toolSessionId);
+
+    List<GroupSummary> getMonitoringSummary(Long contentId);
 
     List<GroupSummary> getGroupSummariesByItem(Long contentId, Long itemUid);
 
@@ -444,4 +447,6 @@ public interface IScratchieService extends ICommonToolService {
 
     /** Get the statistics such as average, max, min for the marks. Used in monitoring */
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+
+    Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
 }

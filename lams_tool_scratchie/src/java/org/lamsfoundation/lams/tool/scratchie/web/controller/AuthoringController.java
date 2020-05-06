@@ -374,7 +374,7 @@ public class AuthoringController {
 	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 
 	form.setSessionMapID(sessionMap.getSessionID());
-	QbUtils.fillFormWithUserCollections(qbService, form, qbQuestion.getUid());
+	QbUtils.fillFormWithUserCollections(qbService, ScratchieConstants.TOOL_SIGNATURE, form, qbQuestion.getUid());
 
 	form.setContentFolderID(qbQuestion.getContentFolderId());
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
@@ -464,6 +464,7 @@ public class AuthoringController {
 	// check whether it is "edit(old Question)" or "add(new Question)"
 	QbQuestion qbQuestion;
 	ScratchieItem item;
+	boolean isDefaultQuestion = false;
 	final boolean isAddingQuestion = itemIdx == -1;
 	if (isAddingQuestion) { // add
 	    qbQuestion = new QbQuestion();
@@ -484,8 +485,18 @@ public class AuthoringController {
 	} else {
 	    List<ScratchieItem> rList = new ArrayList<>(itemList);
 	    item = rList.get(itemIdx);
-	    qbQuestion = qbService.getQuestionByUid(item.getQbQuestion().getUid());
+	    long qbQuestionUid = item.getQbQuestion().getUid();
+	    qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	    qbService.releaseFromCache(qbQuestion);
+
+	    // if it is a default question, do not modify it
+	    // treat it as a new question
+	    isDefaultQuestion = qbService.isQuestionDefaultInTool(qbQuestionUid, ScratchieConstants.TOOL_SIGNATURE);
+	    if (isDefaultQuestion) {
+		String questionContentFolderID = FileUtil.generateUniqueContentFolderID();
+		qbQuestion.setContentFolderId(questionContentFolderID);
+		qbQuestion.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
+	    }
 	}
 
 	QbQuestion oldQbQuestion = qbQuestion.clone();
@@ -511,7 +522,8 @@ public class AuthoringController {
 	List<QbOption> options = new ArrayList<>(optionList);
 	qbQuestion.setQbOptions(options);
 
-	int isQbQuestionModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
+	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
+		: qbQuestion.isQbQuestionModified(oldQbQuestion);
 	QbQuestion updatedQuestion = null;
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
@@ -544,11 +556,12 @@ public class AuthoringController {
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion || !newCollectionUid.equals(oldCollectionUid)) {
+	if (isAddingQuestion || isDefaultQuestion
+		|| (newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
 	}
 	//remove from the old collection, if needed
-	if (!isAddingQuestion && !newCollectionUid.equals(oldCollectionUid)) {
+	if (!isAddingQuestion && newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
 		    false);
 	}

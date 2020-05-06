@@ -72,7 +72,7 @@ public class ContributeDTOFactory {
     private static ContributeActivityDTO addContributionURLS(Long lessonID, Activity activity,
 	    IContributionTypeStrategy strategy, ILamsCoreToolService toolService) {
 	ContributeActivityDTO dto = null;
-	LinkedList<Integer> contributionType = new LinkedList<Integer>();
+	LinkedList<Integer> contributionType = new LinkedList<>();
 	Collections.addAll(contributionType, strategy.getContributionType());
 
 	// check for activities being edited by Monitor
@@ -90,14 +90,15 @@ public class ContributeDTOFactory {
 		ContributeEntry entry = dto.addContribution(contributionTypeEntry, url);
 
 		// once a gate was opened, it does not require attention
-		if (ContributionTypes.PERMISSION_GATE.equals(contributionTypeEntry)
+		if ((ContributionTypes.PERMISSION_GATE.equals(contributionTypeEntry)
+			|| ContributionTypes.PASSWORD_GATE.equals(contributionTypeEntry))
 			&& Boolean.TRUE.equals(((GateActivity) activity).getGateOpen())) {
 		    entry.setIsComplete(true);
 
 		} else if (ContributionTypes.CHOSEN_GROUPING.equals(contributionTypeEntry)) {
 		    Lesson lesson = null;
 		    // find the lesson for this activity
-		    for (Lesson candidateLesson : (Set<Lesson>) activity.getLearningDesign().getLessons()) {
+		    for (Lesson candidateLesson : activity.getLearningDesign().getLessons()) {
 			if (candidateLesson.getLessonId().equals(lessonID)) {
 			    lesson = candidateLesson;
 			    break;
@@ -105,7 +106,7 @@ public class ContributeDTOFactory {
 		    }
 		    if (lesson != null) {
 			// all availables users
-			Set<User> learners = new HashSet<User>(lesson.getLessonClass().getLearners());
+			Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
 			if (!learners.isEmpty()) {
 			    // check if all users were assigned to groups and can not move anymore
 			    GroupingActivity groupingActivity = (GroupingActivity) activity;

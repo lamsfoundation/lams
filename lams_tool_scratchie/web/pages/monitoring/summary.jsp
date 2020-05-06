@@ -55,20 +55,33 @@
 					"<fmt:message key="label.monitoring.summary.user.name" />",
 					"<fmt:message key="label.monitoring.summary.attempts" />",
 					"<fmt:message key="label.monitoring.summary.mark" />",
-					'portraitId'
+					'portraitId',
+					'isLeader',
+					'reachedActivity'
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:570, formatter:userNameFormatter},
-			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
-			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}},
+			   		{name:'userName', index:'userName', width:570, formatter:userNameFormatter,	cellattr: leaderRowFormatter},
+			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sortable: false, cellattr: leaderRowFormatter},
+			   		{name:'mark', index:'mark', width:100, align:"right", sortable: false, editoptions: {size:4, maxlength: 4}, cellattr: leaderRowFormatter,
+				   	       editable: function (options) {
+				               var row = $(this).jqGrid("getLocalRow", options.rowid);
+				               return row.isLeader == 'true';
+				           }
+			   		},
 			   		{name:'portraitId', index:'portraitId', width:0, hidden: true},
+			   		{name:'isLeader', index:'isLeader', width:0, hidden: true},
+			   		{name:'reachedActivity', index:'reachedActivity', width:0, hidden: true},
 			   	],
 			   	ondblClickRow: function(rowid) {
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+			   		var jqGrid = $("#list${summary.sessionId}");
+			   		if (jqGrid.getCell(rowid, 'isLeader') != 'true') {
+			   			return;
+			   		}
+			   		var userId = jqGrid.getCell(rowid, 'userId');
+			   		var toolSessionId = jqGrid.getCell(rowid, 'sessionId');
 
 			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
 					launchPopup(userSummaryUrl, "MonitoringReview");		
@@ -101,14 +114,16 @@
    	     		jQuery("#list${summary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:"${i.index + 1}",
    	   	     		userId:"${user.userId}",
-   	   	     		sessionId:"${user.session.sessionId}",
+   	   	     		sessionId:"${empty user.session ? '' : user.session.sessionId}",
    	   	     		userName:"${user.lastName}, ${user.firstName}",
-   	   				totalAttempts:"${summary.totalAttempts}",
-   	   				mark:"<c:choose><c:when test='${summary.totalAttempts == 0}'>-</c:when><c:otherwise>${summary.mark}</c:otherwise></c:choose>",
-   	   				portraitId:"${user.portraitId}"
+   	   				totalAttempts:"${summary.leaderUid eq user.uid ? summary.totalAttempts : ''}",
+   	   				mark:"${summary.leaderUid eq user.uid ? (summary.totalAttempts == 0 ? '-' : summary.mark) : ''}",
+   	   				portraitId:"${user.portraitId}",
+   	   				isLeader : "${summary.leaderUid eq user.uid}",
+   	   				reachedActivity : "${summary.getUsersWhoReachedActivity().contains(user.userId)}"
    	   	   	    });
 	        </c:forEach>
-			
+
 		</c:forEach>
 
 		initializePortraitPopover('<lams:LAMSURL/>');
@@ -197,8 +212,33 @@
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
         function userNameFormatter (cellvalue, options, rowObject) {
-    			return definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		var name = definePortraitPopover(rowObject.portraitId, rowObject.userId,  rowObject.userName);
+    		var icon = '';
+    		
+    		if (rowObject.isLeader == 'true') {
+    			icon = '&nbsp;<i title="leader" class="text-primary fa fa-star"></i>';
+    		} else if (rowObject.reachedActivity == 'true') {
+    			icon = '&nbsp;<i class="text-primary fa fa-check"></i>';
     		}
+    		
+    		if (icon != '') {
+    			if (rowObject.portraitId == '') {
+    				name += icon;
+    			} else {
+    				name = name.replace('</a>', icon + '</a>');
+    			}
+    		}
+        
+    		return name;
+    	}
+        
+        function leaderRowFormatter (rowID, val, rawObject, cm, rdata) {
+			if (rdata.isLeader == 'true') {
+				return 'class="info"';
+			} else if (rdata.reachedActivity == 'true') {
+				return 'title="<fmt:message key="label.summary.reached.activity"/>"';
+			}
+		}
     	
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
@@ -285,6 +325,10 @@
 		<div class="voffset5 help-block" id="messageArea"></div>
 	
 	</div>
+	
+	<c:set var="showStudentChoicesTableOnly" value="true" />
+	<h4><fmt:message key="monitoring.tab.summary" /></h4>
+	<%@ include file="studentChoices.jsp"%>
 
 	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
@@ -297,28 +341,15 @@
 		</select>
 		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 	</div>
-	<div class="form-group">
-		<!-- Dropdown menu for choosing user -->
-		<label for="userid-dropdown"><h4><fmt:message key="label.monitoring.summary.report.by.user" /></h4></label>
-		<select id="userid-dropdown" class="form-control">
-			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-   			<c:forEach var="learner" items="${sessionMap.learners}">
-				<option value="${learner.userId}" alt="${learner.session.sessionId}"><c:out value="${learner.firstName} ${learner.lastName} (${learner.session.sessionName})" escapeXml="true"/></option>
-		   	</c:forEach>
-		</select>
-	</div>
 
-	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<H4>${summaryTitle}</H4>
-	</c:if>
-	
+	<h4 style="padding-top: 10px"><fmt:message key="label.report.by.team.tra" /></h4>
 	<fmt:message key="label.monitoring.summary.select.student" />
 
+	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
 	<c:forEach var="summary" items="${summaryList}" varStatus="status">
 
 		<c:if test="${sessionMap.isGroupedActivity}">
-			<c:set var="summaryTitle"><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}</c:set>
+			<c:set var="summaryTitle"><strong><fmt:message key="monitoring.label.group" /></strong> ${summary.sessionName}</c:set>
 		</c:if>
 		
 	    <div class="panel panel-default" >
@@ -341,7 +372,7 @@
 
 	<!-- Display burningQuestionItemDtos -->
 	<c:if test="${scratchie.burningQuestionsEnabled}">
-		<div class="panel-group" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
+		<div class="panel-group" style="padding-top: 10px" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
 		    <div class="panel panel-default" >
 		        <div class="panel-heading collapsable-icon-left" id="headingBurning">
 		        	<span class="panel-title">

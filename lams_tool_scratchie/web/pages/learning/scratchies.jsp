@@ -1,5 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:if test="${isQuestionEtherpadEnabled and not empty allGroupUsers}">
+	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
+	<c:set var="questionEtherpadContent">
+		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />:<br />
+	<br />
+	<br /></c:forEach>
+	</c:set>
+</c:if>
+
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
 	
 	<div class="lead" id="questionTitle${questionNumber.count}">
@@ -12,13 +21,19 @@
 	<div class="panel-body-sm">
 		<c:out value="${item.qbQuestion.description}" escapeXml="false" />
 	</div>
+	
+	<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
+		<div class="panel-footer item-score">
+			<fmt:message key="label.score" />&nbsp;${item.mark}
+		</div>
+	</c:if>
 
 	<c:choose>
 	<c:when test="${item.qbQuestion.type == 1}">
 		<table class="table table-hover scratches">
 			<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 				<tr id="tr${optionDto.qbOptionUid}">
-					<td style="width: 40px;">
+					<td style="width: 40px;vertical-align: top;">
 						<c:choose>
 							<c:when test="${optionDto.scratched && optionDto.correct}">
 								<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image"
@@ -104,7 +119,7 @@
 						</c:if>
 					</td>
 	
-					<td class="answer-with-confidence-level-portrait">
+					<td class="answer-with-confidence-level-portrait" style="vertical-align: top;">
 						<div class="answer-description">
 							<c:out value="${optionDto.answer}" escapeXml="true" />
 						</div>
@@ -122,7 +137,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-
+		
 		<c:if test="${!sessionMap.userFinished && !item.unraveled && isUserLeader && (mode != 'teacher') && !showResults}">
 			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;"
 				class="<c:if test='${item.qbQuestion.answerRequired}'>item-required</c:if>">
@@ -143,6 +158,26 @@
 		</c:if>
 	</c:otherwise>
 	</c:choose>
+	
+		
+	<%--Display Etherpad for each question --%>
+	<c:if test="${isQuestionEtherpadEnabled}">
+		<div class="form-group question-etherpad-container">
+			<a data-toggle="collapse" data-target="#question-etherpad-${item.uid}" href="#qe${item.uid}" class="collapsed">
+				<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+  				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+				<fmt:message key="label.etherpad.discussion" />
+			</a>
+			
+			<div id="question-etherpad-${item.uid}" class="collapse">
+				<div class="panel panel-default question-etherpad">
+					<lams:Etherpad groupId="etherpad-scratchie-${toolSessionID}-question-${item.uid}" 
+					   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
+					>${questionEtherpadContent}</lams:Etherpad>
+				</div>
+			</div>
+		</div>
+	</c:if>
 	
 	<%-- show burning questions --%>
 	<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">

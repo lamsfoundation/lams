@@ -4,8 +4,12 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
+
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
+	
 <style media="screen,projection" type="text/css">
 	#countdown {
 		width: 150px; 
@@ -45,14 +49,22 @@
 	#time-limit-buttons {
 		padding-bottom: 20px;
 	}
+	
+	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
+	  outline: #337ab7 2px solid;
+	}
 </style>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>  
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/etherpad.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
@@ -177,7 +189,125 @@
 	        
 	        return false;
 		});
+		
+		
+		// marks table for each group
+		var tablesorters = $(".tablesorter");
+		// intialise tablesorter tables
+		tablesorters.tablesorter({
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
+		    sortInitialOrder: 'asc',
+		    sortList: [[0]],
+		    widgets: [ "uitheme", "resizable", "editable" ],
+		    headers: { 0: { sorter: true}, 1: { sorter: true}, 2: { sorter: false}  }, 
+		    sortList : [[0,1]],
+		    showProcessing: false,
+		    widgetOptions: {
+		    	resizable: true,
+		    	
+		    	// only marks is editable
+		        editable_columns       : [2],
+		        editable_enterToAccept : true,          // press enter to accept content, or click outside if false
+		        editable_autoAccept    : false,          // accepts any changes made to the table cell automatically
+		        editable_autoResort    : false,         // auto resort after the content has changed.
+		        editable_validate      : function (text, original, columnIndex) {
+		        	// removing all text produces "&nbsp;", so get rid of it
+		        	text = text ? text.replace(/&nbsp;/g, '').trim() : null;
+		        	// acceptable values are empty text or a number
+		        	return !text || !isNaN(text) ? text : original;
+		        },
+		        editable_selectAll     : function(txt, columnIndex, $element) {
+		          // note $element is the div inside of the table cell, so use $element.closest('td') to get the cell
+		          // only select everthing within the element when the content starts with the letter "B"
+		          return true;
+		        },
+		        editable_wrapContent   : '<div>',       // wrap all editable cell content... makes this widget work in IE, and with autocomplete
+		        editable_trimContent   : true,          // trim content ( removes outer tabs & carriage returns )
+		        editable_editComplete  : 'editComplete' // event fired after the table content has been edited
+		    }
+		});
+		
+		// update mark on edit
+		tablesorters.each(function(){
+		    // config event variable new in v2.17.6
+		    $(this).children('tbody').on('editComplete', 'td', function(event, config) {
+		      var $this = $(this),
+		        mark = $this.text() ? +$this.text() : null,
+		        toolSessionId = +$this.closest('.tablesorter').attr('toolSessionId'),
+		        userId = +$this.closest('tr').attr('userId'); 
 
+		        $.ajax({
+		        	async: true,
+		            url: '<c:url value="/monitoring/updateLearnerMark.do"/>',
+		            data : {
+		            	'toolSessionId' : toolSessionId,
+		            	'userId'		: userId,
+		            	'mark'			: mark,
+		            	'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+		            },
+		            type: 'post',
+		            error: function (request, status, error) {
+		                alert('<fmt:message key="messsage.monitoring.learner.marks.update.fail" />');
+		            }
+		       	});
+		        
+		    });
+		});
+
+		// pager processing
+		tablesorters.each(function() {
+			var toolSessionId = $(this).attr('toolSessionId');
+			
+			$(this).tablesorterPager({
+				processAjaxOnInit: true,
+				initialRows: {
+			        total: 10
+			      },
+			    savePages: false, 
+			    container: $(this).find(".ts-pager"),
+		        output: '{startRow} to {endRow} ({totalRows})',
+		        cssPageDisplay: '.pagedisplay',
+		        cssPageSize: '.pagesize',
+		        cssDisabled: 'disabled',
+				ajaxUrl : "<c:url value='/monitoring/getLearnerMarks.do?{sortList:column}&page={page}&size={size}&toolSessionId='/>" + toolSessionId,
+				ajaxProcessing: function (data, table) {
+			    	if (data && data.hasOwnProperty('rows')) {
+			    		var rows = [],
+			            json = {};
+
+			    		for (i = 0; i < data.rows.length; i++){
+							var userData = data.rows[i];
+							
+							rows += '<tr userId="' + userData['userId'] + '">';
+
+							rows += '<td>';
+							rows += 	userData['firstName'];
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	userData['lastName'];
+							rows += '</td>';
+							
+							rows += '<td>';
+							rows += 	userData['mark'];
+							rows += '</td>';
+
+							rows += '</tr>';
+						}
+			            
+						json.total = data.total_rows;
+						json.rows = $(rows);
+						return json;
+			    	}
+				}
+		  	})
+		   .bind('pagerInitialized pagerComplete', function(event, options){
+			  if ( options.totalRows == 0 ) {
+				  $.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
+			  }
+			});
+		});
 	});
 	
 	function displayCountdown() {		
@@ -215,6 +345,8 @@
 	    <c:out value="${sessionMap.dokumaran.title}" escapeXml="true"/>
 	</h4>
 	
+	<c:out value="${sessionMap.dokumaran.description}" escapeXml="false"/>
+	 
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			 <fmt:message key="message.monitoring.summary.no.session" />
@@ -297,6 +429,21 @@
 			<div id="etherpad-container-${groupSummary.sessionId}"></div>		
 		</c:otherwise>
 	</c:choose>
+	
+
+	<!-- Editable marsk section -->
+	<div class="voffset10">	
+		<h4>
+		   <fmt:message key="label.monitoring.learner.marks.header"/>
+		</h4>
+		<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
+			<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
+			<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
+			<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
+				<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
+			</th>
+		</lams:TSTable>
+	</div>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->

@@ -484,16 +484,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook) {
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
 	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	String[] presetMarks = getPresetMarks(scratchie);
+
+	populateScratchieItemsWithMarks(scratchie, scratchie.getScratchieItems(), sessionId);
 
 	// calculate mark
 	int mark = 0;
 	for (ScratchieItem item : items) {
-	    mark += ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, userLogs, presetMarks);
+	    mark += item.getMark();
 	}
 
 	// change mark for all learners in a group
@@ -627,6 +627,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
 	scratchieSessionDao.saveObject(session);
+
+	recalculateMarkForSession(toolSessionId, false);
     }
 
     @Override
@@ -692,17 +694,24 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchieUserDao.saveObject(user);
     }
 
+    public Collection<User> getAllGroupUsers(Long toolSessionId) {
+	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+
     @Override
     /*
      * If isIncludeOnlyLeaders then include the portrait ids needed for monitoring. If false then it
      * is probably the export and that doesn't need portraits.
      */
-    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
+    public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<>();
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(contentId);
 
 	for (ScratchieSession session : sessions) {
+
 	    Long sessionId = session.getSessionId();
+
+	    Collection<User> groupUsers = getAllGroupUsers(sessionId);
 
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
@@ -710,20 +719,29 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 	    groupSummary.setTotalAttempts(totalAttempts);
 
-	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
-	    List<ScratchieUser> usersToShow = new LinkedList<>();
-	    for (ScratchieUser user : sessionUsers) {
+	    Map<Long, ScratchieUser> sessionUsers = getUsersBySession(sessionId).stream()
+		    .collect(Collectors.toMap(ScratchieUser::getUserId, s -> s));
+	    groupSummary.setUsersWhoReachedActivity(sessionUsers.keySet());
 
-		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
-		// include only leaders in case isUserGroupLeader is ON, include all otherwise
-		if (isIncludeOnlyLeaders && isUserGroupLeader) {
-		    User systemUser = (User) userManagementService.findById(User.class, user.getUserId().intValue());
-		    user.setPortraitId(
-			    systemUser.getPortraitUuid() == null ? null : systemUser.getPortraitUuid().toString());
-		    usersToShow.add(user);
-		} else if (!isIncludeOnlyLeaders) {
-		    usersToShow.add(user);
+	    List<ScratchieUser> usersToShow = new LinkedList<>();
+	    for (User user : groupUsers) {
+		boolean isUserGroupLeader = false;
+		ScratchieUser scratchieUser = sessionUsers.get(user.getUserId().longValue());
+		if (scratchieUser == null) {
+		    scratchieUser = new ScratchieUser();
+		    scratchieUser.setFirstName(user.getFirstName());
+		    scratchieUser.setLastName(user.getLastName());
+		    scratchieUser.setLoginName(user.getLogin());
+		    scratchieUser.setUserId(user.getUserId().longValue());
+		} else {
+		    isUserGroupLeader = session.isUserGroupLeader(scratchieUser.getUid());
+		    if (isUserGroupLeader) {
+			groupSummary.setLeaderUid(scratchieUser.getUid());
+		    }
 		}
+
+		scratchieUser.setPortraitId(user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
+		usersToShow.add(scratchieUser);
 	    }
 
 	    groupSummary.setUsers(usersToShow);
@@ -1012,34 +1030,29 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return false;
     }
 
-    /**
-     *
-     * @param scratchie
-     * @param item
-     * @param userLogs
-     *            uses list of logs to reduce number of queries to DB
-     * @param presetMarks
-     *            presetMarks to reduce number of queries to DB
-     * @return
-     */
-    private static int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item,
-	    List<ScratchieAnswerVisitLog> userLogs, String[] presetMarks) {
+    @Override
+    public void populateScratchieItemsWithMarks(Scratchie scratchie, Collection<ScratchieItem> items, long sessionId) {
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+	String[] presetMarks = getPresetMarks(scratchie);
 
-	int mark = 0;
-	// add mark only if an item was unraveled
-	if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
-	    int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
-	    String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
-		    : presetMarks[presetMarks.length - 1];
-	    mark = Integer.parseInt(markStr);
+	for (ScratchieItem item : items) {
+	    // get lowest mark by default
+	    int mark = Integer.parseInt(presetMarks[presetMarks.length - 1]);
+	    // add mark only if an item was unravelled
+	    // add mark only if an item was unraveled
+	    if (ScratchieServiceImpl.isItemUnraveled(item, userLogs)) {
+		int itemAttempts = ScratchieServiceImpl.getNumberAttemptsForItem(userLogs, item);
+		String markStr = (itemAttempts <= presetMarks.length) ? presetMarks[itemAttempts - 1]
+			: presetMarks[presetMarks.length - 1];
+		mark = Integer.parseInt(markStr);
 
-	    // add extra point if needed
-	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
-		mark++;
+		// add extra point if needed
+		if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
+		    mark++;
+		}
 	    }
+	    item.setMark(mark);
 	}
-
-	return mark;
     }
 
     /**
@@ -1551,7 +1564,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	row.addCell(getMessage("label.mark"));
 	row.addCell(getMessage("label.group"));
 
-	List<GroupSummary> summaryList = getMonitoringSummary(contentId, false);
+	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
 		row = researchAndAnalysisSheet.initRow();
@@ -1929,6 +1942,61 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return newDto;
     }
 
+    @Override
+    public Map<String, Object> prepareStudentChoicesData(Scratchie scratchie) {
+	Map<String, Object> model = new HashMap<>();
+
+	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+	model.put("items", items);
+
+	//correct answers row
+	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
+	model.put("correctAnswerLetters", correctAnswerLetters);
+
+	List<GroupSummary> groupSummaries = getSummaryByTeam(scratchie, items);
+	for (GroupSummary summary : groupSummaries) {
+	    //prepare OptionDtos to display
+	    int i = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		String optionSequence = itemDto.getOptionsSequence();
+		String[] optionLetters = optionSequence.split(", ");
+
+		List<OptionDTO> optionDtos = new LinkedList<>();
+		for (int j = 0; j < optionLetters.length; j++) {
+		    String optionLetter = optionLetters[j];
+		    String correctOptionLetter = correctAnswerLetters.get(i);
+
+		    OptionDTO optionDto = new OptionDTO();
+		    optionDto.setAnswer(optionLetter);
+		    optionDto.setCorrect(correctOptionLetter.equals(optionLetter));
+		    optionDtos.add(optionDto);
+		}
+
+		itemDto.setOptionDtos(optionDtos);
+		i++;
+	    }
+
+	    //calculate what is the percentage of first choice events in each session
+	    int numberOfFirstChoiceEvents = 0;
+	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
+		if (itemDto.isUnraveledOnFirstAttempt()) {
+		    numberOfFirstChoiceEvents++;
+		}
+	    }
+	    summary.setMark(numberOfFirstChoiceEvents);
+
+	    // round the percentage cell
+	    String totalPercentage = String.valueOf(
+		    Math.round((items.size() == 0) ? 0 : (double) numberOfFirstChoiceEvents * 100 / items.size()));
+	    summary.setTotalPercentage(totalPercentage);
+
+	}
+
+	model.put("sessionDtos", groupSummaries);
+	return model;
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -1946,8 +2014,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     @Override
     public List<GroupSummary> getSummaryByTeam(Scratchie scratchie, Collection<ScratchieItem> sortedItems) {
 	List<GroupSummary> groupSummaries = new ArrayList<>();
-	String[] presetMarks = getPresetMarks(scratchie);
-
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
@@ -1957,6 +2023,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 	    List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySession(sessionId);
+
+	    populateScratchieItemsWithMarks(scratchie, sortedItems, sessionId);
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItemDTO itemDto = new ScratchieItemDTO();
@@ -1980,8 +2048,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    numberOfAttempts = visitLogs.size();
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1
-			    : ScratchieServiceImpl.getUserMarkPerItem(scratchie, item, logs, presetMarks);
+		    mark = (numberOfAttempts == 0) ? -1 : item.getMark();
 
 		    isUnraveledOnFirstAttempt = (numberOfAttempts == 1)
 			    && ScratchieServiceImpl.isItemUnraveled(item, logs);

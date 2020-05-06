@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -33,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 
@@ -42,10 +38,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.etherpad.EtherpadException;
+import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
+import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -59,14 +57,12 @@ import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
-import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranConfigItemDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranSessionDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranUserDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
-import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -81,7 +77,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.gjerull.etherpad.client.EPLiteClient;
-import net.gjerull.etherpad.client.EPLiteException;
 
 /**
  * @author Dapeng.Ni
@@ -95,8 +90,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     private DokumaranSessionDAO dokumaranSessionDao;
 
-    private DokumaranConfigItemDAO dokumaranConfigItemDAO;
-
     // tool service
     private IToolContentHandler dokumaranToolContentHandler;
 
@@ -106,17 +99,15 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     private ILamsToolService toolService;
 
-    private ILogEventService logEventService;
-
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
 
     private ICoreNotebookService coreNotebookService;
 
-    private DokumaranOutputFactory dokumaranOutputFactory;
+    private IEtherpadService etherpadService;
 
-    private EPLiteClient client = null;
+    private DokumaranOutputFactory dokumaranOutputFactory;
 
     // *******************************************************************************
     // Service method
@@ -337,12 +328,12 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DokumaranUser getUserByLoginAndContent(String login, long contentId) {
 	List<User> user = dokumaranUserDao.findByProperty(User.class, "login", login);
 	return user.isEmpty() ? null
-		: dokumaranUserDao.getUserByUserIDAndContentID(user.get(0).getUserId().longValue(), contentId);
+		: dokumaranUserDao.getUserByUserIDAndContentIDViaSession(user.get(0).getUserId().longValue(),
+			contentId);
     }
 
     @Override
@@ -353,16 +344,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public List<DokumaranUser> getUsersBySession(Long toolSessionId) {
 	return dokumaranUserDao.getBySessionID(toolSessionId);
-    }
-
-    @Override
-    public DokumaranConfigItem getConfigItem(String key) {
-	return dokumaranConfigItemDAO.getConfigItemByKey(key);
-    }
-
-    @Override
-    public void saveOrUpdateDokumaranConfigItem(DokumaranConfigItem item) {
-	dokumaranConfigItemDAO.saveOrUpdate(item);
     }
 
     @Override
@@ -401,7 +382,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	//finish Etherpad session. Encapsulate it in try-catch block as we don't want it to affect regular LAMS workflow.
 	try {
-	    EPLiteClient client = initializeEPLiteClient();
+	    EPLiteClient client = etherpadService.getClient();
 
 	    DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
 	    String groupId = session.getEtherpadGroupId();
@@ -758,10 +739,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException {
+    public void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranApplicationException {
 	Long toolSessionId = session.getSessionId();
 	Long toolContentId = dokumaran.getContentId();
 	String groupIdentifier = DokumaranConstants.PREFIX_REGULAR_GROUP + toolSessionId;
+	String etherpadHtml = null;
 
 	// in case sharedPadId is present - all sessions will share the same padId
 	if (dokumaran.isSharedPadEnabled()) {
@@ -787,40 +769,22 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		dokumaranSessionDao.saveObject(session);
 		return;
 	    }
+	} else {
+	    etherpadHtml = EtherpadUtil.preparePadContent(dokumaran.getInstructions());
 	}
 
-	EPLiteClient client = initializeEPLiteClient();
+	Map<String, Object> result;
 
-	// create Etherpad Group assossiated with this session
-	Map map = client.createGroupIfNotExistsFor(groupIdentifier);
-	String groupId = (String) map.get("groupID");
-	session.setEtherpadGroupId(groupId);
-	String padId = session.getPadId();
-
-	boolean isPadAlreadyCreated = false;
 	try {
-	    client.createGroupPad(groupId, DokumaranConstants.DEFAULT_PAD_NAME);
-	} catch (EPLiteException e) {
-	    // allow recreating existing pads
-	    if ("padName does already exist".equals(e.getMessage())) {
-		isPadAlreadyCreated = true;
-		// throw exception in all other cases
-	    } else {
-		throw e;
-	    }
+	    result = etherpadService.createPad(groupIdentifier, etherpadHtml);
+	} catch (EtherpadException e) {
+	    throw new DokumaranApplicationException("Exception while creating an etherpad pad", e);
 	}
 
-	// set initial content
-	if (!dokumaran.isSharedPadEnabled() || !isPadAlreadyCreated) {
-	    String etherpadHtml = "<html><body>"
-		    + dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
-		    + "</body></html>";
-	    client.setHTML(padId, etherpadHtml);
-	}
-
-	// gets read-only id
-	String etherpadReadOnlyId = (String) client.getReadOnlyID(padId).get("readOnlyID");
-	session.setEtherpadReadOnlyId(etherpadReadOnlyId);
+	String groupId = (String) result.get("groupId");
+	String readOnlyId = (String) result.get("readOnlyId");
+	session.setEtherpadGroupId(groupId);
+	session.setEtherpadReadOnlyId(readOnlyId);
 
 	dokumaranSessionDao.saveObject(session);
     }
@@ -836,9 +800,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
-	    throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException {
+	    throws DokumaranApplicationException, EtherpadException {
 	String groupId = session.getEtherpadGroupId();
 
 	//don't allow sessions that has had problems with pad initializations. they could be fixed in monitoring by a teacher
@@ -847,28 +812,24 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    "This session has had problems with initialization. Please seek help from your teacher.");
 	}
 
-	EPLiteClient client = initializeEPLiteClient();
+	EPLiteClient client = etherpadService.getClient();
 
 	String userName = user.getFirstName() + " " + user.getLastName();
-	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
-	String authorId = map.get("authorID");
+	Map<String, Object> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
+	String authorId = (String) map.get("authorID");
 
 	// search for already existing user's session at Etherpad server
 	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
-	String etherpadSessionId = getEtherpadSession(authorId, groupId, etherpadSessions);
-
-	return createEtherpadCookie(etherpadSessionId);
+	String etherpadSessionId = etherpadService.getExistingSessionID(authorId, groupId, etherpadSessions);
+	return etherpadService.createCookie(etherpadSessionId);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId)
-	    throws DokumaranConfigurationException, URISyntaxException {
+    public Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws EtherpadException {
 
-	EPLiteClient client = initializeEPLiteClient();
-
-	String userName = user.getFirstName() + " " + user.getLastName();
-	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserID().toString(), userName);
-	String authorId = map.get("authorID");
+	String authorId = etherpadService.createAuthor(user.getUserID(),
+		user.getFirstName() + " " + user.getLastName());
 
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	if (sessionList.isEmpty()) {
@@ -883,7 +844,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	// find according session
 	String etherpadSessionIds = "";
-	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
+	EPLiteClient client = etherpadService.getClient();
+	Map<String, Object> etherpadSessions = client.listSessionsOfAuthor(authorId);
 	for (DokumaranSession session : sessionList) {
 	    String groupId = session.getEtherpadGroupId();
 
@@ -892,101 +854,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		continue;
 	    }
 
-	    String etherpadSessionId = getEtherpadSession(authorId, groupId, etherpadSessions);
+	    String etherpadSessionId = etherpadService.getExistingSessionID(authorId, groupId, etherpadSessions);
 	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? etherpadSessionId : "," + etherpadSessionId;
 	}
 
-	return createEtherpadCookie(etherpadSessionIds);
-    }
-
-    /**
-     * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise
-     */
-    private String getEtherpadSession(String authorId, String etherpadGroupId, Map etherpadSessions) {
-	String etherpadSessionId = null;
-
-	// search for already existing user's session
-	boolean isValidForMoreThan1Hour = false;
-	for (String etherpadSessionIdIter : (Set<String>) etherpadSessions.keySet()) {
-	    Map<String, Object> sessessionAttributes = (Map<String, Object>) etherpadSessions
-		    .get(etherpadSessionIdIter);
-	    String groupIdIter = (String) sessessionAttributes.get("groupID");
-	    if (groupIdIter.equals(etherpadGroupId)) {
-
-		// check session expiration date
-		long validUntil = (Long) sessessionAttributes.get("validUntil") * 1000;
-		long now = System.currentTimeMillis();
-		isValidForMoreThan1Hour = ((validUntil - now) > 0) && ((validUntil - now) >= 60 * 60 * 1000);
-
-		//use existing session if it's valid for more than 1 hour
-		if (isValidForMoreThan1Hour) {
-		    etherpadSessionId = etherpadSessionIdIter;
-		    break;
-
-		} else {
-		    // can't delete expired sessions as Etherpad throws an exception. Nonetheless it returns expired
-		    // ones when client.listSessionsOfAuthor(authorId) is requested
-		}
-	    }
-
-	}
-
-	// if session with validity of more than 1 hour doesn't exist yet  - create it
-	if (etherpadSessionId == null) {
-	    Map map2 = client.createSession(etherpadGroupId, authorId, 24);
-	    etherpadSessionId = (String) map2.get("sessionID");
-	}
-
-	return etherpadSessionId;
-    }
-
-    /**
-     * Constructs cookie to be stored at a clientside browser.
-     *
-     * @param etherpadSessionIds
-     * @return
-     * @throws URISyntaxException
-     */
-    private Cookie createEtherpadCookie(String etherpadSessionIds) throws URISyntaxException {
-	DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
-	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
-	URI uri = new URI(etherpadServerUrl);
-	//regex to get the top level part of a domain
-	Pattern p = Pattern.compile(
-		"^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
-	// eg: uri.getHost() will return "www.foo.com"
-	Matcher m = p.matcher(uri.getHost());
-	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
-
-	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
-	etherpadSessionCookie.setDomain(topLevelDomain);
-	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
-	// exits. A zero value causes the cookie to be deleted.
-	etherpadSessionCookie.setMaxAge(-1);
-	etherpadSessionCookie.setPath("/");
-
-	return etherpadSessionCookie;
-    }
-
-    @Override
-    public EPLiteClient initializeEPLiteClient() throws DokumaranConfigurationException {
-	if (client == null) {
-	    // get the API key from the config table and create EPLiteClient using it
-	    DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
-	    DokumaranConfigItem etherpadApiKeyConfig = getConfigItem(DokumaranConfigItem.KEY_API_KEY);
-	    if (etherpadApiKeyConfig == null || etherpadApiKeyConfig.getConfigValue() == null
-		    || etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
-		throw new DokumaranConfigurationException("Dokumaran settings are not configured. apiKeyConfig="
-			+ etherpadApiKeyConfig + " etherpadServerUrlConfig=" + etherpadServerUrlConfig
-			+ " Please seek help from your administrator");
-	    }
-
-	    // create EPLiteClient
-	    String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
-	    String etherpadApiKey = etherpadApiKeyConfig.getConfigValue();
-	    client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
-	}
-	return client;
+	return etherpadService.createCookie(etherpadSessionIds);
     }
 
     @Override
@@ -1071,10 +943,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setLogEventService(ILogEventService logEventService) {
-	this.logEventService = logEventService;
-    }
-
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -1085,10 +953,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     public void setDokumaranSessionDao(DokumaranSessionDAO dokumaranSessionDao) {
 	this.dokumaranSessionDao = dokumaranSessionDao;
-    }
-
-    public void setDokumaranConfigItemDAO(DokumaranConfigItemDAO dokumaranConfigItemDAO) {
-	this.dokumaranConfigItemDAO = dokumaranConfigItemDAO;
     }
 
     public void setDokumaranToolContentHandler(IToolContentHandler dokumaranToolContentHandler) {
@@ -1113,6 +977,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
+    }
+
+    public void setEtherpadService(IEtherpadService etherpadService) {
+	this.etherpadService = etherpadService;
     }
 
     public DokumaranOutputFactory getDokumaranOutputFactory() {

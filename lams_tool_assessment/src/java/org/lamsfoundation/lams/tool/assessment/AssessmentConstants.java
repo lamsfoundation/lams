@@ -35,9 +35,9 @@ public class AssessmentConstants {
     public static final String EXPORT_QUESTIONS_FILENAME = "questions.xml";
 
     // for parameters' name
-    
+
     public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
-    
+
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 
     public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
@@ -47,7 +47,7 @@ public class AssessmentConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
 
     public static final String PARAM_QUESTION_INDEX = "questionIndex";
-    
+
     public static final String PARAM_QUESTION_DISPLAY_ORDER = "questionDisplayOrder";
 
     public static final String PARAM_QUESTION_UID = "questionUid";
@@ -59,9 +59,9 @@ public class AssessmentConstants {
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
     public static final String PARAM_GRADE = "grade";
-    
+
     public static final String PARAM_MAX_MARK = "maxMark";
-    
+
     public static final String PARAM_SEQUENCE_ID = "sequenceId";
 
     public static final String PARAM_SESSION_ID = "sessionId";
@@ -69,12 +69,12 @@ public class AssessmentConstants {
     public static final String PARAM_QUESTION_RESULT_UID = "questionResultUid";
 
     // for request attribute name
-    
+
     /**
      * used to signify edit in monitor when assessment has been attempted already
      */
     public static final String ATTR_IS_AUTHORING_RESTRICTED = "isAuthoringRestricted";
-    
+
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
@@ -86,13 +86,13 @@ public class AssessmentConstants {
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
     public static final String ATTR_QUESTION_PREFIX = "question";
-    
+
     public static final String ATTR_CONFIDENCE_LEVEL_PREFIX = "confidenceLevel";
 
     public static final String ATTR_QUESTION_LIST = "questionList";
-    
+
     public static final String ATTR_RANDOM_POOL_QUESTIONS = "randomPoolQuestions";
-    
+
     public static final String ATTR_DELETED_RANDOM_POOL_QUESTIONS = "deletedRandomPoolQuestions";
 
     public static final String ATTR_QUESTION_REFERENCES = "questionReferences";
@@ -102,13 +102,13 @@ public class AssessmentConstants {
     public static final String ATTR_UNIT_LIST = "unitList";
 
     public static final String ATTR_REFERENCES_MAX_MARKS = "referenceMaxMarks";
-    
+
     public static final String ATTR_REFERENCES_SEQUENCE_IDS = "sequenceIds";
-    
+
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
-    
+
     public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
-    
+
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_OVERALL_FEEDBACK_LIST = "overallFeedbackList";
@@ -170,7 +170,7 @@ public class AssessmentConstants {
     public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
-    
+
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
 
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
@@ -203,15 +203,19 @@ public class AssessmentConstants {
 
     public static final String OUTPUT_NAME_ORDERED_ANSWERS = "ordered.answers";
     public static final String OUTPUT_NAME_CONDITION_ORDERED_ANSWER = "ordered.answer";
-   
+
     public static final String ATTR_USER_UID = "userUid";
 
     public static final String DEFUALT_PROTOCOL_REFIX = "http://";
 
     public static final String ALLOW_PROTOCOL_REFIX = new String("[http://|https://|ftp://|nntp://]");
 
-    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";  
-    
+    public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_ASSIGMENT_SUBMIT = "notify_teachers_on_assigment_submit";
+
     // configuration keys
     public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
+
+    public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
+    
+    public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
 }

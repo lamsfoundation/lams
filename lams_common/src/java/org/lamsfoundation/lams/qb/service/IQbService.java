@@ -125,6 +125,8 @@ public interface IQbService {
 
     boolean removeQuestionPossibleByQuestionId(int qbQuestionId);
 
+    void removeAnswersByToolContentId(long toolContentId);
+
     QbCollection getCollection(long collectionUid);
 
     int getCountQuestionActivitiesByUid(long qbQuestionUid);
@@ -144,4 +146,6 @@ public interface IQbService {
     void prepareQuestionForExport(QbQuestion qbQuestion);
 
     int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid);
+
+    boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature);
 }

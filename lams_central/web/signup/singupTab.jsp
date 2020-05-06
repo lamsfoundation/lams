@@ -52,7 +52,6 @@
 	$(function() {
 		// Setup form validation 
 		$("#SignupForm").validate({
-							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
 							rules : {

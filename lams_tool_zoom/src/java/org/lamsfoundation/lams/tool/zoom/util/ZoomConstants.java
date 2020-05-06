@@ -33,6 +33,7 @@ public final class ZoomConstants {
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String ATTR_MEETING_OPEN = "meetingOpen";
     public static final String ATTR_MEETING_URL = "meetingURL";
+    public static final String ATTR_MEETING_PASSWORD = "meetingPassword";
     public static final String ATTR_MESSAGE_KEY = "messageKey";
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";

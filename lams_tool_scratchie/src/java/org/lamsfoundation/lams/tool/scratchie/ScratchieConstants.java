@@ -89,6 +89,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
+    public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
+
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
 
     public static final String ATTR_DELETED_OPTION_LIST = "deleteOptionList";
@@ -98,6 +100,8 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
 
     public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
+    
+    public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
 
     public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
@@ -126,6 +130,8 @@ public class ScratchieConstants {
     public static final String ATTR_ITEM = "item";
 
     public static final String ATTR_SCORE = "score";
+
+    public static final String ATTR_SCORE_PERCENTAGE = "scorePercentage";
 
     public static final String ATTR_MAX_SCORE = "maxScore";
 

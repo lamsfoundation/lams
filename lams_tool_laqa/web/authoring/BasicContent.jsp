@@ -111,6 +111,7 @@
         </div>
 	
 		<div id="question-bank-collapse" class="panel-body panel-collapse collapse contains-nothing" role="tabpanel" aria-labelledby="question-bank-heading">
+			<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>	
 		</div>
 	</div>
 </div>

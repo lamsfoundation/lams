@@ -33,9 +33,17 @@ public class QbUtils {
 	    : string.trim();
 
     public static void fillFormWithUserCollections(IQbService qbService, QbQuestionForm form, Long qbQuestionUid) {
+	QbUtils.fillFormWithUserCollections(qbService, null, form, qbQuestionUid);
+    }
+
+    public static void fillFormWithUserCollections(IQbService qbService, String toolSignature, QbQuestionForm form,
+	    Long qbQuestionUid) {
 	final boolean isRequestCameFromTool = StringUtils.isNotBlank(form.getSessionMapID());
+	boolean isDefaultQuestion = qbQuestionUid == null ? false
+		: qbService.isQuestionDefaultInTool(qbQuestionUid, toolSignature);
 	Integer userId = QbUtils.getUserId();
-	if (isRequestCameFromTool && qbQuestionUid != null) {
+
+	if (isRequestCameFromTool && !isDefaultQuestion && qbQuestionUid != null) {
 	    QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	    boolean isQuestionInUserCollection = qbService.isQuestionInUserCollection(qbQuestion.getQuestionId(),
 		    userId);
@@ -58,7 +66,7 @@ public class QbUtils {
 	Collection<QbCollection> questionCollections = qbQuestionUid == null ? new LinkedList<>()
 		: qbService.getQuestionCollectionsByUid(qbQuestionUid);
 	Long collectionUid = null;
-	if (questionCollections.isEmpty()) {
+	if (isDefaultQuestion || questionCollections.isEmpty()) {
 	    //set private collection as default, if question is new or doesn't have associated collection
 	    for (QbCollection collection : userCollections) {
 		if (collection.isPersonal()) {
