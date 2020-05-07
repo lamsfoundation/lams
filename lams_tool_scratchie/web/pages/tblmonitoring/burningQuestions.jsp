@@ -32,6 +32,11 @@
 			$(this).data("expanded", !isExpanded);
 		});
 	});
+	
+	function showOptions(itemUid) {
+		$('#options-show-' + itemUid).remove();
+		$('#options-' + itemUid).show();
+	}
 </script>
 
 <!-- Header -->
@@ -76,29 +81,51 @@
 					</c:set>
 				
 					<c:choose>
-						<c:when test="${burningQsCount > 0}">
+						<c:when test="${burningQuestionItemDto.scratchieItem.uid == 0 and burningQsCount == 0}">
+							${itemTitle} 
+						</c:when>
+						<c:otherwise>
 							<a data-toggle="collapse" data-itemuid="${item.uid}" class="collapsed burning-question-title">
 								${itemTitle}
 							</a>
 							
 							<span class="badge pull-right" style="margin-right: 4px">${burningQsCount}</span>
-						</c:when>
-						<c:otherwise>
-							${itemTitle} 
 						</c:otherwise>
 					</c:choose>
 				</h4>
 			</div>
 		
-			<c:if test="${burningQsCount > 0}">
+			<c:if test="${burningQuestionItemDto.scratchieItem.uid != 0 or burningQsCount > 0}">
 				<div id="collapse-${item.uid}" class="panel-collapse collapse">
 				<div class="panel-body">
 				
 					<span class="burning-question-description">
-						<c:out value="${item.description}" escapeXml="false"/> 
+						<c:out value="${item.description}" escapeXml="false"/><br /> 
 					</span>
 					
-					<div class="table-responsive">
+					<c:if test="${burningQuestionItemDto.scratchieItem.uid != 0">
+						<a id="options-show-${item.uid}" href="#" onClick="javascript:showOptions(${item.uid})">
+							<fmt:message key='label.options.show' />
+						</a>
+						<div  id="options-${item.uid}" class="table-responsive" style="display: none">
+							<table class="table table-striped table-bordered table-hover">
+								<tr>
+									<th>
+										<fmt:message key='label.scratchie.options' />
+									</th>
+								</tr>
+								<c:forEach var="answer" items="${item.answers}">
+									<tr>
+										<td>
+											<c:out value="${answer.description}" escapeXml="false"/> 
+										</td>
+									</tr>
+								</c:forEach>
+							</table>
+						</div>
+					</c:if>
+					
+					<div class="table-responsive voffset10">
 						<table class="table table-striped table-bordered table-hover">
 							<tbody>
 								<c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}">
