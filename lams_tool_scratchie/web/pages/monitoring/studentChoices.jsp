@@ -1,4 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -147,7 +150,20 @@
 				<tr>
 					<th class="text-center">
 						<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
-							${sessionDto.sessionName}
+							<c:choose>
+								<c:when test="${empty sessionDto.leaderUid}">
+									${sessionDto.sessionName}
+								</c:when>
+								<c:otherwise>
+									<c:url var="userSummaryUrl" value='/learning/start.do'>
+										<c:param name="userID" value="${sessionDto.leaderUid}" />
+										<c:param name="toolSessionID" value="${sessionDto.sessionId}" />
+										<c:param name="mode" value="teacher" />
+									</c:url>
+									<a href="#" onClick="javascript:launchPopup('${userSummaryUrl}', 'MonitoringReview')">${sessionDto.sessionName}</a>
+								</c:otherwise>
+							</c:choose>
+							
 						</c:if>
 					</th>
 					

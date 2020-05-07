@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -1669,12 +1670,20 @@ public class ScratchieServiceImpl
 	//prepare data for displaying user answers table
 	int groupsSize = countSessionsByContentId(scratchie.getContentId());
 	ArrayList<GroupSummary> sessionDtos = new ArrayList<>();
+	Map<String, ScratchieSession> sessionsByName = scratchieSessionDao.getByContentId(scratchie.getContentId())
+		.stream().filter(s -> s.getGroupLeader() != null)
+		.collect(Collectors.toMap(ScratchieSession::getSessionName, Function.identity()));
 	for (int groupCount = 0; groupCount < groupsSize; groupCount++) {
 	    ExcelRow groupRow = secondPageData.getRows().get(6 + groupCount);
 
 	    GroupSummary groupSummary = new GroupSummary();
 	    String sessionName = groupRow.getCell(0).toString();
 	    groupSummary.setSessionName(sessionName);
+	    ScratchieSession session = sessionsByName.get(sessionName);
+	    if (session != null) {
+		groupSummary.setLeaderUid(session.getGroupLeader().getUserId());
+		groupSummary.setSessionId(session.getSessionId());
+	    }
 
 	    Collection<ScratchieItemDTO> itemDtos = new ArrayList<>();
 	    for (int i = 1; i <= items.size(); i++) {
