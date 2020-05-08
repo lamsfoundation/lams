@@ -103,7 +103,7 @@
 						<c:out value="${item.description}" escapeXml="false"/><br /> 
 					</span>
 					
-					<c:if test="${burningQuestionItemDto.scratchieItem.uid != 0">
+					<c:if test="${burningQuestionItemDto.scratchieItem.uid != 0}">
 						<a id="options-show-${item.uid}" href="#" onClick="javascript:showOptions(${item.uid})">
 							<fmt:message key='label.options.show' />
 						</a>
