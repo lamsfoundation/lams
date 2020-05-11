@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -694,6 +695,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchieUserDao.saveObject(user);
     }
 
+    @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
     }
@@ -1954,8 +1956,17 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
 	model.put("correctAnswerLetters", correctAnswerLetters);
 
+	Map<String, ScratchieSession> sessionsByName = scratchieSessionDao.getByContentId(scratchie.getContentId())
+		.stream().filter(s -> s.getGroupLeader() != null)
+		.collect(Collectors.toMap(ScratchieSession::getSessionName, Function.identity()));
 	List<GroupSummary> groupSummaries = getSummaryByTeam(scratchie, items);
 	for (GroupSummary summary : groupSummaries) {
+	    ScratchieSession session = sessionsByName.get(summary.getSessionName());
+	    if (session != null) {
+		// for this view, we need user ID, not UID
+		summary.setLeaderUid(session.getGroupLeader().getUserId());
+	    }
+
 	    //prepare OptionDtos to display
 	    int i = 0;
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
