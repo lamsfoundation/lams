@@ -3,9 +3,12 @@ package org.lamsfoundation.lams.etherpad.service;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 
@@ -22,7 +25,7 @@ public class EtherpadService implements IEtherpadService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> createPad(String groupIdentifier) throws EtherpadException {
+    public Map<String, Object> createPad(String groupIdentifier, String content) throws EtherpadException {
 	EPLiteClient client = getClient();
 
 	Map<String, Object> result = new HashMap<>();
@@ -54,6 +57,10 @@ public class EtherpadService implements IEtherpadService {
 	}
 
 	result.put("isPadAlreadyCreated", isPadAlreadyCreated);
+
+	if (!isPadAlreadyCreated && content != null) {
+	    client.setHTML(padId, content);
+	}
 
 	// gets read-only id
 	String etherpadReadOnlyId = (String) client.getReadOnlyID(padId).get("readOnlyID");
@@ -105,22 +112,44 @@ public class EtherpadService implements IEtherpadService {
 	return etherpadSessionCookie;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public Cookie createCookie(String authorId, String etherpadGroupId, boolean includeAllGroups)
+	    throws EtherpadException {
+	// search for already existing user's session at Etherpad server
+	Map<String, Object> etherpadSessions = getClient().listSessionsOfAuthor(authorId);
+	String etherpadSessionId = getExistingSessionID(authorId, etherpadGroupId, etherpadSessions, includeAllGroups);
+	return createCookie(etherpadSessionId);
+    }
+
+    /**
+     * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise
+     *
+     * @throws EtherpadException
+     */
+    @Override
+    public String getExistingSessionID(String authorId, String etherpadGroupId, Map<String, Object> etherpadSessions)
+	    throws EtherpadException {
+	return getExistingSessionID(authorId, etherpadGroupId, etherpadSessions, false);
+    }
+
     /**
      * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise
      */
     @Override
     @SuppressWarnings("unchecked")
-    public String getExistingSessionID(String authorId, String etherpadGroupId, Map<String, Object> etherpadSessions)
-	    throws EtherpadException {
-	String etherpadSessionId = null;
-
+    public String getExistingSessionID(String authorId, String etherpadGroupId, Map<String, Object> etherpadSessions,
+	    boolean includeAllGroups) throws EtherpadException {
 	// search for already existing user's session
 	boolean isValidForMoreThan1Hour = false;
+	String etherpadSessionId = null;
+	Set<String> otherEtherpadSessionIds = new HashSet<>();
 	for (String etherpadSessionIdIter : etherpadSessions.keySet()) {
 	    Map<String, Object> sessessionAttributes = (Map<String, Object>) etherpadSessions
 		    .get(etherpadSessionIdIter);
 	    String groupIdIter = (String) sessessionAttributes.get("groupID");
-	    if (groupIdIter.equals(etherpadGroupId)) {
+	    boolean isTargetGroup = groupIdIter.equals(etherpadGroupId);
+	    if (includeAllGroups || isTargetGroup) {
 
 		// check session expiration date
 		long validUntil = (Long) sessessionAttributes.get("validUntil") * 1000;
@@ -129,15 +158,15 @@ public class EtherpadService implements IEtherpadService {
 
 		//use existing session if it's valid for more than 1 hour
 		if (isValidForMoreThan1Hour) {
-		    etherpadSessionId = etherpadSessionIdIter;
-		    break;
-
+		    otherEtherpadSessionIds.add(etherpadSessionIdIter);
+		    if (isTargetGroup) {
+			etherpadSessionId = etherpadSessionIdIter;
+		    }
 		} else {
 		    // can't delete expired sessions as Etherpad throws an exception. Nonetheless it returns expired
 		    // ones when client.listSessionsOfAuthor(authorId) is requested
 		}
 	    }
-
 	}
 
 	// if session with validity of more than 1 hour doesn't exist yet  - create it
@@ -145,11 +174,13 @@ public class EtherpadService implements IEtherpadService {
 	    EPLiteClient client = getClient();
 	    Map<String, Object> map2 = client.createSession(etherpadGroupId, authorId, 24);
 	    etherpadSessionId = (String) map2.get("sessionID");
+	    otherEtherpadSessionIds.add(etherpadSessionId);
 	}
 
-	return etherpadSessionId;
+	return includeAllGroups ? otherEtherpadSessionIds.stream().collect(Collectors.joining(",")) : etherpadSessionId;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public String createAuthor(Integer userId, String userName) throws EtherpadException {
 	EPLiteClient client = getClient();

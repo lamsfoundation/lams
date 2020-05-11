@@ -226,16 +226,16 @@
 				<%--Display Etherpad for each question --%>
 				<c:if test="${isQuestionEtherpadEnabled}">
 					<div class="form-group question-etherpad-container">
-						<a data-toggle="collapse" data-target="#question-etherpad-${userSummaryItem.questionDto.uid}"
-							href="#qe${userSummaryItem.questionDto.uid}" class="collapsed">
+						<a data-toggle="collapse" data-target="#question-etherpad-${userSummaryItem.question.uid}"
+							href="#qe${userSummaryItem.question.uid}" class="collapsed">
 							<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
 				 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
 							<fmt:message key="label.etherpad.discussion" />
 						</a>
 						
-						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="collapse">
+						<div id="question-etherpad-${userSummaryItem.question.uid}" class="collapse">
 							<div class="panel panel-default question-etherpad">
-								<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${userSummaryItem.questionDto.uid}" 
+								<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${userSummaryItem.question.uid}" 
 								   showControls="true" showChat="false" heightAutoGrow="true" />
 							</div>
 						</div>

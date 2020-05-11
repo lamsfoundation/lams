@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
+import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -742,6 +743,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Long toolSessionId = session.getSessionId();
 	Long toolContentId = dokumaran.getContentId();
 	String groupIdentifier = DokumaranConstants.PREFIX_REGULAR_GROUP + toolSessionId;
+	String etherpadHtml = null;
 
 	// in case sharedPadId is present - all sessions will share the same padId
 	if (dokumaran.isSharedPadEnabled()) {
@@ -767,31 +769,21 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		dokumaranSessionDao.saveObject(session);
 		return;
 	    }
+	} else {
+	    etherpadHtml = EtherpadUtil.preparePadContent(dokumaran.getInstructions());
 	}
 
 	Map<String, Object> result;
+
 	try {
-	    result = etherpadService.createPad(groupIdentifier);
+	    result = etherpadService.createPad(groupIdentifier, etherpadHtml);
 	} catch (EtherpadException e) {
 	    throw new DokumaranApplicationException("Exception while creating an etherpad pad", e);
 	}
 
-	EPLiteClient client = (EPLiteClient) result.get("client");
 	String groupId = (String) result.get("groupId");
-	String padId = (String) result.get("padId");
-	boolean isPadAlreadyCreated = (boolean) result.get("isPadAlreadyCreated");
-
-	session.setEtherpadGroupId(groupId);
-	// set initial content
-	if (!dokumaran.isSharedPadEnabled() || !isPadAlreadyCreated) {
-	    String etherpadHtml = "<html><body>"
-		    + dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
-		    + "</body></html>";
-	    client.setHTML(padId, etherpadHtml);
-	}
-
-	// gets read-only id
 	String readOnlyId = (String) result.get("readOnlyId");
+	session.setEtherpadGroupId(groupId);
 	session.setEtherpadReadOnlyId(readOnlyId);
 
 	dokumaranSessionDao.saveObject(session);

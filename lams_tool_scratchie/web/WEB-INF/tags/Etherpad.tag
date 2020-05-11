@@ -9,6 +9,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+
 <%@ attribute name="groupId" required="true" rtexprvalue="true" %>
 <%@ attribute name="showControls" required="false" rtexprvalue="true" %>
 <%@ attribute name="showChat" required="false" rtexprvalue="true" %>
