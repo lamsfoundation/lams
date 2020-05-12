@@ -639,15 +639,14 @@ function updateContributeActivities(contributeActivities) {
 		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
 		row = row.append(cell);
 	}
-	
-	if (contributeActivities ) {
+	if (contributeActivities) {
 		$.each(contributeActivities, function(){
 			var cell = $('<div />').addClass('contributeActivityCell').text(this.title);
-			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
+				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
 				var entryContent = '';
-				switch(this.contributionType) {
+				switch (this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
 					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
@@ -655,14 +654,30 @@ function updateContributeActivities(contributeActivities) {
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 					case 12 : entryContent = LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
-				entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
-							 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
-							 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+				switch (this.contributionType) {
+					case 3  : 
+					case 12 : if (this.isComplete) {
+						 		entryContent += '<span class="pull-right"><strong>' + LABELS.CONTRIBUTE_OPENED_GATE + '</strong></span>';
+							} else {
+								entryContent += '<span class="btn btn-xs btn-primary pull-right loffset10" onClick="javascript:openPopUp(\''
+									 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP
+									 + '">' + LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</span>';
+								entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openGateNow('
+									 + contributeActivity.activityID + ')" title="' + LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP
+									 + '">' + LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</span>';
+							}
+							break;
+					default : entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
+						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+				}
+
 				cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
 				row = row.append(cell);
 			});
 		});
 	}
+	
 	if ($('.contributeRow').length == 0) {
 		$('#requiredTasks').hide();
 	} else {
@@ -857,6 +872,21 @@ function addEmailProgressSeries(forceQuestion, table) {
     }
 	colorDialogList(table);
 } 
+
+function openGateNow(activityId) {
+	var data = {
+		'activityId' : activityId
+	};
+	data[csrfTokenName] = csrfTokenValue;
+	$.ajax({
+		'type' : 'post',
+		'url'  : LAMS_URL + 'monitoring/gate/openGate.do',
+		'data'  : data,
+		'success' : function(){
+			updateLessonTab();
+		}
+	});
+}
 
 //********** SEQUENCE TAB FUNCTIONS **********
 
