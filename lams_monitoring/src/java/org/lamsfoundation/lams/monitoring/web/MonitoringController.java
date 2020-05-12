@@ -285,13 +285,12 @@ public class MonitoringController {
     }
 
     @RequestMapping(path = "/addLesson", method = RequestMethod.POST)
-    public String addLesson(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam String lessonName, @RequestParam long learningDesignID)
-	    throws IOException, ServletException, ParseException {
+    public String addLesson(HttpServletRequest request, HttpServletResponse response, @RequestParam String lessonName,
+	    @RequestParam long learningDesignID) throws IOException, ServletException, ParseException {
 	if (!ValidationUtil.isOrgNameValid(lessonName)) {
 	    throw new IOException("Lesson name contains invalid characters");
 	}
-	
+
 	String[] organisationIdsStr = request.getParameterValues(AttributeNames.PARAM_ORGANISATION_ID);
 	boolean introEnable = WebUtil.readBooleanParam(request, "introEnable", false);
 	String introDescription = introEnable ? request.getParameter("introDescription") : null;
@@ -461,8 +460,7 @@ public class MonitoringController {
      * The Struts dispatch method to archive a lesson.
      */
     @RequestMapping(path = "/archiveLesson", method = RequestMethod.POST)
-    public void archiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public void archiveLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.archiveLesson(lessonId, getUserId());
@@ -475,8 +473,7 @@ public class MonitoringController {
      * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state.
      */
     @RequestMapping(path = "/unarchiveLesson", method = RequestMethod.POST)
-    public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unarchiveLesson(lessonId, getUserId());
@@ -628,8 +625,8 @@ public class MonitoringController {
 	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
-		    + lessonId + ". " + message);
+	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson " + lessonId + ". "
+		    + message);
 	}
 
 	// audit log force completion attempt
@@ -1135,7 +1132,7 @@ public class MonitoringController {
 		    indfm.format(tzFinishDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
 
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, false, false);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
@@ -1205,7 +1202,7 @@ public class MonitoringController {
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true);
+	List<ContributeActivityDTO> contributeActivities = getContributeActivities(lessonId, true, true);
 	if (contributeActivities != null) {
 	    responseJSON.set("contributeActivities", JsonUtil.readArray(contributeActivities));
 	}
@@ -1632,7 +1629,8 @@ public class MonitoringController {
     }
 
     @SuppressWarnings("unchecked")
-    private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching) {
+    private List<ContributeActivityDTO> getContributeActivities(Long lessonId, boolean skipCompletedBranching,
+	    boolean skipOpenedGates) {
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
 	Lesson lesson = lessonService.getLesson(lessonId);
 
@@ -1660,7 +1658,7 @@ public class MonitoringController {
 			    contributeEntry.setIsComplete(learners.isEmpty());
 			}
 
-			if (!contributeEntry.getIsRequired() || contributeEntry.getIsComplete()) {
+			if (!contributeEntry.getIsRequired() || (skipOpenedGates && contributeEntry.getIsComplete())) {
 			    entryIterator.remove();
 			}
 		    }

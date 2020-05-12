@@ -158,6 +158,16 @@
 				CONTRIBUTE_TOOLTIP : '<c:out value="${CONTRIBUTE_TOOLTIP_VAR}" />',
 				<fmt:message key="button.task.go" var="CONTRIBUTE_BUTTON_VAR"/>
 				CONTRIBUTE_BUTTON : '<c:out value="${CONTRIBUTE_BUTTON_VAR}" />',
+				<fmt:message key="button.task.gate.open.now" var="CONTRIBUTE_OPEN_GATE_NOW_BUTTON_VAR"/>
+				CONTRIBUTE_OPEN_GATE_NOW_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_NOW_BUTTON_VAR}" />',
+				<fmt:message key="button.task.gate.open.now.tooltip" var="CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP_VAR}" />',
+				<fmt:message key="button.task.gate.open" var="CONTRIBUTE_OPEN_GATE_BUTTON_VAR"/>
+				CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
+				<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
+				<fmt:message key="label.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
+				CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
@@ -517,6 +527,7 @@
 							<div id="chartDiv" class="panel-body"></div>
 						</div>
 					</div>
+					
 					<!-- Required tasks -->
 					<div id="requiredTasks" class="panel panel-warning" style="display: none;">
 						<div class="panel-heading">
@@ -526,48 +537,6 @@
 							<span id="contributeHeader"></span>
 						</div>
 					</div>
-					
-					<table id="tabLessonTable" class="table table-striped">
-						<tr id="contributeHeader">
-							<td colspan="2" class="active">
-								<fmt:message key="lesson.required.tasks"/>
-							</td>
-						</tr>
-						<c:forEach var="activity" items="${contributeActivities}">
-							<tr class="contributeRow">
-								<td colspan="2" class="contributeActivityCell">
-									<c:out value="${activity.title}" />
-								</td>
-							</tr>
-							<c:forEach var="entry" items="${activity.contributeEntries}">
-								<c:if test="${entry.isRequired}">
-									<tr class="contributeRow">
-										<td colspan="2" class="contributeEntryCell">
-											<c:choose>
-												<c:when test="${entry.contributionType eq 3}">
-													<fmt:message key="lesson.task.gate"/>
-												</c:when>
-												<c:when test="${entry.contributionType eq 6}">
-													<fmt:message key="lesson.task.grouping"/>
-												</c:when>
-												<c:when test="${entry.contributionType eq 9}">
-													<fmt:message key="lesson.task.branching"/>
-												</c:when>
-												<c:when test="${entry.contributionType eq 12}">
-													<fmt:message key="lesson.task.gate.password"/>
-												</c:when>
-											</c:choose>
-											<a href="#" class="btn btn-sm btn-default"
-											   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 648, 1152, true)"
-											   title='<fmt:message key="button.task.go.tooltip"/>'>
-											   <fmt:message key="button.task.go"/>
-											</a>
-										</td>
-									</tr>
-								</c:if>
-							</c:forEach>
-						</c:forEach>
-					</table>
 				</lams:TabBody>
 				
 				<lams:TabBody id="2" titleKey="label.advanced">
