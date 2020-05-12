@@ -677,6 +677,7 @@ public class ScratchieServiceImpl
 	scratchieUserDao.saveObject(user);
     }
 
+    @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
     }
@@ -954,7 +955,7 @@ public class ScratchieServiceImpl
 
     @Override
     public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId,
-	    boolean includeEmptyItems) {
+	    boolean includeEmptyItems, boolean prepareForHTML) {
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
@@ -1014,8 +1015,11 @@ public class ScratchieServiceImpl
 		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
 		burningQuestionDto.setSessionName(escapedSessionName);
 
-		String escapedBurningQuestion = StringEscapeUtils
-			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
+		String escapedBurningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
+		if (prepareForHTML) {
+		    escapedBurningQuestion = escapedBurningQuestion.replaceAll("\n", "<br>");
+		}
+		escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(escapedBurningQuestion);
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
@@ -1610,7 +1614,7 @@ public class ScratchieServiceImpl
 	    row.addCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
 	    row.addCell(getMessage("label.count"), IndexedColors.BLUE);
 
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true, false);
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
 		row = burningQuestionsSheet.initRow();
