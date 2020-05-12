@@ -111,15 +111,14 @@
 							<fmt:message key='label.options.show' />
 						</a>
 						<div  id="options-${item.uid}" class="table-responsive" style="display: none">
-							<table class="table table-striped table-bordered table-hover">
-								<tr>
-									<th>
-										<fmt:message key='label.scratchie.options' />
-									</th>
-								</tr>
+							<table class="table table-striped table-hover">
 								<c:forEach var="answer" items="${item.qbQuestion.qbOptions}">
+									<c:set var="cssClass"><c:if test='${answer.correct}'>bg-success</c:if></c:set>
 									<tr>
-										<td>
+										<td width="5px" class="${cssClass}">
+											${ALPHABET[j.index]}.
+										</td>
+										<td class="${cssClass}">
 											<c:out value="${answer.name}" escapeXml="false"/> 
 										</td>
 									</tr>

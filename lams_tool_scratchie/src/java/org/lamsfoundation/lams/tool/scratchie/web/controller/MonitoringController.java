@@ -132,7 +132,7 @@ public class MonitoringController {
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    null, true);
+		    null, true, true);
 	    sessionMap.put(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
