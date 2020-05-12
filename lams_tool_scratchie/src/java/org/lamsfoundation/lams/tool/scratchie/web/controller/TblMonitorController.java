@@ -184,7 +184,7 @@ public class TblMonitorController {
 	//find available burningQuestionDtos, if any
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    null, true);
+		    null, true, true);
 
 	    //unescape previously escaped session names
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
