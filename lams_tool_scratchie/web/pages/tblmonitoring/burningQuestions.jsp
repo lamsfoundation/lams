@@ -112,7 +112,7 @@
 						</a>
 						<div  id="options-${item.uid}" class="table-responsive" style="display: none">
 							<table class="table table-striped table-hover">
-								<c:forEach var="answer" items="${item.qbQuestion.qbOptions}">
+								<c:forEach var="answer" items="${item.qbQuestion.qbOptions}" varStatus="j">
 									<c:set var="cssClass"><c:if test='${answer.correct}'>bg-success</c:if></c:set>
 									<tr>
 										<td width="5px" class="${cssClass}">
