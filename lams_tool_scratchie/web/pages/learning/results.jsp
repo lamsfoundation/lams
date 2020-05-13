@@ -148,7 +148,10 @@
 				   		{name:'isUserAuthor', width:0, hidden: true},
 				   		{name:'groupName', index:'groupName', width:100, title: false},
 				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
-					   		formatter:function(cellvalue, options, rowObject) {
+					   		formatter:function(cellvalue, options, rowObject, event) {
+					   			if (event == "edit") {
+					   				cellvalue = cellvalue.replace(/\n/g, '<br>');
+					   			}
 					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
 
 					   			//when item is editable - show pencil icon on hover
@@ -192,9 +195,6 @@
 							</c:choose> 
 							+ " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItemUid}',
-	  	          	beforeEditRow: function (options, rowid) {
-		  	          	alert("aaa");
-	  	          	},
 	  				inlineEditing: { keys: true, defaultFocusField: "burningQuestion", focusField: "burningQuestion" },
 	  				onSelectRow: function (rowid, status, e) {
 	  	                var $self = $(this), 
