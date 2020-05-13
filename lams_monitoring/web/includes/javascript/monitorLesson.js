@@ -641,7 +641,8 @@ function updateContributeActivities(contributeActivities) {
 	}
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
-			var cell = $('<div />').addClass('contributeActivityCell').text(this.title);
+			var contributeActivity = this,
+				cell = $('<div />').addClass('contributeActivityCell').text(this.title);
 				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
