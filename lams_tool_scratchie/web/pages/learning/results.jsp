@@ -147,16 +147,19 @@
 				   		{name:'isUserAuthor', width:0, hidden: true},
 				   		{name:'groupName', index:'groupName', width:100, title: false},
 				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
-					   		formatter:function(cellvalue, options, rowObject) {
+					   		formatter:function(cellvalue, options, rowObject, event) {
+					   			if (event == "edit") {
+					   				cellvalue = cellvalue.replace(/\n/g, '<br>');
+					   			}
 					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
-
+					   			
 					   			//when item is editable - show pencil icon on hover
 								return ${isUserLeader} && eval(item.isUserAuthor) ? 
 								   		"<span class='burning-question-text'>" +cellvalue + "</span><span>&nbsp;</span><i class='fa fa-pencil'></i>" 
 								   		: cellvalue;
 			   				},
 			   				unformat:function(cellvalue, options, rowObject) {
-			   					var text = $('<div>' + cellvalue + '</div>').text();
+			   					var text = $('<div>' + cellvalue  + '</div>').text();
 								return text.trim();
 			   				},
 				   			editable: function (options) {
@@ -173,9 +176,6 @@
 				   	],
                     caption: <c:choose><c:when test="${scratchieItem.uid == 0}">"${scratchieItem.title}"</c:when><c:otherwise>"<a href='#${scratchieItem.title}' class='bq-title'>${scratchieItem.title}</a>"</c:otherwise></c:choose> + " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItem.uid}',
-	  	          	beforeEditRow: function (options, rowid) {
-		  	          	alert("aaa");
-	  	          	},
 	  				inlineEditing: { keys: true, defaultFocusField: "burningQuestion", focusField: "burningQuestion" },
 	  				onSelectRow: function (rowid, status, e) {
 	  	                var $self = $(this), 
