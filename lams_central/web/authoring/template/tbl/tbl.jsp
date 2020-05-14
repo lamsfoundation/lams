@@ -13,10 +13,21 @@
  	<%@ include file="../header.jsp" %>
  	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
- 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
- 
- 	<title><fmt:message key="authoring.tbl.template.title"/></title>
+	<style>
+		/* Hide it initially */
+		#question-bank-div {
+			display: none;
+			margin-top: 20px;
+		}
+		
+		#itemArea {
+			display: none;
+		}
+	</style>
 	
+	<title><fmt:message key="authoring.tbl.template.title"/></title>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
 
 		<%@ include file="../comms.jsp" %>
@@ -127,6 +138,31 @@
 				});
 	    	}
 	    }
+	    
+	    function openQuestionBank(){
+	    	// show panel
+	    	$('#question-bank-div').slideDown(function(){
+	    		// load question bank content
+				$('#question-bank-collapse').load(
+					"<lams:LAMSURL/>searchQB/start.do",
+					{
+						// this action returns ID of the created QB question
+						// which is put into itemArea div
+						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
+						// limit question to multiple choice
+						toolSignature: "lamc11"
+					}
+				);
+		    });
+	    }
+	    
+	    // this method is run when imported QB question ID is put into itemArea div
+		function refreshThickbox(){
+			// extract the ID
+			var qbQuestionUid = +$("#itemArea").text();
+			// fetch HTML with filled data from QB question
+			createQuestion('numQuestions', 'divq', 'divquestions', 'importQb', '&qbQuestionUid=' + qbQuestionUid);
+		};
 
         $(document).ready(function(){
         	$('[data-toggle="tooltip"]').tooltip();
@@ -222,6 +258,25 @@
 				
 				<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
+			
+			<!-- Question Bank -->
+			<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
+			    <div class="panel panel-default">
+			        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
+			        	<span class="panel-title">
+					    	<a role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="true" aria-controls="question-bank-collapse" >
+				          		<fmt:message key="label.question.bank" />
+				        	</a>
+			      		</span>
+			        </div>
+			
+					<div id="question-bank-collapse" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="question-bank-heading">
+						<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>			
+					</div>
+				</div>
+			</div>
+			<!-- Hidden div just for storing ID of the imported QB question -->
+			<div id="itemArea"></div>
 			
 	    </div>
 		<div class="tab-pane" id="tab4">
