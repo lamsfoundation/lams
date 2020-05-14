@@ -203,8 +203,24 @@
 			</div>
 		
 			<span class="voffset10">
-			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/></a>
-			<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
+				<div class="btn-group">
+					<button id="createQuestionButton"
+							onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
+							type="button" class="btn btn-default">
+								<i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/>
+					</button>
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="#" onClick="javascript:openQuestionBank()"> 
+								<fmt:message key="authoring.create.question.qb"/>
+							</a>
+						</li>
+					</ul>
+				</div>
+				
+				<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
 			
 	    </div>
