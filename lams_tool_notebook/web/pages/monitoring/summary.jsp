@@ -182,6 +182,11 @@
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <div class="panel">
+	<button class="btn btn-default pull-right"
+			onClick="javascript:window.open('${tool}monitoring/showPrintDialog.do?toolContentID=${param.toolContentID}', 'PrintNotebook',width=800,height=600,scrollbars)">
+		<i class="fa fa-print"></i> <span class="hidden-xs"><fmt:message key="monitor.summary.print"/></span>
+	</button>
+	
 	<h4>
 	    <c:out value="${notebookDTO.title}" escapeXml="true"/>
 	</h4>
@@ -189,13 +194,13 @@
 	    <c:out value="${notebookDTO.instructions}" escapeXml="false"/>
 	</div>
 	
-		<c:if test="${empty notebookDTO.sessions}">
-			<lams:Alert type="info" id="no-session-summary" close="false">
-				<fmt:message key="message.monitoring.summary.no.session" />
-			</lams:Alert>
-		</c:if>
+	<c:if test="${empty notebookDTO.sessions}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
 		
-	</div>
+</div>
 	 
 	<c:if test="${isGroupedActivity}">
 		<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 

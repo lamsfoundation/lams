@@ -102,7 +102,7 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
     /**
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+    public List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
 	    String searchString, ICoreNotebookService coreNotebookService,
 	    IUserManagementService userManagementService) {
 	String sortingOrder;
@@ -154,7 +154,15 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", NotebookUser.class).addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
+		.setParameter("sessionId", sessionId.longValue());
+
+	if (size != null) {
+	    query.setMaxResults(size);
+	    if (page != null) {
+		query.setFirstResult(page * size);
+	    }
+	}
+
 	return query.list();
     }
 

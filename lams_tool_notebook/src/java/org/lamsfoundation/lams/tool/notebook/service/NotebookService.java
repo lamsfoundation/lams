@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -98,7 +97,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
-    
+
     private IUserManagementService userManagementService;
 
     private MessageService messageService;
@@ -171,7 +170,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -226,7 +225,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    return;
 	}
 
-	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	for (NotebookSession session : notebook.getNotebookSessions()) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
@@ -252,7 +251,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    return;
 	}
 
-	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	for (NotebookSession session : notebook.getNotebookSessions()) {
 	    NotebookUser user = notebookUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
 		if (user.getEntryUID() != null) {
@@ -357,7 +356,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
-	for (NotebookSession session : (Set<NotebookSession>) notebook.getNotebookSessions()) {
+	for (NotebookSession session : notebook.getNotebookSessions()) {
 	    if (!session.getNotebookUsers().isEmpty()) {
 		return true;
 	    }
@@ -367,12 +366,12 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     /* ********** INotebookService Methods ********************************* */
-    
+
     @Override
     public String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText) {
 	Long userId = notebookUser.getUserId();
 	Long toolSessionId = notebookUser.getNotebookSession().getSessionId();
-	
+
 	// learningForm.getContentEditable() will be null if the deadline has passed
 	if (isContentEditable != null && isContentEditable) {
 	    // TODO fix idType to use real value not 999
@@ -381,7 +380,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
 			notebookUser.getUserId().intValue(), "", entryText);
 		notebookUser.setEntryUID(entryUID);
-		
+
 	    } else {
 		// update existing entry.
 		coreNotebookService.updateEntry(notebookUser.getEntryUID(), "", entryText);
@@ -507,10 +506,10 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
+    public List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
 	    String searchString) {
-	return notebookUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		coreNotebookService, userManagementService);
+	return notebookUserDAO.getUsersEntriesDates(sessionId, page, size, sorting, searchString, coreNotebookService,
+		userManagementService);
     }
 
     @Override
@@ -583,11 +582,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     }
 
     public IUserManagementService getUserManagementService() {
-        return userManagementService;
+	return userManagementService;
     }
 
     public void setUserManagementService(IUserManagementService userManagementService) {
-        this.userManagementService = userManagementService;
+	this.userManagementService = userManagementService;
     }
 
     public ICoreNotebookService getCoreNotebookService() {
@@ -657,7 +656,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
