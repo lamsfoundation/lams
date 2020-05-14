@@ -49,8 +49,6 @@ public class AuthoringForm {
 
     private String sessionMapID;
 
-    private boolean enableMeetingPassword;
-
     private SessionMap<String, Object> sessionMap;
 
     public String getSessionMapID() {
@@ -123,14 +121,6 @@ public class AuthoringForm {
 
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    public boolean isEnableMeetingPassword() {
-	return enableMeetingPassword;
-    }
-
-    public void setEnableMeetingPassword(boolean enableMeetingPassword) {
-	this.enableMeetingPassword = enableMeetingPassword;
     }
 
     public void setSessionMap(SessionMap<String, Object> sessionMap) {
