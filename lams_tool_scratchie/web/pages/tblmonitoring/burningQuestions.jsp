@@ -110,7 +110,7 @@
 						<a id="options-show-${item.uid}" href="#" onClick="javascript:showOptions(${item.uid})">
 							<fmt:message key='label.options.show' />
 						</a>
-						<div  id="options-${item.uid}" class="table-responsive" style="display: none">
+						<div  id="options-${item.uid}" class="voffset10 table-responsive" style="display: none">
 							<table class="table table-striped table-hover">
 								<c:forEach var="answer" items="${item.qbQuestion.qbOptions}" varStatus="j">
 									<c:set var="cssClass"><c:if test='${answer.correct}'>bg-success</c:if></c:set>
