@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.dao;
 
 import java.util.List;
@@ -38,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  */
 public interface INotebookUserDAO extends IBaseDAO {
     /**
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @return
@@ -48,7 +47,7 @@ public interface INotebookUserDAO extends IBaseDAO {
     void saveOrUpdate(NotebookUser notebookUser);
 
     /**
-     * 
+     *
      * @param loginName
      * @param sessionID
      * @return
@@ -56,7 +55,7 @@ public interface INotebookUserDAO extends IBaseDAO {
     NotebookUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
 
     /**
-     * 
+     *
      * @param uid
      * @return
      */
@@ -65,8 +64,9 @@ public interface INotebookUserDAO extends IBaseDAO {
     /**
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
+    List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
+	    String searchString, ICoreNotebookService coreNotebookService,
+	    IUserManagementService userManagementService);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 
