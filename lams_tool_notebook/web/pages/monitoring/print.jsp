@@ -46,14 +46,15 @@
 				</c:if>
 				
 				<c:forEach items="${sessionEntry.value}" var="printUserDTO">
-					<h4><c:out value="${printUserDTO.lastName}" />&nbsp;<c:out value="${printUserDTO.firstName}" />&nbsp;<c:out value="${printUserDTO.email}" /></h4>
-					<span><small><lams:Date value="${printUserDTO.entryModifiedDate}"/></small></span> 
+				<h4 style="margin-bottom: 1px"><c:out value="${printUserDTO.lastName}" />&nbsp;<c:out value="${printUserDTO.firstName}" /></h4>
+				<small><c:out value="${printUserDTO.email}" /></small></br>
+					<span class="loffset10"><small><lams:Date value="${printUserDTO.entryModifiedDate}"/></small></span> 
 					
-					<p><c:out value="${printUserDTO.entry}" escapeXml="false" /></p>
+					<p class="panel-body"><c:out value="${printUserDTO.entry}" escapeXml="false" /></p>
 					
 					<c:if test="${not empty printUserDTO.teacherComment}">
 						<h4 class="voffset20"><fmt:message key="label.comment" /></h4>
-	 					<p><c:out value="${printUserDTO.teacherComment}" /></p>
+	 					<p class="panel-body"><c:out value="${printUserDTO.teacherComment}" /></p>
 					
 					</c:if>
 					<hr>
