@@ -87,7 +87,7 @@
    * - "colibris": the new experimental skin (since Etherpad 1.8), candidate to
    *               become the default in Etherpad 2.0
    */
-  "skinName": "no-skin",
+  "skinName": "colibris",
 
   /*
    * Skin Variants
@@ -262,7 +262,7 @@
    * Pad creation is only via the API.
    * This applies both to group pads and regular pads.
    */
-  "editOnly": false,
+  "editOnly": true,
 
   /*
    * If set to true, those users who have a valid session will automatically be
@@ -405,22 +405,12 @@
    *          follow the section "secure your installation" in README.md
    */
 
-  /*
   "users": {
     "admin": {
-      // 1) "password" can be replaced with "hash" if you install ep_hash_auth
-      // 2) please note that if password is null, the user will not be created
       "password": "changeme1",
       "is_admin": true
-    },
-    "user": {
-      // 1) "password" can be replaced with "hash" if you install ep_hash_auth
-      // 2) please note that if password is null, the user will not be created
-      "password": "changeme1",
-      "is_admin": false
     }
   },
-  */
 
   /*
    * Restrict socket.io transport methods
@@ -492,7 +482,7 @@
       ["showusers"]
     ],
     "timeslider": [
-      ["timeslider_export"]
+      ["timeslider_export", "timeslider_returnToPad"]
     ]
   },
 
