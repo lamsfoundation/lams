@@ -169,7 +169,6 @@ public class AuthoringController {
 	zoom.setReflectOnActivity(authForm.isReflectOnActivity());
 	zoom.setReflectInstructions(authForm.getReflectInstructions());
 	zoom.setStartInMonitor(authForm.isStartInMonitor());
-	zoom.setEnableMeetingPassword(authForm.isEnableMeetingPassword());
 	Integer duration = authForm.getDuration();
 	zoom.setDuration(duration != null && duration > 0 ? duration : null);
     }

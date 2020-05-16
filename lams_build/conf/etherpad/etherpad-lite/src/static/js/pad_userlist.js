@@ -207,6 +207,7 @@ var paduserlist = (function()
         tr = $(getRowHtml(domId, getEmptyRowHtml(getAnimationHeight(ANIMATION_START)), authorId));
       }
       handleRowNode(tr, data);
+      $("table#otheruserstable").show();
       if (position == 0)
       {
         $("table#otheruserstable").prepend(tr);
@@ -262,6 +263,9 @@ var paduserlist = (function()
           rowsFadingOut.push(row);
           scheduleAnimation();
         }
+      }
+      if (rowsPresent.length === 0) {
+        $("table#otheruserstable").hide();
       }
     }
 
@@ -421,20 +425,6 @@ var paduserlist = (function()
     jqueryNode.removeAttr('disabled').addClass('editable');
   }
 
-  function updateInviteNotice()
-  {
-    if (otherUsersInfo.length == 0)
-    {
-      $("#otheruserstable").hide();
-      $("#nootherusers").show();
-    }
-    else
-    {
-      $("#nootherusers").hide();
-      $("#otheruserstable").show();
-    }
-  }
-
   var knocksToIgnore = {};
   var guestPromptFlashState = 0;
   var guestPromptFlash = padutils.makeAnimationScheduler(
@@ -493,7 +483,7 @@ var paduserlist = (function()
         });
       }
 	  */
-
+	  
       // color picker
       $("#myswatchbox").click(showColorPicker);
       $("#mycolorpicker .pickerswatchouter").click(function()
@@ -622,8 +612,6 @@ var paduserlist = (function()
         rowManager.insertRow(newIndex, userData);
       }
 
-      updateInviteNotice();
-
       self.updateNumberOfOnlineUsers();
     },
     updateNumberOfOnlineUsers: function()
@@ -671,13 +659,11 @@ var paduserlist = (function()
               hooks.callAll('userLeave', {
                 userInfo: info
               });
-              updateInviteNotice();
             }
           }
         }, 8000); // how long to wait
         userData.leaveTimer = thisLeaveTimer;
       }
-      updateInviteNotice();
 
       self.updateNumberOfOnlineUsers();
     },
@@ -806,7 +792,7 @@ function closeColorPicker(accept)
   }
 
   colorPickerOpen = false;
-  $("#mycolorpicker").fadeOut("fast");
+  $("#mycolorpicker").removeClass('popup-show');
 }
 
 function showColorPicker()
@@ -844,7 +830,7 @@ function showColorPicker()
       colorPickerSetup = true;
     }
 
-    $("#mycolorpicker").fadeIn();
+    $("#mycolorpicker").addClass('popup-show')
     colorPickerOpen = true;
 
     $("#colorpickerswatches li").removeClass('picked');

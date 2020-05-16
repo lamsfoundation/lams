@@ -16,13 +16,6 @@
 	</div>
 	
 	<div class="checkbox">
-		<label for="enableMeetingPassword">
-			<form:checkbox path="enableMeetingPassword" cssClass="noBorder" id="enableMeetingPassword" />
-			<fmt:message key="advanced.password" />
-		</label>
-	</div>
-	
-	<div class="checkbox">
 		<label for="durationSwitch">
 			<input type="checkbox" id="durationSwitch" class="noBorder" 
 				<c:if test="${durationSet}">

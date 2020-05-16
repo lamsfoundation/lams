@@ -70,6 +70,19 @@
 	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
+		// Resize Etherpad iframe when its content grows.
+		// It does not support shrinking, only growing.
+		// This feature requires ep_resize plugin installed in Etherpad and customised with code in Doku tool
+		$(window).on('message onmessage', function (e) {
+			var msg = e.originalEvent.data;
+	        if (msg.name === 'ep_resize') {
+	        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
+	        		iframe = $('iframe[src^="' + src + '"]'),
+	            	// height should be no less than 200 px
+	            	height = Math.max(200, msg.data.height);
+	           	iframe.height(height);
+	        }
+	    });
 		
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 			$('#etherpad-container-${groupSummary.sessionId}').pad({
@@ -333,11 +346,6 @@
 			$('#countdown').countdown('pause');
 		}
 	}
-	
-	function showTimeSlider(toolSessionId, padId) {
-		$('#etherpad-container-' + toolSessionId).html("<iframe src='${etherpadServerUrl}/p/" + padId + "/timeslider' width='100%' height='316'><iframe>");
-	}
-
 </script>
 
 <div class="panel">
@@ -412,12 +420,6 @@
 		</c:when>
 		<c:otherwise>
 			<div class="btn-group btn-group-xs pull-right">
-				<a href="#nogo" onclick="showTimeSlider(${groupSummary.sessionId}, '${groupSummary.padId}')" class="btn btn-default btn-sm "
-						title="<fmt:message key="label.timeslider" />">
-					<i class="fa fa-lg fa-clock-o"></i>
-					<fmt:message key="label.timeslider" />
-				</a>
-				
 				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
 				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
 						title="<fmt:message key="label.export.pad.html" />">

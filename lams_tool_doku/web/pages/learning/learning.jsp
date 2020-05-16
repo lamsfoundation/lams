@@ -41,6 +41,19 @@
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			// Resize Etherpad iframe when its content grows.
+			// It does not support shrinking, only growing.
+			// This feature requires ep_resize plugin installed in Etherpad and customised with code in Doku tool
+			$(window).on('message onmessage', function (e) {
+				var msg = e.originalEvent.data;
+		        if (msg.name === 'ep_resize') {
+		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
+		        		iframe = $('iframe[src^="' + src + '"]'),
+		            	// height should be no less than 200 px
+		            	height = Math.max(200, msg.data.height - ${hasEditRight ? 0 : 72});
+		           	iframe.height(height);
+		        }
+		    });
 			
 			$('#etherpad-container').pad({
 				'padId':'${padId}',

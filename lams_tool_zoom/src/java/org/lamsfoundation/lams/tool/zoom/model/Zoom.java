@@ -101,9 +101,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
     @Column(name = "meeting_password")
     private String meetingPassword;
 
-    @Column(name = "enable_meeting_password")
-    private boolean enableMeetingPassword;
-
     @OneToMany(mappedBy = "zoom")
     private Set<ZoomSession> zoomSessions;
 
@@ -233,14 +230,6 @@ public class Zoom implements java.io.Serializable, Cloneable {
 
     public void setMeetingStartUrl(String meetingStartUrl) {
 	this.meetingStartUrl = meetingStartUrl;
-    }
-
-    public boolean isEnableMeetingPassword() {
-	return enableMeetingPassword;
-    }
-
-    public void setEnableMeetingPassword(boolean enableMeetingPassword) {
-	this.enableMeetingPassword = enableMeetingPassword;
     }
 
     public String getMeetingPassword() {
