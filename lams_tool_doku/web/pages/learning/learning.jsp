@@ -50,7 +50,7 @@
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height - ${hasEditRight ? 0 : 72});
+		            	height = Math.max(200, msg.data.height - 10);
 		           	iframe.height(height);
 		        }
 		    });
