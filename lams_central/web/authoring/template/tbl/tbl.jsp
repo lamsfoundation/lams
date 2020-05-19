@@ -15,7 +15,7 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<style>
 		/* Hide them initially */
-		#question-bank-ira-div, .question-bank-ae-div {
+		.question-bank-div {
 			display: none;
 			margin-top: 20px;
 		}
@@ -144,8 +144,11 @@
 	    function openQuestionBank(appexNumber){
 	    	// empty field for IRA import
 	    	qbQuestionAddAppexNumber = appexNumber;
+	    	// make sure that only one Question Bank is open as its internal code has problems with multiple instances
+			$('.question-bank-div').hide().find('.panel-collapse').empty();
 	    	// show panel
 	    	$(appexNumber ? '#question-bank-ae-div-' + appexNumber : '#question-bank-ira-div').slideDown(function(){
+	    		var container = this;
 	    		// load question bank content
 				$(appexNumber ? '#question-bank-ae-collapse-' + appexNumber : '#question-bank-ira-collapse').load(
 					"<lams:LAMSURL/>searchQB/start.do",
@@ -155,8 +158,10 @@
 						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
 						// limit question to multiple choice (ira) or essay and multiple choice (ae)
 						toolSignature: appexNumber ? "lasurv11" : "lamc11"
+					}, function(){
+						 container.scrollIntoView(true);
 					}
-				);
+				)	
 		    });
 	    }
 	    
@@ -167,13 +172,13 @@
 			if (qbQuestionAddAppexNumber) {
 				createAssessment('importQbAe', 'numAssessments' + qbQuestionAddAppexNumber, 'divass' + qbQuestionAddAppexNumber, qbQuestionUid);
 				$('#question-bank-ae-div-' + qbQuestionAddAppexNumber).slideUp(function(){
-					$('#question-bank-ae-collapse-' + qbQuestionAddAppexNumber, this).empty();
+					$('.panel-collapse', this).empty();
 				});
 			} else {
 				// fetch HTML with filled data from QB question
 				createQuestion('numQuestions', 'divq', 'divquestions', 'importQbIra', '&qbQuestionUid=' + qbQuestionUid);
 				$('#question-bank-ira-div').slideUp(function(){
-					$('#question-bank-ira-collapse', this).empty();
+					$('.panel-collapse', this).empty();
 				});
 			}
 		};
@@ -264,7 +269,7 @@
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="#" onClick="javascript:openQuestionBank()"> 
-								<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
+							<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
 							</a>
 						</li>
 					</ul>
@@ -274,7 +279,7 @@
 			</span>
 			
 			<!-- Question Bank -->
-			<div class="panel-group" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
+			<div class="panel-group question-bank-div" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
 			    <div class="panel panel-default">
 			        <div class="panel-heading collapsable-icon-left" id="question-bank-ira-heading">
 			        	<span class="panel-title">

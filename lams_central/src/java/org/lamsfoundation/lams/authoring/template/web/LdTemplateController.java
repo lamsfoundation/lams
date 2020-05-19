@@ -1377,7 +1377,7 @@ public abstract class LdTemplateController {
 	String questionType = WebUtil.readStrParam(request, "questionType");
 	if (questionType != null) {
 	    if (questionType.equalsIgnoreCase("essay")) {
-		return "authoring/template/tool/assessmcq";
+		return "authoring/template/tool/assessment";
 	    }
 	    // if it is a import from Question Bank, we need to do further processing
 	    if (questionType.equalsIgnoreCase("importQbAe")) {

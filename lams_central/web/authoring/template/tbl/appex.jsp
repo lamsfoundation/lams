@@ -46,7 +46,7 @@
 			</div>
 			
 			<!-- Question Bank for this Application Excercise -->
-			<div class="panel-group question-bank-ae-div" id="question-bank-ae-div-${appexNumber}" role="tablist" aria-multiselectable="true"> 
+			<div class="panel-group question-bank-div" id="question-bank-ae-div-${appexNumber}" role="tablist" aria-multiselectable="true"> 
 			    <div class="panel panel-default">
 			        <div class="panel-heading collapsable-icon-left" id="question-bank-ae-heading-${appexNumber}">
 			        	<span class="panel-title">
