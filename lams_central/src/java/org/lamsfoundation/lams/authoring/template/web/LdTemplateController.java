@@ -51,6 +51,9 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
@@ -65,10 +68,13 @@ import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -115,6 +121,8 @@ public abstract class LdTemplateController {
     protected IWorkspaceManagementService workspaceManagementService;
     @Autowired
     protected IAuthoringFullService authoringService;
+    @Autowired
+    protected IQbService qbService;
     @Autowired
     protected IToolDAO toolDAO;
 
@@ -1367,11 +1375,16 @@ public abstract class LdTemplateController {
 	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 
 	String questionType = WebUtil.readStrParam(request, "questionType");
-	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
-	    return "/authoring/template/tool/assessment";
-	} else {
-	    return "authoring/template/tool/assessmcq";
+	if (questionType != null) {
+	    if (questionType.equalsIgnoreCase("essay")) {
+		return "authoring/template/tool/assessmcq";
+	    }
+	    // if it is a import from Question Bank, we need to do further processing
+	    if (questionType.equalsIgnoreCase("importQbAe")) {
+		return "forward:importQbAe.do";
+	    }
 	}
+	return "/authoring/template/tool/assessmcq";
 
     }
 
@@ -1386,6 +1399,65 @@ public abstract class LdTemplateController {
 	request.setAttribute("numQuestionsFieldname", WebUtil.readStrParam(request, "numQuestionsFieldname"));
 	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 	return "/authoring/template/tool/" + templatePage;
+    }
+
+    /**
+     * Gets a QB question based on its UID and creates a structure for template wizard JSP.
+     */
+    @RequestMapping("/importQbAe")
+    private String importAeQuestionFromQb(@RequestParam long qbQuestionUid, Model model)
+	    throws UnsupportedEncodingException {
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
+
+	Assessment question = new Assessment();
+	question.setType(qbQuestion.getType().shortValue());
+	question.setTitle(qbQuestion.getName());
+	question.setText(qbQuestion.getDescription());
+	question.setMultipleAnswersAllowed(qbQuestion.isMultipleAnswersAllowed());
+	question.setRequired(qbQuestion.isAnswerRequired());
+	question.setDefaultGrade(qbQuestion.getMaxMark());
+	question.setUuid(qbQuestion.getUuid().toString());
+
+	model.addAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
+	model.addAttribute("question", question);
+
+	if (question.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    Set<AssessMCAnswer> answers = question.getAnswers();
+	    for (QbOption qbOption : qbQuestion.getQbOptions()) {
+		AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
+			qbOption.getMaxMark());
+		answers.add(answer);
+	    }
+	    return "/authoring/template/tool/assessmcq";
+	}
+	return "/authoring/template/tool/assessment";
+    }
+
+    /**
+     * Gets a QB question based on its UID and creates a structure for template wizard JSP.
+     */
+    @RequestMapping("/importQbIra")
+    private String importIraQuestionFromQb(@RequestParam long qbQuestionUid, @RequestParam int questionNumber,
+	    Model model) throws UnsupportedEncodingException {
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
+
+	Assessment question = new Assessment();
+	question.setType(Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE);
+	question.setTitle(qbQuestion.getName());
+	question.setText(qbQuestion.getDescription());
+	question.setUuid(qbQuestion.getUuid().toString());
+
+	Set<AssessMCAnswer> answers = question.getAnswers();
+	for (QbOption qbOption : qbQuestion.getQbOptions()) {
+	    AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
+		    qbOption.getMaxMark());
+	    answers.add(answer);
+	}
+
+	model.addAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
+	model.addAttribute("question", question);
+	model.addAttribute("questionNumber", questionNumber);
+	return "/authoring/template/tool/mcquestion";
     }
 
     private List<Assessment> preprocessQuestions(Question[] questions, String contentFolderID) {
@@ -1530,6 +1602,10 @@ public abstract class LdTemplateController {
 		    break;
 		case ("peerreviewstar"):
 		    path = "authoring/template/tool/peerreviewstar";
+		    break;
+		case ("importQbIra"):
+		    // further processing in another action method
+		    path = "forward:importQbIra.do";
 		    break;
 		default:
 		    path = null;
