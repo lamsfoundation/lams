@@ -45,10 +45,11 @@ CREATE TRIGGER before_insert_qb_question
 CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
                                     `qb_question_uid` BIGINT NOT NULL,
                                     `tool_content_id` BIGINT NOT NULL,
-                                    `display_order` TINYINT NOT NULL DEFAULT 1,
+                                    `display_order` TINYINT UNSIGNED NOT NULL DEFAULT 1,
                                     PRIMARY KEY (tool_question_uid),
                                     INDEX (tool_content_id),
                                     CONSTRAINT FK_lams_qb_tool_question_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE);
+
 -- create Question Bank option
 CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
                              `qb_question_uid` BIGINT NOT NULL,
@@ -158,6 +159,16 @@ ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
                                   DROP COLUMN mark,
                                   DROP COLUMN display_order,
                                   DROP COLUMN feedback;
+
+-- add missing display order in options, if any
+UPDATE tl_lamc11_options_content AS c 
+	JOIN (SELECT MIN(uid)-1 AS uid_shift, mc_que_content_id
+		FROM tl_lamc11_options_content
+		WHERE displayOrder IS NULL
+		GROUP BY mc_que_content_id) AS s
+	USING (mc_que_content_id)
+	SET c.displayOrder = c.uid - s.uid_shift
+	WHERE c.displayOrder IS NULL;
                                   
 -- fill table with options matching unique QB questions inserted above
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, max_mark)
