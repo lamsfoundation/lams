@@ -141,7 +141,7 @@
 	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
 	    }
 
-		function createAssessment(questionType, numAssessmentsFieldname, containingDivName ) {
+		function createAssessment(questionType, numAssessmentsFieldname, containingDivName, qbQuestionUid) {
 			var numAssessments = $('#'+numAssessmentsFieldname);
 			var type = questionType ? questionType : 'essay';
 			var currNum = numAssessments.val();
@@ -150,6 +150,9 @@
 			newDiv.id = containingDivName+'divassess'+nextNum;
 			newDiv.className = 'space-top space-sides';
 			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type+"&containingDivName="+containingDivName;
+			if (qbQuestionUid) {
+				url += '&qbQuestionUid=' + qbQuestionUid;
+			}
 			$('#'+containingDivName).append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {

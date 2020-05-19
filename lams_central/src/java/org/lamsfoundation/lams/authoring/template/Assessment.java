@@ -24,9 +24,11 @@
 package org.lamsfoundation.lams.authoring.template;
 
 import java.text.MessageFormat;
-import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.rest.RestTags;
 
@@ -53,13 +55,14 @@ public class Assessment {
     Boolean required = false;
     int defaultGrade = 1;
     boolean multipleAnswersAllowed = false; // only used if type == 1
-    List<AssessMCAnswer> answers = null; // only used if type == 1
+    Set<AssessMCAnswer> answers = null; // only used if type == 1
     String uuid = null; // used when QTI gets imported and it contains QB question UUID
 
     public void setType(short type) {
 	this.type = type;
 	if (type == 1 && this.answers == null) {
-	    this.answers = new LinkedList<>();
+	    // JSP template pages expect this list to be in correct order
+	    this.answers = new TreeSet<>(Comparator.comparingInt(AssessMCAnswer::getSequenceId));
 	}
     }
 
@@ -107,7 +110,7 @@ public class Assessment {
 	this.defaultGrade = defaultGrade;
     }
 
-    public List<AssessMCAnswer> getAnswers() {
+    public Set<AssessMCAnswer> getAnswers() {
 	return answers;
     }
 

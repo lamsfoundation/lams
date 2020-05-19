@@ -14,8 +14,8 @@
  	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<style>
-		/* Hide it initially */
-		#question-bank-div {
+		/* Hide them initially */
+		#question-bank-ira-div, .question-bank-ae-div {
 			display: none;
 			margin-top: 20px;
 		}
@@ -34,6 +34,8 @@
 
 		var minimumWordsSpinnerArray  = new Array(); // Peer Review Tab.
 		var showTime = 100; // how long should it take a field to show/hide.
+		var qbQuestionAddAppexNumber = null; // if null, we are importin IRA question from QB
+											 // otherwise we are importing a question for the given AE
 		
 		$(document).ready(function() {
 			groupingChanged();
@@ -67,7 +69,7 @@
 			initializeWizard(validator);
 		});
 
-		function createApplicationExercise(numAppexFieldname ) {
+		function createApplicationExercise() {
 			var numAppex = $('#numAppEx');
 			var currNum = numAppex.val();
 			var nextNum = +currNum + 1;
@@ -139,18 +141,20 @@
 	    	}
 	    }
 	    
-	    function openQuestionBank(){
+	    function openQuestionBank(appexNumber){
+	    	// empty field for IRA import
+	    	qbQuestionAddAppexNumber = appexNumber;
 	    	// show panel
-	    	$('#question-bank-div').slideDown(function(){
+	    	$(appexNumber ? '#question-bank-ae-div-' + appexNumber : '#question-bank-ira-div').slideDown(function(){
 	    		// load question bank content
-				$('#question-bank-collapse').load(
+				$(appexNumber ? '#question-bank-ae-collapse-' + appexNumber : '#question-bank-ira-collapse').load(
 					"<lams:LAMSURL/>searchQB/start.do",
 					{
 						// this action returns ID of the created QB question
 						// which is put into itemArea div
 						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
-						// limit question to multiple choice
-						toolSignature: "lamc11"
+						// limit question to multiple choice (ira) or essay and multiple choice (ae)
+						toolSignature: appexNumber ? "lasurv11" : "lamc11"
 					}
 				);
 		    });
@@ -160,10 +164,18 @@
 		function refreshThickbox(){
 			// extract the ID
 			var qbQuestionUid = +$("#itemArea").text();
-			// fetch HTML with filled data from QB question
-			createQuestion('numQuestions', 'divq', 'divquestions', 'importQb', '&qbQuestionUid=' + qbQuestionUid);
-			
-			$('#question-bank-div').slideUp();
+			if (qbQuestionAddAppexNumber) {
+				createAssessment('importQbAe', 'numAssessments' + qbQuestionAddAppexNumber, 'divass' + qbQuestionAddAppexNumber, qbQuestionUid);
+				$('#question-bank-ae-div-' + qbQuestionAddAppexNumber).slideUp(function(){
+					$('#question-bank-ae-collapse-' + qbQuestionAddAppexNumber, this).empty();
+				});
+			} else {
+				// fetch HTML with filled data from QB question
+				createQuestion('numQuestions', 'divq', 'divquestions', 'importQbIra', '&qbQuestionUid=' + qbQuestionUid);
+				$('#question-bank-ira-div').slideUp(function(){
+					$('#question-bank-ira-collapse', this).empty();
+				});
+			}
 		};
 
         $(document).ready(function(){
@@ -252,7 +264,7 @@
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="#" onClick="javascript:openQuestionBank()"> 
-								<fmt:message key="authoring.create.question.qb"/>
+								<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
 							</a>
 						</li>
 					</ul>
@@ -262,17 +274,17 @@
 			</span>
 			
 			<!-- Question Bank -->
-			<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
+			<div class="panel-group" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
 			    <div class="panel panel-default">
-			        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
+			        <div class="panel-heading collapsable-icon-left" id="question-bank-ira-heading">
 			        	<span class="panel-title">
-					    	<a role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="true" aria-controls="question-bank-collapse" >
+					    	<a role="button" data-toggle="collapse" href="#question-bank-ira-collapse" aria-expanded="true" aria-controls="question-bank-ira-collapse" >
 				          		<fmt:message key="label.question.bank" />
 				        	</a>
 			      		</span>
 			        </div>
 			
-					<div id="question-bank-collapse" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="question-bank-heading">
+					<div id="question-bank-ira-collapse" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="question-bank-ira-heading">
 						<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>			
 					</div>
 				</div>

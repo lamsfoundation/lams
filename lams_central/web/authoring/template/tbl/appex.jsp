@@ -30,6 +30,9 @@
 			<div class="space-top space-sides">
 				<a href="#" id="divass${appexNumber}CEssay" onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.essay.question"/></a>
 				<a href="#" id="divass${appexNumber}CMCQ"  onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.mc.question"/></a>
+				
+				<a href="#" id="divass${appexNumber}CQB" onClick="javascript:openQuestionBank(${appexNumber})" class="btn btn-default"><i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb" /></a>
+				
 				<a href="#" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('appex${appexNumber}')" class="btn btn-default pull-right"><i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</div>
 			<div class="space-top space-sides space-bottom">
@@ -39,6 +42,23 @@
 				</label></div>
 				<div class="form-group" id="divappex${appexNumber}NBEntryDiv">
 					<lams:CKEditor id="divappex${appexNumber}NBEntry" value="" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
+				</div>
+			</div>
+			
+			<!-- Question Bank for this Application Excercise -->
+			<div class="panel-group question-bank-ae-div" id="question-bank-ae-div-${appexNumber}" role="tablist" aria-multiselectable="true"> 
+			    <div class="panel panel-default">
+			        <div class="panel-heading collapsable-icon-left" id="question-bank-ae-heading-${appexNumber}">
+			        	<span class="panel-title">
+					    	<a role="button" data-toggle="collapse" href="#question-bank-ae-collapse-${appexNumber}" aria-expanded="true" aria-controls="question-bank-ae-collapse-${appexNumber}" >
+				          		<fmt:message key="label.question.bank" />
+				        	</a>
+			      		</span>
+			        </div>
+			
+					<div id="question-bank-ae-collapse-${appexNumber}" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="question-bank-ae-heading-${appexNumber}">
+						<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>			
+					</div>
 				</div>
 			</div>
 	</div>

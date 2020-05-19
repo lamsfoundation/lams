@@ -3513,9 +3513,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		List<QbOption> optionList = new ArrayList<>();
 		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
 		for (JsonNode answerData : optionsData) {
-		    QbOption option = new QbOption();
-		    option.setQbQuestion(qbQuestion);
-		    option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
+		    int displayOrder = JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER);
+		    QbOption option = null;
+		    // check if existing question gets modified or do we create a new one
+		    for (QbOption existingOption : qbQuestion.getQbOptions()) {
+			if (existingOption.getDisplayOrder() == displayOrder) {
+			    option = existingOption;
+			    break;
+			}
+		    }
+		    if (option == null) {
+			option = new QbOption();
+			option.setDisplayOrder(displayOrder);
+			option.setQbQuestion(qbQuestion);
+		    }
+		    
+		  
 		    Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
 		    if (correct == null) {
 			Double grade = JsonUtil.optDouble(answerData, "grade");

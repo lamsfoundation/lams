@@ -186,6 +186,7 @@ public class QbQuestion implements Serializable, Cloneable {
 			    //changed option maxMark (Assessment tool) or correctness of the option (MCQ/Scratchie/Q&A)
 			    || (oldOption.getMaxMark() != newOption.getMaxMark())) {
 			isModificationRequiresNewVersion = true;
+			break;
 		    }
 		}
 	    }

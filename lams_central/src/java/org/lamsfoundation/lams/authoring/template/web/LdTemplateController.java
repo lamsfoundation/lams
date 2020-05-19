@@ -1375,11 +1375,16 @@ public abstract class LdTemplateController {
 	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
 
 	String questionType = WebUtil.readStrParam(request, "questionType");
-	if (questionType == null || !questionType.equalsIgnoreCase("mcq")) {
-	    return "/authoring/template/tool/assessment";
-	} else {
-	    return "authoring/template/tool/assessmcq";
+	if (questionType != null) {
+	    if (questionType.equalsIgnoreCase("essay")) {
+		return "authoring/template/tool/assessmcq";
+	    }
+	    // if it is a import from Question Bank, we need to do further processing
+	    if (questionType.equalsIgnoreCase("importQbAe")) {
+		return "forward:importQbAe.do";
+	    }
 	}
+	return "/authoring/template/tool/assessmcq";
 
     }
 
@@ -1399,9 +1404,41 @@ public abstract class LdTemplateController {
     /**
      * Gets a QB question based on its UID and creates a structure for template wizard JSP.
      */
-    @RequestMapping("/importQb")
-    private String importQuestionFromQb(@RequestParam long qbQuestionUid, @RequestParam int questionNumber, Model model)
+    @RequestMapping("/importQbAe")
+    private String importAeQuestionFromQb(@RequestParam long qbQuestionUid, Model model)
 	    throws UnsupportedEncodingException {
+	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
+
+	Assessment question = new Assessment();
+	question.setType(qbQuestion.getType().shortValue());
+	question.setTitle(qbQuestion.getName());
+	question.setText(qbQuestion.getDescription());
+	question.setMultipleAnswersAllowed(qbQuestion.isMultipleAnswersAllowed());
+	question.setRequired(qbQuestion.isAnswerRequired());
+	question.setDefaultGrade(qbQuestion.getMaxMark());
+	question.setUuid(qbQuestion.getUuid().toString());
+
+	model.addAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, qbQuestion.getContentFolderId());
+	model.addAttribute("question", question);
+
+	if (question.getType() == Assessment.ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    Set<AssessMCAnswer> answers = question.getAnswers();
+	    for (QbOption qbOption : qbQuestion.getQbOptions()) {
+		AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
+			qbOption.getMaxMark());
+		answers.add(answer);
+	    }
+	    return "/authoring/template/tool/assessmcq";
+	}
+	return "/authoring/template/tool/assessment";
+    }
+
+    /**
+     * Gets a QB question based on its UID and creates a structure for template wizard JSP.
+     */
+    @RequestMapping("/importQbIra")
+    private String importIraQuestionFromQb(@RequestParam long qbQuestionUid, @RequestParam int questionNumber,
+	    Model model) throws UnsupportedEncodingException {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 
 	Assessment question = new Assessment();
@@ -1410,7 +1447,7 @@ public abstract class LdTemplateController {
 	question.setText(qbQuestion.getDescription());
 	question.setUuid(qbQuestion.getUuid().toString());
 
-	List<AssessMCAnswer> answers = question.getAnswers();
+	Set<AssessMCAnswer> answers = question.getAnswers();
 	for (QbOption qbOption : qbQuestion.getQbOptions()) {
 	    AssessMCAnswer answer = new AssessMCAnswer(qbOption.getDisplayOrder(), qbOption.getName(),
 		    qbOption.getMaxMark());
@@ -1566,9 +1603,9 @@ public abstract class LdTemplateController {
 		case ("peerreviewstar"):
 		    path = "authoring/template/tool/peerreviewstar";
 		    break;
-		case ("importQb"):
+		case ("importQbIra"):
 		    // further processing in another action method
-		    path = "forward:importQb.do";
+		    path = "forward:importQbIra.do";
 		    break;
 		default:
 		    path = null;
