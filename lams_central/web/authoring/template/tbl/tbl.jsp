@@ -23,6 +23,10 @@
 		#itemArea {
 			display: none;
 		}
+		
+		.collapsable-icon-left a[data-toggle="collapse"] {
+			text-decoration: none;
+		}
 	</style>
 	
 	<title><fmt:message key="authoring.tbl.template.title"/></title>

@@ -12,18 +12,21 @@
 <c:set var="questionTitleField">question${questionNumber}title</c:set>
 
 <div class="panel panel-default">
-	<div class="panel-heading">
+	<div class="panel-heading" id="questionPanelHeading${questionNumber}">
 		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
 			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
-		<div class="panel-title">		
-		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
-			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-		${questionNumber eq 1 ? "</label>" : ""}
+		<div class="panel-title collapsable-icon-left">	
+			<a role="button" data-toggle="collapse" href="#questionPanelCollapse${questionNumber}" 
+				aria-expanded="true" aria-controls="questionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
+		  	</a>	
+			${questionNumber eq 1 ? "<label class=\"required\">" : ""}
+				<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
+			${questionNumber eq 1 ? "</label>" : ""}
 			<input name="${questionTitleField}" id="${questionTitleField}" type="hidden" value="${questionTitle}"/>
 		</div>
 	</div>
 
-	<div class="panel-body">	
+	<div class="panel-body panel-collapse collapse in" id="questionPanelCollapse${questionNumber}" role="tabpanel" aria-labelledby="questionPanelHeading${questionNumber}">	
 		<input type="hidden" name="question${questionNumber}uuid" value="${question.uuid}"/>
 		<lams:CKEditor id="question${questionNumber}" value="${question.text}" contentFolderID="${contentFolderID}" height="100"></lams:CKEditor>
 		
