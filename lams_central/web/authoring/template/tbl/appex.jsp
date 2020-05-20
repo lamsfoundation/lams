@@ -13,7 +13,7 @@
 			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
      	<span class="panel-title collapsable-icon-left">
      		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapseAppex${appexNumber}" 
-			aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapseAppex${appexNumber}" >&nbsp;
+			aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapseAppex${appexNumber}" >&nbsp;&nbsp;
 			</a>
 		</span>
 			${appexNumber eq 1 ? "<label class=\"required\">" : ""}
