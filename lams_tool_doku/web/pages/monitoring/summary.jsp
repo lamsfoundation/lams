@@ -72,6 +72,7 @@
 	        }
 	    });
 		
+		<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 			$('#etherpad-container-${groupSummary.sessionId}').pad({
 				'padId':'${groupSummary.padId}',
@@ -81,7 +82,7 @@
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
 				'height':'600',
-				'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'
+				'userName':'<c:out value="${fullName}" />'
 			});			
 		</c:forEach>
 		
