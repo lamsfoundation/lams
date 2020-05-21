@@ -78,7 +78,10 @@
 							'showControls':${empty showControls ? false : showControls},
 							'showChat': ${empty showChat ? false : showChat},
 							'height': ${empty height ? 'undefined' : height}
-							<c:if test="${showControls}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
+							<c:if test="${showControls}">
+								<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
+								,'userName':'<c:out value="${fullName}" />'
+							</c:if>
 						});
 					}
 				}
