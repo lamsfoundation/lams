@@ -108,6 +108,7 @@ function initializeJRating() {
 	$(".add-comment-new").click(function() {
     	var itemId = $(this).data("item-id");
     	var commentsCriteriaId = $(this).data("comment-criteria-id");
+    	var showAllComments = $(this).data('show-all-comments');
     	
 		var comment = validComment("comment-textarea-" + itemId, false, false);
 		if ( ! comment )
@@ -124,20 +125,33 @@ function initializeJRating() {
 	    			hasRatingLimits: HAS_RATING_LIMITS,
 	    			ratingLimitsByCriteria: ratingLimitsByCriteria,
 	    			maxRatingsForItem: maxRatingsForItem,
+	    			showAllComments : showAllComments,
 	    			toolSessionId: SESSION_ID
 	    		},
 	    		success: function(data, textStatus) {
 	    			if ( data.error ) {
 	    				handleError();
 	    			} else {
-		   				//add comment to HTML
-	   					jQuery('<div/>', {
-	   						'class': "rating-comment",
-	   						html: data.comment
-	   					}).appendTo('#comments-area-' + itemId);
+	    				var commentsArea = $('#comments-area-' + itemId);
+		   				
+	    				if (data.allComments) {
+	    					// add all users' comments to HTML
+	    					jQuery.each(data.allComments, function(){
+			   					jQuery('<div/>', {
+			   						'class': "rating-comment",
+			   						html: this
+			   					}).appendTo(commentsArea);
+	    					});
+	    				} else {
+	    					//add this user's comment to HTML
+		   					jQuery('<div/>', {
+		   						'class': "rating-comment",
+		   						html: data.comment
+		   					}).appendTo(commentsArea);
+	    				}
 	   					
 	 	 				//hide comments textarea and button
-		   				$("#add-comment-area-" + itemId).hide();
+		   				$("#add-comment-area-" + itemId, commentsArea).hide();
 	   			
 		   				//handle rating limits if available
 		  				if (HAS_RATING_LIMITS) {

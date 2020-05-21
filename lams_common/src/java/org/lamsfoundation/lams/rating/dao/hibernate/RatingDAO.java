@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.util.Collection;
@@ -60,13 +58,22 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	    + " AS r where r.ratingCriteria.ratingCriteriaId IN (:ratingCriteriaIds) AND r.itemId IN (:itemIds)";
 
     private static final String FIND_RATING_AVERAGE_BY_ITEM = "SELECT AVG(r.rating), COUNT(*) FROM "
-	    + Rating.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.toolSessionId=? AND r.itemId=?";
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.toolSessionId=? AND r.itemId=?";
 
     private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName()
-	    + " AS r where r.ratingCriteria.toolContentId=? AND r.toolSessionId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
 
     private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=:contentId AND r.itemId IN (:itemIds) GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
+
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_SESSION_AND_ITEM = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
+	    + Rating.class.getName()
+	    + " AS r where r.ratingCriteria.toolContentId=? AND r.toolSessionId=? AND r.itemId=? GROUP BY r.ratingCriteria.ratingCriteriaId";
+
+    private static final String FIND_RATING_AVERAGE_BY_CONTENT_AND_SESSION_AND_ITEMS = "SELECT r.itemId, r.ratingCriteria.ratingCriteriaId, AVG(r.rating), COUNT(*) FROM "
 	    + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.toolContentId=:contentId AND r.toolSessionId=:toolSessionId AND r.itemId IN (:itemIds) GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
 
@@ -74,16 +81,15 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	    + Rating.class.getName()
 	    + " AS r where r.ratingCriteria.toolContentId=? GROUP BY r.itemId, r.ratingCriteria.ratingCriteriaId";
 
-    // Used by tools to get the ratings and comments relating to their items, as submitted by a particular user. 
+    // Used by tools to get the ratings and comments relating to their items, as submitted by a particular user.
     // To be used within SQL and supply the userId as :userId and criteriaId as :ratingCriteriaId
     // See Peer Review for example usage. Special version for comment style as there is no entry in the lams_rating table for a comment style rating.
-    private static final String TOOL_SELECT_LEFT_JOIN_BY_USER_STANDARD = "SELECT r.item_id, ANY_VALUE(rc.comment) comment, ANY_VALUE(r2.rating) rating, AVG(r.rating) average_rating, COUNT(r.rating) count_vote "              
-	    + " FROM lams_rating r  "              
-	    + " LEFT JOIN lams_rating r2  ON r2.rating_criteria_id = r.rating_criteria_id AND r.item_id = r2.item_id AND r2.user_id = :userId "              
-	    + " LEFT JOIN lams_rating_comment rc ON rc.rating_criteria_id = r.rating_criteria_id AND rc.item_id = r2.item_id AND rc.user_id = :userId "              
-	    + " WHERE r.rating_criteria_id = :ratingCriteriaId "              
-	    + " GROUP BY r.item_id";
-	    
+    private static final String TOOL_SELECT_LEFT_JOIN_BY_USER_STANDARD = "SELECT r.item_id, ANY_VALUE(rc.comment) comment, ANY_VALUE(r2.rating) rating, AVG(r.rating) average_rating, COUNT(r.rating) count_vote "
+	    + " FROM lams_rating r  "
+	    + " LEFT JOIN lams_rating r2  ON r2.rating_criteria_id = r.rating_criteria_id AND r.item_id = r2.item_id AND r2.user_id = :userId "
+	    + " LEFT JOIN lams_rating_comment rc ON rc.rating_criteria_id = r.rating_criteria_id AND rc.item_id = r2.item_id AND rc.user_id = :userId "
+	    + " WHERE r.rating_criteria_id = :ratingCriteriaId " + " GROUP BY r.item_id";
+
     // Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply criteriaId as :ratingCriteriaId
     // See Peer Review for example usage.
     private static final String TOOL_SELECT_LEFT_JOIN_BY_USER_COMMENT = "SELECT r.item_id, r.comment "
@@ -95,11 +101,10 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	    + "      JOIN lams_rating_criteria c ON r.item_id = :userId AND c.tool_content_id = :toolContentId "
 	    + "      AND c.rating_criteria_id = :ratingCriteriaId AND c.rating_criteria_id = r.rating_criteria_id "
 	    + "      LEFT JOIN lams_rating_comment rc ON rc.rating_criteria_id = r.rating_criteria_id AND rc.item_id = r.item_id and rc.user_id = r.user_id "
-	    + "      LEFT JOIN ( " 	              
-	    + "                SELECT r2.item_id, AVG(r2.rating) average_rating, COUNT(*) count_vote  " 	              
-	    + "                FROM lams_rating r2 WHERE r2.rating_criteria_id = :ratingCriteriaId AND r2.item_id = :userId " 	              
-	    + "                GROUP BY r2.item_id  " 	              
-	    + "                ) calc ON calc.item_id = r.item_id "; 	 
+	    + "      LEFT JOIN ( "
+	    + "                SELECT r2.item_id, AVG(r2.rating) average_rating, COUNT(*) count_vote  "
+	    + "                FROM lams_rating r2 WHERE r2.rating_criteria_id = :ratingCriteriaId AND r2.item_id = :userId "
+	    + "                GROUP BY r2.item_id  " + "                ) calc ON calc.item_id = r.item_id ";
 
     // Same as TOOL_SELECT_LEFT_JOIN_BY_USER_COMMENT except that it returns all the comments results for a single user (:userId), as left by other users
     private static final String TOOL_SELECT_LEFT_JOIN_FOR_USER_COMMENT = "SELECT r.item_id, r.comment"
@@ -120,6 +125,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	getSession().flush();
     }
 
+    @Override
     public void delete(Object object) {
 	getSession().delete(object);
 	getSession().flush();
@@ -127,7 +133,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     @Override
     public Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId) {
-	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM,
+	List<Rating> list = doFind(FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM,
 		new Object[] { ratingCriteriaId, userId, itemId });
 	if (list.size() > 0) {
 	    return list.get(0);
@@ -143,8 +149,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     // method is not used at the moment
     private Rating getRating(Long ratingCriteriaId, Integer userId) {
-	List<Rating> list = (List<Rating>) doFind(FIND_RATING_BY_CRITERIA_AND_USER,
-		new Object[] { ratingCriteriaId, userId });
+	List<Rating> list = doFind(FIND_RATING_BY_CRITERIA_AND_USER, new Object[] { ratingCriteriaId, userId });
 	if (list.size() > 0) {
 	    return list.get(0);
 	} else {
@@ -154,44 +159,59 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     @Override
     public List<Rating> getRatingsByUser(Long contentId, Integer userId) {
-	return (List<Rating>) doFind(FIND_RATINGS_BY_USER, new Object[] { contentId, userId });
+	return doFind(FIND_RATINGS_BY_USER, new Object[] { contentId, userId });
     }
 
     @Override
     public List<Rating> getRatingsByUserCriteria(Long criteriaId, Integer userId) {
-	return (List<Rating>) doFind(FIND_RATINGS_BY_USER_CRITERIA, new Object[] { criteriaId, userId });
+	return doFind(FIND_RATINGS_BY_USER_CRITERIA, new Object[] { criteriaId, userId });
     }
 
     @Override
     public ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long toolSessionId, Long itemId) {
-	List<Object[]> list = (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_ITEM,
+	List<Object[]> list = doFind(FIND_RATING_AVERAGE_BY_ITEM,
 		new Object[] { ratingCriteriaId, toolSessionId, itemId });
 	Object[] results = list.get(0);
 
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
 
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
-	return new ItemRatingCriteriaDTO((Number)averageRatingObj, numberOfVotes);
+	return new ItemRatingCriteriaDTO((Number) averageRatingObj, numberOfVotes);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId) {
+	return doFind(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM, new Object[] { contentId, itemId });
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds) {
+	return getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS).setParameter("contentId", contentId)
+		.setParameterList("itemIds", itemIds).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long toolSessionId, Long itemId) {
-	return (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEM, new Object[] { contentId, toolSessionId, itemId });
+	return doFind(FIND_RATING_AVERAGE_BY_CONTENT_AND_SESSION_AND_ITEM,
+		new Object[] { contentId, toolSessionId, itemId });
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Long toolSessionId, Collection<Long> itemIds) {
-	return getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_ITEMS).setParameter("contentId", contentId)
-		.setParameter("toolSessionId", toolSessionId)
+    public List<Object[]> getRatingAverageByContentAndItems(Long contentId, Long toolSessionId,
+	    Collection<Long> itemIds) {
+	return getSession().createQuery(FIND_RATING_AVERAGE_BY_CONTENT_AND_SESSION_AND_ITEMS)
+		.setParameter("contentId", contentId).setParameter("toolSessionId", toolSessionId)
 		.setParameterList("itemIds", itemIds).list();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getRatingAverageByContent(Long contentId) {
-	return (List<Object[]>) doFind(FIND_RATING_AVERAGE_BY_CONTENT_ID, new Object[] { contentId });
+	return doFind(FIND_RATING_AVERAGE_BY_CONTENT_ID, new Object[] { contentId });
     }
 
     @Override
@@ -222,7 +242,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
 		.setParameter("toolContentId", toolContentId).setParameter("userId", userId).list();
 
-	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
+	Set<Long> unionItemIds = new HashSet<>(ratedItemIds);
 	unionItemIds.addAll(commentedItemIds);
 
 	return unionItemIds.size();
@@ -246,7 +266,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	List<Long> commentedItemIds = this.getSession().createQuery(FIND_ITEM_IDS_COMMENTED_BY_USER)
 		.setParameter("criteriaId", criteriaId).setParameter("userId", userId).list();
 
-	Set<Long> unionItemIds = new HashSet<Long>(ratedItemIds);
+	Set<Long> unionItemIds = new HashSet<>(ratedItemIds);
 	unionItemIds.addAll(commentedItemIds);
 
 	return unionItemIds.size();
@@ -254,10 +274,10 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId) {
 
-	HashMap<Long, Long> itemIdToRatedUsersCountMap = new HashMap<Long, Long>();
+	HashMap<Long, Long> itemIdToRatedUsersCountMap = new HashMap<>();
 	if (itemIds.isEmpty()) {
 	    return itemIdToRatedUsersCountMap;
 	}
@@ -273,8 +293,9 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 		+ " AS r where comment.ratingCriteria.toolContentId=:contentId AND comment.itemId IN (:itemIds) AND comment.ratingCriteria.commentsEnabled IS TRUE"
 		+ " AND comment.toolSessionId=:toolSessionId";
 
-	List<Object[]> ratedItemObjs  = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
-		.setParameter("contentId", contentId).setParameter("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
+	List<Object[]> ratedItemObjs = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
+		.setParameter("contentId", contentId).setParameter("toolSessionId", toolSessionId)
+		.setParameterList("itemIds", itemIds).list();
 
 	List<Object[]> commentedItemObjs = getSession()
 		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setParameter("contentId", contentId)
@@ -283,13 +304,13 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	return createUsersRatedEachItem(itemIds, excludeUserId, itemIdToRatedUsersCountMap, ratedItemObjs,
 		commentedItemObjs);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
+    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId) {
 
-	HashMap<Long, Long> itemIdToRatedUsersCountMap = new HashMap<Long, Long>();
+	HashMap<Long, Long> itemIdToRatedUsersCountMap = new HashMap<>();
 	if (itemIds.isEmpty()) {
 	    return itemIdToRatedUsersCountMap;
 	}
@@ -306,14 +327,14 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 		+ " AND comment.itemId IN (:itemIds) AND comment.ratingCriteria.commentsEnabled IS TRUE"
 		+ " AND comment.toolSessionId=:toolSessionId";
 
-
 	List<Object[]> ratedItemObjs = getSession().createQuery(FIND_ITEMID_USERID_PAIRS_BY_CONTENT_AND_ITEMS)
 		.setParameter("criteriaId", criteriaId).setParameter("toolSessionId", toolSessionId)
 		.setParameterList("itemIds", itemIds).list();
 
 	List<Object[]> commentedItemObjs = getSession()
-		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS).setParameter("criteriaId", criteriaId)
-		.setParameterList("itemIds", itemIds).setParameter("toolSessionId", toolSessionId).list();
+		.createQuery(FIND_ITEMID_USERID_COMMENT_PAIRS_BY_CONTENT_AND_ITEMS)
+		.setParameter("criteriaId", criteriaId).setParameterList("itemIds", itemIds)
+		.setParameter("toolSessionId", toolSessionId).list();
 
 	return createUsersRatedEachItem(itemIds, excludeUserId, itemIdToRatedUsersCountMap, ratedItemObjs,
 		commentedItemObjs);
@@ -323,7 +344,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	    HashMap<Long, Long> itemIdToRatedUsersCountMap, List<Object[]> ratedItemObjs,
 	    List<Object[]> commentedItemObjs) {
 	for (Long itemId : itemIds) {
-	    HashSet<Integer> userIds = new HashSet<Integer>();
+	    HashSet<Integer> userIds = new HashSet<>();
 
 	    //put all corresponding userIds into the userIds set
 	    for (Object[] ratedItemObj : ratedItemObjs) {
@@ -354,27 +375,29 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 
 	return itemIdToRatedUsersCountMap;
     }
+
     /**
-     *  Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the toolContentId as :toolContentId.
-     *  If getAllValues == true then returns data for all users (monitoring), otherwise just the data for a single user. 
-     *  See Peer Review for example usage.
+     * Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the
+     * toolContentId as :toolContentId.
+     * If getAllValues == true then returns data for all users (monitoring), otherwise just the data for a single user.
+     * See Peer Review for example usage.
      */
-    public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser){
-	if ( ratingStyle == RatingCriteria.RATING_STYLE_COMMENT )
+    @Override
+    public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
+	if (ratingStyle == RatingCriteria.RATING_STYLE_COMMENT) {
 	    return getByUser ? TOOL_SELECT_LEFT_JOIN_BY_USER_COMMENT : TOOL_SELECT_LEFT_JOIN_FOR_USER_COMMENT;
-	else 
+	} else {
 	    return getByUser ? TOOL_SELECT_LEFT_JOIN_BY_USER_STANDARD : TOOL_SELECT_LEFT_JOIN_FOR_USER_STANDARD;
+	}
     }
-    
-    /** 
+
+    /**
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
+    @Override
     public List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds) {
 	return getSession().createQuery(FIND_RATINGS_BY_ITEM_CRITERIA)
-		.setParameterList("ratingCriteriaIds", ratingCriteriaIds)
-		.setParameterList("itemIds", itemIds)
-		.list();
+		.setParameterList("ratingCriteriaIds", ratingCriteriaIds).setParameterList("itemIds", itemIds).list();
     }
-    
-	    
+
 }

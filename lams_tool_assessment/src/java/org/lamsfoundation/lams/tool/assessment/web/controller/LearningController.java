@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -53,6 +54,10 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -73,6 +78,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -107,6 +113,12 @@ public class LearningController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
+
+    @Autowired
+    private IRatingService ratingService;
+
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -1125,6 +1137,43 @@ public class LearningController {
 
 		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
+
+		// Assessment currently supports only one place for ratings.
+		// It is rating other groups' answers on results page.
+		// Criterion gets automatically created and there must be only one.
+		List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
+		if (criteria.size() > 2) {
+		    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+			    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+		}
+		ToolActivityRatingCriteria criterion = null;
+		if (criteria.isEmpty()) {
+		    criterion = (ToolActivityRatingCriteria) RatingCriteria
+			    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+		    criterion.setTitle(service.getMessage("label.answer.rating.title"));
+		    criterion.setOrderId(1);
+		    criterion.setCommentsEnabled(true);
+		    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+		    criterion.setToolContentId(assessment.getContentId());
+
+		    userManagementService.save(criterion);
+		} else {
+		    criterion = (ToolActivityRatingCriteria) criteria.get(0);
+		}
+		
+		// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
+		// Get all item IDs no matter which session they belong to.
+		Set<Long> itemIds = questionSummaries.values().stream()
+			.flatMap(s -> s.getQuestionResultsPerSession().stream())
+			.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+		List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(),
+			null, itemIds, true, userId);
+		// Mapping of Item ID -> DTO
+		Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
+			.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+		request.setAttribute("itemRatingDtos", itemRatingDtoMap);
 	    }
 	}
 

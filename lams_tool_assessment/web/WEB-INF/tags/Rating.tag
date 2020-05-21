@@ -24,6 +24,7 @@
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
+<%@ attribute name="showAllComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="allowRetries" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
@@ -47,6 +48,9 @@
 </c:if>
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
+</c:if>
+<c:if test="${empty showAllComments}">
+	<c:set var="showAllComments" value="false" scope="request"/>
 </c:if>
 <c:if test="${empty showComments}">
 	<c:set var="showComments" value="true" scope="request"/>
@@ -153,9 +157,8 @@
 <%--Comments area---------------------------------------%>
 <c:if test="${isCommentsEnabled}">
 	<div id="comments-area-${itemRatingDto.itemId}">
-	
 		<c:choose>
-			<c:when test='${isItemAuthoredByUser}'>
+			<c:when test='${isItemAuthoredByUser or (showAllComments and hasStartedRating)}'>
 				<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
 					<div class="rating-comment">
 						<c:out value="${comment.comment}" escapeXml="false" />
@@ -185,10 +188,11 @@
 					<div class="no-gutter">
 						<div class="col-xs-12 col-sm-11 ">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control"
-									placeholder="<fmt:message key="label.comment.textarea.tip"/>"/>
+									placeholder="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
 						</div>
 						<div class="button add-comment add-comment-new col-xs-12 col-sm-1" 
-								data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}">
+								data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
+								data-show-all-comments="${showAllComments}">
 						</div>
 					</div>
 						
