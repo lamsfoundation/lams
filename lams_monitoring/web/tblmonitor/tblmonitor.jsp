@@ -14,7 +14,10 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script>
 		var TOTAL_LESSON_LEARNERS_NUMBER = ${totalLearnersNumber},
-			LAMS_URL = '<lams:LAMSURL/>';
+			LAMS_URL = '<lams:LAMSURL/>',
+			TAB_REFRESH_INTERVAL = 20 * 1000, // refresh tab every 20 seconds
+			lastTabMethod = null, // these variables are needed for tab refresh
+			lastTabToolContentID = null;
 	
 		$(document).ready(function(){
 			<!-- Menu Toggle Script -->
@@ -48,9 +51,22 @@
 		            }
 		       	});
 			}
+			
+			// refresh automatically every X seconds
+			window.setInterval(loadTab, TAB_REFRESH_INTERVAL);
 		});
 
 		function loadTab(method, toolContentID) {
+			if (!method && !toolContentID) {
+				// tab was refreshed, get stored parameters
+				method = lastTabMethod;
+				toolContentID = lastTabToolContentID;
+			} else {
+				// tab was changed, store its parameters
+				lastTabMethod = method;
+				lastTabToolContentID = toolContentID;
+			}
+			
 			var url = "<lams:LAMSURL/>monitoring/tblmonitor/"
 			var options = {};
 			
@@ -136,9 +152,7 @@
 		}
 
 		function refresh() {
-			//get #hash from URL and open according tab. Open sequence tab by default
-			var hash = window.location.hash ? window.location.hash.substring(1) : "sequence"; 
-			$("#tab-link-" + hash)[0].click();
+			loadTab();
 		}
 
         function switchToRegularMonitor() {
