@@ -30,12 +30,14 @@
 				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 				<c:set var="answer" value="${sessionResults.answer}" />
 				<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
+				<c:set var="canRate" value="${sessionMap.toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
+				<c:set var="showRating" value="${canRate or not empty itemRatingDto.commentDtos}" />
 			</c:if>
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
-			<c:if test="${sessionMap.toolSessionID != session.sessionId or not empty itemRatingDto.commentDtos}">
+			<c:if test="${sessionMap.toolSessionID != session.sessionId or showRating}">
 				<tr role="row">
-					<td class="text-center" style="width: 33%" ${sessionMap.toolSessionID == session.sessionId ? '' : 'rowspan="2"'}>
+					<td class="text-center" style="width: 33%" ${showRating ? 'rowspan="2"' : ''}>
 						<%-- Sessions are named after groups --%>
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 						<c:out value="${session.sessionName}" escapeXml="true"/> 
@@ -47,17 +49,19 @@
 								<c:out value="${answer}" escapeXml="false" /> 
 							</td>
 						</tr>
-						<tr>
 					</c:if>
 					
-					<c:if test="${question.groupsAnswersDisclosed}">
+					<c:if test="${showRating}">
+						<tr>
 							<td>
+								<%-- Do not allow voting for own answer, and for non-leaders if leader is enabled --%>
 								<lams:Rating itemRatingDto="${itemRatingDto}"
-											 isItemAuthoredByUser="${sessionMap.toolSessionID == session.sessionId}"
+											 isItemAuthoredByUser="${not canRate}"
 											 showAllComments="true" />
 							</td>
+						</tr>
 					</c:if>
-				</tr>
+				
 			</c:if>
 		</c:forEach>
 	</table>
