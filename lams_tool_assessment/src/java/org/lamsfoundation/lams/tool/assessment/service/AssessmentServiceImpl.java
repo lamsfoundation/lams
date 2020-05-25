@@ -2573,6 +2573,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
+    public String getMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -3527,8 +3532,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			option.setDisplayOrder(displayOrder);
 			option.setQbQuestion(qbQuestion);
 		    }
-		    
-		  
+
 		    Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
 		    if (correct == null) {
 			Double grade = JsonUtil.optDouble(answerData, "grade");

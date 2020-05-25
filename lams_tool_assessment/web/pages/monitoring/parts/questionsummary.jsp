@@ -9,6 +9,8 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<lams:css suffix="jquery.jRating"/>
+		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
@@ -37,11 +39,26 @@
 				LABEL_SURE : '<fmt:message key="label.sure" />',
 				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
 			};
+			
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/";
+			
+			//vars for rating.js
+			var MAX_RATES = 0,
+				MIN_RATES = 0,
+				COMMENTS_MIN_WORDS_LIMIT = 0,
+				LAMS_URL = '',
+				COUNT_RATED_ITEMS = 0,
+				COMMENT_TEXTAREA_TIP_LABEL = '',
+				WARN_COMMENTS_IS_BLANK_LABEL = '',
+				WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -69,6 +86,9 @@
 		  			   		<c:if test="${assessment.enableConfidenceLevels}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
+			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
+		  			   			"<fmt:message key="label.answer.rating.title" />",
+		  			  		</c:if>
 		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
 	  						'portraitId'
 	  					],
@@ -81,7 +101,10 @@
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
-			  			   	{name:'response', index:'response', width:427, sortable:false, search:false},
+				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
+				  				{name:'rating', index:'rating', width:120, align:"center", search:false},
+		  			  		</c:if>
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
 	  				   	multiselect: false,
@@ -119,6 +142,7 @@
 	  				  		}
 	  					},
   						loadComplete: function () {
+  							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
   					    }	  				  	
 	  				})
@@ -192,11 +216,7 @@
     		}
     		
     		function userNameFormatter (cellvalue, options, rowObject) {
-    			<c:choose><c:when test="${assessment.enableConfidenceLevels}">
-    			var portraitId = rowObject[6];
-    			</c:when><c:otherwise>
-    			var portraitId = rowObject[5];
-    			</c:otherwise></c:choose>
+    			var portraitId = rowObject[rowObject.length - 1];
     			return definePortraitPopover(portraitId, rowObject[0], rowObject[2]);
     		}
 

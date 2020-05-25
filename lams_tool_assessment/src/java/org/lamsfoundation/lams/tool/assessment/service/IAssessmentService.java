@@ -498,6 +498,8 @@ public interface IAssessmentService extends ICommonToolService {
      */
     String getMessage(String key);
 
+    String getMessage(String key, Object[] args);
+
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
