@@ -29,10 +29,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -46,6 +50,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -68,6 +73,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
@@ -496,7 +502,7 @@ public class MonitoringController {
 	    // It is rating other groups' answers on results page.
 	    // Criterion gets automatically created in learner and there must be only one.
 	    List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
-	    if (criteria.size() > 2) {
+	    if (criteria.size() >= 2) {
 		throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
 			+ "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
 	    }
@@ -555,12 +561,6 @@ public class MonitoringController {
 		}
 
 		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		if (userDto.getPortraitId() == null) {
-		    userData.add("");
-		} else {
-		    userData.add(userDto.getPortraitId());
-		}
-
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -569,7 +569,17 @@ public class MonitoringController {
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(-1);
 		}
+		if (question.isGroupsAnswersDisclosed()) {
+		    userData.add("-");
+		}
 		userData.add("-");
+	    }
+
+	    userData.add(userDto.getUserId());
+	    if (userDto.getPortraitId() == null) {
+		userData.add("");
+	    } else {
+		userData.add(userDto.getPortraitId());
 	    }
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -588,6 +598,61 @@ public class MonitoringController {
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));
 	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping("/getAnswerRatings")
+    @ResponseBody
+    public String getAnswerRatings(@RequestParam long questionResultUid, Locale locale, HttpServletResponse response)
+	    throws IOException {
+	AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
+	long toolContentId = questionResult.getAssessmentResult().getAssessment().getContentId();
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+	if (criteria.size() >= 2) {
+	    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	}
+
+	Long ratingCriteriaId = criteria.get(0).getRatingCriteriaId();
+	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(Arrays.asList(ratingCriteriaId),
+		Arrays.asList(questionResultUid));
+	List<RatingCommentDTO> comments = ratingService.getCommentsByCriteriaAndItem(ratingCriteriaId, null,
+		questionResultUid);
+	Map<Long, RatingCommentDTO> commentsByUserId = comments.stream()
+		.collect(Collectors.toMap(RatingCommentDTO::getUserId, Function.identity()));
+
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	int i = 0;
+
+	for (Rating rating : ratings) {
+	    ArrayNode ratingJSON = JsonNodeFactory.instance.arrayNode();
+	    User learner = rating.getLearner();
+	    long userId = learner.getUserId();
+	    RatingCommentDTO comment = commentsByUserId.get(userId);
+
+	    ratingJSON.add(rating.getUid());
+	    ratingJSON.add(comment.getUserFullName());
+	    ratingJSON.add(DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
+	    ratingJSON.add(NumberUtil.formatLocalisedNumberForceDecimalPlaces(rating.getRating(), null, 2));
+	    ratingJSON.add(HtmlUtils.htmlEscape(comment.getComment()));
+	    ratingJSON.add(userId);
+	    ratingJSON.add(learner.getPortraitUuid() == null ? "" : learner.getPortraitUuid().toString());
+
+	    ObjectNode ratingRow = JsonNodeFactory.instance.objectNode();
+	    ratingRow.put("id", i++);
+	    ratingRow.set("cell", ratingJSON);
+
+	    rows.add(ratingRow);
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total", 1);
+	responseJSON.put("page", 1);
+	responseJSON.put("records", rows.size());
+	responseJSON.set("rows", rows);
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**

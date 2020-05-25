@@ -1142,7 +1142,7 @@ public class LearningController {
 		// It is rating other groups' answers on results page.
 		// Criterion gets automatically created and there must be only one.
 		List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
-		if (criteria.size() > 2) {
+		if (criteria.size() >= 2) {
 		    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
 			    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
 		}

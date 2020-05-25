@@ -90,13 +90,16 @@
 		  			   			"<fmt:message key="label.answer.rating.title" />",
 		  			  		</c:if>
 		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+		  			   		'userId',
 	  						'portraitId'
 	  					],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
+				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
+							}},
 							{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
@@ -105,6 +108,7 @@
 				  				{name:'rating', index:'rating', width:120, align:"center", search:false},
 		  			  		</c:if>
 			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
+			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
 	  				   	multiselect: false,
@@ -144,7 +148,61 @@
   						loadComplete: function () {
   							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
-  					    }	  				  	
+  					    },
+  					    subGrid: true,
+  						subGridOptions: {
+  							reloadOnExpand : false,
+						    hasSubgrid: function (options) {
+						    	// if there are no ratings for the given answer, there will be no subgrid
+						        return options.data.rating != '-';
+						    }
+  						},
+  						subGridRowExpanded: function(subgrid_id, row_id) {
+  								var subgridTableId = subgrid_id+"_t";
+  								var questionResultUid = jQuery("#session${sessionDto.sessionId}")
+  														.getRowData(row_id)["questionResultUid"];
+  								   
+  								jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>");
+  								   
+  								jQuery("#"+subgridTableId).jqGrid({
+  									datatype: "json",
+  									loadonce:true,
+  									rowNum: 100,
+  									url: "<c:url value='/monitoring/getAnswerRatings.do'/>?questionResultUid=" + questionResultUid,
+  									height: "100%",
+  									autowidth:true,
+  									autoencode:false,
+  									guiStyle: "bootstrap",
+  									iconSet: 'fontAwesome',
+  									colNames:[
+  										'ratingId',
+  				  		  				'<fmt:message key="label.monitoring.summary.user.name" />',
+  				  		  				'<fmt:message key="label.comment.date" />',
+  				  		  				'<fmt:message key="label.rating" />',
+  				  		  				'<fmt:message key="label.comment" />',
+  				  		  				'userId',
+  				  		  				'portraitId'
+  										],
+  									colModel:[
+  									   {name:'ratingId', index:'ratingId', width:0, hidden:true},
+  									   {name:'userName',index:'userName', width:45, formatter : function(cellvalue, options, rowObject) {
+  										    // get portrait UUID, user ID and user name
+  							    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[1]);
+  									   }},
+  									   {name:'date', index:'date', width:45, align:"center",  title:false},
+  									   {name:'rating', index:'rating', width:31, align:"center",  title:false},
+  									   {name:'comment', index:'comment', title:false},
+  						  			   {name:'userId', index:'userId', width:0, hidden: true},
+  									   {name:'portraitId', index:'portraitId', width:0, hidden: true}
+  									],
+  									loadComplete: function () {
+  			  					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+  			  					    },
+  									loadError: function(xhr,st,err) {
+  								    	jQuery("#"+subgridTableId).clearGridData();
+  								    }
+  								});
+  						}				  	
 	  				})
 	  				<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
 		  				.jqGrid('filterToolbar', { 
@@ -214,12 +272,6 @@
         			self.parent.tb_remove();
         		}
     		}
-    		
-    		function userNameFormatter (cellvalue, options, rowObject) {
-    			var portraitId = rowObject[rowObject.length - 1];
-    			return definePortraitPopover(portraitId, rowObject[0], rowObject[2]);
-    		}
-
   		</script>
 	</lams:head>
 	
