@@ -36,7 +36,7 @@
 						<c:set var="answer" value="${sessionResults.answer}" />
 					</c:if>
 					
-					<td class="text-center">
+					<td>
 						<c:out value="${answer}" escapeXml="false" /> 
 					</td>
 					
