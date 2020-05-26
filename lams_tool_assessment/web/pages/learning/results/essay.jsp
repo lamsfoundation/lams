@@ -66,7 +66,8 @@
 								<%-- Do not allow voting for own answer, and for non-leaders if leader is enabled --%>
 								<lams:Rating itemRatingDto="${itemRatingDto}"
 											 isItemAuthoredByUser="${not canRate}"
-											 showAllComments="true" />
+											 showAllComments="true"
+											 refreshOnComment="true" />
 							</td>
 						</tr>
 					</c:if>

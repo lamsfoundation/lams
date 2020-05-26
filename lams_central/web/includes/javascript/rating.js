@@ -109,6 +109,7 @@ function initializeJRating() {
     	var itemId = $(this).data("item-id");
     	var commentsCriteriaId = $(this).data("comment-criteria-id");
     	var showAllComments = $(this).data('show-all-comments');
+    	var refreshOnSubmit = $(this).data('refresh-on-submit');
     	
 		var comment = validComment("comment-textarea-" + itemId, false, false);
 		if ( ! comment )
@@ -159,6 +160,17 @@ function initializeJRating() {
 		   				}
 		  			   //LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
 	    				alert("Submitted the comment successfully.");
+	    				
+	    				// LDEV-5052 Refresh page and scroll to comments on submit
+	    				if (refreshOnSubmit) {
+	    					var url = location.href,
+	    						anchorIndex = url.lastIndexOf('#');
+	    					if (anchorIndex > 0) {
+	    						url = url.substring(0, anchorIndex);
+	    					}
+	    					url += '#comments-area-' + itemId;
+	    					location.href = url;
+	    				}
 		   			}
 	    		},
 				onError : function(){

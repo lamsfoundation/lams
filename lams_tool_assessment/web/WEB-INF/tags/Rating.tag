@@ -26,6 +26,7 @@
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="showAllComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="allowRetries" required="false" rtexprvalue="true" %>
+<%@ attribute name="refreshOnComment" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -56,6 +57,9 @@
 	<c:set var="showComments" value="true" scope="request"/>
 </c:if>
 <c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled && showComments}"/>
+<c:if test="${empty refreshOnComment}">
+	<c:set var="refreshOnComment" value="false" scope="request"/>
+</c:if>
 
 <c:if test="${isCommentsEnabled}">
 	<c:set var="userId"><lams:user property="userID" /></c:set>
@@ -192,7 +196,8 @@
 						</div>
 						<div class="button add-comment add-comment-new col-xs-12 col-sm-1" 
 								data-item-id="${itemRatingDto.itemId}" data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
-								data-show-all-comments="${showAllComments}">
+								data-show-all-comments="${showAllComments}"
+								data-refresh-on-submit="${refreshOnComment}">
 						</div>
 					</div>
 						
