@@ -25,13 +25,15 @@
 			
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
+				<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
 				<c:set var="sessionResults" 
-					value="${questionSummaries[question.uid].questionResultsPerSession[status.index]}" />
+					value="${questionSummary.questionResultsPerSession[status.index]}" />
 				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 				<c:set var="answer" value="${sessionResults.answer}" />
 				<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
 				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
-				<c:set var="showRating" value="${canRate or not empty itemRatingDto.commentDtos}" />
+				<c:set var="showRating" 
+					value="${canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating))}" />
 			</c:if>
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>

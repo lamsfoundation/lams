@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -1148,25 +1149,12 @@ public class LearningController {
 		    }
 		    sessionIndex++;
 		}
-
+		// put user's own group first
+		sessionList.add(0, user.getSession());
 		request.setAttribute("sessions", sessionList);
 
 		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
-
-		// question summaries need to be in the same order as sessions, i.e. user group first
-		if (userSessionIndex != null) {
-		    sessionList.add(0, user.getSession());
-		    for (QuestionSummary summary : questionSummaries.values()) {
-			List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
-				.getQuestionResultsPerSession();
-			if (questionResultsPerSession != null) {
-			    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
-				    .remove((int) userSessionIndex);
-			    questionResultsPerSession.add(0, questionResults);
-			}
-		    }
-		}
 
 		// Assessment currently supports only one place for ratings.
 		// It is rating other groups' answers on results page.
@@ -1202,6 +1190,41 @@ public class LearningController {
 		// Mapping of Item ID -> DTO
 		Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
 			.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+		Long ratingUserId = user.getSession().getGroupLeader() == null ? userId
+			: user.getSession().getGroupLeader().getUserId();
+
+		for (QuestionSummary summary : questionSummaries.values()) {
+
+		    List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
+			    .getQuestionResultsPerSession();
+		    if (questionResultsPerSession != null) {
+			List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+				.remove((int) userSessionIndex);
+			// user or his leader should rate all other groups' answers in order to show ratings left for own group
+			int expectedRatedItemCount = questionResultsPerSession.size();
+
+			Set<Long> questionItemIds = questionResultsPerSession.stream()
+				.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+			// question results need to be in the same order as sessions, i.e. user group first
+			questionResultsPerSession.add(0, questionResults);
+
+			// count how many ratings user or his leader left
+			// maybe exact session ID matching should be used here to make sure
+			int ratedItemCount = 0;
+			for (Long questionItemId : questionItemIds) {
+			    ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
+			    for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
+				if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
+				    ratedItemCount++;
+				}
+			    }
+			}
+
+			summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		    }
+		}
 
 		request.setAttribute("itemRatingDtos", itemRatingDtoMap);
 	    }
