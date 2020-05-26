@@ -30,21 +30,28 @@
 				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 				<c:set var="answer" value="${sessionResults.answer}" />
 				<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
-				<c:set var="canRate" value="${sessionMap.toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
+				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
 				<c:set var="showRating" value="${canRate or not empty itemRatingDto.commentDtos}" />
 			</c:if>
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
-			<c:if test="${sessionMap.toolSessionID != session.sessionId or showRating}">
-				<tr role="row">
+			<c:if test="${toolSessionID != session.sessionId or showRating}">
+				<tr role="row" ${toolSessionID == session.sessionId ? 'class="bg-success"' : ''}>
 					<td class="text-center" style="width: 33%" ${showRating ? 'rowspan="2"' : ''}>
-						<%-- Sessions are named after groups --%>
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
-						<c:out value="${session.sessionName}" escapeXml="true"/> 
+						<c:choose>
+							<c:when test="${toolSessionID == session.sessionId}">
+								<b><fmt:message key="label.your.group"/></b>
+							</c:when>
+							<c:otherwise>
+								<%-- Sessions are named after groups --%>
+								<c:out value="${session.sessionName}" escapeXml="true"/> 
+							</c:otherwise>
+						</c:choose>
 					</td>
 					
 					<%-- Do not show your own answer --%> 
-					<c:if test="${sessionMap.toolSessionID != session.sessionId}">
+					<c:if test="${toolSessionID != session.sessionId}">
 							<td>
 								<c:out value="${answer}" escapeXml="false" /> 
 							</td>
