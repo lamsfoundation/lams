@@ -630,8 +630,11 @@ public class MonitoringController {
 	    long userId = learner.getUserId();
 	    RatingCommentDTO comment = commentsByUserId.get(userId);
 
+	    AssessmentSession session = service.getSessionBySessionId(rating.getToolSessionId());
+	    
 	    ratingJSON.add(rating.getUid());
 	    ratingJSON.add(comment.getUserFullName());
+	    ratingJSON.add(session.getSessionName());
 	    ratingJSON.add(DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
 	    ratingJSON.add(NumberUtil.formatLocalisedNumberForceDecimalPlaces(rating.getRating(), null, 2));
 	    ratingJSON.add(HtmlUtils.htmlEscape(comment.getComment()));
