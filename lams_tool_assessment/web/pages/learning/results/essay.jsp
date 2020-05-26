@@ -21,7 +21,7 @@
 		</tr>
 		<c:forEach var="session" items="${sessions}" varStatus="status">
 			<%-- Default answer value, when answers are not disclosed yet --%>
-			<c:set var="answer" value="?" />
+			<c:set var="answer"><fmt:message key="label.not.yet.disclosed"/></c:set>
 			
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
@@ -43,7 +43,7 @@
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 						<c:choose>
 							<c:when test="${toolSessionID == session.sessionId}">
-								<b><fmt:message key="label.your.group"/></b>
+								<b><fmt:message key="label.your.team"/></b>
 							</c:when>
 							<c:otherwise>
 								<%-- Sessions are named after groups --%>
