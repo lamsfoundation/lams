@@ -1048,7 +1048,8 @@ public class LearningController {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	Long userId = user.getUserId();
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
@@ -1133,10 +1134,39 @@ public class LearningController {
 		// such entities should not go into session map, but as request attributes instead
 		SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
-		request.setAttribute("sessions", sessions);
+
+		Long userSessionId = user.getSession().getSessionId();
+		Integer userSessionIndex = null;
+		int sessionIndex = 0;
+		// find user session in order to put it first
+		List<AssessmentSession> sessionList = new ArrayList<>();
+		for (AssessmentSession session : sessions) {
+		    if (userSessionId.equals(session.getSessionId())) {
+			userSessionIndex = sessionIndex;
+		    } else {
+			sessionList.add(session);
+		    }
+		    sessionIndex++;
+		}
+
+		request.setAttribute("sessions", sessionList);
 
 		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
+
+		// question summaries need to be in the same order as sessions, i.e. user group first
+		if (userSessionIndex != null) {
+		    sessionList.add(0, user.getSession());
+		    for (QuestionSummary summary : questionSummaries.values()) {
+			List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
+				.getQuestionResultsPerSession();
+			if (questionResultsPerSession != null) {
+			    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+				    .remove((int) userSessionIndex);
+			    questionResultsPerSession.add(0, questionResults);
+			}
+		    }
+		}
 
 		// Assessment currently supports only one place for ratings.
 		// It is rating other groups' answers on results page.
@@ -1160,7 +1190,7 @@ public class LearningController {
 		} else {
 		    criterion = (ToolActivityRatingCriteria) criteria.get(0);
 		}
-		
+
 		// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
 		// Get all item IDs no matter which session they belong to.
 		Set<Long> itemIds = questionSummaries.values().stream()
