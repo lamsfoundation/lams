@@ -135,7 +135,6 @@ function initializeJRating() {
 	    				return;
 	    			}
 	    			
-    				debugger;
 		  			// LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
     				alert("Submitted the comment successfully.");
     				
@@ -147,8 +146,12 @@ function initializeJRating() {
     						url = url.substring(0, anchorIndex);
     					}
     					url += '#' + refreshOnSubmit;
+    					if (url == location.href) {
+    						location.reload(true);
+    						return false;
+    					}
     					location.href = url;
-    					return;
+    					return false;
     				}
     				
     				

@@ -113,7 +113,12 @@
 				url = url.substring(0, anchorIndex);
 			}
 			url += '#rating-table-' + questionUid;
+			if (url == location.href) {
+				location.reload(true);
+				return false;
+			}
 			location.href = url;
+			return false;
 		}
     </script>
 </lams:head>
