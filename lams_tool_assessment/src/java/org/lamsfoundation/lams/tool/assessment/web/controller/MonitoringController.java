@@ -637,7 +637,7 @@ public class MonitoringController {
 	    ratingJSON.add(session.getSessionName());
 	    ratingJSON.add(DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
 	    ratingJSON.add(NumberUtil.formatLocalisedNumberForceDecimalPlaces(rating.getRating(), null, 2));
-	    ratingJSON.add(HtmlUtils.htmlEscape(comment.getComment()));
+	    ratingJSON.add(comment.getComment());
 	    ratingJSON.add(userId);
 	    ratingJSON.add(learner.getPortraitUuid() == null ? "" : learner.getPortraitUuid().toString());
 
