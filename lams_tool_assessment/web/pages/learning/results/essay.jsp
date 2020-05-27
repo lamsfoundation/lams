@@ -28,7 +28,7 @@
 		</tr>
 		<c:forEach var="session" items="${sessions}" varStatus="status">
 			<%-- Default answer value, when answers are not disclosed yet --%>
-			<c:set var="answer"><fmt:message key="label.not.yet.disclosed"/></c:set>
+			<c:set var="answer"><i><fmt:message key="label.not.yet.disclosed"/></i></c:set>
 			
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
