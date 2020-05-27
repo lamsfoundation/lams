@@ -26,6 +26,7 @@
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="showAllComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="allowRetries" required="false" rtexprvalue="true" %>
+<%-- ID of HTML element where to scroll after refresh after comment was submitted --%>
 <%@ attribute name="refreshOnComment" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
@@ -58,7 +59,7 @@
 </c:if>
 <c:set var="isCommentsEnabled" value="${itemRatingDto.commentsEnabled && showComments}"/>
 <c:if test="${empty refreshOnComment}">
-	<c:set var="refreshOnComment" value="false" scope="request"/>
+	<c:set var="refreshOnComment" value="" scope="request"/>
 </c:if>
 
 <c:if test="${isCommentsEnabled}">

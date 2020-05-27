@@ -15,9 +15,16 @@
 </div>
 
 <c:if test="${assessment.allowDiscloseAnswers && fn:length(sessions) > 1}">
-	<table class="table table-responsive table-striped table-bordered table-hover table-condensed">
+	<table class="table table-responsive table-striped table-bordered table-hover table-condensed" id="rating-table-${question.uid}">
 		<tr role="row">
-			<td colspan="2" class="text-center"><b><fmt:message key="label.learning.summary.other.team.answers"/></b></td>
+			<td colspan="2" class="text-center">
+				<b><fmt:message key="label.learning.summary.other.team.answers"/></b>
+				<c:if test="${question.groupsAnswersDisclosed}">
+					<button type="button" class="btn btn-xs btn-default pull-right" onClick="javascript:refreshToRating(${question.uid})">
+						<fmt:message key="label.refresh"/>
+					</button>
+				</c:if>
+			</td>
 		</tr>
 		<c:forEach var="session" items="${sessions}" varStatus="status">
 			<%-- Default answer value, when answers are not disclosed yet --%>
@@ -67,7 +74,7 @@
 								<lams:Rating itemRatingDto="${itemRatingDto}"
 											 isItemAuthoredByUser="${not canRate}"
 											 showAllComments="true"
-											 refreshOnComment="true" />
+											 refreshOnComment="rating-table-${question.uid}" />
 							</td>
 						</tr>
 					</c:if>

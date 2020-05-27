@@ -104,6 +104,17 @@
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
 		}
+		
+		function refreshToRating(questionUid) {
+			// LDEV-5052 Refresh page and scroll to the given ID on comment submit
+			var url = location.href,
+				anchorIndex = url.lastIndexOf('#');
+			if (anchorIndex > 0) {
+				url = url.substring(0, anchorIndex);
+			}
+			url += '#rating-table-' + questionUid;
+			location.href = url;
+		}
     </script>
 </lams:head>
 <body class="stripes">
