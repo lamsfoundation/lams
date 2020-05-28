@@ -631,11 +631,10 @@ public class MonitoringController {
 	    RatingCommentDTO comment = commentsByUserId.get(userId);
 
 	    AssessmentSession session = service.getSessionBySessionId(rating.getToolSessionId());
-	    
+
 	    ratingJSON.add(rating.getUid());
-	    ratingJSON.add(comment.getUserFullName());
-	    ratingJSON.add(session.getSessionName());
-	    ratingJSON.add(DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
+	    ratingJSON.add(comment.getUserFullName() + "<BR>" + session.getSessionName() + "<BR>"
+		    + DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
 	    ratingJSON.add(NumberUtil.formatLocalisedNumberForceDecimalPlaces(rating.getRating(), null, 2));
 	    ratingJSON.add(comment.getComment());
 	    ratingJSON.add(userId);

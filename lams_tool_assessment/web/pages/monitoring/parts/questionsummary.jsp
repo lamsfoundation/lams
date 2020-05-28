@@ -105,7 +105,7 @@
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
 				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
-				  				{name:'rating', index:'rating', width:120, align:"center", search:false},
+				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 		  			  		</c:if>
 			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
 			  				{name:'userId', index:'userId', width:0, hidden: true},
@@ -172,13 +172,12 @@
   									height: "100%",
   									autowidth:true,
   									autoencode:false,
+  									cmTemplate: { title: false, search: false, sortable: false},
   									guiStyle: "bootstrap",
   									iconSet: 'fontAwesome',
   									colNames:[
   										'ratingId',
-  				  		  				'<fmt:message key="label.monitoring.summary.user.name" />',
-  				  		  				'<fmt:message key="monitoring.label.group" />',
-  				  		  				'<fmt:message key="label.comment.date" />',
+  				  		  				'<fmt:message key="label.comment.name" />',
   				  		  				'<fmt:message key="label.rating" />',
   				  		  				'<fmt:message key="label.comment" />',
   				  		  				'userId',
@@ -187,13 +186,16 @@
   									colModel:[
   									   {name:'ratingId', index:'ratingId', width:0, hidden:true},
   									   {name:'userName',index:'userName', width: 35, formatter : function(cellvalue, options, rowObject) {
+  										    var columnParts = rowObject[1].split('<BR>'),
+  										   		userName = columnParts[0];
   										    // get portrait UUID, user ID and user name
-  							    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[1]);
+  							    			userName = definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], userName);
+  										    columnParts[0] = userName;
+  										    columnParts[1] = '<b>' + columnParts[1] + '</b>';
+  										    return columnParts.join('<BR>');
   									   }},
-  									   {name:'group', index:'group', width: 25, title:false},
-  									   {name:'date', index:'date', width: 39, title:false},
-  									   {name:'rating', index:'rating', width: 20,  align:"center",  title:false},
-  									   {name:'comment', index:'comment', title:false},
+  									   {name:'rating', index:'rating', width: 10,  align:"center"},
+  									   {name:'comment', index:'comment'},
   						  			   {name:'userId', index:'userId', width:0, hidden: true},
   									   {name:'portraitId', index:'portraitId', width:0, hidden: true}
   									],

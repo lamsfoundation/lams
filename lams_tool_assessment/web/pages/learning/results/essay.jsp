@@ -46,7 +46,7 @@
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
 			<c:if test="${toolSessionID != session.sessionId or showRating}">
 				<tr role="row" ${toolSessionID == session.sessionId ? 'class="bg-success"' : ''}>
-					<td class="text-center" style="width: 33%" ${showRating ? 'rowspan="2"' : ''}>
+					<td class="text-center" style="width: 20%" ${showRating ? 'rowspan="2"' : ''}>
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
 						<c:choose>
 							<c:when test="${toolSessionID == session.sessionId}">
