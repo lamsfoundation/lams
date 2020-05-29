@@ -83,8 +83,8 @@
 							],
 						colModel:[
 						   {name:'id', index:'id', width:0, hidden:true},
-						   {name:'userName', index:'userName', width:100 },
-						   {name:'rating', index:'rating', width:200, align:"center",  title:false},
+						   {name:'userName', index:'userName', width:40 },
+						   {name:'rating', index:'rating',  title:false},
 						   {name:'criteriaId', width:0, hidden:true}
 						],
 						loadComplete: function(){
