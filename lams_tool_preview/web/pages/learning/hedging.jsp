@@ -44,21 +44,12 @@
 		
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled && ! finishedLock}">
 		function validateJustification() {
-			
-			var justify = document.getElementById("justify");
-			
-			//replace special characters with HTML tags
-		    var tempTextarea = jQuery('<textarea/>');
-		    filterData(justify, tempTextarea);
-			var comment = tempTextarea.value;
-
 			//word count limit
 			var wordLimit = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit};
 			if (wordLimit != 0) { 
-				var value =  $("#justify").val();
-				value = value.trim();
-				
-			    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
+				var justify = document.getElementById("justify"),
+					value =  $("#justify").val().trim(),
+					wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 				    
 			    if(wordCount < wordLimit){
 			    	var alertMessage = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>';
@@ -67,7 +58,6 @@
 				}
 			}
 			
-			justify.value = comment;
 			return true;
 		} 
 		</c:if>

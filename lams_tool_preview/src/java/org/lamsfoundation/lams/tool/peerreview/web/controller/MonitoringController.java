@@ -328,7 +328,7 @@ public class MonitoringController {
 		    userData.add(i);
 		    userData.add((String)ratingDetails[4]);
 		    String commentText = HtmlUtils.htmlEscape(comment);
-		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
+		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>").replace("\n", "<BR/>");
 		    userData.add(commentText);
 		    userData.add("Comments");
 
