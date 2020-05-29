@@ -195,7 +195,7 @@ When true, hides the names and groups the comments.  -->
  	</ul>
  	<c:if test="${showJustification && criteriaRatings.ratingCriteria.commentsEnabled}">
 	<fmt:message key="label.learning.your.justification"/>&nbsp;
-	<div class="rating-comment"><c:out value="${criteriaRatings.justificationComment}" escapeXml="false"/></div>
+	<div class="rating-comment"><lams:out value="${criteriaRatings.justificationComment}" /></div>
 	</c:if>
 </c:when> 
 
