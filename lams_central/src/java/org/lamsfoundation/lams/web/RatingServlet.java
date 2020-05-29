@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -122,10 +123,20 @@ public class RatingServlet extends HttpServlet {
 	    if (criteria.isCommentsEnabled()) {
 		// can have but do not have to have comment
 		String comment = WebUtil.readStrParam(request, "comment", true);
+
 		if (comment != null) {
 		    ratingService.commentItem(criteria, toolSessionId, userId, itemId, comment);
+
 		    responseJSON.put("comment", StringEscapeUtils.escapeCsv(comment));
+		    boolean showAllComments = WebUtil.readBooleanParam(request, "showAllComments", false);
+		    if (showAllComments) {
+			ArrayNode allCommentsJSON = JsonNodeFactory.instance.arrayNode();
+			ratingService.getCommentsByCriteriaAndItem(ratingCriteriaId, null, itemId)
+				.forEach(c -> allCommentsJSON.add(c.getComment()));
+			responseJSON.set("allComments", allCommentsJSON);
+		    }
 		}
+
 	    }
 
 	    String floatString = request.getParameter("rate");

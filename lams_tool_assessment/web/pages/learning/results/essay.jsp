@@ -15,30 +15,70 @@
 </div>
 
 <c:if test="${assessment.allowDiscloseAnswers && fn:length(sessions) > 1}">
-	<table class="table table-responsive table-striped table-bordered table-hover table-condensed">
+	<table class="table table-responsive table-striped table-bordered table-hover table-condensed" id="rating-table-${question.uid}">
 		<tr role="row">
-			<td colspan="2" class="text-center"><b><fmt:message key="label.learning.summary.other.team.answers"/></b></td>
+			<td colspan="2" class="text-center">
+				<b><fmt:message key="label.learning.summary.other.team.answers"/></b>
+				<c:if test="${question.groupsAnswersDisclosed}">
+					<button type="button" class="btn btn-xs btn-default pull-right" onClick="javascript:refreshToRating(${question.uid})">
+						<fmt:message key="label.refresh"/>
+					</button>
+				</c:if>
+			</td>
 		</tr>
 		<c:forEach var="session" items="${sessions}" varStatus="status">
-			<c:if test="${sessionMap.toolSessionID != session.sessionId}">
-				<tr role="row">
-					<td class="text-center" style="width: 33%">
-						<%-- Sessions are named after groups --%>
+			<%-- Default answer value, when answers are not disclosed yet --%>
+			<c:set var="answer"><i><fmt:message key="label.not.yet.disclosed"/></i></c:set>
+			
+			<c:if test="${question.groupsAnswersDisclosed}">
+				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
+				<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
+				<c:set var="sessionResults" 
+					value="${questionSummary.questionResultsPerSession[status.index]}" />
+				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
+				<c:set var="answer" value="${sessionResults.answer}" />
+				<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
+				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
+				<c:set var="showRating" 
+					value="${canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating))}" />
+			</c:if>
+			
+			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
+			<c:if test="${toolSessionID != session.sessionId or showRating}">
+				<tr role="row" ${toolSessionID == session.sessionId ? 'class="bg-success"' : ''}>
+					<td class="text-center" style="width: 20%" ${showRating ? 'rowspan="2"' : ''}>
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
-						<c:out value="${session.sessionName}" escapeXml="true"/> 
+						<c:choose>
+							<c:when test="${toolSessionID == session.sessionId}">
+								<b><fmt:message key="label.your.team"/></b>
+							</c:when>
+							<c:otherwise>
+								<%-- Sessions are named after groups --%>
+								<c:out value="${session.sessionName}" escapeXml="true"/> 
+							</c:otherwise>
+						</c:choose>
 					</td>
-					<c:set var="answer" value="?" />
-					<c:if test="${question.groupsAnswersDisclosed}">
-						<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
-						<c:set var="sessionResults" 
-							value="${questionSummaries[question.uid].questionResultsPerSession[status.index]}" />
-						<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
-						<c:set var="answer" value="${sessionResults.answer}" />
+					
+					<%-- Do not show your own answer --%> 
+					<c:if test="${toolSessionID != session.sessionId}">
+							<td>
+								<c:out value="${answer}" escapeXml="false" /> 
+							</td>
+						</tr>
 					</c:if>
-					<td class="text-center">
-						<c:out value="${answer}" escapeXml="false" /> 
-					</td>
-				</tr>
+					
+					<c:if test="${showRating}">
+						<tr>
+							<td>
+								<%-- Do not allow voting for own answer, and for non-leaders if leader is enabled --%>
+								<lams:Rating itemRatingDto="${itemRatingDto}"
+											 isItemAuthoredByUser="${not canRate}"
+											 showAllComments="true"
+											 refreshOnComment="rating-table-${question.uid}" />
+							</td>
+						</tr>
+					</c:if>
+				
 			</c:if>
 		</c:forEach>
 	</table>

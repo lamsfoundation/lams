@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.dto;
 
 import java.util.List;
@@ -53,10 +52,13 @@ public class QuestionSummary {
     //used only for question summary page
     private List<AssessmentQuestionResult> notAllocatedQuestionResults;
     private boolean isTbl;
-    
+
     //used only for export
     private List<List<AssessmentQuestionResult>> questionResultsPerSession;
-    
+
+    // used for answer rating
+    private boolean showOwnGroupRating;
+
     public QuestionSummary(AssessmentQuestion question) {
 	this.questionDto = new QuestionDTO(question);
     }
@@ -76,7 +78,7 @@ public class QuestionSummary {
     public void setAverageMark(float averageMark) {
 	this.averageMark = averageMark;
     }
-    
+
     public List<AssessmentQuestionResult> getNotAllocatedQuestionResults() {
 	return notAllocatedQuestionResults;
     }
@@ -84,7 +86,7 @@ public class QuestionSummary {
     public void setNotAllocatedQuestionResults(List<AssessmentQuestionResult> notAllocatedQuestionResults) {
 	this.notAllocatedQuestionResults = notAllocatedQuestionResults;
     }
-    
+
     public boolean isTbl() {
 	return isTbl;
     }
@@ -101,4 +103,11 @@ public class QuestionSummary {
 	this.questionResultsPerSession = questionResultsPerSession;
     }
 
+    public boolean isShowOwnGroupRating() {
+	return showOwnGroupRating;
+    }
+
+    public void setShowOwnGroupRating(boolean showOwnGroupRating) {
+	this.showOwnGroupRating = showOwnGroupRating;
+    }
 }

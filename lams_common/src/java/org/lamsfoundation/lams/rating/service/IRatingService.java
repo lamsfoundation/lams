@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
@@ -46,7 +47,7 @@ public interface IRatingService {
     /**
      * Save a group of ratings as the new ratings for this criteria, marking any existing ratings NULL.
      * Returns the number of "real" ratings, which should be newRatings.size.
-     * 
+     *
      * @return
      */
     public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId,
@@ -66,7 +67,7 @@ public interface IRatingService {
     /**
      * Save an already set up rating criteria. Only used when there will only ever be one anonymous criteria, like in
      * Share Resources
-     * 
+     *
      * @param criteria
      * @return
      */
@@ -76,7 +77,7 @@ public interface IRatingService {
     /**
      * Delete all the rating criteria linked to a tool content. This allows you to delete criteria created with
      * saveToolStarRatingCriteria
-     * 
+     *
      * @param toolContentId
      * @return
      */
@@ -195,7 +196,7 @@ public interface IRatingService {
 
     /**
      * Removes all ratings and comments left by the specified user.
-     * 
+     *
      * @param contentId
      * @param userId
      * @return
@@ -217,9 +218,12 @@ public interface IRatingService {
 
     Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
 	    final Collection<Long> itemIds, Integer excludeUserId);
-    /** 
+
+    /**
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
     List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds);
+
+    List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long toolSessionId, Long itemId);
 
 }

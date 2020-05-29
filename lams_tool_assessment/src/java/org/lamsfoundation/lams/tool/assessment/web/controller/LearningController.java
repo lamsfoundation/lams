@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -53,6 +54,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -73,6 +79,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -107,6 +114,12 @@ public class LearningController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
+
+    @Autowired
+    private IRatingService ratingService;
+
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -1036,7 +1049,8 @@ public class LearningController {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	Long userId = user.getUserId();
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
@@ -1121,10 +1135,98 @@ public class LearningController {
 		// such entities should not go into session map, but as request attributes instead
 		SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
-		request.setAttribute("sessions", sessions);
+
+		Long userSessionId = user.getSession().getSessionId();
+		Integer userSessionIndex = null;
+		int sessionIndex = 0;
+		// find user session in order to put it first
+		List<AssessmentSession> sessionList = new ArrayList<>();
+		for (AssessmentSession session : sessions) {
+		    if (userSessionId.equals(session.getSessionId())) {
+			userSessionIndex = sessionIndex;
+		    } else {
+			sessionList.add(session);
+		    }
+		    sessionIndex++;
+		}
+		// put user's own group first
+		sessionList.add(0, user.getSession());
+		request.setAttribute("sessions", sessionList);
 
 		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
+
+		// Assessment currently supports only one place for ratings.
+		// It is rating other groups' answers on results page.
+		// Criterion gets automatically created and there must be only one.
+		List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
+		if (criteria.size() >= 2) {
+		    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+			    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+		}
+		ToolActivityRatingCriteria criterion = null;
+		if (criteria.isEmpty()) {
+		    criterion = (ToolActivityRatingCriteria) RatingCriteria
+			    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+		    criterion.setTitle(service.getMessage("label.answer.rating.title"));
+		    criterion.setOrderId(1);
+		    criterion.setCommentsEnabled(true);
+		    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+		    criterion.setToolContentId(assessment.getContentId());
+
+		    userManagementService.save(criterion);
+		} else {
+		    criterion = (ToolActivityRatingCriteria) criteria.get(0);
+		}
+
+		// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
+		// Get all item IDs no matter which session they belong to.
+		Set<Long> itemIds = questionSummaries.values().stream()
+			.flatMap(s -> s.getQuestionResultsPerSession().stream())
+			.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+		List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(),
+			null, itemIds, true, userId);
+		// Mapping of Item ID -> DTO
+		Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
+			.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+		Long ratingUserId = user.getSession().getGroupLeader() == null ? userId
+			: user.getSession().getGroupLeader().getUserId();
+
+		for (QuestionSummary summary : questionSummaries.values()) {
+
+		    List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
+			    .getQuestionResultsPerSession();
+		    if (questionResultsPerSession != null) {
+			List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+				.remove((int) userSessionIndex);
+			// user or his leader should rate all other groups' answers in order to show ratings left for own group
+			int expectedRatedItemCount = questionResultsPerSession.size();
+
+			Set<Long> questionItemIds = questionResultsPerSession.stream()
+				.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+			// question results need to be in the same order as sessions, i.e. user group first
+			questionResultsPerSession.add(0, questionResults);
+
+			// count how many ratings user or his leader left
+			// maybe exact session ID matching should be used here to make sure
+			int ratedItemCount = 0;
+			for (Long questionItemId : questionItemIds) {
+			    ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
+			    for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
+				if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
+				    ratedItemCount++;
+				}
+			    }
+			}
+
+			summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		    }
+		}
+
+		request.setAttribute("itemRatingDtos", itemRatingDtoMap);
 	    }
 	}
 
