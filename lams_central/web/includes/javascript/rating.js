@@ -140,17 +140,10 @@ function initializeJRating() {
     				
     				if (refreshOnSubmit) {
 	    				// LDEV-5052 Refresh page and scroll to the given ID on comment submit
-    					var url = location.href,
-    						anchorIndex = url.lastIndexOf('#');
-    					if (anchorIndex > 0) {
-    						url = url.substring(0, anchorIndex);
-    					}
-    					url += '#' + refreshOnSubmit;
-    					if (url == location.href) {
-    						location.reload(true);
-    						return false;
-    					}
-    					location.href = url;
+ 
+    					// setting href does not navigate if url contains #, we still need a reload
+    					location.hash = '#' + refreshOnSubmit;
+    					location.reload();
     					return false;
     				}
     				
