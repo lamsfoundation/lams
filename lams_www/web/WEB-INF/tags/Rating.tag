@@ -163,7 +163,7 @@
 <c:if test="${isCommentsEnabled}">
 	<div id="comments-area-${itemRatingDto.itemId}">
 		<c:choose>
-			<c:when test='${isItemAuthoredByUser or (showAllComments and hasStartedRating)}'>
+			<c:when test='${isItemAuthoredByUser or (showAllComments and not empty commentLeftByUser)}'>
 				<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
 					<div class="rating-comment">
 						<c:out value="${comment.comment}" escapeXml="false" />
