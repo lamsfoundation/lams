@@ -5,17 +5,10 @@ import static org.imsglobal.lti.BasicLTIConstants.LTI_VERSION;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +32,6 @@ import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
-import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -106,7 +98,7 @@ public class LtiController {
 
 	ExtServerLessonMap extLessonMap = integrationService.getLtiConsumerLesson(consumerKey, resourceLinkId);
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
-	
+
 	//it's the case of ContentItemSelection request or course-copy. (Currently we support course-copy only for links created using ContentItemSelection or from Blackboard server)
 	if (extLessonMap == null && (isContentItemSelection || StringUtils.isNotBlank(resourceLinkIdHistory))) {
 
@@ -118,9 +110,9 @@ public class LtiController {
 	    } else {
 		ExtServerLessonMap oldExtLessonMap = integrationService.getLtiConsumerLesson(consumerKey,
 			resourceLinkIdHistory);
-		lesson = lessonService.getLesson(oldExtLessonMap.getLessonId());		
+		lesson = lessonService.getLesson(oldExtLessonMap.getLessonId());
 	    }
-	    
+
 	    if (lesson == null) {
 		//abort as this is not normal case
 		request.setAttribute("messageKey", "lessonsearch.noresults");
@@ -132,18 +124,18 @@ public class LtiController {
 	    Integer currentOrganisationId = currentOrgMap.getOrganisation().getOrganisationId();
 
 	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side;
-	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one). 
+	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one).
 	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
 		    && !lesson.getOrganisation().getOrganisationId().equals(currentOrganisationId);
 	    if (isLessonCopyRequired) {
-		
+
 		//add users to the course
 		integrationService.addUsersUsingMembershipService(extServer, null, extCourseId, resourceLinkId);
-		
+
 		// clone lesson
 		Integer creatorId = lesson.getUser().getUserId();
-		Long newLessonId = monitoringService.cloneLesson(lesson.getLessonId(), creatorId, true, true, null, null,
-			currentOrgMap.getOrganisation());
+		Long newLessonId = monitoringService.cloneLesson(lesson.getLessonId(), creatorId, true, true, null,
+			null, currentOrgMap.getOrganisation());
 		// store information which extServer has started the lesson
 		extLessonMap = integrationService.createExtServerLessonMap(newLessonId, extServer);
 
@@ -158,7 +150,7 @@ public class LtiController {
 	    extServer.setLessonFinishUrl(lessonFinishCallbackUrl);
 	    userManagementService.save(extServer);
 	}
-	
+
 	//update MembershipUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
 	String membershipUrl = request.getParameter("custom_context_memberships_url");
 	if (StringUtils.isNotBlank(membershipUrl) && StringUtils.isBlank(extServer.getMembershipUrl())) {
@@ -171,7 +163,8 @@ public class LtiController {
 	if (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && extLessonMap == null) {
 	    String roles = request.getParameter(BasicLTIConstants.ROLES);
 	    //try to detect monitor with custom roles not supported by LTI specification
-	    String messageKey = roles.contains("Instructor") || roles.contains("Admin") ? "message.teacher.role.not.recognized"
+	    String messageKey = roles.contains("Instructor") || roles.contains("Admin")
+		    ? "message.teacher.role.not.recognized"
 		    : "message.lesson.not.started.cannot.participate";
 
 	    request.setAttribute("messageKey", messageKey);
@@ -239,7 +232,7 @@ public class LtiController {
 	    request.setAttribute(BasicLTIConstants.LTI_MESSAGE_TYPE, ltiMessageType);
 	    request.setAttribute(LtiUtils.CONTENT_ITEM_RETURN_URL, contentItemReturnUrl);
 	    request.setAttribute("title", request.getParameter("title"));
-	    //text parameter can be null in case of BB server 
+	    //text parameter can be null in case of BB server
 	    String description = request.getParameter("text") == null ? ""
 		    : request.getParameter("text").replaceAll("\\<[^>]*>", "");
 	    request.setAttribute("desc", description);
@@ -285,20 +278,31 @@ public class LtiController {
 		extServer.getAllowLearnerRestart(), extServer.getGradebookOnComplete(), null, null);
 	Long lessonId = lesson.getLessonId();
 	// 2. create lessonClass for lesson
-	List<User> staffList = new LinkedList<User>();
+	List<User> staffList = new LinkedList<>();
 	staffList.add(user);
-	List<User> learnerList = new LinkedList<User>();
+	List<User> learnerList = new LinkedList<>();
 	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
-	monitoringService.createLessonClassForLesson(lessonId, organisation,
-		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
-		user.getUserId());
+	monitoringService.createLessonClassForLesson(lessonId, organisation, organisation.getName() + "Learners",
+		learnerList, organisation.getName() + "Staff", staffList, user.getUserId());
 	// 3. start lesson
 	monitoringService.startLesson(lessonId, user.getUserId());
 	// store information which extServer has started the lesson
-	integrationService.createExtServerLessonMap(lessonId, resourceLinkId, extServer);
-	
+
+	/*
+	 * Blackboard sends a resource link ID which corresponds to a content space and not the LAMS lesson which is
+	 * being created.
+	 * If we map the received ID to a newly created lesson right now, then we can not create another lesson for this
+	 * content space. It is because we receive the content space ID which is already mapped to a lesson and we
+	 * display the lesson instead of authoring interface.
+	 * The real ID is only received when an user enters the lesson and only then we can create the mapping.
+	 *
+	 * BUT if there is another integration client which does not use deep linking and sends proper resource link ID
+	 * right away, then this may need adjusting.
+	 */
+	integrationService.createExtServerLessonMap(lessonId, extServer);
+
 	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId);
 
 	//support for ContentItemSelectionRequest
@@ -416,7 +420,7 @@ public class LtiController {
 	customJSON.put("lessonid", lesson.getLessonId().toString());
 	customJSON.put("iscontentitemselection", "true");
 	contentItemJSON.set("custom", customJSON);
-	
+
 	ObjectNode lineItem = JsonNodeFactory.instance.objectNode();
 	lineItem.put("reportingMethod", "http://purl.imsglobal.org/ctx/lis/v2p1/Result#totalScore");
 	lineItem.put("@type", "LineItem");
@@ -431,7 +435,7 @@ public class LtiController {
 	scoreConstraints.put("totalMaximum", 100);
 	lineItem.set("scoreConstraints", scoreConstraints);
 	contentItemJSON.set("lineItem", lineItem);
-	
+
 	ArrayNode graph = JsonNodeFactory.instance.arrayNode();
 	graph.add(contentItemJSON);
 
@@ -472,7 +476,7 @@ public class LtiController {
 	request.setAttribute("title", lesson.getLessonName());
 	request.setAttribute("description", lesson.getLessonDescription());
 	request.setAttribute("isDisplayDesignImage", lesson.isDisplayDesignImage());
-	// only teachers can see "Open monitor" link 
+	// only teachers can see "Open monitor" link
 	boolean isMonitor = securityService.isLessonMonitor(lessonId, userId, null, false);
 	request.setAttribute("isMonitor", isMonitor);
 
