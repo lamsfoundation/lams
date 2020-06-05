@@ -76,6 +76,7 @@
 							<hr class="hr-confidence-level" />
 						
 							<div>
+								<c:set var="confidenceLevelsAnonymous" value="${mode != 'teacher' && scratchie.confidenceLevelsAnonymous}" />
 								<c:forEach var="confidenceLevelDto" items="${optionDto.confidenceLevelDtos}" varStatus="status">
 									<%@ include file="parts/confidenceLevelPortrait.jsp"%>
 								</c:forEach>

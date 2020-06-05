@@ -109,6 +109,13 @@
 						</c:forEach>
 					</form:select>
 				</label>
+				
+				<div class="checkbox voffset20">
+					<label for="confidence-levels-anonymous">
+						<form:checkbox path="scratchie.confidenceLevelsAnonymous" id="confidence-levels-anonymous"/>
+						<fmt:message key="label.anonymous.confidence.level" />
+					</label>
+				</div>
 			</c:otherwise>
 		</c:choose>
 	</div>
