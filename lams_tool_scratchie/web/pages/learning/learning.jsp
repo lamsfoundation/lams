@@ -9,7 +9,7 @@
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
-<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />	
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 
 <lams:html>
 <lams:head>
