@@ -83,6 +83,7 @@
 			} else {
 				$('#errorArea').show();
 			}
+
 		}
 		
 		$(document).ready(function(){
@@ -266,7 +267,7 @@
 		
 		<div id="buttonsDiv" class="voffset10 pull-right">
 			<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />
-			<input class="btn btn-primary" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
+			<input id="submitButton" class="btn btn-primary" value='<fmt:message key="label.ok"/>'      type="button" onClick="javascript:submitForm()" />			
 		</div>
 	</form>
 

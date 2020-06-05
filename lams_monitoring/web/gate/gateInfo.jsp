@@ -21,7 +21,7 @@
 				</div>
 	</div>
 </c:if>		
-<p>
+<p id="gate-waiting-learners-p">
 <span><fmt:message key="label.grouping.status"/></span> 
 	<strong> <fmt:message key="label.gate.waiting.learners">
 			<fmt:param value="${gateForm.waitingLearners}" />

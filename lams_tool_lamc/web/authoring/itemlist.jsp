@@ -32,7 +32,7 @@
 		<i class="fa fa-spinner" style="display: none" id="itemArea_Busy"></i>
 		<div class="btn-group btn-group-xs pull-right">
 			<c:if test="${!isAuthoringRestricted}">
-				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default" id="importQTI">
+				<a href="#nogo" id="importQTILink"  onClick="javascript:importQTI()" class="btn btn-default" id="importQTI">
 					<fmt:message key="label.authoring.import.qti" />
 				</a>
 			</c:if>

@@ -222,7 +222,7 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<button type="button" class="btn btn-sm btn-file btn-default offset5" onclick="history.go(-1);">
+				<button type="button" class="btn btn-sm btn-file btn-default offset5" id="portraitReturnButton" onclick="history.go(-1);">
 					<fmt:message key="label.return.to.myprofile" />
 				</button>
 			</div>

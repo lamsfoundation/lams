@@ -344,13 +344,13 @@
 		</div>
 			
 		<div class="form-group" align="right">
-			<button type="button" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+			<button type="button" class="btn btn-sm btn-default voffset5" id="cancelEditProfile" onclick="history.go(-1);">
 				<fmt:message key="button.cancel" />
 			</button>
 			&nbsp;&nbsp;
 			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
 				<button type="submit" class="btn btn-sm btn-primary voffset5" 
-						name="submit"> 
+						name="submit"  id="saveEditProfile"> 
 					<fmt:message key="button.save" />
 				</button>
 			</c:if>

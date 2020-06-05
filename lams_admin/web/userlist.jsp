@@ -163,7 +163,7 @@
 								&nbsp;
 							</c:if>
 							<c:if test="${userManageForm.courseAdminCanAddNewUsers}">
-                            	<a title="<fmt:message key="admin.edit" />" href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit" /></span></button></a>
+                            	<a title="<fmt:message key="admin.edit" />" href="<lams:LAMSURL/>admin/user/edit.do?userId=<c:out value="${userManageBean.userId}" />&orgId=<c:out value="${userManageForm.orgId}"/>"  id="userEdit${userManageBean.userId}"><button type="button" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit" /></span></button></a>
 								&nbsp;
 							</c:if>
 							<c:if test="${canDeleteUser}">

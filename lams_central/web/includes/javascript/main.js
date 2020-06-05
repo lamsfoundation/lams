@@ -199,7 +199,8 @@ function showMyProfileDialog() {
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?redirect=profile');
+			$('iframe', dialog).attr({'src': LAMS_URL + 'index.do?redirect=profile',
+				'id' : 'myProfileModal'});
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -303,9 +304,10 @@ function showMonitorLessonDialog(lessonID) {
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
-				$('iframe', this).attr('src', LAMS_URL
+				$('iframe', this).attr({'src': LAMS_URL
 					+ 'home/monitorLesson.do?lessonID='
-					+ $(this).data('lessonID'));
+					+ $(this).data('lessonID'),
+					'id' : 'monitorModal'});
 			},
 
 		}, true, true);
@@ -347,9 +349,10 @@ function showAddLessonDialog(orgID) {
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog)
-					.attr('src', LAMS_URL
+					.attr({'src': LAMS_URL
 						+ 'home/addLesson.do?organisationID='
-						+ dialog.data('orgID'));
+						+ dialog.data('orgID'),
+						'id' : 'addLessonModal'});
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -372,8 +375,9 @@ function showOrgGroupingDialog(orgID, activityID) {
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID
-												   + (activityID ? '&activityID=' + activityID : ''));
+			$('iframe', this).attr({'src': LAMS_URL + 'organisationGroup/viewGroupings.do?organisationID=' + orgID
+												   + (activityID ? '&activityID=' + activityID : ''),
+													'id' : 'orgGroupingModal'});
 		}
 	}, true);
 }
@@ -386,7 +390,8 @@ function showOrgGroupDialog(url) {
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', url);
+			$('iframe', this).attr({'src': url,
+				'id' : 'orgGroupModal'});
 		}
 	}, true);
 }
@@ -491,8 +496,9 @@ function showGradebookCourseDialog(orgID){
 		'open' : function() {
 			console.log("width "+$(window).width()+":"+Math.max(380, Math.min(955, $(window).width() - 60)));
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID);
+			$('iframe', this).attr({'src': LAMS_URL
+				+ 'gradebook/gradebookMonitoring/courseMonitor.do?organisationID=' + orgID,
+				'id' : 'gradebookCourseModal'});
 		}
 	}, true);
 }
@@ -509,8 +515,9 @@ function showGradebookLearnerDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookLearning/courseLearner.do?organisationID=' + orgID);
+			$('iframe', this).attr({'src': LAMS_URL
+				+ 'gradebook/gradebookLearning/courseLearner.do?organisationID=' + orgID,
+				'id' : 'gradebookLearnerModal'});
 		}
 	}, true);
 }
@@ -527,8 +534,9 @@ function showConditionsDialog(lessonID){
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'lessonConditions/getIndexLessonConditions.do?lsId=' + lessonID);
+			$('iframe', this).attr({'src': LAMS_URL
+				+ 'lessonConditions/getIndexLessonConditions.do?lsId=' + lessonID,
+				'id' : 'conditionsModal'});
 		}
 	}, true);
 }
@@ -545,8 +553,9 @@ function showSearchLessonDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'findUserLessons/getResults.do?courseID=' + orgID);
+			$('iframe', this).attr({'src': LAMS_URL
+				+ 'findUserLessons/getResults.do?courseID=' + orgID,
+				'id' : 'searchLessonModal'});
 		}
 	}, true);
 }
@@ -563,7 +572,8 @@ function showKumaliveRubricsDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getRubrics.do?organisationID=' + orgID);
+			$('iframe', this).attr({'src': LAMS_URL	+ 'learning/kumalive/getRubrics.do?organisationID=' + orgID,
+					'id' : 'kumaliveModal'});
 		}
 	}, false);
 }
@@ -580,7 +590,8 @@ function showKumaliveReportDialog(orgID){
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL	+ 'learning/kumalive/getReport.do?organisationID=' + orgID);
+			$('iframe', this).attr({'src': LAMS_URL	+ 'learning/kumalive/getReport.do?organisationID=' + orgID,
+				'id' : 'kumaliveReportsModal'});
 		}
 	}, false);
 }
@@ -594,8 +605,9 @@ function showOutcomeDialog() {
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog)
-					.attr('src', LAMS_URL
-						+ 'outcome.do?method=outcomeManage');
+					.attr({'src': LAMS_URL
+						+ 'outcome.do?method=outcomeManage',
+						'id' : 'outcomeModal'});
 		}
 	});
 }
