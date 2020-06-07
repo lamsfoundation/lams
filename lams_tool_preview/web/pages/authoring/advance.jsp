@@ -47,7 +47,12 @@
 	</label>
 	</div>
 
-
+	<div class="form-group">
+	<label for="tolerance">
+	<fmt:message key="label.authoring.advanced.tolearnce" />
+	<form:input type="number" min="0" max="50" path="peerreview.tolerance" id="tolerance" cssClass="form-control form-control-inline loffset5" />
+	</label>
+	</div>
 </lams:SimplePanel>
 
 <lams:OutcomeAuthor toolContentId="${peerreviewForm.peerreview.contentId}" />
