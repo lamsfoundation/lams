@@ -127,6 +127,9 @@ public class Peerreview implements Serializable, Cloneable {
     @Column(name = "notify_users_of_results")
     private boolean notifyUsersOfResults;
 
+    @Column
+    private int tolerance;
+
     // **********************************************************
     // Function method for Peerreview
     // **********************************************************
@@ -161,7 +164,7 @@ public class Peerreview implements Serializable, Cloneable {
 
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
-		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
+		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<>();
 		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
 		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
 		    // just clone old file without duplicate it in repository
@@ -452,5 +455,13 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setShowRatingsLeftByUser(boolean showRatingsLeftByUser) {
 	this.showRatingsLeftByUser = showRatingsLeftByUser;
+    }
+
+    public int getTolerance() {
+	return tolerance;
+    }
+
+    public void setTolerance(int tolerance) {
+	this.tolerance = tolerance;
     }
 }
