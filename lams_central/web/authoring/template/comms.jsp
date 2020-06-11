@@ -141,7 +141,7 @@
 	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
 	    }
 
-		function createAssessment(questionType, numAssessmentsFieldname, containingDivName, qbQuestionUid) {
+		function createAssessment(questionType, numAssessmentsFieldname, containingDivName, qbQuestionUid, collapse) {
 			var numAssessments = $('#'+numAssessmentsFieldname);
 			var type = questionType ? questionType : 'essay';
 			var currNum = numAssessments.val();
@@ -161,12 +161,16 @@
 					newDiv.remove();
 				} else {
 					numAssessments.val(nextNum);
-					newDiv.scrollIntoView();
+					if (collapse) {
+						$('.collapse', newDiv).collapse('hide');
+					} else {
+						newDiv.scrollIntoView();
+					}
 				}
 			});
 		}		
 		
-		function createQuestion(numQuestionsFieldname, newDivPrefix, questionDivName, forward, extraParam) {
+		function createQuestion(numQuestionsFieldname, newDivPrefix, questionDivName, forward, extraParam, collapse) {
 			var numQuestions = $('#'+numQuestionsFieldname);
 			var currNum = numQuestions.val();
 			var nextNum = +currNum + 1;
@@ -187,8 +191,12 @@
 					newDiv.remove();
 				} else {
 					numQuestions.val(nextNum);
-					newDiv.focus();
-					newDiv.scrollIntoView();
+					if (collapse) {
+						$('.collapse', newDiv).collapse('hide');
+					} else {
+						newDiv.focus();
+						newDiv.scrollIntoView();
+					}
 				}
 			});
 		}		
