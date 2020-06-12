@@ -285,13 +285,12 @@ public class MonitoringController {
     }
 
     @RequestMapping(path = "/addLesson", method = RequestMethod.POST)
-    public String addLesson(HttpServletRequest request, HttpServletResponse response,
-	    @RequestParam String lessonName, @RequestParam long learningDesignID)
-	    throws IOException, ServletException, ParseException {
+    public String addLesson(HttpServletRequest request, HttpServletResponse response, @RequestParam String lessonName,
+	    @RequestParam long learningDesignID) throws IOException, ServletException, ParseException {
 	if (!ValidationUtil.isOrgNameValid(lessonName)) {
 	    throw new IOException("Lesson name contains invalid characters");
 	}
-	
+
 	String[] organisationIdsStr = request.getParameterValues(AttributeNames.PARAM_ORGANISATION_ID);
 	boolean introEnable = WebUtil.readBooleanParam(request, "introEnable", false);
 	String introDescription = introEnable ? request.getParameter("introDescription") : null;
@@ -461,8 +460,7 @@ public class MonitoringController {
      * The Struts dispatch method to archive a lesson.
      */
     @RequestMapping(path = "/archiveLesson", method = RequestMethod.POST)
-    public void archiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public void archiveLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.archiveLesson(lessonId, getUserId());
@@ -475,8 +473,7 @@ public class MonitoringController {
      * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state.
      */
     @RequestMapping(path = "/unarchiveLesson", method = RequestMethod.POST)
-    public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public void unarchiveLesson(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	try {
 	    monitoringService.unarchiveLesson(lessonId, getUserId());
@@ -628,8 +625,8 @@ public class MonitoringController {
 	}
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson "
-		    + lessonId + ". " + message);
+	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson " + lessonId + ". "
+		    + message);
 	}
 
 	// audit log force completion attempt
@@ -782,7 +779,7 @@ public class MonitoringController {
 		    MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
-		learnersJSON.add(WebUtil.userToJSON(learner));
+		learnersJSON.add(WebUtil.userToJSON(learner, activity));
 	    }
 	    learnerCount = monitoringService.getCountLearnersCurrentActivities(new Long[] { activityId })
 		    .get(activityId);
@@ -1303,7 +1300,7 @@ public class MonitoringController {
 		if (!latestLearners.isEmpty()) {
 		    ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 		    for (User learner : latestLearners) {
-			ObjectNode userJSON = WebUtil.userToJSON(learner);
+			ObjectNode userJSON = WebUtil.userToJSON(learner, activity);
 			if (leaders.contains(learner.getUserId().longValue())) {
 			    userJSON.put("leader", true);
 			}

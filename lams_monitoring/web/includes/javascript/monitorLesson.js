@@ -2429,8 +2429,9 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  * Formats learner name.
  */
 function getLearnerDisplayName(learner, raw) {
-	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')'
-			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')';
+	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')' + (learner.group ? ' - ' + learner.group : '')
+			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')' 
+			   	 + (learner.group ? ' - ' + escapeHtml(learner.group) : '');
 }
 
 
