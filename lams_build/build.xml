@@ -816,7 +816,6 @@
 				<include name=".jbossclirc"/>
 				<include name="add*"/>
 				<include name="appclient*"/>
-				<include name="jboss-cli*"/>
 				<include name="jconsole*"/>
 				<include name="jdr*"/>
 				<include name="domain*"/>
