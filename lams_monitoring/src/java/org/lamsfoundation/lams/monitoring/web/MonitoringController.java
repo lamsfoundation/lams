@@ -779,7 +779,7 @@ public class MonitoringController {
 		    MonitoringController.USER_PAGE_SIZE, (pageNumber - 1) * MonitoringController.USER_PAGE_SIZE,
 		    orderAscending);
 	    for (User learner : learners) {
-		learnersJSON.add(WebUtil.userToJSON(learner));
+		learnersJSON.add(WebUtil.userToJSON(learner, activity));
 	    }
 	    learnerCount = monitoringService.getCountLearnersCurrentActivities(new Long[] { activityId })
 		    .get(activityId);
@@ -1300,7 +1300,7 @@ public class MonitoringController {
 		if (!latestLearners.isEmpty()) {
 		    ArrayNode learnersJSON = JsonNodeFactory.instance.arrayNode();
 		    for (User learner : latestLearners) {
-			ObjectNode userJSON = WebUtil.userToJSON(learner);
+			ObjectNode userJSON = WebUtil.userToJSON(learner, activity);
 			if (leaders.contains(learner.getUserId().longValue())) {
 			    userJSON.put("leader", true);
 			}

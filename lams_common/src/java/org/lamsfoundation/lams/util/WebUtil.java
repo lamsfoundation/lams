@@ -21,6 +21,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -461,6 +465,21 @@ public class WebUtil {
 	userJSON.put("lastName", user.getLastName());
 	userJSON.put("login", user.getLogin());
 	userJSON.put("portraitId", user.getPortraitUuid() == null ? null : user.getPortraitUuid().toString());
+	return userJSON;
+    }
+
+    public static ObjectNode userToJSON(User user, Activity activity) {
+	ObjectNode userJSON = WebUtil.userToJSON(user);
+
+	// get a group from applied grouping or from the grouping activity itself
+	Grouping grouping = activity.isGroupingActivity() ? ((GroupingActivity) activity).getCreateGrouping()
+		: activity.getGrouping();
+	if (grouping != null) {
+	    Group group = grouping.getGroupBy(user);
+	    if (group != null) {
+		userJSON.put("group", group.getGroupName());
+	    }
+	}
 	return userJSON;
     }
 
