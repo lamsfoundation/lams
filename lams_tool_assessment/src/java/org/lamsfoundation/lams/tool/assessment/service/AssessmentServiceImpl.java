@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -306,7 +308,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public void launchTimeLimit(Long assessmentUid, Long userId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
-	lastResult.setTimeLimitLaunchedDate(new Date());
+	lastResult.setTimeLimitLaunchedDate(LocalDateTime.now());
 	assessmentResultDao.saveObject(lastResult);
     }
 
@@ -318,9 +320,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (assessment.getTimeLimit() != 0) {
 	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
 	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
+
 	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
 		    : assessment.getTimeLimit() * 60
-			    - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
+			    - Duration.between(lastResult.getTimeLimitLaunchedDate(), LocalDateTime.now()).toSeconds();
+
 	    // change negative or zero number to 1
 	    secondsLeft = Math.max(1, secondsLeft);
 	}
@@ -339,8 +343,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	//check if the time limit is exceeded
 	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
-		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System
-			.currentTimeMillis();
+		&& lastLeaderResult.getTimeLimitLaunchedDate().plusSeconds(timeLimit).isBefore(LocalDateTime.now());
     }
 
     @Override
