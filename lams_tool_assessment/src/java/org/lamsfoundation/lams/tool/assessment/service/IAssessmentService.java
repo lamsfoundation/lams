@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -91,24 +92,14 @@ public interface IAssessmentService extends ICommonToolService {
      * @param assessmentUid
      * @param userId
      */
-    void launchTimeLimit(Long assessmentUid, Long userId);
-
-    /**
-     * Calculates how many seconds left till the time limit will expire. If it's expired already - returns 1 in order to
-     * show learning.jsp and autosubmit results.
-     *
-     * @param assessment
-     * @param user
-     * @return
-     */
-    long getSecondsLeft(Assessment assessment, AssessmentUser user);
+    LocalDateTime launchTimeLimit(Long assessmentUid, Long userId);
 
     /**
      * @param assessment
      * @param groupLeader
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader);
+    boolean checkTimeLimitExceeded(long assessmentUid, long userUid);
 
     /**
      * Get users by given toolSessionID.
@@ -167,6 +158,8 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     AssessmentUser getUserByIdAndContent(Long userID, Long contentId);
+
+    AssessmentUser getUserByLoginAndContent(String login, Long contentId);
 
     /**
      * Get user by sessionID and UserID

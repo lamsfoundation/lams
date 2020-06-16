@@ -109,8 +109,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
 
-    public static final String ATTR_SECONDS_LEFT = "secondsLeft";
-
     public static final String ATTR_OVERALL_FEEDBACK_LIST = "overallFeedbackList";
 
     public static final String ATTR_OVERALL_FEEDBACK_COUNT = "overallFeedbackCount";

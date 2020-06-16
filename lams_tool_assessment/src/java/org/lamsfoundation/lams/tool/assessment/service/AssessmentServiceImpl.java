@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +109,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.tool.assessment.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
@@ -306,44 +306,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void launchTimeLimit(Long assessmentUid, Long userId) {
+    public LocalDateTime launchTimeLimit(Long assessmentUid, Long userId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
-	lastResult.setTimeLimitLaunchedDate(LocalDateTime.now());
+	LocalDateTime launchedDate = LocalDateTime.now();
+	lastResult.setTimeLimitLaunchedDate(launchedDate);
 	assessmentResultDao.saveObject(lastResult);
+	return launchedDate;
     }
 
     @Override
-    public long getSecondsLeft(Assessment assessment, AssessmentUser user) {
-	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
-
-	long secondsLeft = 1;
-	if (assessment.getTimeLimit() != 0) {
-	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
-	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-
-	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
-		    : assessment.getTimeLimit() * 60
-			    - Duration.between(lastResult.getTimeLimitLaunchedDate(), LocalDateTime.now()).toSeconds();
-
-	    // change negative or zero number to 1
-	    secondsLeft = Math.max(1, secondsLeft);
-	}
-
-	return secondsLeft;
-    }
-
-    @Override
-    public boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader) {
-	int timeLimit = assessment.getTimeLimit();
-	if (timeLimit == 0) {
-	    return false;
-	}
-
-	AssessmentResult lastLeaderResult = getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
-
-	//check if the time limit is exceeded
-	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
-		&& lastLeaderResult.getTimeLimitLaunchedDate().plusSeconds(timeLimit).isBefore(LocalDateTime.now());
+    public boolean checkTimeLimitExceeded(long assessmentUid, long userUid) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(assessmentUid, userUid);
+	return secondsLeft != null && secondsLeft.equals(0);
     }
 
     @Override
@@ -426,6 +400,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
 	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
+    }
+
+    @Override
+    public AssessmentUser getUserByLoginAndContent(String login, Long contentId) {
+	return assessmentUserDao.getUserByLoginAndContent(login, contentId);
     }
 
     @Override
