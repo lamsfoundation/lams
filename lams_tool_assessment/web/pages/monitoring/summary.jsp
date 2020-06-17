@@ -289,7 +289,6 @@
 		jqgrids.each(function(index) {
 			var gridId = $(this).attr('id');
 	    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-	    	console.log(gridParentWidth);
 	    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
 	    });
 	};
@@ -302,6 +301,77 @@
 		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
+	
+	var relativeTimeLimit = ${assessment.timeLimit};
+	
+	function timeLimitControl(type, toggle, adjust) {
+		if (type == 'relative') {
+			var relativeTimeLimitSpan = $('#relative-time-limit-value'),
+				displayedRelativeTimeLimit = +relativeTimeLimitSpan.text();
+			
+			if (toggle !== null) {
+				
+				if (toggle === false) {
+					displayedRelativeTimeLimit = relativeTimeLimit = 0;
+					callTimeLimitController(function(){
+						relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+						$('#relative-time-limit-disabled').removeClass('hidden');
+						$('#relative-time-limit-cancel').addClass('hidden');
+						$('#relative-time-limit-enabled').addClass('hidden');
+						$('#relative-time-limit-start').removeClass('hidden').addClass('disabled');
+					});
+					return;
+				}
+				
+				if (toggle === true && displayedRelativeTimeLimit > 0) {
+					relativeTimeLimit = displayedRelativeTimeLimit;
+					
+					callTimeLimitController(function(){
+						relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+						$('#relative-time-limit-disabled').addClass('hidden');
+						$('#relative-time-limit-cancel').removeClass('hidden');
+						$('#relative-time-limit-enabled').removeClass('hidden');
+						$('#relative-time-limit-start').addClass('hidden').removeClass('disabled');
+					});
+				}
+				return;
+			}
+			
+			var adjustedRelativeTimeLimit = displayedRelativeTimeLimit + adjust;
+			if (adjustedRelativeTimeLimit < 1) {
+				displayedRelativeTimeLimit = 1;
+				relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+				return;
+			}
+			
+			if (relativeTimeLimit > 0) {
+				relativeTimeLimit = displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
+				callTimeLimitController(function(){
+					relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+				});
+				return;
+			}
+			
+			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
+			relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+			$('#relative-time-limit-start').removeClass('disabled');
+		}
+	}
+	
+	function callTimeLimitController(callback) {
+		$.ajax({
+			'url' : '<c:url value="/monitoring/timeLimitControl.do"/>',
+			'type': 'post',
+			'dataType' : 'text',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${assessment.contentId}',
+				'relativeTimeLimit' : relativeTimeLimit,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : callback
+		});
+	}
 </script>
 
 <div class="panel">
@@ -445,5 +515,7 @@
 </c:if>
 
 <%@ include file="parts/advanceoptions.jsp"%>
+
+<%@ include file="parts/timeLimit.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>

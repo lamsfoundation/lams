@@ -100,6 +100,8 @@
 						}			            
 			        });
 			    });
+				
+				initAssessmentTimeLimitWebsocket();
 			}
 
 			//autocomplete for VSA
@@ -121,160 +123,163 @@
 		}
 	
 		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
+		// var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
 	
+		
+		
 		//timelimit feature
-		<c:if test="${isTimeLimitEnabled}">
-			// websocket needs pinging and reconnection feature in case it fails
-			// it works pretty much the same as command websocket in Page.tag
-			var assessmentTimeLimitWebsocketInitTime = null,
-				assessmentTimeLimitWebsocket = null,
-				assessmentTimeLimitWebsocketPingTimeout = null,
-				assessmentTimeLimitWebsocketPingFunc = null,
-				assessmentTimeLimitWebsocketReconnectAttempts = 0,
-				counterInitialised = false;
+
+		// websocket needs pinging and reconnection feature in case it fails
+		// it works pretty much the same as command websocket in Page.tag
+		var assessmentTimeLimitWebsocketInitTime = null,
+			assessmentTimeLimitWebsocket = null,
+			assessmentTimeLimitWebsocketPingTimeout = null,
+			assessmentTimeLimitWebsocketPingFunc = null,
+			assessmentTimeLimitWebsocketReconnectAttempts = 0,
+			counterInitialised = false;
+		
+		assessmentTimeLimitWebsocketPingFunc = function(skipPing){
+			if (assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSING 
+					|| assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSED){
+				return;
+			}
 			
-			assessmentTimeLimitWebsocketPingFunc = function(skipPing){
-				if (assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSING 
-						|| assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				assessmentTimeLimitWebsocketPingTimeout = setTimeout(assessmentTimeLimitWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					assessmentTimeLimitWebsocket.send("ping");
+			// check and ping every 3 minutes
+			assessmentTimeLimitWebsocketPingTimeout = setTimeout(assessmentTimeLimitWebsocketPingFunc, 3*60*1000);
+			// initial set up does not send ping
+			if (!skipPing) {
+				assessmentTimeLimitWebsocket.send("ping");
+			}
+		};
+			
+		function initAssessmentTimeLimitWebsocket(){
+			assessmentTimeLimitWebsocketInitTime = Date.now();
+			assessmentTimeLimitWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+					+ 'learningWebsocket?toolContentID=' + ${sessionMap.assessment.contentId});
+
+			assessmentTimeLimitWebsocket.onclose = function(e){
+				// check reason and whether the close did not happen immediately after websocket creation
+				// (possible access denied, user logged out?)
+				if (e.code === 1006 &&
+					Date.now() - assessmentTimeLimitWebsocketInitTime > 1000 &&
+					assessmentTimeLimitWebsocketReconnectAttempts < 20) {
+					assessmentTimeLimitWebsocketReconnectAttempts++;
+					// maybe iPad went into sleep mode?
+					// we need this websocket working, so init it again after delay
+					setTimeout(initAssessmentTimeLimitWebsocket, 3000);
 				}
 			};
-				
-			function initAssessmentTimeLimitWebsocket(){
-				assessmentTimeLimitWebsocketInitTime = Date.now();
-				assessmentTimeLimitWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-						+ 'learningWebsocket?toolContentID=' + ${sessionMap.assessment.contentId});
 
-				assessmentTimeLimitWebsocket.onclose = function(e){
-					// check reason and whether the close did not happen immediately after websocket creation
-					// (possible access denied, user logged out?)
-					if (e.code === 1006 &&
-						Date.now() - assessmentTimeLimitWebsocketInitTime > 1000 &&
-						assessmentTimeLimitWebsocketReconnectAttempts < 20) {
-						assessmentTimeLimitWebsocketReconnectAttempts++;
-						// maybe iPad went into sleep mode?
-						// we need this websocket working, so init it again after delay
-						setTimeout(initAssessmentTimeLimitWebsocket, 3000);
-					}
-				};
-
-				// set up timer for the first time
-				assessmentTimeLimitWebsocketPingFunc(true);
-				
-				// when the server pushes new inputs
-				assessmentTimeLimitWebsocket.onmessage = function(e){
-					// read JSON object
-					var input = JSON.parse(e.data);
-					
-					if (input.clearTimer == true) {
-						// teacher has stopped the timer, destroy it
-						$('#countdown').countdown('destroy').remove();
-						counterInitialised = false;
-					} else {
-						// teacher has updated the timer
-						var secondsLeft = +input.secondsLeft;
-						if (counterInitialised) {
-							// just set the new time
-							$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-						} else {
-							// initialise the timer
-							displayCountdown(secondsLeft);
-						}
-					}
-
-					// reset ping timer
-					clearTimeout(assessmentTimeLimitWebsocketPingTimeout);
-					assessmentTimeLimitWebsocketPingFunc(true);
-				};
-			}
+			// set up timer for the first time
+			assessmentTimeLimitWebsocketPingFunc(true);
 			
-			function displayCountdown(secondsLeft){
-				counterIntialised = true;
-				var countdown = '<div id="countdown"></div>';
+			// when the server pushes new inputs
+			assessmentTimeLimitWebsocket.onmessage = function(e){
 				
-				$.blockUI({
-					message: countdown, 
-					showOverlay: false,
-					focusInput: false,
-					css: { 
-						top: '40px',
-						left: '',
-						right: '0%',
-				        opacity: '.8', 
-				        width: '230px',
-				        cursor: 'default',
-				        border: 'none'
-			        }   
-				});
+				// read JSON object
+				var input = JSON.parse(e.data);
 				
-				$('#countdown').countdown({
-					until: '+' + secondsLeft +'S',
-					format: 'hMS',
-					compact: true,
-					alwaysExpire : true,
-					onTick: function(periods) {
-						//check for 30 seconds
-						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-							$('#countdown').css('color', '#FF3333');
-						}					
-					},
-					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
-				        
-				        setTimeout(function() { 
-				        	submitAll(true);
-				        }, 4000); 
-					},
-					description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
-				});
-			}
-				
-		
-			$(document).ready(function(){
-				//show timelimit-start-dialog in order to start countdown
-				if (${sessionMap.isTimeLimitNotLaunched}) {
-					
-					$.blockUI({ 
-						message: $('#timelimit-start-dialog'), 
-						css: { width: '325px', height: '120px'}, 
-						overlayCSS: { opacity: '.98'} 
-					});
-					
-					//once OK button pressed start countdown
-			        $('#timelimit-start-ok').click(function() {
-			        	
-			        	//store date when user has started activity with time limit
-				        $.ajax({
-				        	async: true,
-				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
-				            data: 'sessionMapID=${sessionMapID}',
-				            type: 'post'
-				       	});
-			        	
-			        	$.unblockUI();
-			        	initAssessmentTimeLimitWebsocket();
-			        	isWaitingForConfirmation = false;
-			        });
-					
+				if (input.clearTimer == true) {
+					// teacher has stopped the timer, destroy it
+					$('#countdown').countdown('destroy').remove();
+					counterInitialised = false;
 				} else {
-					initAssessmentTimeLimitWebsocket();
+					// teacher has updated the timer
+					var secondsLeft = +input.secondsLeft;
+					if (counterInitialised) {
+						// just set the new time
+						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+					} else {
+						// initialise the timer
+						displayCountdown(secondsLeft);
+					}
 				}
+
+				// reset ping timer
+				clearTimeout(assessmentTimeLimitWebsocketPingTimeout);
+				assessmentTimeLimitWebsocketPingFunc(true);
+			};
+		}
+		
+		function displayCountdown(secondsLeft){
+			counterIntialised = true;
+			var countdown = '<div id="countdown"></div>';
+			
+			$.blockUI({
+				message: countdown, 
+				showOverlay: false,
+				focusInput: false,
+				css: { 
+					top: '40px',
+					left: '',
+					right: '0%',
+			        opacity: '.8', 
+			        width: '230px',
+			        cursor: 'default',
+			        border: 'none'
+		        }   
 			});
-		</c:if>
+			
+			$('#countdown').countdown({
+				until: '+' + secondsLeft +'S',
+				format: 'hMS',
+				compact: true,
+				alwaysExpire : true,
+				onTick: function(periods) {
+					//check for 30 seconds
+					if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
+						$('#countdown').css('color', '#FF3333');
+					}					
+				},
+				onExpiry: function(periods) {
+			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+			        
+			        setTimeout(function() { 
+			        	submitAll(true);
+			        }, 4000); 
+				},
+				description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
+			});
+		}
+			
+	
+		/*
+		$(document).ready(function(){
+			//show timelimit-start-dialog in order to start countdown
+			if (${sessionMap.isTimeLimitNotLaunched}) {
+				
+				$.blockUI({ 
+					message: $('#timelimit-start-dialog'), 
+					css: { width: '325px', height: '120px'}, 
+					overlayCSS: { opacity: '.98'} 
+				});
+				
+				//once OK button pressed start countdown
+		        $('#timelimit-start-ok').click(function() {
+		        	
+		        	//store date when user has started activity with time limit
+			        $.ajax({
+			        	async: true,
+			            url: '<c:url value="/learning/launchTimeLimit.do"/>',
+			            data: 'sessionMapID=${sessionMapID}',
+			            type: 'post'
+			       	});
+		        	
+		        	$.unblockUI();
+		        	initAssessmentTimeLimitWebsocket();
+		        	isWaitingForConfirmation = false;
+		        });
+				
+			} else {
+				initAssessmentTimeLimitWebsocket();
+			}
+		});*/
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
 		
 			function learnerAutosave(){
-				if (isWaitingForConfirmation) return;
+				// if (isWaitingForConfirmation) return;
 				
 				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
 				$("textarea[id^='question']").each(function()  {

@@ -97,10 +97,12 @@ public class LearningWebsocketServer {
 			if (timeCache.relativeTimeLimit > 0) {
 			    AssessmentResult result = LearningWebsocketServer.getAssessmentService()
 				    .getLastAssessmentResult(assessmentUid, userId);
-			    LocalDateTime existingLaunchDate = result == null ? null
-				    : result.getTimeLimitLaunchedDate();
-			    if (existingLaunchDate == null) {
+			    if (result == null) {
 				continue;
+			    }
+			    LocalDateTime existingLaunchDate = result.getTimeLimitLaunchedDate();
+			    if (existingLaunchDate == null) {
+				existingLaunchDate = assessmentService.launchTimeLimit(assessmentUid, userId);
 			    }
 
 			    LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);

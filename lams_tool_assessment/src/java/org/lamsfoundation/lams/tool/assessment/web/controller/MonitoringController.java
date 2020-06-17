@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -807,6 +808,19 @@ public class MonitoringController {
 	    log.debug("Disclosed other groups' answers for Assessment tool content ID " + toolContentId
 		    + " and question ID " + questionUid);
 	}
+    }
+
+    @RequestMapping(path = "/timeLimitControl", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void timeLimitControl(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int relativeTimeLimit) {
+	if (relativeTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	assessment.setTimeLimit(relativeTimeLimit);
+	service.saveOrUpdateAssessment(assessment);
     }
 
     @SuppressWarnings("unchecked")
