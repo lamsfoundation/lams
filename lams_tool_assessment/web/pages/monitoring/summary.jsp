@@ -287,6 +287,11 @@
 		// create counter if absolute time limit is set
 		if (absoluteTimeLimit) {
 			updateAbsoluteTimeLimitCounter();
+			
+			// expand time limit panel if absolute time limit is set and not expired
+			if (absoluteTimeLimit > new Date().getTime() / 1000) {
+				$('#time-limit-collapse').collapse('show');
+			}
 		}
 		initInidividualTimeLimitAutocomplete();
 	});
