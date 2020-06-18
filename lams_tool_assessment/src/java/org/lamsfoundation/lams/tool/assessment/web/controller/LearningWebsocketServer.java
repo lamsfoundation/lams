@@ -213,19 +213,19 @@ public class LearningWebsocketServer {
 	}
     }
 
-    public static Long getSecondsLeft(long assessmentUid, long userUid) {
+    public static Long getSecondsLeft(long assessmentUid, long userId) {
 	TimeCache timeCache = timeCaches.get(assessmentUid);
-	return timeCache == null ? null : LearningWebsocketServer.getSecondsLeft(timeCache, userUid);
+	return timeCache == null ? null : LearningWebsocketServer.getSecondsLeft(timeCache, userId);
     }
 
-    private static Long getSecondsLeft(TimeCache timeCache, long userUid) {
+    private static Long getSecondsLeft(TimeCache timeCache, long userId) {
 	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
 	    // no time limit is set at all
 	    return null;
 	}
 
 	// when user entered the activity
-	LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userUid);
+	LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);
 	// what is the time limit for him
 	LocalDateTime finish = null;
 	if (timeCache.absoluteTimeLimit != null) {

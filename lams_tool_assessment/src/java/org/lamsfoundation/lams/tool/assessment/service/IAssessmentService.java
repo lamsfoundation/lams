@@ -99,7 +99,7 @@ public interface IAssessmentService extends ICommonToolService {
      * @param groupLeader
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(long assessmentUid, long userUid);
+    boolean checkTimeLimitExceeded(long assessmentUid, long userId);
 
     /**
      * Get users by given toolSessionID.
