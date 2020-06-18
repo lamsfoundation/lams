@@ -342,7 +342,7 @@
 			}
 			
 			// no negative time limit is allowed
-			if (displayedRelativeTimeLimit == 0 && adjust < 0){
+			if (displayedRelativeTimeLimit == 0 && adjust < 0) {
 				return;
 			}
 			
@@ -363,7 +363,7 @@
 			// if time limit is not enforced yet, just update the screen
 			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
 			$('#relative-time-limit-value').text(displayedRelativeTimeLimit);
-			$('#relative-time-limit-start').removeClass('disabled');
+			$('#relative-time-limit-start').prop('disabled', false);
 			return;
 		}
 		
@@ -388,12 +388,18 @@
 				// turn on the time limit, if there is any value on counter set already
 				if (toggle === true && secondsLeft) {
 					updateAbsoluteTimeLimitCounter(secondsLeft, true);
+					return;
+				}
+				
+				if (toggle === 'stop') {
+					absoluteTimeLimit =  Math.round(new Date().getTime() / 1000);
+					updateAbsoluteTimeLimitCounter();
 				}
 				return;
 			}
 			
 			// counter is not set yet and user clicked negative value
-			if (!secondsLeft && adjust < 0){
+			if (!secondsLeft && adjust < 0) {
 				return;
 			}
 			
@@ -406,7 +412,7 @@
 			// is time limit already enforced, update the server
 			// if time limit is not enforced yet, just update the screen
 			updateAbsoluteTimeLimitCounter(secondsLeft);
-			$('#absolute-time-limit-start').removeClass('disabled');
+			$('#absolute-time-limit-start').prop('disabled', false);
 			return;
 		}
 	}
@@ -436,12 +442,12 @@
 					$('#relative-time-limit-disabled').addClass('hidden');
 					$('#relative-time-limit-cancel').removeClass('hidden');
 					$('#relative-time-limit-enabled').removeClass('hidden');
-					$('#relative-time-limit-start').addClass('hidden').removeClass('disabled');
+					$('#relative-time-limit-start').addClass('hidden');
 				} else {
 					$('#relative-time-limit-disabled').removeClass('hidden');
 					$('#relative-time-limit-cancel').addClass('hidden');
 					$('#relative-time-limit-enabled').addClass('hidden');
-					$('#relative-time-limit-start').removeClass('hidden').addClass('disabled');
+					$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
 				}
 				
 				if (absoluteTimeLimit === null) {
@@ -452,12 +458,14 @@
 					$('#absolute-time-limit-disabled').removeClass('hidden');
 					$('#absolute-time-limit-cancel').addClass('hidden');
 					$('#absolute-time-limit-enabled').addClass('hidden');
-					$('#absolute-time-limit-start').removeClass('hidden').addClass('disabled');
+					$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
+					$('#absolute-time-limit-finish-now').prop('disabled', false);
 				} else {
 					$('#absolute-time-limit-disabled').addClass('hidden');
 					$('#absolute-time-limit-cancel').removeClass('hidden');
 					$('#absolute-time-limit-enabled').removeClass('hidden');
-					$('#absolute-time-limit-start').addClass('hidden').removeClass('disabled');
+					$('#absolute-time-limit-start').addClass('hidden');
+					$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimit <= Math.round(new Date().getTime() / 1000));
 				}
 			}
 		});
@@ -480,8 +488,12 @@
 				updateTimeLimitOnServer();
 				return;
 			}
-			// counter initialisation on page load
+			// counter initialisation on page load or "finish now"
 			secondsLeft = absoluteTimeLimit - now;
+			if (secondsLeft <= 0) {
+				// finish now
+				updateTimeLimitOnServer();
+			}
 		}
 		
 		var counter = $('#absolute-time-limit-counter');
@@ -515,6 +527,12 @@
 			$('#absolute-time-limit-start').removeClass('disabled');
 		} else {
 			counter.countdown('resume');
+		}
+	}
+	
+	function timeLimitFinishNow(){
+		if (confirm('<fmt:message key="label.monitoring.summary.time.limit.finish.now.confirm" />')) {
+			updateTimeLimit('absolute', 'stop');
 		}
 	}
 	

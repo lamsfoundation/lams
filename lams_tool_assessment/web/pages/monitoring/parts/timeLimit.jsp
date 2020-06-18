@@ -31,14 +31,17 @@
 						</div>
 					</td>
 					<td>
-						<button id="relative-time-limit-start" class="btn btn-success btn-xs disabled ${relativeTimeLimitEnabled ? 'hidden' : ''}"
-								onClick="updateTimeLimit('relative', true)">
+						<button id="relative-time-limit-start" class="btn btn-success btn-xs ${relativeTimeLimitEnabled ? 'hidden' : ''}"
+								onClick="updateTimeLimit('relative', true)" disabled>
 							<fmt:message key="label.monitoring.summary.time.limit.start"/>
 						</button>
 						<button id="relative-time-limit-cancel" class="btn btn-danger btn-xs ${relativeTimeLimitEnabled ? '' : 'hidden'}"
 								onClick="updateTimeLimit('relative', false)">
 							<fmt:message key="label.monitoring.summary.time.limit.cancel"/>
 						</button>
+					</td>
+					<td>
+						<!-- Finish now button at absolute time limit row -->
 					</td>
 					<td>
 						<button class="btn btn-default btn-xs"
@@ -80,13 +83,19 @@
 						</div>
 					</td>
 					<td>
-						<button id="absolute-time-limit-start" class="btn btn-success btn-xs disabled ${absoluteTimeLimitEnabled ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', true)">
+						<button id="absolute-time-limit-start" class="btn btn-success btn-xs ${absoluteTimeLimitEnabled ? 'hidden' : ''}"
+								onClick="updateTimeLimit('absolute', true)" disabled>
 							<fmt:message key="label.monitoring.summary.time.limit.start"/>
 						</button>
 						<button id="absolute-time-limit-cancel" class="btn btn-danger btn-xs ${absoluteTimeLimitEnabled ? '' : 'hidden'}"
 								onClick="updateTimeLimit('absolute', false)">
 							<fmt:message key="label.monitoring.summary.time.limit.cancel"/>
+						</button>
+					</td>
+					<td>
+						<button id="absolute-time-limit-finish-now" class="btn btn-warning btn-xs"
+								onClick="timeLimitFinishNow()">
+							<fmt:message key="label.monitoring.summary.time.limit.finish.now"/>
 						</button>
 					</td>
 					<td>
