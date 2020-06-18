@@ -3401,7 +3401,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.optBoolean(toolContentJSON, "shuffled", Boolean.FALSE));
-	assessment.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	assessment.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring

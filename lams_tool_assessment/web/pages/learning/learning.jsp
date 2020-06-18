@@ -12,7 +12,9 @@
 <c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 <c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
+<%--
+<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.relativeTimeLimit != 0}" />
+ --%>
 <c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
 <c:set var="result" value="${sessionMap.assessmentResult}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
@@ -39,6 +41,10 @@
 		
 		[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
   			display: none;
+  		}
+  		
+  		.countdown-timeout {
+  			color: #FF3333 !important;
   		}
 	</style>
 
@@ -127,7 +133,7 @@
 	
 		
 		
-		//timelimit feature
+		// TIME LIMIT
 
 		// websocket needs pinging and reconnection feature in case it fails
 		// it works pretty much the same as command websocket in Page.tag
@@ -180,12 +186,13 @@
 				var input = JSON.parse(e.data);
 				
 				if (input.clearTimer == true) {
-					// teacher has stopped the timer, destroy it
+					// teacher stopped the timer, destroy it
 					$('#countdown').countdown('destroy').remove();
-					counterInitialised = false;
 				} else {
-					// teacher has updated the timer
-					var secondsLeft = +input.secondsLeft;
+					// teacher updated the timer
+					var secondsLeft = +input.secondsLeft,
+						counterInitialised = $('#countdown').length > 0;
+						
 					if (counterInitialised) {
 						// just set the new time
 						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
@@ -202,7 +209,6 @@
 		}
 		
 		function displayCountdown(secondsLeft){
-			counterIntialised = true;
 			var countdown = '<div id="countdown"></div>';
 			
 			$.blockUI({
@@ -226,10 +232,13 @@
 				compact: true,
 				alwaysExpire : true,
 				onTick: function(periods) {
-					//check for 30 seconds
-					if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-						$('#countdown').css('color', '#FF3333');
-					}					
+					// check for 30 seconds or less and display timer in red
+					var secondsLeft = $.countdown.periodsToSeconds(periods);
+					if (secondsLeft <= 30) {
+						$(this).addClass('countdown-timeout');
+					} else {
+						$(this).removeClass('countdown-timeout');
+					}
 				},
 				onExpiry: function(periods) {
 			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 

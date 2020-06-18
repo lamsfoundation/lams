@@ -178,7 +178,7 @@ public class LearningController {
 
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
+	    if (assessment.getRelativeTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {

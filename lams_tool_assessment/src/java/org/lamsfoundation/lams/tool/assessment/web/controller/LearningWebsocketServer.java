@@ -44,6 +44,8 @@ public class LearningWebsocketServer {
 
     private static class TimeCache {
 	private int relativeTimeLimit;
+	private LocalDateTime absoluteTimeLimit;
+	// mapping of user ID (not UID) and when the learner entered the activity
 	private final Map<Long, LocalDateTime> timeLimitLaunchedDate = new ConcurrentHashMap<>();
     }
 
@@ -75,15 +77,24 @@ public class LearningWebsocketServer {
 			    .getAssessmentByContentId(toolContentId);
 		    long assessmentUid = assessment.getUid();
 		    TimeCache timeCache = timeCaches.get(toolContentId);
+		    // first time a learner entered the activity, so there is not cache yet
 		    if (timeCache == null) {
 			timeCache = new TimeCache();
 			timeCaches.put(toolContentId, timeCache);
 		    }
 
 		    boolean updateAllUsers = false;
-		    int existingRelativeTimeLimit = assessment.getTimeLimit() * 60;
+		    // compare relative and absolute time limits with cache
+		    // it they changed, update all learners
+		    int existingRelativeTimeLimit = assessment.getRelativeTimeLimit() * 60;
 		    if (timeCache.relativeTimeLimit != existingRelativeTimeLimit) {
 			timeCache.relativeTimeLimit = existingRelativeTimeLimit;
+			updateAllUsers = true;
+		    }
+		    LocalDateTime existingAbsoluteTimeLimit = assessment.getAbsoluteTimeLimit();
+		    if (timeCache.absoluteTimeLimit == null ? existingAbsoluteTimeLimit != null
+			    : !timeCache.absoluteTimeLimit.equals(existingAbsoluteTimeLimit)) {
+			timeCache.absoluteTimeLimit = existingAbsoluteTimeLimit;
 			updateAllUsers = true;
 		    }
 
@@ -94,7 +105,8 @@ public class LearningWebsocketServer {
 			long userId = user.getUserId();
 			boolean updateUser = updateAllUsers;
 
-			if (timeCache.relativeTimeLimit > 0) {
+			// check if there is a point in updating learner launch date
+			if (timeCache.relativeTimeLimit > 0 || timeCache.absoluteTimeLimit != null) {
 			    AssessmentResult result = LearningWebsocketServer.getAssessmentService()
 				    .getLastAssessmentResult(assessmentUid, userId);
 			    if (result == null) {
@@ -102,10 +114,12 @@ public class LearningWebsocketServer {
 			    }
 			    LocalDateTime existingLaunchDate = result.getTimeLimitLaunchedDate();
 			    if (existingLaunchDate == null) {
+				// learner entered the activity, so store his launch date in cache and DB
 				existingLaunchDate = assessmentService.launchTimeLimit(assessmentUid, userId);
 			    }
 
 			    LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);
+			    // user (re)entered the activity, so update him with time limit
 			    if (launchedDate == null || !launchedDate.equals(existingLaunchDate)) {
 				updateUser = true;
 				timeCache.timeLimitLaunchedDate.put(userId, existingLaunchDate);
@@ -141,7 +155,7 @@ public class LearningWebsocketServer {
     private static IAssessmentService assessmentService;
 
     static {
-	// run the singleton thread
+	// run the singleton thread in given periods
 	executor.scheduleAtFixedRate(sendWorker, 0, CHECK_INTERVAL, TimeUnit.SECONDS);
     }
 
@@ -169,6 +183,7 @@ public class LearningWebsocketServer {
 
 	TimeCache timeCache = timeCaches.get(toolContentID);
 	if (timeCache != null) {
+	    // clear cached learner data, so he gets updated with current time limit via websocket
 	    timeCache.timeLimitLaunchedDate.remove(user.getUserId());
 	}
 
@@ -204,12 +219,24 @@ public class LearningWebsocketServer {
     }
 
     private static Long getSecondsLeft(TimeCache timeCache, long userUid) {
-	if (timeCache.relativeTimeLimit == 0) {
+	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
+	    // no time limit is set at all
 	    return null;
 	}
 
+	// when user entered the activity
+	LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userUid);
+	// what is the time limit for him
+	LocalDateTime finish = null;
+	if (timeCache.absoluteTimeLimit != null) {
+	    // the limit is same for everyone
+	    finish = timeCache.absoluteTimeLimit;
+	} else {
+	    // the limit is his entry plus relative time limit
+	    finish = launchedDate.plusSeconds(timeCache.relativeTimeLimit);
+	}
+
 	LocalDateTime now = LocalDateTime.now();
-	LocalDateTime finish = timeCache.timeLimitLaunchedDate.get(userUid).plusSeconds(timeCache.relativeTimeLimit);
 	long secondsLeft = Duration.between(now, finish).toSeconds();
 
 	return Math.max(0, secondsLeft);
@@ -218,6 +245,7 @@ public class LearningWebsocketServer {
     private static void sendUpdate(Session websocket, Long secondsLeft) throws IOException {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (secondsLeft == null) {
+	    // time limit feature was disabled, so destroy counter on learner screen
 	    responseJSON.put("clearTimer", true);
 	} else {
 	    responseJSON.put("secondsLeft", secondsLeft);

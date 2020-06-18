@@ -14,10 +14,15 @@
 		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css" >
  		<lams:css suffix="chart"/>
  		<link href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet" type="text/css">
+ 		
  		<style>
- 		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
-			background-color: #f5f5f5;
- 		}
+	 		.ui-jqdialog.ui-jqgrid-bootstrap .ui-jqdialog-titlebar, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
+				background-color: #f5f5f5;
+	 		}
+	 		
+	 		.countdown-timeout {
+	  			color: #FF3333 !important;
+	  		}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -46,12 +51,14 @@
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
  		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>

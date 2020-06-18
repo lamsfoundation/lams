@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
@@ -78,8 +80,11 @@ public class Assessment implements Cloneable {
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+    @Column(name = "relative_time_limit")
+    private int relativeTimeLimit;
+
+    @Column(name = "absolute_time_limit")
+    private LocalDateTime absoluteTimeLimit;
 
     @Column(name = "questions_per_page")
     private int questionsPerPage;
@@ -424,16 +429,28 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
-    public int getTimeLimit() {
-	return timeLimit;
+    public int getRelativeTimeLimit() {
+	return relativeTimeLimit;
     }
 
     /**
      * @param timeLimit
      *            the time limitation, that students have to complete an attempt.
      */
-    public void setTimeLimit(int timeLimit) {
-	this.timeLimit = timeLimit;
+    public void setRelativeTimeLimit(int timeLimit) {
+	this.relativeTimeLimit = timeLimit;
+    }
+
+    public LocalDateTime getAbsoluteTimeLimit() {
+	return absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
     /**

@@ -283,6 +283,11 @@
 
 		// trigger the resize when the window first opens so that the grid uses all the space available.
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+		
+		// create counter if absolute time limit is set
+		if (absoluteTimeLimit) {
+			updateAbsoluteTimeLimitCounter();
+		}
 	});
 
 	function resizeJqgrid(jqgrids) {
@@ -302,76 +307,217 @@
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
-	var relativeTimeLimit = ${assessment.timeLimit};
 	
-	function timeLimitControl(type, toggle, adjust) {
+	// TIME LIMIT
+	
+		// in minutes since learner entered the activity
+	var relativeTimeLimit = ${assessment.relativeTimeLimit},
+		// in seconds since epoch started
+		absoluteTimeLimit = ${empty assessment.absoluteTimeLimit ? 'null' : assessment.absoluteTimeLimitSeconds};
+	
+	function updateTimeLimit(type, toggle, adjust) {
+		// relavite time limit set
 		if (type == 'relative') {
-			var relativeTimeLimitSpan = $('#relative-time-limit-value'),
-				displayedRelativeTimeLimit = +relativeTimeLimitSpan.text();
+			// what is set at the moment on screen, not at server
+			var displayedRelativeTimeLimit = +$('#relative-time-limit-value').text();
 			
+			// start/stop
 			if (toggle !== null) {
 				
 				if (toggle === false) {
-					displayedRelativeTimeLimit = relativeTimeLimit = 0;
-					callTimeLimitController(function(){
-						relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
-						$('#relative-time-limit-disabled').removeClass('hidden');
-						$('#relative-time-limit-cancel').addClass('hidden');
-						$('#relative-time-limit-enabled').addClass('hidden');
-						$('#relative-time-limit-start').removeClass('hidden').addClass('disabled');
-					});
+					// stop, i.e. set time limit to 0
+					relativeTimeLimit = 0;
+					updateTimeLimitOnServer();
 					return;
 				}
 				
+				// start, i.e. set backend time limit to whatever is set on screen
 				if (toggle === true && displayedRelativeTimeLimit > 0) {
 					relativeTimeLimit = displayedRelativeTimeLimit;
-					
-					callTimeLimitController(function(){
-						relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
-						$('#relative-time-limit-disabled').addClass('hidden');
-						$('#relative-time-limit-cancel').removeClass('hidden');
-						$('#relative-time-limit-enabled').removeClass('hidden');
-						$('#relative-time-limit-start').addClass('hidden').removeClass('disabled');
-					});
+					// when teacher enables relative time limit, absolute one gets disabled
+					absoluteTimeLimit = null;
+					updateTimeLimitOnServer();
 				}
+				return;
+			}
+			
+			// no negative time limit is allowed
+			if (displayedRelativeTimeLimit == 0 && adjust < 0){
 				return;
 			}
 			
 			var adjustedRelativeTimeLimit = displayedRelativeTimeLimit + adjust;
+			// at least one minute is required
+			// if teacher wants to set less, he should disable the limit or click "finish now"
 			if (adjustedRelativeTimeLimit < 1) {
-				displayedRelativeTimeLimit = 1;
-				relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
-				return;
+				adjustedRelativeTimeLimit = 1;
 			}
 			
+			// is time limit already enforced? if so, update the server
 			if (relativeTimeLimit > 0) {
-				relativeTimeLimit = displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
-				callTimeLimitController(function(){
-					relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
-				});
+				relativeTimeLimit = adjustedRelativeTimeLimit;
+				updateTimeLimitOnServer();
 				return;
 			}
 			
+			// if time limit is not enforced yet, just update the screen
 			displayedRelativeTimeLimit = adjustedRelativeTimeLimit;
-			relativeTimeLimitSpan.text(displayedRelativeTimeLimit);
+			$('#relative-time-limit-value').text(displayedRelativeTimeLimit);
 			$('#relative-time-limit-start').removeClass('disabled');
+			return;
+		}
+		
+		if (type == 'absolute') {
+			// get existing value on counter, if it is set already
+			var counter = $('#absolute-time-limit-counter'),
+				secondsLeft = null;
+			if (counter.length === 1) {
+				var periods = counter.countdown('getTimes');
+				secondsLeft = $.countdown.periodsToSeconds(periods);
+			}
+			
+			if (toggle !== null) {
+				
+				// start/stop
+				if (toggle === false) {
+					absoluteTimeLimit = null;
+					updateAbsoluteTimeLimitCounter();
+					return;
+				} 
+				
+				// turn on the time limit, if there is any value on counter set already
+				if (toggle === true && secondsLeft) {
+					updateAbsoluteTimeLimitCounter(secondsLeft, true);
+				}
+				return;
+			}
+			
+			// counter is not set yet and user clicked negative value
+			if (!secondsLeft && adjust < 0){
+				return;
+			}
+			
+			// adjust time
+			secondsLeft += adjust * 60;
+			if (secondsLeft < 60) {
+				secondsLeft = 60;
+			}
+
+			// is time limit already enforced, update the server
+			// if time limit is not enforced yet, just update the screen
+			updateAbsoluteTimeLimitCounter(secondsLeft);
+			$('#absolute-time-limit-start').removeClass('disabled');
+			return;
 		}
 	}
 	
-	function callTimeLimitController(callback) {
+	function updateTimeLimitOnServer() {
+		
+		// absolute time limit has higher priority
+		if (absoluteTimeLimit != null) {
+			relativeTimeLimit = 0;
+		}
+		
 		$.ajax({
-			'url' : '<c:url value="/monitoring/timeLimitControl.do"/>',
+			'url' : '<c:url value="/monitoring/updateTimeLimit.do"/>',
 			'type': 'post',
-			'dataType' : 'text',
 			'cache' : 'false',
 			'data': {
 				'toolContentID' : '${assessment.contentId}',
 				'relativeTimeLimit' : relativeTimeLimit,
+				'absoluteTimeLimit' : absoluteTimeLimit,
 				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 			},
-			success : callback
+			success : function(){
+				// update widgets
+				$('#relative-time-limit-value').text(relativeTimeLimit);
+				
+				if (relativeTimeLimit > 0) {
+					$('#relative-time-limit-disabled').addClass('hidden');
+					$('#relative-time-limit-cancel').removeClass('hidden');
+					$('#relative-time-limit-enabled').removeClass('hidden');
+					$('#relative-time-limit-start').addClass('hidden').removeClass('disabled');
+				} else {
+					$('#relative-time-limit-disabled').removeClass('hidden');
+					$('#relative-time-limit-cancel').addClass('hidden');
+					$('#relative-time-limit-enabled').addClass('hidden');
+					$('#relative-time-limit-start').removeClass('hidden').addClass('disabled');
+				}
+				
+				if (absoluteTimeLimit === null) {
+					// no absolute time limit? destroy the counter
+					$('#absolute-time-limit-counter').countdown('destroy');
+					$('#absolute-time-limit-value').empty();
+					
+					$('#absolute-time-limit-disabled').removeClass('hidden');
+					$('#absolute-time-limit-cancel').addClass('hidden');
+					$('#absolute-time-limit-enabled').addClass('hidden');
+					$('#absolute-time-limit-start').removeClass('hidden').addClass('disabled');
+				} else {
+					$('#absolute-time-limit-disabled').addClass('hidden');
+					$('#absolute-time-limit-cancel').removeClass('hidden');
+					$('#absolute-time-limit-enabled').removeClass('hidden');
+					$('#absolute-time-limit-start').addClass('hidden').removeClass('disabled');
+				}
+			}
 		});
 	}
+	
+	function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
+		var now = Math.round(new Date().getTime() / 1000),
+			// preset means that counter is set just on screen and the time limit is not enforced for learners
+			preset = start !== true && absoluteTimeLimit == null;
+		
+		if (secondsLeft) {
+			if (!preset) {
+				// time limit is already enforced on server, so update it there now
+				absoluteTimeLimit = now + secondsLeft;
+				updateTimeLimitOnServer();
+			}
+		} else {
+			if (absoluteTimeLimit == null) {
+				// disable the counter
+				updateTimeLimitOnServer();
+				return;
+			}
+			// counter initialisation on page load
+			secondsLeft = absoluteTimeLimit - now;
+		}
+		
+		var counter = $('#absolute-time-limit-counter');
+	
+		if (counter.length == 0) {
+			counter = $('<div />').attr('id', 'absolute-time-limit-counter').appendTo('#absolute-time-limit-value')
+				.countdown({
+					until: '+' + secondsLeft +'S',
+					format: 'hMS',
+					compact: true,
+					alwaysExpire : true,
+					onTick: function(periods) {
+						// check for 30 seconds or less and display timer in red
+						var secondsLeft = $.countdown.periodsToSeconds(periods);
+						if (secondsLeft <= 30) {
+							counter.addClass('countdown-timeout');
+						} else {
+							counter.removeClass('countdown-timeout');
+						}				
+					},
+					expiryText : '<span class="countdown-timeout">Expired</span>'
+				});
+		} else {
+			// if counter is paused, we can not adjust time, so resume it for a moment
+			counter.countdown('resume');
+			counter.countdown('option', 'until', secondsLeft + 'S');
+		}
+		
+		if (preset) {
+			counter.countdown('pause');
+			$('#absolute-time-limit-start').removeClass('disabled');
+		} else {
+			counter.countdown('resume');
+		}
+	}
+	
 </script>
 
 <div class="panel">

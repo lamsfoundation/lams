@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -810,16 +812,24 @@ public class MonitoringController {
 	}
     }
 
-    @RequestMapping(path = "/timeLimitControl", method = RequestMethod.POST)
+    @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void timeLimitControl(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit) {
+    public void updateTimeLimit(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
+	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be provided when absolute time limit is set");
+	}
+
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
-	assessment.setTimeLimit(relativeTimeLimit);
+	assessment.setRelativeTimeLimit(relativeTimeLimit);
+	// set time limit as seconds from start of epoch, using current server time zone
+	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
     }
 
