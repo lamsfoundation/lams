@@ -3,6 +3,7 @@ package org.lamsfoundation.lams.tool.assessment.web.controller;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -47,6 +49,7 @@ public class LearningWebsocketServer {
 	private LocalDateTime absoluteTimeLimit;
 	// mapping of user ID (not UID) and when the learner entered the activity
 	private final Map<Long, LocalDateTime> timeLimitLaunchedDate = new ConcurrentHashMap<>();
+	private Map<Long, Integer> timeLimitAdjustment = new HashMap<>();
     }
 
     /**
@@ -95,6 +98,14 @@ public class LearningWebsocketServer {
 		    if (timeCache.absoluteTimeLimit == null ? existingAbsoluteTimeLimit != null
 			    : !timeCache.absoluteTimeLimit.equals(existingAbsoluteTimeLimit)) {
 			timeCache.absoluteTimeLimit = existingAbsoluteTimeLimit;
+			updateAllUsers = true;
+		    }
+
+		    Map<Long, Integer> existingTimeLimitAdjustment = LearningWebsocketServer.getAssessmentService()
+			    .getExistingIndividualTimeLimitUsers(toolContentId).stream().collect(Collectors
+				    .toMap(AssessmentUser::getUserId, AssessmentUser::getTimeLimitAdjustment));
+		    if (!existingTimeLimitAdjustment.equals(timeCache.timeLimitAdjustment)) {
+			timeCache.timeLimitAdjustment = existingTimeLimitAdjustment;
 			updateAllUsers = true;
 		    }
 
@@ -238,6 +249,11 @@ public class LearningWebsocketServer {
 
 	LocalDateTime now = LocalDateTime.now();
 	long secondsLeft = Duration.between(now, finish).toSeconds();
+
+	Integer adjustment = timeCache.timeLimitAdjustment.get(userId);
+	if (adjustment != null) {
+	    secondsLeft += adjustment * 60;
+	}
 
 	return Math.max(0, secondsLeft);
     }

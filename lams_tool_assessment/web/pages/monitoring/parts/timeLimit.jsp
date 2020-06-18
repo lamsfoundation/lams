@@ -13,9 +13,9 @@
 		<c:set var="absoluteTimeLimitEnabled" value="${not empty assessment.absoluteTimeLimit}" />
 		<c:set var="relativeTimeLimitEnabled" value="${assessment.relativeTimeLimit != 0}" />
         <div id="time-limit-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="time-limit-heading">
-			<table class="table">
+			<table id="time-limit-table" class="table">
 				<tr>
-					<th colspan="7"><fmt:message key="label.monitoring.summary.time.limit.relative"/></th>
+					<th colspan="8"><fmt:message key="label.monitoring.summary.time.limit.relative"/></th>
 				</tr>
 				<tr>
 					<td>
@@ -70,7 +70,7 @@
 				</tr>
 				
 				<tr>
-					<th colspan="7"><fmt:message key="label.monitoring.summary.time.limit.absolute"/></th>
+					<th colspan="8"><fmt:message key="label.monitoring.summary.time.limit.absolute"/></th>
 				</tr>
 				<tr>
 					<td id="absolute-time-limit-value"></td>
@@ -123,6 +123,62 @@
 						</button>
 					</td>
 				</tr>
+								
+				<tr>
+					<th colspan="2">
+						<fmt:message key="label.monitoring.summary.time.limit.individual"/>
+					</th>
+					<td colspan="6">
+						<div class="input-group">
+		    				<span class="input-group-addon"><i class="fa fa-search"></i></span>
+		    				<input id="individual-time-limit-autocomplete" type="text" class="ui-autocomplete-input form-control input-sm" 
+		    	   				   placeholder='<fmt:message key="label.monitoring.summary.time.limit.individual.placeholder" />' />
+						</div>
+					</td>
+				</tr>
+				
+				<tr id="individual-time-limit-template-row" class="hidden">
+					<td class="individual-time-limit-user-name"></td>
+					<td>
+						<span class="individual-time-limit-value"></span>
+						<fmt:message key="label.monitoring.summary.time.limit.minutes"/>
+						<!-- (<time class="timeago" />)  -->
+					</td>
+					<td>
+						<button id="individual-time-limit-cancel" class="btn btn-danger btn-xs"
+								onClick="updateTimeLimit.call(this, 'individual', false)">
+							<fmt:message key="label.monitoring.summary.time.limit.cancel"/>
+						</button>
+					</td>
+					<td>
+						<!-- Finish now button at absolute time limit row -->
+					</td>
+					<td>
+						<button class="btn btn-default btn-xs"
+								onClick="updateTimeLimit.call(this, 'individual', null, 1)">
+							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.1"/>
+						</button>
+					</td>
+					<td>
+						<button class="btn btn-default btn-xs"
+								onClick="updateTimeLimit.call(this, 'individual', null, 5)">
+							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.5"/>
+						</button>
+					</td>
+					<td>
+						<button class="btn btn-default btn-xs"
+								onClick="updateTimeLimit.call(this, 'individual', null, -5)">
+							<fmt:message key="label.monitoring.summary.time.limit.minus.minute.5"/>
+						</button>
+					</td>
+					<td>
+						<button class="btn btn-default btn-xs"
+								onClick="updateTimeLimit.call(this, 'individual', null, -1)">
+							<fmt:message key="label.monitoring.summary.time.limit.minus.minute.1"/>
+						</button>
+					</td>
+				</tr>
+				
 			</table>
 		</div>
 	</div>

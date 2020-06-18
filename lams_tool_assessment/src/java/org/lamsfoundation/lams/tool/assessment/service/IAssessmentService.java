@@ -539,4 +539,8 @@ public interface IAssessmentService extends ICommonToolService {
     String getConfigValue(String key);
 
     Collection<User> getAllGroupUsers(Long toolSessionId);
+
+    List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId);
+
+    List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 }

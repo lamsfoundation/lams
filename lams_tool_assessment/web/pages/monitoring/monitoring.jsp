@@ -23,6 +23,10 @@
 	 		.countdown-timeout {
 	  			color: #FF3333 !important;
 	  		}
+	  		
+	  		#time-limit-table th {
+	  			vertical-align: middle;
+	  		}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -59,6 +63,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>	
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
  		<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>

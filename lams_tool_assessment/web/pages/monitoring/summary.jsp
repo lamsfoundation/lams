@@ -288,6 +288,7 @@
 		if (absoluteTimeLimit) {
 			updateAbsoluteTimeLimitCounter();
 		}
+		initInidividualTimeLimitAutocomplete();
 	});
 
 	function resizeJqgrid(jqgrids) {
@@ -415,6 +416,25 @@
 			$('#absolute-time-limit-start').prop('disabled', false);
 			return;
 		}
+		
+		if (type == 'individual') {
+			// this method is called with updateTimeLimit.call() so we can change meaning of "this"
+			// and identify row and userUid
+			var button = $(this),
+				row = button.closest('.individual-time-limit-row'),
+				userUid = row.data('userUid');
+			
+			// disable individual time adjustment
+			if (toggle === false) {
+				updateIndividualTimeLimitOnServer(userUid);
+				return;
+			}
+			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
+				newAdjustment = existingAdjustment + adjust;
+			
+			updateIndividualTimeLimitOnServer(userUid, newAdjustment);
+			return;
+		}
 	}
 	
 	function updateTimeLimitOnServer() {
@@ -535,6 +555,90 @@
 			updateTimeLimit('absolute', 'stop');
 		}
 	}
+	
+	
+	function initInidividualTimeLimitAutocomplete(){
+		$('#individual-time-limit-autocomplete').autocomplete({
+			'source' : '<c:url value="/monitoring/getPossibleIndividualTimeLimitUsers.do"/>?toolContentID=${assessment.contentId}',
+			'delay'  : 700,
+			'minLength' : 3,
+			'select' : function(event, ui){
+				// userUid and default 0 adjustment
+				updateIndividualTimeLimitOnServer(ui.item.value, 0);
+
+				// clear search field
+				$(this).val('');
+				return false;
+			},
+			'focus': function() {
+				// Stop the autocomplete of resetting the value to the selected one
+				// It puts LAMS user ID instead of user name
+				event.preventDefault();
+			}
+		});
+		
+		refreshInidividualTimeLimitUsers();
+	}
+	
+	
+	function updateIndividualTimeLimitOnServer(userUid, adjustment) {
+		$.ajax({
+			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
+			'type': 'post',
+			'cache' : 'false',
+			'data': {
+				'userUid' : userUid,
+				'adjustment' : adjustment,
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			},
+			success : function(){
+				refreshInidividualTimeLimitUsers();
+			}
+		});
+	}
+
+
+	function refreshInidividualTimeLimitUsers() {
+		var table = $('#time-limit-table');
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/getExistingIndividualTimeLimitUsers.do"/>',
+			'dataType' : 'json',
+			'cache' : 'false',
+			'data': {
+				'toolContentID' : '${assessment.contentId}'
+			},
+			success : function(users) {
+				// remove existing users
+				$('.individual-time-limit-row', table).remove();
+				
+				if (!users) {
+					return;
+				}
+				
+				var template = $('#individual-time-limit-template-row'),
+					now = new Date().getTime();
+				$.each(users, function(){
+					var row = template.clone()
+									  .attr('id', 'individual-time-limit-row-' + this.uid)
+									  .data('userUid', this.uid)
+									  .addClass('individual-time-limit-row')
+									  .appendTo(table);
+					$('.individual-time-limit-user-name', row).text(this.name);
+					$('.individual-time-limit-value', row).text(this.adjustment);
+					// var individualFinishTime = now + (this.adjustment * 60 * 1000),
+					//	   individualFinishDate = new Date(individualFinishTime).toString();
+					// $('time.timeago', row).attr('datetime', individualFinishDate);
+					
+					row.removeClass('hidden');
+				});
+				
+				// $("time.timeago").timeago();
+			}
+		});
+	}
+	
+	// END OF TIME LIMIT
 	
 </script>
 

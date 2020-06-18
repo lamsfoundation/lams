@@ -3650,4 +3650,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
     }
+
+    @Override
+    public List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId) {
+	return assessmentUserDao.getExistingIndividualTimeLimitUsers(toolContentId);
+    }
+
+    @Override
+    public List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	return assessmentUserDao.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+    }
 }

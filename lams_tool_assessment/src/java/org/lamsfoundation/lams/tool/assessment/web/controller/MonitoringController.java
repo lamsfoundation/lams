@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -114,6 +115,9 @@ public class MonitoringController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
+
+    @Autowired
+    private IUserManagementService userManagementService;
 
     @Autowired
     private IQbService qbService;
@@ -831,6 +835,51 @@ public class MonitoringController {
 	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
 		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
+    }
+
+    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getPossibleIndividualTimeLimitUsers(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam(name = "term") String searchString) {
+	List<AssessmentUser> users = service.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	for (AssessmentUser user : users) {
+	    // this format is required by jQuery UI autocomplete
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+	    userJSON.put("value", user.getUid());
+	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")");
+	    responseJSON.add(userJSON);
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExistingIndividualTimeLimitUsers(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId) {
+	List<AssessmentUser> users = service.getExistingIndividualTimeLimitUsers(toolContentId);
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	for (AssessmentUser user : users) {
+	    // this format is required by jQuery UI autocomplete
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+	    userJSON.put("uid", user.getUid());
+	    userJSON.put("name", user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")");
+	    userJSON.put("adjustment", user.getTimeLimitAdjustment());
+	    responseJSON.add(userJSON);
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/updateIndividualTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateIndividualTimeLimit(@RequestParam long userUid,
+	    @RequestParam(required = false) Integer adjustment) {
+	AssessmentUser user = (AssessmentUser) userManagementService.findById(AssessmentUser.class, userUid);
+	user.setTimeLimitAdjustment(adjustment);
+	userManagementService.save(user);
     }
 
     @SuppressWarnings("unchecked")

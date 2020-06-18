@@ -62,6 +62,16 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
+    private static final String FIND_POSSIBLE_INDIVIDUAL_TIME_LIMIT_USERS = "FROM " + AssessmentUser.class.getName()
+	    + " AS u WHERE u.timeLimitAdjustment IS NULL AND u.assessment.contentId = :toolContentId "
+	    + "AND (u.firstName LIKE CONCAT('%', :searchString, '%') "
+	    + "OR u.lastName    LIKE CONCAT('%', :searchString, '%') "
+	    + "OR u.loginName   LIKE CONCAT('%', :searchString, '%')) ORDER BY u.firstName, u.lastName";
+
+    private static final String FIND_EXISTING_INDIVIDUAL_TIME_LIMIT_USERS = "FROM " + AssessmentUser.class.getName()
+	    + " AS u WHERE u.timeLimitAdjustment IS NOT NULL AND u.assessment.contentId = :toolContentId "
+	    + " ORDER BY u.firstName, u.lastName";
+
     @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
@@ -323,4 +333,16 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	return list;
     }
 
+    @Override
+    public List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	return getSession().createQuery(FIND_POSSIBLE_INDIVIDUAL_TIME_LIMIT_USERS, AssessmentUser.class)
+		.setParameter("toolContentId", toolContentId).setParameter("searchString", searchString)
+		.getResultList();
+    }
+
+    @Override
+    public List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId) {
+	return getSession().createQuery(FIND_EXISTING_INDIVIDUAL_TIME_LIMIT_USERS, AssessmentUser.class)
+		.setParameter("toolContentId", toolContentId).getResultList();
+    }
 }
