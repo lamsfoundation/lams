@@ -217,16 +217,16 @@ body {
 							</div>
 						</c:if>
            
-						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-signin" id="loginForm" autocomplete="off">
+						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-signin" id="loginForm">
            					<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
            	 
 			            	<div class="form-label-group">
-			              		<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" onkeypress="onEnter(event)" tabindex="1" required autofocus placeholder="aaaaa">
+			              		<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" onkeypress="onEnter(event)" tabindex="1" required autofocus placeholder="aaaaa" autocomplete="username">
 			                	<label for="j_username">Username</label>
 			              	</div>
 			
 			              	<div class="form-label-group">
-			              		<input id="" type="password" class="form-control" name="j_password" onkeypress="onEnter(event)" tabindex="2" required>
+			              		<input id="" type="password" class="form-control" name="j_password" onkeypress="onEnter(event)" tabindex="2" required autocomplete="current-password">
 			                	<label for="j_password">Password</label>
 			              	</div>	
 			              

@@ -13,7 +13,7 @@
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
-<script type="text/javascript" src="/lams/includes/javascript/bootstrap.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
 	var mustHaveUppercase = ${mustHaveUppercase},
 	mustHaveNumerics  = ${mustHaveNumerics},
@@ -52,7 +52,6 @@
 	$(function() {
 		// Setup form validation 
 		$("#SignupForm").validate({
-							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
 							rules : {
@@ -142,26 +141,25 @@
 	});
 </script>
 <div>
-	<form:form modelAttribute="SignupForm" id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
+	<form:form modelAttribute="SignupForm" id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate">
 		<form:hidden path="submitted" value="1" />
 		<form:hidden path="context" value="${signupOrganisation.context}" />
 		<div class="container">
 			<div class="row vertical-center-row">
 				<div
-					class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 					<div class="panel">
 						<div class="panel-body">
 
 							<div class="form-group">
 								<label for="username"><fmt:message key="signup.username" /></label>:
-								<form:input path="username" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="username" name="username" class="form-control" type="text" value="" size="40" maxlength="255" autocomplete="username">
 								<lams:errors path="username"/>
 								<span style="display: none;'" class="msg error"> <fmt:message
 										key="error.username.invalid.characters" /></span>
 							</div>
 
-							<div class="col-12">
+							<div class="col-xs-12">
 								<lams:Alert type="info" id="passwordConditions" close="false">
 									<strong><fmt:message key='label.password.must.contain' />:</strong>
 									<ul class="list-unstyled" style="line-height: 1.2">
@@ -192,24 +190,21 @@
 							<div class="form-group">
 								<label for="password"><fmt:message key="signup.password" /></label>:
 
-								<form:password path="password" size="40"
-									cssClass="form-control" maxlength="25" />
+								<input id="password" name="password" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
 								<lams:errors path="password"/>
 							</div>
 
 							<div class="form-group">
 								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
-								<form:password path="confirmPassword" size="40"
-									maxlength="25" cssClass="form-control" />
+								<input id="confirmPassword" name="confirmPassword" class="form-control" type="password" value="" size="40" maxlength="25" autocomplete="new-password">
 								<span style="display: none;'" class="confirmPassword error"><fmt:message
 										key="error.passwords.unequal" /></span>
 							</div>
 							<div class="form-group">
 								<label for="firstName"><fmt:message key="signup.first.name" /></label>:
 
-								<form:input path="firstName" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="firstName" name="firstName" class="form-control valid" type="text" value="" size="40" maxlength="255" autocomplete="given-name">
 								<lams:errors path="firstName"/>
 								<span style="display: none;'" class="first error"><fmt:message
 										key="error.firstname.invalid.characters" /></span>
@@ -218,8 +213,7 @@
 							<div class="form-group">
 								<label for="lastName"><fmt:message key="signup.last.name" /></label>:
 
-								<form:input path="lastName" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="lastName" name="lastName" class="form-control valid" type="text" value="" size="40" maxlength="255" autocomplete="family-name">
 								<lams:errors path="lastName"/>
 								<span style="display: none;'" class="last error"><fmt:message
 										key="error.lastname.invalid.characters" /></span>
@@ -227,8 +221,7 @@
 							<div class="form-group">
 								<label for="email"><fmt:message key="signup.email" /></label>:
 
-								<form:input path="email" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="email" name="email" class="form-control" type="text" value="" size="40" maxlength="255" autocomplete="email">
 								<lams:errors path="email"/>
 								<span style="display: none;'" class="email error"><fmt:message
 										key="error.email.invalid.format" /></span>
@@ -237,8 +230,7 @@
 							<div class="form-group">
 								<label for="confirmEmail"><fmt:message key="signup.confirm.email" /></label>:
 
-								<form:input path="confirmEmail" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="confirmEmail" name="confirmEmail" class="form-control" type="text" value="" size="40" maxlength="255" autocomplete="email">
 								<span style="display: none;'" class="confirmEmail error"><fmt:message
 										key="error.emails.unequal" /></span>
 							</div>
@@ -265,14 +257,13 @@
 							<div class="form-group">
 								<label for="courseKey"><fmt:message key="signup.course.key" /></label>:
 
-								<form:input path="courseKey" size="40" maxlength="255"
-									cssClass="form-control" />
+								<input id="courseKey" name="courseKey" class="form-control" type="text" value="" size="40" maxlength="255" autocomplete="one-time-code">
 								<lams:errors path="courseKey"/>
 							</div>
 
 							<div class="form-group" align="right">
 								<button id="submitButton"
-										class="btn btn-sm btn-secondary voffset5"
+										class="btn btn-sm btn-default voffset5"
 									    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='login.submit' /></span>"
 									    onClick="javascript:$(this).button('loading');$('#SignupForm').submit()"
 								>

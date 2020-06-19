@@ -243,8 +243,7 @@
 							<label for="login">
 								<fmt:message key="admin.user.login" />:&nbsp;<span class="text-danger">*</span>
 							</label>
-							<form:input id="login" path="login"  maxlength="50"
-									cssClass="form-control form-control-sm"/>
+								<input id="login" name="login" class="form-control form-control-sm" autocomplete="username" type="text" value="${userForm.login}" maxlength="50" required>
 							<small id="loginHelpBlock" class="form-text text-muted">
 								<lams:errors path="login"/>
 							</small>		
@@ -256,8 +255,7 @@
 								<label for="password">
 									<fmt:message key="admin.user.password" />:&nbsp;<span class="text-danger">*</span>
 								</label>
-								<form:input type="password" path="password" 
-									maxlength="25" id="password" cssClass="form-control form-control-sm" />
+									<input id="password" name="password" class="form-control form-control-sm" type="password" value="${userForm.password}" maxlength="25" autocomplete="new-password" required>	
 								<small id="passwordHelpBlock" class="form-text text-muted">
 									<lams:errors path="password"/>
 								</small>		
@@ -268,8 +266,7 @@
 								<label for="password2">
 									<fmt:message key="admin.user.password.confirm" />:&nbsp;<span class="text-danger">*</span>
 								</label>
-								<form:input type="password" path="password2" 
-									maxlength="25" id="password2" cssClass="form-control form-control-sm" />
+								<input id="password2" name="password2" class="form-control form-control-sm" type="password" value="${userForm.password2}" maxlength="25" autocomplete="new-password" required>
 							
 							</div>
 						</c:if>
@@ -292,16 +289,14 @@
 							<label for="title">
 								<fmt:message key="admin.user.title" />:
 							</label>
-							<form:input type="text" path="title" size="32" maxlength="32"
-								id="title" cssClass="form-control form-control-sm"/>
+								<input id="title" name="title" class="form-control form-control-sm" type="text" value="${userForm.title}" size="32" maxlength="32" autocomplete=honorific-prefix">
 						</div>	
 						
 						<div class="form-group">
 							<label for="firstName">
 								<fmt:message key="admin.user.first_name" />:&nbsp;<span class="text-danger">*</span>
 							</label>
-							<form:input path="firstName" 
-								id="firstName" maxlength="128" cssClass="form-control form-control-sm"/>
+								<input id="firstName" name="firstName" required class="form-control form-control-sm" type="text" value="${userForm.firstName}" maxlength="128" autocomplete="given-name">
 							<small id="firstNameHelpBlock" class="form-text text-muted">
 								<lams:errors path="firstName"/>
 							</small>	
@@ -311,8 +306,7 @@
 							<label for="lastName">
 								<fmt:message key="admin.user.last_name" />:&nbsp;<span class="text-danger">*</span>
 							</label>
-							<form:input path="lastName" 
-								id="lastName" maxlength="128" cssClass="form-control form-control-sm"/>
+								<input id="lastName" name="lastName" class="form-control form-control-sm" type="text" value="${userForm.lastName}" required maxlength="128" autocomplete="family-name">
 							<small id="lastNameHelpBlock" class="form-text text-muted">
 								<lams:errors path="lastName"/>
 							</small>	
@@ -322,8 +316,7 @@
 							<label for="email">
 								<fmt:message key="admin.user.email" />:&nbsp;<span class="text-danger">*</span>
 							</label>
-							<form:input path="email" maxlength="128" id="email"
-								cssClass="form-control form-control-sm"/>
+								<input id="email" name="email" class="form-control form-control-sm" type="text" value="${userForm.email}" maxlength="128" required autocomplete="email">
 							<small id="emailHelpBlock" class="form-text text-muted">
 								<lams:errors path="email"/>
 							</small>	
@@ -334,8 +327,7 @@
 							<label for="addressLine1">
 								<fmt:message key="admin.user.address_line_1" />:
 							</label>
-							<form:input path="addressLine1" 
-								maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="addressLine1" name="addressLine1" class="form-control form-control-sm" type="text" value="${userForm.addressLine1}" maxlength="64" autocomplete="address-line1">
 						</div>
 						
 						
@@ -343,8 +335,7 @@
 							<label for="addressLine2">
 								<fmt:message key="admin.user.address_line_2" />:
 							</label>	
-							<form:input path="addressLine2" 
-								maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="addressLine2" name="addressLine2" class="form-control form-control-sm" type="text" value="${userForm.addressLine2}" maxlength="64" autocomplete="address-line2">
 										
 						</div>
 						
@@ -352,8 +343,7 @@
 							<label for="addressLine3">
 								<fmt:message key="admin.user.address_line_3" />:
 							</label>	
-							<form:input path="addressLine3" 
-								maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="addressLine3" name="addressLine3" class="form-control form-control-sm" type="text" value="${userForm.addressLine3}" maxlength="64" autocomplete="address-line3">
 										
 						</div>
 						
@@ -361,8 +351,8 @@
 							<label for="city">
 								<fmt:message key="admin.user.city" />:
 							</label>	
-							<form:input path="city" 
-								maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="city" name="city" class="form-control form-control-sm" type="text" value="${userForm.city}" maxlength="64" autocomplete="address=line4">
+
 										
 						</div>
 
@@ -370,8 +360,7 @@
 							<label for="postcode">
 								<fmt:message key="admin.user.postcode" />:
 							</label>	
-							<form:input path="postcode" 
-								maxlength="10" cssClass="form-control form-control-sm"/>
+								<input id="postcode" name="postcode" class="form-control form-control-sm" type="text" value="${userForm.postcode}" value="${userForm.postcode}" maxlength="10">
 										
 						</div>
 
@@ -402,30 +391,23 @@
 							<label for="dayPhone">
 								<fmt:message key="admin.user.day_phone" />:
 							</label>	
-							<form:input path="dayPhone" maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="dayPhone" name="dayPhone" class="form-control form-control-sm" type="text" value="${userForm.dayPhone}" maxlength="64" autocomplete="tel">
 						</div>
 
 						<div class="form-group">
 							<label for="eveningPhone">
 								<fmt:message key="admin.user.evening_phone" />:
 							</label>	
-							<form:input path="eveningPhone" maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="eveningPhone" name="eveningPhone" class="form-control form-control-sm" type="text" value="${userForm.eveningPhone}" maxlength="64" autocomplete="tel">
 						</div>
 
 						<div class="form-group">
 							<label for="mobilePhone">
 								<fmt:message key="admin.user.mobile_phone" />:
 							</label>	
-							<form:input path="mobilePhone" maxlength="64" cssClass="form-control form-control-sm"/>
+								<input id="mobilePhone" name="mobilePhone" class="form-control form-control-sm" type="text" value="${userForm.mobilePhone}" maxlength="64" autocomplete="tel">
 						</div>
 																								
-						<div class="form-group">
-							<label for="fax">
-								<fmt:message key="admin.user.fax" />:
-							</label>	
-							<form:input path="fax" maxlength="64" cssClass="form-control form-control-sm"/>
-						</div>
-
 						<div class="form-group">
 							<label for="localeId">
 								<fmt:message key="admin.organisation.locale" />:
