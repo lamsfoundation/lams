@@ -102,7 +102,7 @@
 						<div class="form-group">
 							<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
  							<lams:errors path="oldPassword"/>	
- 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
+ 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword" required autocomplete="current-password"/>			
 						</div>
 							
 						<div class="col-12">
@@ -135,13 +135,13 @@
 						<lams:errors path="password"/>	
  						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password"  
+							<input class="form-control" type="password" required autocomplete="new-password"  
 									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			
 						</div>
 						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
-									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
+							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" required 
+							autocomplete="new-password" placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
 						</div>
 							
 						<div class="form-group" align="right">
