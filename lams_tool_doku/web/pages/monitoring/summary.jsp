@@ -14,6 +14,7 @@
 		color:#47bc23; 
 		margin-bottom: 10px;
 		text-align: center;
+		position: static;
 	}
 	#countdown-label {
 		font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
@@ -235,7 +236,7 @@
 	<!--For release marks feature-->
 	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div>
-	
+
 	<c:if test="${dokumaran.timeLimit > 0}">
 		
 	
