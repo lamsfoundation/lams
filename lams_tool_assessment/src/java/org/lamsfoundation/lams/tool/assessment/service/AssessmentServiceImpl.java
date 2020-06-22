@@ -58,6 +58,8 @@ import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -3657,6 +3659,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+
+    @Override
+    public Grouping getGrouping(long toolContentId) {
+	ToolActivity toolActivity = (ToolActivity) userManagementService
+		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
     }
 
     @Override

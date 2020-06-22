@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -539,6 +540,8 @@ public interface IAssessmentService extends ICommonToolService {
     String getConfigValue(String key);
 
     Collection<User> getAllGroupUsers(Long toolSessionId);
+
+    Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 }

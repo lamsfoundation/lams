@@ -431,13 +431,13 @@
 			
 			// disable individual time adjustment
 			if (toggle === false) {
-				updateIndividualTimeLimitOnServer(userId);
+				updateIndividualTimeLimitOnServer('user-' + userId);
 				return;
 			}
 			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
 				newAdjustment = existingAdjustment + adjust;
 			
-			updateIndividualTimeLimitOnServer(userId, newAdjustment);
+			updateIndividualTimeLimitOnServer('user-' + userId, newAdjustment);
 			return;
 		}
 	}
@@ -568,7 +568,7 @@
 			'delay'  : 700,
 			'minLength' : 3,
 			'select' : function(event, ui){
-				// userUid and default 0 adjustment
+				// user ID or group ID, and default 0 adjustment
 				updateIndividualTimeLimitOnServer(ui.item.value, 0);
 
 				// clear search field
@@ -586,14 +586,15 @@
 	}
 	
 	
-	function updateIndividualTimeLimitOnServer(userId, adjustment) {
+	function updateIndividualTimeLimitOnServer(itemId, adjustment) {
 		$.ajax({
 			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
 			'type': 'post',
 			'cache' : 'false',
 			'data': {
 				'toolContentID' : '${assessment.contentId}',
-				'userId' : userId,
+				// itemId can user-<userId> or group-<groupId>
+				'itemId' : itemId,
 				'adjustment' : adjustment,
 				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 			},

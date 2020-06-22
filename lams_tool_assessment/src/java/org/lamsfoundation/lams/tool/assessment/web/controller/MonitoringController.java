@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,6 +53,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -112,6 +116,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RequestMapping("/monitoring")
 public class MonitoringController {
     public static Logger log = Logger.getLogger(MonitoringController.class);
+
+    private static final Comparator<User> USER_NAME_COMPARATOR = Comparator.comparing(User::getFirstName)
+	    .thenComparing(User::getLastName).thenComparing(User::getLogin);
 
     @Autowired
     @Qualifier("laasseAssessmentService")
@@ -847,14 +854,37 @@ public class MonitoringController {
 	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
 
 	List<User> users = service.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+	Grouping grouping = service.getGrouping(toolContentId);
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	String groupLabel = service.getMessage("monitoring.label.group") + " \"";
+	if (grouping != null) {
+	    Set<Group> groups = grouping.getGroups();
+	    for (Group group : groups) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().contains(searchString.toLowerCase())) {
+		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
+		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
+		    groupJSON.put("value", "group-" + group.getGroupId());
+		    responseJSON.add(groupJSON);
+		}
+	    }
+	}
+
 	for (User user : users) {
 	    if (!timeLimitAdjustments.containsKey(user.getUserId())) {
 		// this format is required by jQuery UI autocomplete
 		ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
-		userJSON.put("value", user.getUserId());
-		userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")");
+		userJSON.put("value", "user-" + user.getUserId());
+
+		String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+		if (grouping != null) {
+		    Group group = grouping.getGroupBy(user);
+		    if (group != null) {
+			name += " - " + group.getGroupName();
+		    }
+		}
+
+		userJSON.put("label", name);
 		responseJSON.add(userJSON);
 	    }
 	}
@@ -867,19 +897,47 @@ public class MonitoringController {
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId) {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
-
-	// find User objects based on their userIDs and sort by names
+	Grouping grouping = service.getGrouping(toolContentId);
+	// find User objects based on their userIDs and sort by name
 	List<User> users = assessment.getTimeLimitAdjustments().keySet().stream()
-		.map(userId -> userManagementService.getUserById(userId)).sorted(Comparator
-			.comparing(User::getFirstName).thenComparing(User::getLastName).thenComparing(User::getLogin))
+		.map(userId -> userManagementService.getUserById(userId)).sorted(USER_NAME_COMPARATOR)
 		.collect(Collectors.toList());
+
+	if (grouping != null) {
+	    // Make a map group -> its users who have a time limit set
+	    // key are sorted by group name, users in each group are sorted by name
+	    List<User> groupedUsers = grouping.getGroups().stream()
+		    .collect(Collectors.toMap(Group::getGroupName, group -> {
+			return group.getUsers().stream()
+				.filter(user -> timeLimitAdjustments.containsKey(user.getUserId()))
+				.collect(Collectors.toCollection(() -> new TreeSet<>(USER_NAME_COMPARATOR)));
+		    }, (s1, s2) -> {
+			s1.addAll(s2);
+			return s1;
+		    }, TreeMap::new)).values().stream().flatMap(Set::stream).collect(Collectors.toList());
+
+	    // from general user list remove grouped users
+	    users.removeAll(groupedUsers);
+	    // at the end of list, add remaining, not yet grouped users
+	    groupedUsers.addAll(users);
+	    users = groupedUsers;
+	}
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 	    userJSON.put("userId", user.getUserId());
-	    userJSON.put("name", user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")");
 	    userJSON.put("adjustment", timeLimitAdjustments.get(user.getUserId().intValue()));
+
+	    String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+	    if (grouping != null) {
+		Group group = grouping.getGroupBy(user);
+		if (group != null && !group.isNull()) {
+		    name += " - " + group.getGroupName();
+		}
+	    }
+	    userJSON.put("name", name);
+
 	    responseJSON.add(userJSON);
 	}
 	return responseJSON.toString();
@@ -889,13 +947,30 @@ public class MonitoringController {
     @ResponseStatus(HttpStatus.OK)
     public void updateIndividualTimeLimit(
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int userId, @RequestParam(required = false) Integer adjustment) {
+	    @RequestParam String itemId, @RequestParam(required = false) Integer adjustment) {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
-	if (adjustment == null) {
-	    timeLimitAdjustments.remove(userId);
+	Set<Integer> userIds = null;
+
+	// itemId can user-<userId> or group-<groupId>
+	String[] itemIdParts = itemId.split("-");
+	if (itemIdParts[0].equalsIgnoreCase("group")) {
+	    // add all users from a group, except for ones who are already added
+	    Group group = (Group) userManagementService.findById(Group.class, Long.valueOf(itemIdParts[1]));
+	    userIds = group.getUsers().stream().map(User::getUserId)
+		    .filter(userId -> !timeLimitAdjustments.containsKey(userId)).collect(Collectors.toSet());
 	} else {
-	    timeLimitAdjustments.put(userId, adjustment);
+	    // adjust for a single user
+	    userIds = new HashSet<>();
+	    userIds.add(Integer.valueOf(itemIdParts[1]));
+	}
+
+	for (Integer userId : userIds) {
+	    if (adjustment == null) {
+		timeLimitAdjustments.remove(userId);
+	    } else {
+		timeLimitAdjustments.put(userId, adjustment);
+	    }
 	}
 	service.saveOrUpdateAssessment(assessment);
     }
