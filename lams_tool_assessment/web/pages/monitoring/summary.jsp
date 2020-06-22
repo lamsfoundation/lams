@@ -427,17 +427,17 @@
 			// and identify row and userUid
 			var button = $(this),
 				row = button.closest('.individual-time-limit-row'),
-				userUid = row.data('userUid');
+				userId = row.data('userId');
 			
 			// disable individual time adjustment
 			if (toggle === false) {
-				updateIndividualTimeLimitOnServer(userUid);
+				updateIndividualTimeLimitOnServer(userId);
 				return;
 			}
 			var existingAdjustment = +$('.individual-time-limit-value', row).text(),
 				newAdjustment = existingAdjustment + adjust;
 			
-			updateIndividualTimeLimitOnServer(userUid, newAdjustment);
+			updateIndividualTimeLimitOnServer(userId, newAdjustment);
 			return;
 		}
 	}
@@ -586,13 +586,14 @@
 	}
 	
 	
-	function updateIndividualTimeLimitOnServer(userUid, adjustment) {
+	function updateIndividualTimeLimitOnServer(userId, adjustment) {
 		$.ajax({
 			'url' : '<c:url value="/monitoring/updateIndividualTimeLimit.do"/>',
 			'type': 'post',
 			'cache' : 'false',
 			'data': {
-				'userUid' : userUid,
+				'toolContentID' : '${assessment.contentId}',
+				'userId' : userId,
 				'adjustment' : adjustment,
 				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 			},
@@ -625,20 +626,15 @@
 					now = new Date().getTime();
 				$.each(users, function(){
 					var row = template.clone()
-									  .attr('id', 'individual-time-limit-row-' + this.uid)
-									  .data('userUid', this.uid)
+									  .attr('id', 'individual-time-limit-row-' + this.userId)
+									  .data('userId', this.userId)
 									  .addClass('individual-time-limit-row')
 									  .appendTo(table);
 					$('.individual-time-limit-user-name', row).text(this.name);
 					$('.individual-time-limit-value', row).text(this.adjustment);
-					// var individualFinishTime = now + (this.adjustment * 60 * 1000),
-					//	   individualFinishDate = new Date(individualFinishTime).toString();
-					// $('time.timeago', row).attr('datetime', individualFinishDate);
 					
 					row.removeClass('hidden');
 				});
-				
-				// $("time.timeago").timeago();
 			}
 		});
 	}

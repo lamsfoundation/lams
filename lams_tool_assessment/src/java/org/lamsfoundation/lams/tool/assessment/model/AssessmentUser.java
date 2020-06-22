@@ -79,9 +79,6 @@ public class AssessmentUser implements Cloneable {
     @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
 
-    @Column(name = "time_limit_adjustment")
-    private Integer timeLimitAdjustment;
-
     // *************** NON Persist Fields ********************
 
     // the user access some reousrce question date time. Use in monitoring summary page
@@ -235,14 +232,6 @@ public class AssessmentUser implements Cloneable {
 
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
-    }
-
-    public Integer getTimeLimitAdjustment() {
-	return timeLimitAdjustment;
-    }
-
-    public void setTimeLimitAdjustment(Integer timeLimitAdjustment) {
-	this.timeLimitAdjustment = timeLimitAdjustment;
     }
 
     @Override

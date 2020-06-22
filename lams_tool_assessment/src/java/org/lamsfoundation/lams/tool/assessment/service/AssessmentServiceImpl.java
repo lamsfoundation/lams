@@ -61,6 +61,8 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -168,6 +170,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
+
+    private ILessonService lessonService;
 
     private IExportToolContentService exportContentService;
 
@@ -3282,6 +3286,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	this.learnerService = learnerService;
     }
 
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -3652,12 +3660,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId) {
-	return assessmentUserDao.getExistingIndividualTimeLimitUsers(toolContentId);
-    }
-
-    @Override
-    public List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
-	return assessmentUserDao.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+    public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
     }
 }

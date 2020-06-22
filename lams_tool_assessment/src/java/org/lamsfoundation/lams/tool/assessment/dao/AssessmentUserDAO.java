@@ -58,8 +58,4 @@ public interface AssessmentUserDAO extends DAO {
     List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
 
     Object[] getStatsMarksForLeaders(Long toolContentId);
-    
-    List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId);
-    
-    List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 }

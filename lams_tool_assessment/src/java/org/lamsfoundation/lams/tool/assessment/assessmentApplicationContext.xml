@@ -103,6 +103,9 @@
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
    		</property>
+   		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
    		<property name="exportContentService">
    			<ref bean="exportToolContentService"/>
    		</property>

@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -49,7 +48,7 @@ public class LearningWebsocketServer {
 	private LocalDateTime absoluteTimeLimit;
 	// mapping of user ID (not UID) and when the learner entered the activity
 	private final Map<Long, LocalDateTime> timeLimitLaunchedDate = new ConcurrentHashMap<>();
-	private Map<Long, Integer> timeLimitAdjustment = new HashMap<>();
+	private Map<Integer, Integer> timeLimitAdjustment = new HashMap<>();
     }
 
     /**
@@ -101,9 +100,7 @@ public class LearningWebsocketServer {
 			updateAllUsers = true;
 		    }
 
-		    Map<Long, Integer> existingTimeLimitAdjustment = LearningWebsocketServer.getAssessmentService()
-			    .getExistingIndividualTimeLimitUsers(toolContentId).stream().collect(Collectors
-				    .toMap(AssessmentUser::getUserId, AssessmentUser::getTimeLimitAdjustment));
+		    Map<Integer, Integer> existingTimeLimitAdjustment = assessment.getTimeLimitAdjustments();
 		    if (!existingTimeLimitAdjustment.equals(timeCache.timeLimitAdjustment)) {
 			timeCache.timeLimitAdjustment = existingTimeLimitAdjustment;
 			updateAllUsers = true;
@@ -229,7 +226,7 @@ public class LearningWebsocketServer {
 	return timeCache == null ? null : LearningWebsocketServer.getSecondsLeft(timeCache, userId);
     }
 
-    private static Long getSecondsLeft(TimeCache timeCache, long userId) {
+    private static Long getSecondsLeft(TimeCache timeCache, Long userId) {
 	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
 	    // no time limit is set at all
 	    return null;
@@ -250,7 +247,7 @@ public class LearningWebsocketServer {
 	LocalDateTime now = LocalDateTime.now();
 	long secondsLeft = Duration.between(now, finish).toSeconds();
 
-	Integer adjustment = timeCache.timeLimitAdjustment.get(userId);
+	Integer adjustment = timeCache.timeLimitAdjustment.get(userId.intValue());
 	if (adjustment != null) {
 	    secondsLeft += adjustment * 60;
 	}

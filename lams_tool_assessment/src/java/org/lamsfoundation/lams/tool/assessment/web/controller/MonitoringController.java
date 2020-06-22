@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -842,15 +843,20 @@ public class MonitoringController {
     public String getPossibleIndividualTimeLimitUsers(
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    @RequestParam(name = "term") String searchString) {
-	List<AssessmentUser> users = service.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+
+	List<User> users = service.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
-	for (AssessmentUser user : users) {
-	    // this format is required by jQuery UI autocomplete
-	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
-	    userJSON.put("value", user.getUid());
-	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")");
-	    responseJSON.add(userJSON);
+	for (User user : users) {
+	    if (!timeLimitAdjustments.containsKey(user.getUserId())) {
+		// this format is required by jQuery UI autocomplete
+		ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+		userJSON.put("value", user.getUserId());
+		userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")");
+		responseJSON.add(userJSON);
+	    }
 	}
 	return responseJSON.toString();
     }
@@ -859,15 +865,21 @@ public class MonitoringController {
     @ResponseBody
     public String getExistingIndividualTimeLimitUsers(
 	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId) {
-	List<AssessmentUser> users = service.getExistingIndividualTimeLimitUsers(toolContentId);
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+
+	// find User objects based on their userIDs and sort by names
+	List<User> users = assessment.getTimeLimitAdjustments().keySet().stream()
+		.map(userId -> userManagementService.getUserById(userId)).sorted(Comparator
+			.comparing(User::getFirstName).thenComparing(User::getLastName).thenComparing(User::getLogin))
+		.collect(Collectors.toList());
 
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
-	for (AssessmentUser user : users) {
-	    // this format is required by jQuery UI autocomplete
+	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
-	    userJSON.put("uid", user.getUid());
-	    userJSON.put("name", user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")");
-	    userJSON.put("adjustment", user.getTimeLimitAdjustment());
+	    userJSON.put("userId", user.getUserId());
+	    userJSON.put("name", user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")");
+	    userJSON.put("adjustment", timeLimitAdjustments.get(user.getUserId().intValue()));
 	    responseJSON.add(userJSON);
 	}
 	return responseJSON.toString();
@@ -875,11 +887,17 @@ public class MonitoringController {
 
     @RequestMapping(path = "/updateIndividualTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void updateIndividualTimeLimit(@RequestParam long userUid,
-	    @RequestParam(required = false) Integer adjustment) {
-	AssessmentUser user = (AssessmentUser) userManagementService.findById(AssessmentUser.class, userUid);
-	user.setTimeLimitAdjustment(adjustment);
-	userManagementService.save(user);
+    public void updateIndividualTimeLimit(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int userId, @RequestParam(required = false) Integer adjustment) {
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+	if (adjustment == null) {
+	    timeLimitAdjustments.remove(userId);
+	} else {
+	    timeLimitAdjustments.put(userId, adjustment);
+	}
+	service.saveOrUpdateAssessment(assessment);
     }
 
     @SuppressWarnings("unchecked")
@@ -888,5 +906,4 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
-
 }

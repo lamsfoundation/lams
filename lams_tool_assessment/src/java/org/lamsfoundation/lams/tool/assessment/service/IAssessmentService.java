@@ -540,7 +540,5 @@ public interface IAssessmentService extends ICommonToolService {
 
     Collection<User> getAllGroupUsers(Long toolSessionId);
 
-    List<AssessmentUser> getExistingIndividualTimeLimitUsers(long toolContentId);
-
-    List<AssessmentUser> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+    List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 }
