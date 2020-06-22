@@ -296,10 +296,6 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
-	//time limit
-	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
-
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(toolSessionId));
 
 	// add define later support
@@ -643,9 +639,6 @@ public class LearningController {
 	    // clear isUserFailed indicator
 	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
 
-	    // time limit feature
-	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
-
 	    return "pages/learning/learning";
 	}
 
@@ -687,21 +680,6 @@ public class LearningController {
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
-    }
-
-    /**
-     * Stores date when user has started activity with time limit
-     */
-    @RequestMapping("/launchTimeLimit")
-    @ResponseStatus(HttpStatus.OK)
-    public void launchTimeLimit(HttpServletRequest request) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
-
-	service.launchTimeLimit(assessmentUid, userId);
     }
 
     @RequestMapping("/vsaAutocomplete")

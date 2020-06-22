@@ -12,9 +12,6 @@
 <c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 <c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-<%--
-<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.relativeTimeLimit != 0}" />
- --%>
 <c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
 <c:set var="result" value="${sessionMap.assessmentResult}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
@@ -251,38 +248,6 @@
 			});
 		}
 			
-	
-		/*
-		$(document).ready(function(){
-			//show timelimit-start-dialog in order to start countdown
-			if (${sessionMap.isTimeLimitNotLaunched}) {
-				
-				$.blockUI({ 
-					message: $('#timelimit-start-dialog'), 
-					css: { width: '325px', height: '120px'}, 
-					overlayCSS: { opacity: '.98'} 
-				});
-				
-				//once OK button pressed start countdown
-		        $('#timelimit-start-ok').click(function() {
-		        	
-		        	//store date when user has started activity with time limit
-			        $.ajax({
-			        	async: true,
-			            url: '<c:url value="/learning/launchTimeLimit.do"/>',
-			            data: 'sessionMapID=${sessionMapID}',
-			            type: 'post'
-			       	});
-		        	
-		        	$.unblockUI();
-		        	initAssessmentTimeLimitWebsocket();
-		        	isWaitingForConfirmation = false;
-		        });
-				
-			} else {
-				initAssessmentTimeLimitWebsocket();
-			}
-		});*/
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
@@ -608,15 +573,6 @@
 		<lams:Alert id="warning-mark-hedging-wrong-justification" type="warning" close="true">
 			<fmt:message key="warn.mark.hedging.wrong.justification" />
 		</lams:Alert>
-		
-		<div id="timelimit-start-dialog"> 
-	        <h4>
-	        	<fmt:message key='label.learning.blockui.are.you.ready' />
-	        </h4>
-	        <button type="button" name="ok" id="timelimit-start-ok" class="button">
-				OK
-			</button>
-		</div>
 		
 		<lams:errors/>
 		<br>

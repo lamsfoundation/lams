@@ -107,8 +107,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
 
-    public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
-
     public static final String ATTR_OVERALL_FEEDBACK_LIST = "overallFeedbackList";
 
     public static final String ATTR_OVERALL_FEEDBACK_COUNT = "overallFeedbackCount";
