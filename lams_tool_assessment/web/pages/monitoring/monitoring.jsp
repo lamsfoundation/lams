@@ -27,6 +27,10 @@
 	  		#time-limit-table th {
 	  			vertical-align: middle;
 	  		}
+	  		
+	  		#time-limit-table td.centered {
+	  			text-align: center;
+	  		}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>

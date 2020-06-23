@@ -25,7 +25,7 @@
 						<span id="relative-time-limit-value">${assessment.relativeTimeLimit}</span>&nbsp;
 						<fmt:message key="label.monitoring.summary.time.limit.minutes"/>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<div id="relative-time-limit-enabled" class="text-success ${relativeTimeLimitEnabled ? '' : 'hidden'}">
 							<fmt:message key="label.monitoring.summary.time.limit.enabled"/>
 						</div>
@@ -33,7 +33,7 @@
 							<fmt:message key="label.monitoring.summary.time.limit.disabled"/>
 						</div>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button id="relative-time-limit-start" class="btn btn-success btn-xs ${relativeTimeLimitEnabled ? 'hidden' : ''}"
 								onClick="updateTimeLimit('relative', true)" disabled>
 							<fmt:message key="label.monitoring.summary.time.limit.start"/>
@@ -46,7 +46,7 @@
 					<td>
 						<!-- Finish now button at absolute time limit row -->
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit('relative', null, 1)">
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.1"/>
@@ -56,7 +56,7 @@
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.5"/>
 						</button>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit('relative', null, -5)">
 							<fmt:message key="label.monitoring.summary.time.limit.minus.minute.5"/>
@@ -88,7 +88,7 @@
 							<fmt:message key="label.monitoring.summary.time.limit.disabled"/>
 						</div>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button id="absolute-time-limit-start" class="btn btn-success btn-xs ${absoluteTimeLimitEnabled ? 'hidden' : ''}"
 								onClick="updateTimeLimit('absolute', true)" disabled>
 							<fmt:message key="label.monitoring.summary.time.limit.start"/>
@@ -98,13 +98,13 @@
 							<fmt:message key="label.monitoring.summary.time.limit.cancel"/>
 						</button>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button id="absolute-time-limit-finish-now" class="btn btn-warning btn-xs"
 								onClick="timeLimitFinishNow()">
 							<fmt:message key="label.monitoring.summary.time.limit.finish.now"/>
 						</button>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit('absolute', null, 1)">
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.1"/>
@@ -114,7 +114,7 @@
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.5"/>
 						</button>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit('absolute', null, -5)">
 							<fmt:message key="label.monitoring.summary.time.limit.minus.minute.5"/>
@@ -139,7 +139,7 @@
 					</td>
 				</tr>
 				<tr>	
-					<td colspan="8">
+					<td colspan="6">
 						<div class="input-group">
 		    				<span class="input-group-addon"><i class="fa fa-search"></i></span>
 		    				<input id="individual-time-limit-autocomplete" type="text" class="ui-autocomplete-input form-control input-sm" 
@@ -150,12 +150,12 @@
 				
 				<tr id="individual-time-limit-template-row" class="hidden">
 					<td class="individual-time-limit-user-name"></td>
-					<td  align="center">
+					<td  class="centered">
 						<span class="individual-time-limit-value"></span>
 						<fmt:message key="label.monitoring.summary.time.limit.minutes"/>
 						<!-- (<time class="timeago" />)  -->
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button id="individual-time-limit-cancel" class="btn btn-danger btn-xs"
 								onClick="updateTimeLimit.call(this, 'individual', false)">
 							<fmt:message key="label.monitoring.summary.time.limit.cancel"/>
@@ -164,7 +164,7 @@
 					<td>
 						<!-- Finish now button at absolute time limit row -->
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit.call(this, 'individual', null, 1)">
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.1"/>
@@ -174,7 +174,7 @@
 							<fmt:message key="label.monitoring.summary.time.limit.plus.minute.5"/>
 						</button>
 					</td>
-					<td align="center">
+					<td class="centered">
 						<button class="btn btn-default btn-xs"
 								onClick="updateTimeLimit.call(this, 'individual', null, -5)">
 							<fmt:message key="label.monitoring.summary.time.limit.minus.minute.5"/>
