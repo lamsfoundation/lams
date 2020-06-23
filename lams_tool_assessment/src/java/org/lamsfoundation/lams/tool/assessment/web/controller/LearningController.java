@@ -178,7 +178,7 @@ public class LearningController {
 
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
+	    if (assessment.getRelativeTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -188,7 +188,8 @@ public class LearningController {
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
-		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
+		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getUid(),
+			groupLeader.getUserId());
 		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
@@ -294,13 +295,6 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
-
-	//time limit
-	boolean isTimeLimitEnabled = hasEditRight && !showResults && assessment.getTimeLimit() != 0;
-	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
-	sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(toolSessionId));
 
@@ -433,7 +427,8 @@ public class LearningController {
 	AssessmentUser leader = session.getGroupLeader();
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
+	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getUid(),
+		leader.getUserId());
 	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -469,8 +464,6 @@ public class LearningController {
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	int oldPageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//if AnswersValidationFailed - get pageNumber as request parameter and as method parameter otherwise
@@ -502,9 +495,6 @@ public class LearningController {
 	    // store results from sessionMap into DB
 	    storeUserAnswersIntoDatabase(sessionMap, true);
 
-	    long secondsLeft = service.getSecondsLeft(assessment, user);
-	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-
 	    // use redirect to prevent form resubmission
 	    String redirectURL = "redirect:/pages/learning/learning.jsp";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AssessmentConstants.ATTR_SESSION_MAP_ID,
@@ -513,29 +503,6 @@ public class LearningController {
 		    AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, "" + isAnswersValidationFailed);
 	    return redirectURL;
 	}
-    }
-
-    /**
-     * Ajax call to get the remaining seconds. Needed when the page is reloaded in the browser to check with the server
-     * what the current values should be! Otherwise the learner can keep hitting reload after a page change or submit
-     * all (when questions are spread across pages) and increase their time!
-     *
-     * @return
-     * @throws JSONException
-     * @throws IOException
-     */
-    @RequestMapping("/getSecondsLeft")
-    @ResponseBody
-    public String getSecondsLeft(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
-	long secondsLeft = service.getSecondsLeft(assessment, user);
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
     }
 
     /**
@@ -672,10 +639,6 @@ public class LearningController {
 	    // clear isUserFailed indicator
 	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
 
-	    // time limit feature
-	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
-	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
-
 	    return "pages/learning/learning";
 	}
 
@@ -717,21 +680,6 @@ public class LearningController {
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
-    }
-
-    /**
-     * Stores date when user has started activity with time limit
-     */
-    @RequestMapping("/launchTimeLimit")
-    @ResponseStatus(HttpStatus.OK)
-    public void launchTimeLimit(HttpServletRequest request) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
-
-	service.launchTimeLimit(assessmentUid, userId);
     }
 
     @RequestMapping("/vsaAutocomplete")

@@ -20,9 +20,9 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -53,38 +53,38 @@ public class AssessmentResult {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "start_date")
     private Date startDate;
-    
+
     //date when user has started activity (pressed start button) that has time limitation
     @Column(name = "time_limit_launched_date")
-    private Date timeLimitLaunchedDate;
-    
+    private LocalDateTime timeLimitLaunchedDate;
+
     //indicates the latest retry
     @Column
     private Boolean latest;
-    
+
     @Column(name = "finish_date")
     private Date finishDate;
-    
+
     @Column(name = "session_id")
     private Long sessionId;
-    
+
     @Column(name = "maximum_grade")
     private int maximumGrade;
-    
+
     @Column
     private float grade;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assessment_uid")
     private Assessment assessment;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uid")
     private AssessmentUser user;
-    
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "result_uid")
     private Set<AssessmentQuestionResult> questionResults = new TreeSet<>();
@@ -129,14 +129,14 @@ public class AssessmentResult {
     public void setStartDate(Date startDate) {
 	this.startDate = startDate;
     }
-    
-   public Date getTimeLimitLaunchedDate() {
-	return timeLimitLaunchedDate;
-   }
 
-   public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
+    public LocalDateTime getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
+    }
+
+    public void setTimeLimitLaunchedDate(LocalDateTime timeLimitLaunchedDate) {
 	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
-   }
+    }
 
     public Boolean isLatest() {
 	return latest;

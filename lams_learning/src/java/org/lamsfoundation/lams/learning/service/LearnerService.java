@@ -628,7 +628,7 @@ public class LearnerService implements ILearnerFullService {
 			new Object[] { progress.getUser().getLogin(), progress.getUser().getUserId(),
 				activity.getTitle(), activity.getActivityId() }));
     }
-    
+
     /**
      * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
      * Grouping actions. Calls the learningService to actually complete the activity and progress.
@@ -646,13 +646,13 @@ public class LearnerService implements ILearnerFullService {
 
 	if (currentActivity == null) {
 	    progress = joinLesson(learnerId, lesson.getLessonId());
-	    
+
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
 
 	    // recalculate activity mark and pass it to gradebook
 	    updateGradebookMark(currentActivity, progress);
 	    return activityMapping.getCloseForward(currentActivity, lesson.getLessonId());
-	    
+
 	} else {
 	    completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
 	}
@@ -1434,14 +1434,11 @@ public class LearnerService implements ILearnerFullService {
     @Override
     public void createCommandForLearners(Long toolContentId, Collection<Integer> userIds, String jsonCommand) {
 	// find lesson for given tool content ID
-	ToolActivity activity = activityDAO.getToolActivityByToolContentId(toolContentId);
-	LearningDesign learningDesign = activity.getLearningDesign();
-	Lesson lesson = learningDesign.getLessons().iterator().next();
-	Long lessonId = lesson.getLessonId();
+	Long lessonId = lessonService.getLessonByToolContentId(toolContentId).getLessonId();
 
 	// go through each user, find his user name and add a command for him
 	for (Integer userId : userIds) {
-	    User user = (User) activityDAO.find(User.class, userId);
+	    User user = activityDAO.find(User.class, userId);
 	    Command command = new Command(lessonId, user.getLogin(), jsonCommand);
 	    commandDAO.insert(command);
 	}

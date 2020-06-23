@@ -12,7 +12,6 @@
 <c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 <c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
 <c:set var="secondsLeft" value="${sessionMap.secondsLeft}"/>
 <c:set var="result" value="${sessionMap.assessmentResult}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
@@ -39,6 +38,10 @@
 		
 		[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
   			display: none;
+  		}
+  		
+  		.countdown-timeout {
+  			color: #FF3333 !important;
   		}
 	</style>
 
@@ -100,6 +103,8 @@
 						}			            
 			        });
 			    });
+				
+				initAssessmentTimeLimitWebsocket();
 			}
 
 			//autocomplete for VSA
@@ -121,96 +126,134 @@
 		}
 	
 		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
+		// var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
 	
-		//timelimit feature
-		<c:if test="${isTimeLimitEnabled}">
-			$(document).ready(function(){
-				//show timelimit-start-dialog in order to start countdown
-				if (${sessionMap.isTimeLimitNotLaunched}) {
-					
-					$.blockUI({ 
-						message: $('#timelimit-start-dialog'), 
-						css: { width: '325px', height: '120px'}, 
-						overlayCSS: { opacity: '.98'} 
-					});
-					
-					//once OK button pressed start countdown
-			        $('#timelimit-start-ok').click(function() {
-			        	
-			        	//store date when user has started activity with time limit
-				        $.ajax({
-				        	async: true,
-				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
-				            data: 'sessionMapID=${sessionMapID}',
-				            type: 'post'
-				       	});
-			        	
-			        	$.unblockUI();
-			        	displayCountdown();
-			        	isWaitingForConfirmation = false;
-			        });
-					
-				} else {
-					displayCountdown();
+		
+		
+		// TIME LIMIT
+
+		// websocket needs pinging and reconnection feature in case it fails
+		// it works pretty much the same as command websocket in Page.tag
+		var assessmentTimeLimitWebsocketInitTime = null,
+			assessmentTimeLimitWebsocket = null,
+			assessmentTimeLimitWebsocketPingTimeout = null,
+			assessmentTimeLimitWebsocketPingFunc = null,
+			assessmentTimeLimitWebsocketReconnectAttempts = 0,
+			counterInitialised = false;
+		
+		assessmentTimeLimitWebsocketPingFunc = function(skipPing){
+			if (assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSING 
+					|| assessmentTimeLimitWebsocket.readyState == assessmentTimeLimitWebsocket.CLOSED){
+				return;
+			}
+			
+			// check and ping every 3 minutes
+			assessmentTimeLimitWebsocketPingTimeout = setTimeout(assessmentTimeLimitWebsocketPingFunc, 3*60*1000);
+			// initial set up does not send ping
+			if (!skipPing) {
+				assessmentTimeLimitWebsocket.send("ping");
+			}
+		};
+			
+		function initAssessmentTimeLimitWebsocket(){
+			assessmentTimeLimitWebsocketInitTime = Date.now();
+			assessmentTimeLimitWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+					+ 'learningWebsocket?toolContentID=' + ${sessionMap.assessment.contentId});
+
+			assessmentTimeLimitWebsocket.onclose = function(e){
+				// check reason and whether the close did not happen immediately after websocket creation
+				// (possible access denied, user logged out?)
+				if (e.code === 1006 &&
+					Date.now() - assessmentTimeLimitWebsocketInitTime > 1000 &&
+					assessmentTimeLimitWebsocketReconnectAttempts < 20) {
+					assessmentTimeLimitWebsocketReconnectAttempts++;
+					// maybe iPad went into sleep mode?
+					// we need this websocket working, so init it again after delay
+					setTimeout(initAssessmentTimeLimitWebsocket, 3000);
 				}
+			};
+
+			// set up timer for the first time
+			assessmentTimeLimitWebsocketPingFunc(true);
+			
+			// when the server pushes new inputs
+			assessmentTimeLimitWebsocket.onmessage = function(e){
+				
+				// read JSON object
+				var input = JSON.parse(e.data);
+				
+				if (input.clearTimer == true) {
+					// teacher stopped the timer, destroy it
+					$('#countdown').countdown('destroy').remove();
+				} else {
+					// teacher updated the timer
+					var secondsLeft = +input.secondsLeft,
+						counterInitialised = $('#countdown').length > 0;
+						
+					if (counterInitialised) {
+						// just set the new time
+						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+					} else {
+						// initialise the timer
+						displayCountdown(secondsLeft);
+					}
+				}
+
+				// reset ping timer
+				clearTimeout(assessmentTimeLimitWebsocketPingTimeout);
+				assessmentTimeLimitWebsocketPingFunc(true);
+			};
+		}
+		
+		function displayCountdown(secondsLeft){
+			var countdown = '<div id="countdown"></div>';
+			
+			$.blockUI({
+				message: countdown, 
+				showOverlay: false,
+				focusInput: false,
+				css: { 
+					top: '40px',
+					left: '',
+					right: '0%',
+			        opacity: '.8', 
+			        width: '230px',
+			        cursor: 'default',
+			        border: 'none'
+		        }   
 			});
 			
-			function displayCountdown(){
-				var countdown = '<div id="countdown"></div>' 
-				$.blockUI({
-					message: countdown, 
-					showOverlay: false,
-					focusInput: false,
-					css: { 
-						top: '40px',
-						left: '',
-						right: '0%',
-				        opacity: '.8', 
-				        width: '230px',
-				        cursor: 'default',
-				        border: 'none'
-			        }   
-				});
-				
-				$('#countdown').countdown({
-					until: '+${secondsLeft}S',
-					format: 'hMS',
-					compact: true,
-					onTick: function(periods) {
-						//check for 30 seconds
-						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-							$('#countdown').css('color', '#FF3333');
-						}					
-					},
-					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
-				        
-				        setTimeout(function() { 
-				        	submitAll(true);
-				        }, 4000); 
-					},
-					description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
-				});
-				
-				<%--  double check if we have the correct number of seconds left in case user has clicked refresh --%>
-				$.ajax({
-		            url: '<c:url value="/learning/getSecondsLeft.do"/>',
-		            data: 'sessionMapID=${sessionMapID}',
-		            dataType: 'json',
-		            type: 'post',
-		            success: function (json) {
-		            	$('#countdown').countdown('option', 'until', json.secondsLeft+'S');
-		            }
-			   });
-			}		
-		</c:if>
+			$('#countdown').countdown({
+				until: '+' + secondsLeft +'S',
+				format: 'hMS',
+				compact: true,
+				alwaysExpire : true,
+				onTick: function(periods) {
+					// check for 30 seconds or less and display timer in red
+					var secondsLeft = $.countdown.periodsToSeconds(periods);
+					if (secondsLeft <= 30) {
+						$(this).addClass('countdown-timeout');
+					} else {
+						$(this).removeClass('countdown-timeout');
+					}
+				},
+				onExpiry: function(periods) {
+			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+			        
+			        setTimeout(function() { 
+			        	submitAll(true);
+			        }, 4000); 
+				},
+				description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
+			});
+		}
+			
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
 		
 			function learnerAutosave(){
-				if (isWaitingForConfirmation) return;
+				// if (isWaitingForConfirmation) return;
 				
 				//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
 				$("textarea[id^='question']").each(function()  {
@@ -530,15 +573,6 @@
 		<lams:Alert id="warning-mark-hedging-wrong-justification" type="warning" close="true">
 			<fmt:message key="warn.mark.hedging.wrong.justification" />
 		</lams:Alert>
-		
-		<div id="timelimit-start-dialog"> 
-	        <h4>
-	        	<fmt:message key='label.learning.blockui.are.you.ready' />
-	        </h4>
-	        <button type="button" name="ok" id="timelimit-start-ok" class="button">
-				OK
-			</button>
-		</div>
 		
 		<lams:errors/>
 		<br>

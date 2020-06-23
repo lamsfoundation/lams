@@ -23,13 +23,19 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,6 +43,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -78,8 +85,17 @@ public class Assessment implements Cloneable {
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
 
-    @Column(name = "time_limit")
-    private int timeLimit;
+    @Column(name = "relative_time_limit")
+    private int relativeTimeLimit;
+
+    @Column(name = "absolute_time_limit")
+    private LocalDateTime absoluteTimeLimit;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "tl_laasse10_time_limit", joinColumns = @JoinColumn(name = "assessment_uid"))
+    @MapKeyColumn(name = "user_id")
+    @Column(name = "adjustment")
+    private Map<Integer, Integer> timeLimitAdjustments = new HashMap<>();
 
     @Column(name = "questions_per_page")
     private int questionsPerPage;
@@ -249,6 +265,8 @@ public class Assessment implements Cloneable {
 	    if (createdBy != null) {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
+
+	    assessment.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Assessment.class + " failed");
 	}
@@ -424,22 +442,40 @@ public class Assessment implements Cloneable {
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
      */
-    public int getTimeLimit() {
-	return timeLimit;
+    public int getRelativeTimeLimit() {
+	return relativeTimeLimit;
     }
 
     /**
      * @param timeLimit
      *            the time limitation, that students have to complete an attempt.
      */
-    public void setTimeLimit(int timeLimit) {
-	this.timeLimit = timeLimit;
+    public void setRelativeTimeLimit(int timeLimit) {
+	this.relativeTimeLimit = timeLimit;
+    }
+
+    public LocalDateTime getAbsoluteTimeLimit() {
+	return absoluteTimeLimit;
+    }
+
+    public Long getAbsoluteTimeLimitSeconds() {
+	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
+    }
+
+    public Map<Integer, Integer> getTimeLimitAdjustments() {
+	return timeLimitAdjustments;
+    }
+
+    public void setTimeLimitAdjustments(Map<Integer, Integer> timeLimitAdjustment) {
+	this.timeLimitAdjustments = timeLimitAdjustment;
     }
 
     /**
      * @return Returns the instructions set by the teacher.
-     *
-     *
      */
     public String getInstructions() {
 	return instructions;

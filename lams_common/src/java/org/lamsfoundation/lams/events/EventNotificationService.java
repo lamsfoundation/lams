@@ -60,7 +60,7 @@ public class EventNotificationService implements IEventNotificationService {
     public void createLessonEvent(String scope, String name, Long toolContentId, String defaultSubject,
 	    String defaultMessage, boolean isHtmlFormat, AbstractDeliveryMethod deliveryMethod)
 	    throws InvalidParameterException {
-	Lesson lesson = getLessonByToolContentId(toolContentId);
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 	if (!eventExists(scope, name, lesson.getLessonId())) {
 	    Event event = new Event(scope, name, lesson.getLessonId(), defaultSubject, defaultMessage, isHtmlFormat);
 	    Set<User> users = null;
@@ -125,7 +125,7 @@ public class EventNotificationService implements IEventNotificationService {
 	    return;
 	}
 
-	ArrayList<Integer> monitoringUsersIds = new ArrayList<Integer>();
+	ArrayList<Integer> monitoringUsersIds = new ArrayList<>();
 	for (Map.Entry<User, Boolean> entry : monitoringUsers.entrySet()) {
 	    if (entry.getValue()) {
 		monitoringUsersIds.add(entry.getKey().getUserId());
@@ -304,7 +304,7 @@ public class EventNotificationService implements IEventNotificationService {
 	    throw new InvalidParameterException("Delivery method can not be null.");
 	}
 	boolean substriptionFound = false;
-	List<Subscription> subscriptionList = new ArrayList<Subscription>(event.getSubscriptions());
+	List<Subscription> subscriptionList = new ArrayList<>(event.getSubscriptions());
 	for (int index = 0; index < subscriptionList.size(); index++) {
 	    Subscription subscription = subscriptionList.get(index);
 	    if (subscription.getUserId().equals(userId) && subscription.getDeliveryMethod().equals(deliveryMethod)) {
@@ -367,7 +367,7 @@ public class EventNotificationService implements IEventNotificationService {
     @Override
     public void triggerInternal(Event eventData, String subject, String message) {
 	// fetch the event again so it is associated with current session
-	Event event = (Event) eventDAO.find(Event.class, eventData.getUid());
+	Event event = eventDAO.find(Event.class, eventData.getUid());
 	Event eventFailCopy = null;
 	Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
 	while (subscriptionIterator.hasNext()) {
@@ -444,7 +444,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     @Override
     public void triggerLessonEvent(String scope, String name, Long toolContentId, String subject, String message) {
-	Lesson lesson = getLessonByToolContentId(toolContentId);
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 	trigger(scope, name, lesson.getLessonId(), subject, message);
     }
 
@@ -474,7 +474,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     @Override
     public void triggerForSingleUser(Long subscriptionUid, String subject, String message) {
-	Subscription subscription = (Subscription) eventDAO.find(Subscription.class, subscriptionUid);
+	Subscription subscription = eventDAO.find(Subscription.class, subscriptionUid);
 	Event event = subscription.getEvent();
 	String subjectToSend = subject == null ? event.getSubject() : subject;
 	String messageToSend = message == null ? event.getMessage() : message;
@@ -639,11 +639,5 @@ public class EventNotificationService implements IEventNotificationService {
 	    throw new InvalidParameterException("An event with the given parameters does not exist.");
 	}
 	unsubscribe(event, userId, deliveryMethod);
-    }
-
-    private Lesson getLessonByToolContentId(Long toolContentId) {
-	ToolActivity activity = (ToolActivity) eventDAO
-		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
-	return (Lesson) activity.getLearningDesign().getLessons().iterator().next();
     }
 }
