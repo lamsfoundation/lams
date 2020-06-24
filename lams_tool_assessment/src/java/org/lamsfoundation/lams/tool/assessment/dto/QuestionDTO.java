@@ -10,12 +10,12 @@ import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 
-public class QuestionDTO implements Comparable<QuestionDTO>{
+public class QuestionDTO implements Comparable<QuestionDTO> {
 
     // ============= immutable properties copied from AssessmentQuestion question =============
 
     private Long uid;
-    
+
     private Long qbQuestionUid;
 
     private Integer type;
@@ -61,7 +61,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     private int minWordsLimit;
 
     private boolean hedgingJustificationEnabled;
-    
+
     private boolean autocompleteEnabled;
 
     private boolean correctAnswersDisclosed;
@@ -69,7 +69,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     private boolean groupsAnswersDisclosed;
 
     // ============= variable properties =============
-    
+
     private String titleEscaped;
 
     private String answer;
@@ -79,6 +79,8 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     private boolean answerBoolean;
 
     private String questionFeedback;
+
+    private String justification;
 
     private boolean responseSubmitted;
 
@@ -98,25 +100,25 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 
     /**
      * Expanded version of the constructor which also sets correctAnswersDisclosed and groupsAnswersDisclosed.
-     * 
+     *
      * @param assessmentQuestion
      */
     public QuestionDTO(AssessmentQuestion assessmentQuestion) {
 	this((QbToolQuestion) assessmentQuestion);
-	
+
 	this.correctAnswersDisclosed = assessmentQuestion.isCorrectAnswersDisclosed();
 	this.groupsAnswersDisclosed = assessmentQuestion.isGroupsAnswersDisclosed();
     }
-    
+
     /**
      * Same as above, but skips setting correctAnswersDisclosed and groupsAnswersDisclosed
-     * 
+     *
      * @param qbToolQuestion
      */
     public QuestionDTO(QbToolQuestion qbToolQuestion) {
 	this.uid = qbToolQuestion.getUid();
 	this.displayOrder = qbToolQuestion.getDisplayOrder();
-	
+
 	QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
 	this.type = qbQuestion.getType();
 	this.title = qbQuestion.getName();
@@ -146,7 +148,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 	    optionDtos.add(new OptionDTO(option));
 	}
     }
-    
+
     @Override
     public int compareTo(QuestionDTO anotherQuestion) {
 	return displayOrder - anotherQuestion.getDisplayOrder();
@@ -159,7 +161,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     public void setUid(Long userID) {
 	this.uid = userID;
     }
-    
+
     public Long getQbQuestionUid() {
 	return qbQuestionUid;
     }
@@ -335,7 +337,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
     public boolean isAutocompleteEnabled() {
 	return autocompleteEnabled;
     }
@@ -383,6 +385,18 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
 
     public String getQuestionFeedback() {
 	return questionFeedback;
+    }
+
+    public String getJustification() {
+	return justification;
+    }
+
+    public void setJustification(String justification) {
+	this.justification = justification;
+    }
+
+    public String getJustificationHtml() {
+	return justification == null ? null : justification.replace("\n", "<br>");
     }
 
     public Float getMark() {
@@ -456,7 +470,7 @@ public class QuestionDTO implements Comparable<QuestionDTO>{
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
 	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
-    
+
     public String getTitleEscaped() {
 	return titleEscaped;
     }

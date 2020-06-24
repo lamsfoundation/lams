@@ -264,6 +264,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    userOptionAnswer.setOptionUid(leaderOptionAnswer.getOptionUid());
 		    userOptionAnswers.add(userOptionAnswer);
 		}
+
+		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
 	}
 
@@ -708,6 +710,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
 
+	// store justification entered by the learner
+	if (assessment.isAllowAnswerJustification()) {
+	    questionResult.setJustification(questionDto.getJustification());
+	}
+
 	return questionResult;
     }
 
@@ -943,6 +950,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
 	questionDto.setAnswerFloat(questionResult.getAnswerFloat());
 	questionDto.setAnswer(questionResult.getAnswer());
+	questionDto.setJustification(questionResult.getJustification());
 	questionDto.setMark(questionResult.getMark());
 	questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 	questionDto.setPenalty(questionResult.getPenalty());
@@ -1775,6 +1783,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.taken"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    if (assessment.isAllowAnswerJustification()) {
+		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    }
 
 	    int questionNumber = 1;
 
@@ -1891,6 +1903,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			//mark
 			userResultRow.addCell(questionResult.getMark());
+
+			if (assessment.isAllowAnswerJustification()) {
+			    userResultRow.addCell(AssessmentEscapeUtils
+				    .escapeStringForExcelExport(questionResult.getJustification()));
+			}
+
 			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
@@ -2030,6 +2048,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 			userTitleRow.addCell(getMessage("label.export.mark"), true);
 
+			if (assessment.isAllowAnswerJustification()) {
+			    userTitleRow.addCell(getMessage("label.answer.justification"), true);
+			}
+
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
 			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
@@ -2064,7 +2086,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 					userResultRow.addCell(confidenceLevel);
 				    }
+
 				    userResultRow.addCell(questionResult.getMark());
+
+				    if (assessment.isAllowAnswerJustification()) {
+					userResultRow.addCell(AssessmentEscapeUtils
+						.escapeStringForExcelExport(questionResult.getJustification()));
+				    }
 				}
 			    }
 

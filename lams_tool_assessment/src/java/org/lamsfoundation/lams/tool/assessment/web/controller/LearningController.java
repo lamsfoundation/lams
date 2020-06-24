@@ -885,11 +885,18 @@ public class LearningController {
 			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
 		questionDto.setConfidenceLevel(confidenceLevel);
 	    }
+
+	    // store justification entered by the learner
+	    if (assessment.isAllowAnswerJustification()) {
+		String justification = WebUtil.readStrParam(request,
+			AssessmentConstants.ATTR_ANSWER_JUSTIFICATION_PREFIX + i, true);
+		questionDto.setJustification(justification);
+	    }
 	}
     }
 
     /**
-     * Checks whether all required questions were answered and all essay question with min words limit have fullfilled
+     * Checks whether all required questions were answered and all essay question with min words limit have fulfilled
      * that.
      *
      * @param sessionMap
@@ -1040,6 +1047,10 @@ public class LearningController {
 				    }
 				}
 				questionDto.setAnswerBoolean(isAnsweredCorrectly);
+			    }
+
+			    if (StringUtils.isNotBlank(questionResult.getJustification())) {
+				questionDto.setJustification(questionResult.getJustification());
 			    }
 
 			    // required for markandpenalty area and if it's on - on question's summary page

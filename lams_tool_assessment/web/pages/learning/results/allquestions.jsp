@@ -61,6 +61,15 @@
 			<c:if test="${assessment.enableConfidenceLevels}">
 				<%@ include file="confidencelevel.jsp"%>
 			</c:if>
+			
+			<c:if test="${assessment.allowAnswerJustification and not empty question.justification}">
+				<div class="question-type">
+					<fmt:message key="label.answer.justification" />
+				</div>
+				<p>
+					<c:out value="${question.justificationHtml}" escapeXml="false" />
+				</p>
+			</c:if>
 		</div>
 					
 	</div>

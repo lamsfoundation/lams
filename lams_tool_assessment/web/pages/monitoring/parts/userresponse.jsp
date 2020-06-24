@@ -90,3 +90,8 @@
 	</c:when>						
 	
 </c:choose>
+
+<c:if test="${not empty questionResult.justification}">
+	responseStr += '<br><br><i><fmt:message key="label.answer.justification" /></i><br>';
+	responseStr += "${questionResult.justificationEscaped}"
+</c:if>
