@@ -39,27 +39,35 @@
 			<div class="panel-body" id="question-area-${status.index}">
 				<c:choose>
 					<c:when test="${question.type == 1}">
+						<c:set var="justificationEligible" value="true" />
 						<%@ include file="multiplechoice.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 2}">
+						<c:set var="justificationEligible" value="true" />
 						<%@ include file="matchingpairs.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 3}">
+						<c:set var="justificationEligible" value="false" />
 						<%@ include file="vsa.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 4}">
+						<c:set var="justificationEligible" value="true" />
 						<%@ include file="numerical.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 5}">
+						<c:set var="justificationEligible" value="true" />
 						<%@ include file="truefalse.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 6}">
+						<c:set var="justificationEligible" value="false" />
 						<%@ include file="essay.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 7}">
+						<c:set var="justificationEligible" value="true" />
 						<%@ include file="ordering.jsp"%>
 					</c:when>
 					<c:when test="${question.type == 8}">
+						<c:set var="justificationEligible" value="true" />
 						<c:set var="questionIndex" value="${status.index}"/>
 						
 						<c:choose>
@@ -82,10 +90,27 @@
 					
 		</div>
 		
+		<%--Display jsutification for each question --%>
+		<c:if test="${assessment.allowAnswerJustification && justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
+			<div class="form-group answer-justification-container">
+				<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
+					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
+		 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+					<fmt:message key="label.answer.justification" />
+				</a>
+				
+				<div id="answer-justification-${question.uid}" class="collapse">
+					<textarea name="answerJustification${status.index}" class="form-control" rows="6" 
+							  placeholder='<fmt:message key="label.answer.justification.prompt"/>'
+					>${question.justification}</textarea>
+				</div>
+			</div>
+		</c:if>
+		
 		<%--Display Etherpad for each question --%>
 		<c:if test="${isQuestionEtherpadEnabled}">
 			<div class="form-group question-etherpad-container">
-				<a data-toggle="collapse" data-target="#question-etherpad-${question.uid}" href="#qe${question.uid}" class="collapsed">
+				<a data-toggle="collapse" data-target="#question-etherpad-${question.uid}" role="button" class="collapsed">
 					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
 		 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
 					<fmt:message key="label.etherpad.discussion" />

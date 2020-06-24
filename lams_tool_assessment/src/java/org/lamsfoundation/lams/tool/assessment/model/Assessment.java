@@ -139,6 +139,9 @@ public class Assessment implements Cloneable {
     @Column(name = "allow_history_responses")
     private boolean allowHistoryResponses;
 
+    @Column(name = "allow_answer_justification")
+    private boolean allowAnswerJustification;
+
     @Column(name = "display_summary")
     private boolean displaySummary;
 
@@ -601,6 +604,14 @@ public class Assessment implements Cloneable {
 
     public void setAllowHistoryResponses(boolean allowHistoryResponses) {
 	this.allowHistoryResponses = allowHistoryResponses;
+    }
+
+    public boolean isAllowAnswerJustification() {
+	return allowAnswerJustification;
+    }
+
+    public void setAllowAnswerJustification(boolean allowAnswerJustification) {
+	this.allowAnswerJustification = allowAnswerJustification;
     }
 
     public boolean isDisplaySummary() {

@@ -89,6 +89,8 @@ public class AssessmentConstants {
 
     public static final String ATTR_CONFIDENCE_LEVEL_PREFIX = "confidenceLevel";
 
+    public static final String ATTR_ANSWER_JUSTIFICATION_PREFIX = "answerJustification";
+
     public static final String ATTR_QUESTION_LIST = "questionList";
 
     public static final String ATTR_RANDOM_POOL_QUESTIONS = "randomPoolQuestions";
@@ -211,6 +213,6 @@ public class AssessmentConstants {
     public static final String CONFIG_KEY_HIDE_TITLES = "hideTitles";
 
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
-    
+
     public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
 }

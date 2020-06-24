@@ -575,7 +575,14 @@ public class MonitoringController {
 		    userData.add(starString);
 		}
 
-		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
+		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
+		
+		if (StringUtils.isNotBlank(questionResult.getJustification())) {
+		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
+			    + questionResult.getJustificationEscaped();
+		}
+
+		userData.add(response);
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -626,6 +633,10 @@ public class MonitoringController {
 	if (criteria.size() >= 2) {
 	    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
 		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	}
+	if (criteria.isEmpty()) {
+	    // criteria were not yet created in learner results page
+	    return null;
 	}
 
 	Long ratingCriteriaId = criteria.get(0).getRatingCriteriaId();
