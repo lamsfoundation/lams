@@ -771,39 +771,39 @@ public class GradebookService implements IGradebookFullService {
 
     /*
      * TODO Method is not in use. Remove it?
-     * 
+     *
      * private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
      * ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
-     * 
+     *
      * if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
      * || (activity == null) || !(activity instanceof ToolActivity)
      * || (((ToolActivity) activity).getEvaluation() == null)) {
      * return;
      * }
      * ToolActivity toolActivity = (ToolActivity) activity;
-     * 
+     *
      * // Getting the first activity evaluation
      * ActivityEvaluation eval = toolActivity.getEvaluation();
-     * 
+     *
      * try {
      * ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
      * learner.getUserId());
-     * 
+     *
      * if (toolOutput != null) {
      * ToolOutputValue outputVal = toolOutput.getValue();
      * if (outputVal != null) {
      * Double outputDouble = outputVal.getDouble();
-     * 
+     *
      * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(toolActivity.getActivityId(),
      * learner.getUserId());
-     * 
+     *
      * // Only set the mark if it hasnt previously been set by a teacher
      * if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
      * updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
      * }
      * }
      * }
-     * 
+     *
      * } catch (ToolException e) {
      * logger.debug(
      * "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
@@ -1884,7 +1884,7 @@ public class GradebookService implements IGradebookFullService {
 
     /*
      * TODO Method is not in use. Remove it?
-     * 
+     *
      * public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
      * Boolean markedInGradebook) {
      * ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
@@ -1892,7 +1892,7 @@ public class GradebookService implements IGradebookFullService {
      * if ((learner != null) && (toolSession != null)) {
      * ToolActivity activity = toolSession.getToolActivity();
      * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
-     * 
+     *
      * // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
      * // mark and feedback
      * if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {

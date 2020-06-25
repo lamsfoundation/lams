@@ -159,7 +159,9 @@ CKEDITOR.on('instanceReady', function(e){
 	var height = e.editor.config.height;
 	if ( ! height ) {
 		height = "60px";
-	} else if ( height.indexOf("px") == -1 ){
+		
+	// convert to string, just in case it is a number
+	} else if ( ("" + height).indexOf("px") == -1 ){
 		height = height + "px";
 	}
 	e.editor._.editable.$.style.minHeight = height;

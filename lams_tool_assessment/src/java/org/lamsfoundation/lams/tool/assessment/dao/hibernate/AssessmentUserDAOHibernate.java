@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -93,6 +95,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    return null;
 	}
 	return (AssessmentUser) list.get(0);
+    }
+
+    @Override
+    public AssessmentUser getUserByLoginAndContent(String login, Long contentId) {
+	Map<String, Object> properties = new HashMap<>();
+	properties.put("loginName", login);
+	properties.put("session.assessment.contentId", contentId);
+	List<AssessmentUser> users = findByProperties(AssessmentUser.class, properties);
+	return users.isEmpty() ? null : users.get(0);
     }
 
     @Override
@@ -311,5 +322,4 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	List<Number> list = query.list();
 	return list;
     }
-
 }

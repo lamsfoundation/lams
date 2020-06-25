@@ -470,27 +470,31 @@ public class EmailAnalysisBuilder {
 	double spa = new BigDecimal(rawSPA).setScale(2, RoundingMode.HALF_UP).doubleValue();
 	double sapa = new BigDecimal(rawSAPA).setScale(2, RoundingMode.HALF_UP).doubleValue();
 
+	double tolerance = peerreview.getTolerance() == 0 ? 0 : roundTo2Places(peerreview.getTolerance() / 100d);
+	double rangeStart = roundTo2Places(1 - tolerance);
+	double rangeEnd = roundTo2Places(1 + tolerance);
+
 	int cellToHighlight;
-	if (sapa < 1.0) {
-	    if (spa < 1.0) {
+	if (sapa < rangeStart) {
+	    if (spa < rangeStart) {
 		cellToHighlight = 1;
-	    } else if (spa > 1.0) {
+	    } else if (spa > rangeEnd) {
 		cellToHighlight = 3;
 	    } else {
 		cellToHighlight = 2;
 	    }
-	} else if (sapa > 1.0) {
-	    if (spa < 1.0) {
+	} else if (sapa > rangeEnd) {
+	    if (spa < rangeStart) {
 		cellToHighlight = 7;
-	    } else if (spa > 1.0) {
+	    } else if (spa > rangeEnd) {
 		cellToHighlight = 9;
 	    } else {
 		cellToHighlight = 8;
 	    }
 	} else {
-	    if (spa < 1.0) {
+	    if (spa < rangeStart) {
 		cellToHighlight = 4;
-	    } else if (spa > 1.0) {
+	    } else if (spa > rangeEnd) {
 		cellToHighlight = 6;
 	    } else {
 		cellToHighlight = 5;
@@ -542,34 +546,46 @@ public class EmailAnalysisBuilder {
 	// SPA / SAPA comparison results table
 	tempBuffer = new StringBuilder();
 
+	double tolerance = peerreview.getTolerance() == 0 ? 0 : roundTo2Places(peerreview.getTolerance() / 100d);
+	String rangeStart = roundTo2PlacesAsString(1 - tolerance);
+	String rangeEnd = roundTo2PlacesAsString(1 + tolerance);
+
 	tempBuffer.append("<table style=\"").append(tableBorderedStyle).append("\">\n");
 	tempBuffer.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle)
 		.append("\">&nbsp;</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
-		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.less.one"))
+		.append(centeredStyle).append("\">")
+		.append(getLocalisedMessage("email.explanation.SPA.less", new Object[] { rangeStart }))
 		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
-		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.one"))
+		.append(centeredStyle).append("\">")
+		.append(tolerance == 0 ? getLocalisedMessage("email.explanation.SPA.one")
+			: getLocalisedMessage("email.explanation.SPA.range", new Object[] { rangeStart, rangeEnd }))
 		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
-		.append(centeredStyle).append("\">").append(getLocalisedMessage("email.explanation.SPA.greater.one"))
+		.append(centeredStyle).append("\">")
+		.append(getLocalisedMessage("email.explanation.SPA.greater", new Object[] { rangeEnd }))
 		.append("</td>");
 
 	tempBuffer.append("</tr>\n<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SAPA.less.one")).append("</td>");
+		.append(getLocalisedMessage("email.explanation.SAPA.less", new Object[] { rangeStart }))
+		.append("</td>");
 	addExplanationCell(tempBuffer, 1, "email.explanation.1");
 	addExplanationCell(tempBuffer, 2, "email.explanation.2");
 	addExplanationCell(tempBuffer, 3, "email.explanation.3");
 
 	tempBuffer.append("</tr>\n<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SAPA.one")).append("</td>");
+		.append(tolerance == 0 ? getLocalisedMessage("email.explanation.SAPA.one")
+			: getLocalisedMessage("email.explanation.SAPA.range", new Object[] { rangeStart, rangeEnd }))
+		.append("</td>");
 	addExplanationCell(tempBuffer, 4, "email.explanation.4");
 	addExplanationCell(tempBuffer, 5, "email.explanation.5");
 	addExplanationCell(tempBuffer, 6, "email.explanation.6");
 
 	tempBuffer.append("</tr>\n<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(getLocalisedMessage("email.explanation.SAPA.greater.one")).append("</td>");
+		.append(getLocalisedMessage("email.explanation.SAPA.greater", new Object[] { rangeEnd }))
+		.append("</td>");
 	addExplanationCell(tempBuffer, 7, "email.explanation.7");
 	addExplanationCell(tempBuffer, 8, "email.explanation.8");
 	addExplanationCell(tempBuffer, 9, "email.explanation.9");

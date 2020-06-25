@@ -108,6 +108,8 @@ function initializeJRating() {
 	$(".add-comment-new").click(function() {
     	var itemId = $(this).data("item-id");
     	var commentsCriteriaId = $(this).data("comment-criteria-id");
+    	var showAllComments = $(this).data('show-all-comments');
+    	var refreshOnSubmit = $(this).data('refresh-on-submit');
     	
 		var comment = validComment("comment-textarea-" + itemId, false, false);
 		if ( ! comment )
@@ -124,28 +126,53 @@ function initializeJRating() {
 	    			hasRatingLimits: HAS_RATING_LIMITS,
 	    			ratingLimitsByCriteria: ratingLimitsByCriteria,
 	    			maxRatingsForItem: maxRatingsForItem,
+	    			showAllComments : showAllComments,
 	    			toolSessionId: SESSION_ID
 	    		},
 	    		success: function(data, textStatus) {
-	    			if ( data.error ) {
+	    			if (data.error) {
 	    				handleError();
-	    			} else {
-		   				//add comment to HTML
+	    				return;
+	    			}
+	    			
+		  			// LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
+    				alert("Submitted the comment successfully.");
+    				
+    				if (refreshOnSubmit) {
+	    				// LDEV-5052 Refresh page and scroll to the given ID on comment submit
+ 
+    					// setting href does not navigate if url contains #, we still need a reload
+    					location.hash = '#' + refreshOnSubmit;
+    					location.reload();
+    					return false;
+    				}
+    				
+    				
+    				var commentsArea = $('#comments-area-' + itemId);
+	   				
+    				if (data.allComments) {
+    					// add all users' comments to HTML
+    					jQuery.each(data.allComments, function(){
+		   					jQuery('<div/>', {
+		   						'class': "rating-comment",
+		   						html: this
+		   					}).appendTo(commentsArea);
+    					});
+    				} else {
+    					//add this user's comment to HTML
 	   					jQuery('<div/>', {
 	   						'class': "rating-comment",
 	   						html: data.comment
-	   					}).appendTo('#comments-area-' + itemId);
-	   					
-	 	 				//hide comments textarea and button
-		   				$("#add-comment-area-" + itemId).hide();
-	   			
-		   				//handle rating limits if available
-		  				if (HAS_RATING_LIMITS) {
-		   					handleRatingLimits(data.countRatedItems, itemId);
-		   				}
-		  			   //LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
-	    				alert("Submitted the comment successfully.");
-		   			}
+	   					}).appendTo(commentsArea);
+    				}
+   					
+ 	 				//hide comments textarea and button
+	   				$("#add-comment-area-" + itemId, commentsArea).hide();
+   			
+	   				//handle rating limits if available
+	  				if (HAS_RATING_LIMITS) {
+	   					handleRatingLimits(data.countRatedItems, itemId);
+	   				}
 	    		},
 				onError : function(){
 	 				handleError();

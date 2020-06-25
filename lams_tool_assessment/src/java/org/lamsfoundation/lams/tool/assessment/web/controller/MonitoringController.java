@@ -24,14 +24,25 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -42,9 +53,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.model.Rating;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -64,12 +81,15 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
@@ -97,12 +117,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class MonitoringController {
     public static Logger log = Logger.getLogger(MonitoringController.class);
 
+    private static final Comparator<User> USER_NAME_COMPARATOR = Comparator.comparing(User::getFirstName)
+	    .thenComparing(User::getLastName).thenComparing(User::getLogin);
+
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
 
     @Autowired
+    private IUserManagementService userManagementService;
+
+    @Autowired
     private IQbService qbService;
+
+    @Autowired
+    private IRatingService ratingService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
@@ -190,7 +219,7 @@ public class MonitoringController {
 	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
 	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
-	    
+
 	    Set<QuestionDTO> questionDtos = new TreeSet<>();
 	    for (AssessmentQuestion question : assessment.getQuestions()) {
 		QuestionDTO questionDto = new QuestionDTO(question);
@@ -231,9 +260,10 @@ public class MonitoringController {
 	    return null;
 	}
 	Long contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
 
+	QuestionSummary questionSummary = service.getQuestionSummary(contentId, questionUid);
 	request.setAttribute(AssessmentConstants.ATTR_QUESTION_SUMMARY, questionSummary);
+
 	return "pages/monitoring/parts/questionsummary";
     }
 
@@ -420,6 +450,7 @@ public class MonitoringController {
     /**
      * Refreshes user list.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/getUsersByQuestion")
     public String getUsersByQuestion(HttpServletRequest request, HttpServletResponse res)
 	    throws IOException, ServletException {
@@ -428,6 +459,7 @@ public class MonitoringController {
 
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, CommonConstants.PARAM_PAGE);
@@ -479,6 +511,22 @@ public class MonitoringController {
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countSessionUsers) / Double.valueOf(rowLimit)))
 		.intValue();
 
+	Long ratingCriteriaId = null;
+	if (question.isGroupsAnswersDisclosed()) {
+	    // Assessment currently supports only one place for ratings.
+	    // It is rating other groups' answers on results page.
+	    // Criterion gets automatically created in learner and there must be only one.
+	    List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
+	    if (criteria.size() >= 2) {
+		throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+			+ "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	    }
+
+	    if (!criteria.isEmpty()) {
+		ratingCriteriaId = criteria.get(0).getRatingCriteriaId();
+	    }
+	}
+
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	int i = 1;
 	for (AssessmentUserDTO userDto : userDtos) {
@@ -500,11 +548,41 @@ public class MonitoringController {
 		    userData.add(questionResult.getConfidenceLevel());
 		}
 
-		userData.add(AssessmentEscapeUtils.printResponsesForJqgrid(questionResult));
-		if (userDto.getPortraitId() != null) {
-		    userData.add(userDto.getPortraitId());
+		// show average rating
+		if (question.isGroupsAnswersDisclosed()) {
+		    String starString = "-";
+		    if (ratingCriteriaId != null) {
+			List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(
+				Arrays.asList(ratingCriteriaId), Arrays.asList(questionResultUid));
+			if (!ratings.isEmpty()) {
+			    int numberOfVotes = ratings.size();
+			    double ratingSum = ratings.stream().mapToDouble(Rating::getRating).sum();
+			    String averageRating = NumberUtil
+				    .formatLocalisedNumberForceDecimalPlaces(ratingSum / numberOfVotes, null, 2);
+
+			    starString = "<div class='rating-stars-holder'>";
+			    starString += "<div class='rating-stars-disabled rating-stars-new' data-average='"
+				    + averageRating + "' data-id='" + ratingCriteriaId + "'>";
+			    starString += "</div>";
+			    starString += "<div class='rating-stars-caption' id='rating-stars-caption-"
+				    + ratingCriteriaId + "' >";
+			    String msg = service.getMessage("label.average.rating",
+				    new Object[] { averageRating, numberOfVotes });
+			    starString += msg;
+			    starString += "</div>";
+			}
+		    }
+		    userData.add(starString);
 		}
 
+		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
+		
+		if (StringUtils.isNotBlank(questionResult.getJustification())) {
+		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
+			    + questionResult.getJustificationEscaped();
+		}
+
+		userData.add(response);
 	    } else {
 		userData.add("");
 		userData.add("");
@@ -513,7 +591,17 @@ public class MonitoringController {
 		if (assessment.isEnableConfidenceLevels()) {
 		    userData.add(-1);
 		}
+		if (question.isGroupsAnswersDisclosed()) {
+		    userData.add("-");
+		}
 		userData.add("-");
+	    }
+
+	    userData.add(userDto.getUserId());
+	    if (userDto.getPortraitId() == null) {
+		userData.add("");
+	    } else {
+		userData.add(userDto.getPortraitId());
 	    }
 
 	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
@@ -532,6 +620,67 @@ public class MonitoringController {
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responseJSON.toString()));
 	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping("/getAnswerRatings")
+    @ResponseBody
+    public String getAnswerRatings(@RequestParam long questionResultUid, Locale locale, HttpServletResponse response)
+	    throws IOException {
+	AssessmentQuestionResult questionResult = service.getAssessmentQuestionResultByUid(questionResultUid);
+	long toolContentId = questionResult.getAssessmentResult().getAssessment().getContentId();
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+	if (criteria.size() >= 2) {
+	    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	}
+	if (criteria.isEmpty()) {
+	    // criteria were not yet created in learner results page
+	    return null;
+	}
+
+	Long ratingCriteriaId = criteria.get(0).getRatingCriteriaId();
+	List<Rating> ratings = ratingService.getRatingsByCriteriasAndItems(Arrays.asList(ratingCriteriaId),
+		Arrays.asList(questionResultUid));
+	List<RatingCommentDTO> comments = ratingService.getCommentsByCriteriaAndItem(ratingCriteriaId, null,
+		questionResultUid);
+	Map<Long, RatingCommentDTO> commentsByUserId = comments.stream()
+		.collect(Collectors.toMap(RatingCommentDTO::getUserId, Function.identity()));
+
+	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
+	int i = 0;
+
+	for (Rating rating : ratings) {
+	    ArrayNode ratingJSON = JsonNodeFactory.instance.arrayNode();
+	    User learner = rating.getLearner();
+	    long userId = learner.getUserId();
+	    RatingCommentDTO comment = commentsByUserId.get(userId);
+
+	    AssessmentSession session = service.getSessionBySessionId(rating.getToolSessionId());
+
+	    ratingJSON.add(rating.getUid());
+	    ratingJSON.add(comment.getUserFullName() + "<BR>" + session.getSessionName() + "<BR>"
+		    + DateUtil.convertToStringForJSON(comment.getPostedDate(), locale));
+	    ratingJSON.add(NumberUtil.formatLocalisedNumberForceDecimalPlaces(rating.getRating(), null, 2));
+	    ratingJSON.add(comment.getComment());
+	    ratingJSON.add(userId);
+	    ratingJSON.add(learner.getPortraitUuid() == null ? "" : learner.getPortraitUuid().toString());
+
+	    ObjectNode ratingRow = JsonNodeFactory.instance.objectNode();
+	    ratingRow.put("id", i++);
+	    ratingRow.set("cell", ratingJSON);
+
+	    rows.add(ratingRow);
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	responseJSON.put("total", 1);
+	responseJSON.put("page", 1);
+	responseJSON.put("records", rows.size());
+	responseJSON.set("rows", rows);
+
+	response.setContentType("application/json;charset=utf-8");
+	return responseJSON.toString();
     }
 
     /**
@@ -686,11 +835,161 @@ public class MonitoringController {
 	}
     }
 
+    @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateTimeLimit(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	if (relativeTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	    throw new InvalidParameterException(
+		    "Relative time limit must not be provided when absolute time limit is set");
+	}
+
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	assessment.setRelativeTimeLimit(relativeTimeLimit);
+	// set time limit as seconds from start of epoch, using current server time zone
+	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	service.saveOrUpdateAssessment(assessment);
+    }
+
+    @RequestMapping(path = "/getPossibleIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getPossibleIndividualTimeLimitUsers(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam(name = "term") String searchString) {
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+
+	List<User> users = service.getPossibleIndividualTimeLimitUsers(toolContentId, searchString);
+	Grouping grouping = service.getGrouping(toolContentId);
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	String groupLabel = service.getMessage("monitoring.label.group") + " \"";
+	if (grouping != null) {
+	    Set<Group> groups = grouping.getGroups();
+	    for (Group group : groups) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().contains(searchString.toLowerCase())) {
+		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
+		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
+		    groupJSON.put("value", "group-" + group.getGroupId());
+		    responseJSON.add(groupJSON);
+		}
+	    }
+	}
+
+	for (User user : users) {
+	    if (!timeLimitAdjustments.containsKey(user.getUserId())) {
+		// this format is required by jQuery UI autocomplete
+		ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+		userJSON.put("value", "user-" + user.getUserId());
+
+		String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+		if (grouping != null) {
+		    Group group = grouping.getGroupBy(user);
+		    if (group != null) {
+			name += " - " + group.getGroupName();
+		    }
+		}
+
+		userJSON.put("label", name);
+		responseJSON.add(userJSON);
+	    }
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getExistingIndividualTimeLimitUsers", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExistingIndividualTimeLimitUsers(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId) {
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+	Grouping grouping = service.getGrouping(toolContentId);
+	// find User objects based on their userIDs and sort by name
+	List<User> users = assessment.getTimeLimitAdjustments().keySet().stream()
+		.map(userId -> userManagementService.getUserById(userId)).sorted(USER_NAME_COMPARATOR)
+		.collect(Collectors.toList());
+
+	if (grouping != null) {
+	    // Make a map group -> its users who have a time limit set
+	    // key are sorted by group name, users in each group are sorted by name
+	    List<User> groupedUsers = grouping.getGroups().stream()
+		    .collect(Collectors.toMap(Group::getGroupName, group -> {
+			return group.getUsers().stream()
+				.filter(user -> timeLimitAdjustments.containsKey(user.getUserId()))
+				.collect(Collectors.toCollection(() -> new TreeSet<>(USER_NAME_COMPARATOR)));
+		    }, (s1, s2) -> {
+			s1.addAll(s2);
+			return s1;
+		    }, TreeMap::new)).values().stream().flatMap(Set::stream).collect(Collectors.toList());
+
+	    // from general user list remove grouped users
+	    users.removeAll(groupedUsers);
+	    // at the end of list, add remaining, not yet grouped users
+	    groupedUsers.addAll(users);
+	    users = groupedUsers;
+	}
+
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	for (User user : users) {
+	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
+	    userJSON.put("userId", user.getUserId());
+	    userJSON.put("adjustment", timeLimitAdjustments.get(user.getUserId().intValue()));
+
+	    String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+	    if (grouping != null) {
+		Group group = grouping.getGroupBy(user);
+		if (group != null && !group.isNull()) {
+		    name += " - " + group.getGroupName();
+		}
+	    }
+	    userJSON.put("name", name);
+
+	    responseJSON.add(userJSON);
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/updateIndividualTimeLimit", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void updateIndividualTimeLimit(
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
+	    @RequestParam String itemId, @RequestParam(required = false) Integer adjustment) {
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	Map<Integer, Integer> timeLimitAdjustments = assessment.getTimeLimitAdjustments();
+	Set<Integer> userIds = null;
+
+	// itemId can user-<userId> or group-<groupId>
+	String[] itemIdParts = itemId.split("-");
+	if (itemIdParts[0].equalsIgnoreCase("group")) {
+	    // add all users from a group, except for ones who are already added
+	    Group group = (Group) userManagementService.findById(Group.class, Long.valueOf(itemIdParts[1]));
+	    userIds = group.getUsers().stream().map(User::getUserId)
+		    .filter(userId -> !timeLimitAdjustments.containsKey(userId)).collect(Collectors.toSet());
+	} else {
+	    // adjust for a single user
+	    userIds = new HashSet<>();
+	    userIds.add(Integer.valueOf(itemIdParts[1]));
+	}
+
+	for (Integer userId : userIds) {
+	    if (adjustment == null) {
+		timeLimitAdjustments.remove(userId);
+	    } else {
+		timeLimitAdjustments.put(userId, adjustment);
+	    }
+	}
+	service.saveOrUpdateAssessment(assessment);
+    }
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
     }
-
 }

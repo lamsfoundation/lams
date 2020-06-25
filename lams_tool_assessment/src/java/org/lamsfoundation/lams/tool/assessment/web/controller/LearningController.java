@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -53,6 +54,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
@@ -73,6 +79,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -107,6 +114,12 @@ public class LearningController {
     @Autowired
     @Qualifier("laasseAssessmentService")
     private IAssessmentService service;
+
+    @Autowired
+    private IRatingService ratingService;
+
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
@@ -165,7 +178,7 @@ public class LearningController {
 
 	    // forwards to the waitForLeader pages
 	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (assessment.getTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
+	    if (assessment.getRelativeTimeLimit() != 0 && isNonLeader && !isLastAttemptFinishedByLeader) {
 
 		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
 		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
@@ -175,7 +188,8 @@ public class LearningController {
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
-		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
+		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment.getUid(),
+			groupLeader.getUserId());
 		if (isTimeLimitExceeded) {
 		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.finish");
@@ -281,13 +295,6 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
-
-	//time limit
-	boolean isTimeLimitEnabled = hasEditRight && !showResults && assessment.getTimeLimit() != 0;
-	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
-	sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, service.isLastActivity(toolSessionId));
 
@@ -420,7 +427,8 @@ public class LearningController {
 	AssessmentUser leader = session.getGroupLeader();
 
 	//in case of time limit - prevent user from seeing questions page longer than time limit allows
-	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
+	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment().getUid(),
+		leader.getUserId());
 	boolean isLeaderResponseFinalized = service.isLastAttemptFinishedByUser(leader);
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
@@ -456,8 +464,6 @@ public class LearningController {
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	int oldPageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//if AnswersValidationFailed - get pageNumber as request parameter and as method parameter otherwise
@@ -489,9 +495,6 @@ public class LearningController {
 	    // store results from sessionMap into DB
 	    storeUserAnswersIntoDatabase(sessionMap, true);
 
-	    long secondsLeft = service.getSecondsLeft(assessment, user);
-	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-
 	    // use redirect to prevent form resubmission
 	    String redirectURL = "redirect:/pages/learning/learning.jsp";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AssessmentConstants.ATTR_SESSION_MAP_ID,
@@ -500,29 +503,6 @@ public class LearningController {
 		    AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, "" + isAnswersValidationFailed);
 	    return redirectURL;
 	}
-    }
-
-    /**
-     * Ajax call to get the remaining seconds. Needed when the page is reloaded in the browser to check with the server
-     * what the current values should be! Otherwise the learner can keep hitting reload after a page change or submit
-     * all (when questions are spread across pages) and increase their time!
-     *
-     * @return
-     * @throws JSONException
-     * @throws IOException
-     */
-    @RequestMapping("/getSecondsLeft")
-    @ResponseBody
-    public String getSecondsLeft(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
-	long secondsLeft = service.getSecondsLeft(assessment, user);
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	response.setContentType("application/json;charset=utf-8");
-	return responseJSON.toString();
     }
 
     /**
@@ -659,10 +639,6 @@ public class LearningController {
 	    // clear isUserFailed indicator
 	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
 
-	    // time limit feature
-	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
-	    sessionMap.put(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
-
 	    return "pages/learning/learning";
 	}
 
@@ -704,21 +680,6 @@ public class LearningController {
 	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
-    }
-
-    /**
-     * Stores date when user has started activity with time limit
-     */
-    @RequestMapping("/launchTimeLimit")
-    @ResponseStatus(HttpStatus.OK)
-    public void launchTimeLimit(HttpServletRequest request) {
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
-
-	service.launchTimeLimit(assessmentUid, userId);
     }
 
     @RequestMapping("/vsaAutocomplete")
@@ -924,11 +885,18 @@ public class LearningController {
 			AssessmentConstants.ATTR_CONFIDENCE_LEVEL_PREFIX + i);
 		questionDto.setConfidenceLevel(confidenceLevel);
 	    }
+
+	    // store justification entered by the learner
+	    if (assessment.isAllowAnswerJustification()) {
+		String justification = WebUtil.readStrParam(request,
+			AssessmentConstants.ATTR_ANSWER_JUSTIFICATION_PREFIX + i, true);
+		questionDto.setJustification(justification);
+	    }
 	}
     }
 
     /**
-     * Checks whether all required questions were answered and all essay question with min words limit have fullfilled
+     * Checks whether all required questions were answered and all essay question with min words limit have fulfilled
      * that.
      *
      * @param sessionMap
@@ -1036,7 +1004,8 @@ public class LearningController {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	Long userId = user.getUserId();
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
 	if (dbResultCount > 0) {
@@ -1080,6 +1049,10 @@ public class LearningController {
 				questionDto.setAnswerBoolean(isAnsweredCorrectly);
 			    }
 
+			    if (StringUtils.isNotBlank(questionResult.getJustification())) {
+				questionDto.setJustification(questionResult.getJustification());
+			    }
+
 			    // required for markandpenalty area and if it's on - on question's summary page
 			    List<Object[]> questionResults = service
 				    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionDto.getUid());
@@ -1121,10 +1094,98 @@ public class LearningController {
 		// such entities should not go into session map, but as request attributes instead
 		SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
 		sessions.addAll(service.getSessionsByContentId(assessment.getContentId()));
-		request.setAttribute("sessions", sessions);
+
+		Long userSessionId = user.getSession().getSessionId();
+		Integer userSessionIndex = null;
+		int sessionIndex = 0;
+		// find user session in order to put it first
+		List<AssessmentSession> sessionList = new ArrayList<>();
+		for (AssessmentSession session : sessions) {
+		    if (userSessionId.equals(session.getSessionId())) {
+			userSessionIndex = sessionIndex;
+		    } else {
+			sessionList.add(session);
+		    }
+		    sessionIndex++;
+		}
+		// put user's own group first
+		sessionList.add(0, user.getSession());
+		request.setAttribute("sessions", sessionList);
 
 		Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
 		request.setAttribute("questionSummaries", questionSummaries);
+
+		// Assessment currently supports only one place for ratings.
+		// It is rating other groups' answers on results page.
+		// Criterion gets automatically created and there must be only one.
+		List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
+		if (criteria.size() >= 2) {
+		    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
+			    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+		}
+		ToolActivityRatingCriteria criterion = null;
+		if (criteria.isEmpty()) {
+		    criterion = (ToolActivityRatingCriteria) RatingCriteria
+			    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+		    criterion.setTitle(service.getMessage("label.answer.rating.title"));
+		    criterion.setOrderId(1);
+		    criterion.setCommentsEnabled(true);
+		    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+		    criterion.setToolContentId(assessment.getContentId());
+
+		    userManagementService.save(criterion);
+		} else {
+		    criterion = (ToolActivityRatingCriteria) criteria.get(0);
+		}
+
+		// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
+		// Get all item IDs no matter which session they belong to.
+		Set<Long> itemIds = questionSummaries.values().stream()
+			.flatMap(s -> s.getQuestionResultsPerSession().stream())
+			.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+		List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(),
+			null, itemIds, true, userId);
+		// Mapping of Item ID -> DTO
+		Map<Long, ItemRatingDTO> itemRatingDtoMap = itemRatingDtos.stream()
+			.collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+
+		Long ratingUserId = user.getSession().getGroupLeader() == null ? userId
+			: user.getSession().getGroupLeader().getUserId();
+
+		for (QuestionSummary summary : questionSummaries.values()) {
+
+		    List<List<AssessmentQuestionResult>> questionResultsPerSession = summary
+			    .getQuestionResultsPerSession();
+		    if (questionResultsPerSession != null) {
+			List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+				.remove((int) userSessionIndex);
+			// user or his leader should rate all other groups' answers in order to show ratings left for own group
+			int expectedRatedItemCount = questionResultsPerSession.size();
+
+			Set<Long> questionItemIds = questionResultsPerSession.stream()
+				.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+			// question results need to be in the same order as sessions, i.e. user group first
+			questionResultsPerSession.add(0, questionResults);
+
+			// count how many ratings user or his leader left
+			// maybe exact session ID matching should be used here to make sure
+			int ratedItemCount = 0;
+			for (Long questionItemId : questionItemIds) {
+			    ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
+			    for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
+				if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
+				    ratedItemCount++;
+				}
+			    }
+			}
+
+			summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		    }
+		}
+
+		request.setAttribute("itemRatingDtos", itemRatingDtoMap);
 	    }
 	}
 

@@ -123,9 +123,9 @@
 <lams:SimplePanel panelBodyClass="panel-body-sm">
 
 <div class="form-inline">
-	<label for="timeLimit">
+	<label for="relativeTimeLimit">
 		<fmt:message key="label.authoring.advance.time.limit" />&nbsp;
-		<form:input path="assessment.timeLimit" size="3" id="timeLimit" cssClass="form-control input-sm"/>
+		<form:input path="assessment.relativeTimeLimit" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
 	</label>
 </div>
 
@@ -225,6 +225,13 @@
 	<label for="allowGradesAfterAttempt">
 		<form:checkbox path="assessment.allowGradesAfterAttempt" id="allowGradesAfterAttempt"/>
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
+	</label>
+</div>
+
+<div class="checkbox">
+	<label for="allowAnswerJustification">
+		<form:checkbox path="assessment.allowAnswerJustification" id="allowAnswerJustification"/>
+		<fmt:message key="label.authoring.advance.answer.justification" />
 	</label>
 </div>
 

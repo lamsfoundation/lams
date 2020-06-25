@@ -115,17 +115,17 @@
 						</div>
 						</c:if>
 
-						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm" autocomplete="off">
+						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm">
 							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" 
 						  		 escapeXml="true" />' />
              				 <div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-user"></i></span>
-								<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
+								<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1" autocomplete="username">
               				</div>
 
 							<div class="input-group voffset5">
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-								<input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2">
+								<input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2" autocomplete="current-password">
 							</div>
 							<div class="form-group voffset5" style="margin-bottom: 5px;">
 								<c:if test="${isForgotYourPasswordEnabled}">

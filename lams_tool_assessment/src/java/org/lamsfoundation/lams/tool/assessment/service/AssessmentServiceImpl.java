@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,9 +58,13 @@ import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -108,6 +113,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.tool.assessment.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
@@ -166,6 +172,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
+
+    private ILessonService lessonService;
 
     private IExportToolContentService exportContentService;
 
@@ -256,6 +264,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    userOptionAnswer.setOptionUid(leaderOptionAnswer.getOptionUid());
 		    userOptionAnswers.add(userOptionAnswer);
 		}
+
+		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
 	}
 
@@ -304,43 +314,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void launchTimeLimit(Long assessmentUid, Long userId) {
+    public LocalDateTime launchTimeLimit(Long assessmentUid, Long userId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
-	lastResult.setTimeLimitLaunchedDate(new Date());
+	LocalDateTime launchedDate = LocalDateTime.now();
+	lastResult.setTimeLimitLaunchedDate(launchedDate);
 	assessmentResultDao.saveObject(lastResult);
+	return launchedDate;
     }
 
     @Override
-    public long getSecondsLeft(Assessment assessment, AssessmentUser user) {
-	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
-
-	long secondsLeft = 1;
-	if (assessment.getTimeLimit() != 0) {
-	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
-	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
-		    : assessment.getTimeLimit() * 60
-			    - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
-	    // change negative or zero number to 1
-	    secondsLeft = Math.max(1, secondsLeft);
-	}
-
-	return secondsLeft;
-    }
-
-    @Override
-    public boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader) {
-	int timeLimit = assessment.getTimeLimit();
-	if (timeLimit == 0) {
-	    return false;
-	}
-
-	AssessmentResult lastLeaderResult = getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
-
-	//check if the time limit is exceeded
-	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
-		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System
-			.currentTimeMillis();
+    public boolean checkTimeLimitExceeded(long assessmentUid, long userId) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(assessmentUid, userId);
+	return secondsLeft != null && secondsLeft.equals(0);
     }
 
     @Override
@@ -423,6 +408,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
 	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
+    }
+
+    @Override
+    public AssessmentUser getUserByLoginAndContent(String login, Long contentId) {
+	return assessmentUserDao.getUserByLoginAndContent(login, contentId);
     }
 
     @Override
@@ -720,6 +710,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
 
+	// store justification entered by the learner
+	if (assessment.isAllowAnswerJustification()) {
+	    questionResult.setJustification(questionDto.getJustification());
+	}
+
 	return questionResult;
     }
 
@@ -955,6 +950,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
 	questionDto.setAnswerFloat(questionResult.getAnswerFloat());
 	questionDto.setAnswer(questionResult.getAnswer());
+	questionDto.setJustification(questionResult.getJustification());
 	questionDto.setMark(questionResult.getMark());
 	questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 	questionDto.setPenalty(questionResult.getPenalty());
@@ -1787,6 +1783,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.taken"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    if (assessment.isAllowAnswerJustification()) {
+		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    }
 
 	    int questionNumber = 1;
 
@@ -1903,6 +1903,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			//mark
 			userResultRow.addCell(questionResult.getMark());
+
+			if (assessment.isAllowAnswerJustification()) {
+			    userResultRow.addCell(AssessmentEscapeUtils
+				    .escapeStringForExcelExport(questionResult.getJustification()));
+			}
+
 			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
@@ -2042,6 +2048,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 			userTitleRow.addCell(getMessage("label.export.mark"), true);
 
+			if (assessment.isAllowAnswerJustification()) {
+			    userTitleRow.addCell(getMessage("label.answer.justification"), true);
+			}
+
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
 			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
@@ -2076,7 +2086,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 					userResultRow.addCell(confidenceLevel);
 				    }
+
 				    userResultRow.addCell(questionResult.getMark());
+
+				    if (assessment.isAllowAnswerJustification()) {
+					userResultRow.addCell(AssessmentEscapeUtils
+						.escapeStringForExcelExport(questionResult.getJustification()));
+				    }
 				}
 			    }
 
@@ -2570,6 +2586,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
+    }
+
+    @Override
+    public String getMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
     }
 
     @Override
@@ -3295,6 +3316,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	this.learnerService = learnerService;
     }
 
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -3414,7 +3439,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.optBoolean(toolContentJSON, "shuffled", Boolean.FALSE));
-	assessment.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	assessment.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
 	// submission deadline set in monitoring
@@ -3527,8 +3552,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			option.setDisplayOrder(displayOrder);
 			option.setQbQuestion(qbQuestion);
 		    }
-		    
-		  
+
 		    Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
 		    if (correct == null) {
 			Double grade = JsonUtil.optDouble(answerData, "grade");
@@ -3663,5 +3687,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+
+    @Override
+    public Grouping getGrouping(long toolContentId) {
+	ToolActivity toolActivity = (ToolActivity) userManagementService
+		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
+    }
+
+    @Override
+    public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
     }
 }

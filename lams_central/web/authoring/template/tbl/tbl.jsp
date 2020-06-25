@@ -174,16 +174,10 @@
 			// extract the ID
 			var qbQuestionUid = +$("#itemArea").text();
 			if (qbQuestionAddAppexNumber) {
-				createAssessment('importQbAe', 'numAssessments' + qbQuestionAddAppexNumber, 'divass' + qbQuestionAddAppexNumber, qbQuestionUid);
-				$('#question-bank-ae-div-' + qbQuestionAddAppexNumber).slideUp(function(){
-					$('.panel-collapse', this).empty();
-				});
+				createAssessment('importQbAe', 'numAssessments' + qbQuestionAddAppexNumber, 'divass' + qbQuestionAddAppexNumber, qbQuestionUid, true);
 			} else {
 				// fetch HTML with filled data from QB question
-				createQuestion('numQuestions', 'divq', 'divquestions', 'importQbIra', '&qbQuestionUid=' + qbQuestionUid);
-				$('#question-bank-ira-div').slideUp(function(){
-					$('.panel-collapse', this).empty();
-				});
+				createQuestion('numQuestions', 'divq', 'divquestions', 'importQbIra', '&qbQuestionUid=' + qbQuestionUid, true);
 			}
 		};
 

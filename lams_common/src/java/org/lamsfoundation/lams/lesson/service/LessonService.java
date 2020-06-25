@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.exception.GroupingException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -148,6 +149,11 @@ public class LessonService implements ILessonService {
 	return lessonDAO.getLesson(lessonId);
     }
 
+    public Lesson getLessonByToolContentId(long toolContentId) {
+	ToolActivity toolActivity = baseDAO.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return toolActivity.getLearningDesign().getLessons().iterator().next();
+    }
+
     @Override
     public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner)
 	    throws LessonServiceException {
@@ -218,7 +224,7 @@ public class LessonService implements ILessonService {
 	    if (grouper != null) {
 		grouper.setCommonMessageService(messageService);
 		try {
-		    List<User> learners = new ArrayList<User>(1);
+		    List<User> learners = new ArrayList<>(1);
 		    learners.add(learner);
 		    grouper.doGrouping(grouping, groupId, learners);
 		} catch (GroupingException e) {
@@ -267,10 +273,9 @@ public class LessonService implements ILessonService {
 	    groupingDAO.update(grouping);
 	}
     }
-    
+
     @Override
-    public void removeAllLearnersFromGrouping(Grouping grouping)
-	    throws LessonServiceException {
+    public void removeAllLearnersFromGrouping(Grouping grouping) throws LessonServiceException {
 	if (grouping != null) {
 	    // get the real objects, not the CGLIB version
 	    grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
@@ -344,7 +349,7 @@ public class LessonService implements ILessonService {
 	    lessonDAO.initialize(learnersGroup);
 	}
 
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	boolean ret = lessonClass.addLearner(user);
 	if (ret) {
 	    lessonClassDAO.updateLessonClass(lessonClass);
@@ -356,7 +361,7 @@ public class LessonService implements ILessonService {
     public boolean removeLearner(Long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonClass lessonClass = lesson.getLessonClass();
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	Group learnerGroup = lessonClass.getGroupBy(user);
 	boolean result = learnerGroup.getUsers().remove(user);
 
@@ -388,9 +393,9 @@ public class LessonService implements ILessonService {
 	    lessonDAO.initialize(learnersGroup);
 	}
 
-	Set<User> users = new HashSet<User>();
+	Set<User> users = new HashSet<>();
 	for (Integer userId : userIds) {
-	    User user = (User) baseDAO.find(User.class, userId);
+	    User user = baseDAO.find(User.class, userId);
 	    users.add(user);
 	}
 	addLearners(lesson, users);
@@ -436,7 +441,7 @@ public class LessonService implements ILessonService {
 	}
 
 	lessonDAO.initialize(lessonClass.getStaffGroup());
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 
 	boolean ret = lessonClass.addStaffMember(user);
 	if (ret) {
@@ -449,7 +454,7 @@ public class LessonService implements ILessonService {
     public boolean removeStaffMember(Long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonClass lessonClass = lesson.getLessonClass();
-	User user = (User) baseDAO.find(User.class, userId);
+	User user = baseDAO.find(User.class, userId);
 	Group staffGroup = lessonClass.getStaffGroup();
 	boolean result = staffGroup.getUsers().remove(user);
 
@@ -478,9 +483,9 @@ public class LessonService implements ILessonService {
 	// yes this is a bit of a hack!
 	lessonDAO.initialize(lessonClass.getStaffGroup());
 
-	Set<User> users = new HashSet<User>();
+	Set<User> users = new HashSet<>();
 	for (Integer userId : userIds) {
-	    User user = (User) baseDAO.find(User.class, userId);
+	    User user = baseDAO.find(User.class, userId);
 	    users.add(user);
 	}
 	addStaffMembers(lesson, users);
@@ -584,7 +589,7 @@ public class LessonService implements ILessonService {
 	int count = 0;
 	List<LearnerProgress> progresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId, null, null,
 		true);
-	Activity firstAddedActivity = (Activity) baseDAO.find(Activity.class, firstAddedActivityId);
+	Activity firstAddedActivity = baseDAO.find(Activity.class, firstAddedActivityId);
 
 	for (LearnerProgress progress : progresses) {
 	    if (progress.getLessonComplete() == LearnerProgress.LESSON_END_OF_DESIGN_COMPLETE) {
@@ -614,13 +619,15 @@ public class LessonService implements ILessonService {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
     }
 
-    public Integer getCountLearnersInCurrentActivity(Activity activity){
+    @Override
+    public Integer getCountLearnersInCurrentActivity(Activity activity) {
 	return learnerProgressDAO.getNumUsersCurrentActivity(activity);
     }
+
     @Override
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
 	    Integer userRole) {
-	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
+	TreeMap<Long, IndexLessonBean> map = new TreeMap<>();
 	List list = lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, userRole);
 	if (list != null) {
 	    Iterator iterator = list.iterator();
@@ -690,10 +697,10 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public List<Long> getOrganisationLessons(Integer organisationId)  {
-	return lessonDAO.getOrganisationLessons(organisationId) ;
+    public List<Long> getOrganisationLessons(Integer organisationId) {
+	return lessonDAO.getOrganisationLessons(organisationId);
     }
-    
+
     @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
@@ -710,7 +717,7 @@ public class LessonService implements ILessonService {
 
     @Override
     public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId) {
-	Set<Lesson> releasedSucceedingLessons = new HashSet<Lesson>();
+	Set<Lesson> releasedSucceedingLessons = new HashSet<>();
 	Lesson lesson = getLesson(completedLessonId);
 	if (lesson != null) {
 	    for (Lesson succeedingLesson : lesson.getSucceedingLessons()) {

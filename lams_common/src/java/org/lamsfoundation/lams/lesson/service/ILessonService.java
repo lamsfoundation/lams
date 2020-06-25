@@ -103,6 +103,8 @@ public interface ILessonService {
      */
     Lesson getLesson(Long lessonId);
 
+    Lesson getLessonByToolContentId(long toolContentId);
+
     /**
      * If the supplied learner is not already in a group, then perform grouping for the learners who have started the
      * lesson, based on the grouping activity. Currently used for random grouping. This method should be used when we do
@@ -342,7 +344,7 @@ public interface ILessonService {
 
     /** Gets the count of the users who are currently in an activity */
     Integer getCountLearnersInCurrentActivity(Activity activity);
-    
+
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.
      *
@@ -436,9 +438,10 @@ public interface ILessonService {
      * Finds IDs of preview lessons.
      */
     List<Long> getPreviewLessons(Integer limit);
-    
+
     /**
-     * Finds IDs of all lessons in an organisation. When calling MonitoringService.removeLessonPermanently() you cannot load the Lessons
+     * Finds IDs of all lessons in an organisation. When calling MonitoringService.removeLessonPermanently() you cannot
+     * load the Lessons
      * or a Hibernate error occurs. So we need a way to get the ids withouth calling Organisation.getLessons()
      */
     List<Long> getOrganisationLessons(Integer organisationId);

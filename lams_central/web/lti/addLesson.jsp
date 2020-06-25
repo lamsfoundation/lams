@@ -90,6 +90,11 @@
 		);
 	});
 
+	function openAuthor() {
+		window.open(LAMS_URL + 'authoring/openAuthoring.do','Author',
+                                    'width=1366,height=768,resizable,scrollbars=yes,status=yes');
+	}
+
 	function openPreview() {
     	var ldId = document.getElementsByName("ldId")[0].value;
         var title = document.forms.lessonForm.title.value;
@@ -120,7 +125,7 @@
 					success : function() {
 						// open preview pop up window
 						window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
-									'width=920,height=700,resizable,scrollbars=yes,status=yes');
+									'width=1366,height=768,resizable,scrollbars=yes,status=yes');
 					}
 				});
 
@@ -208,7 +213,7 @@
 					<fmt:message key="authoring.fla.preview.lesson.default.title" />
 				</a>
 				
-				<a class="btn btn-default" href="javascript:showAuthoringDialog();" title="<fmt:message key="label.author.sequence" />">
+				<a class="btn btn-default" href="javascript:openAuthor();"  title="<fmt:message key="label.author.sequence" />">
 					<fmt:message key="label.author.sequence" />
 				</a>
 				
