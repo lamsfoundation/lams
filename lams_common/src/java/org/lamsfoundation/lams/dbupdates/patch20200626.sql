@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 --LDEV-5047 Make numeric option more accurate as with large numbers it performs rounding
 
-ALTER TABLE tl_laasse10_question_option MODIFY COLUMN option_float DOUBLE;
+ALTER TABLE lams_qb_option MODIFY COLUMN numerical_option DOUBLE;
 
 -- Put all sql statements above here
 
