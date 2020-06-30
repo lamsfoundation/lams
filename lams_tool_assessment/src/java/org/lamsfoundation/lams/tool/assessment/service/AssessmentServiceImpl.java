@@ -3504,7 +3504,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
 	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
 	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
+	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
 	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
 	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
 	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
