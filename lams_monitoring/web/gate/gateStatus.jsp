@@ -13,7 +13,7 @@
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<input type="hidden" name="activityId" value="${gateForm.activityId}" />
 			<p>
-				<input type="submit" class="btn btn-primary btn-sm voffset10" value="<fmt:message key="label.gate.open"/>" />
+				<input type="submit"  id="openGateButton" class="btn btn-primary btn-sm voffset10" value="<fmt:message key="label.gate.open"/>" />
 			</p>
 		</form:form>
 	</c:if>    

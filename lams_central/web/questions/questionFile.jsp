@@ -67,7 +67,7 @@
 				<div class="pull-right voffset5" id="buttonsDiv">
 					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:window.close()" />
-					<button class="btn btn-sm btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
+					<button id="importButton" class="btn btn-sm btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
 						<fmt:message key="button.import" />
 					</button>
 				</div>

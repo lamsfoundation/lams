@@ -55,7 +55,7 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-								href="<lams:LAMSURL/>index.do?redirect=editprofile" role="button">
+								href="<lams:LAMSURL/>index.do?redirect=editprofile" id="editProfileButton" role="button">
 							<i class="fa fa-fw fa-pencil"></i> 
 							<span class="hidden-xs">
 								<fmt:message key="title.profile.edit.screen" />
@@ -68,7 +68,7 @@
 						<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 						<c:if test="${authenticationMethodId eq dbId}">
 							<a class="btn btn-sm btn-default offset5"
-									href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile" role="button">
+									href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile"  id="changePasswordButton" role="button">
 								<i class="fa fa-fw fa-lock"></i>
 								<span class="hidden-xs">
 									<fmt:message key="title.password.change.screen" />
@@ -77,14 +77,14 @@
 						</c:if>
 
 						<a class="btn btn-sm btn-default offset5"
-								href="<lams:LAMSURL/>index.do?redirect=portrait" role="button">
+								href="<lams:LAMSURL/>index.do?redirect=portrait"  id="editPortraitButton" role="button">
 							<i class="fa fa-fw fa-camera"></i> 
 							<span class="hidden-xs">
 								<fmt:message key="title.portrait.change.screen" />
 							</span>
 						</a>&nbsp;&nbsp;
 
-						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do" role="button">
+						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do"  id="viewPolicies" role="button">
 							<i class="fa fa-fw fa-calendar-check-o"></i> 
 							<span class="hidden-xs">
 								<fmt:message key="label.policies.consents" />
@@ -93,7 +93,7 @@
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-									href="<lams:LAMSURL/>index.do?redirect=lessons" role="button">
+									href="<lams:LAMSURL/>index.do?redirect=lessons" id="viewAllLessons"  role="button">
 								<i class="fa fa-fw fa-book"></i> 
 								<span class="hidden-xs">
 									<fmt:message key="title.all.my.lessons" />

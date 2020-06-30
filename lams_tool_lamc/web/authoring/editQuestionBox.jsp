@@ -204,7 +204,7 @@
 			</div>
 
 			<div class="pull-right">
-				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
+				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"  id="eqbCancel"> 
 					<fmt:message key="label.cancel" />
 				</a>
 				<a href="#" onclick="javascript:saveQuestion();"

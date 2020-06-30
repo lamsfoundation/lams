@@ -641,8 +641,9 @@ function updateContributeActivities(contributeActivities) {
 	}
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
+			var contributeId = 'contribute' + this.activityID;
 			var contributeActivity = this,
-				cell = $('<div />').addClass('contributeActivityCell').text(this.title);
+				cell = $('<div />').addClass('contributeActivityCell').text(this.title).attr('id', contributeId);
 				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
@@ -670,7 +671,7 @@ function updateContributeActivities(contributeActivities) {
 									
 							}
 							break;
-					default : entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
 						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 				}

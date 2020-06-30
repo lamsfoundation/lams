@@ -273,7 +273,7 @@
 					</ul>
 				</div>
 				
-				<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
+				<a href="#"  id="importQTIButton" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
 			
 			<!-- Question Bank -->

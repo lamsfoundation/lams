@@ -149,7 +149,7 @@
 								<fmt:message key="button.cancel"/>
 							</button>
 							&nbsp;&nbsp;
-							<button type="submit" class="btn btn-sm btn-primary voffset5">
+							<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
 								<fmt:message key="button.save" />
 							</button>
 						</div>

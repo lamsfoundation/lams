@@ -207,14 +207,14 @@
 						
 				<ul class="dropdown-menu dropdown-usermenu pull-right">
 					<li>
-						<a href="#" onclick="javascript:showMyProfileDialog(); return false;">
+						<a href="#" id="showProfileButton" onclick="javascript:showMyProfileDialog(); return false;">
 							<i class="fa fa-user"></i> <fmt:message key="index.myprofile"/>
 						</a>
 					</li>
 					
 					<c:if test="${showQbCollectionsLink}">
 						<li>
-							<a href="#" onclick="javascript:openQbCollections(); return false;">
+							<a href="#" id="showQbCollectionsButton" onclick="javascript:openQbCollections(); return false;">
 								<i class="fa fa-question"></i> <fmt:message key="index.qb.collections"/>
 							</a>
 						</li>
@@ -225,14 +225,16 @@
 						<c:choose>
 		               		<c:when test="${adminlink.name == 'index.courseman'}">
 		               			<c:set var="iconClass">fa-users</c:set>
+		               			<c:set var="linkId">courseManagementButton</c:set>
 		               		</c:when>
 		               		<c:when test="${adminlink.name == 'index.sysadmin'}">
 		               			<c:set var="iconClass">fa-gear</c:set>
+		               			<c:set var="linkId">sysadminButton</c:set>
 		               		</c:when>
 		               	</c:choose>
 									
 						<li>
-							<a href="javascript:;" onclick="<c:out value="${adminlink.url}"/>">
+							<a href="javascript:;" id="<c:out value="${linkId}"/>" onclick="<c:out value="${adminlink.url}"/>">
 								<span><i class="fa ${iconClass}"></i> <fmt:message key="${adminlink.name}"/></span>
 							</a>
 						</li>
