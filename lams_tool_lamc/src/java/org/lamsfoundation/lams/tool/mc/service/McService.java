@@ -2222,6 +2222,7 @@ public class McService
 	for (QbQuestion qbQuestion : newQuestions) {
 	    McQueContent mcQuestion = new McQueContent(qbQuestion, displayOrder++, mcContent);
 	    mcQueContentDAO.insert(mcQuestion);
+	    mcContent.getMcQueContents().add(mcQuestion);
 	}
     }
 
