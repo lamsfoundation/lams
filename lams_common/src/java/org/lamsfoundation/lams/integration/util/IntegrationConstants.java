@@ -68,4 +68,8 @@ public class IntegrationConstants {
 
     public static final String PARAM_LESSON_ID = "lsid";
 
+    public static final String WORKFLOW_AUTOMATION_METHOD_LEARNER = "wa_learner";
+    public static final String WORKFLOW_AUTOMATION_METHOD_MONITOR = "wa_monitor";
+    public static final String WORKFLOW_AUTOMATION_PARAM_EVENT_ID = "eventId";
+    public static final String WORKFLOW_AUTOMATION_PARAM_LEARNING_ACTIVITY_ID = "learningActivityId";
 }

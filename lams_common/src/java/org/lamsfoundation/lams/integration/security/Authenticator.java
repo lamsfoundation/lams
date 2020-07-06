@@ -47,8 +47,8 @@ public class Authenticator {
      * @param hashValue
      * @throws AuthenticationException
      */
-    public static void authenticate(ExtServer map, String datetime, String username, String method,
-	    String hashValue) throws AuthenticationException {
+    public static void authenticate(ExtServer map, String datetime, String username, String method, String hashValue)
+	    throws AuthenticationException {
 
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
@@ -128,8 +128,7 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    public static void authenticate(ExtServer map, String datetime, String hashValue)
-	    throws AuthenticationException {
+    public static void authenticate(ExtServer map, String datetime, String hashValue) throws AuthenticationException {
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
@@ -142,10 +141,9 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    private static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
+    public static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
 	if (!hashValue.equals(HashUtil.sha1(plaintext))) {
 	    throw new AuthenticationException("Authentication failed!");
 	}
     }
-
 }

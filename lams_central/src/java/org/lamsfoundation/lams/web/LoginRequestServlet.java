@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -62,7 +63,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @SuppressWarnings("serial")
 public class LoginRequestServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LoginRequestServlet.class);
-    
+
     private static final String URL_DEFAULT = "/index.jsp";
 
     private static final String URL_AUTHOR = "/home/author.do";
@@ -79,7 +80,7 @@ public class LoginRequestServlet extends HttpServlet {
     private ILessonService lessonService;
     @Autowired
     private MessageService centralMessageService;
-    
+
     /*
      * Request Spring to lookup the applicationContext tied to the current ServletContext and inject service beans
      * available in that applicationContext.
@@ -144,14 +145,6 @@ public class LoginRequestServlet extends HttpServlet {
 	ExtServer extServer = integrationService.getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
-	    ExtUserUseridMap userMap = null;
-	    if ((firstName == null) && (lastName == null)) {
-		userMap = integrationService.getExtUserUseridMap(extServer, extUsername, prefix);
-	    } else {
-		userMap = integrationService.getImplicitExtUserUseridMap(extServer, extUsername, firstName,
-			lastName, locale, country, email, prefix, isUpdateUserDetails);
-	    }
-
 	    // in case of request for learner with strict authentication check cache should also contain lessonId
 	    if ((IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
 		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && StringUtils.isBlank(lessonId)) {
@@ -159,19 +152,53 @@ public class LoginRequestServlet extends HttpServlet {
 		String errorMessage = IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
 			&& extServer.isLtiConsumer()
 				? centralMessageService.getMessage("message.lesson.not.started.cannot.participate")
-				: "Login Failed - lsId parameter missing";
+				: "Login Failed - lsid parameter missing";
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, errorMessage);
 		return;
 	    }
-	    
+
 	    Authenticator.authenticateLoginRequest(extServer, timestamp, extUsername, method, lessonId, hash);
+
+	    // LKC workflow automation
+	    boolean isWorkflowAutomation = false;
+	    if (method.equals(IntegrationConstants.WORKFLOW_AUTOMATION_METHOD_MONITOR)) {
+		method = IntegrationConstants.METHOD_MONITOR;
+		isWorkflowAutomation = true;
+	    } else if (method.equals(IntegrationConstants.WORKFLOW_AUTOMATION_METHOD_LEARNER)) {
+		method = IntegrationConstants.METHOD_LEARNER;
+		isWorkflowAutomation = true;
+	    }
+
+	    String waEventId = null;
+	    String waLearningActivityId = null;
+	    // if we are processing workflow automation call, check for required parameters
+	    if (isWorkflowAutomation) {
+		waEventId = request.getParameter(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_EVENT_ID);
+		waLearningActivityId = request
+			.getParameter(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_LEARNING_ACTIVITY_ID);
+		if (StringUtils.isBlank(waEventId) || StringUtils.isBlank(waLearningActivityId)) {
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+			    "Login Failed - Workflow Automation parameter eventId or learningActivityId is missing");
+		    return;
+		}
+	    }
+
+	    ExtUserUseridMap userMap = null;
+	    // do not create user if we are processing Workflow Automation call
+	    if (isWorkflowAutomation || (firstName == null && lastName == null)) {
+		userMap = integrationService.getExtUserUseridMap(extServer, extUsername, prefix);
+	    } else {
+		userMap = integrationService.getImplicitExtUserUseridMap(extServer, extUsername, firstName, lastName,
+			locale, country, email, prefix, isUpdateUserDetails);
+	    }
 
 	    if (extCourseId == null && StringUtils.isNotBlank(lessonId)) {
 		// derive course ID from lesson ID
 		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(extServer.getSid(),
 			Long.parseLong(lessonId));
 		if (classMap == null) {
-		    log.warn("Lesson " + lessonId + " is not mapped to any course for server " + extServer.getServername());
+		    log.warn("Lesson " + lessonId + " is not mapped to any course for server "
+			    + extServer.getServername());
 		} else {
 		    extCourseId = classMap.getCourseid();
 		}
@@ -179,17 +206,16 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method,
-			prefix);
+		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method, prefix);
 	    }
-	    
+
 	    User user = userMap.getUser();
 	    if (user == null) {
 		String error = "Unable to add user to lesson class as user is missing from the user map";
 		log.error(error);
 		throw new UserInfoFetchException(error);
 	    }
-	    
+
 	    //adds users to the lesson with respective roles
 	    if (StringUtils.isNotBlank(lessonId)) {
 		if (IntegrationConstants.METHOD_LEARNER.equals(method)
@@ -201,7 +227,7 @@ public class LoginRequestServlet extends HttpServlet {
 		    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
 		}
 	    }
-	    
+
 	    String login = user.getLogin();
 	    UserDTO loggedInUserDTO = (UserDTO) hses.getAttribute(AttributeNames.USER);
 	    String loggedInLogin = loggedInUserDTO == null ? null : loggedInUserDTO.getLogin();
@@ -210,7 +236,25 @@ public class LoginRequestServlet extends HttpServlet {
 		    ? IntegrationConstants.METHOD_LEARNER
 		    : method;
 	    // check if there is a redirect URL parameter already
-	    String requestUrl = LoginRequestServlet.getRequestURL(request);
+	    String requestUrl = null;
+
+	    if (isWorkflowAutomation) {
+		// build redirect URL which hashes event ID, learning activity ID, method and user ID
+		String waHash = new StringBuilder(waEventId).append(waLearningActivityId).append(method)
+			.append(user.getUserId()).append(extServer.getServerkey()).toString();
+		waHash = HashUtil.sha1(waHash);
+		StringBuilder redirectURLBuilder = new StringBuilder("/lams/wa/home.do?")
+			.append(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_EVENT_ID).append("=").append(waEventId)
+			.append("&").append(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_LEARNING_ACTIVITY_ID)
+			.append("=").append(waLearningActivityId).append("&").append(IntegrationConstants.PARAM_METHOD)
+			.append("=").append(method).append("&").append(IntegrationConstants.PARAM_HASH).append("=")
+			.append(waHash);
+		requestUrl = redirectURLBuilder.toString();
+	    }
+
+	    if (requestUrl == null) {
+		requestUrl = LoginRequestServlet.getRequestURL(request);
+	    }
 	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
 		response.sendRedirect(response.encodeRedirectURL(requestUrl));
 		return;
@@ -261,7 +305,7 @@ public class LoginRequestServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
     }
-    
+
     /**
      * If there is a redirectURL parameter then this becomes the redirect, otherwise it
      * fetches the method parameter from HttpServletRequest and builds the redirect url.
