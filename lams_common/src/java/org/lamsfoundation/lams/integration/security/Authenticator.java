@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.integration.security;
 import java.util.Date;
 
 import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 
 /**
@@ -109,7 +110,8 @@ public class Authenticator {
 	//learnerStrictAuth hash [ts + uid + method + lsid + serverID + serverKey]
 	//otherwise [ts + uid + method + serverID + serverKey]
 	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
-		+ ("learnerStrictAuth".equals(method) ? lsid.toLowerCase().trim() : "")
+		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lsid.toLowerCase().trim()
+			: "")
 		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
 	Authenticator.checkHash(plaintext, hashValue);
     }

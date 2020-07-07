@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.security.UniversalLoginModule;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -142,11 +141,15 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
+	String redirectURL = LoginRequestServlet.getRedirectURL(request);
+	boolean isWorkflowAutomation = redirectURL
+		.startsWith(request.getContextPath() + IntegrationConstants.WORKFLOW_AUTOMATION_REDIRECT_URL_PREFIX);
+
 	ExtServer extServer = integrationService.getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    // in case of request for learner with strict authentication check cache should also contain lessonId
-	    if ((IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
+	    if (!isWorkflowAutomation && (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
 		    || IntegrationConstants.METHOD_MONITOR.equals(method)) && StringUtils.isBlank(lessonId)) {
 		//show different messages for LTI learners (as this is a typical expected scenario) and all others
 		String errorMessage = IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
@@ -159,30 +162,6 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    Authenticator.authenticateLoginRequest(extServer, timestamp, extUsername, method, lessonId, hash);
 
-	    // LKC workflow automation
-	    boolean isWorkflowAutomation = false;
-	    if (method.equals(IntegrationConstants.WORKFLOW_AUTOMATION_METHOD_MONITOR)) {
-		method = IntegrationConstants.METHOD_MONITOR;
-		isWorkflowAutomation = true;
-	    } else if (method.equals(IntegrationConstants.WORKFLOW_AUTOMATION_METHOD_LEARNER)) {
-		method = IntegrationConstants.METHOD_LEARNER;
-		isWorkflowAutomation = true;
-	    }
-
-	    String waEventId = null;
-	    String waLearningActivityId = null;
-	    // if we are processing workflow automation call, check for required parameters
-	    if (isWorkflowAutomation) {
-		waEventId = request.getParameter(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_EVENT_ID);
-		waLearningActivityId = request
-			.getParameter(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_LEARNING_ACTIVITY_ID);
-		if (StringUtils.isBlank(waEventId) || StringUtils.isBlank(waLearningActivityId)) {
-		    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-			    "Login Failed - Workflow Automation parameter eventId or learningActivityId is missing");
-		    return;
-		}
-	    }
-
 	    ExtUserUseridMap userMap = null;
 	    // do not create user if we are processing Workflow Automation call
 	    if (isWorkflowAutomation || (firstName == null && lastName == null)) {
@@ -192,7 +171,7 @@ public class LoginRequestServlet extends HttpServlet {
 			locale, country, email, prefix, isUpdateUserDetails);
 	    }
 
-	    if (extCourseId == null && StringUtils.isNotBlank(lessonId)) {
+	    if (!isWorkflowAutomation && extCourseId == null && StringUtils.isNotBlank(lessonId)) {
 		// derive course ID from lesson ID
 		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(extServer.getSid(),
 			Long.parseLong(lessonId));
@@ -204,7 +183,7 @@ public class LoginRequestServlet extends HttpServlet {
 		}
 	    }
 
-	    if (extCourseId != null) {
+	    if (!isWorkflowAutomation && extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
 		integrationService.getExtCourseClassMap(extServer, userMap, extCourseId, courseName, method, prefix);
 	    }
@@ -217,7 +196,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 
 	    //adds users to the lesson with respective roles
-	    if (StringUtils.isNotBlank(lessonId)) {
+	    if (!isWorkflowAutomation && StringUtils.isNotBlank(lessonId)) {
 		if (IntegrationConstants.METHOD_LEARNER.equals(method)
 			|| IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
 		    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
@@ -236,27 +215,8 @@ public class LoginRequestServlet extends HttpServlet {
 		    ? IntegrationConstants.METHOD_LEARNER
 		    : method;
 	    // check if there is a redirect URL parameter already
-	    String requestUrl = null;
-
-	    if (isWorkflowAutomation) {
-		// build redirect URL which hashes event ID, learning activity ID, method and user ID
-		String waHash = new StringBuilder(waEventId).append(waLearningActivityId).append(method)
-			.append(user.getUserId()).append(extServer.getServerkey()).toString();
-		waHash = HashUtil.sha1(waHash);
-		StringBuilder redirectURLBuilder = new StringBuilder("/lams/wa/home.do?")
-			.append(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_EVENT_ID).append("=").append(waEventId)
-			.append("&").append(IntegrationConstants.WORKFLOW_AUTOMATION_PARAM_LEARNING_ACTIVITY_ID)
-			.append("=").append(waLearningActivityId).append("&").append(IntegrationConstants.PARAM_METHOD)
-			.append("=").append(method).append("&").append(IntegrationConstants.PARAM_HASH).append("=")
-			.append(waHash);
-		requestUrl = redirectURLBuilder.toString();
-	    }
-
-	    if (requestUrl == null) {
-		requestUrl = LoginRequestServlet.getRequestURL(request);
-	    }
 	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
-		response.sendRedirect(response.encodeRedirectURL(requestUrl));
+		response.sendRedirect(response.encodeRedirectURL(redirectURL));
 		return;
 	    }
 
@@ -270,7 +230,7 @@ public class LoginRequestServlet extends HttpServlet {
 	    // notify the login module that the user has been authenticated correctly
 	    UniversalLoginModule.setAuthenticationToken(token);
 
-	    String redirectURL = WebUtil.getBaseServerURL() + requestUrl;
+	    redirectURL = WebUtil.getBaseServerURL() + redirectURL;
 	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
 	} catch (AuthenticationException e) {
@@ -310,7 +270,7 @@ public class LoginRequestServlet extends HttpServlet {
      * If there is a redirectURL parameter then this becomes the redirect, otherwise it
      * fetches the method parameter from HttpServletRequest and builds the redirect url.
      */
-    private static String getRequestURL(HttpServletRequest request) {
+    private static String getRedirectURL(HttpServletRequest request) {
 	String method = request.getParameter(IntegrationConstants.PARAM_METHOD);
 	String lessonId = request.getParameter(IntegrationConstants.PARAM_LESSON_ID);
 	String mode = request.getParameter(IntegrationConstants.PARAM_MODE);
