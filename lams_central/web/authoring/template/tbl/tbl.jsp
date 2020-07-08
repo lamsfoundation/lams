@@ -192,7 +192,7 @@
 <c:set var="title"><fmt:message key="authoring.tbl.template.title"/></c:set>
 <lams:Page title="${title}" type="wizard">
 
-<c:set var="usePreview">${fn:toLowerCase('checked') eq 'checked'}</c:set>
+<c:set var="usePreview">${fn:toLowerCase('@template_tbl_show_preview@') eq 'checked'}</c:set>
 
 	<div id="rootwizard">
 	<div class="navbar">
@@ -223,11 +223,11 @@
 	    <div class="tab-pane" id="tab1">
 		    	<jsp:include page="../genericintro.jsp" ><jsp:param name="templateName" value="tbl"/></jsp:include>
 		    	<div style="display:none">
- 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" checked />
+ 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" @template_tbl_show_introduction@ />
 			<input type="checkbox" name="iratra" value="true" class="form-control-inline" id="iratra" checked />
 			<input type="checkbox" name="appex" value="true" class="form-control-inline" id="appex" checked />
-			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  checked  />
- 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="reflect" checked/>
+			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  @template_tbl_show_preview@  />
+ 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="reflect" @template_tbl_show_notebook@/>
 			</div>
 	    </div>
 	    <div class="tab-pane" id="tab2">
