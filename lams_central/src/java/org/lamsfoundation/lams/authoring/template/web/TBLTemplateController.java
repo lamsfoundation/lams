@@ -154,7 +154,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 
 	    Long iRAToolContentId = createAssessmentToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), null, false, false, data.confidenceLevelEnable,
+		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable,
 		    testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);

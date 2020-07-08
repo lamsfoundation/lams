@@ -801,7 +801,7 @@ public abstract class LdTemplateController {
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
 	toolContentJSON.put("numbered", enableNumbering);
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
-	toolContentJSON.put("allowDiscloseAnswers", Boolean.TRUE);
+	toolContentJSON.put("allowDiscloseAnswers", Boolean.FALSE);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
