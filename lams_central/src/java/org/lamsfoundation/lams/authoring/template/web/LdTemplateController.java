@@ -793,7 +793,7 @@ public abstract class LdTemplateController {
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
-	    boolean enableConfidenceLevels, ArrayNode questions) throws IOException {
+	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
@@ -801,7 +801,7 @@ public abstract class LdTemplateController {
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
 	toolContentJSON.put("numbered", enableNumbering);
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
-	toolContentJSON.put("allowDiscloseAnswers", Boolean.FALSE);
+	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
 	toolContentJSON.set(RestTags.QUESTIONS, questions);
 
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
