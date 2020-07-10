@@ -117,9 +117,9 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
      * Migration to Question Bank
      */
     public void up20190704To20190809(String toolFilePath) throws IOException {
-	//perform all transformations from the previous methods. Do it now as long as the following commands expect Assesment model to be in its latest state 
+	//perform all transformations from the previous methods. Do it now as long as the following commands expect Assesment model to be in its latest state
 	transformXML(toolFilePath);
-	
+
 	// find LD's content folder ID to use it in new QB questions
 	String contentFolderId = null;
 	try {
@@ -189,8 +189,8 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 			"prefixAnswersWithLetters", "false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "caseSensitive", "caseSensitive", "false",
 			false, true);
-		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "autocompleteEnabled",
-			"autocompleteEnabled", "false", false, true);
+		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "autocompleteEnabled", "autocompleteEnabled",
+			"false", false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "correctAnswer", "correctAnswer", "false",
 			false, true);
 		XMLUtil.rewriteTextElement(assessmentQuestion, qbQuestion, "allowRichEditor", "allowRichEditor",
@@ -286,8 +286,29 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	    }
 	});
     }
-    
+
     public void up20191016To20191120() {
 	this.addField(Assessment.class, "confidenceLevelsType", "1");
+    }
+
+    /**
+     * Move "is required" from QB question to tool
+     */
+    public void up20191120To20200710(String toolFilePath) throws IOException {
+
+	// tell which file to process and what to do with its root element
+	transformXML(toolFilePath, toolRoot -> {
+	    NodeList assessmentQuestions = toolRoot
+		    .getElementsByTagName("org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion");
+
+	    for (int assessmentQuestionIndex = 0; assessmentQuestionIndex < assessmentQuestions
+		    .getLength(); assessmentQuestionIndex++) {
+		Element assessmentQuestion = (Element) assessmentQuestions.item(assessmentQuestionIndex);
+		Element qbQuestion = (Element) assessmentQuestion.getElementsByTagName("qbQuestion").item(0);
+
+		XMLUtil.rewriteTextElement(qbQuestion, assessmentQuestion, "answerRequired", "answerRequired", "true",
+			false, true);
+	    }
+	});
     }
 }
