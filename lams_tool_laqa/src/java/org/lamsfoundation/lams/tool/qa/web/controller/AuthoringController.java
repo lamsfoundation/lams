@@ -550,6 +550,21 @@ public class AuthoringController implements QaAppConstants {
 	return "authoring/itemlist";
     }
 
+    @RequestMapping(path = "/toggleQuestionRequired", method = RequestMethod.POST)
+    @ResponseBody
+    public String toggleQuestionRequired(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
+	    HttpServletRequest request) throws IOException, ServletException {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	int questionIndex = NumberUtils.toInt(request.getParameter("questionIndex"), -1);
+	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
+
+	List<QaQueContent> rList = new ArrayList<>(qaQuestions);
+	QaQueContent question = rList.get(questionIndex);
+	question.setAnswerRequired(!question.isAnswerRequired());
+
+	return String.valueOf(question.isAnswerRequired());
+    }
+
     /**
      * moves a question down in the list
      */

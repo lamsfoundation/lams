@@ -50,6 +50,13 @@
 									onclick="javascript:moveQuestion(${status.index},'moveQuestionDown') "/>
 		 			</c:if>
 				</td>
+								
+				<td align="center" style="width:5%">
+					<i class="fa fa-xs fa-asterisk ${qaQuestion.answerRequired ? 'text-danger' : ''}" 
+								title="<fmt:message key="label.answer.required"/>" 
+								alt="<fmt:message key="label.answer.required"/>"
+								onClick="javascript:toggleQuestionRequired(${status.index}, this)"></i>
+				</td>
 				
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
