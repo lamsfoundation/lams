@@ -101,6 +101,27 @@
 		$(link).attr("href", editHref);
     }
 	
+	function toggleQuestionRequired(icon){
+		var sequenceId = $('.reference-sequence-id', $(icon).parents('tr')).val();
+		
+		$.ajax({ 
+		    url: '<c:url value="/authoring/toggleQuestionRequired.do"/>',
+			type: 'POST',
+			dataType : 'text',
+			data: {
+				sessionMapID: "${sessionMapID}",
+				referenceSequenceId: sequenceId
+			},
+			success(isRequired) {
+				if (isRequired == 'true') {
+				 	$(icon).addClass('text-danger');
+				} else if (isRequired == 'false') {
+					$(icon).removeClass('text-danger');
+				}
+			}
+		});
+	}
+	
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
