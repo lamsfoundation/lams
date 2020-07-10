@@ -2700,6 +2700,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    ScratchieItem item = new ScratchieItem();
 	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
+	    item.setAnswerRequired(JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE));
 	    item.setToolContentId(scratchie.getContentId());
 
 	    QbQuestion qbQuestion = null;

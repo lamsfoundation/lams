@@ -1201,7 +1201,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    saveOrUpdate(qbQuestion);
 
 	    QaQueContent question = new QaQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
-		    JsonUtil.optBoolean(questionData, "required", Boolean.FALSE), qa);
+		    JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE), qa);
 	    saveOrUpdate(question);
 	}
 

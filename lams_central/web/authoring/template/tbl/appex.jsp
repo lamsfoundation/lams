@@ -16,9 +16,7 @@
 			aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapseAppex${appexNumber}" >&nbsp;&nbsp;
 			</a>
 		</span>
-			${appexNumber eq 1 ? "<label class=\"required\">" : ""}
 			<span class="panel-title hoverEdit" name="${appexTitleDisplay}" id="${appexTitleDisplay}" ><c:out value="${appexTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-			${appexNumber eq 1 ? "</label>" : ""}
 			<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
      </div>
     
