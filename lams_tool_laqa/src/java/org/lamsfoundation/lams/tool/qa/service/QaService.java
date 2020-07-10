@@ -639,6 +639,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    }
 
 	    qaDAO.saveOrUpdateQa(toolContentObj);
+	    // in case an imported question had a question ID which is the highest
+	    qbService.updateMaxQuestionId();
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}

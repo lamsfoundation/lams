@@ -2334,6 +2334,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		scratchieDao.insert(scratchieItem);
+		// in case an imported question had a question ID which is the highest
+		qbService.updateMaxQuestionId();
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);

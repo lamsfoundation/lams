@@ -2897,6 +2897,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		assessmentDao.insert(assessmentQuestion);
+		// in case an imported question had a question ID which is the highest
+		qbService.updateMaxQuestionId();
 	    }
 
 	    saveOrUpdateAssessment(toolContentObj);

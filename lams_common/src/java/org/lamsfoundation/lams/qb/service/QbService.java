@@ -110,6 +110,11 @@ public class QbService implements IQbService {
     }
 
     @Override
+    public void updateMaxQuestionId() {
+	qbDAO.updateMaxQuestionId();
+    }
+
+    @Override
     public int getMaxQuestionVersion(Integer qbQuestionId) {
 	return qbDAO.getMaxQuestionVersion(qbQuestionId);
     }
@@ -600,12 +605,11 @@ public class QbService implements IQbService {
      */
     @Override
     public void insertQuestion(QbQuestion qbQuestion) {
-	if (qbQuestion.getQuestionId() == null) {
-	    qbQuestion.setQuestionId(generateNextQuestionId());
-	}
-	if (qbQuestion.getVersion() == null) {
-	    qbQuestion.setVersion(1);
-	}
+	// question identification may be overlapping with existing data
+	// it is a new question, so reset it
+	qbQuestion.setQuestionId(generateNextQuestionId());
+	qbQuestion.setVersion(1);
+
 	if (qbQuestion.getContentFolderId() == null) {
 	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 	}

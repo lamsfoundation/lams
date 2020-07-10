@@ -30,6 +30,8 @@ public interface IQbDAO extends IBaseDAO {
     // finds next question ID for Question Bank question
     int generateNextQuestionId();
 
+    void updateMaxQuestionId();
+
     // finds next version for given question ID for Question Bank question
     int getMaxQuestionVersion(Integer qbQuestionId);
 
