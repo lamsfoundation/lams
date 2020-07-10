@@ -90,9 +90,6 @@ public class QbQuestion implements Serializable, Cloneable {
     @Column(name = "penalty_factor")
     private float penaltyFactor;
 
-    @Column(name = "answer_required")
-    private boolean answerRequired;
-
     @Column(name = "multiple_answers_allowed")
     private boolean multipleAnswersAllowed;
 
@@ -368,14 +365,6 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setPenaltyFactor(float penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
-    }
-
-    public boolean isAnswerRequired() {
-	return answerRequired;
-    }
-
-    public void setAnswerRequired(boolean answerRequired) {
-	this.answerRequired = answerRequired;
     }
 
     public boolean isMultipleAnswersAllowed() {

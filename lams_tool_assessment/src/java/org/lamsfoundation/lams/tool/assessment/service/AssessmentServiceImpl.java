@@ -3474,6 +3474,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
 	    question.setToolContentId(toolContentID);
 	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
+	    question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
 
 	    QbQuestion oldQbQuestion = null;
 	    QbQuestion qbQuestion = null;
@@ -3501,7 +3502,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    qbQuestion.setAllowRichEditor(
 		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
 	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
 	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
 	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));

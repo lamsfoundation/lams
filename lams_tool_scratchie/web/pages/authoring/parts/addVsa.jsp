@@ -131,16 +131,6 @@
 							<span></span>
 						</lams:Alert>	
 				    </div>
-				
-					<div>
-						<label class="switch">
-							<form:checkbox path="answerRequired" id="answer-required"/>
-							<span class="switch-slider round"></span>
-						</label>
-						<label for="answer-required">
-							<fmt:message key="label.answer.required" />
-						</label>
-					</div>
 					
 					<div class="form-group row form-inline">
 						<label for="caseSensitive" class="col-sm-3 voffset10">

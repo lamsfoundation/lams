@@ -416,7 +416,6 @@ public class AuthoringController implements QaAppConstants {
 
 	qbQuestion.setName(form.getTitle());
 	qbQuestion.setDescription(form.getDescription());
-	qbQuestion.setAnswerRequired(form.isAnswerRequired());
 	qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
 	qbQuestion.setFeedback(form.getFeedback());
 
@@ -500,7 +499,6 @@ public class AuthoringController implements QaAppConstants {
 	if (questionIndex >= 0) {
 	    form.setItemIndex(String.valueOf(questionIndex));
 	}
-	form.setAnswerRequired(qbQuestion.isAnswerRequired());
 	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
 	form.setFeedback(qbQuestion.getFeedback());
 

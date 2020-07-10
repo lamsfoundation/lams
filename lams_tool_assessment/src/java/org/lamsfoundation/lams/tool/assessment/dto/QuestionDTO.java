@@ -111,12 +111,11 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
     }
 
     /**
-     * Same as above, but skips setting correctAnswersDisclosed and groupsAnswersDisclosed
-     *
-     * @param qbToolQuestion
+     * Same as above, but skips setting assessment-specific question attributes
      */
     public QuestionDTO(QbToolQuestion qbToolQuestion) {
 	this.uid = qbToolQuestion.getUid();
+	this.answerRequired = qbToolQuestion.isAnswerRequired();
 	this.displayOrder = qbToolQuestion.getDisplayOrder();
 
 	QbQuestion qbQuestion = qbToolQuestion.getQbQuestion();
@@ -125,7 +124,6 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 	this.question = qbQuestion.getDescription();
 	this.maxMark = qbQuestion.getMaxMark();
 	this.penaltyFactor = qbQuestion.getPenaltyFactor();
-	this.answerRequired = qbQuestion.isAnswerRequired();
 	this.feedback = qbQuestion.getFeedback();
 	this.multipleAnswersAllowed = qbQuestion.isMultipleAnswersAllowed();
 	this.incorrectAnswerNullifiesMark = qbQuestion.isIncorrectAnswerNullifiesMark();

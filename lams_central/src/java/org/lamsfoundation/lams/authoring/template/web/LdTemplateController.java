@@ -1414,7 +1414,6 @@ public abstract class LdTemplateController {
 	question.setTitle(qbQuestion.getName());
 	question.setText(qbQuestion.getDescription());
 	question.setMultipleAnswersAllowed(qbQuestion.isMultipleAnswersAllowed());
-	question.setRequired(qbQuestion.isAnswerRequired());
 	question.setDefaultGrade(qbQuestion.getMaxMark());
 	question.setUuid(qbQuestion.getUuid().toString());
 

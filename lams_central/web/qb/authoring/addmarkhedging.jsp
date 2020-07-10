@@ -125,14 +125,6 @@
 							<span></span>
 						</lams:Alert>	
 				    </div>
-
-					<label class="switch">
-						<form:checkbox path="answerRequired" id="answer-required"/>
-						<span class="switch-slider round"></span>
-					</label>
-					<label for="answer-required">
-						<fmt:message key="label.authoring.answer.required" />
-					</label>
 	
 					<c:if test="${!assessmentQuestionForm.authoringRestricted}">
 						<div class="form-group row form-inline">

@@ -472,7 +472,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
-	
+
 	qbService.removeAnswersByToolContentId(toolContentId);
 
 	qaDAO.removeQa(toolContentId);
@@ -1196,12 +1196,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setFeedback(JsonUtil.optString(questionData, "feedback"));
-	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionData, "required", Boolean.FALSE));
+
 	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionData, "minWordsLimit", 0));
 	    saveOrUpdate(qbQuestion);
 
 	    QaQueContent question = new QaQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
-		    qa);
+		    JsonUtil.optBoolean(questionData, "required", Boolean.FALSE), qa);
 	    saveOrUpdate(question);
 	}
 
