@@ -483,7 +483,7 @@
 						</button>
 					</c:if>
 	
-					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
 						<button name="redoQuestions" type="button" class="btn btn-default voffset5  pull-left"
 								onclick="submitMethod('redoQuestions');">
 							<fmt:message key="label.redo" />
