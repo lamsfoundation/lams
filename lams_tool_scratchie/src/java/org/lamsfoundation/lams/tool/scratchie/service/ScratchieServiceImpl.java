@@ -2334,6 +2334,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		scratchieDao.insert(scratchieItem);
+		// in case an imported question had a question ID which is the highest
+		qbService.updateMaxQuestionId();
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);
@@ -2700,6 +2702,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    ScratchieItem item = new ScratchieItem();
 	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
+	    item.setAnswerRequired(JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE));
 	    item.setToolContentId(scratchie.getContentId());
 
 	    QbQuestion qbQuestion = null;

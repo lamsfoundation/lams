@@ -807,6 +807,8 @@ public abstract class LdTemplateController {
 	ArrayNode references = JsonNodeFactory.instance.arrayNode();
 	for (int i = 0; i < questions.size(); i++) {
 	    ObjectNode question = (ObjectNode) questions.get(i);
+	    question.put("answerRequired", true);
+
 	    Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
 	    Integer defaultGrade = JsonUtil.optInt(question, "defaultGrade", 1);
 	    references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
@@ -1166,6 +1168,12 @@ public abstract class LdTemplateController {
 	if (confidenceLevelsActivityUiid != null) {
 	    toolContentJSON.put(RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID, confidenceLevelsActivityUiid);
 	}
+
+	for (int i = 0; i < questions.size(); i++) {
+	    ObjectNode question = (ObjectNode) questions.get(i);
+	    question.put("answerRequired", true);
+	}
+
 	return createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
     }
 
@@ -1414,7 +1422,6 @@ public abstract class LdTemplateController {
 	question.setTitle(qbQuestion.getName());
 	question.setText(qbQuestion.getDescription());
 	question.setMultipleAnswersAllowed(qbQuestion.isMultipleAnswersAllowed());
-	question.setRequired(qbQuestion.isAnswerRequired());
 	question.setDefaultGrade(qbQuestion.getMaxMark());
 	question.setUuid(qbQuestion.getUuid().toString());
 

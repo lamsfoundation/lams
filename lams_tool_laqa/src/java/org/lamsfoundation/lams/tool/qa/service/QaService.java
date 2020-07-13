@@ -472,7 +472,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		coreNotebookService.deleteEntry(entry);
 	    }
 	}
-	
+
 	qbService.removeAnswersByToolContentId(toolContentId);
 
 	qaDAO.removeQa(toolContentId);
@@ -639,6 +639,8 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    }
 
 	    qaDAO.saveOrUpdateQa(toolContentObj);
+	    // in case an imported question had a question ID which is the highest
+	    qbService.updateMaxQuestionId();
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
 	}
@@ -1196,12 +1198,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	    qbQuestion.setName(JsonUtil.optString(questionData, RestTags.QUESTION_TEXT));
 	    qbQuestion.setFeedback(JsonUtil.optString(questionData, "feedback"));
-	    qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionData, "required", Boolean.FALSE));
+
 	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionData, "minWordsLimit", 0));
 	    saveOrUpdate(qbQuestion);
 
 	    QaQueContent question = new QaQueContent(qbQuestion, JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER),
-		    qa);
+		    JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE), qa);
 	    saveOrUpdate(question);
 	}
 

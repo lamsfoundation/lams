@@ -46,7 +46,6 @@ public class QbQuestionForm {
     private String description;
     private int maxMark;
     private String penaltyFactor;
-    private boolean answerRequired;
     private String feedback;
     private boolean multipleAnswersAllowed;
     private boolean incorrectAnswerNullifiesMark;
@@ -64,11 +63,11 @@ public class QbQuestionForm {
     private boolean hedgingJustificationEnabled;
     private boolean autocompleteEnabled;
     private boolean authoringRestricted;
-    
+
     private Long oldCollectionUid;
     private Long newCollectionUid;
     private Collection<QbCollection> userCollections;
-    
+
     //used only by Scratchie and Q&A tools
     private String itemIndex;
 
@@ -150,14 +149,6 @@ public class QbQuestionForm {
 
     public void setPenaltyFactor(String penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
-    }
-
-    public boolean isAnswerRequired() {
-	return answerRequired;
-    }
-
-    public void setAnswerRequired(boolean answerRequired) {
-	this.answerRequired = answerRequired;
     }
 
     public String getFeedback() {
@@ -271,7 +262,7 @@ public class QbQuestionForm {
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-    
+
     public boolean isAutocompleteEnabled() {
 	return autocompleteEnabled;
     }
@@ -287,7 +278,7 @@ public class QbQuestionForm {
     public void setAuthoringRestricted(boolean authoringRestricted) {
 	this.authoringRestricted = authoringRestricted;
     }
-    
+
     public Long getOldCollectionUid() {
 	return oldCollectionUid;
     }
@@ -303,7 +294,7 @@ public class QbQuestionForm {
     public void setNewCollectionUid(Long newCollectionUid) {
 	this.newCollectionUid = newCollectionUid;
     }
-    
+
     public Collection<QbCollection> getUserCollections() {
 	return userCollections;
     }
@@ -311,7 +302,7 @@ public class QbQuestionForm {
     public void setUserCollections(Collection<QbCollection> userCollections) {
 	this.userCollections = userCollections;
     }
-    
+
     public String getItemIndex() {
 	return itemIndex;
     }

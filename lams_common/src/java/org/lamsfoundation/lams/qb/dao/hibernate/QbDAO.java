@@ -22,7 +22,9 @@ import org.lamsfoundation.lams.qb.model.QbQuestion;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
-    private static final String FIND_MAX_QUESTION_ID = "SELECT MAX(lams_qb_question_question_id) FROM lams_sequence_generator";
+    private static final String FIND_MAX_QUESTION_ID = "SELECT IFNULL(MAX(question_id), 0) FROM lams_qb_question";
+
+    private static final String FIND_MAX_QUESTION_ID_FROM_GENERATOR = "SELECT IFNULL(MAX(lams_qb_question_question_id), 0) FROM lams_sequence_generator";
 
     private static final String FIND_MAX_VERSION = "SELECT MAX(version) FROM QbQuestion AS q WHERE q.questionId = :questionId";
 
@@ -144,10 +146,23 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
     @Override
     public int generateNextQuestionId() {
-	Integer max = (Integer) this.getSession().createNativeQuery(FIND_MAX_QUESTION_ID).uniqueResult();
+	int max = ((BigInteger) this.getSession().createNativeQuery(FIND_MAX_QUESTION_ID_FROM_GENERATOR).uniqueResult())
+		.intValue();
 	max++;
 	this.getSession().createNativeQuery(GENERATE_QUESTION_ID).setParameter("qbQuestionId", max).executeUpdate();
 	return max;
+    }
+
+    @Override
+    public void updateMaxQuestionId() {
+	int maxGenerator = ((BigInteger) this.getSession().createNativeQuery(FIND_MAX_QUESTION_ID_FROM_GENERATOR)
+		.uniqueResult()).intValue();
+	int maxTable = ((BigInteger) this.getSession().createNativeQuery(FIND_MAX_QUESTION_ID).uniqueResult())
+		.intValue();
+	if (maxGenerator < maxTable) {
+	    this.getSession().createNativeQuery(GENERATE_QUESTION_ID).setParameter("qbQuestionId", maxTable)
+		    .executeUpdate();
+	}
     }
 
     @Override

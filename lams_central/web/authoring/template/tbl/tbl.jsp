@@ -233,7 +233,7 @@
 	    <div class="tab-pane" id="tab2">
 	 		<div class="form-group">			
 				<span class="field-name">
-					<label for="sequenceTitle" class="input required"><fmt:message key="authoring.label.sequence.title" /></label>
+					<label for="sequenceTitle" class="input"><fmt:message key="authoring.label.sequence.title" /></label>
 				</span>
 				<input name="sequenceTitle" id="sequenceTitle" class="form-control" type="text" maxlength="200"/>
 			</div>

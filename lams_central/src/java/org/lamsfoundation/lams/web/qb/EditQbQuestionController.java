@@ -71,7 +71,6 @@ public class EditQbQuestionController {
 	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 	form.setMaxMark(1);
 	form.setPenaltyFactor("0");
-	form.setAnswerRequired(true);
 
 	// generate a new contentFolderID for new question
 	String contentFolderId = FileUtil.generateUniqueContentFolderID();
@@ -125,7 +124,6 @@ public class EditQbQuestionController {
 	form.setDescription(qbQuestion.getDescription());
 	form.setMaxMark(qbQuestion.getMaxMark() == null ? 1 : qbQuestion.getMaxMark());
 	form.setPenaltyFactor(String.valueOf(qbQuestion.getPenaltyFactor()));
-	form.setAnswerRequired(qbQuestion.isAnswerRequired());
 	form.setFeedback(qbQuestion.getFeedback());
 	form.setMultipleAnswersAllowed(qbQuestion.isMultipleAnswersAllowed());
 	form.setIncorrectAnswerNullifiesMark(qbQuestion.isIncorrectAnswerNullifiesMark());
@@ -272,7 +270,6 @@ public class EditQbQuestionController {
 	    qbQuestion.setMaxMark(form.getMaxMark());
 	}
 	qbQuestion.setFeedback(form.getFeedback());
-	qbQuestion.setAnswerRequired(form.isAnswerRequired());
 	qbQuestion.setContentFolderId(form.getContentFolderID());
 
 	Integer type = form.getQuestionType();

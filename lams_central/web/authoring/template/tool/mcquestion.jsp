@@ -19,9 +19,7 @@
 			<a role="button" data-toggle="collapse" href="#questionPanelCollapse${questionNumber}" 
 				aria-expanded="true" aria-controls="questionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
 		  	</a>	
-			${questionNumber eq 1 ? "<label class=\"required\">" : ""}
 				<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-			${questionNumber eq 1 ? "</label>" : ""}
 			<input name="${questionTitleField}" id="${questionTitleField}" type="hidden" value="${questionTitle}"/>
 		</div>
 	</div>

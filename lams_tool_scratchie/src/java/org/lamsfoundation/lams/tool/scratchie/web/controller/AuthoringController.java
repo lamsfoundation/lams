@@ -364,7 +364,6 @@ public class AuthoringController {
 	boolean isMcqQuestionType = qbQuestion.getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 	if (!isMcqQuestionType) {
 	    form.setFeedback(qbQuestion.getFeedback());
-	    form.setAnswerRequired(qbQuestion.isAnswerRequired());
 	    form.setCaseSensitive(qbQuestion.isCaseSensitive());
 	    form.setAutocompleteEnabled(qbQuestion.isAutocompleteEnabled());
 	}
@@ -511,7 +510,6 @@ public class AuthoringController {
 	//handle VSA question type
 	if (!isMcqQuestionType) {
 	    qbQuestion.setFeedback(form.getFeedback());
-	    qbQuestion.setAnswerRequired(form.isAnswerRequired());
 	    qbQuestion.setCaseSensitive(form.isCaseSensitive());
 	    qbQuestion.setAutocompleteEnabled(form.isAutocompleteEnabled());
 	}

@@ -336,7 +336,7 @@
 			var proceed = true;
 			//ask for leave confirmation only if time limit is not expired
 			if (!isTimelimitExpired) {
-				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-][class=item-required]:visible").length;
+				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]:visible").length;
 				proceed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;	
 			}
 			

@@ -47,6 +47,27 @@
 			);
 		};
 	}
+	
+	function toggleQuestionRequired(questionIndex, icon){
+		var sequenceId = $('.reference-sequence-id', $(icon).parents('tr')).val();
+		
+		$.ajax({ 
+		    url: '<c:url value="/authoring/toggleQuestionRequired.do"/>',
+			type: 'POST',
+			dataType : 'text',
+			data: {
+				sessionMapID: "${sessionMapID}",
+				questionIndex: questionIndex
+			},
+			success(isRequired) {
+				if (isRequired == 'true') {
+				 	$(icon).addClass('text-danger');
+				} else if (isRequired == 'false') {
+					$(icon).removeClass('text-danger');
+				}
+			}
+		});
+	}
 
 	function moveQuestion(questionIndex, actionMethod){
 		var url = "<c:url value="/authoring/"/>" + actionMethod + ".do";

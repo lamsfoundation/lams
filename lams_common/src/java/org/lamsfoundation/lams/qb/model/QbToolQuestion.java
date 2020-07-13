@@ -54,6 +54,9 @@ public abstract class QbToolQuestion implements Comparable<QbToolQuestion> {
     @Column(name = "tool_content_id")
     protected Long toolContentId;
 
+    @Column(name = "answer_required")
+    protected boolean answerRequired;
+
     @Column(name = "display_order")
     protected int displayOrder = 1;
 
@@ -80,6 +83,14 @@ public abstract class QbToolQuestion implements Comparable<QbToolQuestion> {
 
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
+    }
+
+    public boolean isAnswerRequired() {
+	return answerRequired;
+    }
+
+    public void setAnswerRequired(boolean answerRequired) {
+	this.answerRequired = answerRequired;
     }
 
     public int getDisplayOrder() {

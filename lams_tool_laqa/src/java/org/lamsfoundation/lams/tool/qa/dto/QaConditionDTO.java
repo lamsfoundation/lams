@@ -36,7 +36,8 @@ public class QaConditionDTO extends TextSearchConditionDTO {
     public QaConditionDTO(QaCondition condition, Integer toolActivityUIID) {
 	super(condition, toolActivityUIID);
 	for (QaQueContent question : condition.getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(), null);
+	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(),
+		    question.isAnswerRequired(), null);
 	    getQuestions().add(questionCopy);
 	}
     }

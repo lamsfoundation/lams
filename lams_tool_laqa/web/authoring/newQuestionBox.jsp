@@ -138,12 +138,6 @@
 				</div>
 				
 				<div class="settings-tab">
-					<div class="checkbox">
-						<label> 
-							<form:checkbox path="answerRequired"/>&nbsp;<fmt:message key="label.required.desc" />
-						</label>
-					</div>
-				
 					<div class="form-group row form-inline" style="display: flex; align-items: center;">
 					    <label for="min-words-limit-checkbox" class="col-sm-4">
 							<input type="checkbox" id="min-words-limit-checkbox" name="noname"

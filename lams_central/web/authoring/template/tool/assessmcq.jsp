@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
 <c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
-<c:set var="required">${questionNumber eq 1 ? "class=\"input required\"" : "class=\"input\""}</c:set>
 
 <%-- Generic MCQ question for assessment. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options.
          Question, and hence question.title and question.text are optional and are only populated if QTI is used to start the questions. ${containingDivName} is set if this is being called from 
@@ -21,9 +20,7 @@
 			<a role="button" data-toggle="collapse" href="#${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" 
 				aria-expanded="true" aria-controls="${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
 		  	</a>			
-		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
 			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-		${questionNumber eq 1 ? "</label>" : ""}
 			<input name="${questionTitleField}" id="${questionTitleField}" type="hidden" value="${questionTitle}"/>
 		</div>
 	</div>
