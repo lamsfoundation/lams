@@ -3444,6 +3444,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	assessment.setAllowAnswerJustification(
+		JsonUtil.optBoolean(toolContentJSON, "allowAnswerJustification", Boolean.FALSE));
+
 	// submission deadline set in monitoring
 
 	if (toolContentJSON.has("overallFeedback")) {
