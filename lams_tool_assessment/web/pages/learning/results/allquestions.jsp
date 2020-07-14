@@ -3,15 +3,15 @@
 							
 	<div class="panel panel-default">
 		<div class="panel-heading">
+			<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
 			<c:if test="${assessment.numbered}">
-				<span class="question-numbers">
 					${status.index + sessionMap.questionNumberingOffset}.
-				</span>
 			</c:if>
-									
+			${question.title}</h3>
+
 			<c:if test="${question.answerRequired}">
-				<span class="asterisk">
-					<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.answer.required"/>" 
+				<span class="asterisk pull-right">
+					<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.answer.required"/>" 
 							alt="<fmt:message key="label.answer.required"/>"></i>
 				</span>
 			</c:if>
