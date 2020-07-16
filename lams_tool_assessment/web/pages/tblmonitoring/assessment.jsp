@@ -121,7 +121,7 @@
 		</div>
 	</div>
 
-	<c:if test="${method eq 'aesStudentChoices' or iraAttemptedByAnyLearners}"
+	<c:if test="${method eq 'aesStudentChoices' or iraAttemptedByAnyLearners}">
 		<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
 			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 					onclick="javascript:loadTab('${method}', document.getElementById('selected-content-id').value); return false;">
