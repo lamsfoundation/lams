@@ -792,14 +792,15 @@ public abstract class LdTemplateController {
      * to be expanded.
      */
     protected Long createAssessmentToolContent(UserDTO user, String title, String instructions,
-	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableConfidenceLevels,
-	    boolean allowDiscloseAnswers, boolean allowAnswerJustification, ArrayNode questions) throws IOException {
+	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
+	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
+	    ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = createStandardToolContent(title, instructions, reflectionInstructions, null, null,
 		user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
-	toolContentJSON.put("numbered", Boolean.TRUE);
+	toolContentJSON.put("numbered", enableNumbering);
 	toolContentJSON.put("displaySummary", Boolean.TRUE);
 	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
 	toolContentJSON.put("allowAnswerJustification", allowAnswerJustification);
