@@ -148,16 +148,15 @@ public class TBLTemplateController extends LdTemplateController {
 			activityTitle, activityTitle));
 	    }
 
-	    // iRA Test - Assessment
+	    // iRA Test - MCQ
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
-
-	    Long iRAToolContentId = createAssessmentToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable, false,
-		    false, testQuestionsArray);
-	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
-		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
+	    Long iRAToolContentId = createMCQToolContent(userDTO, activityTitle,
+		    data.getText("boilerplate.ira.instructions"), false, data.confidenceLevelEnable, false,
+		    testQuestionsArray);
+	    ObjectNode iraActivityJSON = createMCQActivity(maxUIID, order++, currentActivityPosition, iRAToolContentId,
+		    data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
 
 	    // Leader Selection
