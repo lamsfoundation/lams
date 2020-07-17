@@ -167,6 +167,7 @@
 			'data': {
 					'mappingId' :  $(button).attr('mappingId')
 				}, 
+			'type'  : 'post',
 			'cache' : false,
 			'success' : function() {
 				refreshOutcomeMappings('${outcomeTagId}');
