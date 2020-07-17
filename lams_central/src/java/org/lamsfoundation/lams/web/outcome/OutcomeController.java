@@ -292,11 +292,12 @@ public class OutcomeController {
 	return String.valueOf(outcomeMapping.getMappingId());
     }
 
-    @RequestMapping(path = "/outcomeGetMappings", produces = "application/json;charset=utf-8")
+    @RequestMapping(path = "/outcomeGetMappings")
     @ResponseBody
     public String outcomeGetMappings(@RequestParam(required = false) Long lessonId,
 	    @RequestParam(required = false) Long toolContentId, @RequestParam(required = false) Long itemId,
-	    @RequestParam(required = false) Integer qbQuestionId, HttpServletRequest request) throws Exception {
+	    @RequestParam(required = false) Integer qbQuestionId, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	if (lessonId == null && toolContentId == null && qbQuestionId == null) {
 	    throw new IllegalArgumentException(
 		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
@@ -323,6 +324,8 @@ public class OutcomeController {
 		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
+
+	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
 
@@ -338,7 +341,6 @@ public class OutcomeController {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping("/outcomeSetResult")
     @ResponseBody
     public String outcomeSetResult(HttpServletRequest request, HttpServletResponse response) throws Exception {
