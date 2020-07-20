@@ -53,13 +53,20 @@
 			}
 			
 			// refresh automatically every X seconds
-			window.setInterval(loadTab, TAB_REFRESH_INTERVAL);
+			window.setInterval(function(){
+				loadTab(null, null, true);
+			}, TAB_REFRESH_INTERVAL);
 		});
 
-		function loadTab(method, toolContentID) {
+		function loadTab(method, toolContentID, autoRefresh) {
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes')) {
+					// do not auto refresh Burning Questions nor AES tabs
+					return;
+				}	
+				
 				toolContentID = lastTabToolContentID;
 			} else {
 				// tab was changed, store its parameters
