@@ -62,7 +62,7 @@
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes')) {
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices')) {
 					// do not auto refresh Burning Questions nor AES tabs
 					return;
 				}	
