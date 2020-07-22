@@ -101,10 +101,10 @@ function initializeAnswers() {
 	       	}
 	       	
 	       	var optionDisplayOrderSpan = $(this).closest('.single-option-table').find('.optionDisplayOrderSpan');
-	       	if (newValueInt == 1) {
-	       		optionDisplayOrderSpan.addClass('correctOption');
+	       	if (newValueInt > 0) {
+	       		optionDisplayOrderSpan.addClass('correctOption').css('filter', 'brightness(' + (2 - newValueInt)  + ')');
 	       	} else {
-	       		optionDisplayOrderSpan.removeClass('correctOption');
+	       		optionDisplayOrderSpan.removeClass('correctOption').css('filter', 'brightness(1)');
 	       	}
 	    });
 	    //update slider's label with the initial value
