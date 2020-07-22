@@ -2,8 +2,7 @@
 <c:set var="ALPHABET" value="${fn:split('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', ',')}" scope="request"/>
 
 <script type="text/javascript">
-	var questionType = ${questionType},
-		alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+	var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 	
 	$(document).ready(function(){
 		CKEDITOR.on('instanceLoaded', function(e){
@@ -94,7 +93,7 @@
 				<tr>
 					<td>
 						<span class="optionDisplayOrderSpan" 
-							  id="optionDisplayOrderSpan${status.index}">${questionType == 1 ? ALPHABET[status.index] : status.index + 1}</span>
+							  id="optionDisplayOrderSpan${status.index}">${ALPHABET[status.index]}</span>
 					</td>
 					
 					<td>
