@@ -128,6 +128,7 @@ function initializeAnswers() {
 					for (var i = 0; i < order.length; i++) {
 					    var optionIndex = order[i];
 					    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+					    $('span#optionDisplayOrderSpan' + optionIndex).text(questionType == 1 ? alphabet[i] : i + 1);
 					}
 				}
 			}

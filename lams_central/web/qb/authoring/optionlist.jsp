@@ -1,6 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="ALPHABET" value="${fn:split('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', ',')}" scope="request"/>
 
 <script type="text/javascript">
+	var questionType = ${questionType},
+		alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+	
 	$(document).ready(function(){
 		CKEDITOR.on('instanceLoaded', function(e){
 			//apply to only option title CKEditors
@@ -89,7 +93,7 @@
 			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
 				<tr>
 					<td>
-						<span>${status.index+1}</span>
+						<span id="optionDisplayOrderSpan${status.index}">${questionType == 1 ? ALPHABET[status.index] : status.index + 1}</span>
 					</td>
 					
 					<td>
