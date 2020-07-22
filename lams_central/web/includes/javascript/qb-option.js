@@ -99,6 +99,14 @@ function initializeAnswers() {
 	       	if (ui) {
 	        	$(this).next("input").val(ui.value);
 	       	}
+	       	
+	       	// change color of display order circle if the option is the correct one
+	       	var optionDisplayOrderSpan = $(this).closest('.single-option-table').find('.optionDisplayOrderSpan');
+	       	if (newValueInt == 1) {
+	       		optionDisplayOrderSpan.addClass('correctOption');
+	       	} else {
+	       		optionDisplayOrderSpan.removeClass('correctOption');
+	       	}
 	    });
 	    //update slider's label with the initial value
 	    $('.slider').trigger('slide');
@@ -128,6 +136,7 @@ function initializeAnswers() {
 					for (var i = 0; i < order.length; i++) {
 					    var optionIndex = order[i];
 					    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+					    $('span#optionDisplayOrderSpan' + optionIndex).text(questionType == 1 ? alphabet[i] : i + 1);
 					}
 				}
 			}
