@@ -90,10 +90,11 @@
 		<c:if test="${!assessmentQuestionForm.authoringRestricted && questionType != 3}">class="sortable-on"</c:if>>
 		
 		<c:forEach var="option" items="${optionList}" varStatus="status">
-			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
+			<table id="option-table-${status.index}" class="voffset10-bottom single-option-table" data-id="${status.index}" tabindex="1">
 				<tr>
 					<td>
-						<span id="optionDisplayOrderSpan${status.index}">${questionType == 1 ? ALPHABET[status.index] : status.index + 1}</span>
+						<span class="optionDisplayOrderSpan" 
+							  id="optionDisplayOrderSpan${status.index}">${questionType == 1 ? ALPHABET[status.index] : status.index + 1}</span>
 					</td>
 					
 					<td>
