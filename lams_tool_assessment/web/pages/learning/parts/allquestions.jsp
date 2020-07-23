@@ -17,11 +17,14 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
-				<c:if test="${assessment.numbered}">
-						${status.index + sessionMap.questionNumberingOffset}.
-				</c:if>
-
-				${question.title}</h3>
+					<c:if test="${assessment.numbered}">
+							${status.index + sessionMap.questionNumberingOffset}.
+					</c:if>
+	  				
+	  				<c:if test="${not sessionMap.hideTitles}">
+						${question.title}
+					</c:if>
+				</h3>
 									
 				<c:if test="${question.answerRequired}">
 					<span class="asterisk pull-right">

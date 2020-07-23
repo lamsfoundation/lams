@@ -397,6 +397,9 @@ public class LearningController {
 		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
 	    }
 
+	    sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
+		    Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+
 	    // display Etherpads after each question
 	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
 		    && assessment.isQuestionEtherpadEnabled()
