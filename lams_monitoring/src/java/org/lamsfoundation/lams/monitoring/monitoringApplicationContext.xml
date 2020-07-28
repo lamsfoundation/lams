@@ -13,6 +13,7 @@
 			<property name="basename">
 				<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
 			</property>
+			<property name="defaultEncoding" value="UTF-8" />
 		</bean>
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
