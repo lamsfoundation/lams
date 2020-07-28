@@ -15,6 +15,7 @@
 		<property name="basename">
 			<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
 		</property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	
 	<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
@@ -25,10 +26,11 @@
 		<property name="basename">
 			<value>org.lamsfoundation.lams.learning.ApplicationResources</value>
 		</property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	
 	<bean id="learningMessageService" class="org.lamsfoundation.lams.util.MessageService" >
-		<property name="messageSource" ref="learningMessageSource" />								
+		<property name="messageSource" ref="learningMessageSource" />	
 	</bean>
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
