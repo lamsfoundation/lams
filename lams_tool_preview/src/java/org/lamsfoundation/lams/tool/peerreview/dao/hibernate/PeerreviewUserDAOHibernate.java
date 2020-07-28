@@ -71,7 +71,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 
     @Override
     public PeerreviewUser getUserByUid(Long userUid) {
-	return (PeerreviewUser) this.find(PeerreviewUser.class, userUid);
+	return this.find(PeerreviewUser.class, userUid);
     }
 
     @Override
@@ -155,7 +155,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     @Override
     public List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
 	    Long userId, Integer page, Integer size, int sorting, String searchString, boolean getByUser,
-	    IRatingService coreRatingService, IUserManagementService userManagementService) {
+	    boolean includeCurrentUser, IRatingService coreRatingService,
+	    IUserManagementService userManagementService) {
 
 	String sortingOrder = "";
 	switch (sorting) {
@@ -195,6 +196,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	bldr.append(FIND_USER_RATINGS_COMMENTS3);
 	if (!getByUser) {
 	    bldr.append("WHERE user.user_id = :userId ");
+	} else if (!includeCurrentUser) {
+	    bldr.append("WHERE user.user_id != :userId ");
 	}
 
 	buildNameSearch(searchString, bldr, !getByUser);

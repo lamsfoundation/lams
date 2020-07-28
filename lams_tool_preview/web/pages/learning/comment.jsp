@@ -72,7 +72,7 @@
 						return url;
 					} else { 
 						<!-- Save comments first - this will retrigger the page call. Have to wait for submitEntrys ajax call to complete or end up not showing the comments when the pagesize is changed -->
-						submitEntry();
+						submitEntry(null, true);
 						return "";
 					}
 				}, 
@@ -86,7 +86,8 @@
 			    			$(".tablesorter,.pager").hide();
 			    			$("#no-users-info").show();
 			    		}
-
+						
+						numCommentsOnPage = 0;
 			    		commentsOnOtherPages = data.countRatedItems;
 						var isDisabled = "${finishedLock}";
 						var maxReached = false;
@@ -221,11 +222,10 @@
 	</c:if>
 
 	
-	function submitEntry(next, url){	
+	function submitEntry(next, skipNumberValidation){	
 
 		hideButtons();
-
-		if ( numCommentsOnPage + commentsOnOtherPages < ${minRates} ) {
+		if (!skipNumberValidation && (numCommentsOnPage + commentsOnOtherPages < ${minRates})) {
 			alert('<fmt:message key="label.rate.limits.reminder.min"/>'.replace('{0}',${minRates}) );
 			return false;
 		}
@@ -281,7 +281,7 @@
 	
 	function moveOn(next) {
 		commentsSaved = true;
-		if ( ! ( typeof next === "undefined" ) ) {
+		if ( ! ( typeof next === "undefined" || next == null ) ) {
 			return nextprev(next);
 		} else {
 			$(".tablesorter").trigger('pagerUpdate');

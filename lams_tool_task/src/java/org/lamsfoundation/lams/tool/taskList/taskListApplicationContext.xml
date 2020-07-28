@@ -7,6 +7,7 @@
 
 	<bean id="lataskMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.tool.taskList.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	<bean id="lataskMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref bean="lataskMessageSource"/></property>										

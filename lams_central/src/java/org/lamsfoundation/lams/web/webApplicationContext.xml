@@ -13,6 +13,7 @@
 	
 	<bean id="centralMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename"><value>org.lamsfoundation.lams.central.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	<bean id="centralMessageService" class="org.lamsfoundation.lams.util.MessageService" >
 		<property name="messageSource"><ref bean="centralMessageSource"/></property>										

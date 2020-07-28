@@ -314,6 +314,7 @@
     	
     <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
 	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" scope="prototype">
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 			
 	<!--  Core Notebook Service -->
