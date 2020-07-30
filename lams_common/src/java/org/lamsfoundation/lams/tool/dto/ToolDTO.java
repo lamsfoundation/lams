@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.dto;
 
 public class ToolDTO {
@@ -31,7 +30,6 @@ public class ToolDTO {
     private String toolDisplayName;
     private String iconPath;
     private Boolean supportsOutputs;
-    private Integer activityCategoryID;
     private Long[] childToolIds;
     private Boolean valid;
 
@@ -70,14 +68,6 @@ public class ToolDTO {
 	this.supportsOutputs = supportsOutputs;
     }
 
-    public Integer getActivityCategoryID() {
-	return activityCategoryID;
-    }
-
-    public void setActivityCategoryID(Integer activityCategoryID) {
-	this.activityCategoryID = activityCategoryID;
-    }
-
     public Long getLearningLibraryId() {
 	return learningLibraryId;
     }
@@ -111,10 +101,10 @@ public class ToolDTO {
     }
 
     public Boolean getValid() {
-        return valid;
+	return valid;
     }
 
     public void setValid(Boolean valid) {
-        this.valid = valid;
+	this.valid = valid;
     }
 }

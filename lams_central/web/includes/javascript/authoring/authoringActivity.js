@@ -42,6 +42,53 @@ var ActivityIcons = {
 		'Forum and Scribe' : 'data:image/png;base64,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'
 },
 
+/**
+ * For colouring. See LDEV-5058
+ *  CATEGORY_SYSTEM = 1;
+    CATEGORY_COLLABORATION = 2;
+    CATEGORY_ASSESSMENT = 3;
+    CATEGORY_CONTENT = 4;
+    CATEGORY_SPLIT = 5;
+    CATEGORY_RESPONSE = 6;
+ */
+ActivityCategories = {
+		'Assessment' : 3,
+		'Bbb' : 2,
+		'Chat' : 2,
+		'Data Collection' : 6,
+		'doKumaran' : 2,
+		'Forum' : 2,
+		'Gmap' : 2,
+		'Share imageGallery' : 4,
+		'Share commonCartridge' : 4,
+		'MCQ' : 3,
+		'Question and Answer' : 6,
+		'Share resources' : 4,
+		'Leaderselection' : 6,
+		'Mindmap' : 6,
+		'Noticeboard' : 4,
+		'Notebook' : 6,
+		'Peerreview' : 3,
+		'Pixlr' : 4,
+		'Submit file' : 3,
+		'Scratchie' : 3,
+		'Scribe' : 2,
+		'Spreadsheet' : 4,
+		'Survey' : 6,
+		'Share taskList' : 4,
+		'Voting' : 6,
+		'Wiki' : 2,
+		'Kaltura' : 2,
+		'Zoom' : 2,
+		'Resources and Forum' : 5,
+		'Chat and Scribe' : 5,
+		'Forum and Scribe' : 5
+},
+
+/*
+
+ */
+
 ActivityDefs = {
 		
 	/**

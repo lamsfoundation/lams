@@ -1055,7 +1055,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	    activity.setCreateDateTime(modificationDate);
 	}
 
-	activity.setActivityCategoryID(JsonUtil.optInt(activityDetails, AuthoringJsonTags.ACTIVITY_CATEGORY_ID));
 	activity.setLibraryActivityUiImage(JsonUtil.optString(activityDetails, AuthoringJsonTags.LIBRARY_IMAGE));
 	activity.setGroupingSupportType(JsonUtil.optInt(activityDetails, AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
 	activity.setStopAfterActivity(

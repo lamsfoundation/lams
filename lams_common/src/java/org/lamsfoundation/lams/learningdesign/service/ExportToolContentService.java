@@ -1993,7 +1993,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	act.setGroupingSupportType(actDto.getGroupingSupportType());
 	act.setActivityUIID(actDto.getActivityUIID());
-	act.setActivityCategoryID(actDto.getActivityCategoryID());
 	act.setActivityId(actDto.getActivityID());
 	act.setActivityTypeId(actDto.getActivityTypeID());
 	act.setApplyGrouping(actDto.getApplyGrouping());

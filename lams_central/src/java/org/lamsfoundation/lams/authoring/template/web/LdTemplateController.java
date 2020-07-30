@@ -422,7 +422,6 @@ public abstract class LdTemplateController {
 	if (activityDescription != null) {
 	    activityJSON.put(AuthoringJsonTags.DESCRIPTION, activityDescription);
 	}
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PERMISSION_GATE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID, GateActivity.LEARNER_GATE_LEVEL);
 
@@ -493,7 +492,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, title != null ? title : "Grouping");
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.GROUPING_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.CREATE_GROUPING_UIID, groupingUIID);
 
@@ -527,7 +525,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Parallel Activity");
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SPLIT);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.PARALLEL_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.DESCRIPTION, description);
 	if (groupingUIID != null) {
@@ -558,7 +555,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, "Support Activity");
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.FLOATING_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.MAX_ACTIVITIES, MAX_FLOATING_ACTIVITY_OPTIONS);
 	return activityJSON;
@@ -581,7 +577,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.GROUPING_SUPPORT_TYPE, Activity.GROUPING_SUPPORT_OPTIONAL);
 	activityJSON.put(AuthoringJsonTags.APPLY_GROUPING, false);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, branchName != null ? branchName : "Branch " + orderId);
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.SEQUENCE_ACTIVITY_TYPE);
 	activityJSON.put(AuthoringJsonTags.ORDER_ID, orderId);
 	activityJSON.put(AuthoringJsonTags.PARENT_UIID, parentUIID);
@@ -649,7 +644,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_UIID, reservedUiid);
 	activityJSON.put(AuthoringJsonTags.GROUPING_SUPPORT_TYPE, Activity.GROUPING_SUPPORT_OPTIONAL);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Branching");
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, Activity.CATEGORY_SYSTEM);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, activityType);
 	activityJSON.put(AuthoringJsonTags.MAX_ACTIVITIES, MAX_FLOATING_ACTIVITY_OPTIONS);
 	activityJSON.put(AuthoringJsonTags.XCOORD, layoutCoords[0]);
@@ -700,14 +694,14 @@ public abstract class LdTemplateController {
      */
     protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
 	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
-	    Integer parentActivityType, String activityTitle, int activityCategory) {
+	    Integer parentActivityType, String activityTitle) {
 	return createToolActivity(uiid, order, layoutCoords, toolSignature, toolIcon, toolContentID, contentFolderID,
-		groupingUIID, parentUIID, parentActivityType, activityTitle, activityCategory, null);
+		groupingUIID, parentUIID, parentActivityType, activityTitle, null);
     }
 
     protected ObjectNode createToolActivity(AtomicInteger uiid, int order, Integer[] layoutCoords, String toolSignature,
 	    String toolIcon, Long toolContentID, String contentFolderID, Integer groupingUIID, Integer parentUIID,
-	    Integer parentActivityType, String activityTitle, int activityCategory, String toolOutputDefinition) {
+	    Integer parentActivityType, String activityTitle, String toolOutputDefinition) {
 	ObjectNode activityJSON = JsonNodeFactory.instance.objectNode();
 	Tool tool = getTool(toolSignature);
 
@@ -724,7 +718,6 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
 	activityJSON.put(AuthoringJsonTags.YCOORD, pos[1]);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TITLE, activityTitle != null ? activityTitle : "Activity");
-	activityJSON.put(AuthoringJsonTags.ACTIVITY_CATEGORY_ID, activityCategory);
 	activityJSON.put(AuthoringJsonTags.ACTIVITY_TYPE_ID, Activity.TOOL_ACTIVITY_TYPE);
 	if (parentUIID != null) {
 	    activityJSON.put(AuthoringJsonTags.PARENT_UIID, parentUIID);
@@ -831,7 +824,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.ASSESSMENT_TOOL_SIGNATURE,
 		LdTemplateController.ASSESSMENT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Assessment", Activity.CATEGORY_ASSESSMENT,
+		parentActivityType, activityTitle != null ? activityTitle : "Assessment",
 		LdTemplateController.ASSESSMENT_TOOL_OUTPUT_DEFINITION);
     }
 
@@ -858,7 +851,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.CHAT_TOOL_SIGNATURE,
 		LdTemplateController.CHAT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Chat", Activity.CATEGORY_COLLABORATION);
+		parentActivityType, activityTitle != null ? activityTitle : "Chat");
     }
 
     /**
@@ -904,7 +897,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.FORUM_TOOL_SIGNATURE,
 		LdTemplateController.FORUM_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Forum", Activity.CATEGORY_COLLABORATION);
+		parentActivityType, activityTitle != null ? activityTitle : "Forum");
     }
 
     /**
@@ -926,8 +919,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.LEADER_TOOL_SIGNATURE,
 		LdTemplateController.LEADER_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Leader Selection",
-		Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "Leader Selection");
     }
 
     /**
@@ -951,7 +943,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.NOTEBOOK_TOOL_SIGNATURE,
 		LdTemplateController.NOTEBOOK_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Notebook", Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "Notebook");
     }
 
     /**
@@ -975,7 +967,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.NOTICEBOARD_TOOL_SIGNATURE,
 		LdTemplateController.NOTICEBOARD_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Noticeboard", Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Noticeboard");
     }
 
     /**
@@ -1004,7 +996,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.QA_TOOL_SIGNATURE,
 		LdTemplateController.QA_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Q&A", Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "Q&A");
     }
 
     /**
@@ -1033,7 +1025,7 @@ public abstract class LdTemplateController {
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MCQ_TOOL_SIGNATURE,
 		LdTemplateController.MCQ_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
 		parentActivityType, activityTitle != null ? activityTitle : "Multiple Choice",
-		Activity.CATEGORY_ASSESSMENT, LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
+		LdTemplateController.MCQ_TOOL_OUTPUT_DEFINITION);
     }
 
     /**
@@ -1056,7 +1048,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.MINDMAP_TOOL_SIGNATURE,
 		LdTemplateController.MINDMAP_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "MindMap", Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "MindMap");
     }
 
     /**
@@ -1154,8 +1146,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SHARE_RESOURCES_TOOL_SIGNATURE,
 		LdTemplateController.SHARE_RESOURCES_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Share Resources",
-		Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Share Resources");
     }
 
     /**
@@ -1189,7 +1180,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE,
 		LdTemplateController.SCRATCHIE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Scratchie", Activity.CATEGORY_CONTENT,
+		parentActivityType, activityTitle != null ? activityTitle : "Scratchie",
 		LdTemplateController.SCRATCHIE_TOOL_OUTPUT_DEFINITION);
     }
 
@@ -1218,7 +1209,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SCRIBE_TOOL_SIGNATURE,
 		LdTemplateController.SCRIBE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Scribe", Activity.CATEGORY_COLLABORATION);
+		parentActivityType, activityTitle != null ? activityTitle : "Scribe");
     }
 
     /**
@@ -1247,8 +1238,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SUBMIT_TOOL_SIGNATURE,
 		LdTemplateController.SUBMIT_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Submit File",
-		Activity.CATEGORY_ASSESSMENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Submit File");
     }
 
     /**
@@ -1272,7 +1262,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.SURVEY_TOOL_SIGNATURE,
 		LdTemplateController.SURVEY_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Survey", Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "Survey");
     }
 
     /**
@@ -1297,7 +1287,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.VOTE_TOOL_SIGNATURE,
 		LdTemplateController.VOTE_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Voting", Activity.CATEGORY_RESPONSE);
+		parentActivityType, activityTitle != null ? activityTitle : "Voting");
     }
 
     /**
@@ -1320,7 +1310,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.WIKI_TOOL_SIGNATURE,
 		LdTemplateController.WIKI_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Wiki", Activity.CATEGORY_COLLABORATION);
+		parentActivityType, activityTitle != null ? activityTitle : "Wiki");
     }
 
     /**
@@ -1348,7 +1338,7 @@ public abstract class LdTemplateController {
 
 	return createToolActivity(uiid, order, layoutCoords, LdTemplateController.PEER_REVIEW_TOOL_SIGNATURE,
 		LdTemplateController.PEER_REVIEW_ICON, toolContentID, contentFolderID, groupingUIID, parentUIID,
-		parentActivityType, activityTitle != null ? activityTitle : "Peer Review", Activity.CATEGORY_CONTENT);
+		parentActivityType, activityTitle != null ? activityTitle : "Peer Review");
     }
 
     /**
