@@ -45,7 +45,6 @@ import org.lamsfoundation.lams.util.HelpUtil;
 public class LibraryActivityDTO extends BaseDTO {
     private Integer activityTypeID;
     private Long activityID;
-    private Integer activityCategoryID;
     private Integer activityUIID;
     private Long learningLibraryID; //not sure if this is needed
     private Long learningDesignID;
@@ -109,7 +108,6 @@ public class LibraryActivityDTO extends BaseDTO {
     public LibraryActivityDTO(Activity activity, String languageCode) {
 	activityTypeID = activity.getActivityTypeId();
 	activityID = activity.getActivityId();
-	activityCategoryID = activity.getActivityCategoryID();
 	activityUIID = activity.getActivityUIID();
 	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary().getLearningLibraryId()
 		: null;
@@ -246,13 +244,6 @@ public class LibraryActivityDTO extends BaseDTO {
     }
 
     private void addConditionGateActivityAttributes(ConditionGateActivity activity) {
-    }
-
-    /**
-     * @return Returns the activityCategoryID.
-     */
-    public Integer getActivityCategoryID() {
-	return activityCategoryID;
     }
 
     /**

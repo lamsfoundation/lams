@@ -79,8 +79,17 @@ var paper = null,
 		
 		'colors' : {
 			'activityBorder'	  : 'black',
+			
+			/*
+			 * Colours depend on activity category.
+			 *  CATEGORY_SYSTEM = 1;
+			    CATEGORY_COLLABORATION = 2;
+			    CATEGORY_ASSESSMENT = 3;
+			    CATEGORY_CONTENT = 4;
+			    CATEGORY_SPLIT = 5;
+			    CATEGORY_RESPONSE = 6;
+			 */
 			'toolActivityBorder'      : ['','#00007f','#ff8300','#625F67','#ffa500','#00007f','#7aa712'],
-			// each activity type has its own colour
 			'activity'     		  : ['','#caddfb','#ffffbb','#ece9f7','#fdf1d3','#caddfb','#e9f9c0'],
 			'activityText' 		  : 'black',
 			// default region colour
@@ -167,7 +176,7 @@ GeneralInitLib = {
 		$('.template').each(function(){
 			var learningLibraryID = +$(this).attr('learningLibraryId'),
 				learningLibraryTitle = $(this).attr('learningLibraryTitle'),
-				activityCategoryID = +$(this).attr('activityCategoryId'),
+				activityCategoryID = ActivityCategories[learningLibraryTitle],
 				parallelChildActivityDefs = null;
 			
 			if (activityCategoryID == 5) {
@@ -191,10 +200,10 @@ GeneralInitLib = {
 			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(".img-"+learningLibraryID);
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
-				'iconPath'				  : $(this).attr('iconPath'),
-				'defaultToolContentID'    : $(this).attr('defaultToolContentId'),
-				'supportsOutputs' 	 	  : $(this).attr('supportsOutputs'),
-				'activityCategoryID' 	  : activityCategoryID,
+				'iconPath'				    : $(this).attr('iconPath'),
+				'defaultToolContentID'      : $(this).attr('defaultToolContentId'),
+				'supportsOutputs' 	 	    : $(this).attr('supportsOutputs'),
+				'activityCategoryID' 	    : activityCategoryID,
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
 			
@@ -277,7 +286,7 @@ GeneralInitLib = {
 						// calculate the position and create an instance of the tool activity
 					    var learningLibraryID = +draggable.draggable.attr('learningLibraryId'),
 					    	toolID = +draggable.draggable.attr('toolId'),
-							activityCategoryID = +draggable.draggable.attr('activityCategoryId'),
+							activityCategoryID = layout.toolMetadata[learningLibraryID].activityCategoryID,
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 					    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
 					    	label = $('#toolDisplayName', draggable.draggable).text().trim(),
@@ -2693,7 +2702,6 @@ GeneralLib = {
 												parseInt(activity.end.items.shape.getBBox().y) : null,
 				'activityTitle' 		 : activity.title,
 				'description'			 : activity.description,
-				'activityCategoryID' 	 : activityCategoryID,
 				'activityTypeID'     	 : activityTypeID,
 				'orderID'				 : activity.orderID,
 				'defaultActivityUIID'    : activity.defaultActivityUIID,

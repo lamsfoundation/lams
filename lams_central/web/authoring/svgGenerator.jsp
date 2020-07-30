@@ -58,7 +58,6 @@
 				 learningLibraryId="${tool.learningLibraryId}"
 				 learningLibraryTitle="${tool.learningLibraryTitle}"
 				 supportsOutputs="${tool.supportsOutputs}"
-				 activityCategoryId="${tool.activityCategoryID}"
 				 iconPath="${tool.iconPath}"
 				 childToolIds="
 				 <c:forEach var='childId' items='${tool.childToolIds}'>

@@ -55,8 +55,6 @@ public interface AuthoringJsonTags {
     public static final String ACTIVITY_TYPE_ID = "activityTypeID";
     public static final String ORDER_ID = "orderID";
 
-    public static final String ACTIVITY_CATEGORY_ID = "activityCategoryID";
-
     public static final String LIBRARY_IMAGE = "libraryActivityUIImage";
     public static final String LIBRARY_ACTIVITY = "libraryActivityID";
 
