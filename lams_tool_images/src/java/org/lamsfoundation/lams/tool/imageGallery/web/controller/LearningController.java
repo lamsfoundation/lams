@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -52,12 +51,9 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
-import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryUtils;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
-import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
@@ -68,11 +64,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 /**
@@ -256,17 +252,11 @@ public class LearningController {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(imageGalleryItemForm.getSessionMapID());
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 
-	//validate form
-	boolean isLargeFilesAllowed = mode.isTeacher();
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm,
-		isLargeFilesAllowed, messageService);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	try {
-	    if (errorMap.isEmpty()) {
-		extractFormToImageGalleryItem(request, imageGalleryItemForm);
-	    }
+	    extractFormToImageGalleryItem(request, imageGalleryItemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
 	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
@@ -282,41 +272,6 @@ public class LearningController {
 		sb.append(pair.getKey() + " " + pair.getValue());
 	    }
 	    outputStream.print(sb.toString());
-	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
-
-	return null;
-    }
-
-    /**
-     * Save file or url imageGallery item into database.
-     */
-    @RequestMapping("/saveMultipleImages")
-    public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(multipleForm.getSessionMapID());
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-
-	//validate form
-	boolean isLargeFilesAllowed = mode.isTeacher();
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleForm,
-		isLargeFilesAllowed, messageService);
-
-	try {
-	    if (errorMap.isEmpty()) {
-		extractMultipleFormToImageGalleryItems(request, multipleForm);
-	    }
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    new Object[] { e.getMessage() }));
-	}
-
-	if (!errorMap.isEmpty()) {
-	    ServletOutputStream outputStream = response.getOutputStream();
-//	    outputStream.print(errors.get().next().toString());
 	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
@@ -559,14 +514,14 @@ public class LearningController {
 	// upload ImageGalleryItem file
 	// and setting file properties' fields: item.setFileUuid();
 	// item.setFileName();
-	if (imageForm.getFile() != null) {
-	    try {
-		igService.uploadImageGalleryItemFile(image, imageForm.getFile());
-	    } catch (UploadImageGalleryFileException e) {
-		// remove new image!
-		throw e;
-	    }
-	}
+//	if (imageForm.getFile() != null) {
+//	    try {
+//		igService.uploadImageGalleryItemFile(image, imageForm.getFile());
+//	    } catch (UploadImageGalleryFileException e) {
+//		// remove new image!
+//		throw e;
+//	    }
+//	}
 
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
@@ -606,22 +561,4 @@ public class LearningController {
 	    igService.notifyTeachersOnImageSumbit(toolSessionId, user);
 	}
     }
-
-    /**
-     * Extract web form content to imageGallery items.
-     */
-    private void extractMultipleFormToImageGalleryItems(HttpServletRequest request, MultipleImagesForm multipleForm)
-	    throws Exception {
-
-	List<MultipartFile> fileList = ImageGalleryUtils.createFileListFromMultipleForm(multipleForm);
-	for (MultipartFile file : fileList) {
-	    ImageGalleryItemForm imageForm = new ImageGalleryItemForm();
-	    imageForm.setSessionMapID(multipleForm.getSessionMapID());
-	    imageForm.setTitle("");
-	    imageForm.setDescription("");
-	    imageForm.setFile(file);
-	    extractFormToImageGalleryItem(request, imageForm);
-	}
-    }
-
 }

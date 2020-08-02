@@ -3,8 +3,10 @@
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="ALLOWED_EXTENSIONS_IMAGE"><%=FileUtil.ALLOWED_EXTENSIONS_IMAGE%></c:set>
 
 <lams:html>
 <lams:head>
@@ -12,17 +14,22 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />
+	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript">
 		<%-- used for  imageGalleryitem.js --%>
+		var LAMS_URL = '${lams}';
 		var removeItemAttachmentUrl = "<c:url value='/authoring/removeImageFile.do'/>";
 		var saveMultipleImagesUrl = "<c:url value='/authoring/saveMultipleImages.do'/>";
 		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_LARGE_MAX_SIZE}";
+		// convert Java syntax to JSON
+		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
 		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/imageGalleryitem.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/uppy.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>

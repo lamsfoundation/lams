@@ -45,6 +45,7 @@ public class ImageGalleryItemForm {
     private Long fileUuid;
     private String fileName;
     private MultipartFile file;
+    private String tmpFileUploadId;
 
     //used only in monitoring
     private String imageUid;
@@ -130,6 +131,14 @@ public class ImageGalleryItemForm {
 
     public void setFile(MultipartFile file) {
 	this.file = file;
+    }
+
+    public String getTmpFileUploadId() {
+	return tmpFileUploadId;
+    }
+
+    public void setTmpFileUploadId(String tmpFileUploadId) {
+	this.tmpFileUploadId = tmpFileUploadId;
     }
 
     public String getImageUid() {

@@ -24,6 +24,8 @@
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,7 +99,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Andrey Balan
@@ -538,8 +539,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public void uploadImageGalleryItemFile(ImageGalleryItem image, MultipartFile file)
-	    throws UploadImageGalleryFileException {
+    public void uploadImageGalleryItemFile(ImageGalleryItem image, File file) throws UploadImageGalleryFileException {
 
 	ImageGalleryConfigItem mediumImageDimensionsKey = getConfigItem(
 		ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
@@ -552,9 +552,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	try {
 	    // upload file
 	    NodeKey nodeKey = uploadMultipartFile(file);
-	    image.setFileName(file.getOriginalFilename());
+	    image.setFileName(file.getName());
 	    image.setOriginalFileUuid(nodeKey.getUuid());
-	    String fileName = file.getOriginalFilename();
+	    String fileName = file.getName();
 
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getUuid());
 	    BufferedImage originalImage = ImageIO.read(originalIS);
@@ -612,16 +612,15 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey uploadMultipartFile(MultipartFile file) throws UploadImageGalleryFileException {
-	if ((file == null) || StringUtils.isEmpty(file.getOriginalFilename())) {
+    private NodeKey uploadMultipartFile(File file) throws UploadImageGalleryFileException {
+	if ((file == null) || StringUtils.isEmpty(file.getName())) {
 	    throw new UploadImageGalleryFileException(
 		    messageService.getMessage("error.msg.upload.file.not.found", new Object[] { file }));
 	}
 
 	NodeKey node = null;
 	try {
-	    node = imageGalleryToolContentHandler.uploadFile(file.getInputStream(), file.getOriginalFilename(),
-		    file.getContentType());
+	    node = imageGalleryToolContentHandler.uploadFile(new FileInputStream(file), file.getName(), null);
 	} catch (InvalidParameterException e) {
 	    throw new UploadImageGalleryFileException(messageService.getMessage("error.msg.invaid.param.upload"));
 	} catch (FileNotFoundException e) {

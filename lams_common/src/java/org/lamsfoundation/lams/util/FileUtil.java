@@ -41,6 +41,7 @@ import java.util.Properties;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -55,7 +56,10 @@ import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDGenerator;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.w3c.dom.Document;
 
 import com.thoughtworks.xstream.XStream;
@@ -87,7 +91,7 @@ public class FileUtil {
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
     public static final String ALLOWED_EXTENSIONS_MEDIA = ".3gp,.avi,.flv,.m4v,.mkv,.mov,.mp3,.mp4,.mpe,.mpeg,.mpg,.mpv,.mts,.m2ts,ogg,.wma,.wmv";
 
-    protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
+    public static final String prefix = "lamstmp_";
 
     private static Transformer xmlTransformer = null;
 
@@ -888,5 +892,22 @@ public class FileUtil {
 	    throw new IOException("Could not connect to ClamAV server at " + host + ":" + port, e);
 	}
 	return false;
+    }
+
+    /**
+     * Generates a suffix of temporary subdir to store uploaded files.
+     */
+    public static String generateTmpFileUploadId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return "upload_" + user.getUserID() + "_" + System.currentTimeMillis();
+    }
+
+    /**
+     * Gets upload dir for the given ID
+     */
+    public static File getTmpFileUploadDir(String tmpFileUploadId) {
+	String uploadSubDir = FileUtil.prefix + tmpFileUploadId;
+	return new File(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), uploadSubDir);
     }
 }
