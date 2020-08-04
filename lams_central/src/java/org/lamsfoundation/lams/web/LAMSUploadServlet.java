@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;
@@ -45,12 +46,12 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
  * folder with a unique numeric name. Whenever a new design is created (using "New" in the client), a new design folder
  * name is assigned. The [design folder] is passed in as the CurrentFolder. This servlet supports the image and link
  * windows, not the browse window.
- * 
+ *
  * Currently this servlet can not be rewritten to Spring Controller.
- * Requests to controllers pass few additional Spring layers. 
+ * Requests to controllers pass few additional Spring layers.
  * For files uploaded with Ajax Spring looks for Spring Security CSRF token.
  * It is not present as we do not use Spring Security. It results in HTTP 405 Method not allowed.
- * There are ways to turn off CSRF check, but not with current Spring version. 
+ * There are ways to turn off CSRF check, but not with current Spring version.
  * We can try to rewrite this servlet once we upgrade Spring and switch to programmatic configuration.
  *
  * @author Marcin Cieslak
@@ -87,7 +88,7 @@ public class LAMSUploadServlet extends HttpServlet {
 	String uploadSubDir = FileUtil.prefix + tmpFileUploadId;
 	File uploadDir = new File(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), uploadSubDir);
 	File file = new File(uploadDir, fileName);
-	if (file.exists() && file.delete()) {
+	if (file.exists() && FileUtils.deleteQuietly(file)) {
 	    if (log.isDebugEnabled()) {
 		log.debug("Deleted temporarily uploaded file: " + file.getAbsolutePath());
 	    }

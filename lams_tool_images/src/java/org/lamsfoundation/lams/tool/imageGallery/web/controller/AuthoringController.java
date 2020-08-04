@@ -676,6 +676,8 @@ public class AuthoringController {
 		}
 		sequenceId++;
 	    }
+
+	    FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
 	}
     }
 }

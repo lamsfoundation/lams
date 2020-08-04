@@ -528,6 +528,8 @@ public class LearningController {
 	    throw new ServletException("Can not access upload dir");
 	}
 
+	FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
+
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
 	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();

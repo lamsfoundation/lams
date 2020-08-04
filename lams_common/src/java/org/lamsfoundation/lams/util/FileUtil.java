@@ -49,6 +49,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.id.Configurable;
@@ -909,5 +910,10 @@ public class FileUtil {
     public static File getTmpFileUploadDir(String tmpFileUploadId) {
 	String uploadSubDir = FileUtil.prefix + tmpFileUploadId;
 	return new File(Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR), uploadSubDir);
+    }
+
+    public static void deleteTmpFileUploadDir(String tmpFileUploadId) {
+	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	FileUtils.deleteQuietly(uploadDir);
     }
 }
