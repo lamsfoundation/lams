@@ -218,7 +218,7 @@ public class LAMSUploadServlet extends HttpServlet {
 
 	    out.println("<script type=\"text/javascript\">");
 	    out.println("this.parent.CKEDITOR.tools.callFunction(" + ckeditorSetUrlFuncNum + ",'" + fileUrl + "','"
-		    + returnMessage + "');");
+		    + (returnMessage == null ? "" : returnMessage) + "');");
 	    out.println("</script>");
 	    out.flush();
 	    out.close();
