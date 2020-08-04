@@ -59,8 +59,8 @@ function submitImageGalleryItem(){
 /**
  * Initialised Uppy as the file upload widget
  */
-function initFileUpload(tmpFileUploadId, singleFileUpload) {
-	  var uppy = Uppy.Core({
+function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
+	  var uppyProperties = {
 		  // upload immediately 
 		  autoProceed: true,
 		  allowMultipleUploads: true,
@@ -80,8 +80,16 @@ function initFileUpload(tmpFileUploadId, singleFileUpload) {
 			  'Type' : 'Image',
 			  'largeFilesAllowed' : true
 		  }
-		});
+	  };
 	  
+	  switch(language) {
+	  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
+		case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
+		case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+	  }
+	  
+	  
+	  var uppy = Uppy.Core(uppyProperties);
 	  // upload using Ajax
 	  uppy.use(Uppy.XHRUpload, {
 		  endpoint: LAMS_URL + 'tmpFileUpload',
