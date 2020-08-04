@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -30,6 +31,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -250,9 +253,6 @@ public class LearningController {
     public String saveNewImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(imageGalleryItemForm.getSessionMapID());
-
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	try {
@@ -272,7 +272,7 @@ public class LearningController {
 		sb.append(pair.getKey() + " " + pair.getValue());
 	    }
 	    outputStream.print(sb.toString());
-	    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, sb.toString());
 	}
 
 	return null;
@@ -488,6 +488,7 @@ public class LearningController {
     /**
      * Extract web form content to imageGallery item.
      */
+    @SuppressWarnings("unchecked")
     private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
 	    throws Exception {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -511,17 +512,21 @@ public class LearningController {
 	ImageGalleryItem image = new ImageGalleryItem();
 	image.setCreateDate(new Timestamp(new Date().getTime()));
 
-	// upload ImageGalleryItem file
-	// and setting file properties' fields: item.setFileUuid();
-	// item.setFileName();
-//	if (imageForm.getFile() != null) {
-//	    try {
-//		igService.uploadImageGalleryItemFile(image, imageForm.getFile());
-//	    } catch (UploadImageGalleryFileException e) {
-//		// remove new image!
-//		throw e;
-//	    }
-//	}
+	File uploadDir = FileUtil.getTmpFileUploadDir(imageForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length == 0) {
+		throw new ServletException("No image uploaded");
+	    }
+
+	    if (files.length > 1) {
+		throw new ServletException("Uploaded more than 1 image while editing an Image Gallery Item");
+	    }
+
+	    igService.uploadImageGalleryItemFile(image, files[0]);
+	} else {
+	    throw new ServletException("Can not access upload dir");
+	}
 
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
@@ -534,11 +539,8 @@ public class LearningController {
 
 	image.setCreateBy(user);
 	image.setDescription(imageForm.getDescription());
-	image.setCreateByAuthor(false);
+	image.setCreateByAuthor(mode.isTeacher());
 	image.setHide(false);
-	if (mode.isTeacher()) {
-	    image.setCreateByAuthor(true);
-	}
 
 	// setting SequenceId
 	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();

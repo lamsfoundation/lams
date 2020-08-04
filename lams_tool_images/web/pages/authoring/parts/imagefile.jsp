@@ -21,5 +21,5 @@
 <input type="hidden" name="tmpFileUploadId" value="${imageGalleryItemForm.tmpFileUploadId}" />
 <div id="image-upload-area" class="voffset20"></div>
 <script>
-	initFileUpload('${imageGalleryItemForm.tmpFileUploadId}', ${itemAttachment.hasFile}, '<lams:user property="localeLanguage"/>');
+	initFileUpload('${imageGalleryItemForm.tmpFileUploadId}', ${itemAttachment.hasFile or saveUsingLearningAction}, '<lams:user property="localeLanguage"/>');
 </script>

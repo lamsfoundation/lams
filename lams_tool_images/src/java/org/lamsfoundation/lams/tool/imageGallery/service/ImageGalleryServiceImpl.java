@@ -940,7 +940,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (ImageGalleryServiceImpl.log.isDebugEnabled()) {
 	    ImageGalleryServiceImpl.log.debug(

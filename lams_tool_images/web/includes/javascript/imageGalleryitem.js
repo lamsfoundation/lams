@@ -50,7 +50,7 @@ function submitImageGalleryItem(){
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
     		$('#uploadButtons').show();
-    		$('#itemAttachmentArea_Busy').hide();    		
+    		$('#itemAttachmentArea_Busy').hide();    
         	alert(errorMessage);
     	}
 	});
