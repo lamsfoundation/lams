@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.rsrc.service;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +102,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -604,12 +604,12 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(MultipartFile file) throws UploadResourceFileException {
+    private NodeKey processFile(File file) throws UploadResourceFileException {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
-	    String fileName = file.getOriginalFilename();
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
 	    try {
-		node = resourceToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
+		node = resourceToolContentHandler.uploadFile(new FileInputStream(file), fileName, null);
 	    } catch (InvalidParameterException e) {
 		throw new UploadResourceFileException(
 			messageService.getMessage("error.msg.invaid.param.upload") + " " + e.getMessage());
@@ -640,11 +640,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void uploadResourceItemFile(ResourceItem item, MultipartFile file) throws UploadResourceFileException {
+    public void uploadResourceItemFile(ResourceItem item, File file) throws UploadResourceFileException {
 	try {
-	    InputStream is = file.getInputStream();
-	    String fileName = file.getOriginalFilename();
-	    String fileType = file.getContentType();
+	    InputStream is = new FileInputStream(file);
+	    String fileName = file.getName();
 	    // For file only upload one sigle file
 	    if (item.getType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 		NodeKey nodeKey = processFile(file);
@@ -679,7 +678,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		item.setFileVersionId(nodeKey.getVersion());
 	    }
 	    // create the package from the directory contents
-	    item.setFileType(fileType);
 	    item.setFileName(fileName);
 	} catch (ZipFileUtilException e) {
 	    log.error(messageService.getMessage("error.msg.zip.file.exception") + " : " + e.toString());
@@ -1052,7 +1050,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;

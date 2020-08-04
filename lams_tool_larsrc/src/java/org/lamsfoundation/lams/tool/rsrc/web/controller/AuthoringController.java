@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -62,9 +63,7 @@ import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourcePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -87,7 +86,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/authoring")
 public class AuthoringController {
     private static Logger log = Logger.getLogger(AuthoringController.class);
-    
+
     private static final int INIT_INSTRUCTION_COUNT = 2;
     private static final String INSTRUCTION_ITEM_DESC_PREFIX = "instructionItemDesc";
     private static final String INSTRUCTION_ITEM_COUNT = "instructionCount";
@@ -110,7 +109,9 @@ public class AuthoringController {
      */
     @RequestMapping("/removeItemAttachment")
     private String removeItemAttachment(HttpServletRequest request) {
-	request.setAttribute("resourceItemForm", null);
+	ResourceItemForm resourceItemForm = new ResourceItemForm();
+	resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+	request.setAttribute("resourceItemForm", resourceItemForm);
 	return "pages/authoring/parts/itemattachment";
     }
 
@@ -164,10 +165,13 @@ public class AuthoringController {
 	    case 1:
 		return "pages/authoring/parts/addurl";
 	    case 2:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addfile";
 	    case 3:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addwebsite";
 	    case 4:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addlearningobject";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + item.getType());
@@ -193,10 +197,13 @@ public class AuthoringController {
 	    case 1:
 		return "pages/authoring/parts/addurl";
 	    case 2:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addfile";
 	    case 3:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addwebsite";
 	    case 4:
+		resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		return "pages/authoring/parts/addlearningobject";
 	    default:
 		throw new IllegalArgumentException("Unknown item type" + type);
@@ -225,10 +232,13 @@ public class AuthoringController {
 		case 1:
 		    return "pages/authoring/parts/addurl";
 		case 2:
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addfile";
 		case 3:
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addwebsite";
 		case 4:
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addlearningobject";
 		default:
 		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
@@ -385,7 +395,7 @@ public class AuthoringController {
 	    if (resource == null) {
 		resource = resourceService.getDefaultContent(contentId);
 		if (resource.getResourceItems() != null) {
-		    items = new ArrayList<ResourceItem>(resource.getResourceItems());
+		    items = new ArrayList<>(resource.getResourceItems());
 		} else {
 		    items = null;
 		}
@@ -466,8 +476,8 @@ public class AuthoringController {
      * all resource item, information etc.
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm, HttpServletRequest request)
-	    throws Exception {
+    private String updateContent(@ModelAttribute("authoringForm") ResourceForm authoringForm,
+	    HttpServletRequest request) throws Exception {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
 
@@ -539,7 +549,7 @@ public class AuthoringController {
 	List<ResourceItem> delResourceItemList = getDeletedResourceItemList(sessionMap);
 	iter = delResourceItemList.iterator();
 	while (iter.hasNext()) {
-	    ResourceItem item = (ResourceItem) iter.next();
+	    ResourceItem item = iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
 		resourceService.deleteResourceItem(item.getUid());
@@ -549,7 +559,7 @@ public class AuthoringController {
 	List<ResourceItem> delItemAttList = getDeletedItemAttachmentList(sessionMap);
 	iter = delItemAttList.iterator();
 	while (iter.hasNext()) {
-	    ResourceItem delAtt = (ResourceItem) iter.next();
+	    ResourceItem delAtt = iter.next();
 	    iter.remove();
 	}
 
@@ -726,6 +736,7 @@ public class AuthoringController {
      * ResourceItem.createDate and ResourceItem.createBy, which need be set
      * when persisting this resource item.
      */
+    @SuppressWarnings("unchecked")
     private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList,
 	    ResourceItemForm itemForm) throws Exception {
 
@@ -733,14 +744,14 @@ public class AuthoringController {
 		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
-	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
+	int itemIdx = NumberUtils.toInt(itemForm.getItemIndex(), -1);
 	ResourceItem item = null;
 
 	if (itemIdx == -1) { // add
 	    item = new ResourceItem();
 	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    item.setOrderId(resourceList.size() + 1);
-	    
+
 	} else { // edit
 	    List<ResourceItem> rList = new ArrayList<>(resourceList);
 	    item = rList.get(itemIdx);
@@ -756,34 +767,46 @@ public class AuthoringController {
 	// if the item is edit (not new add) then the getFile may return null
 	// it may throw exception, so put it as first, to avoid other invlidate
 	// update:
-	if (itemForm.getFile() != null) {
-	    if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE
-		    || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		    || type == ResourceConstants.RESOURCE_TYPE_FILE) {
-		// if it has old file, and upload a new, then save old to deleteList
-		ResourceItem delAttItem = new ResourceItem();
-		boolean hasOld = false;
-		if (item.getFileUuid() != null) {
-		    hasOld = true;
-		    // be careful, This new ResourceItem object never be save
-		    // into database
-		    // just temporarily use for saving fileUuid and versionID
-		    // use:
-		    delAttItem.setFileUuid(item.getFileUuid());
-		    delAttItem.setFileVersionId(item.getFileVersionId());
+
+	if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+		|| type == ResourceConstants.RESOURCE_TYPE_FILE) {
+	    File uploadDir = FileUtil.getTmpFileUploadDir(itemForm.getTmpFileUploadId());
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    throw new ServletException("Uploaded more than 1 file");
 		}
 
-		//throws UploadResourceFileException
-		resourceService.uploadResourceItemFile(item, itemForm.getFile());
-		
-		// put it after "upload" to ensure deleted file added into list
-		// only no exception happens during upload
-		if (hasOld) {
-		    List<ResourceItem> delAtt = getDeletedItemAttachmentList(sessionMap);
-		    delAtt.add(delAttItem);
+		if (files.length == 1) {
+		    // if it has old file, and upload a new, then save old to deleteList
+		    ResourceItem delAttItem = new ResourceItem();
+		    boolean hasOld = false;
+		    if (item.getFileUuid() != null) {
+			hasOld = true;
+			// be careful, This new ResourceItem object never be save
+			// into database
+			// just temporarily use for saving fileUuid and versionID
+			// use:
+			delAttItem.setFileUuid(item.getFileUuid());
+			delAttItem.setFileVersionId(item.getFileVersionId());
+		    }
+
+		    File file = files[0];
+
+		    resourceService.uploadResourceItemFile(item, file);
+
+		    FileUtil.deleteTmpFileUploadDir(itemForm.getTmpFileUploadId());
+
+		    // put it after "upload" to ensure deleted file added into list
+		    // only no exception happens during upload
+		    if (hasOld) {
+			List<ResourceItem> delAtt = getDeletedItemAttachmentList(sessionMap);
+			delAtt.add(delAttItem);
+		    }
 		}
 	    }
 	}
+
 	item.setTitle(itemForm.getTitle());
 	item.setCreateByAuthor(true);
 	item.setHide(false);
@@ -838,6 +861,7 @@ public class AuthoringController {
 		// ActionMessage(ResourceConstants.ERROR_MSG_INVALID_URL));
 	    }
 	}
+
 	// if(itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
 	// ||itemForm.getItemType() ==
 	// ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT){
@@ -845,21 +869,25 @@ public class AuthoringController {
 	// errors.add(ActionMessages.GLOBAL_MESSAGE,new
 	// ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 	// }
-	if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
-		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
-		|| resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
-	    // validate item size
-	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
-		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-	    }
 
-	    // for edit validate: file already exist
-	    if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
-		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
-		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
-	    }
-	}
+	// uploads using tmp file upload servlet made following validation obsolete (?)
+	/*
+	 * if (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
+	 * || resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+	 * || resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
+	 * // validate item size
+	 * if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
+	 * errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+	 * new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+	 * }
+	 *
+	 * // for edit validate: file already exist
+	 * if (!resourceItemForm.isHasFile() && (resourceItemForm.getFile() == null
+	 * || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
+	 * errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
+	 * }
+	 * }
+	 */
     }
 
     @RequestMapping("/initPedagogicalPlannerForm")
@@ -888,7 +916,7 @@ public class AuthoringController {
 	    ResourceItem resourceItem = null;
 	    List<ResourceItem> newItems = new LinkedList<>();
 	    // we need a copy for later Hibernate-bound processing
-	    LinkedList<ResourceItem> resourceItems = new LinkedList<ResourceItem>(taskList.getResourceItems());
+	    LinkedList<ResourceItem> resourceItems = new LinkedList<>(taskList.getResourceItems());
 	    Iterator<ResourceItem> taskListItemIterator = resourceItems.iterator();
 	    /*
 	     * Not the case anymore (why?):
@@ -942,7 +970,9 @@ public class AuthoringController {
 				    resourceService.deleteFromRepository(resourceItem.getFileUuid(),
 					    resourceItem.getFileVersionId());
 				}
-				resourceService.uploadResourceItemFile(resourceItem, file);
+				throw new UnsupportedOperationException(
+					"Temporary file uploading is not implemented for Share Resources yet");
+//				resourceService.uploadResourceItemFile(resourceItem, file);
 			    } catch (Exception e) {
 				AuthoringController.log.error(e);
 				errorMap.add("GLOBAL", messageService.getMessage("error.msg.io.exception"));
@@ -950,10 +980,10 @@ public class AuthoringController {
 				pedagogicalPlannerForm.setValid(false);
 				return "pages/authoring/pedagogicalPlannerForm";
 			    }
-			    pedagogicalPlannerForm.setFileName(itemIndex, resourceItem.getFileName());
-			    pedagogicalPlannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
-			    pedagogicalPlannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
-			    pedagogicalPlannerForm.setFile(itemIndex, null);
+//			    pedagogicalPlannerForm.setFileName(itemIndex, resourceItem.getFileName());
+//			    pedagogicalPlannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
+//			    pedagogicalPlannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
+//			    pedagogicalPlannerForm.setFile(itemIndex, null);
 			}
 		    }
 		    itemIndex++;
@@ -1020,12 +1050,12 @@ public class AuthoringController {
 	// return null to close this window
 	return "pages/authoring/parts/itemlist";
     }
-    
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-    } 
+    }
 
 }

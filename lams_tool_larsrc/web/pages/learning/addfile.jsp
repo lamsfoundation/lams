@@ -26,8 +26,9 @@
 			<form:input path="title" class="form-control" tabindex="1" id="resourcetitle"/>
 	  	</div>	
 
-		<lams:FileUpload fileFieldname="file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="2"/>
-
+		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${resourceItemForm.tmpFileUploadId}" />
+		<div id="image-upload-area" class="voffset20"></div>
+		
 		<div class="form-group voffset10">
 	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
 			<form:input path="description" tabindex="3" cssClass="form-control" maxlength="255"/>
@@ -46,50 +47,30 @@
 	</form:form>
 	
 	<script type="text/javascript">
+	
+		var LAMS_URL = '<lams:LAMSURL/>',
+			UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>',
+			// convert Java syntax to JSON
+	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+	       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
 
 		$(document).ready(function(){
 			$('#title').focus();
+			
+			var extensionValidation = function(currentFile, files) {
+			  var name = currentFile.data.name,
+			  	  extensionIndex = name.lastIndexOf('.'),
+			  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+			  if (!valid) {
+				  uppy.info(EXE_FILE_ERROR, 'error', 10000);
+			  }
+			  
+			  return valid;
+		    }
+			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
 		});	
 					
-		$.validator.addMethod('validateType', function (value, element, param) {
-			return validateNotExecutable(element.files[0], param);
-		}, '<fmt:message key="error.attachment.executable"/>');
-
-		$.validator.addMethod('validateSize', function (value, element, param) {
-			return validateFileSize(element.files[0], param);
-		}, '<fmt:message key="errors.maxfilesize"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message>');
-
 		$('#resourceItemForm').submit(submitResourceForm);
-		$('#resourceItemForm').validate({
-			ignore: [],
-			errorClass: "text-danger",
-			wrapper: "span",
-			rules: {
-				file: {
-			    	required: true,
-			    	validateType: '<c:out value="${EXE_FILE_TYPES}"/>',
-			    	validateSize: '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>', 
-			    },
-			    title: {
-			    	required: true
-			    }
-			},
-			messages : {
-				file : {
-					required : '<fmt:message key="error.resource.item.file.blank"/> '
-				},
-				title : {
-					required : '<fmt:message key="error.resource.item.title.blank"/> '
-				}
-			},
-			errorPlacement: function(error, element) {
-		        if (element.hasClass("fileUpload")) {
-		           error.insertAfter(element.parent());
-		        } else {
-		           error.insertAfter(element);
-		        }
-		    }
-		});	
 	</script>
 	
 </div>
