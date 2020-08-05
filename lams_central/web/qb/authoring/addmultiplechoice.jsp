@@ -241,25 +241,25 @@
 					<!-- <h5 style="margin-top: 20px;">Feedbacks</h5> -->
 	
 					<div class="form-group">
-						<c:set var="GENERAL_FEEDBACK_LABEL">General Feedback</c:set>
+						<fmt:message key="label.authoring.feeback.general" var="GENERAL_FEEDBACK_LABEL"/>
 						<lams:CKEditor id="feedback" value="${assessmentQuestionForm.feedback}" 
 							placeholder="${GENERAL_FEEDBACK_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}" />
 					</div>
 					
 					<div class="form-group">
-						<c:set var="FEEDBACK_ON_CORRECT_LABEL">Feedback on any correct response</c:set>
+						<fmt:message key="label.authoring.feeback.correct" var="FEEDBACK_ON_CORRECT_LABEL" />
 						<lams:CKEditor id="feedbackOnCorrect" value="${assessmentQuestionForm.feedbackOnCorrect}" 
 							placeholder="${FEEDBACK_ON_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>
 					
 					<div class="form-group">
-						<c:set var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL">Feedback on any partially correct response</c:set>
+						<fmt:message key="label.authoring.feeback.partially.correct" var="FEEDBACK_ON_PARTICALLY_CORRECT_LABEL" />
 						<lams:CKEditor id="feedbackOnPartiallyCorrect" value="${assessmentQuestionForm.feedbackOnPartiallyCorrect}" 
 							placeholder="${FEEDBACK_ON_PARTICALLY_CORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>
 							
 					<div class="form-group">
-						<c:set var="FEEDBACK_ON_INCORRECT_LABEL">Feedback on any incorrect response</c:set>
+						<fmt:message key="label.authoring.feeback.incorrect" var="FEEDBACK_ON_INCORRECT_LABEL" />
 						<lams:CKEditor id="feedbackOnIncorrect" value="${assessmentQuestionForm.feedbackOnIncorrect}" 
 							placeholder="${FEEDBACK_ON_INCORRECT_LABEL}" contentFolderID="${assessmentQuestionForm.contentFolderID}"/>
 					</div>

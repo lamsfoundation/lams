@@ -217,7 +217,7 @@
 			</div>
 
 			<c:if test="${not empty question.qbOptions}">
-				<p class="question-section-header">Options</p>
+				<p class="question-section-header"><fmt:message key="label.qb.stats.options.title" /></p>
 				<table class="table table-striped qb-stats-table">
 					<tr>
 						<th>
@@ -541,7 +541,7 @@
 	<c:if test="${managementAllowed and mergeAllowed}">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				Merge this question with...
+				<fmt:message key="label.qb.stats.merge.title" />
 			</div>
 			<div class="panel-body">
 				<c:if test="${not empty mergeErrors}">
@@ -563,13 +563,13 @@
 						<input type="hidden" name="sourceQbQuestionUid" value="${question.uid}" />
 						<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 						<div class="col-xs-0 col-md-2">
-							Question UID
+							<fmt:message key="label.qb.stats.merge.question.uid" />
 						</div>
 						<div class="col-xs-12 col-md-8 middle-cell">
 							<input type="text" name="targetQbQuestionUid" class="form-control" /> 
 						</div>
 						<div class="col-xs-0 col-md-2">
-							<button type="submit" class="btn btn-default">Merge now</button>
+							<button type="submit" class="btn btn-default"><fmt:message key="label.qb.stats.merge.now" /></button>
 						</div>
 					</form>
 				</div>
@@ -577,8 +577,7 @@
 				<div class="row">
 					<div class="col-xs-0 col-md-2"></div>
 					<div class="col-xs-12 col-md-8">
-						This will merge this question with the question UID you entered above.
-						Before you do this, make sure you know what are you doing as once merging is performed this cannot be undone. 
+						<fmt:message key="label.qb.stats.merge.description" />
 					</div>
 					<div class="col-xs-0 col-md-2"></div>
 				</div>
