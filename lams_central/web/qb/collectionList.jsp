@@ -46,6 +46,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			<%-- Add jqGrid internationalisation snippet --%>
+			<%@ include file="/jqGrid.i18n.jsp"%>
 			
 			// create a grid for each collection
 			$('.collection-grid').each(function(){

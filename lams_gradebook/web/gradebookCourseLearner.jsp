@@ -58,7 +58,7 @@
 			    ],
  			    loadError: function(xhr,st,err) {
 			    	$("#organisationGrid").jqGrid('clearGridData');
-			    	alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
+			    	alert("<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>");
 			    },
  			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -100,7 +100,7 @@
 						     ],
  						     loadError: function(xhr,st,err) {
 						    	$("#"+subgrid_table_id).jqGrid('clearGridData');
-						    	alert('<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>');
+						    	alert("<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>");
 						     },
  							 gridComplete: function(){
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);
