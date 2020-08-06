@@ -22,4 +22,8 @@
  	 	<%@ include file="/includes/javascript/jqgrid-i18n/grid.locale-el.js"%>
  	 	$.extend(true, $.jgrid,$.jgrid.regional['${language}']);
  	 </c:when>
+ 	<c:when test="${language eq 'no'}">
+ 	 	<%@ include file="/includes/javascript/jqgrid-i18n/grid.locale-no.js"%>
+ 	 	$.extend(true, $.jgrid,$.jgrid.regional['${language}']);
+ 	 </c:when>
 </c:choose>
