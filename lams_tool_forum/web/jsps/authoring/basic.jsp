@@ -118,19 +118,6 @@
 				CKEDITOR.instances[instance].updateElement();
 		}
 
-		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
-		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
-
-		var fileSelect = document.getElementById('attachmentFile');
-		// Get the selected files from the input.
-		var files = fileSelect.files;
-		if (files.length > 0) {
-			var file = files[0];
-			if ( ! validateShowErrorNotExecutable(file, LABEL_NOT_ALLOWED_FORMAT, false, '${EXE_FILE_TYPES}') || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', LABEL_MAX_FILE_SIZE, false) )
-				return false;
-		}
-
-		showBusy("itemAttachmentArea");
 		var formData = new FormData(document.getElementById("topicFormId"));
 	    $.ajax({ // create an AJAX call...
 			data: formData, 
@@ -140,7 +127,6 @@
 			url: $("#topicFormId").attr('action'),
 			success: function(data) {
                	$('#messageArea').html(data);
-	       		hideBusy("itemAttachmentArea");
 			}
 	    });
 	}   

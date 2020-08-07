@@ -9,7 +9,7 @@
 		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${resourceItemForm.tmpFileUploadId}" />
 		<div id="image-upload-area" class="voffset20"></div>
 		<script>
-			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
+			initFileUpload('${resourceItemForm.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
 		</script>
 	</c:otherwise>
 </c:choose>

@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>    
+<c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		<%@ include file="/common/tabbedheader.jsp"%>
-
+		
 		<script type="text/javascript">
-		     //<![CDATA[
-			    var csrfTokenName = '<csrf:tokenname/>',
-    				csrfTokenValue = '<csrf:tokenvalue/>';
+		    var csrfTokenName = '<csrf:tokenname/>',
+   				csrfTokenValue = '<csrf:tokenvalue/>';
+   				
+   			var LAMS_URL = '${lams}',
+   		 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
+   		 		UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
+   				// convert Java syntax to JSON
+   		       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+   		       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
+   				
 			function init(){
 				var tag = document.getElementById("currentTab");
 				if(tag == null || tag.value != "")
@@ -31,7 +45,6 @@
 				authorForm.submit();
 			}
 			
-			//]]>        
 		</script>
 		
 	</lams:head>

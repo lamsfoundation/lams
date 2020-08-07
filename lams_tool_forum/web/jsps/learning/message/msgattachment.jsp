@@ -16,6 +16,11 @@
 </c:if>
 
 <c:if test="${not topic.hasAttachment && allowUpload}">
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-	<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}"/>
+		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
+			   value="${empty messageForm.tmpFileUploadId ? tmpFileUploadId : messageForm.tmpFileUploadId}" />
+		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
+		<div id="image-upload-area" class="voffset20"></div>
+		<script>
+			initFileUpload('${empty messageForm.tmpFileUploadId ? tmpFileUploadId : messageForm.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
+		</script>
 </c:if>

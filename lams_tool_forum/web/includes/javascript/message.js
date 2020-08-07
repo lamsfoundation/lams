@@ -82,4 +82,88 @@
 		});
 		$(".rating-stars-new").removeClass("rating-stars-new");
 	}
-
+	
+	/**
+	 * Initialised Uppy as the file upload widget
+	 */
+	function initFileUpload(tmpFileUploadId, largeFilesAllowed, language) {
+		  var uppyProperties = {
+			  // upload immediately 
+			  autoProceed: true,
+			  allowMultipleUploads: true,
+			  debug: false,
+			  restrictions: {
+				// taken from LAMS configuration
+			    maxFileSize: largeFilesAllowed ?  +UPLOAD_FILE_LARGE_MAX_SIZE : +UPLOAD_FILE_MAX_SIZE,
+			    maxNumberOfFiles: 1 
+			  },
+			  meta: {
+				  // all uploaded files go to this subdir in LAMS tmp dir
+				  // its format is: upload_<userId>_<timestamp>
+				  'tmpFileUploadId' : tmpFileUploadId,
+				  'largeFilesAllowed' : largeFilesAllowed
+			  },
+			  onBeforeFileAdded: function(currentFile, files) {
+			  var name = currentFile.data.name,
+			  	  extensionIndex = name.lastIndexOf('.'),
+			  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+			  if (!valid) {
+				  uppy.info(EXE_FILE_ERROR, 'error', 10000);
+			  }
+			  
+			  return valid;
+		    }
+		  };
+		  
+		  switch(language) {
+		  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
+			case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
+			case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+		  }
+		  
+		  
+		  // global variable
+		  uppy = Uppy.Core(uppyProperties);
+		  // upload using Ajax
+		  uppy.use(Uppy.XHRUpload, {
+			  endpoint: LAMS_URL + 'tmpFileUpload',
+			  fieldName : 'file',
+			  // files are uploaded one by one
+			  limit : 1
+		  });
+		  
+		  uppy.use(Uppy.Dashboard, {
+			  target: '#image-upload-area',
+			  inline: true,
+			  height: 300,
+			  width: '100%',
+			  showProgressDetails : true,
+			  hideRetryButton : true,
+			  hideCancelButton : true,
+			  showRemoveButtonAfterComplete: true,
+			  proudlyDisplayPoweredByUppy: false
+		  });
+		  
+		  uppy.use(Uppy.Webcam, {
+			  target: Uppy.Dashboard,
+			  modes: ['picture']
+		  });
+		  
+		  uppy.on('upload-success', (file, response) => {
+			  // if file name was modified by server, reflect it in Uppy
+			  file.meta.name = response.body.name;
+		  });
+		  
+		  uppy.on('file-removed', (file, reason) => {
+			  if (reason === 'removed-by-user') {
+				 // delete file from temporary folder on server
+			    $.ajax({
+			    	url :  LAMS_URL + 'tmpFileUploadDelete',
+			    	data : {
+			    		'tmpFileUploadId' : tmpFileUploadId,
+			    		'name' : file.meta.name
+			    	}
+			    })
+			  }
+		  })
+	}

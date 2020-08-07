@@ -27,7 +27,13 @@
 
 	</c:when>
 	<c:otherwise>
-		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
+			   value="${empty topicFormId.tmpFileUploadId ? tmpFileUploadId : topicFormId.tmpFileUploadId}" />
+		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
+		<div id="image-upload-area" class="voffset20"></div>
+		<script>
+			initFileUpload('${{empty topicFormId.tmpFileUploadId ? tmpFileUploadId : topicFormId.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
+		</script>
 	</c:otherwise>
 </c:choose>
 
