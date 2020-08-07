@@ -32,7 +32,7 @@
 		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
 		<div id="image-upload-area" class="voffset20"></div>
 		<script>
-			initFileUpload('${{empty topicFormId.tmpFileUploadId ? tmpFileUploadId : topicFormId.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
+			initFileUpload('${empty topicFormId.tmpFileUploadId ? tmpFileUploadId : topicFormId.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
 		</script>
 	</c:otherwise>
 </c:choose>
