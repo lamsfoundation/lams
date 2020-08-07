@@ -108,6 +108,9 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
 <script type="text/javascript">
+	<%-- Add jqGrid internationalisation snippet --%>
+	<%@ include file="/jqGrid.i18n.jsp"%>
+
 	$(document).ready(function(){
 			
 		$("#questions-grid").jqGrid({

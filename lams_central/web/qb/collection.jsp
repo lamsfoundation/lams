@@ -83,6 +83,9 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
+		<%-- Add jqGrid internationalisation snippet --%>
+		<%@ include file="/jqGrid.i18n.jsp"%>
+			
 		$(document).ready(function(){
 			var collectionGrid = $('#collection-grid'),	
 				isPublicCollection = ${empty collection.userId};

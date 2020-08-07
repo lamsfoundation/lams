@@ -14,58 +14,12 @@ Include this jsp in your jqGrid page head to get some jqGrid functionality
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 
 <script type="text/javascript">
-
+	<%-- Add jqGrid internationalisation snippet --%>
+	<c:import url="/jqGrid.i18n.jsp" context="/lams" />
+		
 	var popupWidth = 1280,
 		popupHeight = 720;
 		
-	// JQGRID LANGUAGE ENTRIES ---------------------------------------------
-	
-	// editing entries
-	$.jgrid.edit = {
-	    addCaption: "Add Record",
-	    editCaption: "Edit Record",
-	    bSubmit: "Submit",
-	    bCancel: "Cancel",
-		bClose: "Close",
-	    processData: "Processing...",
-	    msg: {
-	        required:"Field is required",
-	        number:"<fmt:message key="gradebook.function.error.enterNumber"/>",
-	        minValue:"value must be greater than or equal to ",
-	        maxValue:"value must be less than or equal to",
-	        email: "is not a valid e-mail",
-	        integer: "Please, enter valid integer value",
-			date: "Please, enter valid date value"
-	    }
-	};
-	
-	// search entries
-	$.jgrid.search = {
-		    caption: "<fmt:message key="gradebook.function.search.title"/>",
-		    Find: "<fmt:message key="label.find"/>",
-		    Reset: "<fmt:message key="label.reset"/>",
-		    odata : [
-		    	"<fmt:message key="gradebook.function.search.equalTo"/>", 
-		    	"<fmt:message key="gradebook.function.search.notEqualTo"/>", 
-		    	'less', 
-		    	'less or equal',
-		    	'greater',
-		    	'greater or equal', 
-		    	"<fmt:message key="gradebook.function.search.startsWith"/>",
-		    	"<fmt:message key="gradebook.function.search.endsWith"/>",
-		    	"<fmt:message key="gradebook.function.search.contains"/>" 
-		    ]
-	};
-	
-	// setcolumns module
-	$.jgrid.col = {
-	    caption: "<fmt:message key="gradebook.function.window.showColumns"/>",
-	    bSubmit: "<fmt:message key="label.ok"/>",
-	    bCancel: "<fmt:message key="label.cancel"/>"
-	};
-	
-	// ---------------------------------------------------------------------
-	
 	// launches a popup from the page
 	function launchPopup(url,title) {
 		var wd = null;
