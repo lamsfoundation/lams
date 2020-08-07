@@ -28,9 +28,15 @@
 					<fmt:message key="label.preview.upload.file" />
 				</h5>
 				<%@ include file="filelist.jsp"%>
+				
 				<c:if test="${sessionMap.mode != 'teacher'}">
-					<lams:FileUpload fileFieldId="uploadButton"  fileFieldname="uploadedFile" fileInputMessageKey="label.authoring.choosefile.button"
-						maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+					<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
+						   value="${taskListItemForm.tmpFileUploadId}" />
+					<div id="image-upload-area" class="voffset20"></div>
+					<script>
+						initFileUpload('${taskListItemForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+					</script>
+					
 					<input type="submit" name="uploadedFileButton" value='<fmt:message key="label.preview.upload.button" />'
 						class="btn btn-default btn-disable-on-submit voffset5" />
 				</c:if>

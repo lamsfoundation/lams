@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.taskList.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -78,7 +80,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Class implements <code>org.lamsfoundation.lams.tool.taskList.service.ITaskListService</code>.
@@ -134,9 +135,9 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public TaskListItemAttachment uploadTaskListItemFile(MultipartFile uploadFile, TaskListUser user)
+    public TaskListItemAttachment uploadTaskListItemFile(File uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getOriginalFilename())) {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getName())) {
 	    throw new UploadTaskListFileException(
 		    messageService.getMessage("error.msg.upload.file.not.found", new Object[] { uploadFile }));
 	}
@@ -148,7 +149,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	TaskListItemAttachment file = new TaskListItemAttachment();
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getOriginalFilename());
+	file.setFileName(uploadFile.getName());
 	file.setCreated(new Timestamp(new Date().getTime()));
 	file.setCreateBy(user);
 
@@ -865,7 +866,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -957,12 +958,12 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
-    private NodeKey processFile(MultipartFile file) throws UploadTaskListFileException {
+    private NodeKey processFile(File file) throws UploadTaskListFileException {
 	NodeKey node = null;
 	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
 	    String fileName = file.getName();
 	    try {
-		node = taskListToolContentHandler.uploadFile(file.getInputStream(), fileName, file.getContentType());
+		node = taskListToolContentHandler.uploadFile(new FileInputStream(file), fileName, null);
 	    } catch (InvalidParameterException e) {
 		throw new UploadTaskListFileException(
 			messageService.getMessage("error.msg.invaid.param.upload") + " " + e.getMessage());
@@ -972,9 +973,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    } catch (RepositoryCheckedException e) {
 		throw new UploadTaskListFileException(
 			messageService.getMessage("error.msg.repository") + " " + e.getMessage());
-	    } catch (IOException e) {
-		throw new UploadTaskListFileException(
-			messageService.getMessage("error.msg.io.exception") + " " + e.getMessage());
 	    }
 	}
 	return node;
