@@ -48,10 +48,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:forEach>
 	</frameset>
 
-	<noframes>
-		<body>
-			<fmt:message key="message.activity.parallel.noFrames" />
-		</body>
-	</noframes>
-
 </lams:html>
