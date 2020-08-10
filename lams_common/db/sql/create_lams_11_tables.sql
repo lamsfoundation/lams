@@ -969,7 +969,7 @@ CREATE TABLE `lams_learning_activity` (
   `options_instructions` mediumtext COLLATE utf8mb4_unicode_ci,
   `tool_id` bigint(20) DEFAULT NULL,
   `tool_content_id` bigint(20) DEFAULT NULL,
-  `activity_category_id` int(3) NOT NULL,
+  `activity_category_id` int(3),
   `gate_activity_level_id` int(11) DEFAULT NULL,
   `gate_open_flag` tinyint(1) DEFAULT NULL,
   `gate_open_user` bigint(20) DEFAULT NULL,

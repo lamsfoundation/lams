@@ -13,7 +13,6 @@ activity_ui_id
 , learning_library_id
 , create_date_time
 , tool_id
-, activity_category_id
 , library_activity_ui_image
 , language_file
 )
@@ -28,7 +27,6 @@ NULL
 , ${learning_library_id}
 , NOW()
 , ${tool_id}
-, 4
 , 'tool/ladoku11/images/icon_dokumaran.svg'
 , 'org.lamsfoundation.lams.tool.dokumaran.ApplicationResources'
 )
