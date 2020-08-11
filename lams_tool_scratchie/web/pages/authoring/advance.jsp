@@ -85,13 +85,6 @@
 		</label>
 	</div>
 	
-	<div class="checkbox">
-		<label for="shuffle-items">
-			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
-			<fmt:message key="label.authoring.advanced.shuffle.items" />
-		</label>
-	</div>
-	
 	<div class="form-inline">
 		<label for="time-limit">
 			<fmt:message key="label.time.limit" />&nbsp;
