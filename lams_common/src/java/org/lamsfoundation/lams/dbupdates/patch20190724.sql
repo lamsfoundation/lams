@@ -29,15 +29,32 @@ CREATE TABLE lams_qb_collection_organisation (`collection_uid`  BIGINT NOT NULL,
 									   		  CONSTRAINT FK_lams_qb_collection_share_2 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id)
 												ON DELETE CASCADE ON UPDATE CASCADE
 									  		  );
-
+									  		  
+-- add questions to public collection
 INSERT INTO lams_qb_collection VALUES (1, 'Public questions', NULL, false);
 
 INSERT INTO lams_qb_collection_question
-	SELECT 1, question_id FROM lams_qb_question;
+	SELECT 1, question_id FROM lams_qb_question
+	WHERE owner_id IS NULL;
 	
+-- add questions to private collections
+INSERT INTO lams_qb_collection
+	SELECT NULL, 'My questions', owner_id, true
+	FROM (SELECT DISTINCT owner_id FROM lams_qb_question WHERE owner_id IS NOT NULL) AS qb;
+
+INSERT INTO lams_qb_collection_question
+	SELECT c.uid, qb.question_id 
+		FROM lams_qb_question AS qb
+		JOIN lams_qb_collection AS c ON qb.owner_id = c.user_id
+	WHERE qb.owner_id IS NOT NULL;
+	
+ALTER TABLE lams_qb_question DROP COLUMN owner_id;
+
+
 INSERT INTO lams_configuration VALUES
 ('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);
-									  		  
+
+
 -- Put all sql statements above here
 
 -- If there were no errors, commit and restore autocommit to on
