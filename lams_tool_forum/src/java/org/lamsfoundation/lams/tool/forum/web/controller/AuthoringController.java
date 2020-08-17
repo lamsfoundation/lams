@@ -377,6 +377,7 @@ public class AuthoringController {
 	//validate form
 	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
 	if (!errorMap.isEmpty()) {
+	    messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/authoring/message/create";
 	}
@@ -529,6 +530,7 @@ public class AuthoringController {
 	//validate form
 	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
 	if (!errorMap.isEmpty()) {
+	    messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/authoring/message/edit";
 	}
