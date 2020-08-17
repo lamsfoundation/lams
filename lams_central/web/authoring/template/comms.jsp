@@ -138,7 +138,7 @@
 		 	}
 			// open import pop up window, centered horizontally
 			var left = ((screen.width / 2) - (500 / 2));
-	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
+	    	window.open(url,'QuestionFile','width=500,height=370,scrollbars=yes,top=150,left=' + left);
 	    }
 
 		function createAssessment(questionType, numAssessmentsFieldname, containingDivName, qbQuestionUid, collapse) {

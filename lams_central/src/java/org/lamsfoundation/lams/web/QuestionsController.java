@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -26,7 +28,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Runs extraction of chosen IMS QTI zip file and prepares form for user to manually choose interesting question.
@@ -42,22 +43,24 @@ public class QuestionsController {
     private IQbService qbService;
 
     @RequestMapping("/questions")
-    public String execute(@RequestParam(name = "file", required = false) MultipartFile file,
-	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,
-	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
-	    HttpServletRequest request) throws Exception {
+    public String execute(@RequestParam String tmpFileUploadId, @RequestParam String returnURL,
+	    @RequestParam("limitType") String limitTypeParam, @RequestParam String callerID,
+	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
 
-	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
-	File tempDir = new File(tempDirName);
-	if (!tempDir.exists()) {
-	    tempDir.mkdirs();
-	}
-
-	InputStream uploadedFileStream = null;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String packageName = null;
-	if (file != null) {
-	    packageName = file.getOriginalFilename().toLowerCase();
-	    uploadedFileStream = file.getInputStream();
+
+	File file = null;
+	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length > 1) {
+		errorMap.add("GLOBAL", "Uploaded more than 1 file");
+	    } else if (files.length == 1) {
+		file = files[0];
+		packageName = file.getName().toLowerCase();
+		;
+	    }
 	}
 
 	// this parameter is not really used at the moment
@@ -75,11 +78,20 @@ public class QuestionsController {
 	}
 
 	// user did not choose a file
-	if ((uploadedFileStream == null) || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
-	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	if (file == null || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
+	}
+
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("tmpFileUploadId", tmpFileUploadId);
 	    request.setAttribute("errorMap", errorMap);
 	    return "questions/questionFile";
+	}
+
+	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
+	File tempDir = new File(tempDirName);
+	if (!tempDir.exists()) {
+	    tempDir.mkdirs();
 	}
 
 	Set<String> limitType = null;
@@ -88,6 +100,8 @@ public class QuestionsController {
 	    // comma delimited acceptable question types, for example "mc,fb"
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
+
+	InputStream uploadedFileStream = new FileInputStream(file);
 
 	Question[] questions = packageName.endsWith(".xml")
 		? QuestionParser.parseQTIFile(uploadedFileStream, null, limitType)

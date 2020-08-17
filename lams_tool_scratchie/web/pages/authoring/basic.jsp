@@ -84,7 +84,7 @@
 	
     function importQTI(){
     	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true',
-    			    'QuestionFile','width=500,height=240,scrollbars=yes');
+    			    'QuestionFile','width=500,height=370,scrollbars=yes');
     }
   	
   	// this method is called by QTI questionChoice.jsp 
