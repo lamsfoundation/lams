@@ -59,7 +59,6 @@ public class QuestionsController {
 	    } else if (files.length == 1) {
 		file = files[0];
 		packageName = file.getName().toLowerCase();
-		;
 	    }
 	}
 
@@ -107,6 +106,8 @@ public class QuestionsController {
 		? QuestionParser.parseQTIFile(uploadedFileStream, null, limitType)
 		: QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
 	request.setAttribute("questions", questions);
+	
+	FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
 
 	return "questions/questionChoice";
     }

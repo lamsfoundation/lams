@@ -24,11 +24,11 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -54,7 +54,8 @@ public class XmlQuestionsController {
      * Initializes import questions page.
      */
     @RequestMapping("/initImportQuestionsXml")
-    public String initImportQuestionsXml() throws ServletException {
+    public String initImportQuestionsXml(Model model) throws ServletException {
+	model.addAttribute("tmpFileUploadId", FileUtil.generateTmpFileUploadId());
 	return "qb/importQuestionsXml";
     }
 
@@ -64,24 +65,33 @@ public class XmlQuestionsController {
     @SuppressWarnings("unchecked")
     @RequestMapping(path = "/importQuestionsXml", method = RequestMethod.POST)
     @ResponseBody
-    public void importQuestionsXml(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request,
+    public void importQuestionsXml(@RequestParam String tmpFileUploadId, HttpServletRequest request,
 	    @RequestParam long collectionUid) throws ServletException {
 	List<String> toolsErrorMsgs = new ArrayList<>();
 	try {
-	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
+	    File file = null;
+	    File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
+		    throw new RuntimeException("Uploaded more than 1 file");
+		}
+		if (files.length == 1) {
+		    file = files[0];
+		}
+	    }
 
 	    // filename on the client
-	    String filename = FileUtil.getFileName(file.getOriginalFilename());
-	    File destinationFile = new File(uploadPath, filename);
-	    file.transferTo(destinationFile);
-
+	    String filename = FileUtil.getFileName(file.getName());
 	    String fileExtension = FileUtil.getFileExtension(filename);
 	    if (!fileExtension.equalsIgnoreCase("xml")) {
+		FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
 
 	    // import learning design
-	    String fullFilePath = destinationFile.getAbsolutePath();
+	    String fullFilePath = file.getAbsolutePath();
 	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
 	    // FileUtil.getFullPath(learningDesignPath, ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
 	    List<QbQuestion> questions = (List<QbQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
@@ -144,6 +154,8 @@ public class XmlQuestionsController {
 	if (toolsErrorMsgs.size() > 0) {
 	    request.setAttribute("toolsErrorMessages", toolsErrorMsgs);
 	}
+
+	FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
     }
 
     /**
