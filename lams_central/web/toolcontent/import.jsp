@@ -4,7 +4,6 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 <c:set var="ANTIVIRUS_ENABLE"><%=Configuration.get(ConfigurationKeys.ANTIVIRUS_ENABLE)%></c:set>
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
@@ -33,10 +32,7 @@
  	
 		<script type="text/javascript">
 			var LAMS_URL = '<lams:LAMSURL/>',
-		 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
-				// convert Java syntax to JSON
-		       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-		       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
+		 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 				
 		       
 			function closeWin(){
@@ -55,7 +51,8 @@
 					  restrictions: {
 						// taken from LAMS configuration
 					    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
-					    maxNumberOfFiles: 1
+					    maxNumberOfFiles: 1,
+					    allowedFileTypes : ['.zip']
 					  },
 					  meta: {
 						  // all uploaded files go to this subdir in LAMS tmp dir
@@ -67,17 +64,7 @@
 					    strings: {
 					    	  'dropPasteImportFiles' : 'Drop files here, paste or %{browseFiles}'
 					    }
-					  },
-					  onBeforeFileAdded: function(currentFile, files) {
-						  var name = currentFile.data.name,
-						  	  extensionIndex = name.lastIndexOf('.'),
-						  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
-						  if (!valid) {
-							  uppy.info(EXE_FILE_ERROR, 'error', 10000);
-						  }
-						  
-						  return valid;
-					    }
+					  }
 				  };
 				  
 				  switch(language) {
