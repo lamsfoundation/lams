@@ -203,22 +203,21 @@
 				  limit : 1
 			  });
 			  
-			  uppy.use(Uppy.Dashboard, {
+			  uppy.use(Uppy.DragDrop, {
 				  target: '#image-upload-area',
 				  inline: true,
-				  height: 300,
-				  width: '100%',
-				  showProgressDetails : true,
-				  hideRetryButton : true,
-				  hideCancelButton : true,
-				  showRemoveButtonAfterComplete: true,
-				  proudlyDisplayPoweredByUppy: false
-			  });
+				  height: 120,
+				  width: '100%'
+				});
 			  
-			  uppy.use(Uppy.Webcam, {
-				  target: Uppy.Dashboard,
-				  modes: ['picture']
-			  });
+			  uppy.use(Uppy.StatusBar, {
+				  target: '#image-upload-area',
+				  hideAfterFinish: false,
+				  hideUploadButton: true,
+				  hideRetryButton: true,
+				  hidePauseResumeButton: true,
+				  hideCancelButton: true
+				});
 			  
 			  uppy.on('upload-success', (file, response) => {
 				  // if file name was modified by server, reflect it in Uppy
