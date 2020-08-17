@@ -59,11 +59,6 @@
 						  // its format is: upload_<userId>_<timestamp>
 						  'tmpFileUploadId' : tmpFileUploadId,
 						  'largeFilesAllowed' : false
-					  },
-					  locale: {
-					    strings: {
-					    	  'dropPasteImportFiles' : 'Drop files here, paste or %{browseFiles}'
-					    }
 					  }
 				  };
 				  
