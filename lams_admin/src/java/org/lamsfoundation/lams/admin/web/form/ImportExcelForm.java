@@ -22,17 +22,13 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
-
 /**
  * @author jliew
- *
- *
  */
 public class ImportExcelForm {
 
     private Integer orgId;
-    private MultipartFile file;
+    private String tmpFileUploadId;
 
     public Integer getOrgId() {
 	return orgId;
@@ -42,12 +38,11 @@ public class ImportExcelForm {
 	this.orgId = orgId;
     }
 
-    public MultipartFile getFile() {
-	return file;
+    public String getTmpFileUploadId() {
+	return tmpFileUploadId;
     }
 
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setTmpFileUploadId(String tmpFileUploadId) {
+	this.tmpFileUploadId = tmpFileUploadId;
     }
-
 }

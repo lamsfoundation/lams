@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,13 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
  */
 @Controller
 public class ImportExcelController {
@@ -48,11 +42,9 @@ public class ImportExcelController {
 	    throws Exception {
 
 	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
-	//if (orgId==null) orgId = (Integer)request.getAttribute("orgId");
-
 	importExcelForm.setOrgId(orgId);
+	importExcelForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 
 	return "import/importexcel";
     }
-
 }
