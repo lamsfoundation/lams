@@ -57,7 +57,7 @@ function submitImageGalleryItem(){
 }
 
 /**
- * Initialised Uppy as the file upload widget
+ * Initialise Uppy as the file upload widget
  */
 function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 	  var uppyProperties = {

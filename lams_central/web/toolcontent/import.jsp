@@ -40,7 +40,7 @@
 			}
 			
 			/**
-			 * Initialised Uppy as the file upload widget
+			 * Initialise Uppy as the file upload widget
 			 */
 			function initFileUpload(tmpFileUploadId, language) {
 				  var uppyProperties = {
