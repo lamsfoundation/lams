@@ -1670,9 +1670,6 @@ public class GradebookService implements IGradebookFullService {
 		activityTouserToGradebookUserActivityMap.put(activity.getActivityId(), userToGradebookUserActivityMap);
 	    }
 
-	    int numberCellsPerRow = simplified ? 3 + selectedLessons.size() + 3
-		    : (selectedLessons.size() * 9) + (allActivities.size() * 2) + 5;
-
 	    String weightedMessage = messageService.getMessage("label.activity.marks.weighted");
 	    // Lesson names row----------------------
 	    ExcelRow lessonsNames = sheet.initRow();
@@ -1697,7 +1694,7 @@ public class GradebookService implements IGradebookFullService {
 		    lessonsNames.addCell(lessonName, true);
 		    lessonsNames.addEmptyCells(9 + (numberActivities * 2));
 		}
-//		i -= 2;
+
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
 		lessonsNames.addCell(getMessage("label.overall.totals"), true);
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
@@ -1723,6 +1720,8 @@ public class GradebookService implements IGradebookFullService {
 	    } else {
 		//create Selected Lessons Header Full
 		for (Lesson lesson : selectedLessons) {
+		    boolean isWeighted = isWeightedLessonMap.get(lesson.getLessonId());
+
 		    headerRow.addCell(getMessage("gradebook.export.last.name"));
 		    headerRow.addCell(getMessage("gradebook.export.first.name"));
 		    headerRow.addCell(getMessage("gradebook.export.login"));
@@ -1732,7 +1731,14 @@ public class GradebookService implements IGradebookFullService {
 
 		    List<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 		    for (Activity activity : activities) {
-			headerRow.addCell(activity.getTitle(), true);
+			String activityName = activity.getTitle();
+			if (isWeighted && activity.isToolActivity()) {
+			    ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+			    activityName += " " + getMessage("gradebook.export.weight",
+				    new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
+			}
+
+			headerRow.addCell(activityName, true);
 			headerRow.addCell(getMessage("label.max.possible"));
 		    }
 
@@ -1815,9 +1821,12 @@ public class GradebookService implements IGradebookFullService {
 			if (activityToTotalMarkMap.get(activity.getActivityId()) != null) {
 			    rawActivityTotalMarks = activityToTotalMarkMap.get(activity.getActivityId());
 			}
-			Integer weight = weighted && activity.getEvaluation() != null
-				&& activity.getEvaluation().getWeight() != null ? activity.getEvaluation().getWeight()
-					: null;
+			Integer weight = weighted ? 0 : null;
+
+			if (activity.getEvaluation() != null && activity.getEvaluation().getWeight() != null) {
+			    weight = activity.getEvaluation().getWeight();
+			}
+
 			Long weightedActivityTotalMarks = weight != null ? weight : rawActivityTotalMarks;
 
 			Double mark = 0d;
