@@ -312,9 +312,9 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ sortOrder;
 
 	final String CONDITION_IF_ANY_USER_PROVIDED = " AND lesson.lessonClass.groupingId = g.grouping.groupingId "
-		+ "AND ug.groupId = g.groupId AND ug.userId = :userId ";
+		+ "AND ug.group.groupId = g.groupId AND ug.user.userId = :userId ";
 
-	final String CONDITION_IF_STAFF_PROVIDED = " AND ug.groupId = lesson.lessonClass.staffGroup.groupId AND ug.userId = :userId ";
+	final String CONDITION_IF_STAFF_PROVIDED = " AND ug.group.groupId = lesson.lessonClass.staffGroup.groupId AND ug.user.userId = :userId ";
 
 	String queryString;
 	if (sortBy.equals("avgTimeTaken")) {
