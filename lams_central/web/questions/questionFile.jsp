@@ -47,7 +47,8 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 			
 		function initFileUpload(tmpFileUploadId, language) {
-			  var uppyProperties = {
+			var allowedFileTypes = ['.zip', '.xml'],
+  	  			uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
 				  allowMultipleUploads: true,
@@ -56,14 +57,24 @@
 					// taken from LAMS configuration
 				    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
 				    maxNumberOfFiles: 1,
-				    allowedFileTypes : ['.zip', '.xml']
+				    allowedFileTypes : allowedFileTypes
 				  },
 				  meta: {
 					  // all uploaded files go to this subdir in LAMS tmp dir
 					  // its format is: upload_<userId>_<timestamp>
 					  'tmpFileUploadId' : tmpFileUploadId,
 					  'largeFilesAllowed' : true
-				  }
+				  },
+				  onBeforeFileAdded: function(currentFile, files) {
+					  var name = currentFile.data.name,
+					  	  extensionIndex = name.lastIndexOf('.'),
+					  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
+					  if (!valid) {
+						  uppy.info('<fmt:message key="label.questions.file.missing" />', 'error', 10000);
+					  }
+					  
+					  return valid;
+			    }
 			  };
 			  
 			  switch(language) {
@@ -89,6 +100,11 @@
 				  height: 120,
 				  width: '100%'
 				});
+
+
+			  uppy.use(Uppy.Informer, {
+				  target: '#image-upload-area'
+			  });
 			  
 			  uppy.use(Uppy.StatusBar, {
 				  target: '#image-upload-area',

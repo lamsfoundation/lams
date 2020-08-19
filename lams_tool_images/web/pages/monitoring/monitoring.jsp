@@ -65,6 +65,7 @@
 			// convert Java syntax to JSON
 			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 		</script>
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/imageGalleryitem.js"></script>
 		

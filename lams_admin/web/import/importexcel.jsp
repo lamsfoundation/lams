@@ -51,24 +51,35 @@
 			 * Initialise Uppy as the file upload widget
 			 */
 			function initFileUpload(tmpFileUploadId, language) {
-				  var uppyProperties = {
-					  // upload immediately 
-					  autoProceed: true,
-					  allowMultipleUploads: true,
-					  debug: false,
-					  restrictions: {
-						// taken from LAMS configuration
-					    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
-					    maxNumberOfFiles: 1,
-					    allowedFileTypes : ['.xls']
-					  },
-					  meta: {
-						  // all uploaded files go to this subdir in LAMS tmp dir
-						  // its format is: upload_<userId>_<timestamp>
-						  'tmpFileUploadId' : tmpFileUploadId,
-						  'largeFilesAllowed' : true
-					  }
-				  };
+				var allowedFileTypes = ['.xls'],
+			  	  	uppyProperties = {
+						  // upload immediately 
+						  autoProceed: true,
+						  allowMultipleUploads: true,
+						  debug: false,
+						  restrictions: {
+							// taken from LAMS configuration
+						    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
+						    maxNumberOfFiles: 1,
+						    allowedFileTypes : allowedFileTypes
+						  },
+						  meta: {
+							  // all uploaded files go to this subdir in LAMS tmp dir
+							  // its format is: upload_<userId>_<timestamp>
+							  'tmpFileUploadId' : tmpFileUploadId,
+							  'largeFilesAllowed' : true
+						  },
+						  onBeforeFileAdded: function(currentFile, files) {
+							  var name = currentFile.data.name,
+							  	  extensionIndex = name.lastIndexOf('.'),
+							  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
+							  if (!valid) {
+								  uppy.info('<fmt:message key="error.attachment.not.xls" />', 'error', 10000);
+							  }
+							  
+							  return valid;
+					    }
+					  };
 				  
 				  switch(language) {
 				  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
@@ -93,6 +104,10 @@
 					  height: 150,
 					  width: '100%'
 					});
+
+				  uppy.use(Uppy.Informer, {
+					  target: '#file-upload-area'
+				  });
 				  
 				  uppy.use(Uppy.StatusBar, {
 					  target: '#file-upload-area',

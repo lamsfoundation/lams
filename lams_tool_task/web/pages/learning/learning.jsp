@@ -175,14 +175,14 @@
 					  'largeFilesAllowed' : false
 				  },
 				  onBeforeFileAdded: function(currentFile, files) {
-				  var name = currentFile.data.name,
-				  	  extensionIndex = name.lastIndexOf('.'),
-				  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
-				  if (!valid) {
-					  uppy.info(EXE_FILE_ERROR, 'error', 10000);
-				  }
-				  
-				  return valid;
+					  var name = currentFile.data.name,
+					  	  extensionIndex = name.lastIndexOf('.'),
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  if (!valid) {
+						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
+					  }
+					  
+					  return valid;
 			    }
 			  };
 			  
@@ -209,6 +209,10 @@
 				  height: 120,
 				  width: '100%'
 				});
+			  
+			  uppy.use(Uppy.Informer, {
+				  target: '#image-upload-area'
+			  });
 			  
 			  uppy.use(Uppy.StatusBar, {
 				  target: '#image-upload-area',
