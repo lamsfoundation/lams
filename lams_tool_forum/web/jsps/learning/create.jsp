@@ -62,7 +62,8 @@
    		       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
    		       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
 		</script>
-		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
+		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>	
 		
 	</lams:head>
 	

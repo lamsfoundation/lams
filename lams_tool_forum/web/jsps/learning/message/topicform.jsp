@@ -13,8 +13,6 @@
 
 <c:if test="${sessionMap.allowUpload}">
 	<div class="form-group">
-		<label><fmt:message key="message.label.attachment" /></label><BR/>
-		
 		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
 	   		value="${messageForm.tmpFileUploadId}" />
 		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
