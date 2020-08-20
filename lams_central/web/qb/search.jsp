@@ -130,7 +130,7 @@
 			iconSet: 'fontAwesome',
 		   	colNames:[
 			   	'questionUid',
-				'<fmt:message key="authoring.section.questions"/>',
+				'<fmt:message key="label.qb.collection.grid.title"/>',
 				'questionDescription'
 			],
 		   	colModel:[
