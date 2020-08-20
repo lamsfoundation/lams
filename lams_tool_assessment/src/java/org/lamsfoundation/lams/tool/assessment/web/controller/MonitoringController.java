@@ -797,13 +797,22 @@ public class MonitoringController {
 
     /**
      * Allows displaying correct answers to learners
+     *
+     * @throws IOException
      */
     @RequestMapping(path = "/discloseCorrectAnswers", method = RequestMethod.POST)
-    public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) {
+    public void discloseCorrectAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	if (question.isCorrectAnswersDisclosed()) {
+	    log.warn(
+		    "Trying to disclose correct answers when they are already disclosed for Assessment tool content ID "
+			    + toolContentId + " and question UID: " + questionUid);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	    return;
+	}
 	question.setCorrectAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 
@@ -817,13 +826,22 @@ public class MonitoringController {
 
     /**
      * Allows displaying other groups' answers to learners
+     *
+     * @throws IOException
      */
     @RequestMapping(path = "/discloseGroupsAnswers", method = RequestMethod.POST)
-    public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) {
+    public void discloseGroupsAnswers(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
 	Long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
 
 	AssessmentQuestion question = service.getAssessmentQuestionByUid(questionUid);
+	if (question.isGroupsAnswersDisclosed()) {
+	    log.warn("Trying to disclose group answers when they are already disclosed for Assessment tool content ID "
+		    + toolContentId + " and question UID: " + questionUid);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	    return;
+	}
+
 	question.setGroupsAnswersDisclosed(true);
 	service.updateAssessmentQuestion(question);
 

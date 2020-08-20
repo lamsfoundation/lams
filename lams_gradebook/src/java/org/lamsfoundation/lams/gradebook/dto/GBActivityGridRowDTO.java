@@ -28,6 +28,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.springframework.web.util.HtmlUtils;
@@ -38,6 +39,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     public static final String VIEW_ACTIVITY = "activityView";
 
     private String competences;
+
+    private Integer weight;
 
     // Properties for user view
     private String activityUrl;
@@ -92,6 +95,12 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	String competenceMappingsStr = "";
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
+
+	    ActivityEvaluation eval = toolActivity.getEvaluation();
+	    if (eval != null && eval.getWeight() != null) {
+		this.weight = eval.getWeight();
+	    }
+
 	    //Constructs the competences for this activity.
 	    Set<CompetenceMapping> competenceMappings = toolActivity.getCompetenceMappings();
 
@@ -105,7 +114,6 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 		    competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
 		}
 	    }
-
 	}
 	this.competences = competenceMappingsStr;
 
@@ -113,7 +121,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     @Override
     public ArrayList<String> toStringArray(GBGridView view) {
-	ArrayList<String> ret = new ArrayList<String>();
+	ArrayList<String> ret = new ArrayList<>();
 	ret.add(id.toString());
 
 	if (view == GBGridView.MON_USER) {
@@ -172,6 +180,14 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	this.competences = competences;
     }
 
+    public Integer getWeight() {
+	return weight;
+    }
+
+    public void setWeight(Integer weight) {
+	this.weight = weight;
+    }
+
     public String getActivityUrl() {
 	return activityUrl;
     }
@@ -187,5 +203,4 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
     }
-
 }

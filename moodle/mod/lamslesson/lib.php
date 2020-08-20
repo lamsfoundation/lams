@@ -37,7 +37,7 @@ require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->libdir.'/xmlize.php');
 require_once($CFG->libdir.'/filelib.php');
-
+include 'classes/event/course_module_viewed.php';
 /// CONSTANTS ///////////////////////////////////////////////////////////
 
 define('LAMSLESSON_LOGIN_REQUEST', '/LoginRequest');
@@ -1048,4 +1048,28 @@ function lamslesson_get_lamsserver_time() {
 	$offset = $result - $localtime;
 	
     return "LAMS time: " . date('m-d-Y H:i:s.u', $result/1000) . " \rMoodle time:" . date('m-d-Y H:i:s.u', $localtime/1000) . " \rOffset: " . $offset/1000/60 . " minutes";
+}
+
+/**
+ * Trigger the course_module_viewed event.
+ *
+ * @param  stdClass $lamslesson        lamslesson object
+ * @param  stdClass $course            course object
+ * @param  stdClass $cm                course module object
+ * @param  stdClass $context           context object
+ * @since Moodle 3.0
+ */
+function lamslesson_view($lamslesson, $course, $cm, $context) {
+
+  // Trigger course_module_viewed event.
+  $params = array(
+      'context' => $context,
+      'objectid' => $lamslesson->id
+  );
+
+  $event = \mod_lamslesson\event\course_module_viewed::create($params);
+  $event->add_record_snapshot('course_modules', $cm);
+  $event->add_record_snapshot('course', $course);
+  $event->add_record_snapshot('lamslesson', $lamslesson);
+  $event->trigger();
 }

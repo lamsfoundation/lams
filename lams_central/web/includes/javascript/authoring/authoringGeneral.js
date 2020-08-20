@@ -1115,13 +1115,19 @@ GeneralInitLib = {
 								$('<td />').text(activity.title).appendTo(row);
 								$('<td />').text(activity.gradebookToolOutputDefinitionDescription).appendTo(row);
 								$('<td />').append(weight).appendTo(row);
+								
+								if (!activity.gradebookToolOutputWeight) {
+									activity.gradebookToolOutputWeight = 0;
+								}
+								
 								weight.spinner({
 									'min'    : 0,
 									'max'    : 100,
 									'change' : function(){
 										var value = $(this).val();
 										if (value == "" || isNaN(value)) {
-											value = null;
+											value = 0;
+											$(this).val(value);
 										}
 										activity.gradebookToolOutputWeight = value;
 										layout.weightsDialog.data('sumWeights')();
@@ -1144,32 +1150,30 @@ GeneralInitLib = {
 				},
 				
 				'sumWeights' : function(firstRun){
-					var sum = null;
+					var sum = 0;
 					$('tbody tr', layout.weightsDialog).each(function(){
+						
 						var weight = $('input', this);
 						if (!firstRun && !weight.spinner('isValid')) {
-							weight.val(null);
+							weight.val(0);
 							return true;
 						}
 						var value = $(this).data('activity').gradebookToolOutputWeight;
 						if (value) {
-							if (sum == null) {
-								sum = 0;
-							}
 							sum += +value;
 						}
 					});
 					
 					var sumCell = $('#sumWeightCell', layout.weightsDialog);
-					if (sum == null) {
-						sumCell.empty();
-					} else {
+					if (sum) {
 						sumCell.text(sum + '%');
 						if (sum == 100) {
 							sumCell.removeClass('incorrect');
 						} else {
 							sumCell.addClass('incorrect');
 						}
+					} else {
+						sumCell.empty();
 					}
 				}
 			}
@@ -2313,7 +2317,7 @@ GeneralLib = {
 			layoutActivityDefs = [],
 			systemGate = null,
 			error = null,
-			weightsSum = null;
+			weightsSum = 0;
 		
 		// validate if groupings and inputs still exist for activities that need them
 		$.each(layout.activities, function(){
@@ -2382,14 +2386,11 @@ GeneralLib = {
 			
 			if (this.gradebookToolOutputDefinitionWeightable
 				&& (this.gradebookToolOutputWeight || this.gradebookToolOutputWeight == 0)) {
-				if (weightsSum == null) {
-					weightsSum = 0;
-				}
 				weightsSum += +this.gradebookToolOutputWeight;
 			}
 		});
 		
-		if (weightsSum != null && weightsSum != 100) {
+		if (weightsSum != 0 && weightsSum != 100) {
 			if (displayErrors) {
 				layout.ldStoreDialog.modal('hide');
 				layout.infoDialog.data('show')(LABELS.WEIGHTS_SUM_ERROR);
