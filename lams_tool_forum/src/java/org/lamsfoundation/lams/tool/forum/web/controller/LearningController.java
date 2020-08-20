@@ -23,9 +23,9 @@
 
 package org.lamsfoundation.lams.tool.forum.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -62,6 +61,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -290,7 +290,8 @@ public class LearningController {
 	    HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -338,7 +339,8 @@ public class LearningController {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -406,7 +408,8 @@ public class LearningController {
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -447,7 +450,8 @@ public class LearningController {
 	Long rootTopicId = WebUtil.readLongParam(request, ForumConstants.ATTR_TOPIC_ID);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -514,7 +518,8 @@ public class LearningController {
 	Long highlightMessageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -553,7 +558,8 @@ public class LearningController {
 	Long messageUid = WebUtil.readLongParam(request, ForumConstants.ATTR_MESS_ID, true);
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
@@ -588,6 +594,7 @@ public class LearningController {
     public String newTopic(@ModelAttribute MessageForm messageForm, HttpServletRequest request) {
 	// transfer SessionMapID as well
 	messageForm.setSessionMapID(WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
+	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 
 	return "jsps/learning/create";
     }
@@ -689,7 +696,7 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 	return "jsps/learning/reply";
     }
-    
+
     /**
      * Create a replayed topic for a parent topic.
      */
@@ -702,17 +709,19 @@ public class LearningController {
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/learning/reply";
 	}
-	
+
 	return "forward:/learning/replyTopicJSON.do";
     }
 
     /**
      * In case validation was successful, we store message and return JSON object back to HTML
+     * 
+     * @throws ServletException
      */
     @RequestMapping("/replyTopicJSON")
     @ResponseBody
     public String replyTopicJSON(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, IOException {
+	    HttpServletResponse response) throws InterruptedException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	Long parentId = (Long) sessionMap.get(ForumConstants.ATTR_PARENT_TOPIC_ID);
@@ -782,6 +791,8 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
+	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
@@ -806,6 +817,7 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
 	request.setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(ForumConstants.ATTR_ALLOW_UPLOAD));
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+	request.setAttribute("tmpFileUploadId", FileUtil.generateTmpFileUploadId());
 	return "jsps/learning/message/msgattachment";
     }
 
@@ -824,15 +836,17 @@ public class LearningController {
 
 	return "forward:/learning/updateTopicJSON.do";
     }
-    
+
     /**
      * In case validation was successful, we store message and return JSON object back to HTML
+     * 
+     * @throws ServletException
      */
     @RequestMapping("/updateTopicJSON")
     @ResponseBody
     public String updateTopicJSON(@ModelAttribute MessageForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException, IOException {
-	
+	    HttpServletResponse response) throws PersistenceException, IOException, ServletException {
+
 	SessionMap<String, Object> sessionMap = getSessionMap(request, messageForm);
 	Long topicId = (Long) sessionMap.get(ForumConstants.ATTR_TOPIC_ID);
 	Message message = messageForm.getMessage();
@@ -970,7 +984,8 @@ public class LearningController {
      * Validation method to check whether user posts meet minimum number.
      */
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
@@ -1056,30 +1071,31 @@ public class LearningController {
 
     /**
      * Get Forum Service.
+     *
+     * @throws ServletException
      */
 
-    private void setAttachment(MessageForm messageForm, Message message) {
-	if (messageForm.getAttachmentFile() != null
-		&& !StringUtils.isBlank(messageForm.getAttachmentFile().getOriginalFilename())) {
-
-	    Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
+    private void setAttachment(MessageForm messageForm, Message message) throws ServletException {
+	// update attachment
+	if (!messageForm.isHasAttachment()) {
 	    Set<Attachment> attSet = message.getAttachments();
-	    if (attSet == null) {
-		attSet = new HashSet<Attachment>();
-	    }
-	    // only allow one attachment, so replace whatever
 	    attSet.clear();
-	    attSet.add(att);
-	    att.setMessage(message);
-	    message.setAttachments(attSet);
-	} else if (!messageForm.isHasAttachment()) {
-	    // user already called deleteAttachment in AJAX call
-	    if (message.getAttachments() != null) {
-		Set<Attachment> atts = message.getAttachments();
-		atts.clear();
-		message.setAttachments(atts);
-	    } else {
-		message.setAttachments(null);
+
+	    File uploadDir = FileUtil.getTmpFileUploadDir(messageForm.getTmpFileUploadId());
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    throw new ServletException("Uploaded more than 1 file");
+		}
+
+		if (files.length == 1) {
+		    File file = files[0];
+		    Attachment att = forumService.uploadAttachment(file);
+		    attSet.add(att);
+		    att.setMessage(message);
+
+		    FileUtil.deleteTmpFileUploadDir(messageForm.getTmpFileUploadId());
+		}
 	    }
 	}
     }

@@ -2,9 +2,7 @@
 <%@include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
@@ -12,15 +10,125 @@
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <lams:html>
 <lams:head>
+		
 	<title><fmt:message key="tool.display.name" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
+	
+	<script type="text/javascript" src="${lams}/includes/javascript/uppy/uppy.min.js"></script>
+	<c:choose>
+		<c:when test="${language eq 'es'}">
+			<script type="text/javascript" src="${lams}/includes/javascript/uppy/es_ES.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'fr'}">
+			<script type="text/javascript" src="${lams}/includes/javascript/uppy/fr_FR.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'el'}">
+			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
+		</c:when>
+	</c:choose>
+	
 	<script type="text/javascript">
+		var LAMS_URL = '<lams:LAMSURL/>',
+			UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
+			// convert Java syntax to JSON
+	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+	       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
+		
+		
 		$(document).ready(function() {
 			$("time.timeago").timeago();
+			
+			if ($('#file-upload-area').length == 1) {
+				initFileUpload('${learnerForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+			}
 		});
-
+		
+		/**
+		 * Initialise Uppy as the file upload widget
+		 */
+		function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
+			  var uppyProperties = {
+				  // upload immediately 
+				  autoProceed: true,
+				  allowMultipleUploads: true,
+				  debug: false,
+				  restrictions: {
+					// taken from LAMS configuration
+				    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
+				    maxNumberOfFiles: ${sessionMap.isMaxLimitUploadEnabled ? sessionMap.maxLimitUploadNumber - learner.filesUploaded.size() : 10}
+				  },
+				  meta: {
+					  // all uploaded files go to this subdir in LAMS tmp dir
+					  // its format is: upload_<userId>_<timestamp>
+					  'tmpFileUploadId' : tmpFileUploadId,
+					  'largeFilesAllowed' : false
+				  },
+				  onBeforeFileAdded: function(currentFile, files) {
+					  var name = currentFile.data.name,
+					  	  extensionIndex = name.lastIndexOf('.'),
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  if (!valid) {
+						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
+					  }
+					  
+					  return valid;
+				    }
+			  };
+			  
+			  switch(language) {
+			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			  }
+			  
+			  
+			  var uppy = Uppy.Core(uppyProperties);
+			  // upload using Ajax
+			  uppy.use(Uppy.XHRUpload, {
+				  endpoint: LAMS_URL + 'tmpFileUpload',
+				  fieldName : 'file',
+				  // files are uploaded one by one
+				  limit : 1
+			  });
+			  
+			  uppy.use(Uppy.Dashboard, {
+				  target: '#file-upload-area',
+				  inline: true,
+				  height: 300,
+				  width: '100%',
+				  showProgressDetails : true,
+				  hideRetryButton : true,
+				  hideCancelButton : true,
+				  showRemoveButtonAfterComplete: true,
+				  proudlyDisplayPoweredByUppy: false
+			  });
+			  
+			  uppy.use(Uppy.Webcam, {
+				  target: Uppy.Dashboard,
+				  modes: ['picture']
+			  });
+			  
+			  uppy.on('upload-success', (file, response) => {
+				  // if file name was modified by server, reflect it in Uppy
+				  file.meta.name = response.body.name;
+			  });
+			  
+			  uppy.on('file-removed', (file, reason) => {
+				  if (reason === 'removed-by-user') {
+					 // delete file from temporary folder on server
+				    $.ajax({
+				    	url :  LAMS_URL + 'tmpFileUploadDelete',
+				    	data : {
+				    		'tmpFileUploadId' : tmpFileUploadId,
+				    		'name' : file.meta.name
+				    	}
+				    })
+				  }
+			  })
+		}
+		
 		function finish() {
 			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
 			return validateFinish(finishUrl);
@@ -30,7 +138,7 @@
 			return validateFinish(continueUrl);
 		}
 		function validateFinish(tUrl) {
-			var uploadedFilesNumber = <c:choose><c:when test="${empty learner.filesUploaded}">0</c:when><c:otherwise>1</c:otherwise></c:choose>;
+			var uploadedFilesNumber = +${learner.filesUploaded.size()};
 
 			//enforce min files upload limit
 			<c:if test="${sessionMap.minLimitUploadNumber != null}">
@@ -57,6 +165,28 @@
 			location.href = tUrl;
 		}
 		
+		function clearFileError(errDivId) {
+			if ( ! errDivId || errDivId.length == 0 ) {
+				errDivId = 'file-error-msg';
+			}
+			var errDiv = $('#'+errDivId);
+			errDiv.empty();
+			errDiv.css( "display", "none" );
+		}
+		
+		function showFileError(error, errDivId) {
+			if ( ! errDivId || errDivId.length == 0 ) {
+				errDivId = 'file-error-msg';
+			}
+			var errDiv = $('#'+errDivId);
+			if ( errDiv.size() > 0 ) {
+				errDiv.append(error);
+				errDiv.css( "display", "block" );
+			} else {
+				alert(error);
+			}
+		}
+		
 		function validateFileUpload() {
 			var valid = true;
 
@@ -68,22 +198,6 @@
 				valid = false;
 			}
 			
-			// check file
-			var fileSelect = document.getElementById('file');
-			var files = fileSelect.files;
-			if (files.length == 0) {
-				clearFileError();
-				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="learner.form.filepath.displayname"/></fmt:param></fmt:message>';
-				showFileError(requiredMsg);
-				valid = false;
-			} else {
-				var file = files[0];
-				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
-						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
-					valid = false;
-				}
-			}
-
 			if ( valid ) {
 				disableButtons();
 			}
@@ -279,7 +393,8 @@
 			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
 				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
-
+				<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" />
+				
 				<!--File path row -->
 				<div class="panel panel-default">
 					<div class="panel-heading panel-title">
@@ -288,9 +403,9 @@
 					
 					<div class="panel-body">
 						<div class="form-group">
-							<label for="file"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
-							<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.learner.filePath"
-								uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+							<label for="file-upload-area"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
+							
+							<div id="file-upload-area" class="voffset20"></div>
 						</div>
 						
 						<!--File Description -->

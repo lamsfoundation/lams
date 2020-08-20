@@ -44,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Import tool content servlet. It needs an uploaded learning design zip file.
@@ -81,11 +80,13 @@ public class ImportToolContentController {
 	if (customCSV != null) {
 	    request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
 	}
+	request.setAttribute("tmpFileUploadId", FileUtil.generateTmpFileUploadId());
 	return "toolcontent/import";
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("")
-    public String importLD(@RequestParam("UPLOAD_FILE") MultipartFile file, HttpServletRequest request) {
+    public String importLD(@RequestParam String tmpFileUploadId, HttpServletRequest request) {
 
 	List<String> ldErrorMsgs = new ArrayList<>();
 	List<String> toolsErrorMsgs = new ArrayList<>();
@@ -98,24 +99,35 @@ public class ImportToolContentController {
 	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    User user = (User) userManagementService.findById(User.class, userDto.getUserID());
 
+	    File file = null;
+	    File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    ldErrorMsgs.add("Uploaded more than 1 file");
+		} else if (files.length == 1) {
+		    file = files[0];
+		}
+	    }
+
 	    if (file == null) {
 		MessageService msgService = authoringMessageService;
 		log.error("Upload file missing");
 		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
 		ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
+	    }
 
-	    } else {
+	    if (ldErrorMsgs.isEmpty()) {
 		// get customCSV for tool adapters if it was an external LMS request
 		String customCSV = request.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
-		String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign");
-		String filename = FileUtil.getFileName(file.getOriginalFilename());
-		File designFile = new File(uploadPath, filename);
-		file.transferTo(designFile);
-		Object[] ldResults = exportToolContentService.importLearningDesign(designFile, user, null,
-			toolsErrorMsgs, customCSV);
+
+		Object[] ldResults = exportToolContentService.importLearningDesign(file, user, null, toolsErrorMsgs,
+			customCSV);
 		ldId = (Long) ldResults[0];
 		ldErrorMsgs = (List<String>) ldResults[1];
 		toolsErrorMsgs = (List<String>) ldResults[2];
+
+		FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
 	    }
 
 	} catch (Exception e) {
@@ -136,6 +148,5 @@ public class ImportToolContentController {
 	}
 
 	return ("toolcontent/importresult");
-
     }
 }

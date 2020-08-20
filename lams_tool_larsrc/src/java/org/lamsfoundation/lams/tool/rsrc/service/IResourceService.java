@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.service;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
@@ -41,11 +42,10 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Interface that defines the contract that all ShareResource service provider must follow.
- * 
+ *
  * @author Dapeng.Ni
  */
 public interface IResourceService extends ICommonToolService {
@@ -79,11 +79,8 @@ public interface IResourceService extends ICommonToolService {
     /**
      * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.
      *
-     * @param item
-     * @param file
-     * @throws UploadResourceFileException
      */
-    void uploadResourceItemFile(ResourceItem item, MultipartFile file) throws UploadResourceFileException;
+    void uploadResourceItemFile(ResourceItem item, File file) throws UploadResourceFileException;
 
     // ********** for user methods *************
     /**
@@ -111,7 +108,7 @@ public interface IResourceService extends ICommonToolService {
     // ********** Repository methods ***********************
     /**
      * Delete file from repository.
-     * 
+     *
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */

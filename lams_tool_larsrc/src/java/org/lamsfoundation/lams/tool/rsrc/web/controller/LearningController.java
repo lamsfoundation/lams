@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -56,10 +58,7 @@ import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -102,6 +101,8 @@ public class LearningController {
     private String addfile(ResourceItemForm resourceItemForm, HttpServletRequest request) {
 	resourceItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
 	resourceItemForm.setSessionMapID(WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID));
+	resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	return "pages/learning/addfile";
     }
 
@@ -333,9 +334,11 @@ public class LearningController {
      * @param request
      * @param response
      * @return
+     * @throws ServletException
      */
     @RequestMapping(value = "/saveOrUpdateItem", method = RequestMethod.POST)
-    private String saveOrUpdateItem(ResourceItemForm resourceItemForm, HttpServletRequest request) {
+    private String saveOrUpdateItem(ResourceItemForm resourceItemForm, HttpServletRequest request)
+	    throws ServletException {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -354,6 +357,7 @@ public class LearningController {
 		case 1:
 		    return "pages/authoring/parts/addurl";
 		case 2:
+		    resourceItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 		    return "pages/authoring/parts/addfile";
 		default:
 		    throw new IllegalArgumentException("Unknown item type" + resourceItemForm.getItemType());
@@ -373,22 +377,35 @@ public class LearningController {
 
 	// special attribute for URL or FILE
 	if (type == ResourceConstants.RESOURCE_TYPE_FILE) {
-	    try {
-		resourceService.uploadResourceItemFile(item, resourceItemForm.getFile());
-	    } catch (UploadResourceFileException e) {
-		errorMap.add("GLOBAL",
-			messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
-		request.setAttribute("errorMap", errorMap);
-		return "pages/authoring/parts/addurl";
-	    }
-	    item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
+	    File uploadDir = FileUtil.getTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    throw new ServletException("Uploaded more than 1 file");
+		}
 
+		if (files.length == 0) {
+		    throw new ServletException("No file uploaded");
+		}
+		try {
+		    resourceService.uploadResourceItemFile(item, files[0]);
+
+		    FileUtil.deleteTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
+		} catch (UploadResourceFileException e) {
+		    errorMap.add("GLOBAL",
+			    messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
+		    request.setAttribute("errorMap", errorMap);
+		    return "pages/authoring/parts/addurl";
+		}
+		item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
+	    } else {
+		throw new ServletException("No file uploaded");
+	    }
 	} else if (type == ResourceConstants.RESOURCE_TYPE_URL) {
 	    item.setUrl(resourceItemForm.getUrl());
 	    item.setOpenUrlNewWindow(resourceItemForm.isOpenUrlNewWindow());
 	}
 	// save and update session
-
 	ResourceSession resSession = resourceService.getResourceSessionBySessionId(sessionId);
 	if (resSession == null) {
 	    LearningController.log.error("Failed update ResourceSession by ID[" + sessionId + "]");
@@ -415,11 +432,11 @@ public class LearningController {
 	    resourceService.notifyTeachersOnAssigmentSumbit(sessionId, resourceUser);
 	}
 
-	if (resource.isNotifyTeachersOnFileUpload() && (type == ResourceConstants.RESOURCE_TYPE_FILE)) {
-	    resourceService.notifyTeachersOnFileUpload(resource.getContentId(), sessionId, sessionMapID,
-		    resourceUser.getFirstName() + " " + resourceUser.getLastName(), item.getUid(),
-		    resourceItemForm.getFile().getOriginalFilename());
-	}
+//	if (resource.isNotifyTeachersOnFileUpload() && (type == ResourceConstants.RESOURCE_TYPE_FILE)) {
+//	    resourceService.notifyTeachersOnFileUpload(resource.getContentId(), sessionId, sessionMapID,
+//		    resourceUser.getFirstName() + " " + resourceUser.getLastName(), item.getUid(),
+//		    resourceItemForm.getFile().getOriginalFilename());
+//	}
 
 	return "pages/learning/success";
     }
@@ -617,23 +634,35 @@ public class LearningController {
 	if ((resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE)
 		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT)
 		|| (resourceItemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE)) {
+	    File uploadDir = FileUtil.getTmpFileUploadDir(resourceItemForm.getTmpFileUploadId());
+	    if (uploadDir.canRead()) {
+		File[] files = uploadDir.listFiles();
+		if (files.length > 1) {
+		    errorMap.add("GLOBAL", "Uploaded more than 1 file");
+		}
 
-	    if ((resourceItemForm.getFile() != null)
-		    && FileUtil.isExecutableFile(resourceItemForm.getFile().getOriginalFilename())) {
-		errorMap.add("Global", messageService.getMessage("error.attachment.executable"));
+		if (files.length == 0) {
+		    errorMap.add("GLOBAL", "No file uploaded");
+		}
+	    } else {
+		 errorMap.add("GLOBAL", "No file uploaded");
 	    }
-
-	    // validate item size
-	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
-		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-	    }
-
-	    // for edit validate: file already exist
-	    if (!resourceItemForm.isHasFile() && ((resourceItemForm.getFile() == null)
-		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
-		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
-	    }
+//	    if ((resourceItemForm.getFile() != null)
+//		    && FileUtil.isExecutableFile(resourceItemForm.getFile().getOriginalFilename())) {
+//		errorMap.add("Global", messageService.getMessage("error.attachment.executable"));
+//	    }
+//
+//	    // validate item size
+//	    if (!FileValidatorUtil.validateFileSize(resourceItemForm.getFile(), false)) {
+//		errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+//			new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+//	    }
+//
+//	    // for edit validate: file already exist
+//	    if (!resourceItemForm.isHasFile() && ((resourceItemForm.getFile() == null)
+//		    || StringUtils.isEmpty(resourceItemForm.getFile().getOriginalFilename()))) {
+//		errorMap.add("GLOBAL", messageService.getMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
+//	    }
 	}
     }
 

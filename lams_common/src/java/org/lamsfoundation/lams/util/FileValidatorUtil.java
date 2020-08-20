@@ -56,25 +56,14 @@ public class FileValidatorUtil {
 	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)
 		: Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
 
-	if (fileSize > maxFileSize) {
-	    String maxSize = FileValidatorUtil.formatSize(maxFileSize);
-
-	    // set error message
-	    return false;
-	}
-	return true;
+	return fileSize <= maxFileSize;
     }
 
     public static boolean validateFileSize(Long fileSize, boolean largeFile) {
 	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)
 		: Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
 
-	if (fileSize > maxFileSize) {
-	    String maxSize = FileValidatorUtil.formatSize(maxFileSize);
-
-	    return false;
-	}
-	return true;
+	return fileSize <= maxFileSize;
     }
 
     public static String formatSize(double size) {

@@ -16,16 +16,36 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
-	<script type="text/javascript">
+	
+	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+	<c:choose>
+		<c:when test="${language eq 'es'}">
+			<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'fr'}">
+			<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'el'}">
+			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+		</c:when>
+	</c:choose>
+		
+	<script type="text/javascript">			
+		var LAMS_URL = '${lams}',
+	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
+			// convert Java syntax to JSON
+	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+	       EXE_FILE_ERROR = '<fmt:message key="error.attachment.executable"/>';
 
 		function disableButtons() {
 			// logic to disable all buttons depends on contained pages so to avoid future changes breaking this code and stopping the page working, wrap in a try.
@@ -134,6 +154,93 @@
 			);
 		}
 
+		/**
+		 * Initialised Uppy as the file upload widget
+		 */
+		function initFileUpload(tmpFileUploadId, language) {
+			  var uppyProperties = {
+				  // upload immediately 
+				  autoProceed: true,
+				  allowMultipleUploads: true,
+				  debug: false,
+				  restrictions: {
+					// taken from LAMS configuration
+				    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
+				    maxNumberOfFiles: 5
+				  },
+				  meta: {
+					  // all uploaded files go to this subdir in LAMS tmp dir
+					  // its format is: upload_<userId>_<timestamp>
+					  'tmpFileUploadId' : tmpFileUploadId,
+					  'largeFilesAllowed' : false
+				  },
+				  onBeforeFileAdded: function(currentFile, files) {
+					  var name = currentFile.data.name,
+					  	  extensionIndex = name.lastIndexOf('.'),
+					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
+					  if (!valid) {
+						  uppy.info(EXE_FILE_ERROR, 'error', 10000);
+					  }
+					  
+					  return valid;
+			    }
+			  };
+			  
+			  switch(language) {
+			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			  }
+			  
+			  
+			  // global variable
+			  uppy = Uppy.Core(uppyProperties);
+			  // upload using Ajax
+			  uppy.use(Uppy.XHRUpload, {
+				  endpoint: LAMS_URL + 'tmpFileUpload',
+				  fieldName : 'file',
+				  // files are uploaded one by one
+				  limit : 1
+			  });
+			  
+			  uppy.use(Uppy.DragDrop, {
+				  target: '#image-upload-area',
+				  inline: true,
+				  height: 120,
+				  width: '100%'
+				});
+			  
+			  uppy.use(Uppy.Informer, {
+				  target: '#image-upload-area'
+			  });
+			  
+			  uppy.use(Uppy.StatusBar, {
+				  target: '#image-upload-area',
+				  hideAfterFinish: false,
+				  hideUploadButton: true,
+				  hideRetryButton: true,
+				  hidePauseResumeButton: true,
+				  hideCancelButton: true
+				});
+			  
+			  uppy.on('upload-success', (file, response) => {
+				  // if file name was modified by server, reflect it in Uppy
+				  file.meta.name = response.body.name;
+			  });
+			  
+			  uppy.on('file-removed', (file, reason) => {
+				  if (reason === 'removed-by-user') {
+					 // delete file from temporary folder on server
+				    $.ajax({
+				    	url :  LAMS_URL + 'tmpFileUploadDelete',
+				    	data : {
+				    		'tmpFileUploadId' : tmpFileUploadId,
+				    		'name' : file.meta.name
+				    	}
+				    })
+				  }
+			  })
+		}
 	</script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.timeago.js"></script>
 </lams:head>

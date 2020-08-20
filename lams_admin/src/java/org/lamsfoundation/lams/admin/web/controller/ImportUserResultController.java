@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
@@ -58,7 +58,7 @@ public class ImportUserResultController {
 	List results = (List) ss.getAttribute(IImportService.IMPORT_RESULTS);
 	String successMessageKey = "";
 	try {
-	    MultipartFile file = (MultipartFile) ss.getAttribute(IImportService.IMPORT_FILE);
+	    File file = (File) ss.getAttribute(IImportService.IMPORT_FILE);
 	    successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
 	} catch (Exception e) {
 	    log.error("Couldn't check spreadsheet type!", e);

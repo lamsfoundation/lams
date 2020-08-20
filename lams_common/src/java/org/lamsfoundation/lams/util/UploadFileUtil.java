@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.util;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
-
 /**
  * Wraps up interface to the Commons FileUpload as much as possible. Reads configuration information such the maximum
  * size of a file from lams.xml using the ConfigurationService.
@@ -35,14 +33,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class UploadFileUtil {
-    private static Logger log = Logger.getLogger(UploadFileUtil.class);
-
     private static final int DEFAULT_MAX_SIZE = 5000000; // 5 Meg
-    private static final int DEFAULT_MEMORY_SIZE = 4096;
-
-    static {
-
-    }
 
     /**
      * @return Maximum size (in megabytes) that a file may be. Standard size, use during running of sequence.
@@ -140,9 +131,9 @@ public class UploadFileUtil {
 	String trimmedFolder = contentFolderID.replace("-", "").replace("/", "");
 	//if trimmedFolder length is less than 12, supplement it with missing character
 	if (trimmedFolder.length() < 12) {
-	    trimmedFolder += "123456789012".substring(0, 12-trimmedFolder.length());
+	    trimmedFolder += "123456789012".substring(0, 12 - trimmedFolder.length());
 	}
-	
+
 	for (int groupIndex = 0; groupIndex < 6; groupIndex++) {
 	    result[groupIndex] = "" + trimmedFolder.charAt(groupIndex * 2) + trimmedFolder.charAt(groupIndex * 2 + 1);
 	}

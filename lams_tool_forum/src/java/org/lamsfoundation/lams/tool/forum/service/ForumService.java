@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -103,7 +105,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -278,7 +279,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     @Override
     public void updateMark(Message message) {
 	messageDao.saveOrUpdate(message);
-	
+
 	// send marks to gradebook, if marks are released for that session
 	ForumUser user = message.getCreatedBy();
 	ForumToolSession session = message.getToolSession();
@@ -340,7 +341,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	// recursively delete clones
-	for (Message clone : (Set<Message>) topic.getSessionClones()) {
+	for (Message clone : topic.getSessionClones()) {
 	    this.deleteTopic(clone.getUid());
 	}
 
@@ -398,8 +399,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public Attachment uploadAttachment(MultipartFile uploadFile) throws PersistenceException {
-	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getOriginalFilename())) {
+    public Attachment uploadAttachment(File uploadFile) throws PersistenceException {
+	if ((uploadFile == null) || StringUtils.isEmpty(uploadFile.getName())) {
 	    throw new ForumException("Could not find upload file: " + uploadFile);
 	}
 
@@ -407,7 +408,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Attachment file = new Attachment();
 	file.setFileUuid(nodeKey.getUuid());
 	file.setFileVersionId(nodeKey.getVersion());
-	file.setFileName(uploadFile.getOriginalFilename());
+	file.setFileName(uploadFile.getName());
 
 	return file;
     }
@@ -610,7 +611,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// update session to set MarkRelease flag
 	session.setMarkReleased(true);
 	forumToolSessionDao.saveOrUpdate(session);
-	
+
 	// notify learners on mark release
 	if (notifyLearnersOnMarkRelease) {
 	    Map<Integer, StringBuilder> notificationMessages = new TreeMap<>();
@@ -642,10 +643,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	    }
 	}
-	
+
 	//audit log event
-	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")"; 
-	String message = messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")";
+	String message = messageService.getMessage("tool.display.name") + ". "
+		+ messageService.getMessage("msg.mark.released", new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, forum.getContentId(), null, message);
 
     }
@@ -725,19 +727,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     /**
      * Process an uploaded file.
-     *
-     * @param forumForm
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws RepositoryCheckedException
-     * @throws InvalidParameterException
      */
-    private NodeKey processFile(MultipartFile file) {
+    private NodeKey processFile(File file) {
 	NodeKey node = null;
-	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
-	    String fileName = file.getOriginalFilename();
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
 	    try {
-		node = getForumToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType());
+		node = getForumToolContentHandler().uploadFile(new FileInputStream(file), fileName, null);
 	    } catch (InvalidParameterException e) {
 		throw new ForumException("FileNotFoundException occured while trying to upload File" + e.getMessage());
 	    } catch (FileNotFoundException e) {
@@ -800,7 +796,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -1179,7 +1175,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;

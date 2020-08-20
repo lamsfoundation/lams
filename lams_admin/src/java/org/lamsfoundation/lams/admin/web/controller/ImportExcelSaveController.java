@@ -22,7 +22,8 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
@@ -49,17 +50,26 @@ public class ImportExcelSaveController {
 
     @Autowired
     private IImportService importService;
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
 
     @RequestMapping(path = "/importexcelsave", method = RequestMethod.POST)
     public String execute(@ModelAttribute ImportExcelForm importExcelForm, HttpServletRequest request)
 	    throws Exception {
-	MultipartFile file = importExcelForm.getFile();
+	File file = null;
+	File uploadDir = FileUtil.getTmpFileUploadDir(importExcelForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length > 1) {
+		throw new IOException("Uploaded more than 1 file");
+	    } else if (files.length == 1) {
+		file = files[0];
+	    }
+	}
 
 	// validation
-	if (file == null || file.getSize() <= 0) {
+	if (file == null) {
 	    return "forward:/importexcel.do";
 	}
 
@@ -90,8 +100,7 @@ public class ImportExcelSaveController {
 		    .getRequiredWebApplicationContext(applicationContext.getServletContext());
 	    IImportService importService = (IImportService) wac.getBean("importService");
 	    try {
-		MultipartFile file = (MultipartFile) SessionManager.getSession(sessionId)
-			.getAttribute(IImportService.IMPORT_FILE);
+		File file = (File) SessionManager.getSession(sessionId).getAttribute(IImportService.IMPORT_FILE);
 		List results = importService.parseSpreadsheet(file, sessionId);
 		SessionManager.getSession(sessionId).setAttribute(IImportService.IMPORT_RESULTS, results);
 	    } catch (Exception e) {

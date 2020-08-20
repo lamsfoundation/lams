@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
-<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
-<c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
 <lams:html>
 	<lams:head>
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
-		  var UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
-
+	       
 		  $(document).ready(function(){
 				$('#title').focus();
 			});		
 		  
-			$.validator.addMethod("fileType", function(value, element) {
-				return this.optional(element) || element.files[0].type == 'application/zip' || element.files[0].type == 'application/x-zip-compressed'
-			});
-			
-			$.validator.addMethod('validateSize', function (value, element, param) {
-				return validateFileSize(element.files[0], param);
-			}, '<fmt:message key="errors.maxfilesize"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message>');
+			var extensionValidation = function(currentFile, files) {
+			  var name = currentFile.data.name,
+			  	  extensionIndex = name.lastIndexOf('.'),
+			  	  valid = extensionIndex < 0 || name.substring(extensionIndex).trim() == '.zip';
+			  if (!valid) {
+				  uppy.info('<fmt:message key="error.file.type.zip"/>', 'error', 10000);
+			  }
+			  
+			  return valid;
+		    }
+
+		  	$.validator.addMethod('requireFileCount', function (value, element, param) {
+				return uppy.getFiles().length >= +param;
+			}, '<fmt:message key="error.resource.item.file.blank"/>');
 
 								  
 	 		$( "#resourceItemForm" ).validate({
@@ -30,30 +31,20 @@
 				errorClass: "text-danger",
 				wrapper: "span",
 	 			rules: {
-	 				file: {
-	 			    	required: true,
-	 			    	fileType: true,
-	 			    	validateSize: UPLOAD_FILE_LARGE_MAX_SIZE,	 			    	
-	 			    },
+	 				'tmpFileUploadId' : {
+	 					requireFileCount: 1
+	 				},
 				    title: {
 				    	required: true
 				    }
 	 			},
 				messages : {
-					file : {
-						required : '<fmt:message key="error.resource.item.file.blank"/> ',
-						fileType: '<fmt:message key="error.file.type.zip"/>'
-					},
 					title : {
 						required : '<fmt:message key="error.resource.item.title.blank"/> '
 					}
 				},
 				errorPlacement: function(error, element) {
-			        if (element.hasClass("fileUpload")) {
-			           error.insertAfter(element.parent());
-			        } else {
-			           error.insertAfter(element);
-			        }
+					error.insertAfter(element);
 			    }
 			});	 		
 		</script>

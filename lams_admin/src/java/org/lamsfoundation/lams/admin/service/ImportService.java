@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.admin.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +58,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -116,14 +117,14 @@ public class ImportService implements IImportService {
     private boolean hasError;
     private Organisation parentOrg;
 
-    private HSSFSheet getSheet(MultipartFile fileItem) throws IOException {
-	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
+    private HSSFSheet getSheet(File fileItem) throws IOException {
+	POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(fileItem));
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
 	return wb.getSheetAt(0);
     }
 
     @Override
-    public boolean isUserSpreadsheet(MultipartFile fileItem) throws IOException {
+    public boolean isUserSpreadsheet(File fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
 	String string = parseStringCell(row.getCell(ImportService.PASSWORD));
@@ -131,7 +132,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public boolean isRolesSpreadsheet(MultipartFile fileItem) throws IOException {
+    public boolean isRolesSpreadsheet(File fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	HSSFRow row = sheet.getRow(sheet.getFirstRowNum());
 	String string = parseStringCell(row.getCell(ImportService.ORGANISATION));
@@ -139,7 +140,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+    public List parseSpreadsheet(File fileItem, String sessionId) throws IOException {
 	if (isUserSpreadsheet(fileItem)) {
 	    return parseUserSpreadsheet(fileItem, sessionId);
 	} else if (isRolesSpreadsheet(fileItem)) {
@@ -152,7 +153,7 @@ public class ImportService implements IImportService {
     // each item in the list lists the id, name, and parent's id of that org; otherwise
     // the items in the list are error messages.
     @Override
-    public List parseGroupSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+    public List parseGroupSpreadsheet(File fileItem, String sessionId) throws IOException {
 	results = new ArrayList<>();
 	parentOrg = service.getRootOrganisation();
 	HSSFSheet sheet = getSheet(fileItem);
@@ -264,7 +265,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public int getNumRows(MultipartFile fileItem) throws IOException {
+    public int getNumRows(File fileItem) throws IOException {
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
@@ -272,7 +273,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseUserSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+    public List parseUserSpreadsheet(File fileItem, String sessionId) throws IOException {
 	results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();
@@ -343,7 +344,7 @@ public class ImportService implements IImportService {
     }
 
     @Override
-    public List parseRolesSpreadsheet(MultipartFile fileItem, String sessionId) throws IOException {
+    public List parseRolesSpreadsheet(File fileItem, String sessionId) throws IOException {
 	results = new ArrayList<>();
 	HSSFSheet sheet = getSheet(fileItem);
 	int startRow = sheet.getFirstRowNum();

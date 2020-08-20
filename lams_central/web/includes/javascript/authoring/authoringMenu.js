@@ -403,7 +403,7 @@ var MenuLib = {
 		}
 		var dialog = showDialog("dialogImportLearningDesign", {
 						'modal' : true,
-						'height' : 350,
+						'height' : 500,
 						'width' : 850,
 						'title' : LABELS.IMPORT_DIALOG_TITLE,
 						'open' : function() {

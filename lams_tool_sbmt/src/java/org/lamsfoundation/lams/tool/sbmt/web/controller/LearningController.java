@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
@@ -72,7 +73,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Manpreet Minhas
@@ -254,6 +254,8 @@ public class LearningController implements SbmtConstants {
 		|| content.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(SbmtConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 
+	learnerForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	return "learner/sbmtlearner";
     }
 
@@ -297,6 +299,8 @@ public class LearningController implements SbmtConstants {
 	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	sessionMap.put(SbmtConstants.ATTR_IS_MARKS_RELEASED, session.isMarksReleased());
 
+	learnerForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	return "learner/sbmtlearner";
     }
 
@@ -314,7 +318,16 @@ public class LearningController implements SbmtConstants {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, submitFilesService.isLastActivity(sessionID));
 
-	if (validateUploadForm(learnerForm, request)) {
+	File[] files = null;
+	File uploadDir = FileUtil.getTmpFileUploadDir(learnerForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    files = uploadDir.listFiles();
+	    if (files.length == 0) {
+		files = null;
+	    }
+	}
+
+	if (validateUploadForm(learnerForm, files, request)) {
 	    // get session from shared session.
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
@@ -328,6 +341,8 @@ public class LearningController implements SbmtConstants {
 	    ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	    setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
+	    learnerForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	    return "learner/sbmtlearner";
 	}
 
@@ -337,12 +352,13 @@ public class LearningController implements SbmtConstants {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Integer userID = user.getUserID();
 
-	MultipartFile file = learnerForm.getFile();
 	String fileDescription = learnerForm.getDescription();
 	// reset fields and display a new form for next new file upload
 	learnerForm.setDescription("");
 	try {
-	    submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+	    for (File file : files) {
+		submitFilesService.uploadFileToSession(sessionID, file, fileDescription, userID);
+	    }
 	} catch (SubmitFilesException e) {
 	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    logger.error("Error while uploading file", e);
@@ -350,6 +366,8 @@ public class LearningController implements SbmtConstants {
 
 	    request.setAttribute("errorMap", errorMap);
 	    return "learner/sbmtlearner";
+	} finally {
+	    FileUtil.deleteTmpFileUploadDir(learnerForm.getTmpFileUploadId());
 	}
 
 	SubmitUser learner = getCurrentLearner(sessionID, submitFilesService);
@@ -407,31 +425,34 @@ public class LearningController implements SbmtConstants {
     // **********************************************************************************************
 
     // validate uploaded form
-    private boolean validateUploadForm(LearnerForm learnerForm, HttpServletRequest request) {
+    private boolean validateUploadForm(LearnerForm learnerForm, File[] files, HttpServletRequest request) {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getName())) {
-	    errorMap.add("GLOBAL", messageService.getMessage("learner.form.filepath.displayname"));
-	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.learner.fileDescription"));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
 	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxdescsize"));
 	}
 
-	boolean fileSizeValid = FileValidatorUtil.validateFileSize(learnerForm.getFile().getSize(), false);
-	if (!fileSizeValid) {
-	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-	}
+	if (files == null) {
+	    errorMap.add("GLOBAL", messageService.getMessage("learner.form.filepath.displayname"));
+	} else {
+	    for (File file : files) {
+		boolean fileSizeValid = FileValidatorUtil.validateFileSize(file.length(), false);
+		if (!fileSizeValid) {
+		    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
+			    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
+		}
 
-	if (learnerForm.getFile() != null) {
-	    logger.debug("Learner submit file : " + learnerForm.getFile().getName());
-	}
+		if (FileUtil.isExecutableFile(file.getName())) {
+		    logger.debug("File is executatable : " + file.getName());
+		    errorMap.add("GLOBAL", messageService.getMessage("error.attachment.executable"));
+		}
 
-	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getName())) {
-	    logger.debug("File is executatable : " + learnerForm.getFile().getName());
-	    errorMap.add("GLOBAL", messageService.getMessage("error.attachment.executable"));
+		if (!errorMap.isEmpty()) {
+		    break;
+		}
+	    }
 	}
 
 	if (!errorMap.isEmpty()) {

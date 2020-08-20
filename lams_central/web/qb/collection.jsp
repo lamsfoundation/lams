@@ -372,7 +372,7 @@
 
 	    function importQTI(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
-				'QuestionFile','width=500,height=240,scrollbars=yes');
+				'QuestionFile','width=500,height=370,scrollbars=yes');
 	    }
 		
 	    function saveQTI(formHTML, formName) {
