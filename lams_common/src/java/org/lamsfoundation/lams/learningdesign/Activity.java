@@ -105,15 +105,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public static final int PASSWORD_GATE_ACTIVITY_TYPE = 16;
     /** *************************************************************** */
 
-    /***************************************************************************
-     * static final variables indicating the the category of activities
-     **************************************************************************/
-    public static final int CATEGORY_SYSTEM = 1;
-    public static final int CATEGORY_COLLABORATION = 2;
-    public static final int CATEGORY_ASSESSMENT = 3;
-    public static final int CATEGORY_CONTENT = 4;
-    public static final int CATEGORY_SPLIT = 5;
-    public static final int CATEGORY_RESPONSE = 6;
     /** *************************************************************** */
 
     /***************************************************************************
@@ -214,9 +205,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     @Column(name = "learning_activity_type_id", insertable = false, updatable = false)
     private Integer activityTypeId;
-
-    @Column(name = "activity_category_id")
-    private Integer activityCategoryID;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transition_to_id")
@@ -348,72 +336,55 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     public static Activity getActivityInstance(int activityType) {
 	// the default constructors don't set up the activity type
 	// so we need to do that manually
-	// also default to a sensible category type
 	Activity activity = null;
 	switch (activityType) {
 	    case TOOL_ACTIVITY_TYPE:
 		activity = new ToolActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
 		break;
 	    case OPTIONS_ACTIVITY_TYPE:
 		activity = new OptionsActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case PARALLEL_ACTIVITY_TYPE:
 		activity = new ParallelActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SPLIT);
 		break;
 	    case SEQUENCE_ACTIVITY_TYPE:
 		activity = new SequenceActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case SYNCH_GATE_ACTIVITY_TYPE:
 		activity = new SynchGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case SCHEDULE_GATE_ACTIVITY_TYPE:
 		activity = new ScheduleGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case PERMISSION_GATE_ACTIVITY_TYPE:
 		activity = new PermissionGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case SYSTEM_GATE_ACTIVITY_TYPE:
 		activity = new SystemGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case CONDITION_GATE_ACTIVITY_TYPE:
 		activity = new ConditionGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case CHOSEN_BRANCHING_ACTIVITY_TYPE:
 		activity = new ChosenBranchingActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case GROUP_BRANCHING_ACTIVITY_TYPE:
 		activity = new GroupBranchingActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case TOOL_BRANCHING_ACTIVITY_TYPE:
 		activity = new ToolBranchingActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case OPTIONS_WITH_SEQUENCES_TYPE:
 		activity = new OptionsWithSequencesActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case FLOATING_ACTIVITY_TYPE:
 		activity = new FloatingActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    case PASSWORD_GATE_ACTIVITY_TYPE:
 		activity = new PasswordGateActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	    default:
 		activity = new GroupingActivity();
-		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 		break;
 	}
 	activity.setActivityTypeId(activityType);
@@ -738,14 +709,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.groupingUIID = groupingUIID;
     }
 
-    public Integer getActivityCategoryID() {
-	return activityCategoryID;
-    }
-
-    public void setActivityCategoryID(Integer activityCategoryID) {
-	this.activityCategoryID = activityCategoryID;
-    }
-
     public String getLanguageFile() {
 	return languageFile;
     }
@@ -1024,7 +987,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
 	newActivity.setGroupingSupportType(this.getGroupingSupportType());
 	newActivity.setApplyGrouping(this.getApplyGrouping());
-	newActivity.setActivityCategoryID(this.getActivityCategoryID());
 
 	newActivity.setGrouping(this.getGrouping());
 	newActivity.setGroupingUIID(LearningDesign.addOffset(this.getGroupingUIID(), uiidOffset));

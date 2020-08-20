@@ -27,14 +27,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.model.Attachment;
 import org.lamsfoundation.lams.tool.forum.model.Message;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -57,8 +53,8 @@ public class MessageForm {
     private boolean hasAttachment;
     // attachment file name
     private String attachmentName;
-    // Message attachment file
-    private MultipartFile attachmentFile;
+
+    private String tmpFileUploadId;
 
     public MessageForm() {
 	message = new Message();
@@ -70,7 +66,7 @@ public class MessageForm {
      */
     public MultiValueMap<String, String> validate(HttpServletRequest request, MessageService messageService) {
 
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<String, String>();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	try {
 	    if (StringUtils.isBlank(message.getSubject())) {
@@ -81,17 +77,6 @@ public class MessageForm {
 		errorMap.add("message.body", messageService.getMessage("error.body.required"));
 	    }
 
-	    // validate item size
-	    boolean largeFile = true;
-	    if (request.getRequestURI().indexOf("/learning/") != -1) {
-		if ((this.getAttachmentFile() != null)
-			&& FileUtil.isExecutableFile(this.getAttachmentFile().getOriginalFilename())) {
-		    errorMap.add("message.attachments", messageService.getMessage("error.attachment.executable"));
-		}
-		largeFile = false;
-	    }
-
-	    FileValidatorUtil.validateFileSize(this.getAttachmentFile(), largeFile);
 
 	} catch (Exception e) {
 	    MessageForm.logger.error("", e);
@@ -105,7 +90,7 @@ public class MessageForm {
 	if (message != null) {
 	    if ((message.getAttachments() != null) && (message.getAttachments().size() > 0)) {
 		hasAttachment = true;
-		attachmentName = ((Attachment) message.getAttachments().iterator().next()).getFileName();
+		attachmentName = message.getAttachments().iterator().next().getFileName();
 	    } else {
 		hasAttachment = false;
 		attachmentName = null;
@@ -149,12 +134,12 @@ public class MessageForm {
 	this.attachmentName = attachmentName;
     }
 
-    public MultipartFile getAttachmentFile() {
-	return attachmentFile;
+    public String getTmpFileUploadId() {
+	return tmpFileUploadId;
     }
 
-    public void setAttachmentFile(MultipartFile attachmentFile) {
-	this.attachmentFile = attachmentFile;
+    public void setTmpFileUploadId(String tmpFileUploadId) {
+	this.tmpFileUploadId = tmpFileUploadId;
     }
 
     public String getSessionMapID() {

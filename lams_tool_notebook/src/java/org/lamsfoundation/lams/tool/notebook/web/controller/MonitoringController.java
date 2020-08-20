@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.notebook.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -33,12 +34,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.lamsfoundation.lams.tool.notebook.dto.NotebookPrintDTO;
+import org.lamsfoundation.lams.tool.notebook.dto.NotebookPrintDTO.NotebookPrintUserDTO;
 import org.lamsfoundation.lams.tool.notebook.dto.NotebookSessionsDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
+import org.lamsfoundation.lams.tool.notebook.model.NotebookSession;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -48,8 +53,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
@@ -66,13 +73,16 @@ public class MonitoringController {
     private INotebookService notebookService;
 
     @Autowired
+    private IUserManagementService userManagementService;
+
+    @Autowired
     @Qualifier("notebookMessageService")
     private MessageService messageService;
 
     @RequestMapping(value = "")
     public String unspecified(HttpServletRequest request) {
 
-	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	request.setAttribute("contentFolderID", contentFolderID);
 
@@ -137,7 +147,7 @@ public class MonitoringController {
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	// our code expects the first page to be 0 but jqgrid uses 1 for the first page.
-	List<Object[]> users = notebookService.getUsersForTablesorter(toolSessionId, page > 0 ? page - 1 : 0, size,
+	List<Object[]> users = notebookService.getUsersEntriesDates(toolSessionId, page > 0 ? page - 1 : 0, size,
 		sorting, searchString);
 
 	String noEntry = getNoEntryText();
@@ -256,6 +266,39 @@ public class MonitoringController {
 	request.setAttribute("statisticList", notebookService.getStatisticsBySession(contentID));
 
 	return "pages/monitoring/statisticpart";
+    }
+
+    @RequestMapping("/showPrintDialog")
+    public String showPrintDialog(@RequestParam(AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentID, Model model) {
+	Notebook notebook = notebookService.getNotebookByContentId(toolContentID);
+	NotebookPrintDTO printDTO = new NotebookPrintDTO();
+	printDTO.setTitle(notebook.getTitle());
+	printDTO.setInstructions(notebook.getInstructions());
+
+	boolean isGroupedActivity = notebookService.isGroupedActivity(toolContentID);
+	printDTO.setGroupedActivity(isGroupedActivity);
+
+	for (NotebookSession session : notebook.getNotebookSessions()) {
+	    List<Object[]> users = notebookService.getUsersEntriesDates(session.getSessionId(), null, null,
+		    NotebookConstants.SORT_BY_USERNAME_ASC, null);
+	    List<NotebookPrintUserDTO> printUserDTOs = new LinkedList<>();
+	    for (Object[] userData : users) {
+		NotebookUser user = (NotebookUser) userData[0];
+		NotebookPrintUserDTO printUserDTO = new NotebookPrintUserDTO();
+		printUserDTO.setFirstName(user.getFirstName());
+		printUserDTO.setLastName(user.getLastName());
+		printUserDTO.setEmail(userManagementService.getUserById(user.getUserId().intValue()).getEmail());
+		printUserDTO.setEntry((String) userData[1]);
+		printUserDTO.setEntryModifiedDate((Date) userData[2]);
+		printUserDTO.setTeacherComment(user.getTeachersComment());
+		printUserDTOs.add(printUserDTO);
+	    }
+
+	    printDTO.getUsersBySession().put(session.getSessionName(), printUserDTOs);
+	}
+	model.addAttribute("printDTO", printDTO);
+
+	return "pages/monitoring/print";
     }
 
     /**

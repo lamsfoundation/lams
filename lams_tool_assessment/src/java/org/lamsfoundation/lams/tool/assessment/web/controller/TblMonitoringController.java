@@ -1,6 +1,5 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -56,6 +54,10 @@ public class TblMonitoringController {
 	String[] activityTitles = new String[] { "" };
 	List<TblAssessmentDTO> assessmentDtos = getAssessmentDtos(toolContentIds, activityTitles);
 	request.setAttribute("assessmentDtos", assessmentDtos);
+
+	boolean attemptedByAnyLearners = assessmentDtos.stream().mapToInt(TblAssessmentDTO::getAttemptedLearnersNumber)
+		.reduce(Integer::max).orElse(0) > 0;
+	request.setAttribute("iraAttemptedByAnyLearners", attemptedByAnyLearners);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("isIraAssessment", true);

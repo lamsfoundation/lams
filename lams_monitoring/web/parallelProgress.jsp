@@ -14,11 +14,6 @@
 	</c:forEach>
 </frameset>
 
-<noframes>
-	<body>
-		<fmt:message key="message.activity.parallel.noFrames" />
-	</body>
-</noframes>
 </c:if>
 
 </lams:html>

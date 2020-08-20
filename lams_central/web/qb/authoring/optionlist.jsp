@@ -1,6 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="ALPHABET" value="${fn:split('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', ',')}" scope="request"/>
 
 <script type="text/javascript">
+	var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+	
 	$(document).ready(function(){
 		CKEDITOR.on('instanceLoaded', function(e){
 			//apply to only option title CKEditors
@@ -86,10 +89,11 @@
 		<c:if test="${!assessmentQuestionForm.authoringRestricted && questionType != 3}">class="sortable-on"</c:if>>
 		
 		<c:forEach var="option" items="${optionList}" varStatus="status">
-			<table id="option-table-${status.index}" class="voffset10-bottom" data-id="${status.index}" tabindex="1">
+			<table id="option-table-${status.index}" class="voffset10-bottom single-option-table" data-id="${status.index}" tabindex="1">
 				<tr>
 					<td>
-						<span>${status.index+1}</span>
+						<span class="optionDisplayOrderSpan" 
+							  id="optionDisplayOrderSpan${status.index}">${ALPHABET[status.index]}</span>
 					</td>
 					
 					<td>

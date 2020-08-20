@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,7 +81,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.springframework.web.util.HtmlUtils;
 
@@ -295,8 +293,8 @@ public class PeerreviewServiceImpl
 		numUsersCreated = peerreviewUserDao.createUsersForSession(session);
 	    }
 
-	    if ( log.isDebugEnabled() ) {
-		log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated);
+	    if (log.isDebugEnabled()) {
+		log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated " + numUsersCreated);
 	    }
 
 	    creatingUsersForSessionIds.remove(toolSessionId);
@@ -354,7 +352,8 @@ public class PeerreviewServiceImpl
 	}
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, null, null, sorting, searchString, getByUser, ratingService, userManagementService);
+		currentUserId, null, null, sorting, searchString, getByUser, !getByUser || getAllUsers, ratingService,
+		userManagementService);
 
 	for (Object[] raw : rawData) {
 	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
@@ -370,7 +369,8 @@ public class PeerreviewServiceImpl
 	    boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) {
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
-		currentUserId, page, size, sorting, searchString, getByUser, ratingService, userManagementService);
+		currentUserId, page, size, sorting, searchString, getByUser, !getByUser || getAllUsers, ratingService,
+		userManagementService);
 
 	for (Object[] raw : rawData) {
 	    raw[raw.length - 2] = HtmlUtils.htmlEscape((String) raw[raw.length - 2]);
@@ -424,7 +424,7 @@ public class PeerreviewServiceImpl
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -468,19 +468,21 @@ public class PeerreviewServiceImpl
     public String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId) {
 	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
 	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
-	return new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao,
-		peerreviewUserDao, this, messageService).generateHTMLEMailForLearner(userId);
+	return new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao, peerreviewUserDao,
+		this, messageService).generateHTMLEMailForLearner(userId);
     }
 
     @Override
     public int emailReportToUser(Long toolContentId, Long sessionId, Long userId, String email) {
 	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	if ( user != null ) {
-            eventNotificationService.sendMessage(null, userId.intValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
-            	getResultsEmailSubject(user.getSession().getPeerreview()), email, true);
-            return 1;
+	if (user != null) {
+	    eventNotificationService.sendMessage(null, userId.intValue(),
+		    IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    getResultsEmailSubject(user.getSession().getPeerreview()), email, true);
+	    return 1;
 	} else {
-	    log.error("Unable to send Peer Review email as user is not in session. SessionId="+sessionId+" userId="+userId);
+	    log.error("Unable to send Peer Review email as user is not in session. SessionId=" + sessionId + " userId="
+		    + userId);
 	    return 0;
 	}
     }
@@ -883,7 +885,7 @@ public class PeerreviewServiceImpl
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -896,7 +898,7 @@ public class PeerreviewServiceImpl
 
     @Override
     @SuppressWarnings("rawtypes")
-   public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
 

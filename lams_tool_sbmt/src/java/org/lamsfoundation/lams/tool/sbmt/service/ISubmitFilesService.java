@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
@@ -87,12 +88,12 @@ public interface ISubmitFilesService extends ICommonToolService {
      *
      * @throws SubmitFilesException
      */
-    public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
+    public void uploadFileToSession(Long sessionID, File file, String fileDescription, Integer userID)
 	    throws SubmitFilesException;
 
     /**
      * Get a the details for a single file uploaded by a learner
-     * 
+     *
      * @param detailId
      * @return SubmissionDetails
      */
@@ -154,14 +155,14 @@ public interface ISubmitFilesService extends ICommonToolService {
     /**
      * Mark the original file uploaded by a learner as deleted. Does not delete the file
      * from the content repository.
-     * 
+     *
      * @param detailID
      */
     public void removeLearnerFile(Long detailID, UserDTO monitor);
 
     /**
      * Mark a deleted original file as not deleted. Undoes what removeLearnerFile().
-     * 
+     *
      * @param detailID
      */
     public void restoreLearnerFile(Long detailID, UserDTO monitor);

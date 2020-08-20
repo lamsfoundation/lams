@@ -42,14 +42,14 @@
 		<c:if test="${heightAutoGrow eq 'true'}">
 			// Resize Etherpad iframe when its content grows.
 			// It does not support shrinking, only growing.
-			// This feature requires ep_resize plugin installed in Etherpad and customised with code in Doku tool
+			// This feature requires ep_resize plugin installed in Etherpad and customised with code in lams_build/conf/etherpad
 			$(window).on('message onmessage', function (e) {
 				var msg = e.originalEvent.data;
 		        if (msg.name === 'ep_resize') {
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height);
+		            	height = Math.max(200, msg.data.height - 10);
 		           	iframe.height(height);
 		        }
 		    });
@@ -78,7 +78,10 @@
 							'showControls':${empty showControls ? false : showControls},
 							'showChat': ${empty showChat ? false : showChat},
 							'height': ${empty height ? 'undefined' : height}
-							<c:if test="${showControls}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
+							<c:if test="${showControls}">
+								<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
+								,'userName':'<c:out value="${fullName}" />'
+							</c:if>
 						});
 					}
 				}

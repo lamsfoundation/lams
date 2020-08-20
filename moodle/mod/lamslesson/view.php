@@ -48,8 +48,24 @@ if ($id) {
 require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
-add_to_log($course->id, 'lamslesson', 'view', "view.php?id=$cm->id", $lamslesson->name, $cm->id);
+// Trigger module viewed event.
+if (!empty($id)) {
+  if (! $cm = get_coursemodule_from_id('lamslesson', $id, 0, true)) {
+      print_error('invalidcoursemodule');
+  }
+  if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
+      print_error('coursemisconf');
+  }
+  if (! $lamslesson = $DB->get_record("lamslesson", array("id" => $cm->instance))) {
+      print_error('invalidcoursemodule');
+  }
+} else {
+  print_error('missingparameter');
+}
+lamslesson_view($lamslesson, $course, $cm, $context);
+
 
 /// Print the page header
 
@@ -63,12 +79,26 @@ $options_html = '';
 $canmanage = has_capability('mod/lamslesson:manage', $context);
 
 // Log the lamslesson view.
-add_to_log($course->id, "lamslesson", "view lamslesson", "view.php?id=$cm->id", "$lamslesson->id", $cm->id);
+
+if (!empty($id)) {
+  if (! $cm = get_coursemodule_from_id('lamslesson', $id, 0, true)) {
+      print_error('invalidcoursemodule');
+  }
+  if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
+      print_error('coursemisconf');
+  }
+  if (! $lamslesson = $DB->get_record("lamslesson", array("id" => $cm->instance))) {
+      print_error('invalidcoursemodule');
+  }
+} else {
+  print_error('missingparameter');
+}
+lamslesson_view($lamslesson, $course, $cm, $context);
+
         
 // Check capabilities
 
 $canparticipate = has_capability('mod/lamslesson:participate', $context);
-
 
 
 // Output starts here

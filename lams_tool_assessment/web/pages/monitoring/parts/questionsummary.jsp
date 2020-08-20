@@ -9,6 +9,8 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<lams:css suffix="jquery.jRating"/>
+		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
@@ -37,11 +39,26 @@
 				LABEL_SURE : '<fmt:message key="label.sure" />',
 				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
 			};
+			
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/";
+			
+			//vars for rating.js
+			var MAX_RATES = 0,
+				MIN_RATES = 0,
+				COMMENTS_MIN_WORDS_LIMIT = 0,
+				LAMS_URL = '',
+				COUNT_RATED_ITEMS = 0,
+				COMMENT_TEXTAREA_TIP_LABEL = '',
+				WARN_COMMENTS_IS_BLANK_LABEL = '',
+				WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/Sortable.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -69,19 +86,29 @@
 		  			   		<c:if test="${assessment.enableConfidenceLevels}">
 		  			   			"<fmt:message key="label.confidence" />",
 		  			  		</c:if>
+			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
+		  			   			"<fmt:message key="label.answer.rating.title" />",
+		  			  		</c:if>
 		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+		  			   		'userId',
 	  						'portraitId'
 	  					],
 	  						    
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
-							{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
+							{name:'userName',index:'userName', width:83, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
+				    			return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
+							}},
+							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align' },
 	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
 			  			  	</c:if>
-			  			   	{name:'response', index:'response', width:427, sortable:false, search:false},
+				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
+				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
+		  			  		</c:if>
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false},
+			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],
 	  				   	multiselect: false,
@@ -119,8 +146,67 @@
 	  				  		}
 	  					},
   						loadComplete: function () {
+  							initializeJRating();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
-  					    }	  				  	
+  					    },
+  					    subGrid: true,
+  						subGridOptions: {
+  							reloadOnExpand : false,
+						    hasSubgrid: function (options) {
+						    	// if there are no ratings for the given answer, there will be no subgrid
+						        return options.data.rating != '-';
+						    }
+  						},
+  						subGridRowExpanded: function(subgrid_id, row_id) {
+  								var subgridTableId = subgrid_id+"_t";
+  								var questionResultUid = jQuery("#session${sessionDto.sessionId}")
+  														.getRowData(row_id)["questionResultUid"];
+  								   
+  								jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>");
+  								   
+  								jQuery("#"+subgridTableId).jqGrid({
+  									datatype: "json",
+  									loadonce:true,
+  									rowNum: 100,
+  									url: "<c:url value='/monitoring/getAnswerRatings.do'/>?questionResultUid=" + questionResultUid,
+  									height: "100%",
+  									autowidth:true,
+  									autoencode:false,
+  									cmTemplate: { title: false, search: false, sortable: false},
+  									guiStyle: "bootstrap",
+  									iconSet: 'fontAwesome',
+  									colNames:[
+  										'ratingId',
+  				  		  				'<fmt:message key="label.comment.name" />',
+  				  		  				'<fmt:message key="label.rating" />',
+  				  		  				'<fmt:message key="label.comment" />',
+  				  		  				'userId',
+  				  		  				'portraitId'
+  										],
+  									colModel:[
+  									   {name:'ratingId', index:'ratingId', width:0, hidden:true},
+  									   {name:'userName',index:'userName', width: 35, formatter : function(cellvalue, options, rowObject) {
+  										    var columnParts = rowObject[1].split('<BR>'),
+  										   		userName = columnParts[0];
+  										    // get portrait UUID, user ID and user name
+  							    			userName = definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], userName);
+  										    columnParts[0] = userName;
+  										    columnParts[1] = '<b>' + columnParts[1] + '</b>';
+  										    return columnParts.join('<BR>');
+  									   }},
+  									   {name:'rating', index:'rating', width: 10,  align:"center"},
+  									   {name:'comment', index:'comment'},
+  						  			   {name:'userId', index:'userId', width:0, hidden: true},
+  									   {name:'portraitId', index:'portraitId', width:0, hidden: true}
+  									],
+  									loadComplete: function () {
+  			  					   	 	initializePortraitPopover('<lams:LAMSURL/>');
+  			  					    },
+  									loadError: function(xhr,st,err) {
+  								    	jQuery("#"+subgridTableId).clearGridData();
+  								    }
+  								});
+  						}				  	
 	  				})
 	  				<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
 		  				.jqGrid('filterToolbar', { 
@@ -190,16 +276,6 @@
         			self.parent.tb_remove();
         		}
     		}
-    		
-    		function userNameFormatter (cellvalue, options, rowObject) {
-    			<c:choose><c:when test="${assessment.enableConfidenceLevels}">
-    			var portraitId = rowObject[6];
-    			</c:when><c:otherwise>
-    			var portraitId = rowObject[5];
-    			</c:otherwise></c:choose>
-    			return definePortraitPopover(portraitId, rowObject[0], rowObject[2]);
-    		}
-
   		</script>
 	</lams:head>
 	

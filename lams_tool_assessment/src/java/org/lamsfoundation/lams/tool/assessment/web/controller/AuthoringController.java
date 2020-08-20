@@ -662,6 +662,20 @@ public class AuthoringController {
 	return "pages/authoring/parts/questionlist";
     }
 
+    @RequestMapping(path = "/toggleQuestionRequired", method = RequestMethod.POST)
+    @ResponseBody
+    public String toggleQuestionRequired(HttpServletRequest request, @RequestParam int referenceSequenceId) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.remove(referenceSequenceId);
+	AssessmentQuestion question = questionReference.getQuestion();
+	question.setAnswerRequired(!question.isAnswerRequired());
+
+	return String.valueOf(question.isAnswerRequired());
+    }
+
     @RequestMapping("/getAllQbQuestionUids")
     @ResponseBody
     public String getAllQbQuestionUids(HttpServletRequest request, HttpServletResponse response,

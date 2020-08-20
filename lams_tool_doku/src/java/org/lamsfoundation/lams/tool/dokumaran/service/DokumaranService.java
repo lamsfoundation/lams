@@ -762,7 +762,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		ToolSession toolSession = toolService.getToolSession(toolSessionId);
 		Long lessonId = toolSession.getLesson().getLessonId();
 		groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
-
+		
+		etherpadHtml = EtherpadUtil.preparePadContent(dokumaran.getInstructions());
 	    } else {
 		session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());
 		session.setEtherpadReadOnlyId(sessionWithAlreadyCreatedPad.getEtherpadReadOnlyId());

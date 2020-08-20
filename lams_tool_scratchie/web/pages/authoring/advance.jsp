@@ -7,9 +7,24 @@
 <script lang="javascript">
 	$(document).ready(function(){
 		$("#display-confidence-levels-activities").click(function() {
-			$("#confidence-levels-activity").prop("disabled", !$(this).is(':checked'));
+			var disabled = !$(this).is(':checked');
+			$("#confidence-levels-activity").prop("disabled", disabled);
+			
+			var confidenceLevelsAnonymousCheckbox = $("#confidence-levels-anonymous").prop('disabled', disabled).closest('.checkbox');
+			if (disabled) {
+				confidenceLevelsAnonymousCheckbox.slideUp();
+			} else {
+				confidenceLevelsAnonymousCheckbox.slideDown();
+			}
 		});
-		<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid == null}">$("#confidence-levels-activity").prop('disabled','disabled'); </c:if>
+		<c:if test="${authoringForm.scratchie.confidenceLevelsActivityUiid == null}">
+			$("#confidence-levels-activity").prop('disabled', true);
+		</c:if>
+		
+		if (!$("#display-confidence-levels-activities").is(':checked')) {
+			$("#confidence-levels-anonymous").prop('disabled', true).closest('.checkbox').hide();
+		}
+		
 		
 		$("#display-activities-providing-vsa-answers").click(function() {
 			$("#activity-providing-vsa-answers").prop("disabled", !$(this).is(':checked'));
@@ -70,13 +85,6 @@
 		</label>
 	</div>
 	
-	<div class="checkbox">
-		<label for="shuffle-items">
-			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
-			<fmt:message key="label.authoring.advanced.shuffle.items" />
-		</label>
-	</div>
-	
 	<div class="form-inline">
 		<label for="time-limit">
 			<fmt:message key="label.time.limit" />&nbsp;
@@ -109,6 +117,13 @@
 						</c:forEach>
 					</form:select>
 				</label>
+				
+				<div class="checkbox loffset20">
+					<label for="confidence-levels-anonymous">
+						<form:checkbox path="scratchie.confidenceLevelsAnonymous" id="confidence-levels-anonymous"/>
+						<fmt:message key="label.anonymous.confidence.level" />
+					</label>
+				</div>
 			</c:otherwise>
 		</c:choose>
 	</div>

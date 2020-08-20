@@ -93,9 +93,9 @@ public class PedagogicalPlannerController {
 			QaQueContent qaQuestion = new QaQueContent();
 			qaQuestion.setDisplayOrder(questionIndex + 1);
 			qaQuestion.setToolContentId(qaContent.getQaContentId());
+			qaQuestion.setAnswerRequired(false);
 
 			QbQuestion qbQuestion = new QbQuestion();
-			qbQuestion.setAnswerRequired(false);
 			qbQuestion.setName(question);
 			qaService.saveOrUpdate(qbQuestion);
 

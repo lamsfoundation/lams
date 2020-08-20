@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,9 +67,13 @@ import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -118,6 +123,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.tool.assessment.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ICommonAssessmentService;
@@ -177,6 +183,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private ILogEventService logEventService;
 
     private IUserManagementService userManagementService;
+
+    private ILessonService lessonService;
 
     private IExportToolContentService exportContentService;
 
@@ -267,6 +275,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    userOptionAnswer.setOptionUid(leaderOptionAnswer.getOptionUid());
 		    userOptionAnswers.add(userOptionAnswer);
 		}
+
+		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
 	}
 
@@ -315,43 +325,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void launchTimeLimit(Long assessmentUid, Long userId) {
+    public LocalDateTime launchTimeLimit(Long assessmentUid, Long userId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
-	lastResult.setTimeLimitLaunchedDate(new Date());
+	LocalDateTime launchedDate = LocalDateTime.now();
+	lastResult.setTimeLimitLaunchedDate(launchedDate);
 	assessmentResultDao.saveObject(lastResult);
+	return launchedDate;
     }
 
     @Override
-    public long getSecondsLeft(Assessment assessment, AssessmentUser user) {
-	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
-
-	long secondsLeft = 1;
-	if (assessment.getTimeLimit() != 0) {
-	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
-	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
-	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
-		    : assessment.getTimeLimit() * 60
-			    - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
-	    // change negative or zero number to 1
-	    secondsLeft = Math.max(1, secondsLeft);
-	}
-
-	return secondsLeft;
-    }
-
-    @Override
-    public boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader) {
-	int timeLimit = assessment.getTimeLimit();
-	if (timeLimit == 0) {
-	    return false;
-	}
-
-	AssessmentResult lastLeaderResult = getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
-
-	//check if the time limit is exceeded
-	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
-		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System
-			.currentTimeMillis();
+    public boolean checkTimeLimitExceeded(long assessmentUid, long userId) {
+	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(assessmentUid, userId);
+	return secondsLeft != null && secondsLeft.equals(0);
     }
 
     @Override
@@ -434,6 +419,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public AssessmentUser getUserByIdAndContent(Long userId, Long contentId) {
 	return assessmentUserDao.getUserByIdAndContent(userId, contentId);
+    }
+
+    @Override
+    public AssessmentUser getUserByLoginAndContent(String login, Long contentId) {
+	return assessmentUserDao.getUserByLoginAndContent(login, contentId);
     }
 
     @Override
@@ -731,6 +721,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    questionResult.setConfidenceLevel(questionDto.getConfidenceLevel());
 	}
 
+	// store justification entered by the learner
+	if (assessment.isAllowAnswerJustification()) {
+	    questionResult.setJustification(questionDto.getJustification());
+	}
+
 	return questionResult;
     }
 
@@ -966,6 +961,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
 	questionDto.setAnswerFloat(questionResult.getAnswerFloat());
 	questionDto.setAnswer(questionResult.getAnswer());
+	questionDto.setJustification(questionResult.getJustification());
 	questionDto.setMark(questionResult.getMark());
 	questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
 	questionDto.setPenalty(questionResult.getPenalty());
@@ -1798,6 +1794,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.time.taken"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow.addCell(getMessage("label.export.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    if (assessment.isAllowAnswerJustification()) {
+		questionTitleRow.addCell(getMessage("label.answer.justification"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    }
 
 	    int questionNumber = 1;
 
@@ -1914,6 +1914,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 			//mark
 			userResultRow.addCell(questionResult.getMark());
+
+			if (assessment.isAllowAnswerJustification()) {
+			    userResultRow.addCell(AssessmentEscapeUtils
+				    .escapeStringForExcelExport(questionResult.getJustification()));
+			}
+
 			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
@@ -2053,6 +2059,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 			userTitleRow.addCell(getMessage("label.export.mark"), true);
 
+			if (assessment.isAllowAnswerJustification()) {
+			    userTitleRow.addCell(getMessage("label.answer.justification"), true);
+			}
+
 			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 			if (assessmentResult != null) {
 			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
@@ -2087,7 +2097,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 					userResultRow.addCell(confidenceLevel);
 				    }
+
 				    userResultRow.addCell(questionResult.getMark());
+
+				    if (assessment.isAllowAnswerJustification()) {
+					userResultRow.addCell(AssessmentEscapeUtils
+						.escapeStringForExcelExport(questionResult.getJustification()));
+				    }
 				}
 			    }
 
@@ -2959,6 +2975,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
+    public String getMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -3262,6 +3283,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		assessmentDao.insert(assessmentQuestion);
+		// in case an imported question had a question ID which is the highest
+		qbService.updateMaxQuestionId();
 	    }
 
 	    saveOrUpdateAssessment(toolContentObj);
@@ -3681,6 +3704,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	this.learnerService = learnerService;
     }
 
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -3800,9 +3827,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setReflectOnActivity(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.optBoolean(toolContentJSON, "shuffled", Boolean.FALSE));
-	assessment.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
+	assessment.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
+	assessment.setAllowAnswerJustification(
+		JsonUtil.optBoolean(toolContentJSON, "allowAnswerJustification", Boolean.FALSE));
+
 	// submission deadline set in monitoring
 
 	if (toolContentJSON.has("overallFeedback")) {
@@ -3829,96 +3859,134 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 	for (JsonNode questionJSONData : questions) {
 
-	    boolean addToCollection = false;
+	    boolean addToCollection = collection != null;
 
 	    AssessmentQuestion question = new AssessmentQuestion();
 	    Integer type = JsonUtil.optInt(questionJSONData, "type");
 	    question.setToolContentId(toolContentID);
 	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
+	    question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
 
+	    QbQuestion oldQbQuestion = null;
 	    QbQuestion qbQuestion = null;
 	    String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
 
 	    // try to match the question to an existing QB question in DB
 	    if (StringUtils.isNotBlank(uuid)) {
-		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+		oldQbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
+	    boolean isModification = oldQbQuestion != null;
 
-	    if (qbQuestion == null) {
-		addToCollection = collection != null;
-
+	    // are we modifying an existing question or creating a new one
+	    if (isModification) {
+		qbQuestion = oldQbQuestion.clone();
+		qbService.releaseFromCache(oldQbQuestion);
+	    } else {
 		qbQuestion = new QbQuestion();
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
 		qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
-		qbQuestion.setType(type);
-		qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
-		qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));
+	    }
 
-		qbQuestion.setAllowRichEditor(
-			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-		qbQuestion.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
-		qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
-		qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-		qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "maxMark", 1));
-		qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
-		qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
-		qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
-		qbQuestion.setFeedbackOnPartiallyCorrect(
-			JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
-		qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
-		qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
-		qbQuestion.setMultipleAnswersAllowed(
-			JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-		qbQuestion.setIncorrectAnswerNullifiesMark(
-			JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+	    qbQuestion.setType(type);
+	    qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
+	    qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));
 
+	    qbQuestion.setAllowRichEditor(
+		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
+	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+	    qbQuestion
+		    .setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
+	    qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+	    qbQuestion.setMultipleAnswersAllowed(
+		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+	    qbQuestion.setIncorrectAnswerNullifiesMark(
+		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
+	    qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
+
+	    if (!isModification) {
 		// UUID normally gets generated in the DB, but we need it immediately,
-		// so we generate it programatically.
+		// so we generate it programmatically.
 		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
 		// not from DB where UUID is filed
 		qbQuestion.setUuid(UUID.randomUUID());
 		assessmentDao.insert(qbQuestion);
-
-		// Store it back into JSON so Scratchie can read it
-		// and use the same questions, not create new ones
-		uuid = qbQuestion.getUuid().toString();
-		ObjectNode questionData = (ObjectNode) questionJSONData;
-		questionData.put(RestTags.QUESTION_UUID, uuid);
-
-		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
-			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
-
-		    if (!questionJSONData.has(RestTags.ANSWERS)) {
-			throw new IOException("REST Authoring is missing answers for a question of type " + type
-				+ ". Data:" + toolContentJSON);
-		    }
-
-		    List<QbOption> optionList = new ArrayList<>();
-		    ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
-		    for (JsonNode answerData : optionsData) {
-			QbOption option = new QbOption();
-			option.setQbQuestion(qbQuestion);
-			option.setDisplayOrder(JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER));
-			Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
-			if (correct == null) {
-			    Double grade = JsonUtil.optDouble(answerData, "grade");
-			    option.setMaxMark(grade == null ? 0 : grade.floatValue());
-			} else {
-			    option.setMaxMark(correct ? 1 : 0);
-			}
-			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
-			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
-			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
-			option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
-			// option.setQuestion(question); can't find the use for this field yet!
-			optionList.add(option);
-		    }
-		    qbQuestion.setQbOptions(optionList);
-		}
-	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
-		addToCollection = true;
 	    }
+
+	    if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
+		    || (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
+
+		if (!questionJSONData.has(RestTags.ANSWERS)) {
+		    throw new IOException("REST Authoring is missing answers for a question of type " + type + ". Data:"
+			    + toolContentJSON);
+		}
+
+		List<QbOption> optionList = new ArrayList<>();
+		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
+		for (JsonNode answerData : optionsData) {
+		    int displayOrder = JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER);
+		    QbOption option = null;
+		    // check if existing question gets modified or do we create a new one
+		    for (QbOption existingOption : qbQuestion.getQbOptions()) {
+			if (existingOption.getDisplayOrder() == displayOrder) {
+			    option = existingOption;
+			    break;
+			}
+		    }
+		    if (option == null) {
+			option = new QbOption();
+			option.setDisplayOrder(displayOrder);
+			option.setQbQuestion(qbQuestion);
+		    }
+
+		    Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
+		    if (correct == null) {
+			Double grade = JsonUtil.optDouble(answerData, "grade");
+			option.setMaxMark(grade == null ? 0 : grade.floatValue());
+		    } else {
+			option.setMaxMark(correct ? 1 : 0);
+		    }
+		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
+		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));
+		    option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
+		    option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
+		    // option.setQuestion(question); can't find the use for this field yet!
+		    optionList.add(option);
+		}
+		qbQuestion.setQbOptions(optionList);
+	    }
+
+	    if (isModification) {
+		addToCollection &= !collectionUUIDs.contains(uuid);
+
+		int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
+		if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
+		    qbQuestion.clearID();
+		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
+		    qbQuestion.setCreateDate(new Date());
+		    qbQuestion.setUuid(UUID.randomUUID());
+		    assessmentDao.insert(qbQuestion);
+		} else if (isModified == IQbService.QUESTION_MODIFIED_NONE) {
+		    // Changes to question and option content does not count as version bump,
+		    // but rather as update of the original question
+		    // They should probably be marked as "update" rather than "none"
+		    assessmentDao.update(qbQuestion);
+		} else {
+		    throw new IllegalArgumentException(
+			    "Implement other Question Bank modification levels in Assessment tool");
+		}
+	    }
+
+	    // Store it back into JSON so Scratchie can read it
+	    // and use the same questions, not create new ones
+	    uuid = qbQuestion.getUuid().toString();
+	    ObjectNode questionData = (ObjectNode) questionJSONData;
+	    questionData.put(RestTags.QUESTION_UUID, uuid);
 
 	    // question.setUnits(units); Needed for numerical type question
 	    question.setQbQuestion(qbQuestion);
@@ -3927,7 +3995,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    // all questions need to end up in user's private collection
 	    if (addToCollection) {
-		qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		// qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
 		collectionUUIDs.add(uuid);
 	    }
 	}
@@ -4010,5 +4078,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
+    }
+
+    @Override
+    public Grouping getGrouping(long toolContentId) {
+	ToolActivity toolActivity = (ToolActivity) userManagementService
+		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
+    }
+
+    @Override
+    public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
     }
 }

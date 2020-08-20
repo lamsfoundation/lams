@@ -96,7 +96,7 @@ public class LearningController implements QaAppConstants {
     @Autowired
     @Qualifier("qaMessageService")
     private MessageService messageService;
-    
+
     @RequestMapping("/")
     public String unspecified() throws IOException, ServletException, ToolException {
 	return null;
@@ -291,14 +291,14 @@ public class LearningController implements QaAppConstants {
 		     * the report should have all the users' entries OR the report should have only the current
 		     * session's entries
 		     */
-		    
-		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
-			    user, generalLearnerFlowDTO);
+
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
+			    generalLearnerFlowDTO);
 
 		    generalLearnerFlowDTO.setIsLearnerFinished(user.isLearnerFinished());
 		    return "learning/learnerRep";
 
-		// show submissionDeadline page otherwise
+		    // show submissionDeadline page otherwise
 		} else {
 		    return "learning/submissionDeadline";
 		}
@@ -336,8 +336,8 @@ public class LearningController implements QaAppConstants {
 		     * session's entries
 		     */
 
-		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId,
-			    user, generalLearnerFlowDTO);
+		    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
+			    generalLearnerFlowDTO);
 
 		    generalLearnerFlowDTO.setIsLearnerFinished(user.isLearnerFinished());
 		    return "learning/LearnerRep";
@@ -517,7 +517,7 @@ public class LearningController implements QaAppConstants {
 	    QaQueContent currentQuestion = qaService
 		    .getQuestionByContentAndDisplayOrder(new Integer(currentQuestionIndex), qaContent.getUid());
 
-	    boolean isRequiredQuestionMissed = currentQuestion.getQbQuestion().isAnswerRequired() && isEmpty(newAnswer);
+	    boolean isRequiredQuestionMissed = currentQuestion.isAnswerRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {
 		qaService.updateResponseWithNewAnswer(newAnswer, toolSessionID, new Integer(currentQuestionIndex),
 			true);
@@ -1081,7 +1081,7 @@ public class LearningController implements QaAppConstants {
 		countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	    }
 	}
-	
+
 	Set<QaQueContent> questions = qaContent.getQaQueContents();
 	generalLearnerFlowDTO.setQuestions(questions);
 	//find according QaQueContent, if any

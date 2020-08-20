@@ -6,8 +6,12 @@
 		<a href="#nogo" onclick="removeItemAttachment(${resourceItemForm.itemIndex})" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i> <fmt:message key="label.delete" /> </a>
 	</c:when>
 	<c:otherwise>
-		<lams:FileUpload fileFieldname="file"  maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-		
+		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${resourceItemForm.tmpFileUploadId}" />
+		<div id="image-upload-area" class="voffset20"></div>
+		<script>
+			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
+		</script>
 	</c:otherwise>
 </c:choose>
+
 <input type="hidden" name="hasFile" value="${not empty resourceItemForm and resourceItemForm.hasFile}" />

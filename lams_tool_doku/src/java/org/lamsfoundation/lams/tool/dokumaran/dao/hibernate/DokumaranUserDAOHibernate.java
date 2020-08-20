@@ -77,6 +77,7 @@ public class DokumaranUserDAOHibernate extends LAMSBaseDAO implements DokumaranU
 	return this.doFind(FIND_BY_SESSION_ID, sessionId);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<DokumaranUser> getLeadersBySessionId(Long sessionId) {
 	return this.doFind(FIND_LEADERS_BY_SESSION_ID, sessionId);

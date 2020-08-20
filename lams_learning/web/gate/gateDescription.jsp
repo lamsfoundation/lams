@@ -3,7 +3,7 @@
     <c:if test="${!empty gateForm.gate.title}">
         <div class="panel-heading">
          <div class="panel-title">
-            <lams:out value="${gateForm.gate.title}" escapeHtml="true" />
+            <span id="gate-name"><lams:out value="${gateForm.gate.title}" escapeHtml="true" /></span>
          </div>
         </div>
     </c:if>

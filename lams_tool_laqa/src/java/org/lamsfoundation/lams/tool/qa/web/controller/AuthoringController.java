@@ -416,7 +416,6 @@ public class AuthoringController implements QaAppConstants {
 
 	qbQuestion.setName(form.getTitle());
 	qbQuestion.setDescription(form.getDescription());
-	qbQuestion.setAnswerRequired(form.isAnswerRequired());
 	qbQuestion.setMinWordsLimit(form.getMinWordsLimit());
 	qbQuestion.setFeedback(form.getFeedback());
 
@@ -500,7 +499,6 @@ public class AuthoringController implements QaAppConstants {
 	if (questionIndex >= 0) {
 	    form.setItemIndex(String.valueOf(questionIndex));
 	}
-	form.setAnswerRequired(qbQuestion.isAnswerRequired());
 	form.setMinWordsLimit(qbQuestion.getMinWordsLimit());
 	form.setFeedback(qbQuestion.getFeedback());
 
@@ -550,6 +548,21 @@ public class AuthoringController implements QaAppConstants {
 	}
 
 	return "authoring/itemlist";
+    }
+
+    @RequestMapping(path = "/toggleQuestionRequired", method = RequestMethod.POST)
+    @ResponseBody
+    public String toggleQuestionRequired(@ModelAttribute("newQuestionForm") QaAuthoringForm form,
+	    HttpServletRequest request) throws IOException, ServletException {
+	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
+	int questionIndex = NumberUtils.toInt(request.getParameter("questionIndex"), -1);
+	Set<QaQueContent> qaQuestions = getQuestions(sessionMap);
+
+	List<QaQueContent> rList = new ArrayList<>(qaQuestions);
+	QaQueContent question = rList.get(questionIndex);
+	question.setAnswerRequired(!question.isAnswerRequired());
+
+	return String.valueOf(question.isAnswerRequired());
     }
 
     /**

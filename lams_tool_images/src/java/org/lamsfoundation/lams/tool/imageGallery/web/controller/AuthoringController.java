@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.web.controller;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -50,14 +51,13 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryUtils;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -66,11 +66,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Andrey Balan
@@ -296,7 +296,7 @@ public class AuthoringController {
 	    }
 	}
 	imageGalleryPO.setImageGalleryItems(itemList);
-	// delete instructino file from database.
+	// delete instructions file from database.
 	List<ImageGalleryItem> delImageGalleryItemList = getDeletedImageGalleryItemList(sessionMap);
 	iter = delImageGalleryItemList.iterator();
 	while (iter.hasNext()) {
@@ -349,12 +349,15 @@ public class AuthoringController {
 	boolean saveUsingLearningAction = WebUtil.readBooleanParam(request, "saveUsingLearningAction", false);
 	request.setAttribute("saveUsingLearningAction", saveUsingLearningAction);
 
+	imageGalleryItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	return "pages/authoring/parts/addimage";
     }
 
     /**
      * Display edit page for existed imageGallery item.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/editImage")
     public String editImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm, HttpServletRequest request) {
 
@@ -363,7 +366,7 @@ public class AuthoringController {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 
-	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
+	int itemIdx = NumberUtils.toInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	ImageGalleryItem item = null;
 	if (itemIdx != -1) {
 	    SortedSet<ImageGalleryItem> imageGalleryList = getImageList(sessionMap);
@@ -373,6 +376,9 @@ public class AuthoringController {
 		populateItemToForm(itemIdx, item, imageGalleryItemForm, request);
 	    }
 	}
+
+	imageGalleryItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	return (item == null) ? null : "pages/authoring/parts/addimage";
     }
 
@@ -398,13 +404,10 @@ public class AuthoringController {
     public String saveOrUpdateImage(@ModelAttribute ImageGalleryItemForm imageGalleryItemForm,
 	    HttpServletRequest request, HttpServletResponse response) {
 
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateImageGalleryItem(imageGalleryItemForm, true,
-		messageService);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
 	try {
-	    if (errorMap.isEmpty()) {
-		extractFormToImageGalleryItem(request, imageGalleryItemForm);
-	    }
+	    extractFormToImageGalleryItems(request, imageGalleryItemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
 	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
@@ -481,40 +484,6 @@ public class AuthoringController {
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	return "pages/authoring/parts/addmultipleimages";
-    }
-
-    /**
-     * This method will get necessary information from imageGallery item form and save or update into
-     * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
-     * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
-     * persisted.
-     */
-    @RequestMapping("/saveMultipleImages")
-    public String saveMultipleImages(@ModelAttribute MultipleImagesForm multipleImagesForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	MultiValueMap<String, String> errorMap = ImageGalleryUtils.validateMultipleImages(multipleImagesForm, true,
-		messageService);
-
-	try {
-	    if (errorMap.isEmpty()) {
-		extractMultipleFormToImageGalleryItems(request, multipleImagesForm);
-	    }
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errorMap.add("GLOBAL", messageService.getMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    new Object[] { e.getMessage() }));
-	}
-
-	if (!errorMap.isEmpty()) {
-	    request.setAttribute("errorMap", errorMap);
-	    return "pages/authoring/parts/addmultipleimages";
-	}
-
-	// set session map ID so that itemlist.jsp can get sessionMAP
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, multipleImagesForm.getSessionMapID());
-	// return null to close this window
-	return "pages/authoring/parts/itemlist";
     }
 
     /**
@@ -598,7 +567,7 @@ public class AuthoringController {
 	form.setDescription(item.getDescription());
 	form.setTitle(item.getTitle());
 	if (itemIdx >= 0) {
-	    form.setImageIndex(new Integer(itemIdx).toString());
+	    form.setImageIndex(String.valueOf(itemIdx));
 	}
 
 	if (item.getOriginalFileUuid() != null) {
@@ -613,7 +582,8 @@ public class AuthoringController {
     /**
      * Extract web form content to imageGallery item.
      */
-    private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
+    @SuppressWarnings("unchecked")
+    private void extractFormToImageGalleryItems(HttpServletRequest request, ImageGalleryItemForm imageForm)
 	    throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy necessary info from request form to an old or new ImageGalleryItem
@@ -624,53 +594,25 @@ public class AuthoringController {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(imageForm.getSessionMapID());
-	// check whether it is "edit(old item)" or "add(new item)"
-	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
-	int imageIdx = NumberUtils.stringToInt(imageForm.getImageIndex(), -1);
-	ImageGalleryItem image = null;
 
-	if (imageIdx == -1) { // add
-	    image = new ImageGalleryItem();
-	    image.setCreateDate(new Timestamp(new Date().getTime()));
+	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
+	int imageIdx = NumberUtils.toInt(imageForm.getImageIndex(), -1);
+	ImageGalleryItem item = null;
+
+	// check whether it is "edit(old item)" or "add(new item)"
+	boolean hasOld = imageIdx >= 0;
+	if (hasOld) {
+	    List<ImageGalleryItem> rList = new ArrayList<>(imageList);
+	    item = rList.get(imageIdx);
+	} else {
+	    item = new ImageGalleryItem();
+	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
 	    if (imageList != null && imageList.size() > 0) {
 		ImageGalleryItem last = imageList.last();
 		maxSeq = last.getSequenceId() + 1;
 	    }
-	    image.setSequenceId(maxSeq);
-	    imageList.add(image);
-	} else { // edit
-	    List<ImageGalleryItem> rList = new ArrayList<>(imageList);
-	    image = rList.get(imageIdx);
-	}
-
-	// uploadImageGalleryItemFile
-	// and setting file properties' fields: item.setFileUuid();
-	// item.setFileName();
-	if (imageForm.getFile() != null) {
-	    // if it has old file, and upload a new, then save old to deleteList
-	    ImageGalleryItem delImage = new ImageGalleryItem();
-	    boolean hasOld = false;
-	    if (image.getOriginalFileUuid() != null) {
-		hasOld = true;
-		// be careful, This new ImageGalleryItem object never be save into database
-		// just temporarily use for saving fileUuid and versionID use:
-		delImage.setOriginalFileUuid(image.getOriginalFileUuid());
-	    }
-	    try {
-		igService.uploadImageGalleryItemFile(image, imageForm.getFile());
-	    } catch (UploadImageGalleryFileException e) {
-		// if it is new add , then remove it!
-		if (imageIdx == -1) {
-		    imageList.remove(image);
-		}
-		throw e;
-	    }
-	    // put it after "upload" to ensure deleted file added into list only no exception happens during upload
-	    if (hasOld) {
-		List<ImageGalleryItem> delAtt = getDeletedItemAttachmentList(sessionMap);
-		delAtt.add(delImage);
-	    }
+	    item.setSequenceId(maxSeq);
 	}
 
 	String title = imageForm.getTitle();
@@ -679,55 +621,63 @@ public class AuthoringController {
 	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
 	    title = igService.generateNextImageTitle(nextImageTitleNumber);
 	}
-	image.setTitle(title);
+	item.setTitle(title);
 
-	image.setDescription(imageForm.getDescription());
-	image.setCreateByAuthor(true);
-	image.setHide(false);
-    }
+	item.setDescription(imageForm.getDescription());
+	item.setCreateByAuthor(true);
+	item.setHide(false);
 
-    /**
-     * Extract web form content to imageGallery items.
-     */
-    private void extractMultipleFormToImageGalleryItems(HttpServletRequest request, MultipleImagesForm multipleForm)
-	    throws Exception {
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(multipleForm.getSessionMapID());
-	// check whether it is "edit(old item)" or "add(new item)"
-	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
-
-	List<MultipartFile> fileList = ImageGalleryUtils.createFileListFromMultipleForm(multipleForm);
-	for (MultipartFile file : fileList) {
-	    ImageGalleryItem image = new ImageGalleryItem();
-	    image.setCreateDate(new Timestamp(new Date().getTime()));
-	    int maxSeq = 1;
-	    if (imageList != null && imageList.size() > 0) {
-		ImageGalleryItem last = imageList.last();
-		maxSeq = last.getSequenceId() + 1;
-	    }
-	    image.setSequenceId(maxSeq);
-	    imageList.add(image);
-
-	    // uploadImageGalleryItemFile
-	    // and setting file properties' fields: item.setFileUuid();
-	    // item.setFileName();
-	    try {
-		igService.uploadImageGalleryItemFile(image, file);
-	    } catch (UploadImageGalleryFileException e) {
-		imageList.remove(image);
-		throw e;
+	File uploadDir = FileUtil.getTmpFileUploadDir(imageForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length == 0) {
+		return;
 	    }
 
-	    Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
-	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
-	    String title = igService.generateNextImageTitle(nextImageTitleNumber);
-	    image.setTitle(title);
+	    if (hasOld) {
+		// if we are replacing an image, there can be only 1 upload
+		if (files.length > 1) {
+		    throw new ServletException("Uploaded more than 1 image while editing an Image Gallery Item");
+		}
 
-	    image.setDescription("");
-	    image.setCreateByAuthor(true);
-	    image.setHide(false);
+		// if it has old file, and upload a new, then save old to deleteList
+		ImageGalleryItem delImage = new ImageGalleryItem();
+		// be careful, This new ImageGalleryItem object never be save into database
+		// just temporarily use for saving fileUuid
+		delImage.setOriginalFileUuid(item.getOriginalFileUuid());
+		List<ImageGalleryItem> delAtt = getDeletedItemAttachmentList(sessionMap);
+		delAtt.add(delImage);
+	    }
+
+	    int sequenceId = item.getSequenceId();
+	    for (File file : files) {
+		// if user uploaded multiple new images, all of them get the same title and description
+		if (sequenceId > item.getSequenceId()) {
+		    ImageGalleryItem nextItem = new ImageGalleryItem();
+		    nextItem.setCreateDate(item.getCreateDate());
+		    nextItem.setSequenceId(sequenceId);
+
+		    title = imageForm.getTitle();
+		    if (StringUtils.isBlank(title)) {
+			Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
+			sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
+			title = igService.generateNextImageTitle(nextImageTitleNumber);
+		    }
+		    nextItem.setTitle(title);
+		    nextItem.setDescription(item.getDescription());
+		    nextItem.setCreateByAuthor(true);
+		    nextItem.setHide(false);
+		    item = nextItem;
+		}
+
+		igService.uploadImageGalleryItemFile(item, file);
+		if (!hasOld) {
+		    imageList.add(item);
+		}
+		sequenceId++;
+	    }
+
+	    FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
 	}
     }
-
 }

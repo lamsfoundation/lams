@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +41,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Interface that defines the contract that all ShareImageGallery service provider must follow.
@@ -74,7 +74,7 @@ public interface IImageGalleryService extends ToolRatingManager, ICommonToolServ
      * @param file
      * @throws UploadImageGalleryFileException
      */
-    void uploadImageGalleryItemFile(ImageGalleryItem item, MultipartFile file) throws UploadImageGalleryFileException;
+    void uploadImageGalleryItemFile(ImageGalleryItem item, File file) throws UploadImageGalleryFileException;
 
     // ********** for user methods *************
     /**

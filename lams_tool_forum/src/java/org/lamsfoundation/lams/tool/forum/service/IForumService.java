@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.forum.service;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,7 +44,6 @@ import org.lamsfoundation.lams.tool.forum.model.Message;
 import org.lamsfoundation.lams.tool.forum.model.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * User: conradb Date: 8/06/2005 Time: 14:49:59
@@ -171,7 +171,7 @@ public interface IForumService extends ICommonToolService {
      * @return Attachment A new instance of attachment has uploaded file VersionID and UUID information.
      * @throws PersistenceException
      */
-    Attachment uploadAttachment(MultipartFile file) throws PersistenceException;
+    Attachment uploadAttachment(File file) throws PersistenceException;
 
     // ************************************************************************************
     // *********************Get topic methods **********************

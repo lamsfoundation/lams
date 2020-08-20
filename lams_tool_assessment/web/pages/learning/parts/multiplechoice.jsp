@@ -16,15 +16,16 @@
 		<c:forEach var="option" items="${question.optionDtos}"  varStatus="answerStatus">
 			<tr>
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
+					<c:set var="inputName">question${status.index}<c:if test="${question.multipleAnswersAllowed}">_${option.uid}</c:if></c:set>
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="question${status.index}_${option.uid}" value="${true}"
+							<input type="checkbox" name="${inputName}" id="${inputName}" value="${true}" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" name="question${status.index}" value="${option.uid}"
+							<input type="radio" name="${inputName}" id="${inputName}" value="${option.uid}" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
@@ -36,7 +37,9 @@
 				</td>
 				
 				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
-					<c:out value="${option.name}" escapeXml="false" />
+					<label for="${inputName}">
+						<c:out value="${option.name}" escapeXml="false" />
+					</label>
 				</td>
 			</tr>
 		</c:forEach>

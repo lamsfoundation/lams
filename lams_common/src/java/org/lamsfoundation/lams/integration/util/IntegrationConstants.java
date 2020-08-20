@@ -68,4 +68,5 @@ public class IntegrationConstants {
 
     public static final String PARAM_LESSON_ID = "lsid";
 
+    public static final String WORKFLOW_AUTOMATION_REDIRECT_URL_PREFIX = "/wa/";
 }

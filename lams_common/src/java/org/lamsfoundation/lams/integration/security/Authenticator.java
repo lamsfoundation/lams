@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.integration.security;
 import java.util.Date;
 
 import org.lamsfoundation.lams.integration.ExtServer;
+import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 
 /**
@@ -47,8 +48,8 @@ public class Authenticator {
      * @param hashValue
      * @throws AuthenticationException
      */
-    public static void authenticate(ExtServer map, String datetime, String username, String method,
-	    String hashValue) throws AuthenticationException {
+    public static void authenticate(ExtServer map, String datetime, String username, String method, String hashValue)
+	    throws AuthenticationException {
 
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
@@ -109,7 +110,8 @@ public class Authenticator {
 	//learnerStrictAuth hash [ts + uid + method + lsid + serverID + serverKey]
 	//otherwise [ts + uid + method + serverID + serverKey]
 	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
-		+ ("learnerStrictAuth".equals(method) ? lsid.toLowerCase().trim() : "")
+		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lsid.toLowerCase().trim()
+			: "")
 		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
 	Authenticator.checkHash(plaintext, hashValue);
     }
@@ -128,8 +130,7 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    public static void authenticate(ExtServer map, String datetime, String hashValue)
-	    throws AuthenticationException {
+    public static void authenticate(ExtServer map, String datetime, String hashValue) throws AuthenticationException {
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
 	}
@@ -142,10 +143,9 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    private static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
+    public static void checkHash(String plaintext, String hashValue) throws AuthenticationException {
 	if (!hashValue.equals(HashUtil.sha1(plaintext))) {
 	    throw new AuthenticationException("Authentication failed!");
 	}
     }
-
 }

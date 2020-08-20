@@ -138,10 +138,10 @@
 		 	}
 			// open import pop up window, centered horizontally
 			var left = ((screen.width / 2) - (500 / 2));
-	    	window.open(url,'QuestionFile','width=500,height=240,scrollbars=yes,top=150,left=' + left);
+	    	window.open(url,'QuestionFile','width=500,height=370,scrollbars=yes,top=150,left=' + left);
 	    }
 
-		function createAssessment(questionType, numAssessmentsFieldname, containingDivName ) {
+		function createAssessment(questionType, numAssessmentsFieldname, containingDivName, qbQuestionUid, collapse) {
 			var numAssessments = $('#'+numAssessmentsFieldname);
 			var type = questionType ? questionType : 'essay';
 			var currNum = numAssessments.val();
@@ -150,6 +150,9 @@
 			newDiv.id = containingDivName+'divassess'+nextNum;
 			newDiv.className = 'space-top space-sides';
 			var url=getSubmissionURL()+"/createAssessment.do?questionNumber="+nextNum+"&questionType="+type+"&containingDivName="+containingDivName;
+			if (qbQuestionUid) {
+				url += '&qbQuestionUid=' + qbQuestionUid;
+			}
 			$('#'+containingDivName).append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
@@ -158,12 +161,16 @@
 					newDiv.remove();
 				} else {
 					numAssessments.val(nextNum);
-					newDiv.scrollIntoView();
+					if (collapse) {
+						$('.collapse', newDiv).collapse('hide');
+					} else {
+						newDiv.scrollIntoView();
+					}
 				}
 			});
 		}		
 		
-		function createQuestion(numQuestionsFieldname, newDivPrefix, questionDivName, forward, extraParam) {
+		function createQuestion(numQuestionsFieldname, newDivPrefix, questionDivName, forward, extraParam, collapse) {
 			var numQuestions = $('#'+numQuestionsFieldname);
 			var currNum = numQuestions.val();
 			var nextNum = +currNum + 1;
@@ -184,8 +191,12 @@
 					newDiv.remove();
 				} else {
 					numQuestions.val(nextNum);
-					newDiv.focus();
-					newDiv.scrollIntoView();
+					if (collapse) {
+						$('.collapse', newDiv).collapse('hide');
+					} else {
+						newDiv.focus();
+						newDiv.scrollIntoView();
+					}
 				}
 			});
 		}		

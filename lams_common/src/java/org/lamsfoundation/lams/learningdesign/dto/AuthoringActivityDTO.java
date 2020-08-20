@@ -162,9 +162,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     /** The url of the tool's admin screen. */
     private String adminURL;
 
-    /** The category of activity */
-    private Integer activityCategoryID;
-
     private Integer gateActivityLevelID;
 
     private Boolean gateOpen;
@@ -296,7 +293,6 @@ public class AuthoringActivityDTO extends BaseDTO {
 		: null;
 	createDateTime = activity.getCreateDateTime();
 	languageFile = activity.getLanguageFile();
-	activityCategoryID = activity.getActivityCategoryID();
 	libraryActivityUIImage = activity.getLibraryActivityUiImage();
 	libraryActivityID = activity.getLibraryActivity() != null ? activity.getLibraryActivity().getActivityId()
 		: null;
@@ -482,13 +478,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     /*******************************************************************************************************************
      * Getters
      ******************************************************************************************************************/
-
-    /**
-     * @return Returns the activityCategoryID.
-     */
-    public Integer getActivityCategoryID() {
-	return activityCategoryID;
-    }
 
     /**
      * @return Returns the activityID.
@@ -839,13 +828,6 @@ public class AuthoringActivityDTO extends BaseDTO {
     /*******************************************************************************************************************
      * Setters
      ******************************************************************************************************************/
-    /**
-     * @param activityCategoryID
-     *            The activityCategoryID to set.
-     */
-    public void setActivityCategoryID(Integer activityCategoryID) {
-	this.activityCategoryID = activityCategoryID;
-    }
 
     /**
      * @param activityID

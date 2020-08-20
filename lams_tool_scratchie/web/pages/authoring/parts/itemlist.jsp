@@ -74,7 +74,7 @@ $(document).ready(function(){
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
 		<div id="importExport" class="btn-group pull-right">
-			<a href="#" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs loffset5">
+			<a href="#" id="importQTILink" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs loffset5">
 				<fmt:message key="label.authoring.import.qti" /> 
 			</a>
 		</div> 

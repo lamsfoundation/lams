@@ -639,15 +639,16 @@ function updateContributeActivities(contributeActivities) {
 		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
 		row = row.append(cell);
 	}
-	
-	if (contributeActivities ) {
+	if (contributeActivities) {
 		$.each(contributeActivities, function(){
-			var cell = $('<div />').addClass('contributeActivityCell').text(this.title);
-			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
+			var contributeId = 'contribute' + this.activityID;
+			var contributeActivity = this,
+				cell = $('<div />').addClass('contributeActivityCell').text(this.title).attr('id', contributeId);
+				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
 				var entryContent = '';
-				switch(this.contributionType) {
+				switch (this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
 					case 7  : entryContent = LABELS.CONTRIBUTE_TOOL; break;
@@ -655,14 +656,32 @@ function updateContributeActivities(contributeActivities) {
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 					case 12 : entryContent = LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
-				entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
-							 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
-							 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+				switch (this.contributionType) {
+					case 3  : 
+					case 12 : if (this.isComplete) {
+						 		entryContent += '<span class="pull-right"><span style="font-size: 12px;" class="label label-success">' + LABELS.CONTRIBUTE_OPENED_GATE + '</span></span>';
+							} else {
+								entryContent += '<div class="pull-right btn-group btn-group-xs"><button onClick="javascript:openGateNow('
+                                     + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button><ul class="dropdown-menu"><li><a href="#" onClick="javascript:openPopUp(\''
+                                     + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
+									
+							}
+							break;
+					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
+						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+				}
+
 				cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
 				row = row.append(cell);
 			});
 		});
 	}
+	
 	if ($('.contributeRow').length == 0) {
 		$('#requiredTasks').hide();
 	} else {
@@ -857,6 +876,21 @@ function addEmailProgressSeries(forceQuestion, table) {
     }
 	colorDialogList(table);
 } 
+
+function openGateNow(activityId) {
+	var data = {
+		'activityId' : activityId
+	};
+	data[csrfTokenName] = csrfTokenValue;
+	$.ajax({
+		'type' : 'post',
+		'url'  : LAMS_URL + 'monitoring/gate/openGate.do',
+		'data'  : data,
+		'success' : function(){
+			updateLessonTab();
+		}
+	});
+}
 
 //********** SEQUENCE TAB FUNCTIONS **********
 
@@ -2429,8 +2463,9 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  * Formats learner name.
  */
 function getLearnerDisplayName(learner, raw) {
-	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')'
-			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')';
+	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')' + (learner.group ? ' - ' + learner.group : '')
+			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')' 
+			   	 + (learner.group ? ' - ' + escapeHtml(learner.group) : '');
 }
 
 

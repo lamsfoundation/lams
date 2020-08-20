@@ -501,6 +501,14 @@
 		<url-pattern>/ckeditor/filemanager/upload/simpleuploader</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>SimpleUploader</servlet-name>
+		<url-pattern>/tmpFileUpload</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SimpleUploader</servlet-name>
+		<url-pattern>/tmpFileUploadDelete</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>RuntimeStatsServlet</servlet-name>
 		<url-pattern>/runtimeStats</url-pattern>
 	</servlet-mapping>

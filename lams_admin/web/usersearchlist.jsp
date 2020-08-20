@@ -95,7 +95,7 @@
 								rows += 	'&nbsp;';
 								rows +=     '<form style="display: inline-block;" id="delete_' + orgData["userId"] +'" method="post" action="/lams/admin/user/edit.do"><input type="hidden" name="userId" value="' + orgData["userId"] + '"/><input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/><button class="btn btn-primary btn-xs" type="submit"><i class="fa fa-pencil"/> <span class="hidden-xs hidden-sm"><fmt:message key="admin.edit"/></span></button></form>';
 								rows += 	'&nbsp;';
-								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '">';
+								rows += 	'<a title="<fmt:message key="label.login.as"/>" href="<lams:LAMSURL/>loginas.do?login=' + orgData["login"] + '" id="loginAs' + orgData["userId"] +'">';
 								rows += 		'<button type="button" class="btn btn-primary btn-xs"><i class="fa fa-sign-in"/><span class="hidden-xs hidden-sm"> <fmt:message key="label.login.as"/></span></button>';
 								rows += 	'</a>';
 								rows += 	'&nbsp;';

@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:choose>
@@ -13,6 +14,8 @@
 		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 	</c:otherwise>
 </c:choose>
+<c:set var="ALLOWED_EXTENSIONS_IMAGE"><%=FileUtil.ALLOWED_EXTENSIONS_IMAGE%></c:set>
+<c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
 <lams:html>
 	<lams:head>
@@ -25,6 +28,7 @@
 		<lams:css suffix="jquery.jRating"/>
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
 			.tablesorter,.tablesorter tr {
 				border: 1px solid #ddd;
@@ -57,13 +61,27 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 
 			<%-- used for  imageGalleryitem.js --%>
-			var saveMultipleImagesUrl = "<c:url value='/learning/saveMultipleImages.do'/>";
 			var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_MAX_SIZE}";
+			// convert Java syntax to JSON
+			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-			var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 		</script>
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/imageGalleryitem.js"></script>
+		
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+		<c:choose>
+			<c:when test="${language eq 'es'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'fr'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+			</c:when>
+			<c:when test="${language eq 'el'}">
+				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+			</c:when>
+		</c:choose>
+	
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/uploadImageLearning.js"></script>
     	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>

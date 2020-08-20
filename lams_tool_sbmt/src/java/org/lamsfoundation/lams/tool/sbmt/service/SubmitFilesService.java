@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -551,10 +553,10 @@ public class SubmitFilesService
     }
 
     @Override
-    public void uploadFileToSession(Long sessionID, MultipartFile file, String fileDescription, Integer userID)
+    public void uploadFileToSession(Long sessionID, File file, String fileDescription, Integer userID)
 	    throws SubmitFilesException {
 
-	if ((file == null) || StringUtils.isEmpty(file.getOriginalFilename())) {
+	if ((file == null) || StringUtils.isEmpty(file.getName())) {
 	    throw new SubmitFilesException("Could not find upload file: " + file);
 	}
 
@@ -567,7 +569,7 @@ public class SubmitFilesService
 
 	SubmissionDetails details = new SubmissionDetails();
 	details.setFileDescription(fileDescription);
-	details.setFilePath(file.getOriginalFilename());
+	details.setFilePath(file.getName());
 	details.setDateOfSubmission(new Date());
 
 	SubmitUser learner = submitUserDAO.getLearner(sessionID, userID);
@@ -596,6 +598,19 @@ public class SubmitFilesService
      * @throws RepositoryCheckedException
      * @throws InvalidParameterException
      */
+    private NodeKey processFile(File file) {
+	NodeKey node = null;
+	if ((file != null) && !StringUtils.isEmpty(file.getName())) {
+	    String fileName = file.getName();
+	    try {
+		node = sbmtToolContentHandler.uploadFile(new FileInputStream(file), fileName, null);
+	    } catch (RepositoryCheckedException | IOException e) {
+		throw new SubmitFilesException(e.getMessage());
+	    }
+	}
+	return node;
+    }
+
     private NodeKey processFile(MultipartFile file) {
 	NodeKey node = null;
 	if ((file != null) && !StringUtils.isEmpty(file.getOriginalFilename())) {
@@ -1058,7 +1073,7 @@ public class SubmitFilesService
 
     @Override
     public SubmitUser getUserByUid(Long learnerID) {
-	return (SubmitUser) submitUserDAO.find(SubmitUser.class, learnerID);
+	return submitUserDAO.find(SubmitUser.class, learnerID);
 
     }
 

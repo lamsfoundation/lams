@@ -578,7 +578,6 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	/* create new System Gate Activity */
 	gate = (GateActivity) Activity.getActivityInstance(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
 	gate.setActivityTypeId(Activity.SYSTEM_GATE_ACTIVITY_TYPE);
-	gate.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
 	gate.setSystemTool(systemTool);
 	gate.setActivityUIID(++maxId);
 	gate.setTitle(title);

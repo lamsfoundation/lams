@@ -159,4 +159,23 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	    }
 	});
     }
+
+    /**
+     * Move "is required" from QB question to tool
+     */
+    public void up20190809To20200710(String toolFilePath) throws IOException {
+
+	// tell which file to process and what to do with its root element
+	transformXML(toolFilePath, toolRoot -> {
+	    NodeList qaQuestions = toolRoot.getElementsByTagName("org.lamsfoundation.lams.tool.qa.model.QaQueContent");
+
+	    // go through each question
+	    for (int qaQuestionIndex = 0; qaQuestionIndex < qaQuestions.getLength(); qaQuestionIndex++) {
+		Element qaQuestion = (Element) qaQuestions.item(qaQuestionIndex);
+		Element qbQuestion = (Element) qaQuestion.getElementsByTagName("qbQuestion").item(0);
+		XMLUtil.rewriteTextElement(qbQuestion, qaQuestion, "answerRequired", "answerRequired", "true", false,
+			true);
+	    }
+	});
+    }
 }

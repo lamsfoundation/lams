@@ -326,7 +326,7 @@ public interface IScratchieService extends ICommonToolService {
      *            whether it should include questions that don't have any burning questions
      * @return
      */
-    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems, boolean prepareForHTML);
 
     boolean addLike(Long burningQuestionUid, Long sessionId);
 

@@ -4,6 +4,8 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css/>
+		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<c:url value="/authoring/deleteAttachment.do"/>";
 		</script>
@@ -41,7 +43,6 @@
 
 			<c:set var="itemAttachment" value="${topicFormId}" />
 			<div class="form-group">
-				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
 				<div id="itemAttachmentArea" class="small-space-bottom">
 					<%@ include file="/jsps/authoring/parts/msgattachment.jsp"%>
 				</div>

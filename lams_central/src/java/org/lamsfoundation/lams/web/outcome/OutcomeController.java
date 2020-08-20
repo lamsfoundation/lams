@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.web.outcome;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +35,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.OutcomeResult;
@@ -54,7 +53,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -86,6 +84,9 @@ public class OutcomeController {
     private ISecurityService securityService;
     @Autowired
     private IOutcomeService outcomeService;
+    @Autowired
+    private ILessonService lessonService;
+
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -291,11 +292,12 @@ public class OutcomeController {
 	return String.valueOf(outcomeMapping.getMappingId());
     }
 
-    @RequestMapping(path = "/outcomeGetMappings", produces = "application/json;charset=utf-8")
+    @RequestMapping(path = "/outcomeGetMappings")
     @ResponseBody
     public String outcomeGetMappings(@RequestParam(required = false) Long lessonId,
 	    @RequestParam(required = false) Long toolContentId, @RequestParam(required = false) Long itemId,
-	    @RequestParam(required = false) Integer qbQuestionId, HttpServletRequest request) throws Exception {
+	    @RequestParam(required = false) Integer qbQuestionId, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	if (lessonId == null && toolContentId == null && qbQuestionId == null) {
 	    throw new IllegalArgumentException(
 		    "Either lesson ID or tool content ID or QB question ID must not be null when fetching outcome mappings");
@@ -322,6 +324,8 @@ public class OutcomeController {
 		    outcome.getName() + (StringUtils.isBlank(outcome.getCode()) ? "" : " (" + outcome.getCode() + ")"));
 	    responseJSON.add(outcomeJSON);
 	}
+
+	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
 
@@ -337,7 +341,6 @@ public class OutcomeController {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping("/outcomeSetResult")
     @ResponseBody
     public String outcomeSetResult(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -348,9 +351,7 @@ public class OutcomeController {
 		mappingId);
 	Long lessonId = outcomeMapping.getLessonId();
 	if (lessonId == null) {
-	    ToolActivity toolActivity = ((List<ToolActivity>) userManagementService.findByProperty(ToolActivity.class,
-		    "toolContentId", outcomeMapping.getToolContentId())).get(0);
-	    lessonId = toolActivity.getLearningDesign().getLessons().iterator().next().getLessonId();
+	    lessonId = lessonService.getLessonByToolContentId(outcomeMapping.getToolContentId()).getLessonId();
 	}
 	Integer userId = getUserDTO().getUserID();
 	securityService.isLessonMonitor(lessonId, userId, "set outcome result", true);

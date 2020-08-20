@@ -63,7 +63,7 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
                                `type` TINYINT NOT NULL,
                                `question_id` INT NOT NULL,
                                `version` SMALLINT NOT NULL DEFAULT 1,
-                               `create_date` DATETIME NOT NULL DEFAULT NOW(),
+                               `create_date` DATETIME,
                                `content_folder_id` char(36),
                                `name` TEXT,
                                `description` MEDIUMTEXT,
@@ -85,6 +85,7 @@ CREATE TABLE lams_qb_question (`uid` BIGINT AUTO_INCREMENT,
                                `min_words_limit` int(11) DEFAULT 0,
                                `hedging_justification_enabled` TINYINT(1) DEFAULT 0,
                                `tmp_question_id` BIGINT,
+                               `owner_id` BIGINT,
                                PRIMARY KEY (uid),
                                INDEX (tmp_question_id),
                                CONSTRAINT UQ_question_version UNIQUE INDEX (question_id, version));
@@ -99,10 +100,11 @@ CREATE TRIGGER before_insert_qb_question
 CREATE TABLE lams_qb_tool_question (`tool_question_uid` BIGINT AUTO_INCREMENT,
                                     `qb_question_uid` BIGINT NOT NULL,
                                     `tool_content_id` BIGINT NOT NULL,
-                                    `display_order` TINYINT NOT NULL DEFAULT 1,
+                                    `display_order` TINYINT UNSIGNED NOT NULL DEFAULT 1,
                                     PRIMARY KEY (tool_question_uid),
                                     INDEX (tool_content_id),
                                     CONSTRAINT FK_lams_qb_tool_question_1 FOREIGN KEY (qb_question_uid) REFERENCES lams_qb_question (uid) ON UPDATE CASCADE);
+
 -- create Question Bank option
 CREATE TABLE lams_qb_option (`uid` BIGINT AUTO_INCREMENT,
                              `qb_question_uid` BIGINT NOT NULL,
@@ -206,12 +208,22 @@ INSERT INTO lams_qb_tool_question
         ON q.question_uid = mcq.uid
     JOIN tl_lamc11_content AS c
         ON mcq.mc_content_id = c.uid;
-
+        
 -- remove columns from MCQ which are duplicated in Question Bank
 ALTER TABLE tl_lamc11_que_content DROP COLUMN question,
                                   DROP COLUMN mark,
                                   DROP COLUMN display_order,
                                   DROP COLUMN feedback;
+
+-- add missing display order in options, if any
+UPDATE tl_lamc11_options_content AS c 
+  JOIN (SELECT MIN(uid)-1 AS uid_shift, mc_que_content_id
+    FROM tl_lamc11_options_content
+    WHERE displayOrder IS NULL
+    GROUP BY mc_que_content_id) AS s
+  USING (mc_que_content_id)
+  SET c.displayOrder = c.uid - s.uid_shift
+  WHERE c.displayOrder IS NULL;                                  
                                   
 -- fill table with options matching unique QB questions inserted above
 INSERT INTO lams_qb_option (qb_question_uid, display_order, name, max_mark)
@@ -583,7 +595,7 @@ INSERT INTO lams_qb_question SELECT NULL, NULL, aq.question_type, @question_id:=
                 TRIM(aq.description), IFNULL(aq.max_mark, 1), aq.feedback, aq.penalty_factor, aq.answer_required,
                 aq.multiple_answers_allowed, aq.incorrect_answer_nullifies_mark, aq.feedback_on_correct, aq.feedback_on_partially_correct,
                 aq.feedback_on_incorrect, aq.shuffle, aq.prefix_answers_with_letters, aq.case_sensitive, aq.correct_answer,
-                aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid
+                aq.allow_rich_editor, aq.max_words_limit, aq.min_words_limit, aq.hedging_justification_enabled, q.target_uid, NULL
     FROM (SELECT uid,
                  title AS question,
                  question AS description,
@@ -612,7 +624,7 @@ INSERT INTO lams_qb_question SELECT NULL, NULL, aq.question_type, @question_id:=
         ON aq.uid = q.target_uid
     JOIN tl_laasse10_assessment AS assessment
         ON aq.assessment_uid = assessment.uid;
-    
+        
 -- set up references to QB question UIDs created above
 INSERT INTO lams_qb_tool_question
     SELECT q.question_uid, qb.uid, assess.content_id, aq.sequence_id
@@ -793,7 +805,7 @@ UPDATE lams_qb_question SET tmp_question_id = -1;
 INSERT INTO lams_qb_question (uid, `type`, question_id, version, create_date, 
 		name,
 		description, max_mark, feedback, answer_required, min_words_limit, tmp_question_id) 
-    SELECT NULL, 6, @question_id:=@question_id + 1, 1, IFNULL(c.creation_date, NOW()),
+    SELECT NULL, 6, @question_id:=@question_id + 1, 1, c.creation_date,
         SUBSTRING(TRIM(REPLACE(REPLACE(strip_tags(qa.question, false) COLLATE utf8mb4_0900_ai_ci, '&nbsp;', ' '), '\t', '')), 1, 200),
         qa.question, 1, qa.feedback, qa.answer_required, qa.min_words_limit, q.target_uid
     FROM (SELECT uid,
@@ -852,8 +864,8 @@ UPDATE lams_qb_question SET content_folder_id = '93b97f99-a9ad-471b-a71a-5cc58ab
 -- clean up
 ALTER TABLE tl_laqa11_usr_resp DROP COLUMN qa_que_content_id,
 							   DROP COLUMN answer;
-                               
 
+                               
 ALTER TABLE lams_qb_question DROP COLUMN tmp_question_id;
 DROP TABLE tmp_question,
            tmp_question_match,
@@ -867,7 +879,24 @@ CREATE UNIQUE INDEX IDX_lams_qb_question_question_id ON lams_sequence_generator(
 INSERT INTO lams_sequence_generator(lams_qb_question_question_id) VALUES ((SELECT MAX(question_id) FROM lams_qb_question));
 
 
+-- find earlierst occurence of questions and fill create date and owner
+UPDATE lams_qb_question AS qb,
+		   (SELECT qt.qb_question_uid,
+		   		   d.user_id AS owner_id,
+		   		   MIN(a.create_date_time) AS create_date
+		   		FROM lams_qb_tool_question AS qt JOIN
+		   			 lams_learning_activity AS a USING (tool_content_id) JOIN
+		   			 lams_learning_design AS d USING (learning_design_id)
+		   		GROUP BY qb_question_uid
+			) AS s
+SET qb.create_date = s.create_date,
+	qb.owner_id    = s.owner_id
+WHERE qb.uid = s.qb_question_uid;
 
+-- fill missing gaps
+UPDATE lams_qb_question 
+	SET create_date = NOW()
+	WHERE create_date IS NULL;
 
 -- LDEV-4827 Add configuration settings for Question Bank
 INSERT INTO lams_configuration VALUES
@@ -904,11 +933,25 @@ CREATE TABLE lams_qb_collection_organisation (`collection_uid`  BIGINT NOT NULL,
 									   		  CONSTRAINT FK_lams_qb_collection_share_2 FOREIGN KEY (organisation_id) REFERENCES lams_organisation (organisation_id)
 												ON DELETE CASCADE ON UPDATE CASCADE
 									  		  );
-
+									  		  
+-- add questions to public collection
 INSERT INTO lams_qb_collection VALUES (1, 'Public questions', NULL, false);
 
 INSERT INTO lams_qb_collection_question
-	SELECT 1, question_id FROM lams_qb_question;
+	SELECT 1, question_id FROM lams_qb_question
+	WHERE owner_id IS NULL;
+-- add questions to private collections
+INSERT INTO lams_qb_collection
+	SELECT NULL, 'My questions', owner_id, true
+	FROM (SELECT DISTINCT owner_id FROM lams_qb_question WHERE owner_id IS NOT NULL) AS qb;
+
+INSERT INTO lams_qb_collection_question
+	SELECT c.uid, qb.question_id 
+		FROM lams_qb_question AS qb
+		JOIN lams_qb_collection AS c ON qb.owner_id = c.user_id
+	WHERE qb.owner_id IS NOT NULL;
+	
+ALTER TABLE lams_qb_question DROP COLUMN owner_id;
 	
 INSERT INTO lams_configuration VALUES
 ('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1);

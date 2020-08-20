@@ -86,7 +86,7 @@
 </lams:head>
 
 <body>
-<form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
+<form:form modelAttribute="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
 	<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 
@@ -102,7 +102,7 @@
 						<div class="form-group">
 							<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
  							<lams:errors path="oldPassword"/>	
- 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword"/>			
+ 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword" autocomplete="current-password"/>			
 						</div>
 							
 						<div class="col-xs-12">
@@ -135,12 +135,12 @@
 						<lams:errors path="password"/>	
  						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password"  
+							<input class="form-control" type="password"  autocomplete="new-password" 
 									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="25"/> 			
 						</div>
 						<div class="input-group voffset5">
 							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm"
+							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
 						</div>
 							
@@ -149,7 +149,7 @@
 								<fmt:message key="button.cancel"/>
 							</button>
 							&nbsp;&nbsp;
-							<button type="submit" class="btn btn-sm btn-primary voffset5">
+							<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
 								<fmt:message key="button.save" />
 							</button>
 						</div>

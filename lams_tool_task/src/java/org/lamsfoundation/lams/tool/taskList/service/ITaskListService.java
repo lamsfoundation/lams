@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.taskList.service;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,6 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.util.MessageService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Interface that defines the contract that all TaskLisk service providers must follow.
@@ -104,7 +104,7 @@ public interface ITaskListService extends ICommonToolService {
      * @return
      * @throws UploadTaskListFileException
      */
-    TaskListItemAttachment uploadTaskListItemFile(MultipartFile uploadFile, TaskListUser user)
+    TaskListItemAttachment uploadTaskListItemFile(File uploadFile, TaskListUser user)
 	    throws UploadTaskListFileException;
 
     /**

@@ -146,6 +146,13 @@
 				</td>
 				
 				<td width="30px">
+					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}" 
+								title="<fmt:message key="label.answer.required"/>" 
+								alt="<fmt:message key="label.answer.required"/>"
+								onClick="javascript:toggleQuestionRequired(this)"></i>
+				</td>
+				
+				<td width="30px">
 					<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
 						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>

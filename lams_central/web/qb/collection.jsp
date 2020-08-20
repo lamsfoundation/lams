@@ -83,6 +83,9 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
+		<%-- Add jqGrid internationalisation snippet --%>
+		<%@ include file="/jqGrid.i18n.jsp"%>
+			
 		$(document).ready(function(){
 			var collectionGrid = $('#collection-grid'),	
 				isPublicCollection = ${empty collection.userId};
@@ -374,7 +377,7 @@
 
 	    function importQTI(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
-				'QuestionFile','width=500,height=240,scrollbars=yes');
+				'QuestionFile','width=500,height=370,scrollbars=yes');
 	    }
 		
 	    function saveQTI(formHTML, formName) {

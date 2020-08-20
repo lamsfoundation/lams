@@ -98,6 +98,7 @@
 		<property name="messageSource">
 			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 				<property name="basename"><value>org.lamsfoundation.lams.tool.wiki.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
 			</bean>
 		</property>										
 	</bean>

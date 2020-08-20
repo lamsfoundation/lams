@@ -55,7 +55,7 @@ function submitCondition(){
 
  <div class="form-inline">
 	<a href="javascript:showConditionMessage('<lams:WebAppURL/>authoringCondition/newConditionInit.do?sessionMapID=${taskListForm.sessionMapID}');"
-	class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="label.authoring.conditions.add.condition" /></a>
+	class="btn btn-default btn-sm"><i class="fa fa-plus"></i> <fmt:message key="label.authoring.conditions.add.condition" /></a>
 </div>
 
 <div id="conditionInputArea" name="conditionInputArea" class="voffset10"></div>

@@ -22,18 +22,20 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.admin.service.IImportService;
 import org.lamsfoundation.lams.admin.web.form.ImportExcelForm;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author jliew
@@ -48,16 +50,30 @@ public class ImportGroupsController {
     public String execute(@ModelAttribute("importForm") ImportExcelForm importForm, HttpServletRequest request)
 	    throws Exception {
 	importForm.setOrgId(0);
-	MultipartFile file = importForm.getFile();
+	File file = null;
+
+	File uploadDir = FileUtil.getTmpFileUploadDir(importForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length > 1) {
+		throw new IOException("Uploaded more than 1 file");
+	    } else if (files.length == 1) {
+		file = files[0];
+	    }
+	}
+
+	importForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 
 	// validation
-	if (file == null || file.getSize() <= 0) {
+	if (file == null) {
 	    return "import/importGroups";
 	}
 
 	String sessionId = SessionManager.getSession().getId();
 	List results = importService.parseGroupSpreadsheet(file, sessionId);
 	request.setAttribute("results", results);
+
+	FileUtil.deleteTmpFileUploadDir(importForm.getTmpFileUploadId());
 
 	return "import/importGroups";
     }

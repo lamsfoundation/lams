@@ -75,6 +75,13 @@
 				<td width="70px">
 					<input name="maxMark" value="${questionReference.maxMark}" class="form-control input-sm max-mark-input">
 				</td>
+				
+				<td width="30px">
+					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}" 
+								title="<fmt:message key="label.answer.required"/>" 
+								alt="<fmt:message key="label.answer.required"/>"
+								onClick="javascript:toggleQuestionRequired(this)"></i>
+				</td>
 
 				<td width="30px" style="padding-right: 20px;">
 					<c:if test="${!questionReference.randomQuestion}">

@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
-
 /**
  * Form responsible for representing <code>TaskListItem</code> objects on a view layer.
  *
@@ -52,7 +50,7 @@ public class TaskListItemForm {
 
     private String parentTaskName;
 
-    private MultipartFile uploadedFile;
+    private String tmpFileUploadId;
     private String comment;
 
     /**
@@ -283,23 +281,12 @@ public class TaskListItemForm {
 	this.parentTaskName = parentTaskName;
     }
 
-    /**
-     * Returns attachment for this <code>TaskLiskItem</code>.
-     *
-     * @return attachment for this <code>TaskLiskItem</code>
-     */
-    public MultipartFile getUploadedFile() {
-	return uploadedFile;
+    public String getTmpFileUploadId() {
+	return tmpFileUploadId;
     }
 
-    /**
-     * Sets attachment for this <code>TaskLiskItem</code>.
-     *
-     * @param uploadedFile
-     *            attachment for this <code>TaskLiskItem</code>
-     */
-    public void setUploadedFile(MultipartFile uploadedFile) {
-	this.uploadedFile = uploadedFile;
+    public void setTmpFileUploadId(String tmpFileUploadId) {
+	this.tmpFileUploadId = tmpFileUploadId;
     }
 
     /**

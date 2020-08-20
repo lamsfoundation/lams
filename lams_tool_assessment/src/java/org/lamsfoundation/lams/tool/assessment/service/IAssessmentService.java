@@ -25,12 +25,14 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -92,24 +94,14 @@ public interface IAssessmentService extends ICommonToolService {
      * @param assessmentUid
      * @param userId
      */
-    void launchTimeLimit(Long assessmentUid, Long userId);
-
-    /**
-     * Calculates how many seconds left till the time limit will expire. If it's expired already - returns 1 in order to
-     * show learning.jsp and autosubmit results.
-     *
-     * @param assessment
-     * @param user
-     * @return
-     */
-    long getSecondsLeft(Assessment assessment, AssessmentUser user);
+    LocalDateTime launchTimeLimit(Long assessmentUid, Long userId);
 
     /**
      * @param assessment
      * @param groupLeader
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader);
+    boolean checkTimeLimitExceeded(long assessmentUid, long userId);
 
     /**
      * Get users by given toolSessionID.
@@ -168,6 +160,8 @@ public interface IAssessmentService extends ICommonToolService {
      * @return
      */
     AssessmentUser getUserByIdAndContent(Long userID, Long contentId);
+
+    AssessmentUser getUserByLoginAndContent(String login, Long contentId);
 
     /**
      * Get user by sessionID and UserID
@@ -504,6 +498,8 @@ public interface IAssessmentService extends ICommonToolService {
      */
     String getMessage(String key);
 
+    String getMessage(String key, Object[] args);
+
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
@@ -550,4 +546,8 @@ public interface IAssessmentService extends ICommonToolService {
     String getConfigValue(String key);
 
     Collection<User> getAllGroupUsers(Long toolSessionId);
+
+    Grouping getGrouping(long toolContentId);
+
+    List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 }

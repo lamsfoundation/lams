@@ -44,7 +44,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -55,8 +54,6 @@ import org.imsglobal.lti.launch.LtiOauthSigner;
 import org.imsglobal.lti.launch.LtiSigner;
 import org.imsglobal.lti.launch.LtiSigningException;
 import org.imsglobal.pox.IMSPOXRequest;
-import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
-import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
@@ -94,6 +91,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import oauth.signpost.exception.OAuthException;
+
 /**
  * <p>
  * <a href="IntegrationService.java.html"><i>View Source</i><a>
@@ -224,12 +222,12 @@ public class IntegrationService implements IIntegrationService {
      * Updates user roles based on the provided method parameter. It method is "author" - we assign Role.ROLE_AUTHOR,
      * Role.ROLE_MONITOR, Role.ROLE_LEARNER; if method is "monitor" - we assign Role.ROLE_MONITOR; in all other cases
      * assign Role.ROLE_LEARNER.
-     * 
+     *
      * @param user
      * @param org
      * @param method
      */
-    private void updateUserRoles(User user, Organisation org, String method) {
+    public void updateUserRoles(User user, Organisation org, String method) {
 
 	//create UserOrganisation if it doesn't exist
 	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), org.getOrganisationId());
@@ -239,14 +237,14 @@ public class IntegrationService implements IIntegrationService {
 	    user.addUserOrganisation(uo);
 	    service.saveUser(user);
 	}
-	
+
 	Integer[] roles;
 	if (StringUtils.equals(method, IntegrationConstants.METHOD_AUTHOR)) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
-	    
+
 	} else if (StringUtils.equals(method, IntegrationConstants.METHOD_MONITOR)) {
 	    roles = new Integer[] { Role.ROLE_MONITOR };
-	    
+
 	} else {
 	    roles = new Integer[] { Role.ROLE_LEARNER };
 	}
@@ -635,7 +633,7 @@ public class IntegrationService implements IIntegrationService {
 	if (lesson == null) {
 	    return null;
 	}
-	
+
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://server.com/lams--bb/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
@@ -669,7 +667,7 @@ public class IntegrationService implements IIntegrationService {
 
 	return lessonFinishCallbackUrl;
     }
-    
+
     @Override
     public void pushMarkToLtiConsumer(User user, Lesson lesson, Double userMark) {
 	if (lesson == null) {
@@ -680,7 +678,7 @@ public class IntegrationService implements IIntegrationService {
 	ExtServer server = extServerLesson == null ? null : extServerLesson.getExtServer();
 	ExtUserUseridMap extUser = extServerLesson == null ? null
 		: getExtUserUseridMapByUserId(server, user.getUserId());
-	
+
 	// checks whether the lesson was created from extServer and whether it's a LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
 	if (extServerLesson != null && extUser != null
 		&& server.getServerTypeId().equals(ExtServer.LTI_CONSUMER_SERVER_TYPE)
@@ -692,8 +690,7 @@ public class IntegrationService implements IIntegrationService {
 	    final String lessonFinishUrl = server.getLessonFinishUrl();
 	    if (userMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
 		Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userMark / lessonMaxPossibleMark;
-		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
-			: score.toString();
+		final String scoreStr = (userMark == null) || lessonMaxPossibleMark.equals(0L) ? "" : score.toString();
 
 		final String serverKey = server.getServerid();
 		final String serverSecret = server.getServerkey();
@@ -875,14 +872,15 @@ public class IntegrationService implements IIntegrationService {
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 	return list == null || list.isEmpty() ? null : list.get(0);
     }
-    
+
     @Override
-    public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName, String lastName,
-	    String email, String extCourseId, String countryIsoCode, String langIsoCode)
+    public ExtUserUseridMap addExtUserToCourse(ExtServer extServer, String method, String username, String firstName,
+	    String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
 	    throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
-	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId + "'.");
+	    log.debug("Adding user '" + username + "' as " + method + " to course with extCourseId '" + extCourseId
+		    + "'.");
 	}
 
 	ExtUserUseridMap userMap = null;
@@ -903,18 +901,18 @@ public class IntegrationService implements IIntegrationService {
 
 	return userMap;
     }
-    
+
     @Override
-    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId, String username,
-	    String firstName, String lastName, String email, String extCourseId, String countryIsoCode, String langIsoCode)
-	    throws UserInfoFetchException, UserInfoValidationException {
+    public ExtUserUseridMap addExtUserToCourseAndLesson(ExtServer extServer, String method, Long lesssonId,
+	    String username, String firstName, String lastName, String email, String extCourseId, String countryIsoCode,
+	    String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Adding user '" + username + "' as " + method + " to lesson with id '" + lesssonId + "'.");
 	}
-	
-	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email, extCourseId,
-		countryIsoCode, langIsoCode);
+
+	ExtUserUseridMap userMap = addExtUserToCourse(extServer, method, username, firstName, lastName, email,
+		extCourseId, countryIsoCode, langIsoCode);
 
 	User user = userMap.getUser();
 	if (user == null) {
@@ -974,26 +972,26 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId, String resourceLinkId)
-	    throws IOException, UserInfoFetchException, UserInfoValidationException {
-	
+    public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId,
+	    String resourceLinkId) throws IOException, UserInfoFetchException, UserInfoValidationException {
+
 	String membershipUrl = extServer.getMembershipUrl();
-	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users 
+	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users
 	if (StringUtils.isBlank(membershipUrl)) {
 	    return;
 	}
 
 	membershipUrl += membershipUrl.contains("?") ? "&" : "?";
 	membershipUrl += "rlid=" + resourceLinkId;
-    	
-        log.debug("Make a call to remote membershipUrl:" + membershipUrl);
-        HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
-        ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
+
+	log.debug("Make a call to remote membershipUrl:" + membershipUrl);
+	HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
+	ltiServiceGetRequest.setHeader("Accept", "application/vnd.ims.lis.v2.membershipcontainer+json");
 
 	LtiSigner ltiSigner = new LtiOauthSigner();
 	try {
 	    HttpRequest httpRequest = ltiSigner.sign(ltiServiceGetRequest, extServer.getServerid(),
-	    	extServer.getServerkey());
+		    extServer.getServerkey());
 	} catch (LtiSigningException e) {
 	    throw new RuntimeException(e);
 	}
@@ -1004,17 +1002,17 @@ public class IntegrationService implements IIntegrationService {
 	    throw new HttpResponseException(response.getStatusLine().getStatusCode(),
 		    response.getStatusLine().getReasonPhrase());
 	}
-	
+
 	String responseString = EntityUtils.toString(response.getEntity());
 	log.debug("membershipUrl responded with the following message: " + responseString);
 	JsonNode json = new ObjectMapper().readTree(responseString);
-	
+
 	//no users provided by membership service
-        if (json == null) {
-            return;
-        }
-            
-        //process users provided by membership service
+	if (json == null) {
+	    return;
+	}
+
+	//process users provided by membership service
 	JsonNode memberships = json.get("pageOf").get("membershipSubject").get("membership");
 	for (int i = 0; i < memberships.size(); i++) {
 	    JsonNode membership = memberships.get(i);
@@ -1049,7 +1047,7 @@ public class IntegrationService implements IIntegrationService {
 	    String method = LtiUtils.isStaff(roles, extServer) || LtiUtils.isAdmin(roles)
 		    ? IntegrationConstants.METHOD_MONITOR
 		    : IntegrationConstants.METHOD_LEARNER;
-	    
+
 	    //empty lessonId means we need to only add users to the course. Otherwise we add them to course AND lesson
 	    ExtUserUseridMap extUser = lessonId == null
 		    ? addExtUserToCourse(extServer, method, extUserId, firstName, lastName, email, courseId,
@@ -1078,7 +1076,7 @@ public class IntegrationService implements IIntegrationService {
 	    }
 	}
     }
-   
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -1094,7 +1092,7 @@ public class IntegrationService implements IIntegrationService {
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
     }
-    
+
     public void setTimezoneService(ITimezoneService timezoneService) {
 	this.timezoneService = timezoneService;
     }

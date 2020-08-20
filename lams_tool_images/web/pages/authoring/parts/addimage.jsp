@@ -9,21 +9,13 @@
 </c:choose>
 
 <c:set var="csrfToken"><csrf:token/></c:set>
-<form:form action="${FORM_ACTION}?${csrfToken}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm" enctype="multipart/form-data">
+<form:form action="${FORM_ACTION}?${csrfToken}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
 	<c:set var="sessionMap"	value="${sessionScope[imageGalleryForm.sessionMapID]}" />
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">
 				<fmt:message key="label.authoring.basic.add.image" />
-				<div class="pull-right">
-					<c:if test="${empty imageGalleryItemForm.imageIndex}">
-						<a href="javascript:showMessage('<lams:WebAppURL />authoring/initMultipleImages.do?sessionMapID=${imageGalleryItemForm.sessionMapID}');" 
-								class="btn btn-default btn-xs">
-							<fmt:message key="label.authoring.basic.upload.multiple.images" />
-						</a>
-					</c:if>		
-				</div>
 			</div>
 		</div>
 			

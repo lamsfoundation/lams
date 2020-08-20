@@ -23,9 +23,11 @@
 
 package org.lamsfoundation.lams.tool.taskList.web.controller;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -57,10 +59,8 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -74,7 +74,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
@@ -313,6 +312,7 @@ public class LearningController implements TaskListConstants {
 
 	}
 
+	taskListItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	sessionMap.put(TaskListConstants.ATTR_TASKLIST, taskList);
 	return "pages/learning/learning";
     }
@@ -375,6 +375,7 @@ public class LearningController implements TaskListConstants {
     public String addTask(@ModelAttribute TaskListItemForm taskListItemForm, HttpServletRequest request) {
 	taskListItemForm.setMode(WebUtil.readStrParam(request, AttributeNames.ATTR_MODE));
 	taskListItemForm.setSessionMapID(WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID));
+	taskListItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	return "pages/learning/parts/addtask";
     }
 
@@ -476,31 +477,25 @@ public class LearningController implements TaskListConstants {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
-	MultipartFile file = taskListItemForm.getUploadedFile();
-
-	if (file == null || StringUtils.isBlank(file.getOriginalFilename())) {
-	    return "pages/learning/learning";
+	File files[] = null;
+	File uploadDir = FileUtil.getTmpFileUploadDir(taskListItemForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    files = uploadDir.listFiles();
 	}
 
-	// validate file size
-	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	boolean fileSizeValid = FileValidatorUtil.validateFileSize(file, false);
-	if (!fileSizeValid) {
-	    errorMap.add("GLOBAL", messageService.getMessage("errors.maxfilesize",
-		    new Object[] { Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE) }));
-	}
-
-	if (!errorMap.isEmpty()) {
-	    request.setAttribute("errorMap", errorMap);
+	if (files == null || files.length == 0) {
 	    return "pages/learning/learning";
 	}
 
 	// upload to repository
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	TaskListUser taskListUser = taskListService.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
-	TaskListItemAttachment att = null;
+	List<TaskListItemAttachment> attachments = new LinkedList<>();
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	try {
-	    att = taskListService.uploadTaskListItemFile(file, taskListUser);
+	    for (File file : files) {
+		attachments.add(taskListService.uploadTaskListItemFile(file, taskListUser));
+	    }
 	} catch (UploadTaskListFileException e) {
 	    errorMap.add("GLOBAL", messageService.getMessage("error.upload.failed", new Object[] { e.getMessage() }));
 	    request.setAttribute("errorMap", errorMap);
@@ -511,7 +506,7 @@ public class LearningController implements TaskListConstants {
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
 	TaskListItem dbItem = taskListService.getTaskListItemByUid(itemUid);
 	Set<TaskListItemAttachment> dbAttachments = dbItem.getAttachments();
-	dbAttachments.add(att);
+	dbAttachments.addAll(attachments);
 	taskListService.saveOrUpdateTaskListItem(dbItem);
 
 	// to make available new changes be visible in jsp page

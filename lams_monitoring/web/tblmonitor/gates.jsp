@@ -6,6 +6,22 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {$("time.timeago").timeago();});
+	
+
+	function openGateNow(activityId) {
+		var data = {
+			'activityId' : activityId,
+			'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+		};
+		$.ajax({
+			'type' : 'post',
+			'url'  : '<lams:LAMSURL/>monitoring/gate/openGate.do',
+			'data'  : data,
+			'success' : function(){
+				refresh();
+			}
+		});
+	}
 </script>
 
 <!-- Header -->
@@ -58,9 +74,15 @@
 							</small>
 						</c:if>
 
-						<button type="button" class="btn btn-sm btn-primary pull-right"
+						<button type="button" class="btn btn-sm btn-primary pull-right loffset10"
+								title="<fmt:message key='button.task.gate.open.tooltip'/>"
 								onClick="javascript:openPopUp('${permissionGate.url}','ContributeActivity', 600, 800, true)">
-							<fmt:message key="label.gate.open"/>
+							<fmt:message key="button.task.gate.open"/>
+						</button>
+						<button type="button" class="btn btn-sm btn-primary pull-right"
+								title="<fmt:message key='button.task.gate.open.now.tooltip'/>"
+								onClick="javascript:openGateNow(${permissionGate.activityID})">
+							<fmt:message key="button.task.gate.open.now"/>
 						</button>
 					</c:otherwise>
 				</c:choose>

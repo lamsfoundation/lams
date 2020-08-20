@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.authoring.template.web.LdTemplateController"%>
 <c:set var="maxOptionCount" value="<%=LdTemplateController.MAX_OPTION_COUNT%>"/>
-<c:set var="required">${questionNumber eq 1 ? "class=\"input required\"" : "class=\"input\""}</c:set>
 
 <%-- Generic MCQ question for assessment. Expects an input of questionNumber, contentFolderID, and creates a text field field question${questionNumber} and three options.
          Question, and hence question.title and question.text are optional and are only populated if QTI is used to start the questions. ${containingDivName} is set if this is being called from 
@@ -16,16 +15,18 @@
 <c:set var="questionTitleField">${containingDivName}assessment${questionNumber}title</c:set>
 
 <div class="panel panel-default">
-	<div class="panel-heading">
-		<div class="panel-title">		
-		${questionNumber eq 1 ? "<label class=\"required\">" : ""}
+	<div class="panel-heading" id="${containingDivName}assessmentQuestionPanelHeading${questionNumber}">
+		<div class="panel-title collapsable-icon-left">
+			<a role="button" data-toggle="collapse" href="#${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" 
+				aria-expanded="true" aria-controls="${containingDivName}assessmentQuestionPanelCollapse${questionNumber}" >&nbsp;&nbsp;
+		  	</a>			
 			<span class="hoverEdit" name="${questionTitleDisplay}" id="${questionTitleDisplay}" ><c:out value="${questionTitle}" /></span><span>&nbsp;</span><i class='fa fa-sm fa-pencil'></i>
-		${questionNumber eq 1 ? "</label>" : ""}
 			<input name="${questionTitleField}" id="${questionTitleField}" type="hidden" value="${questionTitle}"/>
 		</div>
 	</div>
 
-	<div class="panel-body">	
+	<div class="panel-body panel-collapse collapse in" id="${containingDivName}assessmentQuestionPanelCollapse${questionNumber}"
+		 role="tabpanel" aria-labelledby="${containingDivName}assessmentQuestionPanelHeading${questionNumber}">	
 
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}uuid" value="${question.uuid}"/>
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}type" id="${containingDivName}assessment${questionNumber}type" value="mcq"/>

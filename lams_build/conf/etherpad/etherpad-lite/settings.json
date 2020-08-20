@@ -56,6 +56,9 @@
  *    "password": "${PASSW}"  // if PASSW is not defined would result in password === null
  *    "password": "${PASSW:}" // if PASSW is not defined would result in password === ''
  *
+ *    If you want to use an empty value (null) as default value for a variable,
+ *    simply do not set it, without putting any colons: "${ABIWORD}".
+ *
  * 3) if you want to use newlines in the default value of a string parameter,
  *    use "\n" as usual.
  *
@@ -84,7 +87,33 @@
    * - "colibris": the new experimental skin (since Etherpad 1.8), candidate to
    *               become the default in Etherpad 2.0
    */
-  "skinName": "no-skin",
+  "skinName": "colibris",
+
+  /*
+   * Skin Variants
+   *
+   * Use the UI skin variants builder at /p/test#skinvariantsbuilder
+   *
+   * For the colibris skin only, you can choose how to render the three main
+   * containers:
+   * - toolbar (top menu with icons)
+   * - editor (containing the text of the pad)
+   * - background (area outside of editor, mostly visible when using page style)
+   *
+   * For each of the 3 containers you can choose 4 color combinations:
+   * super-light, light, dark, super-dark.
+   *
+   * For example, to make the toolbar dark, you will include "dark-toolbar" into
+   * skinVariants.
+   *
+   * You can provide multiple skin variants separated by spaces. Default
+   * skinVariant is "super-light-toolbar super-light-editor light-background".
+   *
+   * For the editor container, you can also make it full width by adding
+   * "full-width-editor" variant (by default editor is rendered as a page, with
+   * a max-width of 900px).
+   */
+  "skinVariants": "super-light-toolbar super-light-editor light-background",
 
   /*
    * IP and port which Etherpad should bind at.
@@ -168,6 +197,7 @@
    */
   "defaultPadText" : "",
 
+
   /*
    * Default Pad behavior.
    *
@@ -175,7 +205,7 @@
    */
   "padOptions": {
     "noColors":         false,
-    "showControls":     true,
+    "showControls":     false,
     "showChat":         false,
     "showLineNumbers":  false,
     "useMonospaceFont": false,
@@ -232,7 +262,7 @@
    * Pad creation is only via the API.
    * This applies both to group pads and regular pads.
    */
-  "editOnly": false,
+  "editOnly": true,
 
   /*
    * If set to true, those users who have a valid session will automatically be
@@ -375,22 +405,12 @@
    *          follow the section "secure your installation" in README.md
    */
 
-  /*
   "users": {
     "admin": {
-      // 1) "password" can be replaced with "hash" if you install ep_hash_auth
-      // 2) please note that if password is null, the user will not be created
       "password": "changeme1",
       "is_admin": true
-    },
-    "user": {
-      // 1) "password" can be replaced with "hash" if you install ep_hash_auth
-      // 2) please note that if password is null, the user will not be created
-      "password": "changeme1",
-      "is_admin": false
     }
   },
-  */
 
   /*
    * Restrict socket.io transport methods
@@ -465,7 +485,6 @@
       ["timeslider_export", "timeslider_returnToPad"]
     ]
   },
-  
 
   /*
    * Expose Etherpad version in the web interface and in the Server http header.

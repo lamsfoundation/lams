@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.rating.dao;
 
 import java.util.Collection;
@@ -35,7 +33,7 @@ import org.lamsfoundation.lams.rating.model.Rating;
 public interface IRatingDAO {
 
     void saveOrUpdate(Object object);
-    
+
     void delete(Object object);
 
     /** Not limiting by session as the userId is restrictive enough */
@@ -57,6 +55,10 @@ public interface IRatingDAO {
      * @return
      */
     ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long toolSessionId, Long itemId);
+
+    List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId);
+
+    List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds);
 
     List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long toolSessionId, Long itemId);
 
@@ -91,8 +93,10 @@ public interface IRatingDAO {
     int getCountItemsRatedByUser(final Long toolContentId, final Integer userId);
 
     /**
-     * Returns number of items rated by specified user in a current activity, for a particular criteria. It counts comments as ratings
-     * iff it is a comment rating. This method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
+     * Returns number of items rated by specified user in a current activity, for a particular criteria. It counts
+     * comments as ratings
+     * iff it is a comment rating. This method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE
+     * type.
      *
      * @param toolContentId
      * @param userId
@@ -108,11 +112,11 @@ public interface IRatingDAO {
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId);
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId);
 
     /**
-     * Count how many users rated and commented each item for a particular criteria, 
+     * Count how many users rated and commented each item for a particular criteria,
      * limiting to a particular session if toolSessionId is not null
      *
      * @param contentId
@@ -120,18 +124,17 @@ public interface IRatingDAO {
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
-	    Integer excludeUserId);
+    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId,
+	    final Collection<Long> itemIds, Integer excludeUserId);
 
-    
-    
     /**
-     *  Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the toolContentId as :toolContentId.
-     *  See Peer Review for example usage.
+     * Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the
+     * toolContentId as :toolContentId.
+     * See Peer Review for example usage.
      */
     String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser);
-    
-    /** 
+
+    /**
      * Get all the raw ratings for a combination of criteria and item ids. Used by Peer Review to do SPA analysis.
      */
     List getRatingsByCriteriasAndItems(Collection<Long> ratingCriteriaIds, Collection<Long> itemIds);

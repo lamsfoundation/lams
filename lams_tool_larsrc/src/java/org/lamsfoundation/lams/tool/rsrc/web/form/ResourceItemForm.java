@@ -23,8 +23,6 @@
 
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import org.springframework.web.multipart.MultipartFile;
-
 /**
  * Resource Item Form.
  *
@@ -47,7 +45,7 @@ public class ResourceItemForm {
     private Long fileUuid;
     private Long fileVersionId;
     private String fileName;
-    private MultipartFile file;
+    private String tmpFileUploadId;
     private boolean allowRating;
     private boolean allowComments;
 
@@ -59,12 +57,12 @@ public class ResourceItemForm {
 	this.description = description;
     }
 
-    public MultipartFile getFile() {
-	return file;
+    public String getTmpFileUploadId() {
+	return tmpFileUploadId;
     }
 
-    public void setFile(MultipartFile file) {
-	this.file = file;
+    public void setTmpFileUploadId(String tmpFileUploadId) {
+	this.tmpFileUploadId = tmpFileUploadId;
     }
 
     public String getTitle() {

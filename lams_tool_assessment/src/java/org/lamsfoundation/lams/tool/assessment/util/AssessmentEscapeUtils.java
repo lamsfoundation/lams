@@ -233,8 +233,7 @@ public class AssessmentEscapeUtils {
 	    switch (questionResult.getQbQuestion().getType()) {
 		case QbQuestion.TYPE_ESSAY:
 		    String answer = questionResult.getAnswer();
-		    return (answer == null) ? ""
-			    : answer.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
+		    return AssessmentEscapeUtils.escapeStringForExcelExport(answer);
 		case QbQuestion.TYPE_MATCHING_PAIRS:
 		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS);
 		case QbQuestion.TYPE_MULTIPLE_CHOICE:
@@ -254,6 +253,10 @@ public class AssessmentEscapeUtils {
 	    }
 	}
 	return ret;
+    }
+
+    public static String escapeStringForExcelExport(String input) {
+	return input == null ? "" : input.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
     /**

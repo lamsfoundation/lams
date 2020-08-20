@@ -585,7 +585,7 @@ public class LearningController {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = scratchieService.getBurningQuestionDtos(scratchie,
-		    toolSessionId, true);
+		    toolSessionId, true, true);
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
@@ -637,6 +637,8 @@ public class LearningController {
 		: WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
 	String question = request.getParameter(ScratchieConstants.ATTR_BURNING_QUESTION_PREFIX);
+	// this make is work with both plain HTML and HTML textfield
+	question = question.replaceAll("\n", "\r\n");
 	scratchieService.saveBurningQuestion(sessionId, itemUid, question);
     }
 

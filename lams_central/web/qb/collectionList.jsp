@@ -46,6 +46,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			<%-- Add jqGrid internationalisation snippet --%>
+			<%@ include file="/jqGrid.i18n.jsp"%>
 			
 			// create a grid for each collection
 			$('.collection-grid').each(function(){
@@ -117,7 +119,7 @@
 		// add a new collection
 		function addCollection() {
 			// get collection name from a pop up
-			var name = prompt("New collection name"),
+			var name = prompt('<fmt:message key="label.qb.collection.name.prompt" />'),
 				lower = name.toLowerCase();
 			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
@@ -150,7 +152,9 @@
 	<%-- This option can be switched off in sysadmin --%>
 	<c:if test="${createCollectionAllowed}">
 		<div id="add-collection-div">
-			<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">Add collection</button>
+			<button id="add-collection-button" class="btn btn-primary" onClick="javascript:addCollection()">
+				<fmt:message key="label.qb.collection.add" />
+			</button>
 		</div>
 	</c:if>
 	
@@ -158,8 +162,17 @@
 		<div class="panel-body">
 			<%-- Build collection title with its name, question count, optional "private" flag and edit button --%>
 			<c:set var="collectionTitle">
-				<a href="<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}"><c:out value="${collection.name}" />
-					<span class="grid-question-count">(${questionCount[collection.uid]} questions)</span>
+				<a href="<lams:LAMSURL />qb/collection/showOne.do?collectionUid=${collection.uid}">
+					<c:choose>
+						<c:when test="${empty collection.userId and not collection.personal}">
+							<fmt:message key="label.qb.collection.public.name" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${collection.name}" />
+						</c:otherwise>
+					</c:choose>
+					
+					<span class="grid-question-count">(${questionCount[collection.uid]}&nbsp;<fmt:message key="label.qb.collection.questions" />)</span>
 					<c:if test="${collection.personal}">
 						<span class="grid-collection-private"><i class="fa fa-lock"></i> <fmt:message key="label.qb.collection.private" /></span>
 					</c:if>

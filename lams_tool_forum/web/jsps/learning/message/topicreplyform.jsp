@@ -13,7 +13,13 @@
 <c:if test="${sessionMap.allowUpload}">
 
 	<div class="form-group">
- 		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
+		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
+	   		value="${messageForm.tmpFileUploadId}" />
+		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
+		<div id="image-upload-area" class="voffset20"></div>
+		<script>
+			initFileUpload('${messageForm.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
+		</script>
  		<lams:errors path="message.attachments"/>
 	</div>
 	

@@ -190,7 +190,7 @@ footer > div {
 	width: 60px;
 	vertical-align: top;
 }
-#option-table td:first-child span{
+#option-table td:first-child span.optionDisplayOrderSpan{
 	display: inline-block;
 	width: 4rem;
 	height: 4rem;
@@ -203,6 +203,11 @@ footer > div {
 	border-radius: 50%;
 	border-color: #337ab7 !important;
 	background-color: #337ab7 !important;
+}
+
+#option-table td:first-child span.optionDisplayOrderSpan.correctOption {
+	border-color: #3c763d !important;
+	background-color: #3c763d !important;
 }
 
 /*----------SORTABLE----------------*/

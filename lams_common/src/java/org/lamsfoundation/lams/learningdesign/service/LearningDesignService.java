@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -182,7 +181,7 @@ public class LearningDesignService implements ILearningDesignService {
 
     @Override
     public LearningLibrary getLearningLibrary(Long learningLibraryId) {
-	return (LearningLibrary) learningDesignDAO.find(LearningLibrary.class, learningLibraryId);
+	return learningDesignDAO.find(LearningLibrary.class, learningLibraryId);
     }
 
     @Override
@@ -194,7 +193,7 @@ public class LearningDesignService implements ILearningDesignService {
     public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups) {
 	// find out which groups do not exist anymore and get rid of them
 	Collection<LearningLibraryGroup> existingGroups = learningLibraryDAO.getLearningLibraryGroups();
-	Collection<LearningLibraryGroup> removeGroups = new HashSet<LearningLibraryGroup>(existingGroups);
+	Collection<LearningLibraryGroup> removeGroups = new HashSet<>(existingGroups);
 	removeGroups.removeAll(groups);
 	existingGroups.removeAll(removeGroups);
 	learningLibraryDAO.deleteAll(removeGroups);
@@ -224,7 +223,7 @@ public class LearningDesignService implements ILearningDesignService {
     public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)
 	    throws IOException {
 	Iterator<LearningLibrary> iterator = learningLibraryDAO.getAllLearningLibraries(valid).iterator();
-	ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
+	ArrayList<LearningLibraryDTO> libraries = new ArrayList<>();
 	while (iterator.hasNext()) {
 	    LearningLibrary learningLibrary = iterator.next();
 	    List<Activity> templateActivities = activityDAO
@@ -276,10 +275,10 @@ public class LearningDesignService implements ILearningDesignService {
     @SuppressWarnings("unchecked")
     public List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName)
 	    throws IOException {
-	User user = (User) learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
+	User user = learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
 	String languageCode = user.getLocale().getLanguageIsoCode();
 	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(false, languageCode);
-	List<ToolDTO> tools = new ArrayList<ToolDTO>();
+	List<ToolDTO> tools = new ArrayList<>();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
 	    // skip invalid tools
 	    List<LibraryActivityDTO> libraryActivityDTOs = learningLibrary.getTemplateActivities();
@@ -293,7 +292,7 @@ public class LearningDesignService implements ILearningDesignService {
 		LibraryActivityDTO libraryActivityDTO = libraryActivityDTOs.get(0);
 		ToolDTO toolDTO = new ToolDTO();
 		if (isParallel) {
-		    List<Long> childLibraryIDs = new ArrayList<Long>();
+		    List<Long> childLibraryIDs = new ArrayList<>();
 		    for (LibraryActivityDTO childActivityDTO : libraryActivityDTOs) {
 			Long childToolID = childActivityDTO.getToolID();
 			if (childToolID != null) {
@@ -307,14 +306,12 @@ public class LearningDesignService implements ILearningDesignService {
 		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
 		toolDTO.setLearningLibraryTitle(learningLibrary.getTitle());
 		toolDTO.setToolDisplayName(libraryActivityDTO.getActivityTitle());
-		toolDTO.setActivityCategoryID(
-			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
 		toolDTO.setValid(learningLibrary.getValidFlag());
 
 		if (libraryActivityDTO.getToolID() == null) {
 		    toolDTO.setIconPath(libraryActivityDTO.getLibraryActivityUIImage());
 		} else {
-		    Tool tool = (Tool) learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
+		    Tool tool = learningLibraryDAO.find(Tool.class, libraryActivityDTO.getToolID());
 		    String iconPath = "tool/" + tool.getToolSignature() + "/images/icon_" + tool.getToolIdentifier()
 			    + ".svg";
 		    toolDTO.setIconPath(iconPath);
@@ -358,8 +355,7 @@ public class LearningDesignService implements ILearningDesignService {
 			    continue;
 			}
 			short componentsFound = 0;
-			for (Activity libraryComponent : (Set<Activity>) ((ParallelActivity) libraryActivity)
-				.getActivities()) {
+			for (Activity libraryComponent : ((ParallelActivity) libraryActivity).getActivities()) {
 			    ToolActivity toolLibraryCompoment = (ToolActivity) libraryComponent;
 			    for (AuthoringActivityDTO component : components) {
 				// match with tool signature of children

@@ -76,6 +76,7 @@
 							<hr class="hr-confidence-level" />
 						
 							<div>
+								<c:set var="confidenceLevelsAnonymous" value="${mode != 'teacher' && scratchie.confidenceLevelsAnonymous}" />
 								<c:forEach var="confidenceLevelDto" items="${optionDto.confidenceLevelDtos}" varStatus="status">
 									<%@ include file="parts/confidenceLevelPortrait.jsp"%>
 								</c:forEach>
@@ -139,8 +140,7 @@
 		</table>
 		
 		<c:if test="${!sessionMap.userFinished && !item.unraveled && isUserLeader && (mode != 'teacher') && !showResults}">
-			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;"
-				class="<c:if test='${item.qbQuestion.answerRequired}'>item-required</c:if>">
+			<div id="type-your-answer-${item.uid}" style="padding: 0 0 15px 100px; margin-top:-20px;">
 				<div>
 					<fmt:message key="label.type.your.group.answer" />
 				</div>

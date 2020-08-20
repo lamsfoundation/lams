@@ -153,12 +153,12 @@ public class TBLTemplateController extends LdTemplateController {
 	    activityTitle = data.getText("boilerplate.ira.title");
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 	    Long iRAToolContentId = createAssessmentToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), null, false, false, data.confidenceLevelEnable,
-		    testQuestionsArray);
+		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable, false,
+		    false, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
-	    
+
 	    // Leader Selection
 	    firstActivityInRowPosition = calcPositionBelow(firstActivityInRowPosition);
 	    currentActivityPosition = firstActivityInRowPosition;
@@ -227,7 +227,8 @@ public class TBLTemplateController extends LdTemplateController {
 		    assessmentNumber++;
 		}
 		Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
-			data.getText("boilerplate.ae.instructions"), null, true, false, false, questionsJSONArray);
+			data.getText("boilerplate.ae.instructions"), null, true, false, false, true, true,
+			questionsJSONArray);
 		activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 

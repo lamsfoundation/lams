@@ -34,8 +34,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
@@ -78,7 +76,8 @@ public class QaCondition extends TextSearchCondition {
 	super(conditionDTO);
 	this.temporaryQaQuestions = new TreeSet<>(new QaQuestionComparator());
 	for (QaQueContent question : conditionDTO.getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(), null);
+	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(),
+		    question.isAnswerRequired(), null);
 	    getQuestions().add(questionCopy);
 	}
     }
@@ -149,7 +148,8 @@ public class QaCondition extends TextSearchCondition {
 	Set<QaQueContent> questionsCopy = new TreeSet<>(new QaQuestionComparator());
 
 	for (QaQueContent question : getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(), null);
+	    QaQueContent questionCopy = new QaQueContent(question.getQbQuestion(), question.getDisplayOrder(),
+		    question.isAnswerRequired(), null);
 	    questionsCopy.add(questionCopy);
 	}
 	return new QaCondition(null, newConditionUIID, orderId, name, displayName, allWords, phrase, anyWords,

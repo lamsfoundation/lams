@@ -103,6 +103,9 @@ public class Scratchie implements Cloneable {
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
 
+    @Column(name = "confidence_levels_anonymous")
+    private boolean confidenceLevelsAnonymous;
+
     @Column(name = "activity_uuid_providing_vsa_answers")
     private Integer activityUiidProvidingVsaAnswers;
 
@@ -391,6 +394,14 @@ public class Scratchie implements Cloneable {
      */
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
+    }
+
+    public boolean isConfidenceLevelsAnonymous() {
+	return confidenceLevelsAnonymous;
+    }
+
+    public void setConfidenceLevelsAnonymous(boolean confidenceLevelsAnonymous) {
+	this.confidenceLevelsAnonymous = confidenceLevelsAnonymous;
     }
 
     public boolean isAnswersFetchingEnabled() {

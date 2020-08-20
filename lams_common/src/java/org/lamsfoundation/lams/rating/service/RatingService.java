@@ -149,7 +149,7 @@ public class RatingService implements IRatingService {
 		&& Float.compare(ratingFloat, RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT) > 0) {
 	    ratingFloat = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
 	}
-	
+
 	rating.setRating(ratingFloat);
 	ratingDAO.saveOrUpdate(rating);
 
@@ -193,7 +193,7 @@ public class RatingService implements IRatingService {
 		rawRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX_AS_FLOAT;
 	    }
 	    rating.setRating(rawRating);
-		
+
 	    ratingDAO.saveOrUpdate(rating);
 	    numRatings++;
 	}
@@ -246,11 +246,14 @@ public class RatingService implements IRatingService {
 	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
 	List<Object[]> itemsStatistics;
 	if (isSingleItem) {
-	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, toolSessionId, singleItemId);
+	    itemsStatistics = toolSessionId == null
+		    ? ratingDAO.getRatingAverageByContentAndItem(contentId, singleItemId)
+		    : ratingDAO.getRatingAverageByContentAndItem(contentId, toolSessionId, singleItemId);
 
 	    // query DB using itemIds
 	} else {
-	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, toolSessionId, itemIds);
+	    itemsStatistics = toolSessionId == null ? ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds)
+		    : ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
 	}
 
 	//handle all criterias except for comments' one
@@ -325,7 +328,7 @@ public class RatingService implements IRatingService {
 
 	//handle comments criteria
 	for (RatingCriteria criteria : criterias) {
-	    if (criteria.isCommentRating()) {
+	    if (criteria.isCommentRating() || criteria.isCommentsEnabled()) {
 		Long commentCriteriaId = criteria.getRatingCriteriaId();
 
 		List<RatingCommentDTO> commentDtos;
@@ -777,6 +780,11 @@ public class RatingService implements IRatingService {
     @Override
     public String getRatingSelectJoinSQL(Integer ratingStyle, boolean getByUser) {
 	return ratingDAO.getRatingSelectJoinSQL(ratingStyle, getByUser);
+    }
+
+    @Override
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long toolSessionId, Long itemId) {
+	return ratingCommentDAO.getCommentsByCriteriaAndItem(ratingCriteriaId, toolSessionId, itemId);
     }
 
     /**

@@ -46,7 +46,6 @@
 		$(function() {
 			// Setup form validation 
 			$("form[name='changePass']").validate({
-				debug : true,
 				errorClass : 'help-block',
 				//  validation rules
 				rules : {

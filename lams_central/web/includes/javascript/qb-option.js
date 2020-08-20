@@ -99,6 +99,13 @@ function initializeAnswers() {
 	       	if (ui) {
 	        	$(this).next("input").val(ui.value);
 	       	}
+	       	
+	       	var optionDisplayOrderSpan = $(this).closest('.single-option-table').find('.optionDisplayOrderSpan');
+	       	if (newValueInt > 0) {
+	       		optionDisplayOrderSpan.addClass('correctOption').css('filter', 'brightness(' + (2 - newValueInt)  + ')');
+	       	} else {
+	       		optionDisplayOrderSpan.removeClass('correctOption').css('filter', 'brightness(1)');
+	       	}
 	    });
 	    //update slider's label with the initial value
 	    $('.slider').trigger('slide');
@@ -128,6 +135,7 @@ function initializeAnswers() {
 					for (var i = 0; i < order.length; i++) {
 					    var optionIndex = order[i];
 					    $('input[name="optionDisplayOrder' + optionIndex + '"]').val(i+1);
+					    $('span#optionDisplayOrderSpan' + optionIndex).text(alphabet[i]);
 					}
 				}
 			}

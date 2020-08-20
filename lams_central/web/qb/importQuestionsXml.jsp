@@ -3,55 +3,38 @@
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
-<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+<c:set var="tmpFileUploadId"><%=FileUtil.generateTmpFileUploadId()%></c:set>
 
 <lams:html>
 <lams:head>
 	<title>x</title>
 	<lams:css/>
+	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/uppy/uppy.min.js"></script>
+	<c:choose>
+		<c:when test="${language eq 'es'}">
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/es_ES.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'fr'}">
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/fr_FR.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'el'}">
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/el_GR.min.js"></script>
+		</c:when>
+	</c:choose>
 	<script type="text/javascript">
 		function closeWin() {
 			window.close();
 		}
 
-		function isXML(filename) {
-			var extname = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
-			if ( extname.length > 0 ) {
-				extname = extname.toUpperCase();
-				extname = "." + extname;
-				return '.XML' === extname;
-			}
-			return false;
-		}
 		
-		function verifyAndSubmit() {
-			var fileSelect = document.getElementById('UPLOAD_FILE');
-			var files = fileSelect.files;
-			if (files.length == 0) {
-				clearFileError();
-				showFileError('<fmt:message key="button.select.importfile"/>');
-				return;
-			} else {
-				var file = files[0];
-				clearFileError();
-				if  ( ! isXML(file.name) ) {
-					showFileError('<fmt:message key="error.import.file.format"/>');
-					return;
-				} 
-				if ( ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
-					return;
-				}
-			}
-
-			document.getElementById('itemAttachment_Busy').style.display = '';
+		function submit() {
 			var options = { 
 				target:  parent.jQuery('#itemArea'), 
 				success: function (responseText, statusText) {  // post-submit callback 
@@ -60,7 +43,84 @@
 	    	}; 							
 	    	$('#importForm').ajaxSubmit(options);
 		}
+		/**
+		 * Initialise Uppy as the file upload widget
+		 */
+		var LAMS_URL = '<lams:LAMSURL/>',
+	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 			
+		function initFileUpload(tmpFileUploadId, language) {
+			var allowedFileTypes = ['.xml'],
+		  	  	uppyProperties = {
+					  // upload immediately 
+					  autoProceed: true,
+					  allowMultipleUploads: true,
+					  debug: false,
+					  restrictions: {
+						// taken from LAMS configuration
+					    maxFileSize: +UPLOAD_FILE_MAX_SIZE,
+					    maxNumberOfFiles: 1,
+					    allowedFileTypes : allowedFileTypes
+					  },
+					  meta: {
+						  // all uploaded files go to this subdir in LAMS tmp dir
+						  // its format is: upload_<userId>_<timestamp>
+						  'tmpFileUploadId' : tmpFileUploadId,
+						  'largeFilesAllowed' : true
+					  },
+					  onBeforeFileAdded: function(currentFile, files) {
+						  var name = currentFile.data.name,
+						  	  extensionIndex = name.lastIndexOf('.'),
+						  	  valid = allowedFileTypes.includes(name.substring(extensionIndex).trim());
+						  if (!valid) {
+							  uppy.info('<fmt:message key="error.import.file.format" />', 'error', 10000);
+						  }
+						  
+						  return valid;
+				    }
+				  };
+			  
+			  switch(language) {
+			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			  }
+			  
+			  
+			  // global variable
+			  uppy = Uppy.Core(uppyProperties);
+			  // upload using Ajax
+			  uppy.use(Uppy.XHRUpload, {
+				  endpoint: LAMS_URL + 'tmpFileUpload',
+				  fieldName : 'file',
+				  // files are uploaded one by one
+				  limit : 1
+			  });
+			  
+			  uppy.use(Uppy.DragDrop, {
+				  target: '#image-upload-area',
+				  inline: true,
+				  height: 120,
+				  width: '100%'
+				});
+
+			  uppy.use(Uppy.Informer, {
+				  target: '#image-upload-area'
+			  });
+			  
+			  uppy.use(Uppy.StatusBar, {
+				  target: '#image-upload-area',
+				  hideAfterFinish: false,
+				  hideUploadButton: true,
+				  hideRetryButton: true,
+				  hidePauseResumeButton: true,
+				  hideCancelButton: true
+				});
+		}
+		
+		$(document).ready(function(){
+			initFileUpload('${tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
+		});	
 	</script>
 </lams:head>
 
@@ -76,18 +136,17 @@
 		<div class="panel-body">
 			<c:set var="csrfToken"><csrf:token/></c:set>
 			<form action="<c:url value="/xmlQuestions/importQuestionsXml.do"/>?${csrfToken}&collectionUid=${param.collectionUid}" method="post" 
-				enctype="multipart/form-data" id="importForm">	
+				id="importForm">	
+				<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" /> 
 				
-				<lams:FileUpload fileFieldname="UPLOAD_FILE" fileInputMessageKey="label.file" 
-					uploadInfoMessageKey="msg.import.file.format" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-
-				<lams:WaitingSpinner id="itemAttachment_Busy"/>
+			
+				<div id="image-upload-area" class="voffset20"></div>
 			
 				<div class="pull-right voffset10" id="buttonsDiv">
 					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:self.parent.tb_remove();" />
 
-					<a href="#nogo" class="btn btn-sm btn-primary" onclick="javascript:verifyAndSubmit();">
+					<a href="#nogo" class="btn btn-sm btn-primary" onclick="javascript:submit();">
 						<i class="fa fa-sm fa-upload"></i>&nbsp;<fmt:message key="button.import" />
 					</a>
 				</div>

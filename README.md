@@ -25,7 +25,16 @@ LAMS is written in Java, Javascript and uses an MySQL database for data storage.
 
 Automated testing made possible by <b>Browserstack</b>
 
-<a href="https://www.browserstack.com"><img width="150px" src="https://p14.zdusercontent.com/attachment/1015988/UU8ibDdCsjJVDtANurCRfTlZ4?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..wRsFW1JfCWMVQb_R8R5FVQ.0z67ZNEqNApzeXrTNcwB9wXXsYTwVWMHjelknRgRzM-70OS_-mlj-EcJtM218-Mz1O80Ucg2EGDBbmdG41U0BkZVjxX_JDIXC1xtrxCuUenxFTaqs135cprx-JUMrdpAzmKvt-FklMKdnFFBkfk-CLuOr8Y2zBziwrvGxjIZEZ1v5y4QFppIFr48JXORAXvYLXN691L88By3ERy5FIIrtHHGCEC-nZKmxnuxIceLpG8rqxvGA5RBOiU8dKiTBjaGANpjYXEIlSBUCxuaG5ulbYknEFDPrn3bEBjuGYfbwVg.baRNrKuhmv3TA_6nA75TSA"></a>
+<a href="https://www.browserstack.com"><img width="150px" src="https://www.browserstack.com/images/layout/browserstack-logo-600x315.png" alt="Browserstack logo"></a>
+
+
+<b>Internationalisation</b>
+
+<p>For translating and internationalising LAMS, we use <a href="https://lokalise.com/">Lokalise</a>. Lokalise is a fantastic localization and translation management software tool.
+</p>
+<p><img alt="Lokalise logo" src="https://lokalise.com/build/images/logo.6c425399.svg"></p>
+</p>
+
 
 
 

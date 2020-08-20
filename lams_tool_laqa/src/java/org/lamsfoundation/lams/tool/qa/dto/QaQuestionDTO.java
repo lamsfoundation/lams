@@ -43,8 +43,9 @@ public class QaQuestionDTO implements Comparable<QaMonitoredUserDTO> {
 	this.name = qaQuestion.getQbQuestion().getName();
 	this.description = qaQuestion.getQbQuestion().getDescription();
 	this.displayOrder = String.valueOf(qaQuestion.getDisplayOrder());
-	this.feedback = qaQuestion.getQbQuestion().getFeedback() != null ? qaQuestion.getQbQuestion().getFeedback() : "";
-	this.required = qaQuestion.getQbQuestion().isAnswerRequired();
+	this.feedback = qaQuestion.getQbQuestion().getFeedback() != null ? qaQuestion.getQbQuestion().getFeedback()
+		: "";
+	this.required = qaQuestion.isAnswerRequired();
 	this.minWordsLimit = qaQuestion.getQbQuestion().getMinWordsLimit();
 	this.uid = qaQuestion.getUid();
     }
@@ -117,7 +118,7 @@ public class QaQuestionDTO implements Comparable<QaMonitoredUserDTO> {
     public void setName(String question) {
 	this.name = question;
     }
-    
+
     public String getDescription() {
 	return description;
     }

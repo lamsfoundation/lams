@@ -770,39 +770,39 @@ public class GradebookService implements IGradebookFullService {
 
     /*
      * TODO Method is not in use. Remove it?
-     * 
+     *
      * private void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
      * ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
-     * 
+     *
      * if ((toolSession == null) || (toolSession == null) || (learner == null) || (lesson == null)
      * || (activity == null) || !(activity instanceof ToolActivity)
      * || (((ToolActivity) activity).getEvaluation() == null)) {
      * return;
      * }
      * ToolActivity toolActivity = (ToolActivity) activity;
-     * 
+     *
      * // Getting the first activity evaluation
      * ActivityEvaluation eval = toolActivity.getEvaluation();
-     * 
+     *
      * try {
      * ToolOutput toolOutput = toolService.getOutputFromTool(eval.getToolOutputDefinition(), toolSession,
      * learner.getUserId());
-     * 
+     *
      * if (toolOutput != null) {
      * ToolOutputValue outputVal = toolOutput.getValue();
      * if (outputVal != null) {
      * Double outputDouble = outputVal.getDouble();
-     * 
+     *
      * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(toolActivity.getActivityId(),
      * learner.getUserId());
-     * 
+     *
      * // Only set the mark if it hasnt previously been set by a teacher
      * if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
      * updateGradebookUserActivityMark(lesson, learner, toolActivity, outputDouble, false, false);
      * }
      * }
      * }
-     * 
+     *
      * } catch (ToolException e) {
      * logger.debug(
      * "Runtime exception when attempted to get outputs for activity: " + toolActivity.getActivityId(), e);
@@ -1160,7 +1160,12 @@ public class GradebookService implements IGradebookFullService {
 	    GBActivityGridRowDTO activityRow = (GBActivityGridRowDTO) it.next();
 	    // Add the activity average data
 	    ExcelRow activityDataRow = summarySheet.initRow();
-	    activityDataRow.addCell(activityRow.getRowName()); // this is the problem entry
+	    String activityName = activityRow.getRowName();
+	    if (isWeighted) {
+		activityName += " " + getMessage("gradebook.export.weight",
+			new Object[] { activityRow.getWeight() == null ? 0 : activityRow.getWeight() });
+	    }
+	    activityDataRow.addCell(activityName);
 	    activityDataRow.addCell(activityRow.getCompetences());
 	    activityDataRow.addCell(activityRow.getMedianTimeTakenSeconds());
 	    activityDataRow.addCell(activityRow.getAverageMark());
@@ -1223,14 +1228,21 @@ public class GradebookService implements IGradebookFullService {
 	headerRow = summarySheet.initRow();
 	headerRow.addEmptyCells(3);
 	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
-	    headerRow.addCell(activity.getTitle(), true); // this one works
+	    String activityName = activity.getTitle();
+	    if (isWeighted && activity.isToolActivity()) {
+		ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+		activityName += " " + getMessage("gradebook.export.weight",
+			new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
+	    }
+
+	    headerRow.addCell(activityName, true);
 	}
 
 	headerRow = summarySheet.initRow();
 	headerRow.addCell(getMessage("gradebook.export.last.name"), true);
 	headerRow.addCell(getMessage("gradebook.export.first.name"), true);
 	headerRow.addCell(getMessage("gradebook.export.login"), true);
-	for (Activity activity : filteredActivityToUserDTOMap.keySet()) {
+	for (int columnCount = 0; columnCount < filteredActivityToUserDTOMap.keySet().size(); columnCount++) {
 	    headerRow.addCell(getMessage("gradebook.columntitle.mark"), true);
 	}
 	headerRow.addCell(getMessage("gradebook.export.total.mark"), true);
@@ -1270,7 +1282,15 @@ public class GradebookService implements IGradebookFullService {
 	for (Activity activity : activityToUserDTOMap.keySet()) {
 
 	    ExcelRow activityTitleRow = activitySheet.initRow();
-	    activityTitleRow.addCell(activity.getTitle(), true);
+
+	    String activityName = activity.getTitle();
+	    if (isWeighted && activity.isToolActivity()) {
+		ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+		activityName += " " + getMessage("gradebook.export.weight",
+			new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
+	    }
+
+	    activityTitleRow.addCell(activityName, true);
 
 	    ExcelRow titleRow = activitySheet.initRow();
 	    titleRow.addCell(getMessage("gradebook.export.last.name"), true);
@@ -1353,6 +1373,13 @@ public class GradebookService implements IGradebookFullService {
 		    String activityRowName = (groupName != null && groupId != null)
 			    ? activity.getTitle() + " (" + groupName + ")"
 			    : activity.getTitle();
+
+		    if (isWeighted && activity.isToolActivity()) {
+			ActivityEvaluation eval = activity.getEvaluation();
+			activityRowName += " " + getMessage("gradebook.export.weight",
+				new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
+		    }
+
 		    activityIdToName.put(activity.getActivityId(), activityRowName);
 
 		    String startDate = (userDto.getStartDate() == null) ? ""
@@ -1643,9 +1670,6 @@ public class GradebookService implements IGradebookFullService {
 		activityTouserToGradebookUserActivityMap.put(activity.getActivityId(), userToGradebookUserActivityMap);
 	    }
 
-	    int numberCellsPerRow = simplified ? 3 + selectedLessons.size() + 3
-		    : (selectedLessons.size() * 9) + (allActivities.size() * 2) + 5;
-
 	    String weightedMessage = messageService.getMessage("label.activity.marks.weighted");
 	    // Lesson names row----------------------
 	    ExcelRow lessonsNames = sheet.initRow();
@@ -1670,7 +1694,7 @@ public class GradebookService implements IGradebookFullService {
 		    lessonsNames.addCell(lessonName, true);
 		    lessonsNames.addEmptyCells(9 + (numberActivities * 2));
 		}
-//		i -= 2;
+
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
 		lessonsNames.addCell(getMessage("label.overall.totals"), true);
 		lessonsNames.addCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
@@ -1696,6 +1720,8 @@ public class GradebookService implements IGradebookFullService {
 	    } else {
 		//create Selected Lessons Header Full
 		for (Lesson lesson : selectedLessons) {
+		    boolean isWeighted = isWeightedLessonMap.get(lesson.getLessonId());
+
 		    headerRow.addCell(getMessage("gradebook.export.last.name"));
 		    headerRow.addCell(getMessage("gradebook.export.first.name"));
 		    headerRow.addCell(getMessage("gradebook.export.login"));
@@ -1705,7 +1731,14 @@ public class GradebookService implements IGradebookFullService {
 
 		    List<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 		    for (Activity activity : activities) {
-			headerRow.addCell(activity.getTitle(), true);
+			String activityName = activity.getTitle();
+			if (isWeighted && activity.isToolActivity()) {
+			    ActivityEvaluation eval = ((ToolActivity) activity).getEvaluation();
+			    activityName += " " + getMessage("gradebook.export.weight",
+				    new Object[] { eval == null || eval.getWeight() == null ? 0 : eval.getWeight() });
+			}
+
+			headerRow.addCell(activityName, true);
 			headerRow.addCell(getMessage("label.max.possible"));
 		    }
 
@@ -1788,9 +1821,12 @@ public class GradebookService implements IGradebookFullService {
 			if (activityToTotalMarkMap.get(activity.getActivityId()) != null) {
 			    rawActivityTotalMarks = activityToTotalMarkMap.get(activity.getActivityId());
 			}
-			Integer weight = weighted && activity.getEvaluation() != null
-				&& activity.getEvaluation().getWeight() != null ? activity.getEvaluation().getWeight()
-					: null;
+			Integer weight = weighted ? 0 : null;
+
+			if (activity.getEvaluation() != null && activity.getEvaluation().getWeight() != null) {
+			    weight = activity.getEvaluation().getWeight();
+			}
+
 			Long weightedActivityTotalMarks = weight != null ? weight : rawActivityTotalMarks;
 
 			Double mark = 0d;
@@ -1883,7 +1919,7 @@ public class GradebookService implements IGradebookFullService {
 
     /*
      * TODO Method is not in use. Remove it?
-     * 
+     *
      * public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
      * Boolean markedInGradebook) {
      * ToolSession toolSession = toolService.getToolSessionById(toolSessionID);
@@ -1891,7 +1927,7 @@ public class GradebookService implements IGradebookFullService {
      * if ((learner != null) && (toolSession != null)) {
      * ToolActivity activity = toolSession.getToolActivity();
      * GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
-     * 
+     *
      * // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
      * // mark and feedback
      * if ((gradebookUserActivity == null) || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {

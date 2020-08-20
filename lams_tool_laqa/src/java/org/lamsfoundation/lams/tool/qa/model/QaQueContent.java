@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.qa.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -50,10 +51,13 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
 
     private static final long serialVersionUID = -4028785701106936621L;
 
+    @Column(name = "answer_required")
+    private boolean answerRequired;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qa_content_id")
     private QaContent qaContent;
-    
+
     // *************** NON Persist Fields used in learning ********************
     @Transient
     private QaUsrResp userResponse;
@@ -61,16 +65,17 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
     public QaQueContent() {
     }
 
-    public QaQueContent(QbQuestion qbQuestion, int displayOrder, QaContent qaContent) {
+    public QaQueContent(QbQuestion qbQuestion, int displayOrder, boolean answerRequired, QaContent qaContent) {
 	this.qbQuestion = qbQuestion;
 	this.qaContent = qaContent;
 	this.toolContentId = qaContent == null ? null : qaContent.getQaContentId();
 	this.displayOrder = displayOrder;
+	this.answerRequired = answerRequired;
     }
 
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
 	QaQueContent newQueContent = new QaQueContent(queContent.getQbQuestion(), queContent.getDisplayOrder(),
-		newQaContent);
+		queContent.isAnswerRequired(), newQaContent);
 	return newQueContent;
     }
 
@@ -88,7 +93,14 @@ public class QaQueContent extends QbToolQuestion implements Serializable {
 	this.qaContent = qaContent;
 	this.toolContentId = qaContent == null ? null : qaContent.getQaContentId();
     }
-    
+
+    public boolean isAnswerRequired() {
+	return answerRequired;
+    }
+
+    public void setAnswerRequired(boolean answerRequired) {
+	this.answerRequired = answerRequired;
+    }
     // *************** NON Persist Fields used in monitoring ********************
 
     public QaUsrResp getUserResponse() {

@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -694,6 +695,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	scratchieUserDao.saveObject(user);
     }
 
+    @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
     }
@@ -1166,7 +1168,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId,
-	    boolean includeEmptyItems) {
+	    boolean includeEmptyItems, boolean prepareForHTML) {
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
@@ -1228,8 +1230,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
 		burningQuestionDto.setSessionName(escapedSessionName);
 
-		String escapedBurningQuestion = StringEscapeUtils
-			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion());
+		String escapedBurningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
+		if (prepareForHTML) {
+		    escapedBurningQuestion = escapedBurningQuestion.replaceAll("\n", "<br>");
+		}
+		escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(escapedBurningQuestion);
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
@@ -1889,7 +1894,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    row.addCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
 	    row.addCell(getMessage("label.count"), IndexedColors.BLUE);
 
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = getBurningQuestionDtos(scratchie, null, true, false);
 	    int index = 1;
 	    for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 		ScratchieItem item = burningQuestionItemDto.getScratchieItem();
@@ -1954,8 +1959,17 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
 	model.put("correctAnswerLetters", correctAnswerLetters);
 
+	Map<String, ScratchieSession> sessionsByName = scratchieSessionDao.getByContentId(scratchie.getContentId())
+		.stream().filter(s -> s.getGroupLeader() != null)
+		.collect(Collectors.toMap(ScratchieSession::getSessionName, Function.identity()));
 	List<GroupSummary> groupSummaries = getSummaryByTeam(scratchie, items);
 	for (GroupSummary summary : groupSummaries) {
+	    ScratchieSession session = sessionsByName.get(summary.getSessionName());
+	    if (session != null) {
+		// for this view, we need user ID, not UID
+		summary.setLeaderUid(session.getGroupLeader().getUserId());
+	    }
+
 	    //prepare OptionDtos to display
 	    int i = 0;
 	    for (ScratchieItemDTO itemDto : summary.getItemDtos()) {
@@ -2320,6 +2334,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		scratchieDao.insert(scratchieItem);
+		// in case an imported question had a question ID which is the highest
+		qbService.updateMaxQuestionId();
 	    }
 
 	    scratchieDao.saveObject(toolContentObj);
@@ -2686,6 +2702,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    ScratchieItem item = new ScratchieItem();
 	    item.setDisplayOrder(JsonUtil.optInt(questionData, RestTags.DISPLAY_ORDER));
+	    item.setAnswerRequired(JsonUtil.optBoolean(questionData, "answerRequired", Boolean.FALSE));
 	    item.setToolContentId(scratchie.getContentId());
 
 	    QbQuestion qbQuestion = null;

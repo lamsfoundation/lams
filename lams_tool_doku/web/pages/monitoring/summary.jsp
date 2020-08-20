@@ -18,6 +18,7 @@
 		color:#47bc23; 
 		margin-bottom: 10px;
 		text-align: center;
+		position: static;
 	}
 	#countdown-label {
 		font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
@@ -70,7 +71,21 @@
 	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
+		// Resize Etherpad iframe when its content grows.
+		// It does not support shrinking, only growing.
+		// This feature requires ep_resize plugin installed in Etherpad and customised with code in Doku tool
+		$(window).on('message onmessage', function (e) {
+			var msg = e.originalEvent.data;
+	        if (msg.name === 'ep_resize') {
+	        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
+	        		iframe = $('iframe[src^="' + src + '"]'),
+	            	// height should be no less than 200 px
+	            	height = Math.max(200, msg.data.height - 10);
+	           	iframe.height(height);
+	        }
+	    });
 		
+		<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 			$('#etherpad-container-${groupSummary.sessionId}').pad({
 				'padId':'${groupSummary.padId}',
@@ -80,7 +95,7 @@
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
 				'height':'600',
-				'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'
+				'userName':'<c:out value="${fullName}" />'
 			});			
 		</c:forEach>
 		
@@ -333,11 +348,6 @@
 			$('#countdown').countdown('pause');
 		}
 	}
-	
-	function showTimeSlider(toolSessionId, padId) {
-		$('#etherpad-container-' + toolSessionId).html("<iframe src='${etherpadServerUrl}/p/" + padId + "/timeslider' width='100%' height='316'><iframe>");
-	}
-
 </script>
 
 <div class="panel">
@@ -356,7 +366,7 @@
 	<!--For release marks feature-->
 	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div>
-	
+
 	<c:if test="${dokumaran.timeLimit > 0}">
 		
 	
@@ -412,12 +422,6 @@
 		</c:when>
 		<c:otherwise>
 			<div class="btn-group btn-group-xs pull-right">
-				<a href="#nogo" onclick="showTimeSlider(${groupSummary.sessionId}, '${groupSummary.padId}')" class="btn btn-default btn-sm "
-						title="<fmt:message key="label.timeslider" />">
-					<i class="fa fa-lg fa-clock-o"></i>
-					<fmt:message key="label.timeslider" />
-				</a>
-				
 				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
 				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
 						title="<fmt:message key="label.export.pad.html" />">

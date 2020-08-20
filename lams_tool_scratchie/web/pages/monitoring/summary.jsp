@@ -138,6 +138,7 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
+				autoencode: false,
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 			   	colNames:['#',

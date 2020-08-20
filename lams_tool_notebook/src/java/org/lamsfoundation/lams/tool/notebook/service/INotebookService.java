@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.notebook.service;
 
 import java.util.Collection;
@@ -113,7 +112,7 @@ public interface INotebookService extends ICommonToolService {
     NotebookUser createNotebookUser(UserDTO user, NotebookSession notebookSession);
 
     boolean notifyUser(Integer userId, String comment);
-    
+
     String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText);
 
     /**
@@ -150,7 +149,8 @@ public interface INotebookService extends ICommonToolService {
     /**
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
+    List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
+	    String searchString);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 

@@ -13,16 +13,33 @@
  	<%@ include file="../header.jsp" %>
  	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
- 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
- 
- 	<title><fmt:message key="authoring.tbl.template.title"/></title>
+	<style>
+		/* Hide them initially */
+		.question-bank-div {
+			display: none;
+			margin-top: 20px;
+		}
+		
+		#itemArea {
+			display: none;
+		}
+		
+		.collapsable-icon-left a[data-toggle="collapse"] {
+			text-decoration: none;
+		}
+	</style>
 	
+	<title><fmt:message key="authoring.tbl.template.title"/></title>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
 	<script type="text/javascript">
 
 		<%@ include file="../comms.jsp" %>
 
 		var minimumWordsSpinnerArray  = new Array(); // Peer Review Tab.
 		var showTime = 100; // how long should it take a field to show/hide.
+		var qbQuestionAddAppexNumber = null; // if null, we are importin IRA question from QB
+											 // otherwise we are importing a question for the given AE
 		
 		$(document).ready(function() {
 			groupingChanged();
@@ -56,7 +73,7 @@
 			initializeWizard(validator);
 		});
 
-		function createApplicationExercise(numAppexFieldname ) {
+		function createApplicationExercise() {
 			var numAppex = $('#numAppEx');
 			var currNum = numAppex.val();
 			var nextNum = +currNum + 1;
@@ -127,6 +144,42 @@
 				});
 	    	}
 	    }
+	    
+	    function openQuestionBank(appexNumber){
+	    	// empty field for IRA import
+	    	qbQuestionAddAppexNumber = appexNumber;
+	    	// make sure that only one Question Bank is open as its internal code has problems with multiple instances
+			$('.question-bank-div').hide().find('.panel-collapse').empty();
+	    	// show panel
+	    	$(appexNumber ? '#question-bank-ae-div-' + appexNumber : '#question-bank-ira-div').slideDown(function(){
+	    		var container = this;
+	    		// load question bank content
+				$(appexNumber ? '#question-bank-ae-collapse-' + appexNumber : '#question-bank-ira-collapse').load(
+					"<lams:LAMSURL/>searchQB/start.do",
+					{
+						// this action returns ID of the created QB question
+						// which is put into itemArea div
+						returnUrl: "<lams:LAMSURL/>qb/edit/returnQuestionUid.do",
+						// limit question to multiple choice (ira) or essay and multiple choice (ae)
+						toolSignature: appexNumber ? "lasurv11" : "lamc11"
+					}, function(){
+						 container.scrollIntoView(true);
+					}
+				)	
+		    });
+	    }
+	    
+	    // this method is run when imported QB question ID is put into itemArea div
+		function refreshThickbox(){
+			// extract the ID
+			var qbQuestionUid = +$("#itemArea").text();
+			if (qbQuestionAddAppexNumber) {
+				createAssessment('importQbAe', 'numAssessments' + qbQuestionAddAppexNumber, 'divass' + qbQuestionAddAppexNumber, qbQuestionUid, true);
+			} else {
+				// fetch HTML with filled data from QB question
+				createQuestion('numQuestions', 'divq', 'divquestions', 'importQbIra', '&qbQuestionUid=' + qbQuestionUid, true);
+			}
+		};
 
         $(document).ready(function(){
         	$('[data-toggle="tooltip"]').tooltip();
@@ -180,7 +233,7 @@
 	    <div class="tab-pane" id="tab2">
 	 		<div class="form-group">			
 				<span class="field-name">
-					<label for="sequenceTitle" class="input required"><fmt:message key="authoring.label.sequence.title" /></label>
+					<label for="sequenceTitle" class="input"><fmt:message key="authoring.label.sequence.title" /></label>
 				</span>
 				<input name="sequenceTitle" id="sequenceTitle" class="form-control" type="text" maxlength="200"/>
 			</div>
@@ -203,9 +256,44 @@
 			</div>
 		
 			<span class="voffset10">
-			<a href="#" id="createQuestionButton" onclick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/></a>
-			<a href="#" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
+				<div class="btn-group">
+					<button id="createQuestionButton"
+							onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
+							type="button" class="btn btn-default">
+								<i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/>
+					</button>
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="#" onClick="javascript:openQuestionBank()"> 
+							<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
+							</a>
+						</li>
+					</ul>
+				</div>
+				
+				<a href="#"  id="importQTIButton" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
+			
+			<!-- Question Bank -->
+			<div class="panel-group question-bank-div" id="question-bank-ira-div" role="tablist" aria-multiselectable="true"> 
+			    <div class="panel panel-default">
+			        <div class="panel-heading collapsable-icon-left" id="question-bank-ira-heading">
+			        	<span class="panel-title">
+					    	<a role="button" data-toggle="collapse" href="#question-bank-ira-collapse" aria-expanded="true" aria-controls="question-bank-ira-collapse" >
+				          		<fmt:message key="label.question.bank" />
+				        	</a>
+			      		</span>
+			        </div>
+			
+					<div id="question-bank-ira-collapse" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="question-bank-ira-heading">
+						<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>			
+					</div>
+				</div>
+			</div>
+			<!-- Hidden div just for storing ID of the imported QB question -->
+			<div id="itemArea"></div>
 			
 	    </div>
 		<div class="tab-pane" id="tab4">

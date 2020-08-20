@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -15,8 +16,7 @@ import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.questions.QuestionWordParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -27,10 +27,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Runs extraction of the chosen IMS QTI zip file or .docx file. Prepares form for user to manually choose interesting question.
+ * Runs extraction of the chosen IMS QTI zip file or .docx file. Prepares form for user to manually choose interesting
+ * question.
  */
 @Controller
 public class QuestionsController {
@@ -43,24 +43,25 @@ public class QuestionsController {
     private IQbService qbService;
 
     @RequestMapping("/questions")
-    public String execute(@RequestParam(name = "file", required = false) MultipartFile file,
-	    @RequestParam String returnURL, @RequestParam("limitType") String limitTypeParam,
-	    @RequestParam(required = false) String importType, @RequestParam String callerID,
-	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
+    public String execute(@RequestParam String tmpFileUploadId, @RequestParam String returnURL,
+	    @RequestParam("limitType") String limitTypeParam, @RequestParam(required = false) String importType,
+	    @RequestParam String callerID, @RequestParam(required = false) Boolean collectionChoice,
+	    HttpServletRequest request) throws Exception {
 
-	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
-	File tempDir = new File(tempDirName);
-	if (!tempDir.exists()) {
-	    tempDir.mkdirs();
-	}
-
-	InputStream uploadedFileStream = null;
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	String fileName = null;
-	if (file != null) {
-	    fileName = file.getOriginalFilename().toLowerCase();
-	    uploadedFileStream = file.getInputStream();
-	}
 
+	File file = null;
+	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length > 1) {
+		errorMap.add("GLOBAL", "Uploaded more than 1 file");
+	    } else if (files.length == 1) {
+		file = files[0];
+		fileName = file.getName().toLowerCase();
+	    }
+	}
 	// this parameter is not really used at the moment
 	request.setAttribute("returnURL", returnURL);
 
@@ -69,8 +70,8 @@ public class QuestionsController {
 
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
-	
-	boolean isWordInput = "word".equals(importType); 
+
+	boolean isWordInput = "word".equals(importType);
 	request.setAttribute("importType", importType);
 
 	if (collectionChoice != null && collectionChoice) {
@@ -78,13 +79,10 @@ public class QuestionsController {
 	    request.setAttribute("collections", qbService.getUserCollections(QuestionsController.getUserId()));
 	}
 
-	// user did not choose a file, or uploaded it with a wrong file format
-	if ((uploadedFileStream == null) || !(fileName.endsWith(".zip") || fileName.endsWith(".xml")) && !isWordInput
+	// user did not choose a file
+	if (file == null || !(fileName.endsWith(".zip") || fileName.endsWith(".xml")) && !isWordInput
 		|| !fileName.endsWith(".docx") && isWordInput) {
-	    MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
-	    request.setAttribute("errorMap", errorMap);
-	    return "questions/questionFile";
 	}
 
 	Set<String> limitType = null;
@@ -94,17 +92,21 @@ public class QuestionsController {
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
 
+	InputStream uploadedFileStream = new FileInputStream(file);
+
 	Question[] questions;
 	if (fileName.endsWith(".xml")) {
 	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
-	    
+
 	} else if (fileName.endsWith(".docx")) {
 	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, fileName);
-	    
+
 	} else {
 	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
 	}
 	request.setAttribute("questions", questions);
+
+	FileUtil.deleteTmpFileUploadDir(tmpFileUploadId);
 
 	return "questions/questionChoice";
     }

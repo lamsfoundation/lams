@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.forum.web.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -77,7 +79,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Steve.Ni
@@ -362,6 +363,7 @@ public class AuthoringController {
     public String newTopic(@ModelAttribute("topicFormId") MessageForm topicFormId, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	topicFormId.setSessionMapID(sessionMapID);
+	topicFormId.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 
 	return "jsps/authoring/message/create";
     }
@@ -375,6 +377,7 @@ public class AuthoringController {
 	//validate form
 	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
 	if (!errorMap.isEmpty()) {
+	    messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/authoring/message/create";
 	}
@@ -417,11 +420,7 @@ public class AuthoringController {
 	message.setModifiedBy(forumUser);
 
 	// set attachment of this topic
-	Set<Attachment> attSet = null;
-	if (messageForm.getAttachmentFile() != null
-		&& !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-	    attSet = setupAttachmentSet(messageForm.getAttachmentFile(), message);
-	}
+	Set<Attachment> attSet = setupAttachmentSet(messageForm, message);
 	message.setAttachments(attSet);
 
 	// LDEV-4696 no longer needed - cannot edit in monitoring once a session is created.
@@ -513,6 +512,8 @@ public class AuthoringController {
 	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
 	}
 
+	topicFormId.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
+
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX, topicIndex);
 	return "jsps/authoring/message/edit";
     }
@@ -520,13 +521,16 @@ public class AuthoringController {
     /**
      * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user save
      * whole authoring page.
+     *
+     * @throws ServletException
      */
     @RequestMapping(path = "/updateTopic", method = RequestMethod.POST)
     public String updateTopic(@ModelAttribute("topicFormId") MessageForm messageForm, HttpServletRequest request)
-	    throws PersistenceException {
+	    throws PersistenceException, ServletException {
 	//validate form
 	MultiValueMap<String, String> errorMap = messageForm.validate(request, messageService);
 	if (!errorMap.isEmpty()) {
+	    messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
 	    request.setAttribute("errorMap", errorMap);
 	    return "jsps/authoring/message/edit";
 	}
@@ -553,20 +557,15 @@ public class AuthoringController {
 	    newMsg.getMessage().setBody(message.getBody());
 	    newMsg.getMessage().setUpdated(new Date());
 	    // update attachment
-	    if (messageForm.getAttachmentFile() != null
-		    && !StringUtils.isEmpty(messageForm.getAttachmentFile().getOriginalFilename())) {
-		Attachment att = forumService.uploadAttachment(messageForm.getAttachmentFile());
-		Set attSet = setupAttachmentSet(messageForm.getAttachmentFile(), newMsg.getMessage());
-		newMsg.setHasAttachment(true);
-		newMsg.getMessage().setAttachments(attSet);
-	    } else if (!messageForm.isHasAttachment()) {
-		Set att = newMsg.getMessage().getAttachments();
-		if (att != null && att.size() > 0) {
+	    if (!messageForm.isHasAttachment()) {
+		Set oldAttachments = newMsg.getMessage().getAttachments();
+		if (oldAttachments != null && oldAttachments.size() > 0) {
 		    List delTopicAtt = getTopicDeletedAttachmentList(sessionMap);
-		    delTopicAtt.add(att.iterator().next());
+		    delTopicAtt.add(oldAttachments.iterator().next());
 		}
-		newMsg.setHasAttachment(false);
-		newMsg.getMessage().setAttachments(null);
+		Set attSet = setupAttachmentSet(messageForm, newMsg.getMessage());
+		newMsg.getMessage().setAttachments(attSet);
+		newMsg.setHasAttachment(!attSet.isEmpty());
 	    }
 	}
 
@@ -575,11 +574,27 @@ public class AuthoringController {
     }
 
     /* only allow one attachment, so replace whatever */
-    private Set<Attachment> setupAttachmentSet(MultipartFile attachmentFile, Message msg) {
-	Attachment att = forumService.uploadAttachment(attachmentFile);
+    private Set<Attachment> setupAttachmentSet(MessageForm messageForm, Message msg) throws ServletException {
 	Set<Attachment> attSet = new HashSet<>();
-	attSet.add(att);
-	att.setMessage(msg);
+
+	File uploadDir = FileUtil.getTmpFileUploadDir(messageForm.getTmpFileUploadId());
+	if (uploadDir.canRead()) {
+	    File[] files = uploadDir.listFiles();
+	    if (files.length > 1) {
+		throw new ServletException("Uploaded more than 1 file");
+	    }
+
+	    if (files.length == 1) {
+
+		File file = files[0];
+		Attachment att = forumService.uploadAttachment(file);
+		attSet.add(att);
+		att.setMessage(msg);
+
+		FileUtil.deleteTmpFileUploadDir(messageForm.getTmpFileUploadId());
+	    }
+	}
+
 	return attSet;
     }
 
@@ -589,6 +604,7 @@ public class AuthoringController {
     @RequestMapping(path = "/deleteAttachment", method = RequestMethod.POST)
     public String deleteAttachment(HttpServletRequest request) {
 	request.setAttribute("itemAttachment", null);
+	request.setAttribute("tmpFileUploadId", FileUtil.generateTmpFileUploadId());
 	return "jsps/authoring/parts/msgattachment";
     }
 

@@ -274,6 +274,7 @@
   		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
 		
 		<!-- 
 			<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
@@ -286,7 +287,6 @@
 			
 			<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
 			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
-			<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
 		-->
 	</target>
 	
@@ -821,7 +821,6 @@
 				<include name=".jbossclirc"/>
 				<include name="add*"/>
 				<include name="appclient*"/>
-				<include name="jboss-cli*"/>
 				<include name="jconsole*"/>
 				<include name="jdr*"/>
 				<include name="domain*"/>

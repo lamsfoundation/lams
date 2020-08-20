@@ -8,7 +8,6 @@ INSERT INTO lams_learning_activity
 , learning_library_id
 , create_date_time
 , tool_id
-, activity_category_id
 , library_activity_ui_image
 , language_file
 )
@@ -22,7 +21,6 @@ VALUES
 , ${learning_library_id}
 , NOW()
 , ${tool_id}
-, 2
 , 'tool/lascrb11/images/icon_scribe.svg'
 , 'org.lamsfoundation.lams.tool.scribe.ApplicationResources'
 )

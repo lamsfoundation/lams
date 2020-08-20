@@ -6,6 +6,8 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<lams:css suffix="jquery.jRating"/>
+	
 	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 	<style>
 		tr.selected-by-groups td {
@@ -21,7 +23,7 @@
 	</style>
 	
 	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 
@@ -39,6 +41,28 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
+	
+		
+	<script type="text/javascript">
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
+		
+		//vars for rating.js
+		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		COMMENTS_MIN_WORDS_LIMIT = 0,
+		MAX_RATES = 0,
+		MIN_RATES = 0,
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = true,
+		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+		ALLOW_RERATE = false,
+		SESSION_ID = ${toolSessionID};
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("time.timeago").timeago();
@@ -79,6 +103,15 @@
 			disableButtons();
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
+		}
+		
+		function refreshToRating(questionUid) {
+			// LDEV-5052 Refresh page and scroll to the given ID on comment submit
+
+			// setting href does not navigate if url contains #, we still need a reload
+			location.hash = '#rating-table-' + questionUid;
+			location.reload();
+			return false;
 		}
     </script>
 </lams:head>

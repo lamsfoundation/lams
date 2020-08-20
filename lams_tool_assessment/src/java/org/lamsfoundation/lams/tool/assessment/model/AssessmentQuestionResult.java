@@ -38,6 +38,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
@@ -73,6 +74,9 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 
     @Column(name = "confidence_level")
     private int confidenceLevel;
+
+    @Column
+    private String justification;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "result_uid")
@@ -183,6 +187,18 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
 
     public void setConfidenceLevel(int confidenceLevel) {
 	this.confidenceLevel = confidenceLevel;
+    }
+
+    public String getJustification() {
+	return justification;
+    }
+
+    public void setJustification(String justification) {
+	this.justification = justification;
+    }
+
+    public String getJustificationEscaped() {
+	return justification == null ? null : StringEscapeUtils.escapeJavaScript(justification.replace("\r\n", "<br>"));
     }
 
     public AssessmentUser getUser() {
