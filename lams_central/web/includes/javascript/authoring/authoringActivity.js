@@ -721,49 +721,81 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
-		// calculate middle points of each activity
-		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity);
+		this.items = paper.g();
 		
-		// create transition SVG elements
-		var arrowShaft = paper.path(Snap.format('M {startX} {startY} L {endX} {endY}', points))
-				              .attr({
-						          	 'stroke'       : layout.colors.transition,
-						        	 'stroke-width' : 2
-				              	  }),
-			// draw the arrow and turn it in the same direction as the line
-			angle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI,
-			arrowPath = paper.path(Snap.format('M {middleX} {middleY} l 10 15 a 25 25 0 0 0 -20 0 z', points))
-						     .transform(Snap.format('R {angle} {points.middleX} {points.middleY}',
-						    		                {
-						    	 					 'angle' : angle,
-						    	 					 'points' : points
-						    	 					})
-						    	 	   )
-						     .attr({
-								'stroke' : layout.colors.transition,
-								'fill'   : layout.colors.transition
-							 });
-		this.items = paper.g(arrowShaft, arrowPath);
-		this.items.attr('uiid', this.uiid);
-		if (this.title) {
-			// adjust X & Y depending on the angle, so the label does not overlap with the transition;
-			// angle in Javascript is -90 <= a <= 270
-			var label = paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
-					   			   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
-					   			   this.title)
-					   	     .attr(layout.defaultTextAttributes)
-					   	     .attr('text-anchor', 'start');
+		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
+			curve = layout.transition.curve,
+			threshold = 2 * curve + 2;
+		
+		if (points) {
+			var path = Snap.format('M {startX} {startY}', points),	
+				horizontalDelta = points.endX - points.startX,
+				verticalDelta = points.endY - points.startY;
 			
-			this.items.append(label);
-		}
+			// if activities are too close for curves, draw a straight line instead of bezier
+			if (Math.abs(horizontalDelta) < threshold || Math.abs(verticalDelta) < threshold) {
+				path += Snap.format(' L {endX} {endY}', points);
+			} else {
+				// detect if it is left/right or up/down
+				var horizontalModifier = points.endX > points.startX ? 1 : -1,
+					verticalModifier = points.endY > points.startY ? 1 : -1;
+					
+				switch (points.direction) {
+					case 'vertical' :
+						
+						// go to almost the middle of the activities
+						path += ' V ' + (points.middleY - verticalModifier * curve);
+						// first curve
+						path += ' q 0 ' + verticalModifier * curve + ' ';
+						path += horizontalModifier * curve + ' ' + verticalModifier * curve;
+						// straight long line
+						path += ' l ' + (points.endX - points.startX - 2 * horizontalModifier * curve) + ' 0';
+						// second curve
+						path += ' q ' + horizontalModifier * curve + ' 0 ' + horizontalModifier * curve + ' ' + verticalModifier * curve;
+						
+						break;
+					case 'horizontal' : 
+						
+						path += ' H ' + (points.middleX - horizontalModifier * curve);
+						path += ' q ' + horizontalModifier * curve + ' 0 ';
+						path += horizontalModifier * curve + ' ' + verticalModifier * curve;
+						path += ' l 0 ' + (points.endY - points.startY - 2 * verticalModifier * curve);
+						path += ' q 0 ' + verticalModifier * curve + ' ' + horizontalModifier * curve + ' ' + verticalModifier * curve;
+						
+						break;
+					}
 
-		GeneralLib.toBack(this.items);
-		
-		// region annotations could cover grouping effect
-		$.each(layout.regions, function(){
+					// finish the path
+					path += Snap.format(' L {endX} {endY}', points);
+				}
+
+			var arrowShaft = paper.path(path).attr({
+				 'fill'         : 'none',
+	          	 'stroke'       : layout.colors.transition,
+	        	 'stroke-width' : 2
+         	  });
+			this.items.append(arrowShaft);
+			
+			this.items.attr('uiid', this.uiid);
+			if (this.title) {
+				// adjust X & Y, so the label does not overlap with the transition;
+//				var label = paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
+//						   			   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
+//						   			   this.title)
+//						   	     .attr(layout.defaultTextAttributes)
+//						   	     .attr('text-anchor', 'start');
+//				
+//				this.items.append(label);
+			}
+	
 			GeneralLib.toBack(this.items);
-		});
-
+			
+			// region annotations could cover grouping effect
+			$.each(layout.regions, function(){
+				GeneralLib.toBack(this.items);
+			});
+		}
+		
 		this.items.data('parentObject', this);
 		
 		if (!isReadOnlyMode){
@@ -1326,32 +1358,55 @@ ActivityLib = {
 	findTransitionPoints : function(fromActivity, toActivity) {
 		var fromActivityBox = fromActivity.items.shape.getBBox(),
 			toActivityBox = toActivity.items.shape.getBBox(),
-			
-			// find points in the middle of each activity
-			points = {
-				'startX'  : fromActivityBox.x + fromActivityBox.width / 2,
-				'startY'  : fromActivityBox.y + fromActivityBox.height / 2,
-				'endX'    : toActivityBox.x + toActivityBox.width / 2,
-				'endY'    : toActivityBox.y + toActivityBox.height / 2
-			},
-
-			// find intersection points of the temporary transition
-			tempTransitionPath = Snap.format('M {startX} {startY} L {endX} {endY}', points),
-			fromIntersect = Snap.path.intersection(tempTransitionPath, fromActivity.items.shape.attr('path')),
-			toIntersect = Snap.path.intersection(tempTransitionPath, toActivity.items.shape.attr('path'));
+			horizontalDelta = Math.abs(fromActivityBox.cx - toActivityBox.cx),
+			verticalDelta = Math.abs(fromActivityBox.cy - toActivityBox.cy),
+			// if the box is more up/down then left/right, then arrow direction is vertical
+			direction = horizontalDelta > verticalDelta ? 'horizontal' : 'vertical',
+			points = null;
+		if (direction === 'vertical') {
+			if (fromActivityBox.cy < toActivityBox.cy) {
+				// down
+				points = {
+						'startX'  : fromActivityBox.x + fromActivityBox.width / 2,
+						'startY'  : fromActivityBox.y2,
+						'endX'    : toActivityBox.x + toActivityBox.width / 2,
+						'endY'    : toActivityBox.y
+					};
+			} else {
+				// up
+				points = {
+						'startX'  : fromActivityBox.x + fromActivityBox.width / 2,
+						'startY'  : fromActivityBox.y,
+						'endX'    : toActivityBox.x + toActivityBox.width / 2,
+						'endY'    : toActivityBox.y2
+					};
+			}
+		} else {
+			if (fromActivityBox.cx < toActivityBox.cx) {
+				// right
+				points = {
+						'startX'  : fromActivityBox.x2,
+						'startY'  : fromActivityBox.y + fromActivityBox.height / 2,
+						'endX'    : toActivityBox.x,
+						'endY'    : toActivityBox.y + toActivityBox.height / 2
+					};
+			} else {
+				// left
+				points = {
+						'startX'  : fromActivityBox.x,
+						'startY'  : fromActivityBox.y + fromActivityBox.height / 2,
+						'endX'    : toActivityBox.x2,
+						'endY'    : toActivityBox.y + toActivityBox.height / 2
+					};
+			}
+		}
 		
-		// find points on borders of activities, if they exist
-		if (fromIntersect.length > 0) {
-			points.startX = fromIntersect[0].x;
-			points.startY = fromIntersect[0].y;
+		if (points) {
+			points.direction = direction;
+			// middle point of the transition
+			points.middleX = points.startX + (points.endX - points.startX)/2;
+			points.middleY = points.startY + (points.endY - points.startY)/2;
 		}
-		if (toIntersect.length > 0) {
-			points.endX = toIntersect[0].x;
-			points.endY = toIntersect[0].y;
-		}
-		// middle point of the transition
-		points.middleX = points.startX + (points.endX - points.startX)/2;
-		points.middleY = points.startY + (points.endY - points.startY)/2;
 		
 		return points;
 	},
