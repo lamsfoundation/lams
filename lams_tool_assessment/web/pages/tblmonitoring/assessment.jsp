@@ -44,21 +44,15 @@
 					discloseAllGroupsEnabled = true;
 				}
 				
-				button.one('click', function() {		
-					$.ajax({
-						'url'  : '<lams:WebAppURL />monitoring/' 
-								  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
-								  + '.do',
-						'type': 'POST',
-						'data' : {
-							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
-							'toolContentID' : $('#selected-content-id').val(),
-							'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
-						}
-					}).done(function(){
-						// disable the button after click
-						disabledAndCheckButton(button);
-					});
+				
+				
+				button.click(function(event) {	
+					if (!confirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
+												: "<fmt:message key='message.disclose.groups.answers' />")) {
+						return;
+					}
+					
+					discloseAnswers(button);
 				});
 			});
 
@@ -66,8 +60,13 @@
 			// and disable if not
 			var allCorrectButton = $('.disclose-all-correct-button', assessmentPane);
 			if (discloseAllCorrectEnabled) {
-				allCorrectButton.one('click', function(){
-					$('.disclose-correct-button', assessmentPane).not('[disabled]').click();
+				allCorrectButton.click(function(){
+					if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+						return;
+					}
+					$('.disclose-correct-button', assessmentPane).not('[disabled]').each(function() {
+						discloseAnswers($(this));
+					});
 					disabledAndCheckButton(allCorrectButton);
 				});
 			} else {
@@ -76,8 +75,13 @@
 
 			var allGroupsButton = $('.disclose-all-groups-button', assessmentPane);
 			if (discloseAllGroupsEnabled) {
-				allGroupsButton.one('click', function(){
-					$('.disclose-groups-button', assessmentPane).not('[disabled]').click();
+				allGroupsButton.click(function(){
+					if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+						return;
+					}
+					$('.disclose-groups-button', assessmentPane).not('[disabled]').each(function() {
+						discloseAnswers($(this));
+					});
 					disabledAndCheckButton(allGroupsButton);
 				});
 			} else {
@@ -85,6 +89,25 @@
 			}
 		});
 	});
+	
+	function discloseAnswers(button) {
+		let isCorrectButton = button.hasClass('disclose-correct-button');
+		
+		$.ajax({
+			'url'  : '<lams:WebAppURL />monitoring/' 
+					  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
+					  + '.do',
+			'type': 'POST',
+			'data' : {
+				'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
+				'toolContentID' : $('#selected-content-id').val(),
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			}
+		}).done(function(){
+			// disable the button after click
+			disabledAndCheckButton(button);
+		});
+	}
 
 	function disabledAndCheckButton(button){
 		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
