@@ -212,6 +212,10 @@
 
 		// ajax calls to disclose correct/groups answers
 	    correctButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
@@ -226,6 +230,10 @@
 		});
 
 	    groupsButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
@@ -240,6 +248,10 @@
 		});
 
 	    correctAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[correctDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
@@ -261,6 +273,10 @@
 		});
 
 	    groupsAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[groupsDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
