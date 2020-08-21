@@ -125,6 +125,11 @@ var paper = null,
 			'text-anchor' : 'middle',
 			'font-size'   : 10,
 			'font-family' : 'sans-serif'
+		},
+		
+		'transition' : {
+			// the bigger this number, the larger bezier curves will be
+			'curve' : 15
 		}
 },
 
