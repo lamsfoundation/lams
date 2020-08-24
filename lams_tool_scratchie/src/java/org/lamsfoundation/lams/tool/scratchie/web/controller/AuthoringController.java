@@ -65,6 +65,8 @@ import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -205,6 +207,10 @@ public class AuthoringController {
 	}
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
+
+	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	sessionMap.put(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
 	return "pages/authoring/start";
     }
 
