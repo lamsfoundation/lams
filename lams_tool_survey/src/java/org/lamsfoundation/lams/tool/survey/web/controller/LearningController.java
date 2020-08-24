@@ -233,14 +233,15 @@ public class LearningController {
     }
 
     @RequestMapping(value = "/nextQuestion")
-    private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
-	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
+    private String nextQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	getAnswer(request, surveyItemMap.get(questionSeqID), errorMap);
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
@@ -276,14 +277,16 @@ public class LearningController {
     }
 
     @RequestMapping(value = "/previousQuestion")
-    private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm,
-	    MultiValueMap<String, String> errorMap, HttpServletRequest request) {
+    private String previousQuestion(@ModelAttribute("surveyForm") AnswerForm surveyForm, HttpServletRequest request) {
 	Integer questionSeqID = surveyForm.getQuestionSeqID();
 	String sessionMapID = surveyForm.getSessionMapID();
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
+
+	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
+	getAnswer(request, surveyItemMap.get(questionSeqID), errorMap);
 
 	if (!errorMap.isEmpty()) {
 	    request.setAttribute("errorMap", errorMap);
