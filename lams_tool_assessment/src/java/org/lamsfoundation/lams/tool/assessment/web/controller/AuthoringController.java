@@ -191,6 +191,10 @@ public class AuthoringController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED, isAssessmentAttempted && mode.isTeacher());
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
+
+	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	sessionMap.put(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
 	return "pages/authoring/start";
     }
 
