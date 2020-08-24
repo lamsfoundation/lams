@@ -64,12 +64,14 @@
 		</label>
 	</div>
 	
-	<div class="checkbox">
-		<label for="question-etherpad-enabled">
-			<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
-			<fmt:message key="label.authoring.advanced.question.etherpad" />
-		</label>
-	</div>
+	<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
+		<div class="checkbox">
+			<label for="question-etherpad-enabled">
+				<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
+				<fmt:message key="label.authoring.advanced.question.etherpad" />
+			</label>
+		</div>
+	</c:if>
 	
 	<div class="checkbox">
 		<label for="shuffle-items">
