@@ -716,12 +716,10 @@ ActivityDraw = {
 	 * Draws a Transition
 	 */
 	transition : function() {
-		var existingItems = this.items;
-		this.items = paper.g();
-		if (existingItems) {
-			this.items.shape = existingItems.shape;
+		if (this.items) {
+			this.items.remove();
 		}
-		
+		this.items = paper.g();
 		
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
 			curve = layout.transition.curve,
@@ -769,19 +767,13 @@ ActivityDraw = {
 				path += Snap.format(' L {endX} {endY}', points);
 			}
 			
-			if (this.items.shape) {
-				this.items.shape.path = path;
-			} else {
-				this.items.shape = paper.path(path).attr({
-					 'fill'         : 'none',
-		          	 'stroke'       : layout.colors.transition,
-		        	 'stroke-width' : 2
-	         	  });
-				this.items.append(this.items.shape);
-			}
+			this.items.shape = paper.path(path).attr({
+				 'fill'         : 'none',
+	          	 'stroke'       : layout.colors.transition,
+	        	 'stroke-width' : 2
+         	  });
+			this.items.append(this.items.shape);
 
-			
-			
 			this.items.attr('uiid', this.uiid);
 			if (this.title) {
 				// adjust X & Y, so the label does not overlap with the transition;
@@ -1369,6 +1361,7 @@ ActivityLib = {
 			// if the box is more up/down then left/right, then arrow direction is vertical
 			direction = horizontalDelta > verticalDelta ? 'horizontal' : 'vertical',
 			points = null;
+
 		if (direction === 'vertical') {
 			if (fromActivityBox.cy < toActivityBox.cy) {
 				// down
