@@ -716,12 +716,12 @@ ActivityDraw = {
 	 * Draws a Transition
 	 */
 	transition : function() {
-		// clear previous canvas elements
-		if (this.items) {
-			this.items.remove();
+		var existingItems = this.items;
+		this.items = paper.g();
+		if (existingItems) {
+			this.items.shape = existingItems.shape;
 		}
 		
-		this.items = paper.g();
 		
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
 			curve = layout.transition.curve,
@@ -765,16 +765,22 @@ ActivityDraw = {
 						break;
 					}
 
-					// finish the path
-					path += Snap.format(' L {endX} {endY}', points);
-				}
+				// finish the path
+				path += Snap.format(' L {endX} {endY}', points);
+			}
+			
+			if (this.items.shape) {
+				this.items.shape.path = path;
+			} else {
+				this.items.shape = paper.path(path).attr({
+					 'fill'         : 'none',
+		          	 'stroke'       : layout.colors.transition,
+		        	 'stroke-width' : 2
+	         	  });
+				this.items.append(this.items.shape);
+			}
 
-			var arrowShaft = paper.path(path).attr({
-				 'fill'         : 'none',
-	          	 'stroke'       : layout.colors.transition,
-	        	 'stroke-width' : 2
-         	  });
-			this.items.append(arrowShaft);
+			
 			
 			this.items.attr('uiid', this.uiid);
 			if (this.title) {
