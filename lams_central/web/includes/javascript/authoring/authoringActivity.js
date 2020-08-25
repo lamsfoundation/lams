@@ -1350,10 +1350,11 @@ ActivityLib = {
 	findTransitionPoints : function(fromActivity, toActivity) {
 		var fromActivityBox = fromActivity.items.getBBox(),
 			toActivityBox = toActivity.items.getBBox(),
-			horizontalDelta = Math.abs(fromActivityBox.cx - toActivityBox.cx),
-			verticalDelta = Math.abs(fromActivityBox.cy - toActivityBox.cy),
-			// if the box is more up/down then left/right, then arrow direction is vertical
-			direction = horizontalDelta > verticalDelta ? 'horizontal' : 'vertical',
+			// vertical direction takes priority
+			// horizontal is used only if activities are in the same line
+			direction =    (fromActivityBox.y > toActivityBox.y && fromActivityBox.y < toActivityBox.y2) 
+					    || (fromActivityBox.y2 > toActivityBox.y && fromActivityBox.y2 < toActivityBox.y2)
+					    ? 'horizontal' : 'vertical',
 			points = null;
 
 		if (direction === 'vertical') {
