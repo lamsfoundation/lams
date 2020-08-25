@@ -372,8 +372,8 @@ ActivityDraw = {
 	branching : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 		
 		if (this.items) {
@@ -655,8 +655,8 @@ ActivityDraw = {
 	tool : function(x, y) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
-			x = this.items.shape.getBBox().x;
-			y = this.items.shape.getBBox().y;
+			x = this.items.getBBox().x;
+			y = this.items.getBBox().y;
 		}
 		
 		if (this.items) {
@@ -1356,8 +1356,8 @@ ActivityLib = {
 	 * Calculates start, middle and end points of a line between two activities. 
 	 */
 	findTransitionPoints : function(fromActivity, toActivity) {
-		var fromActivityBox = fromActivity.items.shape.getBBox(),
-			toActivityBox = toActivity.items.shape.getBBox(),
+		var fromActivityBox = fromActivity.items.getBBox(),
+			toActivityBox = toActivity.items.getBBox(),
 			horizontalDelta = Math.abs(fromActivityBox.cx - toActivityBox.cx),
 			verticalDelta = Math.abs(fromActivityBox.cy - toActivityBox.cy),
 			// if the box is more up/down then left/right, then arrow direction is vertical

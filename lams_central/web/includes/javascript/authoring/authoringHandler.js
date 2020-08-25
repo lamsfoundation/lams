@@ -204,7 +204,7 @@ var HandlerLib = {
 			object.draw();
 		} else {
 			// finialise the drop
-			var box = object.items.shape.getBBox(),
+			var box = object.items.getBBox(),
 				originalCoordinates = {
 					x : box.x,
 					// adjust this coordinate for annotation labels
