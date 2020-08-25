@@ -87,10 +87,6 @@ ActivityCategories = {
 		'Forum and Scribe' : 5
 },
 
-/*
-
- */
-
 ActivityDefs = {
 		
 	/**
@@ -246,6 +242,7 @@ ActivityDefs = {
 		if (!isReadOnlyMode){
 			this.loadPropertiesDialogContent = PropertyDefs.groupingProperties;
 		}
+		
 		this.draw = ActivityDraw.grouping;
 		this.draw(x, y);
 	},
@@ -270,6 +267,7 @@ ActivityDefs = {
 		if (!isReadOnlyMode){
 			this.loadPropertiesDialogContent = PropertyDefs.optionalActivityProperties;
 		}
+		
 		this.draw = ActivityDraw.optionalActivity;
 		this.draw(x, y);
 	},
@@ -386,6 +384,9 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
 										   {
@@ -427,6 +428,9 @@ ActivityDraw = {
 			y = this.items.getBBox().y;
 		}
 		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		
 		// either check what children are on canvas or use the priovided parameter
 		if (childActivities) {
 			this.childActivities = childActivities;
@@ -442,7 +446,7 @@ ActivityDraw = {
 				this.parentActivity = floatingActivity;
 				this.orderID = orderID;
 				var childBox = this.items.shape.getBBox();
-				this.draw(activityX, y + Math.max(layout.conf.containerActivityPadding + 10, (box.height - childBox.height)/2));
+				this.draw(activityX, y + Math.max(layout.conf.containerActivityPadding + 10, (box.height - childBox.height)/2), true);
 				childBox = this.items.shape.getBBox();
 				activityX = childBox.x2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
@@ -477,6 +481,9 @@ ActivityDraw = {
 		if (this.items) {
 			this.items.remove();
 		}
+		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
 		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z',
@@ -520,6 +527,9 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
 										   {
@@ -559,6 +569,9 @@ ActivityDraw = {
 			y = this.items.getBBox().y;
 		}
 		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		
 		// either check what children are on canvas or use the priovided parameter
 		if (childActivities) {
 			this.childActivities = childActivities;
@@ -576,7 +589,7 @@ ActivityDraw = {
 				this.orderID = orderID + 1;
 				// for some reason, this.items.getBBox() can't be used here
 				var childBox = this.items.shape.getBBox();
-				this.draw(x + Math.max(layout.conf.containerActivityPadding, (boxWidth - childBox.width)/2), activityY);
+				this.draw(x + Math.max(layout.conf.containerActivityPadding, (boxWidth - childBox.width)/2), activityY, true);
 				childBox = this.items.shape.getBBox();
 				activityY = childBox.y2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
@@ -616,6 +629,9 @@ ActivityDraw = {
 			y = this.items ? this.items.getBBox().y : 0;
 		}
 		
+		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
 			var activityY = y + layout.conf.containerActivityPadding + 10,
@@ -624,7 +640,7 @@ ActivityDraw = {
 			$.each(this.childActivities, function(orderID){
 				this.parentActivity = optionalActivity;
 				this.orderID = orderID + 1;
-				this.draw(x + layout.conf.containerActivityPadding, activityY);
+				this.draw(x + layout.conf.containerActivityPadding, activityY, true);
 				activityY = this.items.getBBox().y2 + layout.conf.containerActivityChildrenPadding;
 				allElements.push(this.items.shape);
 			});
@@ -658,7 +674,7 @@ ActivityDraw = {
 	/**
 	 * Draws a Tool activity
 	 */
-	tool : function(x, y) {
+	tool : function(x, y, skipSnapToGrid) {
 		if (x == undefined || y == undefined) {
 			// if no new coordinates are given, just redraw the activity
 			x = this.items.getBBox().x;
@@ -667,6 +683,11 @@ ActivityDraw = {
 		
 		if (this.items) {
 			this.items.remove();
+		}
+		
+		if (!skipSnapToGrid) {
+			x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
+			y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
 		}
 		
 		// create activity SVG elements
@@ -722,7 +743,7 @@ ActivityDraw = {
 		this.items = paper.g();
 		
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
-			curve = layout.transition.curve,
+			curve = layout.conf.transitionCurve,
 			threshold = 2 * curve + 2;
 		
 		if (points) {
@@ -1358,8 +1379,10 @@ ActivityLib = {
 			toActivityBox = toActivity.items.getBBox(),
 			// vertical direction takes priority
 			// horizontal is used only if activities are in the same line
-			direction =    (fromActivityBox.y > toActivityBox.y && fromActivityBox.y < toActivityBox.y2) 
-					    || (fromActivityBox.y2 > toActivityBox.y && fromActivityBox.y2 < toActivityBox.y2)
+			direction =    (fromActivityBox.y >= toActivityBox.y && fromActivityBox.y <= toActivityBox.y2) 
+					    || (fromActivityBox.y2 >= toActivityBox.y && fromActivityBox.y2 <= toActivityBox.y2)
+					    || (toActivityBox.y >= fromActivityBox.y && toActivityBox.y <= fromActivityBox.y2) 
+					    || (toActivityBox.y2 >= fromActivityBox.y && toActivityBox.y2 <= fromActivityBox.y2)
 					    ? 'horizontal' : 'vertical',
 			points = null;
 
@@ -1384,6 +1407,7 @@ ActivityLib = {
 		} else {
 			if (fromActivityBox.cx < toActivityBox.cx) {
 				// right
+				
 				points = {
 						'startX'  : fromActivityBox.x2,
 						'startY'  : fromActivityBox.y + fromActivityBox.height / 2,

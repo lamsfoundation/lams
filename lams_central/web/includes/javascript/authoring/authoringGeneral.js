@@ -42,7 +42,7 @@ var paper = null,
 			}
 		},
 		
-		// graphics contants
+		// graphics constants
 		'conf' : {
 			'arrangeHorizontalSpace'           : 200,
 			'arrangeVerticalSpace'             : 100,
@@ -74,7 +74,14 @@ var paper = null,
 			'supportsDownloadAttribute'		   : typeof $('<a/>')[0].download != 'undefined',
 			
 			// will be initialised when paper gets created
-			'readOnlyFilter'				   : null
+			'readOnlyFilter'				   : null,
+			
+			// the bigger this number, the larger bezier curves will be
+			'transitionCurve' : 15,
+			
+			// snapping grid step when dragging an activity
+			'snapGridX'       : 100,
+			'snapGridY'       : 100
 		},
 		
 		'colors' : {
@@ -125,11 +132,6 @@ var paper = null,
 			'text-anchor' : 'middle',
 			'font-size'   : 10,
 			'font-family' : 'sans-serif'
-		},
-		
-		'transition' : {
-			// the bigger this number, the larger bezier curves will be
-			'curve' : 15
 		}
 },
 
@@ -1441,7 +1443,7 @@ GeneralLib = {
 					// learn where a tall Optional Activity has its end
 					// and later start drawing activities lower than in the next row
 					if (activity instanceof DecorationDefs.Container && activity.childActivities.length > 1) {
-						var activityEndY = activity.items.shape.getBBox().y2;
+						var activityEndY = activity.items.getBBox().y2;
 						if (!forceRowY || activityEndY > forceRowY) {
 							forceRowY = activityEndY;
 						}
