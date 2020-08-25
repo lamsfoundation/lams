@@ -78,14 +78,15 @@ var HandlerLib = {
 	/**
 	 * Start dragging an activity or a transition.
 	 */
-	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
+	dragItemsStartHandler : function(object, draggedElement, mouseupHandler, event, startX, startY) {
 		if (layout.drawMode || (event.originalEvent ?
 				event.originalEvent.defaultPrevented : event.defaultPrevented)){
 			return;
 		}
 		
 		// if user clicks or drags very shortly, do not take it into account 
-		var dragCancel = function(){
+		var items = object.items,
+			dragCancel = function(){
 			canvas.off('mouseup');
 			// if there is already a function waiting to be started, clear it
 			if (items.dragStarter) {
@@ -126,7 +127,7 @@ var HandlerLib = {
 			}
 			
 			canvas.mousemove(function(event) {
-				 HandlerLib.dragItemsMoveHandler(items, event, startX, startY);
+				 HandlerLib.dragItemsMoveHandler(object, event, startX, startY);
 			});
 			
 			var mouseup = function(mouseupEvent){
@@ -144,7 +145,7 @@ var HandlerLib = {
 			};
 			
 			/* The event is passed from items to canvas, so it is OK to assign it only to canvas.
-			   Ufortunately, this does not apply to the icon.
+			   Unfortunately, this does not apply to the icon.
 			   Also, if mousedown was on items and mouseup on canvas (very quick move),
 			   items will not accept mouseup until click.
 			*/
@@ -158,15 +159,20 @@ var HandlerLib = {
 	/**
 	 * Moves dragged elements on the canvas.
 	 */
-	dragItemsMoveHandler : function(items, event, startX, startY) {
+	dragItemsMoveHandler : function(object, event, startX, startY) {
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
+				
+		object.items.transform('t' + dx + ' ' + dy);
 		
-		items.transform('t' + dx + ' ' + dy);
-		
-//		if (items.groupingEffect) {
-//			GeneralLib.toBack(items.groupingEffect);
-//		}
+		if (object.transitions) {
+			$.each(object.transitions.from, function(){
+				this.draw();
+			});
+			$.each(object.transitions.to, function(){
+				this.draw();
+			});
+		}
 		
 		// highlight rubbish bin if dragged elements are over it
 		if (HandlerLib.isElemenentBinned(event)) {
@@ -387,8 +393,10 @@ HandlerActivityLib = {
 					}
 				}
 			}
+
+			var transitions = activity.transitions.from.concat(activity.transitions.to);
 			// start dragging the activity
-			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
+			HandlerLib.dragItemsStartHandler(activity, this, mouseupHandler, event, x, y, transitions);
 		}
 	},
 	
@@ -478,7 +486,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(container.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(container, this, mouseupHandler, event, x, y);
 	},
 		
 	/**
@@ -580,7 +588,7 @@ HandlerDecorationLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(label.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(label, this, mouseupHandler, event, x, y);
 	},
 	
 	
@@ -735,11 +743,13 @@ HandlerTransitionLib = {
 			activity.tempTransition.remove();
 			activity.tempTransition = null;
 		}
-		
 		var endActivity = null,
 			targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
 			endActivity = ActivityLib.getParentObject(targetElement);
+		}
+		if (endActivity == null) {
+			endActivity = ActivityLib.getParentObject(targetElement.parent());
 		}
 
 		if (endActivity && activity != endActivity) {
@@ -772,6 +782,6 @@ HandlerTransitionLib = {
 			}
 		}
 			
-		HandlerLib.dragItemsStartHandler(transition.items, this, mouseupHandler, event, x, y);
+		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x, y);
 	}
 };
