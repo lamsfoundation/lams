@@ -162,16 +162,15 @@ var HandlerLib = {
 	dragItemsMoveHandler : function(object, event, startX, startY) {
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
-				
+		
+		
+		dx = Snap.snapTo(100, dx, 50);
+		dy = Snap.snapTo(100, dy, 50);
+		
 		object.items.transform('t' + dx + ' ' + dy);
 		
 		if (object.transitions) {
-			$.each(object.transitions.from, function(){
-				this.draw();
-			});
-			$.each(object.transitions.to, function(){
-				this.draw();
-			});
+			ActivityLib.redrawTransitions(object);
 		}
 		
 		// highlight rubbish bin if dragged elements are over it
