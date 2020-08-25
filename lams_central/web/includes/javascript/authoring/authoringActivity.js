@@ -685,27 +685,26 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
-										   {
-											'x' : x,
-											'y' : y
-										   }))
+		var shape = paper.rect(x, y, 125, 50, 5, 5)
 						 // activity colour depends on its category ID
 						 .attr({
 							'stroke' : this.requireGrouping ?
 									   layout.colors.activityRequireGrouping 
 									   : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
-							'stroke-width' : this.requireGrouping ? '3' : '0.5',
+							'stroke-width' : this.requireGrouping ? '4' : '2',
 							'stroke-linejoin' : 'round',
-							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
+							'fill'   : '#fff' // layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),
 			// check for icon in the library
 			imageData = ActivityIcons[this.learningLibraryID],
-			icon = imageData ? paper.image(imageData, x + 47, y + 3, 30, 30) : null,
-			label = paper.text(x + 62, y + 43, ActivityLib.shortenActivityTitle(this.title))
+			icon = imageData ? paper.image(imageData, x + 5, y + 3, 20, 20) : null,
+			label = paper.text(x + 30, y + 15, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
-			 			 .attr('id', 'toolActivityTitle')
-			 			 .attr('fill', layout.colors.activityText);
+			 			 .attr({
+			 				 'id'   : 'toolActivityTitle',
+			 				 'fill' : layout.colors.activityText,
+			 				 'text-anchor' : 'start'
+			 			 });
 		
 		this.items = paper.g(shape, label);
 		if (icon) {
@@ -928,10 +927,11 @@ ActivityLib = {
 					activityBox.x + layout.conf.groupingEffectPadding,
 					activityBox.y + layout.conf.groupingEffectPadding,
 					activityBox.width,
-					activityBox.height)
+					activityBox.height,
+					5, 5)
 				.attr({
 					'stroke' : activityBorderColor,
-				    'stroke-width' : '0.5',
+				    'stroke-width' : '2',
 					'fill' : shape.attr('fill')
 				});
 			
@@ -1369,8 +1369,8 @@ ActivityLib = {
 	 * Calculates start, middle and end points of a line between two activities. 
 	 */
 	findTransitionPoints : function(fromActivity, toActivity) {
-		var fromActivityBox = fromActivity.items.getBBox(),
-			toActivityBox = toActivity.items.getBBox(),
+		var fromActivityBox = fromActivity.items.shape.getBBox(),
+			toActivityBox = toActivity.items.shape.getBBox(),
 			// vertical direction takes priority
 			// horizontal is used only if activities are in the same line
 			direction =    (fromActivityBox.y >= toActivityBox.y && fromActivityBox.y <= toActivityBox.y2) 
