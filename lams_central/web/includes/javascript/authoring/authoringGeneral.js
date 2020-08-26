@@ -76,6 +76,11 @@ var paper = null,
 			// will be initialised when paper gets created
 			'readOnlyFilter'				   : null,
 			
+			'activityWidth'					   : 200,
+			'activityHeight'				   : 80,
+			'activityBorderCurve'			   : 5,
+			'activityBannerWidth'			   : 10,
+			
 			// the bigger this number, the larger bezier curves will be
 			'transitionCurve' : 15,
 			'transitionCircleRadius' : 5,
@@ -83,7 +88,7 @@ var paper = null,
 			
 			// snapping grid step when dragging an activity
 			'snapGridX'       : 100,
-			'snapGridY'       : 100
+			'snapGridY'       : 150
 		},
 		
 		'colors' : {
@@ -132,7 +137,7 @@ var paper = null,
 	
 		'defaultTextAttributes' : {
 			'text-anchor' : 'middle',
-			'font-size'   : 10,
+			'font-size'   : 12,
 			'font-family' : 'sans-serif'
 		}
 },
