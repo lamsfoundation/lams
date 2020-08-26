@@ -78,6 +78,8 @@ var paper = null,
 			
 			// the bigger this number, the larger bezier curves will be
 			'transitionCurve' : 15,
+			'transitionCircleRadius' : 5,
+			'transitionArrowLength'  : 5,
 			
 			// snapping grid step when dragging an activity
 			'snapGridX'       : 100,
