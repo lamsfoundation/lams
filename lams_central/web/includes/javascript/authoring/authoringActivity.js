@@ -685,20 +685,33 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		var shape = paper.rect(x, y, 125, 50, 5, 5)
+		var curve = layout.conf.activityBorderCurve,
+			width = layout.conf.activityWidth,
+			height = layout.conf.activityHeight,
+			bannerWidth = layout.conf.activityBannerWidth,
+			bannerPath = 'M ' + (x + curve) + ' ' + (y + height) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve + 
+						 ' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
+			shapePath = bannerPath + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
+						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + ' z',
+			shape = paper.path(shapePath)
 						 // activity colour depends on its category ID
 						 .attr({
-							'stroke' : this.requireGrouping ?
-									   layout.colors.activityRequireGrouping 
-									   : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
-							'stroke-width' : this.requireGrouping ? '4' : '2',
-							'stroke-linejoin' : 'round',
-							'fill'   : '#fff' // layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
+							'stroke' : 'none',
+							'fill'   : '#fff'
 						 }),
+			shapeBorder = paper.path(shapePath)
+							 // activity colour depends on its category ID
+							 .attr({
+								'stroke' : this.requireGrouping
+										   ? layout.colors.activityRequireGrouping 
+										   : '#000',
+								'stroke-width' : this.requireGrouping ? 3 : 1,
+								'fill'     : 'none'
+							 }),
 			// check for icon in the library
-			imageData = ActivityIcons[this.learningLibraryID],
+			imageData = null, // ActivityIcons[this.learningLibraryID],
 			icon = imageData ? paper.image(imageData, x + 5, y + 3, 20, 20) : null,
-			label = paper.text(x + 30, y + 15, ActivityLib.shortenActivityTitle(this.title))
+			label = paper.text(x + 30, y + 18, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr({
 			 				 'id'   : 'toolActivityTitle',
@@ -706,7 +719,14 @@ ActivityDraw = {
 			 				 'text-anchor' : 'start'
 			 			 });
 		
-		this.items = paper.g(shape, label);
+		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
+		var banner = paper.path(bannerPath)
+						  .attr({
+							  'stroke' : 'none',
+							  'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
+						  });
+		this.items = paper.g(shape, banner, shapeBorder, label);
+		
 		if (icon) {
 			this.items.add(icon);
 		}
