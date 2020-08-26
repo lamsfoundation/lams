@@ -1375,8 +1375,8 @@ ActivityLib = {
 	 * Calculates start, middle and end points of a line between two activities. 
 	 */
 	findTransitionPoints : function(fromActivity, toActivity) {
-		var fromActivityBox = fromActivity.items.shape.getBBox(),
-			toActivityBox = toActivity.items.shape.getBBox(),
+		var fromActivityBox = fromActivity.items.getBBox(),
+			toActivityBox = toActivity.items.getBBox(),
 			// vertical direction takes priority
 			// horizontal is used only if activities are in the same line
 			direction =    (fromActivityBox.y >= toActivityBox.y && fromActivityBox.y <= toActivityBox.y2) 
@@ -1390,7 +1390,7 @@ ActivityLib = {
 			if (fromActivityBox.cy < toActivityBox.cy) {
 				// down
 				points = {
-						'startX'  : fromActivityBox.x + fromActivityBox.width / 2,
+						'startX'  : fromActivityBox.x + fromActivityBox.width / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'startY'  : fromActivityBox.y2,
 						'endX'    : toActivityBox.x + toActivityBox.width / 2,
 						'endY'    : toActivityBox.y
@@ -1400,17 +1400,16 @@ ActivityLib = {
 				points = {
 						'startX'  : fromActivityBox.x + fromActivityBox.width / 2,
 						'startY'  : fromActivityBox.y,
-						'endX'    : toActivityBox.x + toActivityBox.width / 2,
+						'endX'    : toActivityBox.x + toActivityBox.width / 2  - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endY'    : toActivityBox.y2
 					};
 			}
 		} else {
 			if (fromActivityBox.cx < toActivityBox.cx) {
 				// right
-				
 				points = {
 						'startX'  : fromActivityBox.x2,
-						'startY'  : fromActivityBox.y + fromActivityBox.height / 2,
+						'startY'  : fromActivityBox.y + fromActivityBox.height / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endX'    : toActivityBox.x,
 						'endY'    : toActivityBox.y + toActivityBox.height / 2
 					};
@@ -1420,7 +1419,7 @@ ActivityLib = {
 						'startX'  : fromActivityBox.x,
 						'startY'  : fromActivityBox.y + fromActivityBox.height / 2,
 						'endX'    : toActivityBox.x2,
-						'endY'    : toActivityBox.y + toActivityBox.height / 2
+						'endY'    : toActivityBox.y + toActivityBox.height / 2 - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0)
 					};
 			}
 		}

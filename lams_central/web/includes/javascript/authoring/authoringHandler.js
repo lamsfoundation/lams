@@ -170,7 +170,12 @@ var HandlerLib = {
 		object.items.transform('t' + dx + ' ' + dy);
 		
 		if (object.transitions) {
-			ActivityLib.redrawTransitions(object);
+			$.each(object.transitions.from, function(){
+				this.draw();
+			});
+			$.each(object.transitions.to, function(){
+				this.draw();
+			});
 		}
 		
 		// highlight rubbish bin if dragged elements are over it
