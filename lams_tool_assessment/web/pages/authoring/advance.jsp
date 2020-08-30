@@ -115,7 +115,7 @@
 <div class="form-inline">
 	<label for="timeLimit">
 		<fmt:message key="label.authoring.advance.time.limit" />&nbsp;
-		<form:input path="assessment.timeLimit" size="3" id="timeLimit" cssClass="form-control input-sm"/>
+		<form:input path="assessment.timeLimit" type="number" min="0" max="999" size="3" id="timeLimit" cssClass="form-control input-sm"/>
 	</label>
 </div>
 

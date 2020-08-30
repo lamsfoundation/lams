@@ -29,26 +29,31 @@
 		    	selectTab(tabId);
         }
 
-        function validateQuestionBankIsNotEmpty() {
+        function validateForm() {
             //check with a teacher whether he forgot to add questions to the question bank
             var referenceCount = $("#referencesTable tr").length - 1;
 			if ((referenceCount == 0) && !confirm("<fmt:message key="label.no.questions.in.question.bank"/>")) {
 				return false;
 			}
+			
+			var timeLimit = $('#timeLimit').val();
+			if (!timeLimit) {
+				$('#timeLimit').val(0);
+			}
 
 			//serialize overallFeedbackForm
-	        	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
-	        	
-	        	//enable checkbox to allow its value been submitted
-	        	$("#display-summary").removeAttr("disabled", "disabled");
+        	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+        	
+        	//enable checkbox to allow its value been submitted
+        	$("#display-summary").removeAttr("disabled", "disabled");
 
-        		return true;
+        	return true;
         }
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
 	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" 
-			onsubmit="return validateQuestionBankIsNotEmpty();">
+			onsubmit="return validateForm();">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>
