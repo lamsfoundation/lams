@@ -740,7 +740,7 @@ ActivityDraw = {
 		var isBranching = this.fromActivity instanceof ActivityDefs.BranchingEdgeActivity || this.toActivity instanceof ActivityDefs.BranchingEdgeActivity,
 			points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
 			curve = layout.transition.curve,
-			threshold = 2 * curve + 2;
+			straightLineThreshold = 2 * curve + 2;
 		
 		if (points) {
 			var path = Snap.format('M {startX} {startY}', points),	
@@ -749,9 +749,9 @@ ActivityDraw = {
 	
 			
 			// if activities are too close for curves, draw a straight line instead of bezier
-			if (isBranching || Math.abs(horizontalDelta) < threshold || Math.abs(verticalDelta) < threshold) {
+			if (isBranching || Math.abs(horizontalDelta) < straightLineThreshold || Math.abs(verticalDelta) < straightLineThreshold) {
 				path += Snap.format(' L {endX} {endY}', points);
-				this.straightLine = true;
+				points.arrowAngle = 90 + Math.atan2(points.endY - points.startY, points.endX - points.startX) * 180 / Math.PI;
 			} else {
 				// adjust according to whether it is right/left and down/up
 				var horizontalModifier = horizontalDelta > 0 ? 1 : -1,
@@ -792,29 +792,12 @@ ActivityDraw = {
 			this.items.shape = paper.path(path).addClass('transition');
 			this.items.append(this.items.shape);
 			
-			var dot = paper.circle(points.startX, points.startY, layout.transition.dotRadius),
-				triangle = null,
-				side = layout.transition.arrowLength;
-			
-			switch (points.direction) {
-				case 'up' :
-					triangle = paper.polygon(points.endX, points.endY, points.endX + side, points.endY + 2 * side, points.endX - side, points.endY + 2 * side);
-					break;
-				case 'down' :
-					triangle = paper.polygon(points.endX, points.endY, points.endX - side, points.endY - 2 * side, points.endX + side, points.endY - 2 * side);
-					break;
-				case 'left' :
-					triangle = paper.polygon(points.endX, points.endY, points.endX + 2 * side, points.endY - side, points.endX + 2 * side, points.endY + side);
-					break;
-				case 'right' :
-					triangle = paper.polygon(points.endX, points.endY, points.endX - 2 * side, points.endY - side, points.endX - 2 * side, points.endY + side);
-					break;
-			}
-			
-			dot.addClass('transition-element');
+			var dot = paper.circle(points.startX, points.startY, layout.transition.dotRadius).addClass('transition-element'),
+				side = layout.transition.arrowLength,
+				triangle = paper.polygon(0, 0, side, 2 * side, -side, 2 * side)
+								.addClass('transition-element')
+								.transform(Snap.format('translate({endX} {endY}) rotate({arrowAngle})', points));
 			this.items.append(dot);
-			
-			triangle.addClass('transition-element');
 			this.items.append(triangle);
 		
 			
@@ -1413,7 +1396,8 @@ ActivityLib = {
 						'startY'    : fromActivityBox.y2 + layout.transition.dotRadius,
 						'endX'      : toActivityBox.x + toActivityBox.width / 2,
 						'endY'      : toActivityBox.y,
-						'direction' : 'down'
+						'direction' : 'down',
+						'arrowAngle': 180
 					};
 			} else {
 				points = {
@@ -1421,7 +1405,8 @@ ActivityLib = {
 						'startY'    : fromActivityBox.y - layout.transition.dotRadius,
 						'endX'      : toActivityBox.x + toActivityBox.width / 2  - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endY'      : toActivityBox.y2,
-						'direction' : 'up'
+						'direction' : 'up',
+						'arrowAngle': 0
 					};
 			}
 		} else {
@@ -1431,7 +1416,8 @@ ActivityLib = {
 						'startY'    : fromActivityBox.y + fromActivityBox.height / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endX'      : toActivityBox.x,
 						'endY'      : toActivityBox.y + toActivityBox.height / 2,
-						'direction' : 'right'
+						'direction' : 'right',
+						'arrowAngle': 90
 					};
 			} else {
 				// left
@@ -1440,7 +1426,8 @@ ActivityLib = {
 						'startY'    : fromActivityBox.y + fromActivityBox.height / 2,
 						'endX'      : toActivityBox.x2,
 						'endY'      : toActivityBox.y + toActivityBox.height / 2 - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
-						'direction' : 'left'
+						'direction' : 'left',
+						'arrowAngle': 270
 					};
 			}
 		}
