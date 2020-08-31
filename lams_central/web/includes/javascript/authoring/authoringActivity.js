@@ -798,26 +798,21 @@ ActivityDraw = {
 			this.items.shape = paper.path(path).addClass('transition');
 			this.items.append(this.items.shape);
 			
-			var dot = null,
-				radius = layout.transition.dotRadius,
+			var dot = paper.circle(points.startX, points.startY, layout.transition.dotRadius),
 				triangle = null,
 				side = layout.transition.arrowLength;
 			
 			switch (points.direction) {
 				case 'up' :
-					dot = paper.circle(points.startX, points.startY - radius - 1, radius);
 					triangle = paper.polygon(points.endX, points.endY, points.endX + side, points.endY + 2 * side, points.endX - side, points.endY + 2 * side);
 					break;
 				case 'down' :
-					dot = paper.circle(points.startX, points.startY + radius + 1, radius);
 					triangle = paper.polygon(points.endX, points.endY, points.endX - side, points.endY - 2 * side, points.endX + side, points.endY - 2 * side);
 					break;
 				case 'left' :
-					dot = paper.circle(points.startX - radius - 1, points.startY, radius);
 					triangle = paper.polygon(points.endX, points.endY, points.endX + 2 * side, points.endY - side, points.endX + 2 * side, points.endY + side);
 					break;
 				case 'right' :
-					dot = paper.circle(points.startX + radius + 1, points.startY, radius);
 					triangle = paper.polygon(points.endX, points.endY, points.endX - 2 * side, points.endY - side, points.endX - 2 * side, points.endY + side);
 					break;
 			}
@@ -1421,7 +1416,7 @@ ActivityLib = {
 			if (fromActivityBox.cy < toActivityBox.cy) {
 				points = {
 						'startX'    : fromActivityBox.x + fromActivityBox.width / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
-						'startY'    : fromActivityBox.y2,
+						'startY'    : fromActivityBox.y2 + layout.transition.dotRadius,
 						'endX'      : toActivityBox.x + toActivityBox.width / 2,
 						'endY'      : toActivityBox.y,
 						'direction' : 'down'
@@ -1429,7 +1424,7 @@ ActivityLib = {
 			} else {
 				points = {
 						'startX'    : fromActivityBox.x + fromActivityBox.width / 2,
-						'startY'    : fromActivityBox.y,
+						'startY'    : fromActivityBox.y - layout.transition.dotRadius,
 						'endX'      : toActivityBox.x + toActivityBox.width / 2  - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endY'      : toActivityBox.y2,
 						'direction' : 'up'
@@ -1438,7 +1433,7 @@ ActivityLib = {
 		} else {
 			if (fromActivityBox.cx < toActivityBox.cx) {
 				points = {
-						'startX'    : fromActivityBox.x2,
+						'startX'    : fromActivityBox.x2 + layout.transition.dotRadius,
 						'startY'    : fromActivityBox.y + fromActivityBox.height / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endX'      : toActivityBox.x,
 						'endY'      : toActivityBox.y + toActivityBox.height / 2,
@@ -1447,7 +1442,7 @@ ActivityLib = {
 			} else {
 				// left
 				points = {
-						'startX'    : fromActivityBox.x,
+						'startX'    : fromActivityBox.x - layout.transition.dotRadius,
 						'startY'    : fromActivityBox.y + fromActivityBox.height / 2,
 						'endX'      : toActivityBox.x2,
 						'endY'      : toActivityBox.y + toActivityBox.height / 2 - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
