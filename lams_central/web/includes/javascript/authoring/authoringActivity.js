@@ -737,7 +737,8 @@ ActivityDraw = {
 		}
 		this.items = paper.g();
 		
-		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
+		var isBranching = this.fromActivity instanceof ActivityDefs.BranchingEdgeActivity || this.toActivity instanceof ActivityDefs.BranchingEdgeActivity,
+			points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
 			curve = layout.transition.curve,
 			threshold = 2 * curve + 2;
 		
@@ -748,8 +749,9 @@ ActivityDraw = {
 	
 			
 			// if activities are too close for curves, draw a straight line instead of bezier
-			if (Math.abs(horizontalDelta) < threshold || Math.abs(verticalDelta) < threshold) {
+			if (isBranching || Math.abs(horizontalDelta) < threshold || Math.abs(verticalDelta) < threshold) {
 				path += Snap.format(' L {endX} {endY}', points);
+				this.straightLine = true;
 			} else {
 				// adjust according to whether it is right/left and down/up
 				var horizontalModifier = horizontalDelta > 0 ? 1 : -1,
