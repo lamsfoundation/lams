@@ -76,35 +76,28 @@ var paper = null,
 			// will be initialised when paper gets created
 			'readOnlyFilter'				   : null,
 			
-			'activityWidth'					   : 200,
-			'activityHeight'				   : 80,
-			'activityBorderCurve'			   : 5,
-			'activityBannerWidth'			   : 10,
-			
-			// the bigger this number, the larger bezier curves will be
-			'transitionCurve' : 15,
-			'transitionCircleRadius' : 5,
-			'transitionArrowLength'  : 5,
+
 			
 			// snapping grid step when dragging an activity
 			'snapGridX'       : 100,
 			'snapGridY'       : 150
 		},
 		
+		'activity' : {
+			'width'					   : 200,
+			'height'				   : 80,
+			'borderCurve'			   : 5,
+			'bannerWidth'			   : 10
+		},
+		
+		'transition' : {
+			'curve' : 15,
+			'dotRadius' : 3,
+			'arrowLength' : 5
+		},
+		
 		'colors' : {
 			'activityBorder'	  : 'black',
-			
-			/*
-			 * Colours depend on activity category.
-			 *  CATEGORY_SYSTEM = 1;
-			    CATEGORY_COLLABORATION = 2;
-			    CATEGORY_ASSESSMENT = 3;
-			    CATEGORY_CONTENT = 4;
-			    CATEGORY_SPLIT = 5;
-			    CATEGORY_RESPONSE = 6;
-			 */
-			'toolActivityBorder'      : ['','#00007f','#ff8300','#625F67','#ffa500','#00007f','#7aa712'],
-			'activity'     		  : ['','#caddfb','#ffffbb','#ece9f7','#fdf1d3','#caddfb','#e9f9c0'],
 			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#CCFF99',
@@ -116,10 +109,6 @@ var paper = null,
 			// when mouse hovers over rubbish bin
 			'binSelect' 		  : 'red',
 			
-			'branchingEdgeStart'  : 'green',
-			'branchingEdgeEnd'    : 'red',
-			// highlight branching edges on mouse hover
-			'branchingEdgeMatch'  : 'blue',
 			'gate'         		  : 'red',
             'gateBorder'          : '#801515',
 			'gateText'     		  : 'white',
@@ -129,9 +118,7 @@ var paper = null,
 			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
-			'transition'   		  : 'rgb(119,126,157)',
 			// highlight TBL activities which should be grouped
-			'activityRequireGrouping' : 'red',
 			'activityReadOnly'	  : 'red'
 		},
 	

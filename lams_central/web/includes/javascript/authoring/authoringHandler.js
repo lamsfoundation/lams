@@ -413,8 +413,8 @@ HandlerActivityLib = {
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+			startItems.shape.addClass('branching-match');
+			endItems.shape.addClass('branching-match');
 		}
 	},
 	
@@ -428,8 +428,8 @@ HandlerActivityLib = {
 			endItems = branchingActivity.end.items;
 		
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
-			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
+			startItems.shape.removeClass('branching-match');
+			endItems.shape.removeClass('branching-match');
 		}
 	}
 },
@@ -725,11 +725,7 @@ HandlerTransitionLib = {
 															 'endX'   : endX,
 															 'endY'   : endY
 															}))
-										  .attr({
-											  	 'stroke' : layout.colors.transition,
-									        	 'stroke-width' : 2,
-												 'stroke-dasharray' : '5,3'
-											    })
+										  .addClass('transition-draw')
 									);
 	},
 	

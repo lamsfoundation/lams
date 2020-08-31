@@ -388,11 +388,7 @@ ActivityDraw = {
 											'y' : y + 8
 										   })
 							  )
-						 .attr({
-							 'stroke' : layout.colors.activityBorder,
-							 'fill' : this.isStart ? layout.colors.branchingEdgeStart
-						                           : layout.colors.branchingEdgeEnd
-						 }),
+						 .addClass('branching-' + (this.isStart ? 'start' : 'end')),
 			title = this.branchingActivity.title,
 			label = paper.text(x + 8, y + 27,  title + ' ' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
 	                                        		 	 				   : LABELS.BRANCHING_END_SUFFIX))
@@ -685,29 +681,18 @@ ActivityDraw = {
 		}
 		
 		// create activity SVG elements
-		var curve = layout.conf.activityBorderCurve,
-			width = layout.conf.activityWidth,
-			height = layout.conf.activityHeight,
-			bannerWidth = layout.conf.activityBannerWidth,
+		var curve = layout.activity.borderCurve,
+			width = layout.activity.width,
+			height = layout.activity.height,
+			bannerWidth = layout.activity.bannerWidth,
 			bannerPath = 'M ' + (x + curve) + ' ' + (y + height) + ' q ' + -curve + ' 0 ' + -curve + ' ' + -curve + 
 						 ' v ' + (-height + 2 * curve) + ' q 0 ' + -curve + ' ' + curve + ' ' + -curve,
 			shapePath = bannerPath + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
 						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + ' z',
 			shape = paper.path(shapePath)
-						 // activity colour depends on its category ID
-						 .attr({
-							'stroke' : 'none',
-							'fill'   : '#fff'
-						 }),
+						 .addClass('tool-activity-background'),
 			shapeBorder = paper.path(shapePath)
-							 // activity colour depends on its category ID
-							 .attr({
-								'stroke' : this.requireGrouping
-										   ? layout.colors.activityRequireGrouping 
-										   : '#000',
-								'stroke-width' : this.requireGrouping ? 3 : 1,
-								'fill'     : 'none'
-							 }),
+							 .addClass('tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			// check for icon in the library
 			imageData = null, // ActivityIcons[this.learningLibraryID],
 			icon = imageData ? paper.image(imageData, x + 5, y + 3, 20, 20) : null,
@@ -721,10 +706,7 @@ ActivityDraw = {
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
 		var banner = paper.path(bannerPath)
-						  .attr({
-							  'stroke' : 'none',
-							  'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
-						  });
+						  .addClass('tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
 		this.items = paper.g(shape, banner, shapeBorder, label);
 		
 		if (icon) {
@@ -756,7 +738,7 @@ ActivityDraw = {
 		this.items = paper.g();
 		
 		var points = ActivityLib.findTransitionPoints(this.fromActivity, this.toActivity),
-			curve = layout.conf.transitionCurve,
+			curve = layout.transition.curve,
 			threshold = 2 * curve + 2;
 		
 		if (points) {
@@ -805,16 +787,13 @@ ActivityDraw = {
 				path += Snap.format(' L {endX} {endY}', points);
 			}
 			
-			this.items.shape = paper.path(path).attr({
-				 'fill'         : 'none',
-	          	 'stroke'       : layout.colors.transition
-         	  });
+			this.items.shape = paper.path(path).addClass('transition');
 			this.items.append(this.items.shape);
 			
 			var dot = null,
-				radius = layout.conf.transitionCircleRadius,
+				radius = layout.transition.dotRadius,
 				triangle = null,
-				side = layout.conf.transitionArrowLength;
+				side = layout.transition.arrowLength;
 			
 			switch (points.direction) {
 				case 'up' :
@@ -835,16 +814,10 @@ ActivityDraw = {
 					break;
 			}
 			
-			dot.attr({
-				 'fill'         : layout.colors.transition,
-	          	 'stroke'       : layout.colors.transition,
-			});
+			dot.addClass('transition-element');
 			this.items.append(dot);
 			
-			triangle.attr({
-				 'fill'         : layout.colors.transition,
-	          	 'stroke'       : layout.colors.transition,
-			});
+			triangle.addClass('transition-element');
 			this.items.append(triangle);
 		
 			
@@ -981,20 +954,15 @@ ActivityLib = {
 		// do not draw twice if it already exists
 		if (!activity.items.groupingEffect) {
 			var shape = activity.items.shape,
-				activityBox = activity.items.getBBox(),
-				activityBorderColor = layout.colors.toolActivityBorder[layout.toolMetadata[activity.learningLibraryID].activityCategoryID];
-
+				activityBox = activity.items.getBBox();
+			
 			activity.items.groupingEffect = paper.rect(
-					activityBox.x + layout.conf.groupingEffectPadding,
-					activityBox.y + layout.conf.groupingEffectPadding,
-					activityBox.width,
-					activityBox.height,
-					5, 5)
-				.attr({
-					'stroke' : activityBorderColor,
-				    'stroke-width' : '2',
-					'fill' : shape.attr('fill')
-				});
+						activityBox.x + layout.conf.groupingEffectPadding,
+						activityBox.y + layout.conf.groupingEffectPadding,
+						activityBox.width,
+						activityBox.height,
+						5, 5)
+				   .addClass('tool-activity-border');
 			
 			activity.items.prepend(activity.items.groupingEffect);
 			
