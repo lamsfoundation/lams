@@ -1372,6 +1372,12 @@ ActivityLib = {
 		
 		return nestedBranching;
 	},
+	
+	adjustTransitionPoint : function(bottomLimit, topLimit, target) {
+		// find a good point inside the grid, then make sure it is within bounds
+		return Math.max(bottomLimit + layout.transition.adjustStep, Math.min(topLimit - layout.transition.adjustStep,
+				Math.floor(target / layout.transition.adjustStep) * layout.transition.adjustStep + layout.snapToGrid.offset));
+	},
 
 	
 	/**
@@ -1392,43 +1398,47 @@ ActivityLib = {
 		if (direction === 'vertical') {
 			if (fromActivityBox.cy < toActivityBox.cy) {
 				points = {
-						'startX'    : fromActivityBox.x + fromActivityBox.width / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
+						'startX'    : ActivityLib.adjustTransitionPoint(fromActivityBox.x, fromActivityBox.x2, toActivityBox.x + toActivityBox.width / 2)
+										- (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'startY'    : fromActivityBox.y2 + layout.transition.dotRadius,
-						'endX'      : toActivityBox.x + toActivityBox.width / 2,
 						'endY'      : toActivityBox.y,
 						'direction' : 'down',
 						'arrowAngle': 180
 					};
+				points.endX = ActivityLib.adjustTransitionPoint(toActivityBox.x, toActivityBox.x2, points.startX);
 			} else {
 				points = {
-						'startX'    : fromActivityBox.x + fromActivityBox.width / 2,
+						'startX'    : ActivityLib.adjustTransitionPoint(fromActivityBox.x, fromActivityBox.x2, toActivityBox.x + toActivityBox.width / 2),
 						'startY'    : fromActivityBox.y - layout.transition.dotRadius,
-						'endX'      : toActivityBox.x + toActivityBox.width / 2  - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endY'      : toActivityBox.y2,
 						'direction' : 'up',
 						'arrowAngle': 0
 					};
+				points.endX = ActivityLib.adjustTransitionPoint(toActivityBox.x, toActivityBox.x2, points.startX) 
+								- (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0);
 			}
 		} else {
 			if (fromActivityBox.cx < toActivityBox.cx) {
 				points = {
 						'startX'    : fromActivityBox.x2 + layout.transition.dotRadius,
-						'startY'    : fromActivityBox.y + fromActivityBox.height / 2 - (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
+						'startY'    : ActivityLib.adjustTransitionPoint(fromActivityBox.y, fromActivityBox.y2, toActivityBox.y + toActivityBox.height / 2)
+										- (fromActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'endX'      : toActivityBox.x,
-						'endY'      : toActivityBox.y + toActivityBox.height / 2,
 						'direction' : 'right',
 						'arrowAngle': 90
 					};
+				points.endY = ActivityLib.adjustTransitionPoint(toActivityBox.y, toActivityBox.y2, points.startY);
 			} else {
 				// left
 				points = {
 						'startX'    : fromActivityBox.x - layout.transition.dotRadius,
-						'startY'    : fromActivityBox.y + fromActivityBox.height / 2,
+						'startY'    : ActivityLib.adjustTransitionPoint(fromActivityBox.y, fromActivityBox.y2, toActivityBox.y + toActivityBox.height / 2),
 						'endX'      : toActivityBox.x2,
-						'endY'      : toActivityBox.y + toActivityBox.height / 2 - (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0),
 						'direction' : 'left',
 						'arrowAngle': 270
 					};
+				points.endY = ActivityLib.adjustTransitionPoint(toActivityBox.y, toActivityBox.y2, points.startY) 
+								- (toActivity.items.groupingEffect ? 0.5 * layout.conf.groupingEffectPadding : 0);
 			}
 		}
 		

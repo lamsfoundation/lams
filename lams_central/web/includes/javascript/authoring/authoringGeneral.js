@@ -92,6 +92,7 @@ var paper = null,
 		},
 		
 		'transition' : {
+			'adjustStep' : 20,
 			'curve' : 15,
 			'dotRadius' : 3,
 			'arrowLength' : 5
