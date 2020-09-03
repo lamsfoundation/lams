@@ -75,12 +75,13 @@ var paper = null,
 			
 			// will be initialised when paper gets created
 			'readOnlyFilter'				   : null,
-			
-
-			
+		},
+		
+		'snapToGrid' : {
 			// snapping grid step when dragging an activity
-			'snapGridX'       : 100,
-			'snapGridY'       : 150
+			'step' : 40,
+			'padding' : 20,
+			'offset' : 10
 		},
 		
 		'activity' : {
@@ -3306,5 +3307,10 @@ GeneralLib = {
 	 */
 	 validateName : function(name) {
 		 return name && GeneralLib.nameValidator.test(name);
+	 },
+	 
+	 snapToGrid : function(input, skipPadding) {
+		 var snapped = Snap.snapTo(layout.snapToGrid.step, input, layout.snapToGrid.step / 2);
+		 return skipPadding ? snapped : (Math.max(snapped, layout.snapToGrid.padding) + layout.snapToGrid.offset);
 	 }
 };

@@ -378,8 +378,8 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
@@ -418,8 +418,8 @@ ActivityDraw = {
 			y = this.items.getBBox().y;
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		// either check what children are on canvas or use the priovided parameter
 		if (childActivities) {
@@ -472,8 +472,8 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} l-9 9 v16 l9 9 h16 l9 -9 v-16 l-9 -9 z',
@@ -517,8 +517,8 @@ ActivityDraw = {
 			this.items.remove();
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		// create activity SVG elements
 		var shape = paper.path(Snap.format('M {x} {y} h 125 v 50 h -125 z',
@@ -559,8 +559,8 @@ ActivityDraw = {
 			y = this.items.getBBox().y;
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		// either check what children are on canvas or use the priovided parameter
 		if (childActivities) {
@@ -619,8 +619,8 @@ ActivityDraw = {
 			y = this.items ? this.items.getBBox().y : 0;
 		}
 		
-		x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-		y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+		x = GeneralLib.snapToGrid(x);
+		y = GeneralLib.snapToGrid(y);
 		
 		if (this.childActivities && this.childActivities.length > 0) {
 			// draw one by one, vertically
@@ -676,8 +676,8 @@ ActivityDraw = {
 		}
 		
 		if (!skipSnapToGrid) {
-			x = Snap.snapTo(layout.conf.snapGridX, x, layout.conf.snapGridX / 2);
-			y = Snap.snapTo(layout.conf.snapGridY, y, layout.conf.snapGridY / 2);
+			x = GeneralLib.snapToGrid(x);
+			y = GeneralLib.snapToGrid(y);
 		}
 		
 		// create activity SVG elements

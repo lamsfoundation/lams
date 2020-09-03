@@ -160,13 +160,9 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(object, event, startX, startY) {
-		var dx = event.pageX - startX,
-			dy = event.pageY - startY;
-		
-		
-		dx = Snap.snapTo(100, dx, 50);
-		dy = Snap.snapTo(100, dy, 50);
-		
+		var dx = GeneralLib.snapToGrid(event.pageX - startX, true),
+			dy = GeneralLib.snapToGrid(event.pageY - startY, true);
+
 		object.items.transform('t' + dx + ' ' + dy);
 		
 		if (object.transitions) {
