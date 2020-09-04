@@ -810,14 +810,19 @@ ActivityDraw = {
 			
 			this.items.attr('uiid', this.uiid);
 			if (this.title) {
+				console.log(points.arrowAngle);
 				// adjust X & Y, so the label does not overlap with the transition;
-//				var label = paper.text(points.middleX + ((angle > -45 && angle < 45) || (angle > 135 && angle < 225) ? 20 : 0),
-//						   			   points.middleY + ((angle > 45 && angle < 135) || angle > 225 || angle < 45 ? -20 : 0),
-//						   			   this.title)
-//						   	     .attr(layout.defaultTextAttributes)
-//						   	     .attr('text-anchor', 'start');
-//				
-//				this.items.append(label);
+				var label = paper.text(points.middleX, points.middleY, this.title)
+						   	     .attr(layout.defaultTextAttributes);
+					labelBox = label.getBBox(),
+					labelBackground = paper.rect(labelBox.x, labelBox.y, labelBox.width, labelBox.height)
+										   .attr({
+											   	'stroke' : 'none',
+											   	'fill'   : 'white'
+												});
+				label = paper.g(label, labelBackground);
+				GeneralLib.toBack(labelBackground);
+				this.items.append(label);
 			}
 	
 			GeneralLib.toBack(this.items);
