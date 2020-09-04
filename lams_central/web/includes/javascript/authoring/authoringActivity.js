@@ -380,21 +380,12 @@ ActivityDraw = {
 		
 		x = GeneralLib.snapToGrid(x);
 		y = GeneralLib.snapToGrid(y);
-		
+
 		// create activity SVG elements
-		var shape = paper.path(Snap.format('M {x} {y} a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
-										   {
-											'x' : x,
-											'y' : y + 8
-										   })
-							  )
-						 .addClass('branching-' + (this.isStart ? 'start' : 'end')),
-			title = this.branchingActivity.title,
-			label = paper.text(x + 8, y + 27,  title + ' ' + (this.isStart ? LABELS.BRANCHING_START_SUFFIX
-	                                        		 	 				   : LABELS.BRANCHING_END_SUFFIX))
-	                     .attr(layout.defaultTextAttributes);
+		var shape = paper.circle(x, y, 20)
+						 .addClass('branching branching-' + (this.isStart ? 'start' : 'end'));
 		
-		this.items = paper.g(shape, label);
+		this.items = paper.g(shape);
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}
@@ -804,7 +795,6 @@ ActivityDraw = {
 			
 			this.items.attr('uiid', this.uiid);
 			if (this.title) {
-				console.log(points.arrowAngle);
 				// adjust X & Y, so the label does not overlap with the transition;
 				var label = paper.text(points.middleX, points.middleY, this.title)
 						   	     .attr(layout.defaultTextAttributes);
