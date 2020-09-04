@@ -592,18 +592,21 @@ td#canvasContainerCell {
 	fill: #e9f9c0;
 }
 
+#canvas .branching {
+	stroke-width: 3;
+	fill: white;
+}
+
 #canvas .branching-start {
-	stroke: black;
-	fill: green;
+	stroke: green;
 }
 
 #canvas .branching-end {
-	stroke: black;
-	fill: red;
+	stroke: red;
 }
 
 #canvas .branching-match {
-	fill: blue;
+	stroke: blue;
 }
 
 #canvas .transition {
