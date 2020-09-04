@@ -780,7 +780,6 @@ var PropertyDefs = {
 				// extract changed properties and redraw the transition
 				var content = $(this).closest('.dialogContents'),
 					transition = content.data('parentObject'),
-					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
 				
 				// validate and save the title
@@ -790,7 +789,6 @@ var PropertyDefs = {
 						if (transition.branch) {
 							transition.branch.title = newTitle;
 						}
-						redrawNeeded = true;
             		} else {
             			layout.infoDialog.data('show')(LABELS.TITLE_VALIDATION_ERROR);
             			$('.propertiesContentFieldTitle', content).val(transition.title);
@@ -807,13 +805,6 @@ var PropertyDefs = {
 							}
 						});
 					}
-				}
-				
-				if (redrawNeeded) {
-					ActivityLib.removeSelectEffect(activity);
-					transition.draw();
-					ActivityLib.addSelectEffect(activity, true);
-					GeneralLib.setModified(true);
 				}
 			});
 		}
