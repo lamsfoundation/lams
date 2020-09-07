@@ -1404,11 +1404,16 @@ ActivityLib = {
 		});
 	},
 	
-
+	
 	/**
 	 * Open separate window with activity authoring on double click.
 	 */
 	openActivityAuthoring : function(activity){
+		if (activity.isAuthoringOpening) {
+			return;
+		}
+		
+		activity.isAuthoringOpening = true;
 		if (activity.authorURL) {
 			var dialogID = "dialogActivity" + activity.toolContentID;
 			showDialog(dialogID, {
@@ -1445,10 +1450,11 @@ ActivityLib = {
 			}, true);
 			
 			GeneralLib.setModified(true);
+			activity.isAuthoringOpening = false;
 			return;
 		}
 		
-		// if there is not authoring URL, fetch it for a Tool Activity
+		// if there is no authoring URL, fetch it for a Tool Activity
 		if (activity.toolID) {
 			$.ajax({
 				async : true,
@@ -1472,11 +1478,17 @@ ActivityLib = {
 							layout.ld.contentFolderID = response.contentFolderID;
 						}
 						
+						activity.isAuthoringOpening = false;
 						// this time open it properly
 						ActivityLib.openActivityAuthoring(activity);
 					}
+				},
+				complete : function(){
+					activity.isAuthoringOpening = false;
 				}
 			});
+		} else {
+			activity.isAuthoringOpening = false;
 		}
 	},
 	
