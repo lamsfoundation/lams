@@ -62,7 +62,7 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     @Column(name = "ext_groups_url")
     private String extGroupsUrl;
-    
+
     @Column(name = "membership_url")
     private String membershipUrl;
 
@@ -118,12 +118,13 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
      */
     @Column(name = "lti_consumer_monitor_roles")
     private String ltiToolConsumerMonitorRoles;
-    
-    @Column(name = "use_alternative_user_id_parameter_name")
-    private Boolean useAlternativeUseridParameterName;
+
+    @Column(name = "user_id_parameter_name")
+    private String userIdParameterName;
 
     public ExtServer() {
 	timeToLiveLoginRequest = 80;
+	userIdParameterName = "user_id";
     }
 
     public Integer getSid() {
@@ -213,7 +214,7 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     public void setExtGroupsUrl(String extGroupsUrl) {
 	this.extGroupsUrl = extGroupsUrl;
     }
-    
+
     public String getMembershipUrl() {
 	return this.membershipUrl;
     }
@@ -347,12 +348,12 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     public void setGradebookOnComplete(Boolean gradebookOnComplete) {
 	this.gradebookOnComplete = gradebookOnComplete;
     }
-    
-    public Boolean getUseAlternativeUseridParameterName() {
-	return useAlternativeUseridParameterName;
+
+    public String getUserIdParameterName() {
+	return userIdParameterName;
     }
 
-    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
-	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
+    public void setUserIdParameterName(String userIdParameterName) {
+	this.userIdParameterName = userIdParameterName;
     }
 }
