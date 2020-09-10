@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -88,12 +87,9 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	//get user id as "user_id" parameter, or as lis_person_sourcedid (if according option is ON for this LTI server)
-	String lisPersonSourcedid = request.getParameter(BasicLTIConstants.LIS_PERSON_SOURCEDID);
-	String extUsername = extServer.getUseAlternativeUseridParameterName()
-		&& StringUtils.isNotBlank(lisPersonSourcedid) ? lisPersonSourcedid
-			: request.getParameter(BasicLTIConstants.USER_ID);
+	String extUsername = request.getParameter(extServer.getUserIdParameterName());
 	String roles = request.getParameter(BasicLTIConstants.ROLES);
-	
+
 	// implicit login params
 	String firstName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_GIVEN);
 	String lastName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FAMILY);
@@ -102,29 +98,29 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
 	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
 	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
-	
+
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
-	
+
 	//log all incoming request parameters, so we can use them later to debug future issues
 	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
-        Enumeration<String> parameterNames = request.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            logMessage += paramName + "=";
- 
-            String[] paramValues = request.getParameterValues(paramName);
-            for (int i = 0; i < paramValues.length; i++) {
-                String paramValue = paramValues[i];
-                if (i>0) {
-                    logMessage += "|";
-                }
-                logMessage += paramValue;
-            }
-            logMessage += ", ";
-        }
-        log.debug(logMessage);
+	Enumeration<String> parameterNames = request.getParameterNames();
+	while (parameterNames.hasMoreElements()) {
+	    String paramName = parameterNames.nextElement();
+	    logMessage += paramName + "=";
+
+	    String[] paramValues = request.getParameterValues(paramName);
+	    for (int i = 0; i < paramValues.length; i++) {
+		String paramValue = paramValues[i];
+		if (i > 0) {
+		    logMessage += "|";
+		}
+		logMessage += paramValue;
+	    }
+	    logMessage += ", ";
+	}
+	log.debug(logMessage);
 
 	if ((extUsername == null) || (consumerKey == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
@@ -153,24 +149,24 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
 	//in case both first and last names are missing, try to get them using other ways
 	if (StringUtils.isBlank(firstName) && StringUtils.isBlank(lastName)) {
-	    
+
 	    //check LIS_PERSON_NAME_FULL parameter
 	    String fullName = request.getParameter(BasicLTIConstants.LIS_PERSON_NAME_FULL);
 	    if (StringUtils.isNotBlank(fullName)) {
 		firstName = fullName;
 		lastName = " ";
-		
+
 	    } else {
 		//provide default values for user names, as we can't fetch them from LTI Tool consumer
 		firstName = DEFAULT_FIRST_NAME;
 		lastName = DEFAULT_LAST_NAME;
 	    }
-	
-	//only firstName is missing
+
+	    //only firstName is missing
 	} else if (StringUtils.isBlank(firstName)) {
 	    firstName = " ";
-	    
-	//only lastName is missing
+
+	    //only lastName is missing
 	} else if (StringUtils.isBlank(lastName)) {
 	    lastName = " ";
 	}
@@ -217,7 +213,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    //skip parameters starting with "oath_"
 	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
 		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
-		//set "user_id" parameter taking into account extServer.getUseAlternativeUseridParameterName() setting
+		//set "user_id" parameter taking into account extServer.getUserIdParamName() setting
 		String paramValue = BasicLTIConstants.USER_ID.equals(paramName) ? extUsername
 			: request.getParameter(paramName);
 		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName,

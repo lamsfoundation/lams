@@ -22,18 +22,24 @@
 
 package org.lamsfoundation.lams.admin.web.form;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Form for managing LTI tool consumers (ExtServer instances).
- * 
+ *
  * @author Andrey Balan
  */
 public class LtiConsumerForm extends ExtServerCommonForm {
 
     private String ltiToolConsumerMonitorRoles;
-    
+
     private String lessonFinishUrl;
-    
-    private Boolean useAlternativeUseridParameterName;
+
+    private String userIdParameterName;
+
+    public LtiConsumerForm() {
+	userIdParameterName = "user_id";
+    }
 
     public String getLtiToolConsumerMonitorRoles() {
 	return ltiToolConsumerMonitorRoles;
@@ -42,21 +48,22 @@ public class LtiConsumerForm extends ExtServerCommonForm {
     public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
 	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
     }
-    
+
+    @Override
     public String getLessonFinishUrl() {
 	return lessonFinishUrl;
     }
 
+    @Override
     public void setLessonFinishUrl(String lessonFinishUrl) {
 	this.lessonFinishUrl = lessonFinishUrl;
     }
-    
-    public Boolean getUseAlternativeUseridParameterName() {
-	return useAlternativeUseridParameterName;
+
+    public String getUserIdParameterName() {
+	return userIdParameterName;
     }
 
-    public void setUseAlternativeUseridParameterName(Boolean useAlternativeUseridParameterName) {
-	this.useAlternativeUseridParameterName = useAlternativeUseridParameterName;
+    public void setUserIdParameterName(String userIdParameterName) {
+	this.userIdParameterName = StringUtils.trim(userIdParameterName);
     }
-
 }
