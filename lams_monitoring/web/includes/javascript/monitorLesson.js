@@ -2262,6 +2262,10 @@ function updateGradebookTab() {
 
 //********** COMMON FUNCTIONS **********
 
+function isAutoRefreshBlocked(){
+	return autoRefreshBlocked || $('#learnerGroupDialog').hasClass('in');
+}
+
 /**
  * Updates all changeable elements of monitoring screen.
  */
@@ -2273,12 +2277,12 @@ function refreshMonitor(tabName, isAuto){
 
 	if (!autoRefreshIntervalObject) {
 		autoRefreshIntervalObject = setInterval(function(){
-			if (!autoRefreshBlocked) {
+			if (!isAutoRefreshBlocked()) {
 				refreshMonitor(null, true);
 			}
 		}, autoRefreshInterval);
 	}
-	
+
 	if (!tabName) {
 		// update Lesson tab widgets (state, number of learners etc.)
 		updateLessonTab();
