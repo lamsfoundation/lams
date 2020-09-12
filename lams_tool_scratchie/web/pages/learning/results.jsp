@@ -149,7 +149,7 @@
 				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
 					   		formatter:function(cellvalue, options, rowObject, event) {
 					   			if (event == "edit") {
-					   				cellvalue = cellvalue.replace(/\n/g, '<br>');
+					   				cellvalue = cellvalue.replace(/\n/g, '\n<br>');
 					   			}
 					   			var item = $(this).jqGrid("getLocalRow", options.rowId);
 					   			
