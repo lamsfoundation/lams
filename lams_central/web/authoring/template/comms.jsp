@@ -99,14 +99,17 @@
 	        					alert('Save failed (expected parameters missing). Data returned by server was '+data);
 	        				}
 	        			}
+	        			$('.button-save').button('reset');
 				    } else {
 					    var title = encodeURIComponent(data.title);
 					    location.href='<lams:WebAppURL />authoring/template/createresult.jsp?learningDesignID='+learningDesignID
 					    		+'&learningDesigntitle='+title;
-       				}})
+       				}
+       			})
 				.fail(function() {
 					alert('Save failed. Please see the server logs for more details.\n\n');
-					});
+					$('.button-save').button('reset');
+				});
 		}
 		
 		function getSubmissionURL() {
@@ -126,6 +129,7 @@
 		}
 		// Called by save button
 		function doSaveForm() {
+			$('.button-save').button('loading');
 			$('#templateForm').submit();
 		}
 
