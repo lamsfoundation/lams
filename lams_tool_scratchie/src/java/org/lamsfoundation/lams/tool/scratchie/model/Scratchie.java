@@ -40,6 +40,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * Scratchie
@@ -83,6 +85,7 @@ public class Scratchie implements Cloneable {
 
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
+    @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "extra_point")

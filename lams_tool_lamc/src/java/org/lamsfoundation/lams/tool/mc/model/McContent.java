@@ -35,10 +35,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * <p>
@@ -122,8 +123,8 @@ public class McContent implements Serializable {
     private String reflectionSubject;
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
-    @OrderBy("displayOrder")
-    private Set<McQueContent> mcQueContents;
+    @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
+    private Set<McQueContent> mcQueContents = new TreeSet<>();
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<McSession> mcSessions;

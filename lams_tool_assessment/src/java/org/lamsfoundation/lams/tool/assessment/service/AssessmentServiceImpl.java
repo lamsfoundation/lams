@@ -2730,7 +2730,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	int displayOrder = 1;
 	for (QbQuestion qbQuestion : newQuestions) {
 	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    assessmentQuestion.setDisplayOrder(displayOrder++);
+	    assessmentQuestion.setDisplayOrder(displayOrder);
 	    assessmentQuestion.setQbQuestion(qbQuestion);
 	    assessmentQuestion.setToolContentId(toolContentId);
 	    assessmentQuestionDao.insert(assessmentQuestion);
