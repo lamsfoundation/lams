@@ -2704,7 +2704,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+    public List<QbToolQuestion> replaceQuestions(long toolContentId, String newActivityName,
+	    List<QbQuestion> newQuestions) {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	if (newActivityName != null) {
 	    assessment.setTitle(newActivityName);
@@ -2724,6 +2725,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	// this is needed, otherwise Hibernate wants to re-save the deleted Assessment questions
 	assessment.getQuestions().clear();
 
+	List<QbToolQuestion> result = new ArrayList<>(newQuestions.size());
 	// populate Assessment with new questions and references
 	int displayOrder = 1;
 	for (QbQuestion qbQuestion : newQuestions) {
@@ -2733,6 +2735,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    assessmentQuestion.setToolContentId(toolContentId);
 	    assessmentQuestionDao.insert(assessmentQuestion);
 	    assessment.getQuestions().add(assessmentQuestion);
+	    result.add(assessmentQuestion);
 
 	    QuestionReference questionReference = new QuestionReference();
 	    questionReference.setQuestion(assessmentQuestion);
@@ -2743,6 +2746,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    displayOrder++;
 	}
 	assessmentDao.update(assessment);
+
+	return result;
     }
     // *****************************************************************************
     // private methods

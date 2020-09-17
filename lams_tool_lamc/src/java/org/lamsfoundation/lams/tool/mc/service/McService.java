@@ -66,6 +66,7 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -2205,7 +2206,8 @@ public class McService
     }
 
     @Override
-    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+    public List<QbToolQuestion> replaceQuestions(long toolContentId, String newActivityName,
+	    List<QbQuestion> newQuestions) {
 	McContent mcContent = getMcContent(toolContentId);
 	if (newActivityName != null) {
 	    mcContent.setTitle(newActivityName);
@@ -2221,11 +2223,14 @@ public class McService
 
 	// populate MC with new questions
 	int displayOrder = 1;
+	List<QbToolQuestion> result = new ArrayList<>(newQuestions.size());
 	for (QbQuestion qbQuestion : newQuestions) {
 	    McQueContent mcQuestion = new McQueContent(qbQuestion, displayOrder++, mcContent);
 	    mcQueContentDAO.insert(mcQuestion);
 	    mcContent.getMcQueContents().add(mcQuestion);
+	    result.add(mcQuestion);
 	}
+	return result;
     }
 
     @Override
