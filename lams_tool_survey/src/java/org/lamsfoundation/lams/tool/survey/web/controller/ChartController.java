@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -65,7 +64,7 @@ public class ChartController {
     @Qualifier("lasurvMessageSource")
     private MessageSource resource;
 
-    @RequestMapping(value = "/showChart", method = RequestMethod.POST)
+    @RequestMapping(value = "/showChart")
     public String execute(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
 
