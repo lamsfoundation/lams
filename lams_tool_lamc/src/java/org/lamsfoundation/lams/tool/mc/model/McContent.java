@@ -124,7 +124,7 @@ public class McContent implements Serializable {
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
-    private Set<McQueContent> mcQueContents = new TreeSet<>();
+    private Set<McQueContent> mcQueContents;
 
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<McSession> mcSessions;
@@ -163,7 +163,7 @@ public class McContent implements Serializable {
 
     /** default constructor */
     public McContent() {
-	this.mcQueContents = new HashSet<>();
+	this.mcQueContents = new TreeSet<>();
 	this.mcSessions = new HashSet<>();
     }
 
