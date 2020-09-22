@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtServer;
@@ -37,8 +38,11 @@ import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -64,6 +68,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     private MessageService centralMessageService;
     @Autowired
     private IExportToolContentService exportToolContentService;
+    @Autowired
+    private IUserManagementService userManagementService;
 
     /**
      * Constructor of the object.
@@ -90,7 +96,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	ContentTreeNode(FolderContentDTO content) {
 	    this.content = content;
-	    children = new LinkedList<ContentTreeNode>();
+	    children = new LinkedList<>();
 	}
 
 	void addChild(ContentTreeNode node) {
@@ -168,7 +174,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     private ContentTreeNode buildContentTree(Integer userId, Integer mode)
 	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	log.debug("User Id - " + userId);
-	FolderContentDTO rootFolder = new FolderContentDTO(centralMessageService.getMessage("label.workspace.root_folder"),
+	FolderContentDTO rootFolder = new FolderContentDTO(
+		centralMessageService.getMessage("label.workspace.root_folder"),
 		centralMessageService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
 		WorkspaceController.BOOTSTRAP_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode root = new ContentTreeNode(rootFolder);
@@ -233,6 +240,15 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	try {
+	    boolean isSysAdmin = false;
+	    String remoteUser = request.getRemoteUser();
+	    if (StringUtils.isNotBlank(remoteUser)) {
+		User user = userManagementService.getUserByLogin(remoteUser);
+		if (user != null) {
+		    isSysAdmin = userManagementService.isUserInRole(user.getUserId(),
+			    userManagementService.getRootOrganisation().getOrganisationId(), Role.SYSADMIN);
+		}
+	    }
 	    // get parameters
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
@@ -243,42 +259,45 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
 	    String locale = request.getParameter(CentralConstants.PARAM_LANG);
 	    Integer mode = WebUtil.readIntParam(request, CentralConstants.PARAM_MODE, true);
-	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
-	    final boolean isUpdateUserDetails = false;
-
+	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String firstName = request.getParameter(IntegrationConstants.PARAM_FIRST_NAME);
 	    String lastName = request.getParameter(IntegrationConstants.PARAM_LAST_NAME);
 	    String email = request.getParameter(IntegrationConstants.PARAM_EMAIL);
 
-	    if ((serverId == null) || (datetime == null) || (hashValue == null) || (username == null)
-		    || (courseId == null) || (country == null) || (locale == null)) {
-		String msg = "Parameters missing";
-		log.error(msg);
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
-	    }
+	    final boolean isUpdateUserDetails = false;
+	    ExtServer extServer = null;
 
-	    // LDEV-2196 preserve character encoding if necessary
-	    if (request.getCharacterEncoding() == null) {
-		log.debug(
-			"request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
-		username = new String(username.getBytes("8859_1"), "UTF-8");
-		if (courseName != null) {
-		    courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
+	    if (!isSysAdmin) {
+		if ((serverId == null) || (datetime == null) || (hashValue == null) || (username == null)
+			|| (courseId == null) || (country == null) || (locale == null)) {
+		    String msg = "Parameters missing";
+		    log.error(msg);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 		}
+
+		// LDEV-2196 preserve character encoding if necessary
+		if (request.getCharacterEncoding() == null) {
+		    log.debug(
+			    "request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+		    username = new String(username.getBytes("8859_1"), "UTF-8");
+		    if (courseName != null) {
+			courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
+		    }
+		}
+
+		// get Server map
+		extServer = integrationService.getExtServer(serverId);
+
+		// authenticate
+		Authenticator.authenticate(extServer, datetime, username, hashValue);
 	    }
-
-	    // get Server map
-	    ExtServer extServer = integrationService.getExtServer(serverId);
-
-	    // authenticate
-	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    // get user map, user is created if this is their first use
 
 	    if ((method != null) && method.equals("exportLD")) {
 		// do export
-		exportLD(request, response);
+		exportLD(request, response, isSysAdmin);
 
 	    } else if ((method != null)
 		    && (method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON"))) {
@@ -292,16 +311,17 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		if (method.equals("getLearningDesignsJSON")) {
 		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
 		    String designType = request.getParameter("type");
-		    folderContentsJSON = workspaceManagementService.getFolderContentsJSON(folderID, userId, allowInvalidDesigns,
-			    designType);
+		    folderContentsJSON = workspaceManagementService.getFolderContentsJSON(folderID, userId,
+			    allowInvalidDesigns, designType);
 		} else {
 		    Integer page = WebUtil.readIntParam(request, "page", true);
 		    Integer size = WebUtil.readIntParam(request, "size", true);
 		    String sortName = request.getParameter("sortName");
 		    String sortDate = request.getParameter("sortDate");
 		    String search = request.getParameter("search");
-		    folderContentsJSON = workspaceManagementService.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page,
-			    size, sortName == null ? null : (sortName.equals("0") ? "DESC" : "ASC"),
+		    folderContentsJSON = workspaceManagementService.getPagedLearningDesignsJSON(userId,
+			    allowInvalidDesigns, search, page, size,
+			    sortName == null ? null : (sortName.equals("0") ? "DESC" : "ASC"),
 			    sortDate == null ? null : (sortDate.equals("0") ? "DESC" : "ASC"));
 		}
 
@@ -398,12 +418,21 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    public void exportLD(HttpServletRequest request, HttpServletResponse response) {
+    public void exportLD(HttpServletRequest request, HttpServletResponse response, boolean isSysAdmin) {
 	Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-	List<String> toolsErrorMsgs = new ArrayList<String>();
+	boolean getPathOnly = isSysAdmin && WebUtil.readBooleanParam(request, "getPathOnly", false);
+
+	List<String> toolsErrorMsgs = new ArrayList<>();
 
 	try {
 	    String zipFilename = exportToolContentService.exportLearningDesign(learningDesignId, toolsErrorMsgs);
+
+	    if (getPathOnly) {
+		// send only path, not the actual zip file content
+		response.setContentType("text/plain");
+		response.getWriter().write(zipFilename);
+		return;
+	    }
 
 	    // get only filename
 	    String zipfile = FileUtil.getFileName(zipFilename);
