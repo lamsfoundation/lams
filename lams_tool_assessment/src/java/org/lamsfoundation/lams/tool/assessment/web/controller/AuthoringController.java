@@ -213,7 +213,7 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	return "pages/authoring/authoring";
+	return "pages/authoring/authoring5";
     }
 
     /**
