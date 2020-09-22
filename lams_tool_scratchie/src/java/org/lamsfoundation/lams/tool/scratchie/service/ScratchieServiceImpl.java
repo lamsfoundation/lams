@@ -2691,7 +2691,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		JsonUtil.optInt(toolContentJSON, "activityUiidProvidingVsaAnswers"));
 
 	// Scratchie Items
-	Set<ScratchieItem> newItems = new LinkedHashSet<>();
+	Set<ScratchieItem> newItems = new TreeSet<>();
 
 	QbCollection collection = qbService.getUserPrivateCollection(userID);
 	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
