@@ -312,126 +312,117 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-12 p-0">
-							<div class="bbox-col d-flex slide_col" id="bbox4">
-								<div class="bbox-left icon yellow">
-									<i class="fa fa-star-o" aria-hidden="true"></i>
+						
+						<lams:Panel id="leaderselection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow">
+							<div class="col-12 col-xl-6 pr-4">
+	                            <div class="form-group row">
+	                                <label class="col-sm-8 col-form-label" for="questionsPerPage">Questions per page <a  tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                 <div class="col-sm-4 justify-content-end d-flex">
+	                                    <select class="form-control form-control-select" id="questionsPerPage" aria-label="Options for gate" tabindex="0">
+	                                        <option>All</option>
+	                                        <option>All</option>
+	                                        <option>All</option>
+	                                    </select>
+	                                </div>     
+	                            </div>    
+								<div class="form-group row">
+									<label class="col-sm-8 col-form-label" for="shuffleQuestions">Shuffle questions  <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-4 justify-content-end d-flex">
+	                                             <label class="switch" >
+	                                               <input type="checkbox" id="shuffleQuestions" checked="">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                         </div>    
 								</div>
-								<div class="bbox-right bbox_body">
-	                                <div class="grey_title grey_title1"><a class="collapsible-link" data-toggle="collapse" href="#leaderselection" data-target="#leaderselection" role="button" aria-expanded="false" aria-controls="leaderselection"><h2>Leader selection</h2></a>
-									</div>
-									<div id="leaderselection" class="row mt-3 collapse">
-										<div class="col-12 col-xl-6 pr-4">
-	                                        <div class="form-group row">
-	                                            <label class="col-sm-8 col-form-label" for="questionsPerPage">Questions per page <a  tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                             <div class="col-sm-4 justify-content-end d-flex">
-	                                                <select class="form-control form-control-select" id="questionsPerPage" aria-label="Options for gate" tabindex="0">
-	                                                    <option>All</option>
-	                                                    <option>All</option>
-	                                                    <option>All</option>
-	                                                </select>
-	                                            </div>     
-	                                        </div>    
-											<div class="form-group row">
-												<label class="col-sm-8 col-form-label" for="shuffleQuestions">Shuffle questions  <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-4 justify-content-end d-flex">
-	                                                <label class="switch" >
-	                                                  <input type="checkbox" id="shuffleQuestions" checked="">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                            </div>    
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-8 col-form-label" for="">Enable question numbering <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-4 justify-content-end d-flex">
-	                                                <label class="switch">
-	                                                  <input type="checkbox" checked="">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                            </div>
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-8 col-form-label" for="option11">Time limit (minutes) <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-4 justify-content-end d-flex">
-	                                                <select id="option11" class="form-control form-control-select" aria-label="">
-	                                                    <option>All</option>
-	                                                    <option>All</option>
-	                                                    <option>All</option>
-	                                                </select>
-	                                            </div>
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-8 col-form-label" for="">Attempts allowed <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-4 justify-content-end d-flex">
-	                                                <select class="form-control form-control-select" aria-label="">
-	                                                    <option>1</option>
-	                                                    <option>1</option>
-	                                                    <option>1</option>
-	                                                </select>
-	                                            </div>
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-8 col-form-label" for="">Assessment passing mark <span class="info_icon" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">i</span></label>
-	                                            <div class="col-sm-4 justify-content-end d-flex">
-	                                                <select class="form-control form-control-select" aria-label="">
-	                                                    <option>None</option>
-	                                                    <option>None</option>
-	                                                    <option>None</option>
-	                                                </select>
-	                                            </div>
-											</div>
-										</div>
-										<div class="col-12 col-xl-6 pr-2">
-												<div class="form-group row">
-												<label class="col-sm-10 col-form-label" for="">Display all questions & answers once the learner finishes <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-2 justify-content-end d-flex">
-	                                                <label class="switch">
-	                                                  <input type="checkbox" checked="">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                             </div>    
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-10 col-form-label" for="">Display overall feedback at the end of each attempt</label>
-												<div class="col-sm-2 justify-content-end d-flex">
-	                                                <label class="switch">
-												     <input type="checkbox">
-												     <span class="slider round"></span>        
-												     </label>
-	                                            </div>    
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-9 col-form-label" for="">Allow learners to see grades at the end of each attempt <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-3 justify-content-end d-flex">
-	                                                <label class="switch">
-	                                                  <input type="checkbox" checked="">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                            </div>    
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-9 col-form-label" for="">Enable answer justification <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-3 justify-content-end d-flex">
-	                                                <label class="switch">
-	                                                  <input type="checkbox">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                            </div>    
-											</div>
-											<div class="form-group row">
-												<label class="col-sm-9 col-form-label" for="">Enable confidence level <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-	                                            <div class="col-sm-3 justify-content-end d-flex">
-	                                                <label class="switch">
-	                                                  <input type="checkbox">
-	                                                  <span class="slider round"></span>
-	                                                </label>
-	                                            </div>    
-											</div>
-										</div>
-									</div>
+								<div class="form-group row">
+									<label class="col-sm-8 col-form-label" for="">Enable question numbering <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-4 justify-content-end d-flex">
+	                                             <label class="switch">
+	                                               <input type="checkbox" checked="">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                         </div>
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-8 col-form-label" for="option11">Time limit (minutes) <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-4 justify-content-end d-flex">
+	                                             <select id="option11" class="form-control form-control-select" aria-label="">
+	                                                 <option>All</option>
+	                                                 <option>All</option>
+	                                                 <option>All</option>
+	                                             </select>
+	                                         </div>
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-8 col-form-label" for="">Attempts allowed <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-4 justify-content-end d-flex">
+	                                             <select class="form-control form-control-select" aria-label="">
+	                                                 <option>1</option>
+	                                                 <option>1</option>
+	                                                 <option>1</option>
+	                                             </select>
+	                                         </div>
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-8 col-form-label" for="">Assessment passing mark <span class="info_icon" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">i</span></label>
+	                                         <div class="col-sm-4 justify-content-end d-flex">
+	                                             <select class="form-control form-control-select" aria-label="">
+	                                                 <option>None</option>
+	                                                 <option>None</option>
+	                                                 <option>None</option>
+	                                             </select>
+	                                         </div>
 								</div>
 							</div>
-						</div>
+							<div class="col-12 col-xl-6 pr-2">
+								<div class="form-group row">
+									<label class="col-sm-10 col-form-label" for="">Display all questions & answers once the learner finishes <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-2 justify-content-end d-flex">
+	                                             <label class="switch">
+	                                               <input type="checkbox" checked="">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                          </div>    
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-10 col-form-label" for="">Display overall feedback at the end of each attempt</label>
+									<div class="col-sm-2 justify-content-end d-flex">
+	                                             <label class="switch">
+									     <input type="checkbox">
+									     <span class="slider round"></span>        
+									     </label>
+	                                         </div>    
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-9 col-form-label" for="">Allow learners to see grades at the end of each attempt <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-3 justify-content-end d-flex">
+	                                             <label class="switch">
+	                                               <input type="checkbox" checked="">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                         </div>    
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-9 col-form-label" for="">Enable answer justification <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-3 justify-content-end d-flex">
+	                                             <label class="switch">
+	                                               <input type="checkbox">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                         </div>    
+								</div>
+								<div class="form-group row">
+									<label class="col-sm-9 col-form-label" for="">Enable confidence level <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+	                                         <div class="col-sm-3 justify-content-end d-flex">
+	                                             <label class="switch">
+	                                               <input type="checkbox">
+	                                               <span class="slider round"></span>
+	                                             </label>
+	                                         </div>    
+								</div>
+							</div>
+						</lams:Panel>
+		
 						<div class="col-12 p-0">
 							<div class="bbox-col d-flex slide_col" id="bbox5">
 								<div class="bbox-left icon purple">
