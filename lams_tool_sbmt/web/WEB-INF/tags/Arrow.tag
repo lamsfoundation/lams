@@ -1,17 +1,18 @@
 <%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
 
 <%-- state = up: up arrow;  state = down: down arrow --%>
 <%@ attribute name="state" required="true" rtexprvalue="true"%>
-<%@ attribute name="title" required="false" rtexprvalue="true"%>
+<%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="onclick" required="false" rtexprvalue="true"%>
 <%@ attribute name="id" required="false" rtexprvalue="true"%>
 <%@ attribute name="display" required="false"  rtexprvalue="true"%>
 
 <c:choose>
-	<c:when test="${not empty title}">
-		<c:set var="fullTitle">title="${title}"</c:set>
+	<c:when test="${not empty titleKey}">
+		<c:set var="fullTitle">title="<fmt:message key='${titleKey}'/>"</c:set>
 	</c:when>
 	<c:otherwise>
 		<c:set var="fullTitle" value=""/>

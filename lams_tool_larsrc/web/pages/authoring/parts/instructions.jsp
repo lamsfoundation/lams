@@ -25,11 +25,11 @@
 					<td class="arrows" style="width:5%">
 						<!-- Don't display up icon if first line -->
 						<c:if test="${not status.first}">
-		 					<lams:Arrow state="up" title="<fmt:message key='label.up'/>" onclick="upItem('${status.index}')"/>
+		 					<lams:Arrow state="up" titleKey="label.up" onclick="upItem('${status.index}')"/>
 		 				</c:if>
 						<!-- Don't display down icon if last line -->
 						<c:if test="${not status.last}">
-							<lams:Arrow state="down" title="<fmt:message key='label.down'/>" onclick="downItem('${status.index}','${listSize}')"/>
+							<lams:Arrow state="down" titleKey="label.down" onclick="downItem('${status.index}','${listSize}')"/>
 		 				</c:if>
 					</td>
 					<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />"  

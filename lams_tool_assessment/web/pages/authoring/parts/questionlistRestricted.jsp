@@ -74,11 +74,11 @@
 				<td class="arrows">
 					<!-- Don't display up icon if first line -->
 					<c:if test="${not status.first}">
-		 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="javascript:upQuestionReference(${status.index})"/>
+		 				<lams:Arrow state="up" titleKey="label.authoring.basic.up" onclick="javascript:upQuestionReference(${status.index})"/>
 		 			</c:if>
 					<!-- Don't display down icon if last line -->
 					<c:if test="${not status.last}">
-						<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="javascript:downQuestionReference(${status.index})"/>
+						<lams:Arrow state="down" titleKey="label.authoring.basic.down" onclick="javascript:downQuestionReference(${status.index})"/>
 		 			</c:if>
 				</td>
 

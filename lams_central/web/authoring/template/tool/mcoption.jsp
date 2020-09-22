@@ -18,12 +18,12 @@ and a text field field named question${questionNumber}option${optionNumber} --%>
 		<td class="arrows" width="40px">
 			<!-- Don't display up icon if first line -->
 			<c:if test="${optionNumber > 1}">
- 				<lams:Arrow state="up" id="${qnon}UpButton" title="<fmt:message key='hint.option.up'/>" 
+ 				<lams:Arrow state="up" id="${qnon}UpButton" titleKey="hint.option.up" 
  					onclick="javascript:swapOptions(${questionNumber}, ${optionNumber}, ${optionNumber-1})"/>
  			</c:if>
 			<!-- Don't display down icon if last line -->
 			<c:set var="display" value="${optionCount > optionNumber ? '' : 'none'}"/>
-			<lams:Arrow state="down" id="${qnon}DownButton" title="<fmt:message key='hint.option.down'/>" 
+			<lams:Arrow state="down" id="${qnon}DownButton" titleKey="hint.option.down" 
 				onclick="javascript:swapOptions(${questionNumber}, ${optionNumber}, ${optionNumber+1})" display="${display}"/>
  		</td>
 		<td width="20px" align="center">
