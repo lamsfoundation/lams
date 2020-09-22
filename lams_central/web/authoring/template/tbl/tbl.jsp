@@ -46,27 +46,30 @@
 
 			// validate the main form
 			var validator = $("#templateForm").validate({
-			rules: {
-				sequenceTitle: {
-					required: true,
-					validateNoSpecialCharacters: true
+				rules: {
+					sequenceTitle: {
+						required: true,
+						validateNoSpecialCharacters: true
+					},
+					<%@ include file="../groupingvalidation.jsp" %>
 				},
-				<%@ include file="../groupingvalidation.jsp" %>
-			},
-			messages: {
-				sequenceTitle: {
-					required: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />',
-					validateNoSpecialCharacters: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />'
+				messages: {
+					sequenceTitle: {
+						required: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />',
+						validateNoSpecialCharacters: '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />'
+					},
+	 				<%@ include file="../groupingerrors.jsp" %>
 				},
- 				<%@ include file="../groupingerrors.jsp" %>
-			},
-			invalidHandler: templateInvalidHandler,
-			errorClass: "text-danger",
-			errorLabelContainer: "ul.error-message",
-			wrapper: "li",
-  			submitHandler: function(form) { 
- 				submitForm(form);
- 				},
+				invalidHandler: templateInvalidHandler,
+				errorClass: "text-danger",
+				errorLabelContainer: "ul.error-message",
+				wrapper: "li",
+	  			submitHandler: function(form) { 
+	 				submitForm(form);
+	 			},
+	 			invalidHandler : function() {
+	 				$('.button-save').button('reset');
+	 			}
 			});
 
 			jQuery.validator.addMethod("validateNoSpecialCharacters", validateNoSpecialCharacters, '<fmt:message key="authoring.section.lessondetails" />: <fmt:message key="authoring.fla.title.validation.error" />');
@@ -192,7 +195,7 @@
 <c:set var="title"><fmt:message key="authoring.tbl.template.title"/></c:set>
 <lams:Page title="${title}" type="wizard">
 
-<c:set var="usePreview">${fn:toLowerCase('@template_tbl_show_preview@') eq 'checked'}</c:set>
+<c:set var="usePreview">${fn:toLowerCase('checked') eq 'checked'}</c:set>
 
 	<div id="rootwizard">
 	<div class="navbar">
@@ -223,11 +226,11 @@
 	    <div class="tab-pane" id="tab1">
 		    	<jsp:include page="../genericintro.jsp" ><jsp:param name="templateName" value="tbl"/></jsp:include>
 		    	<div style="display:none">
- 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" @template_tbl_show_introduction@ />
+ 			<input type="checkbox" name="introduction" value="true" class="form-control-inline" id="introduction" checked />
 			<input type="checkbox" name="iratra" value="true" class="form-control-inline" id="iratra" checked />
 			<input type="checkbox" name="appex" value="true" class="form-control-inline" id="appex" checked />
-			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  @template_tbl_show_preview@  />
- 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="reflect" @template_tbl_show_notebook@/>
+			<input type="checkbox" name="preview" value="true" class="form-control-inline" id="preview"  checked  />
+ 			<input type="checkbox" name="reflect" value="true" class="form-control-inline" id="reflect" checked/>
 			</div>
 	    </div>
 	    <div class="tab-pane" id="tab2">
@@ -331,7 +334,9 @@
                 <hr>
 	    		<div style="float:right">
 		  	<a href="#" class='btn btn-sm btn-primary button-next'><fmt:message key="button.next"/></a>
-	    		<a href="#" class='btn btn-sm btn-primary button-save' onclick="javascript:doSaveForm();" style="display:none"><fmt:message key="button.save"/></a>
+	    		<a href="#" class='btn btn-sm btn-primary button-save' onclick="javascript:doSaveForm();" style="display:none"
+	    		   data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="button.save" /></span>"
+	    		 ><fmt:message key="button.save"/></a>
 		</div>
 		<div style="float:left">
 			<a href="#" class='btn btn-sm btn-default' onclick="javascript:doGotoList();"><fmt:message key="button.return.to.template.list"/></a>

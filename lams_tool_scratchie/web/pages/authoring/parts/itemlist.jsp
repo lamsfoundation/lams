@@ -108,7 +108,7 @@ $(document).ready(function(){
 						</c:choose>
 	       			</span>
 				</td>
-					
+
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
 						<c:url value='/authoring/editItem.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true

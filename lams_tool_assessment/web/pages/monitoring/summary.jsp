@@ -212,6 +212,10 @@
 
 		// ajax calls to disclose correct/groups answers
 	    correctButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
@@ -226,6 +230,10 @@
 		});
 
 	    groupsButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
@@ -240,6 +248,10 @@
 		});
 
 	    correctAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[correctDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
@@ -261,6 +273,10 @@
 		});
 
 	    groupsAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[groupsDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
@@ -761,9 +777,11 @@
 			<a id="questionDiscloseCorrect" class="btn btn-default disabled">
 				<fmt:message key="label.disclose.correct.answers" />
 			</a>
-			<a id="questionDiscloseGroups" class="btn btn-default disabled">
-				<fmt:message key="label.disclose.groups.answers" />
-			</a>
+			<c:if test="${sessionMap.isGroupedActivity}">
+				<a id="questionDiscloseGroups" class="btn btn-default disabled">
+					<fmt:message key="label.disclose.groups.answers" />
+				</a>
+			</c:if>
 		</c:if>
 	</div>
 
@@ -775,12 +793,14 @@
 					</c:if>
 					<fmt:message key="label.disclose.all.correct.answers" />
 				</a>
-				<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
-					<c:if test="${allGroupsDisclosed}">
-						<i class="fa fa-check text-success">&nbsp;</i>
-					</c:if>
-					<fmt:message key="label.disclose.all.groups.answers" />
-				</a>
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
+						<c:if test="${allGroupsDisclosed}">
+							<i class="fa fa-check text-success">&nbsp;</i>
+						</c:if>
+						<fmt:message key="label.disclose.all.groups.answers" />
+					</a>
+				</c:if>
 			</div>
 		</c:if>
 </c:if>

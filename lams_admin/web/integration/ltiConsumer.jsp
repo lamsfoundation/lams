@@ -111,9 +111,9 @@
 					</td>
 				</tr>
 				<tr>
-					<td><fmt:message key="sysadmin.alternative.user.id.name" />:</td>
+					<td><fmt:message key="sysadmin.user.id.name" />:</td>
 					<td>
-						<form:checkbox path="useAlternativeUseridParameterName" />
+						<form:input path="userIdParameterName" size="30"/>
 					</td>
 				</tr>
 			</table>

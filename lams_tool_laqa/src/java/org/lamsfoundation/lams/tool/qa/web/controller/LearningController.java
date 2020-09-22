@@ -1113,7 +1113,6 @@ public class LearningController implements QaAppConstants {
 	TimeZone userTimeZone = userDto.getTimeZone();
 
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
-	boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
 	boolean isOnlyLeadersIncluded = WebUtil.readBooleanParam(request, "isOnlyLeadersIncluded", false);
 	Long qaContentId = WebUtil.readLongParam(request, "qaContentId");
 
@@ -1167,7 +1166,8 @@ public class LearningController implements QaAppConstants {
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
-	responcedata.put("total_rows", 1);
+	responcedata.put("total_rows", qaService.getCountResponsesBySessionAndQuestion(qaSessionId, questionUid, userId,
+		isOnlyLeadersIncluded, searchString));
 
 	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
 	// calculated as they may have been averages over more than one criteria.

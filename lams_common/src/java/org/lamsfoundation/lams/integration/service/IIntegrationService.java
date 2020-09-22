@@ -92,7 +92,7 @@ public interface IIntegrationService {
      * @param extUsername
      * @return
      */
-    ExtUserUseridMap getExistingExtUserUseridMap(ExtServer extServer, String extUsername) throws UserInfoFetchException;
+    ExtUserUseridMap getExistingExtUserUseridMap(ExtServer extServer, String extUsername);
 
     /**
      * Returns integration server by its automatically-created sid.

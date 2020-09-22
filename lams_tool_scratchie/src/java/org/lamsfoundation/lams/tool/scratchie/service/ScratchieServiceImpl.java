@@ -2180,7 +2180,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+    public List<QbToolQuestion> replaceQuestions(long toolContentId, String newActivityName,
+	    List<QbQuestion> newQuestions) {
 	Scratchie scratchie = getScratchieByContentId(toolContentId);
 	if (newActivityName != null) {
 	    scratchie.setTitle(newActivityName);
@@ -2196,6 +2197,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	// populate Scratchie with new questions
 	int displayOrder = 1;
+	List<QbToolQuestion> result = new ArrayList<>(newQuestions.size());
 	for (QbQuestion qbQuestion : newQuestions) {
 	    ScratchieItem scratchieItem = new ScratchieItem();
 	    scratchieItem.setDisplayOrder(displayOrder++);
@@ -2205,6 +2207,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    scratchie.getScratchieItems().add(scratchieItem);
 	}
 	scratchieDao.update(scratchie);
+	return result;
     }
 
     // *****************************************************************************

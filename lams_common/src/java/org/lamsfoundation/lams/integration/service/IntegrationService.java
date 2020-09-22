@@ -1021,8 +1021,9 @@ public class IntegrationService implements IIntegrationService {
 
 	    //get user id using "userId" property, or "sourcedId" if UseAlternativeUseridParameterName option is ON for this LTI server
 	    JsonNode lisPersonSourcedid = member.get("sourcedId");
-	    String extUserId = extServer.getUseAlternativeUseridParameterName() && lisPersonSourcedid != null
-		    && StringUtils.isNotBlank(lisPersonSourcedid.asText()) ? lisPersonSourcedid.asText()
+	    String extUserId = extServer.getUserIdParameterName().equalsIgnoreCase("lis_person_sourcedid")
+		    && lisPersonSourcedid != null && StringUtils.isNotBlank(lisPersonSourcedid.asText())
+			    ? lisPersonSourcedid.asText()
 			    : member.get("userId").asText();
 
 	    //to address Moodle version 3.7.1 bug
