@@ -22,7 +22,7 @@
 					</c:if>
 					<c:if test="${not status.last}">
 						<c:set var="title"><fmt:message key='label.authoring.down'/></c:set>
-						<lams:Arrow state="down" title="<fmt:message key='label.authoring.down'/>" onclick="downQuestion(${status.index},'${sessionMapID}')"/>
+						<lams:Arrow state="down" titleKey="label.authoring.down" onclick="downQuestion(${status.index},'${sessionMapID}')"/>
 					</c:if>
 				</td>
 				

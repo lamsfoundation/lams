@@ -25,11 +25,11 @@
 						
 					<td class="arrows" style="width:5%">
 						<c:if test="${not status.first}">
-							<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.up'/>" onclick="return upItem(${status.index})"/>
+							<lams:Arrow state="up" titleKey="label.up" onclick="return upItem(${status.index})"/>
 						</c:if>
 		
 						<c:if test="${not status.last}">
-							<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.down'/>" onclick="return downItem(${status.index})"/>
+							<lams:Arrow state="down" titleKey="label.down" onclick="return downItem(${status.index})"/>
 						</c:if>
 					</td>
 					

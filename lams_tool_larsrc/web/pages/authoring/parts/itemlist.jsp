@@ -70,11 +70,11 @@
 					<td class="arrows" style="width:5%">
 						<!-- Don't display up icon if first line -->
 						<c:if test="${not status.first}">
-		 					<lams:Arrow state="up" title="<fmt:message key='label.up'/>" onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')"/>
+		 					<lams:Arrow state="up" titleKey="label.up" onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')"/>
 		 				</c:if>
 						<!-- Don't display down icon if last line -->
 						<c:if test="${not status.last}">
-							<lams:Arrow state="down" title="<fmt:message key='label.down'/>" onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')"/>
+							<lams:Arrow state="down" titleKey="label.down" onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')"/>
 		 				</c:if>
 					</td>
 					<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.edit" />" id="edit${status.index}"
