@@ -24,11 +24,11 @@
 			<td class="arrows">
 			<!-- Don't display up icon if first line -->
 			<c:if test="${not status.first}">
- 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.basic.answeroption.up'/>" onclick="javascript:upItem('${status.index+1}')"/>
+ 				<lams:Arrow state="up" titleKey="label.authoring.basic.answeroption.up" onclick="javascript:upItem('${status.index+1}')"/>
  			</c:if>
 			<!-- Don't display down icon if last line -->
 			<c:if test="${not status.last}">
-				<lams:Arrow state="down" title="<fmt:message key='label.authoring.basic.answeroption.down'/>" onclick="javascript:downItem('${status.index+1}','${listSize+1}')"/>
+				<lams:Arrow state="down" titleKey="label.authoring.basic.answeroption.down" onclick="javascript:downItem('${status.index+1}','${listSize+1}')"/>
  			</c:if>
 			</td>
 			<!-- Don't display remove icon if there is less than 2 answer options -->

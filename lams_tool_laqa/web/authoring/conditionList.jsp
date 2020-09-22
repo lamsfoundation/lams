@@ -40,11 +40,11 @@
 					<td class="arrows" style="width:5%">
 						<!-- Don't display up icon if first line -->
 						<c:if test="${not status.first}">
-			 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.up'/>" onclick="upCondition(${status.index},'${sessionMapID}')"/>
+			 				<lams:Arrow state="up" titleKey="label.authoring.up" onclick="upCondition(${status.index},'${sessionMapID}')"/>
 			 			</c:if>
 						<!-- Don't display down icon if last line -->
 						<c:if test="${not status.last}">
-							<lams:Arrow state="down" title="<fmt:message key='label.authoring.down'/>" onclick="downCondition(${status.index},'${sessionMapID}')"/>
+							<lams:Arrow state="down" titleKey="label.authoring.down" onclick="downCondition(${status.index},'${sessionMapID}')"/>
 			 			</c:if>
 					</td>
 					

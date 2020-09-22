@@ -60,12 +60,12 @@
 				 		<c:if test="${optionsCount != 1}"> 		
 				 		
 							<c:if test="${optionIndex != 1}">
-								<lams:Arrow state="up" title="<fmt:message key='label.tip.moveCandidateUp'/>" 
+								<lams:Arrow state="up" titleKey="label.tip.moveCandidateUp" 
 									onclick="javascript:submitModifyCandidate('${optionIndex}', 'moveCandidateUp');"/>
 							</c:if>
 
 							<c:if test="${optionIndex != optionsCount}">
-								<lams:Arrow state="down" title="<fmt:message key='label.tip.moveCandidateDown'/>" 
+								<lams:Arrow state="down" titleKey="label.tip.moveCandidateDown" 
 									onclick="javascript:submitModifyCandidate('${optionIndex}', 'moveCandidateDown');"/>
 							</c:if>
 						

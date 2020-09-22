@@ -27,12 +27,12 @@
 				<td class="arrows" style="width:5%">
 					<c:if test="${fn:length(listQuestionDTO) != 1}">
 						<c:if test="${queIndex != 1}">
-							<lams:Arrow state="up" title="<fmt:message key='label.tip.moveNominationUp'/>" 
+							<lams:Arrow state="up" titleKey="label.tip.moveNominationUp" 
 								onclick="javascript:submitModifyAuthoringNomination('${queIndex}','moveNominationUp');"/>
 						</c:if>
 
 						<c:if test="${queIndex != fn:length(listQuestionDTO)}">
-							<lams:Arrow state="down" title="<fmt:message key='label.tip.moveNominationDown'/>" 
+							<lams:Arrow state="down" titleKey="label.tip.moveNominationDown" 
 								onclick="javascript:submitModifyAuthoringNomination('${queIndex}','moveNominationDown');"/>						
 						</c:if>							
 					</c:if>

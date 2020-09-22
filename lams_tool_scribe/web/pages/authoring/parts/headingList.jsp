@@ -26,7 +26,7 @@
 						<c:url
 							value="authoring/moveHeading.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
 					</c:set>
-					<lams:Arrow state="up" title="<fmt:message key='link.moveUp'/>" 
+					<lams:Arrow state="up" titleKey="link.moveUp" 
 	 						onclick="runUrl('${moveUpURL}')"/>
 				</c:if>
 
@@ -35,7 +35,7 @@
 						<c:url
 							value="authoring/moveHeading.do?sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
 					</c:set>
-					<lams:Arrow state="down" title="<fmt:message key='link.moveDown'/>"  
+					<lams:Arrow state="down" titleKey="link.moveDown"  
 								onclick="runUrl('${moveDownURL}')"/>
 				</c:if>
 			</td>
