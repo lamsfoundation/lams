@@ -12,25 +12,55 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
-<%@ attribute name="titleKey" required="true" rtexprvalue="true" %>
-<%@ attribute name="iconClass" required="true" rtexprvalue="true" %>
-<%@ attribute name="colorClass" required="true" rtexprvalue="true" %>
+<%@ attribute name="titleKey" required="false" rtexprvalue="true" %>
+<%@ attribute name="icon" required="false" rtexprvalue="true" %>
+<%@ attribute name="iconClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="colorClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="expanded" required="false" rtexprvalue="true" %>
 
-<%-- Optional attribute --%>
+<c:set var="expanded" value="${empty expanded ? true : expanded}" />
+<%-- Should left panel (icon, color) be displayed at all --%>
+<c:set var="hasLeftPanel" value="${not empty icon or not empty iconClass or not empty colorClass}" />
 
 <div class="col-12 p-0">
 	<div class="bbox-col d-flex slide_col" id="${id}-bbox">
-		<div class="bbox-left icon ${colorClass}">
-			<i class="fa ${iconClass}" aria-hidden="true"></i>
-		</div>
-		<div class="bbox-right bbox_body">
+	
+		<c:if test="${hasLeftPanel}">
+			<div class="bbox-left ${colorClass}">
+				<c:choose>
+					<c:when test="${not empty icon}">
+						<%-- Display regular icon --%>
+						<img src="${icon}">
+					</c:when>
+					<c:when test="${not empty iconClass}">
+						<%-- Display Font Awesome icon --%>
+						<i class="fa ${iconClass}" aria-hidden="true"></i>
+					</c:when>
+					<c:otherwise>
+						<%-- Blank character for padding --%>
+						<span class="no-icon" aria-hidden="true">&nbsp;</span>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:if>
+		
+		<div class="bbox_body ${hasLeftPanel ? 'bbox-right' : ''}">
             <div class="grey_title grey_title1">
-            	<a class="collapsible-link" data-toggle="collapse" href="#${id}-content" data-target="#${id}-content"
-            	   role="button" aria-expanded="false" aria-controls="${id}-content">
-            	   	<h2><fmt:message key="${titleKey}" /></h2>
+            	<c:set var="contentId" value="${id}-content" />
+            	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
+            	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">
+           	   		<c:choose>
+           	   			<c:when test="${not empty titleKey}">
+           	   				<h2><fmt:message key="${titleKey}" /></h2>
+           	   			</c:when>
+           	   			<c:otherwise>
+           	   				&nbsp;
+           	   			</c:otherwise>
+           	   		</c:choose>
             	</a>
 			</div>
-			<div id="${id}-content" class="row mt-3 collapse">
+			
+			<div id="${id}-content" class="row mt-3 ${expanded ? '' : ' collapse'}">
 				<jsp:doBody />
 			</div>
 		</div>
