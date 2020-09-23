@@ -60,7 +60,7 @@
             	</a>
 			</div>
 			
-			<div id="${id}-content" class="row mt-3 ${expanded ? '' : ' collapse'}">
+			<div id="${id}-content" class="row mt-3 collapse ${expanded ? ' show' : ''}">
 				<jsp:doBody />
 			</div>
 		</div>
