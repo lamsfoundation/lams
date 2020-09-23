@@ -19,6 +19,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionResultDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
@@ -212,9 +213,31 @@ public class TblMonitoringController {
 		if (!questionResultsPerSession.isEmpty()) {
 		    AssessmentQuestionResult questionResult = questionResultsPerSession.get(0);
 		    answer = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
-		    correct = questionResult.getMaxMark() == null ? false
-			    : (questionResult.getPenalty() + questionResult.getMark() + 0.1) >= questionResult
+		    if (questionResult.getMaxMark() != null) {
+			if (questionResult.getMaxMark() == 0) {
+			    // we can not rely of mark calculation when max mark is 0
+			    // so we need to find an actual correct answer
+			    Long chosenQuestionUid = null;
+			    for (AssessmentOptionAnswer chosenAnswer : questionResult.getOptionAnswers()) {
+				if (chosenAnswer.getAnswerBoolean()) {
+				    chosenQuestionUid = chosenAnswer.getOptionUid();
+				    break;
+				}
+			    }
+			    if (chosenQuestionUid != null) {
+				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				    if (optionDto.isCorrect() && chosenQuestionUid.equals(optionDto.getUid())) {
+					correct = true;
+					break;
+				    }
+				}
+			    }
+			} else {
+			    correct = questionResult.getPenalty() + questionResult.getMark() + 0.1 >= questionResult
 				    .getMaxMark();
+			}
+		    }
+
 		}
 		tblQuestionResultDto.setAnswer(answer);
 		tblQuestionResultDto.setCorrect(correct);
