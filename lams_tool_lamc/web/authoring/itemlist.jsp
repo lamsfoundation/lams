@@ -92,14 +92,12 @@
 					<c:if test="${fn:length(questionDtos) != 1}">
 						<!-- Don't display up icon if first line -->
 						<c:if test="${queIndex != 1}">
-							<c:set var="tip"><fmt:message key='label.tip.moveQuestionUp'/></c:set>
- 		 					<lams:Arrow state="up" title="${tip} ${queIndex}" 
+ 		 					<lams:Arrow state="up" titleKey="label.tip.moveQuestionUp" 
 		 						onclick="javascript:submitModifyAuthoringQuestion(${queIndex},'moveQuestionUp');"/>
  		 				</c:if>
 						<!-- Don't display down icon if last line -->
 						<c:if test="${queIndex != fn:length(questionDtos)}">
-							<c:set var="tip"><fmt:message key='label.tip.moveQuestionDown'/></c:set>
-	 						<lams:Arrow state="down" title="${tip} ${queIndex}"  
+	 						<lams:Arrow state="down" titleKey="label.tip.moveQuestionDown"  
 								onclick="javascript:submitModifyAuthoringQuestion(${queIndex},'moveQuestionDown');"/>
 	 	 				</c:if>
 					</c:if>
