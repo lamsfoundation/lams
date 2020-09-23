@@ -173,23 +173,23 @@
 				
 				<lams:Panel id="advanced" titleKey="label.authoring.heading.advance" iconClass="fa-gear" colorClass="purple" expanded="false">
                    	<div class="col-12 col-xl-6 pr-5">
-                              <div class="form-group row">
-                                        <label class="col-sm-8 col-form-label" for="questionsPerPage">Questions per page <a  tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                         <div class="col-sm-4 justify-content-  end d-flex">
-                                            <select class="form-control form-control-select" id="questionsPerPage" aria-label="Options for gate" tabindex="0">
-                                                <option>All</option>
-                                                <option>All</option>
-                                                <option>All</option>
-                                            </select>
-                                        </div>     
-                                    </div>    
-						<div class="form-group row">
-                                        <label class="col-sm-8 col-form-label" for="switchquestionnumbering">Enable question numbering<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" checked="" class="switch" id="switchquestionnumbering">
-								<label for="switchquestionnumbering" />
-                                        </div>
-						</div>
+                        <div class="form-group row">
+                             <label class="col-sm-8 col-form-label" for="questionsPerPage">Questions per page <a  tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
+                              <div class="col-sm-4 justify-content-end d-flex">
+                                 <select class="form-control form-control-select" id="questionsPerPage" aria-label="Options for gate" tabindex="0">
+                                     <option>All</option>
+                                     <option>All</option>
+                                     <option>All</option>
+                                 </select>
+                             </div>     
+                        </div>  
+                                    
+                        <lams:Switch name="question-numbering" checked="true" 
+							 labelKey="label.authoring.advance.numbered.questions"
+							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
+							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
+						/>
+								
 						<div class="form-group row">
 							<label class="col-sm-8 col-form-label" for="option11">Time limit (minutes) <a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
                                         <div class="col-sm-4 justify-content-end d-flex">
@@ -222,54 +222,41 @@
 						</div>
 					</div>
 					<div class="col-12 col-xl-6 pr-4">
-						<div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchshufflequestions">Shuffle questions<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" checked="" class="switch" id="switchshufflequestions">
-								<label for="switchshufflequestions" />
-                                        </div>
-						</div>
+						<lams:Switch name="shuffle-questions" checked="true" 
+									 labelKey="label.authoring.basic.shuffle.the.choices"
+									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
+									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
+						/>
 						
-                                    <div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchdisplayall">Display all questions & answers once the learner finishes<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" class="switch" id="switchdisplayall">
-								<label for="switchdisplayall" />
-                                        </div>
-						</div>
+						<lams:Switch name="display-all"
+									 labelKey="label.authoring.advance.display.summary"
+									 tooltipKey="label.authoring.advance.display.summary.tooltip"
+									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
+						/>
 						
+                       <lams:Switch name="display-over-all" checked="true" 
+									labelKey="label.authoring.advance.allow.students.overall.feedback"
+									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
+									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
+						/>
 						
-						<div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchdisplayoverall">Display overall feedback at the end of each attempt<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" checked="" class="switch" id="switchdisplayoverall">
-								<label for="switchdisplayoverall" />
-                                        </div>
-						</div>
+						<lams:Switch name="allow-learners"
+									 labelKey="label.authoring.advance.allow.students.grades"
+									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
+									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
+						/>
 						
-						<div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchallowlearners">Allow learners to see grades at the end of each attempt<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" class="switch" id="switchallowlearners">
-								<label for="switchallowlearners" />
-                                        </div>
-						</div>
+						<lams:Switch name="enable-justification" checked="true" 
+									labelKey="label.authoring.advance.answer.justification"
+									tooltipKey="label.authoring.advance.answer.justification.tooltip"
+									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
+						/>
 						
-						<div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchenablejustification">Enable answer justification<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" class="switch" id="switchenablejustification">
-								<label for="switchenablejustification" />
-                                        </div>
-						</div>
-						
-						<div class="form-group row">
-							<label class="col-sm-8 col-form-label" for="switchenableconfidence">Enable confidence level<a tabindex="0" role="button" data-toggle="tooltip" title="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i class="info_icon fa fa-info-circle text-info fa-fw" aria-label="Help with Questions per page"></i></a></label>
-                                        <div class="col-sm-4 justify-content-end d-flex switch switch-sm">
-								<input type="checkbox" checked="" class="switch" id="switchenableconfidence">
-								<label for="switchenableconfidence" />
-                                        </div>
-						</div>
+						<lams:Switch name="enable-confidence"
+									 labelKey="label.enable.confidence.levels"
+									 tooltipKey="label.enable.confidence.levels.tooltip"
+									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
+						/>
 					</div>
 				</lams:Panel>
 				

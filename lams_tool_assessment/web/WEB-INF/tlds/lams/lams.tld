@@ -417,4 +417,8 @@
 	    <name>PageComponent</name>
 		<path>/WEB-INF/tags/PageComponent.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>Switch</name>
+		<path>/WEB-INF/tags/Switch.tag</path>
+   	</tag-file>  
 </taglib>
