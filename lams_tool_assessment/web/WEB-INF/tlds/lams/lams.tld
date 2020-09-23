@@ -421,4 +421,8 @@
 	    <name>Switch</name>
 		<path>/WEB-INF/tags/Switch.tag</path>
    	</tag-file>  
+   	<tag-file>
+	    <name>Dropdown</name>
+		<path>/WEB-INF/tags/Dropdown.tag</path>
+   	</tag-file> 
 </taglib>
