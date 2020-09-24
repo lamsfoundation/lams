@@ -243,6 +243,12 @@ input::-moz-placeholder {
 	font-size: 1rem;
 }
 
+.bbox_body div.cke_textarea_inline {
+	border: 0.1rem solid #DFDCE9;
+	border-radius: 1rem;
+	color: black;
+}
+
 .bbox_body input.form-control::placeholder {
 	color: #989EAC;
 }
@@ -404,7 +410,7 @@ label {
 	padding: 0;
 }
 
-.switch input+label {
+.switch input ~ label {
 	position: relative;
 	min-width: calc(calc(2.375rem * .8) * 2);
 	border-radius: calc(2.375rem * .8);
@@ -418,7 +424,7 @@ label {
 	text-indent: calc(calc(calc(2.375rem * .8) * 2) + .5rem);
 }
 
-.switch input+label::before, .switch input+label::after {
+.switch input ~ label::before, .switch input ~ label::after {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -428,14 +434,14 @@ label {
 	display: block;
 }
 
-.switch input+label::before {
+.switch input ~ label::before {
 	right: 0;
 	background-color: #dee2e6;
 	border-radius: calc(2.375rem * .8);
 	transition: 0.2s all;
 }
 
-.switch input+label::after {
+.switch input ~ label::after {
 	top: 2px;
 	left: 2px;
 	width: calc(calc(2.375rem * .8) - calc(2px * 2));
@@ -445,25 +451,25 @@ label {
 	transition: 0.2s all;
 }
 
-.switch input:checked+label::before {
+.switch input:checked ~ label::before {
 	background-color: #7fdaa1;
 }
 
-.switch input:checked+label::after {
+.switch input:checked ~ label::after {
 	margin-left: calc(2.375rem * .8);
 }
 
-.switch input:focus+label::before {
+.switch input:focus ~ label::before {
 	outline: none;
 	box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
 }
 
-.switch input:disabled+label {
+.switch input:disabled ~ label {
 	color: #868e96;
 	cursor: not-allowed;
 }
 
-.switch input:disabled+label::before {
+.switch input:disabled ~ label::before {
 	background-color: #e9ecef;
 }
 
@@ -471,23 +477,23 @@ label {
 	font-size: 1rem;
 }
 
-.switch.switch-sm input+label {
+.switch.switch-sm input ~ label {
 	min-width: calc(calc(1.9375rem * .8) * 2);
 	height: calc(1.9375rem * .8);
 	line-height: calc(1.9375rem * .8);
 	text-indent: calc(calc(calc(1.9375rem * .8) * 2) + .5rem);
 }
 
-.switch.switch-sm input+label::before {
+.switch.switch-sm input ~ label::before {
 	width: calc(calc(1.9375rem * .8) * 2);
 }
 
-.switch.switch-sm input+label::after {
+.switch.switch-sm input ~ label::after {
 	width: calc(calc(1.9375rem * .8) - calc(2px * 2));
 	height: calc(calc(1.9375rem * .8) - calc(2px * 2));
 }
 
-.switch.switch-sm input:checked+label::after {
+.switch.switch-sm input:checked ~ label::after {
 	margin-left: calc(1.9375rem * .8);
 }
 
@@ -495,23 +501,23 @@ label {
 	font-size: 1.25rem;
 }
 
-.switch.switch-lg input+label {
+.switch.switch-lg input ~ label {
 	min-width: calc(calc(3rem * .8)* 2);
 	height: calc(3rem * .8);
 	line-height: calc(3rem * .8);
 	text-indent: calc(calc(calc(3rem * .8) * 2) + .5rem);
 }
 
-.switch.switch-lg input+label::before {
+.switch.switch-lg input ~ label::before {
 	width: calc(calc(3rem * .8)* 2);
 }
 
-.switch.switch-lg input+label::after {
+.switch.switch-lg input ~ label::after {
 	width: calc(calc(3rem * .8) - calc(2px * 2));
 	height: calc(calc(3rem * .8) - calc(2px * 2));
 }
 
-.switch.switch-lg input:checked+label::after {
+.switch.switch-lg input:checked ~ label::after {
 	margin-left: calc(3rem * .8);
 }
 
