@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.assessment.AssessmentConstants"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-<c:set var="mode" value="${sessionMap.mode}" />
-<c:set var="lamsUrl"><lams:LAMSURL/></c:set>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" scope="request" />
+<c:set var="mode" value="${sessionMap.mode}" scope="request" />
+<c:set var="isAuthoringRestricted" value="${sessionMap.isAuthoringRestricted}" scope="request" />
+<c:set var="lamsUrl" scope="request"><lams:LAMSURL/></c:set>
 
 <lams:html>
 <head>
@@ -16,6 +17,7 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/thickbox.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components-responsive.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/assessment.css">
@@ -24,35 +26,24 @@
 	<script src="<lams:LAMSURL/>includes/javascript/bootstrap4.bundle.min.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.pager.js"></script>
-	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script>   
+	<script src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
+	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 	
 	<script>
 		$(document).ready(function(){
 		  $('[data-toggle="tooltip"]').tooltip();
-			// hide child rows
-			$('.tablesorter-childRow td').hide();
-	
-			$(".tablesorter")
-				.tablesorter({
-					theme : 'bootstrap',
-					// this is the default setting
-					cssChildRow: "tablesorter-childRow"
-				})
-				.tablesorterPager({
-					container: $("#pager"),
-					positionFixed: false
-				});
-			
-			$('.tablesorter').delegate('.toggle', 'click' ,function() {
-				$(this).closest('tr').nextUntil('tr:not(.tablesorter-childRow)').find('td').toggle();
-				return false;
-			});
 		});
 	</script>
 </head>
 
 <body>
 <lams:PageComponent titleKey="label.author.title">
+	<c:if test="${isAuthoringRestricted}">
+		<lams:Alert id="edit-in-monitor-while-assessment-already-attempted" type="error" close="true">
+			<fmt:message key="label.edit.in.monitor.warning"/>
+		</lams:Alert>
+	</c:if>
+	
 	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="mode" value="${mode}">
@@ -65,121 +56,11 @@
 			<div id="content" class="content row">
 				
 				<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
-					<%-- 
-					<div class="col-12 p-0">
-						<div class="form-group">
-                                  <label for="title">Title</label>
-                                  <input type="text" id="title" placeholder="Title" class="form-control">
-                                  <label for="instructions">Instructions</label>
-                                  <textarea type="text" id="instructions" placeholder="Enter instructions" class="form-control"></textarea>
-                           </div>
-                    </div>    
-                    --%>
                     <jsp:include page="basic5.jsp"/>
 				</lams:Panel>
 					
                	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
-					<div id="questionlist" >
-						<table class="table table-bordered user-table-data tablesorter tablesorter-bootstrap tablesorterff73dd4148253 hasFilters tablesorter2fb3f6e97d426" role="grid">
-							<colgroup>
-								<col width="85">
-								<col width="900">
-								<col width="220">
-								<col width="100">
-								<col width="180">
-							</colgroup>
-							<thead>
-								<tr role="row" class="tablesorter-headerRow table-sorter-header">
-									<th data-column="0" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" aria-sort="none" aria-label="Order #: No sort applied, activate to apply an ascending sort" style="user-select: none;">
-										<div class="tablesorter-header-inner">#</div>
-									</th>
-									<th data-column="1" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" aria-sort="none" aria-label="Customer: No sort applied, activate to apply an ascending sort" style="user-select: none;">
-										<div class="tablesorter-header-inner">Question</div>
-									</th>
-									<th data-column="2" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" aria-sort="none" aria-label="PO: No sort applied, activate to apply an ascending sort" style="user-select: none;">
-										<div class="tablesorter-header-inner"></div>
-									</th>
-									<th data-column="3" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" aria-sort="none" aria-label="Date: No sort applied, activate to apply an ascending sort" style="user-select: none;">
-										<div class="tablesorter-header-inner">Mark</div>
-									</th>
-									<th data-column="4" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" unselectable="on" aria-sort="none" aria-label="Total: No sort applied, activate to apply an ascending sort" style="user-select: none;">
-										<div class="tablesorter-header-inner"></div>
-									</th>
-								</tr>
-							</thead>
-							<tbody aria-live="polite" aria-relevant="all">
-								<tr role="row" class="tablesorter-hasChildRow table-sorter-top">
-									<td><a href="https://mottie.github.io/tablesorter/docs/example-child-rows.html#" class="toggle">1</a></td>
-									<td>What is the Capital of Botswana?</td>
-									<td>
-										<ul class="list-inline">
-											<li class="list-inline-item"><span class="badge badge-primary">Multiple Choice</span></li>
-											<li class="list-inline-item"><span class="badge badge-primary">V.4</span></li>
-										</ul>
-									</td>
-                                             <td><input type="text" placeholder="1" value="1" aria-label="Points for question: 1" class="form-control"></td>
-									<td>
-										<ul class="list-inline tools">
-											<li class="list-inline-item"><a href="#" aria-label="Answer not required"><i class="fa fa-asterisk" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Remove"><i class="fa fa-times" aria-hidden="true"></i></a></li>
-										</ul>
-									</td>
-								</tr>
-								<tr role="row" class="tablesorter-hasChildRow table-sorter-top">
-									<td><a href="https://mottie.github.io/tablesorter/docs/example-child-rows.html#" class="toggle">2</a></td>
-									<td>What is the Capital of Poland?</td>
-									<td>
-										<ul class="list-inline">
-											<li class="list-inline-item"><span class="badge badge-primary">Multiple Choice</span></li>
-											<li class="list-inline-item"><span class="badge badge-primary">V.4</span></li>
-										</ul>
-									</td>
-									<td><input type="text" placeholder="1" value="1" aria-label="Points for question: 1" class="form-control"></td>
-									<td>
-										<ul class="list-inline tools">
-											<li class="list-inline-item"><a href="#" aria-label="Answer not required"><i class="fa fa-asterisk" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Remove"><i class="fa fa-times" aria-hidden="true"></i></a></li>
-										</ul>
-									</td>
-								</tr>
-								<tr role="row" class="tablesorter-hasChildRow table-sorter-top">
-									<td><a href="https://mottie.github.io/tablesorter/docs/example-child-rows.html#" class="toggle">3</a></td>
-									<td>What is the Capital of Pakistan?</td>
-									<td>
-										<ul class="list-inline">
-											<li class="list-inline-item"><span class="badge badge-primary">Multiple Choice</span></li>
-											<li class="list-inline-item"><span class="badge badge-primary">V.4</span></li>
-										</ul>
-									</td>
-									<td><input type="text" placeholder="1" value="1" aria-label="Points for question: 1" class="form-control"></td>
-									<td>
-										<ul class="list-inline tools">
-											<li class="list-inline-item"><a href="#" aria-label="Answer not required"><i class="fa fa-asterisk" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a></li>
-											<li class="list-inline-item"><a href="#" aria-label="Remove"><i class="fa fa-times" aria-hidden="true"></i></a></li>
-										</ul>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<ul class="list-inline bottom">
-							<li class="list-inline-item">
-								<select class="form-control form-control-select" aria-label="Options for gate">
-									<option>Multiple choice</option>
-									<option>Multiple choice</option>
-									<option>Multiple choice</option>
-								</select>
-							</li>
-							<li class="list-inline-item">
-								<button  aria-label="Add" class="btn btn-primary"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
-							</li>
-							<li class="list-inline-item">
-								<button class="btn btn-primary">Import QTI</button>
-							</li>
-						</ul>
-					</div>
+               		<jsp:include page="questions5.jsp"/>
 				</lams:Panel>
 				
 				<lams:Panel id="advanced" titleKey="label.authoring.heading.advance" iconClass="fa-gear" colorClass="purple" expanded="false">
