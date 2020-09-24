@@ -18,11 +18,14 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components-responsive.css">
-	
+	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/assessment.css">
+
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>	
 	<script src="<lams:LAMSURL/>includes/javascript/bootstrap4.bundle.min.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.pager.js"></script>
+	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script>   
+	
 	<script>
 		$(document).ready(function(){
 		  $('[data-toggle="tooltip"]').tooltip();
@@ -52,11 +55,17 @@
 <lams:PageComponent titleKey="label.author.title">
 	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+		<input type="hidden" name="mode" value="${mode}">
+		
+		<form:hidden path="assessment.contentId" />
+		<form:hidden path="sessionMapID" />
+		<form:hidden path="contentFolderID" />
 
            <div class="container-fluid" style="max-width: 1600px">
 			<div id="content" class="content row">
 				
 				<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
+					<%-- 
 					<div class="col-12 p-0">
 						<div class="form-group">
                                   <label for="title">Title</label>
@@ -64,7 +73,9 @@
                                   <label for="instructions">Instructions</label>
                                   <textarea type="text" id="instructions" placeholder="Enter instructions" class="form-control"></textarea>
                            </div>
-                          </div>    
+                    </div>    
+                    --%>
+                    <jsp:include page="basic5.jsp"/>
 				</lams:Panel>
 					
                	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
@@ -259,6 +270,7 @@
 					</div>
 				</lams:Panel>
 				
+				<%--
 				<lams:Panel id="leaderselection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow" expanded="false">
 					<div class="col-12 col-xl-6 pr-5">
                    		<lams:Dropdown name="questions-per-page" 
@@ -610,6 +622,8 @@
 						/>
 					</div>
 				</lams:Panel>
+				 --%>
+				
 			</div>
            </div>    
 	</form:form>
