@@ -56,99 +56,17 @@
 			<div id="content" class="content row">
 				
 				<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
-                    <jsp:include page="basic5.jsp"/>
+					<div class="col-12 p-0">
+						 <jsp:include page="basic5.jsp"/>
+					</div>
 				</lams:Panel>
 					
                	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
-               		<jsp:include page="questions5.jsp"/>
+					<jsp:include page="questions5.jsp"/>
 				</lams:Panel>
 				
 				<lams:Panel id="advanced" titleKey="label.authoring.heading.advance" iconClass="fa-gear" colorClass="purple" expanded="false">
-                   	<div class="col-12 col-xl-6 pr-5">
-                   		<lams:Dropdown name="questions-per-page" 
-                   					   labelKey="label.authoring.advance.questions.per.page"
-							 		   tooltipKey="label.authoring.advance.questions.per.page.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.questions.per.page.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                                    
-                        <lams:Switch name="question-numbering" checked="true" 
-							 labelKey="label.authoring.advance.numbered.questions"
-							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
-							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
-						/>
-						
-						<lams:Dropdown name="time-limit" 
-                   					   labelKey="label.authoring.advance.time.limit"
-							 		   tooltipKey="label.authoring.advance.time.limit.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.time.limit.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                        		
-						<lams:Dropdown name="attempts-allowed" 
-                   					   labelKey="label.authoring.advance.attempts.allowed"
-							 		   tooltipKey="label.authoring.advance.attempts.allowed.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.attempts.allowed.tooltip.description"
-						>
-                           <option>1</option>
-                           <option>1</option>
-                           <option>1</option>
-                        </lams:Dropdown>
-                        
-						<lams:Dropdown name="passing-mark" 
-                   					   labelKey="label.authoring.advance.passing.mark"
-							 		   tooltipKey="label.authoring.advance.passing.mark.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.passing.mark.tooltip.description"
-						>
-                            <option>None</option>
-                            <option>None</option>
-                            <option>None</option>
-                        </lams:Dropdown>
-					</div>
-					
-					<div class="col-12 col-xl-6 pr-4">
-						<lams:Switch name="shuffle-questions" checked="true" 
-									 labelKey="label.authoring.basic.shuffle.the.choices"
-									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
-									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
-						/>
-						
-						<lams:Switch name="display-all"
-									 labelKey="label.authoring.advance.display.summary"
-									 tooltipKey="label.authoring.advance.display.summary.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
-						/>
-						
-                       <lams:Switch name="display-over-all" checked="true" 
-									labelKey="label.authoring.advance.allow.students.overall.feedback"
-									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
-						/>
-						
-						<lams:Switch name="allow-learners"
-									 labelKey="label.authoring.advance.allow.students.grades"
-									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-justification" checked="true" 
-									labelKey="label.authoring.advance.answer.justification"
-									tooltipKey="label.authoring.advance.answer.justification.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-confidence"
-									 labelKey="label.enable.confidence.levels"
-									 tooltipKey="label.enable.confidence.levels.tooltip"
-									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
-						/>
-					</div>
+					<jsp:include page="advance5.jsp"/>
 				</lams:Panel>
 				
 				<%--
