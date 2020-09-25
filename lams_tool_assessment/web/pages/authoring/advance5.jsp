@@ -1,69 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO"%>
 
-<script>
-	$(document).ready(function(){
-		
-		$("#attemptsAllowedRadio").change(function() {
-			$("#passingMark").val("0");
-			$("#passingMark").prop("disabled", true);
-			$("#attemptsAllowed").prop("disabled", false);
-		});
-		
-		$("#passingMarkRadio").change(function() {
-			$("#attemptsAllowed").val("0");
-			$("#attemptsAllowed").prop("disabled", true);
-			$("#passingMark").prop("disabled", false);
-		});
-		
-		$("#display-summary").change(function(){
-			$('#display-summary-area').toggle('slow');
-			$('#allowQuestionFeedback').prop("checked", false);
-			$('#allowDiscloseAnswers').prop("checked", false);
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().removeClass('text-muted');
-			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
-		});
-
-		$('#allowDiscloseAnswers').change(function(){
-			if ($(this).prop('checked')) {
-				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('checked', false).prop('disabled', true);
-			} else {
-				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', false);
-			}
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().toggleClass('text-muted');
-		});
-		
-		$("#useSelectLeaderToolOuput").change(function() {
-			if ($(this).prop('checked')) {
-				$("#display-summary").prop("checked", true).prop("disabled", true);
-				$('#display-summary-area').show('slow');
-				$('#questionEtherpadEnabled').closest('.checkbox').show('slow');
-				$('#allowDiscloseAnswers').prop('disabled', false);
-			} else {
-				$("#display-summary").prop("disabled", false);
-				$('#questionEtherpadEnabled').prop("checked", false).closest('.checkbox').hide('slow');
-				$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
-			}		
-		});
-
-		$("#enable-confidence-levels").change(function(){
-			$('#confidence-levels-type-area').toggle('slow');
-		});
-		
-		<c:if test="${assessmentForm.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
-		<c:if test="${assessmentForm.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
-		<c:if test="${assessmentForm.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
-		<c:if test="${assessmentForm.assessment.allowDiscloseAnswers}">
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true);
-			$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().addClass('text-muted');
-		</c:if>
-		<c:if test="${!assessmentForm.assessment.enableConfidenceLevels}">
-			$('#confidence-levels-type-area').css('display', 'none');
-		</c:if>
-	});
-</script>
-
 <div class="col-12 col-xl-6 pr-5">
 	<lams:Dropdown name="assessment.questionsPerPage"
 		useSpringForm="true"
@@ -92,7 +29,7 @@
 	<lams:Switch name="assessment.numbered" id="questions-numbering"
 		useSpringForm="true"
 		labelKey="label.authoring.advance.numbered.questions"
-		tooltipKey="label.authoring.advance.numbered.questionss.tooltip"
+		tooltipKey="label.authoring.advance.numbered.questions.tooltip"
 		tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description" />
 
 	<lams:Input
@@ -163,6 +100,12 @@
 				<fmt:message key="label.not.sure" />, <fmt:message key="label.sure" />, <fmt:message key="label.very.sure" />
 			</option>
 	</lams:Dropdown>
+	
+	<lams:Switch name="assessment.notifyTeachersOnAttemptCompletion" id="notifyTeachersOnAttemptCompletion"
+		useSpringForm="true"
+		labelKey="label.authoring.advanced.notify.on.attempt.completion"
+		tooltipKey="label.authoring.advanced.notify.on.attempt.completion.tooltip"
+		tooltipDescriptionKey="label.authoring.advanced.notify.on.attempt.completion.tooltip.description" />
 </div>
 
 

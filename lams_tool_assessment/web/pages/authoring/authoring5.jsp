@@ -31,7 +31,80 @@
 	
 	<script>
 		$(document).ready(function(){
-		  $('[data-toggle="tooltip"]').tooltip();
+			$('[data-toggle="tooltip"]').tooltip();
+			  
+			$("#attemptsAllowedRadio").change(function() {
+				$("#passingMark").val("0");
+				$("#passingMark").prop("disabled", true);
+				$("#attemptsAllowed").prop("disabled", false);
+			});
+			
+			$("#passingMarkRadio").change(function() {
+				$("#attemptsAllowed").val("0");
+				$("#attemptsAllowed").prop("disabled", true);
+				$("#passingMark").prop("disabled", false);
+			});
+			
+			$("#display-summary").change(function(){
+				$('#display-summary-area').toggle('slow');
+				$('#allowQuestionFeedback').prop("checked", false);
+				$('#allowDiscloseAnswers').prop("checked", false);
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop("checked", false).prop('disabled', false);
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().removeClass('text-muted');
+				$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
+			});
+	
+			$('#allowDiscloseAnswers').change(function(){
+				if ($(this).prop('checked')) {
+					$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('checked', false).prop('disabled', true);
+				} else {
+					$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', false);
+				}
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().toggleClass('text-muted');
+			});
+			
+			$("#useSelectLeaderToolOuput").change(function() {
+				if ($(this).prop('checked')) {
+					$("#display-summary").prop("checked", true).prop("disabled", true);
+					$('#display-summary-area').show('slow');
+					$('#questionEtherpadEnabled').closest('.checkbox').show('slow');
+					$('#allowDiscloseAnswers').prop('disabled', false);
+				} else {
+					$("#display-summary").prop("disabled", false);
+					$('#questionEtherpadEnabled').prop("checked", false).closest('.checkbox').hide('slow');
+					$('#allowDiscloseAnswers').prop("checked", false).prop('disabled', true).change();
+				}		
+			}).change();
+	
+			$("#enable-confidence-levels").change(function(){
+				$('#confidence-levels-type-area').toggle('slow');
+			});
+			
+			<c:if test="${assessmentForm.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
+			<c:if test="${assessmentForm.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
+			<c:if test="${assessmentForm.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
+			<c:if test="${assessmentForm.assessment.allowDiscloseAnswers}">
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').prop('disabled', true);
+				$('#allowRightAnswersAfterQuestion, #allowWrongAnswersAfterQuestion').parent().addClass('text-muted');
+			</c:if>
+			<c:if test="${!assessmentForm.assessment.enableConfidenceLevels}">
+				$('#confidence-levels-type-area').css('display', 'none');
+			</c:if>
+			
+			//automatically turn on refect option if there are text input in refect instruction area
+			var ra = document.getElementById("reflectInstructions");
+			var rao = document.getElementById("reflectOnActivity");
+			function turnOnRefect(){
+				if(isEmpty(ra.value)){
+					//turn off	
+					rao.checked = false;
+				}else{
+					//turn on
+					rao.checked = true;		
+				}
+			}
+			
+			ra.onkeyup=turnOnRefect;
 		});
 	</script>
 </head>
@@ -52,9 +125,8 @@
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 
-           <div class="container-fluid" style="max-width: 1600px">
+        <div class="container-fluid" style="max-width: 1600px">
 			<div id="content" class="content row">
-				
 				<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
 					<div class="col-12 p-0">
 						 <jsp:include page="basic5.jsp"/>
@@ -69,362 +141,20 @@
 					<jsp:include page="advance5.jsp"/>
 				</lams:Panel>
 				
-				<%--
-				<lams:Panel id="leaderselection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow" expanded="false">
-					<div class="col-12 col-xl-6 pr-5">
-                   		<lams:Dropdown name="questions-per-page" 
-                   					   labelKey="label.authoring.advance.questions.per.page"
-							 		   tooltipKey="label.authoring.advance.questions.per.page.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.questions.per.page.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                                    
-                        <lams:Switch name="question-numbering" checked="true" 
-							 labelKey="label.authoring.advance.numbered.questions"
-							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
-							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
-						/>
-						
-						<lams:Dropdown name="time-limit" 
-                   					   labelKey="label.authoring.advance.time.limit"
-							 		   tooltipKey="label.authoring.advance.time.limit.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.time.limit.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                        		
-						<lams:Dropdown name="attempts-allowed" 
-                   					   labelKey="label.authoring.advance.attempts.allowed"
-							 		   tooltipKey="label.authoring.advance.attempts.allowed.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.attempts.allowed.tooltip.description"
-						>
-                           <option>1</option>
-                           <option>1</option>
-                           <option>1</option>
-                        </lams:Dropdown>
-                        
-						<lams:Dropdown name="passing-mark" 
-                   					   labelKey="label.authoring.advance.passing.mark"
-							 		   tooltipKey="label.authoring.advance.passing.mark.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.passing.mark.tooltip.description"
-						>
-                            <option>None</option>
-                            <option>None</option>
-                            <option>None</option>
-                        </lams:Dropdown>
-					</div>
-					
-					<div class="col-12 col-xl-6 pr-4">
-						<lams:Switch name="shuffle-questions" checked="true" 
-									 labelKey="label.authoring.basic.shuffle.the.choices"
-									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
-									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
-						/>
-						
-						<lams:Switch name="display-all"
-									 labelKey="label.authoring.advance.display.summary"
-									 tooltipKey="label.authoring.advance.display.summary.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
-						/>
-						
-                       <lams:Switch name="display-over-all" checked="true" 
-									labelKey="label.authoring.advance.allow.students.overall.feedback"
-									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
-						/>
-						
-						<lams:Switch name="allow-learners"
-									 labelKey="label.authoring.advance.allow.students.grades"
-									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-justification" checked="true" 
-									labelKey="label.authoring.advance.answer.justification"
-									tooltipKey="label.authoring.advance.answer.justification.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-confidence"
-									 labelKey="label.enable.confidence.levels"
-									 tooltipKey="label.enable.confidence.levels.tooltip"
-									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
-						/>
-					</div>
-				</lams:Panel>
-				
-				<lams:Panel id="notifications" titleKey="label.notifications" iconClass="fa-bell-o" colorClass="purple" expanded="false">
-					<div class="col-12 col-xl-6 pr-5">
-                   		<lams:Dropdown name="questions-per-page" 
-                   					   labelKey="label.authoring.advance.questions.per.page"
-							 		   tooltipKey="label.authoring.advance.questions.per.page.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.questions.per.page.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                                    
-                        <lams:Switch name="question-numbering" checked="true" 
-							 labelKey="label.authoring.advance.numbered.questions"
-							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
-							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
-						/>
-						
-						<lams:Dropdown name="time-limit" 
-                   					   labelKey="label.authoring.advance.time.limit"
-							 		   tooltipKey="label.authoring.advance.time.limit.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.time.limit.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                        		
-						<lams:Dropdown name="attempts-allowed" 
-                   					   labelKey="label.authoring.advance.attempts.allowed"
-							 		   tooltipKey="label.authoring.advance.attempts.allowed.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.attempts.allowed.tooltip.description"
-						>
-                           <option>1</option>
-                           <option>1</option>
-                           <option>1</option>
-                        </lams:Dropdown>
-                        
-						<lams:Dropdown name="passing-mark" 
-                   					   labelKey="label.authoring.advance.passing.mark"
-							 		   tooltipKey="label.authoring.advance.passing.mark.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.passing.mark.tooltip.description"
-						>
-                            <option>None</option>
-                            <option>None</option>
-                            <option>None</option>
-                        </lams:Dropdown>
-					</div>
-					
-					<div class="col-12 col-xl-6 pr-4">
-						<lams:Switch name="shuffle-questions" checked="true" 
-									 labelKey="label.authoring.basic.shuffle.the.choices"
-									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
-									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
-						/>
-						
-						<lams:Switch name="display-all"
-									 labelKey="label.authoring.advance.display.summary"
-									 tooltipKey="label.authoring.advance.display.summary.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
-						/>
-						
-                       <lams:Switch name="display-over-all" checked="true" 
-									labelKey="label.authoring.advance.allow.students.overall.feedback"
-									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
-						/>
-						
-						<lams:Switch name="allow-learners"
-									 labelKey="label.authoring.advance.allow.students.grades"
-									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-justification" checked="true" 
-									labelKey="label.authoring.advance.answer.justification"
-									tooltipKey="label.authoring.advance.answer.justification.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-confidence"
-									 labelKey="label.enable.confidence.levels"
-									 tooltipKey="label.enable.confidence.levels.tooltip"
-									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
-						/>
-					</div>
+				<lams:Panel id="leader-selection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow" expanded="false">
+					<jsp:include page="leader5.jsp"/>
 				</lams:Panel>
 				
 				<lams:Panel id="feedback" titleKey="label.authoring.basic.general.feedback" iconClass="fa-comment-o" colorClass="blue" expanded="false">
-					<div class="col-12 col-xl-6 pr-5">
-                   		<lams:Dropdown name="questions-per-page" 
-                   					   labelKey="label.authoring.advance.questions.per.page"
-							 		   tooltipKey="label.authoring.advance.questions.per.page.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.questions.per.page.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                                    
-                        <lams:Switch name="question-numbering" checked="true" 
-							 labelKey="label.authoring.advance.numbered.questions"
-							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
-							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
-						/>
-						
-						<lams:Dropdown name="time-limit" 
-                   					   labelKey="label.authoring.advance.time.limit"
-							 		   tooltipKey="label.authoring.advance.time.limit.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.time.limit.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                        		
-						<lams:Dropdown name="attempts-allowed" 
-                   					   labelKey="label.authoring.advance.attempts.allowed"
-							 		   tooltipKey="label.authoring.advance.attempts.allowed.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.attempts.allowed.tooltip.description"
-						>
-                           <option>1</option>
-                           <option>1</option>
-                           <option>1</option>
-                        </lams:Dropdown>
-                        
-						<lams:Dropdown name="passing-mark" 
-                   					   labelKey="label.authoring.advance.passing.mark"
-							 		   tooltipKey="label.authoring.advance.passing.mark.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.passing.mark.tooltip.description"
-						>
-                            <option>None</option>
-                            <option>None</option>
-                            <option>None</option>
-                        </lams:Dropdown>
-					</div>
-					
-					<div class="col-12 col-xl-6 pr-4">
-						<lams:Switch name="shuffle-questions" checked="true" 
-									 labelKey="label.authoring.basic.shuffle.the.choices"
-									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
-									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
-						/>
-						
-						<lams:Switch name="display-all"
-									 labelKey="label.authoring.advance.display.summary"
-									 tooltipKey="label.authoring.advance.display.summary.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
-						/>
-						
-                       <lams:Switch name="display-over-all" checked="true" 
-									labelKey="label.authoring.advance.allow.students.overall.feedback"
-									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
-						/>
-						
-						<lams:Switch name="allow-learners"
-									 labelKey="label.authoring.advance.allow.students.grades"
-									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-justification" checked="true" 
-									labelKey="label.authoring.advance.answer.justification"
-									tooltipKey="label.authoring.advance.answer.justification.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-confidence"
-									 labelKey="label.enable.confidence.levels"
-									 tooltipKey="label.enable.confidence.levels.tooltip"
-									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
-						/>
-					</div>
+					<jsp:include page="feedback5.jsp"/>
 				</lams:Panel>
-				
-				<lams:Panel id="outcomes" titleKey="outcome.authoring.title" icon="${lamsUrl}images/components/assess-icon7.svg" colorClass="green2" expanded="false">
-				<div class="col-12 col-xl-6 pr-5">
-                   		<lams:Dropdown name="questions-per-page" 
-                   					   labelKey="label.authoring.advance.questions.per.page"
-							 		   tooltipKey="label.authoring.advance.questions.per.page.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.questions.per.page.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                                    
-                        <lams:Switch name="question-numbering" checked="true" 
-							 labelKey="label.authoring.advance.numbered.questions"
-							 tooltipKey="label.authoring.advance.numbered.questions.tooltip"
-							 tooltipDescriptionKey="label.authoring.advance.numbered.questions.tooltip.description"
-						/>
-						
-						<lams:Dropdown name="time-limit" 
-                   					   labelKey="label.authoring.advance.time.limit"
-							 		   tooltipKey="label.authoring.advance.time.limit.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.time.limit.tooltip.description"
-						>
-                           <option>All</option>
-                           <option>All</option>
-                           <option>All</option>
-                        </lams:Dropdown>
-                        		
-						<lams:Dropdown name="attempts-allowed" 
-                   					   labelKey="label.authoring.advance.attempts.allowed"
-							 		   tooltipKey="label.authoring.advance.attempts.allowed.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.attempts.allowed.tooltip.description"
-						>
-                           <option>1</option>
-                           <option>1</option>
-                           <option>1</option>
-                        </lams:Dropdown>
-                        
-						<lams:Dropdown name="passing-mark" 
-                   					   labelKey="label.authoring.advance.passing.mark"
-							 		   tooltipKey="label.authoring.advance.passing.mark.tooltip"
-							 		   tooltipDescriptionKey="label.authoring.advance.passing.mark.tooltip.description"
-						>
-                            <option>None</option>
-                            <option>None</option>
-                            <option>None</option>
-                        </lams:Dropdown>
-					</div>
-					
-					<div class="col-12 col-xl-6 pr-4">
-						<lams:Switch name="shuffle-questions" checked="true" 
-									 labelKey="label.authoring.basic.shuffle.the.choices"
-									 tooltipKey="label.authoring.basic.shuffle.the.choices.tooltip"
-									 tooltipDescriptionKey="label.authoring.basic.shuffle.the.choices.tooltip.description"
-						/>
-						
-						<lams:Switch name="display-all"
-									 labelKey="label.authoring.advance.display.summary"
-									 tooltipKey="label.authoring.advance.display.summary.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.display.summary.tooltip.description"
-						/>
-						
-                       <lams:Switch name="display-over-all" checked="true" 
-									labelKey="label.authoring.advance.allow.students.overall.feedback"
-									tooltipKey="label.authoring.advance.allow.students.overall.feedback.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.allow.students.overall.feedback.tooltip.description"
-						/>
-						
-						<lams:Switch name="allow-learners"
-									 labelKey="label.authoring.advance.allow.students.grades"
-									 tooltipKey="label.authoring.advance.allow.students.grades.tooltip"
-									 tooltipDescriptionKey="label.authoring.advance.allow.students.grades.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-justification" checked="true" 
-									labelKey="label.authoring.advance.answer.justification"
-									tooltipKey="label.authoring.advance.answer.justification.tooltip"
-									tooltipDescriptionKey="label.authoring.advance.answer.justification.tooltip.description"
-						/>
-						
-						<lams:Switch name="enable-confidence"
-									 labelKey="label.enable.confidence.levels"
-									 tooltipKey="label.enable.confidence.levels.tooltip"
-									 tooltipDescriptionKey="label.enable.confidence.levels.tooltip.description"
-						/>
-					</div>
+								
+				<lams:Panel id="reflection" titleKey="label.activity.completion"  icon="${lamsUrl}images/components/assess-icon7.svg"
+							colorClass="green2" expanded="false">
+					<jsp:include page="reflection5.jsp"/>
 				</lams:Panel>
-				 --%>
-				
 			</div>
-           </div>    
+		</div>    
 	</form:form>
 </lams:PageComponent>
 </body>
