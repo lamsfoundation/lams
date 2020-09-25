@@ -17,6 +17,7 @@
 <%@ attribute name="checked" required="false" rtexprvalue="true" %>
 <%@ attribute name="id" required="false" rtexprvalue="true" %>
 <%@ attribute name="useSpringForm" required="false" rtexprvalue="true" %>
+<%@ attribute name="inputCellClass" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipDescriptionKey" required="false" rtexprvalue="true" %>
 
@@ -24,7 +25,8 @@
 <c:set var="id" value="${empty id ? name : id}" />
 <c:set var="useSpringForm" value="${empty useSpringForm ? false : useSpringForm}" />
 
-<lams:Input id="${id}" labelKey="${labelKey}" tooltipKey="${tooltipKey}" tooltipDescriptionKey="${tooltipDescriptionKey}" inputCellClass="switch switch-sm">
+<lams:Input id="${id}" labelKey="${labelKey}" inputCellClass="switch switch-sm ${inputCellClass}"
+		    tooltipKey="${tooltipKey}" tooltipDescriptionKey="${tooltipDescriptionKey}" >
     <c:choose>
    		<c:when test="${useSpringForm}">
    			<form:checkbox path="${name}" id="${id}" cssClass="switch" />
