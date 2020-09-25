@@ -30,6 +30,28 @@
 	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 	
 	<script>
+
+	    function validateForm() {
+	        //check with a teacher whether he forgot to add questions to the question bank
+	        var referenceCount = $("#referencesTable tr").length - 1;
+			if ((referenceCount == 0) && !confirm("<fmt:message key="label.no.questions.in.question.bank"/>")) {
+				return false;
+			}
+	
+			var timeLimit = $('#relativeTimeLimit').val();
+			if (!timeLimit) {
+				$('#relativeTimeLimit').val(0);
+			}
+	
+			//serialize overallFeedbackForm
+	        $("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+	        	
+	        //enable checkbox to allow its value been submitted
+	        $("#display-summary").removeAttr("disabled", "disabled");
+	
+	    	return true;
+	    }
+	    
 		$(document).ready(function(){
 			$('[data-toggle="tooltip"]').tooltip();
 			  
@@ -117,7 +139,7 @@
 		</lams:Alert>
 	</c:if>
 	
-	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm">
+	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" onsubmit="return validateForm()">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="mode" value="${mode}">
 		
@@ -154,6 +176,13 @@
 					<jsp:include page="reflection5.jsp"/>
 				</lams:Panel>
 			</div>
+			
+			<!-- Button Row -->
+			<lams:AuthoringButton formID="authoringForm"
+				clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
+				toolContentID="${assessmentForm.assessment.contentId}"
+				accessMode="${mode}" defineLater="${mode=='teacher'}"
+				contentFolderID="${assessmentForm.contentFolderID}" />
 		</div>    
 	</form:form>
 </lams:PageComponent>

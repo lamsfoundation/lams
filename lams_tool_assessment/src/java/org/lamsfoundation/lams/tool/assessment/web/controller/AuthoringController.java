@@ -349,7 +349,7 @@ public class AuthoringController {
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	return "pages/authoring/authoring";
+	return "pages/authoring/authoring5";
     }
 
     /**
