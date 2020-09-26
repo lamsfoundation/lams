@@ -13,11 +13,11 @@
 	
 	<title><fmt:message key="label.author.title" /></title>
 	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/thickbox.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap4.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.custom.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/thickbox.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components-responsive.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/assessment.css">
@@ -114,6 +114,7 @@
 			</c:if>
 			
 			//automatically turn on refect option if there are text input in refect instruction area
+			/*
 			var ra = document.getElementById("reflectInstructions");
 			var rao = document.getElementById("reflectOnActivity");
 			function turnOnRefect(){
@@ -127,6 +128,7 @@
 			}
 			
 			ra.onkeyup=turnOnRefect;
+			*/
 		});
 	</script>
 </head>

@@ -13,11 +13,15 @@
 <%@ attribute name="labelKey" required="true" rtexprvalue="true" %>
 
 <%@ attribute name="inputCellClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="labelCellSize" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipDescriptionKey" required="false" rtexprvalue="true" %>
 
+<c:set var="inputCellClass" value=" ${empty inputCellClass ? 'd-flex justify-content-end' : inputCellClass}" />
+<c:set var="labelCellSize" value="${empty labelCellSize ? 8 : labelCellSize}" />
+
 <div class="form-group row">
-	<label class="col-sm-8 col-form-label" for="${id}">
+	<label class="col-sm-${labelCellSize} col-form-label" for="${id}">
 		<fmt:message key="${labelKey}" />
 		
 		<c:if test="${not empty tooltipKey}">
@@ -31,7 +35,7 @@
 		</c:if>
 	</label>
 	
-    <div class="col-sm-4 justify-content-end d-flex ${inputCellClass}">
+    <div class="col-sm-${12 - labelCellSize} ${inputCellClass}">
     	<jsp:doBody />
     </div>
 </div>

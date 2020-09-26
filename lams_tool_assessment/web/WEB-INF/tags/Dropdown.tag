@@ -23,7 +23,7 @@
 <c:set var="id" value="${empty id ? name : id}" />
 <c:set var="useSpringForm" value="${empty useSpringForm ? false : useSpringForm}" />
 
-<lams:Input id="${id}" labelKey="${labelKey}" inputCellClass="switch switch-sm ${inputCellClass}"
+<lams:Input id="${id}" labelKey="${labelKey}" inputCellClass="d-flex justify-content-end ${inputCellClass}"
 			tooltipKey="${tooltipKey}" tooltipDescriptionKey="${tooltipDescriptionKey}">
 	<c:choose>
    		<c:when test="${useSpringForm}">

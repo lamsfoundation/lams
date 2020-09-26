@@ -392,11 +392,6 @@ label {
 }
 
 /* Switch */
-.switch {
-	font-size: 1rem;
-	position: relative;
-	padding-left: 15px;
-}
 
 .switch input {
 	position: absolute;
