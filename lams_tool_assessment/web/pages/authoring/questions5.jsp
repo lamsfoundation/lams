@@ -1,14 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <style>
-	#question-bank-div {
-		margin-top: 75px;
-	}
-    
-	#question-bank-heading a {
-		color:#333
-	}
-	
 	#referencesTable thead {
 		background-color: #f5f5f5;
 	}
@@ -218,19 +210,13 @@
 		</ul>
 		
 		<!-- Question Bank -->
-		<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
-		    <div class="panel panel-default" >
-		        <div class="panel-heading collapsable-icon-left" id="question-bank-heading">
-		        	<span class="panel-title">
-				    	<a class="collapsed" role="button" data-toggle="collapse" href="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse" >
-			          		<fmt:message key="label.authoring.basic.question.bank.title" />
-			        	</a>
-		      		</span>
-		        </div>
-		
-				<div id="question-bank-collapse" class="panel-body panel-collapse collapse contains-nothing" role="tabpanel" aria-labelledby="question-bank-heading">
-					<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>	
-				</div>
+	    <div class="card mt-5" >
+			<button class="card-header btn btn-block text-left collapsed collapsable-icon-left" type="button"
+					data-toggle="collapse" data-target="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse">
+	       		<fmt:message key="label.authoring.basic.question.bank.title" />
+	        </button>
+			<div id="question-bank-collapse" class="card-body collapse contains-nothing" aria-labelledby="question-bank-heading">
+				<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>	
 			</div>
 		</div>
 	</c:if>

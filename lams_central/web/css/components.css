@@ -523,3 +523,15 @@ label {
 .dropdown-menu {
 	margin-top: .75rem;
 }
+
+.collapsable-icon-left:after {
+	font-family: FontAwesome;
+	content: "\f078";
+	float: left;
+	color: #6c757d;
+	margin-right: .5rem;
+}
+
+.collapsable-icon-left.collapsed:after {
+	content: "\f054";
+}
