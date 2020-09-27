@@ -21,7 +21,7 @@
 		//load question bank div
 		$('#question-bank-collapse').on('show.bs.collapse', function () {
 			$('#question-bank-collapse.contains-nothing').load(
-				"<lams:LAMSURL/>searchQB/start.do",
+				"<lams:LAMSURL/>searchQB/start5.do",
 				{
 					returnUrl: "<c:url value='/authoring/importQbQuestion.do'/>?sessionMapID=${sessionMapID}",
 					toolContentId: ${sessionMap.toolContentID}

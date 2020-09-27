@@ -144,6 +144,74 @@ public class SearchQBController {
 	return "qb/search";
     }
 
+    @RequestMapping("/start5")
+    private String start5(HttpServletRequest request) {
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	// LKC-215 QB in not always initiated from within tools; tool signature is used to control question types
+	String toolSignature = WebUtil.readStrParam(request, "toolSignature", true);
+	if (StringUtils.isBlank(toolSignature)) {
+	    Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
+	    ToolContent toolContent = (ToolContent) userManagementService.findById(ToolContent.class, toolContentId);
+	    if (toolContent == null) {
+		String error = "The toolContentID " + toolContentId
+			+ " is not valid. No such record exists on the database.";
+		throw new DataMissingException(error);
+	    }
+	    Tool tool = toolContent.getTool();
+	    toolSignature = tool.getToolSignature();
+	}
+
+	//empty questionTypesAvailable means no other questionTypes available for this tool
+	StringBuilder questionTypesAvailable = new StringBuilder();
+	//by default show MCQ type of questions (except for Q&A tool)
+	int questionTypeDefault = QbQuestion.TYPE_MULTIPLE_CHOICE;
+	if (CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
+
+	    //CommonConstants.TOOL_SIGNATURE_SURVEY
+	} else if ("lasurv11".equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
+
+	} else if (CommonConstants.TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)) {
+	    questionTypesAvailable.append(QbQuestion.TYPE_MULTIPLE_CHOICE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MATCHING_PAIRS);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_NUMERICAL);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_TRUE_FALSE);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ESSAY);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_ORDERING);
+	    questionTypesAvailable.append(",");
+	    questionTypesAvailable.append(QbQuestion.TYPE_MARK_HEDGING);
+
+	    //CommonConstants.TOOL_SIGNATURE_QA
+	} else if ("laqa11".equals(toolSignature)) {
+	    questionTypeDefault = QbQuestion.TYPE_ESSAY;
+	}
+	request.setAttribute("questionType", questionTypeDefault);
+	request.setAttribute("questionTypesAvailable", questionTypesAvailable.toString());
+	//let jsp know it's Scratchie, so we can disable VSA questions not compatible with TBL
+	request.setAttribute("isScratchie", CommonConstants.TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature));
+
+	//prepare data for displaying collections
+	Integer userId = getUserId();
+	Collection<QbCollection> userCollections = qbService.getUserCollections(userId);
+	request.setAttribute("userCollections", userCollections);
+
+	return "qb/search5";
+    }
+
     /**
      * Returns an xml representation of the lesson grid for a course for gradebook
      *
@@ -227,6 +295,23 @@ public class SearchQBController {
 	request.setAttribute("otherVersions", otherVersions);
 
 	return "qb/qbQuestionDetails";
+    }
+
+    @RequestMapping("/displayQuestionDetails5")
+    private String displayQuestionDetails5(HttpServletRequest request) {
+	Long questionUid = WebUtil.readLongParam(request, "questionUid");
+	QbQuestion qbQuestion = (QbQuestion) userManagementService.findById(QbQuestion.class, questionUid);
+	request.setAttribute("question", qbQuestion);
+
+	boolean isVsaAndCompatibleWithTbl = qbQuestion.isVsaAndCompatibleWithTbl();
+	request.setAttribute("isVsaAndCompatibleWithTbl", isVsaAndCompatibleWithTbl);
+	boolean isScratchie = WebUtil.readBooleanParam(request, "isScratchie", false);
+	request.setAttribute("isScratchie", isScratchie);
+
+	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
+	request.setAttribute("otherVersions", otherVersions);
+
+	return "qb/qbQuestionDetails5";
     }
 
     private Integer getUserId() {
