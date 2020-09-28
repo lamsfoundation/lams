@@ -1,19 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<style>
-	#referencesTable thead {
-		background-color: #f5f5f5;
-	}
-	#referencesTable th {
-		font-weight: 500;
-		font-style: normal;
-	}
-	
-	#add-question-div {
-		margin-top: -5px;
-	}
-</style>
-
 <script lang="javascript">
 	$(document).ready(function(){
 		reinitializePassingMarkSelect(true);
@@ -30,7 +16,7 @@
 					$(this).removeClass("contains-nothing");
 				}
 			);
-		})
+		});
 
     	//handler for "delete" buttons
     	$(document).on("click", '.delete-reference-link', function() {
@@ -174,40 +160,35 @@
 				<%@ include file="/pages/authoring/parts/questionlistRestricted.jsp"%>
 			</c:when>
 			<c:otherwise>
-				<%@ include file="/pages/authoring/parts/questionlist.jsp"%>
+				<%@ include file="/pages/authoring/parts/questionlist5.jsp"%>
 			</c:otherwise>
 		</c:choose>
 	</div>
 	
 	<c:if test="${!isAuthoringRestricted}">
 		<!-- Dropdown menu for choosing a question type -->
-		<ul id="add-question-div" class="list-inline bottom">
-			<li class="list-inline-item">
-				<select id="questionType" class="form-control form-control-select" aria-label="<fmt:message key="label.authoring.basic.question.list.title" />">
-						<option selected="selected" value="1"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
-						<option value="2"><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>
-						<option value="3"><fmt:message key="label.authoring.basic.type.short.answer" /></option>
-						<option value="4"><fmt:message key="label.authoring.basic.type.numerical" /></option>
-						<option value="5"><fmt:message key="label.authoring.basic.type.true.false" /></option>
-						<option value="6"><fmt:message key="label.authoring.basic.type.essay" /></option>
-						<option value="7"><fmt:message key="label.authoring.basic.type.ordering" /></option>
-						<option value="8"><fmt:message key="label.authoring.basic.type.mark.hedging" /></option>
-						<option value="-1">
-							<fmt:message key="label.authoring.basic.type.random.question" />
-						</option>
-				</select>
-			</li>
-			<li class="list-inline-item">
-				<a onclick="initNewReferenceHref(); return false;" href="#nogo" class="btn btn-primary thickbox" id="newQuestionInitHref">  
-					<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
-				</a>
-			</li>
-			<li class="list-inline-item">
-				<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-primary">
-					<fmt:message key="label.authoring.basic.import.qti" /> 
-				</a>
-			</li>
-		</ul>
+		<div id="add-question-div" class="d-flex justify-content-end">
+			<select id="questionType" class="form-control form-control-select" style="width: inherit" 
+					aria-label="<fmt:message key="label.authoring.basic.question.list.title" />">
+					<option selected="selected" value="1"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
+					<option value="2"><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>
+					<option value="3"><fmt:message key="label.authoring.basic.type.short.answer" /></option>
+					<option value="4"><fmt:message key="label.authoring.basic.type.numerical" /></option>
+					<option value="5"><fmt:message key="label.authoring.basic.type.true.false" /></option>
+					<option value="6"><fmt:message key="label.authoring.basic.type.essay" /></option>
+					<option value="7"><fmt:message key="label.authoring.basic.type.ordering" /></option>
+					<option value="8"><fmt:message key="label.authoring.basic.type.mark.hedging" /></option>
+					<option value="-1">
+						<fmt:message key="label.authoring.basic.type.random.question" />
+					</option>
+			</select>
+			<a onclick="initNewReferenceHref(); return false;" href="#" class="btn btn-primary mx-2 thickbox" id="newQuestionInitHref">  
+				<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
+			</a>
+			<button type="button" onClick="javascript:importQTI()" class="btn btn-primary">
+				<fmt:message key="label.authoring.basic.import.qti" /> 
+			</button>
+		</div>
 		
 		<!-- Question Bank -->
 	    <div class="card mt-5" >

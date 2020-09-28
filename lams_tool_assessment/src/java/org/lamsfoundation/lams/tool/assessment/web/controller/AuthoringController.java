@@ -485,9 +485,9 @@ public class AuthoringController {
 	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options
 	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	if (isAuthoringRestricted) {
-	    return "pages/authoring/parts/questionlistRestricted";
+	    return "pages/authoring/parts/questionlistRestricted5";
 	} else {
-	    return "pages/authoring/parts/questionlist";
+	    return "pages/authoring/parts/questionlist5";
 	}
     }
 
@@ -563,7 +563,7 @@ public class AuthoringController {
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist";
+	return "pages/authoring/parts/questionlist5";
     }
 
     /**
@@ -580,7 +580,7 @@ public class AuthoringController {
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist";
+	return "pages/authoring/parts/questionlist5";
     }
 
     /**
@@ -629,7 +629,7 @@ public class AuthoringController {
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist";
+	return "pages/authoring/parts/questionlist5";
     }
 
     /**
@@ -663,7 +663,7 @@ public class AuthoringController {
 	List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
 	delList.add(questionReference);
 
-	return "pages/authoring/parts/questionlist";
+	return "pages/authoring/parts/questionlist5";
     }
 
     @RequestMapping(path = "/toggleQuestionRequired", method = RequestMethod.POST)

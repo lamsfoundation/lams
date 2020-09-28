@@ -234,7 +234,6 @@ input::-moz-placeholder {
 	border: 0.1rem solid #DFDCE9;
 	border-radius: 1rem;
 	color: black;
-	font-size: 1rem;
 }
 
 .bbox_body div.cke_textarea_inline {
@@ -525,4 +524,12 @@ label {
 
 .collapsable-icon-left.collapsed:after {
 	content: "\f054";
+}
+
+table.table thead {
+	background-color: #e5e5e5;
+}
+
+i.fa[role="button"] {
+	cursor : pointer;
 }
