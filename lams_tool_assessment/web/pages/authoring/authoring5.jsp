@@ -149,43 +149,45 @@
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 
-        <div class="container-fluid" style="max-width: 1600px">
-			<div id="content" class="content row">
-				<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
-					<div class="col-12 p-0">
-						 <jsp:include page="basic5.jsp"/>
-					</div>
-				</lams:Panel>
-					
-               	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
-					<jsp:include page="questions5.jsp"/>
-				</lams:Panel>
+        <div id="content">
+			<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
+				<div class="col-12 p-0">
+					 <jsp:include page="basic5.jsp"/>
+				</div>
+			</lams:Panel>
 				
-				<lams:Panel id="advanced" titleKey="label.authoring.heading.advance" iconClass="fa-gear" colorClass="purple" expanded="false">
-					<jsp:include page="advance5.jsp"/>
-				</lams:Panel>
-				
-				<lams:Panel id="leader-selection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow" expanded="false">
-					<jsp:include page="leader5.jsp"/>
-				</lams:Panel>
-				
-				<lams:Panel id="feedback" titleKey="label.authoring.basic.general.feedback" iconClass="fa-comment-o" colorClass="blue" expanded="false">
-					<jsp:include page="feedback5.jsp"/>
-				</lams:Panel>
-								
-				<lams:Panel id="reflection" titleKey="label.activity.completion"  icon="${lamsUrl}images/components/assess-icon7.svg"
-							colorClass="green2" expanded="false">
-					<jsp:include page="reflection5.jsp"/>
-				</lams:Panel>
-			</div>
+              	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
+				<jsp:include page="questions5.jsp"/>
+			</lams:Panel>
 			
-			<!-- Button Row -->
-			<lams:AuthoringButton formID="authoringForm"
-				clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
-				toolContentID="${assessmentForm.assessment.contentId}"
-				accessMode="${mode}" defineLater="${mode=='teacher'}"
-				contentFolderID="${assessmentForm.contentFolderID}" />
-		</div>    
+			<lams:Panel id="advanced" titleKey="label.authoring.heading.advance" iconClass="fa-gear" colorClass="purple" expanded="false">
+				<jsp:include page="advance5.jsp"/>
+			</lams:Panel>
+			
+			<lams:Panel id="leader-selection" titleKey="label.select.leader" iconClass="fa-star-o" colorClass="yellow" expanded="false">
+				<jsp:include page="leader5.jsp"/>
+			</lams:Panel>
+			
+			<lams:Panel id="feedback" titleKey="label.authoring.basic.general.feedback" iconClass="fa-comment-o" colorClass="blue" expanded="false">
+				<jsp:include page="feedback5.jsp"/>
+			</lams:Panel>
+							
+			<lams:Panel id="reflection" titleKey="label.activity.completion"  icon="${lamsUrl}images/components/assess-icon7.svg"
+						colorClass="green2" expanded="false">
+				<jsp:include page="reflection5.jsp"/>
+			</lams:Panel>
+		</div>
+		
+		<!-- Button Row -->
+		<div class="row">
+			<div class="col-12 p-0">
+				<lams:AuthoringButton formID="authoringForm"
+					clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
+					toolContentID="${assessmentForm.assessment.contentId}"
+					accessMode="${mode}" defineLater="${mode=='teacher'}"
+					contentFolderID="${assessmentForm.contentFolderID}" />
+			</div>
+		</div>
 	</form:form>
 </lams:PageComponent>
 </body>

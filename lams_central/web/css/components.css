@@ -99,10 +99,6 @@ img {
 	color: #696f7d;
 }
 
-.content {
-	
-}
-
 .content-left {
 	-ms-flex: 0 0 26.5rem;
 	flex: 0 0 26.5rem;
@@ -237,9 +233,7 @@ input::-moz-placeholder {
 .bbox_body input.form-control {
 	border: 0.1rem solid #DFDCE9;
 	border-radius: 1rem;
-	height: 3.25rem;
 	color: black;
-	margin-bottom: .5rem;
 	font-size: 1rem;
 }
 
@@ -417,6 +411,7 @@ label {
 	user-select: none;
 	vertical-align: middle;
 	text-indent: calc(calc(calc(2.375rem * .8) * 2) + .5rem);
+	margin-bottom: 0;
 }
 
 .switch input ~ label::before, .switch input ~ label::after {
@@ -518,10 +513,6 @@ label {
 
 .switch+.switch {
 	margin-left: 1rem;
-}
-
-.dropdown-menu {
-	margin-top: .75rem;
 }
 
 .collapsable-icon-left:after {

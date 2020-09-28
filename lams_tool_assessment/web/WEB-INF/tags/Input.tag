@@ -17,7 +17,7 @@
 <%@ attribute name="tooltipKey" required="false" rtexprvalue="true" %>
 <%@ attribute name="tooltipDescriptionKey" required="false" rtexprvalue="true" %>
 
-<c:set var="inputCellClass" value=" ${empty inputCellClass ? 'd-flex justify-content-end' : inputCellClass}" />
+<c:set var="inputCellClass" value="${empty inputCellClass ? 'd-flex justify-content-end' : inputCellClass}" />
 <c:set var="labelCellSize" value="${empty labelCellSize ? 8 : labelCellSize}" />
 
 <div class="form-group row">
@@ -35,7 +35,7 @@
 		</c:if>
 	</label>
 	
-    <div class="col-sm-${12 - labelCellSize} ${inputCellClass}">
+    <div class="col-sm-${12 - labelCellSize} col-form-label ${inputCellClass}">
     	<jsp:doBody />
     </div>
 </div>

@@ -22,47 +22,44 @@
 <%-- Should left panel (icon, color) be displayed at all --%>
 <c:set var="hasLeftPanel" value="${not empty icon or not empty iconClass or not empty colorClass}" />
 
-<div class="col-12 p-0">
-	<div class="bbox-col d-flex slide_col" id="${id}-bbox">
+<div class="bbox-col d-flex" id="${id}-bbox">
+	<c:if test="${hasLeftPanel}">
+		<div class="bbox-left ${colorClass}">
+			<c:choose>
+				<c:when test="${not empty icon}">
+					<%-- Display regular icon --%>
+					<img src="${icon}">
+				</c:when>
+				<c:when test="${not empty iconClass}">
+					<%-- Display Font Awesome icon --%>
+					<i class="fa ${iconClass}" aria-hidden="true"></i>
+				</c:when>
+				<c:otherwise>
+					<%-- Blank character for padding --%>
+					<span class="no-icon" aria-hidden="true">&nbsp;</span>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</c:if>
 	
-		<c:if test="${hasLeftPanel}">
-			<div class="bbox-left ${colorClass}">
-				<c:choose>
-					<c:when test="${not empty icon}">
-						<%-- Display regular icon --%>
-						<img src="${icon}">
-					</c:when>
-					<c:when test="${not empty iconClass}">
-						<%-- Display Font Awesome icon --%>
-						<i class="fa ${iconClass}" aria-hidden="true"></i>
-					</c:when>
-					<c:otherwise>
-						<%-- Blank character for padding --%>
-						<span class="no-icon" aria-hidden="true">&nbsp;</span>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</c:if>
+	<div class="bbox_body ${hasLeftPanel ? 'bbox-right' : ''}">
+           <div class="grey_title grey_title1">
+           	<c:set var="contentId" value="${id}-content" />
+           	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
+           	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">
+          	   		<c:choose>
+          	   			<c:when test="${not empty titleKey}">
+          	   				<h2><fmt:message key="${titleKey}" /></h2>
+          	   			</c:when>
+          	   			<c:otherwise>
+          	   				&nbsp;
+          	   			</c:otherwise>
+          	   		</c:choose>
+           	</a>
+		</div>
 		
-		<div class="bbox_body ${hasLeftPanel ? 'bbox-right' : ''}">
-            <div class="grey_title grey_title1">
-            	<c:set var="contentId" value="${id}-content" />
-            	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
-            	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">
-           	   		<c:choose>
-           	   			<c:when test="${not empty titleKey}">
-           	   				<h2><fmt:message key="${titleKey}" /></h2>
-           	   			</c:when>
-           	   			<c:otherwise>
-           	   				&nbsp;
-           	   			</c:otherwise>
-           	   		</c:choose>
-            	</a>
-			</div>
-			
-			<div id="${id}-content" class="row mt-3 collapse ${expanded ? ' show' : ''}">
-				<jsp:doBody />
-			</div>
+		<div id="${id}-content" class="row mt-3 collapse ${expanded ? ' show' : ''}">
+			<jsp:doBody />
 		</div>
 	</div>
 </div>
