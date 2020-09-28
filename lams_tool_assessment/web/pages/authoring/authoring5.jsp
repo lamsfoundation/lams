@@ -156,7 +156,7 @@
 				</div>
 			</lams:Panel>
 				
-              	<lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
+           <lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">
 				<jsp:include page="questions5.jsp"/>
 			</lams:Panel>
 			
@@ -176,17 +176,13 @@
 						colorClass="green2" expanded="false">
 				<jsp:include page="reflection5.jsp"/>
 			</lams:Panel>
-		</div>
-		
-		<!-- Button Row -->
-		<div class="row">
-			<div class="col-12 p-0">
-				<lams:AuthoringButton formID="authoringForm"
-					clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
-					toolContentID="${assessmentForm.assessment.contentId}"
-					accessMode="${mode}" defineLater="${mode=='teacher'}"
-					contentFolderID="${assessmentForm.contentFolderID}" />
-			</div>
+			
+			<!-- Button Row -->
+			<lams:AuthoringButton5 formID="authoringForm"
+				clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
+				toolContentID="${assessmentForm.assessment.contentId}"
+				accessMode="${mode}" defineLater="${mode=='teacher'}"
+				contentFolderID="${assessmentForm.contentFolderID}" />
 		</div>
 	</form:form>
 </lams:PageComponent>
