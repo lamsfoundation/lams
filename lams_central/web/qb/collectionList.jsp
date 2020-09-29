@@ -123,7 +123,7 @@
 				lower = name.toLowerCase();
 			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
-				if ($(this).data('collectionName').trim().toLowerCase() == lower) {
+				if (String($(this).data('collectionName')).trim().toLowerCase() == lower) {
 					alert('<fmt:message key="label.qb.collection.name.duplicate.error" />');
 					name = null;
 					return false;
