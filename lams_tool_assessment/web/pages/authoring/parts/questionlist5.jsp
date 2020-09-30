@@ -101,12 +101,12 @@
 					</c:choose>
 					
 					<c:if test="${!questionReference.randomQuestion}">
-				        <span class='float-right btn btn-sm btn-info mx-2'>
+				        <span class='float-right badge badge-primary mx-2'>
 				       		v.&nbsp;${question.qbQuestion.version}
 				        </span>
 			        </c:if>
 			        
-			       	<span class='float-right btn btn-sm btn-info'>
+			       	<span class='float-right badge badge-primary'>
 						<c:choose>
 							<c:when test="${questionReference.randomQuestion}">
 								<fmt:message key="label.authoring.basic.type.random.question" />
