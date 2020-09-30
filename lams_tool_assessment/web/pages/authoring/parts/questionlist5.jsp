@@ -19,50 +19,50 @@
 			break;
 	}
 	if (qbMessage) {
-		alert(qbMessage);
+		$('#toast-question').toast('show').find('.toast-body').text(qbMessage);
 	}
 
 	$(document).ready(function(){
 	    //init questions sorting
 	    <c:if test="${not empty sessionMap.questionReferences}">
-	    new Sortable($('#referencesTable tbody')[0], {
-		    animation: 150,
-		    direction: 'vertical',
-			store: {
-				set: function (sortable) {
-					//update all sequenceIds
-					for (var i = 0; i < sortable.el.rows.length; i++) {
-					 	var tr = sortable.el.rows[i];
-					 	var input = $("input[name^=sequenceId]", tr);
-					 	input.val(i);
-					 	var displayOrder = $(".reference-display-order", tr);
-					 	displayOrder.text(i + 1 + ")");
-					}
-
-					//prepare SequenceIds parameter
-					var serializedSequenceIds = "";
-					$("[name^=sequenceId]").each(function() {
-						serializedSequenceIds += "&" + this.name + "="  + this.value;
-					});
-
-					$.ajax({ 
-					    url: '<c:url value="/authoring/cacheReferencesOrder.do"/>',
-						type: 'POST',
-						data: {
-							sessionMapID: "${sessionMapID}",
-							sequenceIds: serializedSequenceIds
+		    new Sortable($('#referencesTable tbody')[0], {
+			    animation: 150,
+			    direction: 'vertical',
+				store: {
+					set: function (sortable) {
+						//update all sequenceIds
+						for (var i = 0; i < sortable.el.rows.length; i++) {
+						 	var tr = sortable.el.rows[i];
+						 	var input = $("input[name^=sequenceId]", tr);
+						 	input.val(i);
+						 	var displayOrder = $(".reference-display-order", tr);
+						 	displayOrder.text(i + 1 + ")");
 						}
-					});
-
-					//update names
-					$("[name^=sequenceId]").each(function() {
-						var newSequenceId = this.value;
-						//update name of the hidden input
-						this.name = "sequenceId" + newSequenceId;
-					});
+	
+						//prepare SequenceIds parameter
+						var serializedSequenceIds = "";
+						$("[name^=sequenceId]").each(function() {
+							serializedSequenceIds += "&" + this.name + "="  + this.value;
+						});
+	
+						$.ajax({ 
+						    url: '<c:url value="/authoring/cacheReferencesOrder.do"/>',
+							type: 'POST',
+							data: {
+								sessionMapID: "${sessionMapID}",
+								sequenceIds: serializedSequenceIds
+							}
+						});
+	
+						//update names
+						$("[name^=sequenceId]").each(function() {
+							var newSequenceId = this.value;
+							//update name of the hidden input
+							this.name = "sequenceId" + newSequenceId;
+						});
+					}
 				}
-			}
-		});
+			});
 		</c:if>
 	});
 </script>
@@ -164,3 +164,7 @@
 		</c:forEach>
 	</tbody>
 </table>
+
+<div id="toast-question" class="toast toast-top" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+  <div class="toast-body alert alert-info"></div>
+</div>

@@ -543,3 +543,15 @@ i.fa[role="button"] {
 	height: 100%;
 	border: none;
 }
+
+.toast-top {
+  position: fixed;
+  top: 3rem;
+  left: 50%;
+  transform: translate(-50%, 0px);
+  z-index: 10;
+}
+
+.toast-top .alert {
+	margin: 0;
+}
