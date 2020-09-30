@@ -159,7 +159,7 @@
     }
 </script>
 
-<div id="questionlist" class="col-12 p-0">
+<div id="questionlist">
 	<div id="itemArea">
 		<c:choose>
 			<c:when test="${isAuthoringRestricted}">

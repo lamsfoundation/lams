@@ -137,9 +137,7 @@
 
         <div id="content">
 			<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
-				<div class="col-12 p-0">
-					 <jsp:include page="basic5.jsp"/>
-				</div>
+				<jsp:include page="basic5.jsp"/>
 			</lams:Panel>
 				
            <lams:Panel id="questions" titleKey="label.authoring.basic.question.list.title" iconClass="fa-question-circle-o" colorClass="yellow" expanded="true">

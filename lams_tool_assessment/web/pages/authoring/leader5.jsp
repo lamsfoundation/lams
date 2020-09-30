@@ -1,17 +1,15 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="col-12 p-0">	
-	<lams:Switch name="assessment.useSelectLeaderToolOuput" id="useSelectLeaderToolOuput"
-		useSpringForm="true"
-		labelKey="label.use.select.leader.tool.output"
-		tooltipKey="label.use.select.leader.tool.output.tooltip"
-		tooltipDescriptionKey="label.use.select.leader.tool.output.tooltip.description" />
+<lams:Switch name="assessment.useSelectLeaderToolOuput" id="useSelectLeaderToolOuput"
+	useSpringForm="true"
+	labelKey="label.use.select.leader.tool.output"
+	tooltipKey="label.use.select.leader.tool.output.tooltip"
+	tooltipDescriptionKey="label.use.select.leader.tool.output.tooltip.description" />
 
-	<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
-		<lams:Switch name="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"
-			useSpringForm="true"
-			labelKey="label.authoring.advance.question.etherpad"
-			tooltipKey="label.authoring.advance.question.etherpad.tooltip"
-			tooltipDescriptionKey="label.authoring.advance.question.etherpad.tooltip.description" />
-	</c:if>
-</div>
+<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
+	<lams:Switch name="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"
+		useSpringForm="true"
+		labelKey="label.authoring.advance.question.etherpad"
+		tooltipKey="label.authoring.advance.question.etherpad.tooltip"
+		tooltipDescriptionKey="label.authoring.advance.question.etherpad.tooltip.description" />
+</c:if>

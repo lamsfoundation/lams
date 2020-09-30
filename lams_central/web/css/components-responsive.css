@@ -31,9 +31,6 @@
 	.pr {
 		padding-right: 0rem;
 	}
-	.pr-4 {
-		padding-right: 3rem !important;
-	}
 }
 
 @media ( max-width : 992px) {
