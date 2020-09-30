@@ -152,7 +152,7 @@
 				</td>
 				
 				<td class="align-middle" style="width: 30px">
-					<a class="thickbox edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
+					<a class="edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
 						<i class="fa fa-pencil"	role="button" title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>
 				</td>

@@ -33,7 +33,6 @@
     				},
     				function(){
     					reinitializePassingMarkSelect(false);
-    					refreshThickbox();
     				}
     			);
     		};
@@ -57,25 +56,36 @@
 
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#itemArea";
-	function initNewReferenceHref() {
-		var questionTypeDropdown = document.getElementById("questionType");
-		var questionType = questionTypeDropdown.value;
-		
-		var newQuestionInitHref = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}"
-			+ "&questionType=" + questionType 
-			+ "&KeepThis=true&TB_iframe=true&modal=true";
-		$("#newQuestionInitHref").attr("href", newQuestionInitHref);
+	
+	function initNewReference() {
+		var questionType = $('#questionType').val(),
+			newQuestionInitUrl = "<c:url value='/authoring/initNewReference.do'/>?sessionMapID=${sessionMapID}"
+								  + "&questionType=" + questionType,
+			modal = $('#qb-question-authoring-modal');
+			
+		$('iframe', modal).attr('src', newQuestionInitUrl);
+		modal.modal('show');
 	};
 
 	//handler for "edit" buttons
 	function editReference(link) {
-		var sequenceId = $('.reference-sequence-id', $(link).parents('tr')).val();
-    	
-		var editHref = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}" 
-		+ "&referenceSequenceId=" + sequenceId 
-		+ "&KeepThis=true&TB_iframe=true&modal=true";
-		$(link).attr("href", editHref);
+		var sequenceId = $('.reference-sequence-id', $(link).parents('tr')).val(),
+			editUrl = "<c:url value='/authoring/editReference.do'/>?sessionMapID=${sessionMapID}" 
+						+ "&referenceSequenceId=" + sequenceId,
+			modal = $('#qb-question-authoring-modal');
+		
+		$('iframe', modal).attr('src', editUrl);
+		modal.modal('show');
     }
+ 	
+	function refreshThickbox() {
+		// dummy method for current QB question authoring to work
+	}
+	
+	// for consistency with yet not rewritten QB question authoring
+	function tb_remove() {
+		$('#qb-question-authoring-modal').modal('hide');
+	}
 	
 	function toggleQuestionRequired(icon){
 		var sequenceId = $('.reference-sequence-id', $(icon).parents('tr')).val();
@@ -98,9 +108,6 @@
 		});
 	}
 	
-	function refreshThickbox(){
-		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
-	};
 	function reinitializePassingMarkSelect(isPageFresh){
 		var oldValue = (isPageFresh) ? "${assessmentForm.assessment.passingMark}" : $("#passingMark").val();
 		$('#passingMark').empty();
@@ -145,7 +152,6 @@
 					success: function(response) {
 						// question list gets refreshed
 						$(questionListTargetDiv).html(response);
-						refreshThickbox();
 					}
 				});
 			}
@@ -182,10 +188,10 @@
 						<fmt:message key="label.authoring.basic.type.random.question" />
 					</option>
 			</select>
-			<a onclick="initNewReferenceHref(); return false;" href="#" class="btn btn-primary mx-2 thickbox" id="newQuestionInitHref">  
+			<button onclick="javscript:initNewReference()" type="button" class="btn btn-primary mx-2">  
 				<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
-			</a>
-			<button type="button" onClick="javascript:importQTI()" class="btn btn-primary">
+			</button>
+			<button onClick="javascript:importQTI()" type="button" class="btn btn-primary">
 				<fmt:message key="label.authoring.basic.import.qti" /> 
 			</button>
 		</div>
@@ -200,5 +206,14 @@
 				<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>	
 			</div>
 		</div>
+		
+		<div id="qb-question-authoring-modal" class="modal p-3" tabindex="-1" data-backdrop="static" data-keyboard="false">
+			<div class="modal-content">
+				<div class="modal-body">
+		        	<iframe></iframe>
+		    	</div>
+			</div>
+		</div>
+		
 	</c:if>
 </div>

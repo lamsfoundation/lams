@@ -13,7 +13,6 @@
 	
 	<title><fmt:message key="label.author.title" /></title>
 	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/thickbox.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap4.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.theme.bootstrap.css">
@@ -26,7 +25,6 @@
 	<script src="<lams:LAMSURL/>includes/javascript/bootstrap4.bundle.min.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.tablesorter.pager.js"></script>
-	<script src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 	
 	<script>

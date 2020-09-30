@@ -84,7 +84,7 @@
 
 			<td class="align-middle" style="width: 30px; padding-right: 20px;">
 				<c:if test="${!questionReference.randomQuestion}">
-					<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
+					<a class="edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
 						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>			
 				</c:if>
