@@ -11,9 +11,8 @@
 
 <%@ attribute name="titleKey" required="false" rtexprvalue="true" %>
 
-<div class="wrapper d-flex">
-	<div class="main-content">
-		<div class="main-content-inner">
+<div class="component-page-wrapper d-flex">
+		<div class="component-page-content">
             <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
             
             <c:if test="${not empty titleKey}">
@@ -27,5 +26,4 @@
 			<jsp:doBody />
 			
 		</div>
-	</div>
 </div>

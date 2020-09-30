@@ -22,9 +22,9 @@
 <%-- Should left panel (icon, color) be displayed at all --%>
 <c:set var="hasLeftPanel" value="${not empty icon or not empty iconClass or not empty colorClass}" />
 
-<div class="bbox-col d-flex" id="${id}-bbox">
+<div class="banner-box-col d-flex" id="${id}-banner-box">
 	<c:if test="${hasLeftPanel}">
-		<div class="bbox-left ${colorClass}">
+		<div class="banner-box-left ${colorClass}">
 			<c:choose>
 				<c:when test="${not empty icon}">
 					<%-- Display regular icon --%>
@@ -42,8 +42,8 @@
 		</div>
 	</c:if>
 	
-	<div class="bbox_body ${hasLeftPanel ? 'bbox-right' : ''}">
-           <div class="grey_title grey_title1">
+	<div class="banner-box-body ${hasLeftPanel ? 'banner-box-right' : ''}">
+           <div class="banner-box-title">
            	<c:set var="contentId" value="${id}-content" />
            	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
            	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">

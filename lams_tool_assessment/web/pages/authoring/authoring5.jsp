@@ -28,7 +28,9 @@
 	<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 	
 	<script>
-
+		// jQuery UI overrides Bootstrap's tooltip, so store it under another name
+		$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+			
 	    function validateForm() {
 	        //check with a teacher whether he forgot to add questions to the question bank
 	        var referenceCount = $("#referencesTable tr").length - 1;
@@ -51,7 +53,7 @@
 	    }
 	    
 		$(document).ready(function(){
-			$('[data-toggle="tooltip"]').tooltip();
+			$('[data-toggle="tooltip"]').bootstrapTooltip();
 			  
 			$("#attemptsAllowedRadio").change(function() {
 				$("#passingMark").val("0");
@@ -119,7 +121,7 @@
 	</script>
 </head>
 
-<body>
+<body class="component">
 <lams:PageComponent titleKey="label.author.title">
 	<c:if test="${isAuthoringRestricted}">
 		<lams:Alert id="edit-in-monitor-while-assessment-already-attempted" type="error" close="true">

@@ -198,10 +198,10 @@
 		
 		<!-- Question Bank -->
 	    <div class="card mt-5" >
-			<button class="card-header btn btn-block text-left collapsed collapsable-icon-left" type="button"
+			<div class="card-header text-left collapsed collapsable-icon-left" role="button"
 					data-toggle="collapse" data-target="#question-bank-collapse" aria-expanded="false" aria-controls="question-bank-collapse">
 	       		<fmt:message key="label.authoring.basic.question.bank.title" />
-	        </button>
+	        </div>
 			<div id="question-bank-collapse" class="card-body collapse contains-nothing" aria-labelledby="question-bank-heading">
 				<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="margin: auto; display: block"></i>	
 			</div>
