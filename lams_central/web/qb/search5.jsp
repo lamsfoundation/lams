@@ -3,6 +3,8 @@
 
 <link rel="stylesheet"href="<lams:LAMSURL/>css/free.ui.jqgrid.min5.css">
 <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-select.min5.css" />
+<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+<link rel="stylesheet" href="<lams:LAMSURL/>css/components-responsive.css">
 
 <style>
 	.qb-search-widget .question-description-grid {
@@ -40,14 +42,6 @@
 	    font-size: 14px;
    		margin: 6px;
 	}
-		
-	/* question imported growl */
-	.qb-search-widget div.growlUI h1, .qb-search-widget div.growlUI h2 {
-		color: white;
-		margin: 5px 5px 5px 0px;
-		text-align: center;
-		font-size: 18px;
-	}
 	
 	.qb-search-widget .dropdown-item {
 		cursor: pointer;
@@ -56,7 +50,6 @@
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.min5.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
 <script type="text/javascript">
 	<%-- Add jqGrid internationalisation snippet --%>
@@ -139,8 +132,8 @@
 				success: function(response, status, xhr) {
 					if (response.isDuplicated) {
 						//show not successfull notification
-	                	$.growlUI('<i class="fa fa-lg fa-ban" style="color:red"></i> <fmt:message key="label.question.not.added" />');
-						
+						$('#toast-import').toast('show').find('.toast-body').addClass('alert-danger').removeClass('alert-success')
+										  .html('<i class="fa fa-lg fa-ban"></i>&nbsp;<fmt:message key="label.question.not.added" />');
 					} else {
 						$("#itemArea").html(response);
 
@@ -150,7 +143,8 @@
 						}
 
 						//show successfull notification
-	                	$.growlUI('<i class="fa fa-lg fa-check" style="color:green"></i>&nbsp;<fmt:message key="label.question.successfully.imported" />');
+						$('#toast-import').toast('show').find('.toast-body').addClass('alert-success').removeClass('alert-danger')
+										  .html('<i class="fa fa-lg fa-check"></i>&nbsp;<fmt:message key="label.question.successfully.imported" />');
 					}
 				}
 			});
@@ -291,4 +285,8 @@
 					
 		<div id="question-detail-area" class="col-xs-12 col-sm-7"></div>
 	</div>	
+	
+	<div id="toast-import" class="toast toast-top" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+	  <div class="toast-body alert"></div>
+	</div>
 </div>
