@@ -138,7 +138,7 @@
 		<form:hidden path="contentFolderID" />
 
         <div id="content">
-			<lams:Panel id="basic" titleKey="label.authoring.heading.basic" iconClass="fa-file-o" colorClass="green">
+			<lams:Panel id="basic" collapsible="false" iconClass="fa-file-o" colorClass="green">
 				<jsp:include page="basic5.jsp"/>
 			</lams:Panel>
 				

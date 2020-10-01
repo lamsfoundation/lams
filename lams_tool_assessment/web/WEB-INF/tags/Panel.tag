@@ -16,8 +16,10 @@
 <%@ attribute name="icon" required="false" rtexprvalue="true" %>
 <%@ attribute name="iconClass" required="false" rtexprvalue="true" %>
 <%@ attribute name="colorClass" required="false" rtexprvalue="true" %>
+<%@ attribute name="collapsible" required="false" rtexprvalue="true" %>
 <%@ attribute name="expanded" required="false" rtexprvalue="true" %>
 
+<c:set var="collapsible" value="${empty collapsible ? true : collapsible}" />
 <c:set var="expanded" value="${empty expanded ? true : expanded}" />
 <%-- Should left panel (icon, color) be displayed at all --%>
 <c:set var="hasLeftPanel" value="${not empty icon or not empty iconClass or not empty colorClass}" />
@@ -43,22 +45,31 @@
 	</c:if>
 	
 	<div class="banner-box-body ${hasLeftPanel ? 'banner-box-right' : ''}">
-           <div class="banner-box-title">
-           	<c:set var="contentId" value="${id}-content" />
-           	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
-           	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">
-          	   		<c:choose>
-          	   			<c:when test="${not empty titleKey}">
-          	   				<h2><fmt:message key="${titleKey}" /></h2>
-          	   			</c:when>
-          	   			<c:otherwise>
-          	   				&nbsp;
-          	   			</c:otherwise>
-          	   		</c:choose>
-           	</a>
-		</div>
+		<c:set var="contentId" value="${id}-content" />
 		
-		<div id="${id}-content" class="mt-3 collapse ${expanded ? ' show' : ''}">
+		<c:if test="${collapsible or not empty titleKey}">
+	        <div class="banner-box-title">
+	           <c:if test="${collapsible}">
+		           	<a class="collapsible-link ${empty titleKey ? ' no-title' : ''}" role="button" href="#${contentId}"
+		           	   data-toggle="collapse" data-target="#${contentId}" aria-expanded="${expanded}" aria-controls="${contentId}">
+	           	</c:if>
+	           	
+	   	   		<c:choose>
+	   	   			<c:when test="${not empty titleKey}">
+	   	   				<h2><fmt:message key="${titleKey}" /></h2>
+	   	   			</c:when>
+	   	   			<c:otherwise>
+	   	   				&nbsp;
+	   	   			</c:otherwise>
+	   	   		</c:choose>
+	   	   		
+	   	   		 <c:if test="${collapsible}">
+	           		</a>
+	           	</c:if>
+			</div>
+		</c:if>
+		
+		<div id="${contentId}" class="${collapsible ? 'mt-3 collapse' : ''} ${collapsible and expanded ? ' show' : ''}">
 			<jsp:doBody />
 		</div>
 	</div>
