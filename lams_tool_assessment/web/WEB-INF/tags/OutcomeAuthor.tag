@@ -1,6 +1,6 @@
 <% 
  /**
-  * Outcome.tag
+  * OutcomeAuthor.tag
   *	Author: Marcin Cieslak
   *	Description: Outcome selection in authoring
   */
@@ -24,21 +24,23 @@
 <c:set var="outcomeTagId" value="${empty outcomeTagId ? 1 : outcomeTagId + 1}" />
 
 <%-- ---------------------------------------%>
-<style type="text/css">
-	.outcomeMappings {
+<style>
+	#outcomeAuthor${outcomeTagId} .outcomeMappings div {
 		display: inline-block;
 	}
 	
-	.outcomeButton {
-		padding-top: 2px;
-		padding-bottom: 2px;
+	#outcomeAuthor${outcomeTagId} input {
+		margin-bottom: 0 !important;
+	}
+	
+	.ui-autocomplete .ui-menu-item {
+		cursor: pointer;
 	}
 </style>
 
 <script type="text/javascript">
 	// Adding jquery-ui.js if it hasn't been loaded already
 	if (!jQuery.ui) {
-		document.write('<link href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css" />');
 		document.write('<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"><\/script>');
 	}
 
@@ -63,6 +65,14 @@
 			'source' : "<lams:LAMSURL/>outcome/outcomeSearch.do",
 			'delay'  : 700,
 			'minLength' : 2,
+			'open'	: function(event, ui){
+				$('.ui-autocomplete').addClass('dropdown-menu');
+				$('.ui-menu-item').addClass('dropdown-item');
+			},
+			'classes' : {
+				'ui-autocomplete' : 'dropdown-menu',
+				'ui-menu-item'    : 'dropdown-item'
+			},
 			'response' : function(event, ui) {
 				// filter out already mapped outcomes
 				var index = ui.content.length - 1,
@@ -142,7 +152,7 @@
 						outcomeMappingIds${outcomeTagId}.push(this.outcomeId);
 						// add a label with outcome information
 						var qbMapping = !outcomeData.qbQuestionId && outcomeData.toolContentId && this.qbMapping;
-						$('<button type="button" class="roffset10 btn btn-xs btn-info outcomeButton" />')
+						$('<button type="button" class="mr-2 mt-2 btn btn-sm btn-info outcomeButton" />')
 							.attr('mappingId', this.mappingId)
 							.html(this.label + (qbMapping ? '' : outcomeMappingRemoveButton))
 							.prop('disabled', qbMapping)
@@ -176,35 +186,17 @@
 	}
 </script>
 
-<c:choose>
-	<c:when test="${inPanel}">
-		<lams:SimplePanel titleKey="outcome.authoring.title">
-			<div class="input-group">
-			    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-			    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
-			    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
-			</div>
-			<div class="voffset10">
-				<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
-			</div>
-		</lams:SimplePanel>
-	</c:when>
-	<c:otherwise>
-		<div class="form-group row">
-		    <label for="outcomeSearchInput${outcomeTagId}" class="col-sm-3">
-		    	<fmt:message key="outcome.authoring.title" />
-		    </label>
-		    
-		    <div class="col-sm-9">
-		    	<div class="input-group">
-				    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-				    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="ui-autocomplete-input form-control" 
-				    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
-				</div>
-				<div class="voffset10">
-					<fmt:message key="outcome.authoring.existing" />: <div id="outcomeMappings${outcomeTagId}" class="outcomeMappings"></div>
-				</div>
-			</div>
+<div id="outcomeAuthor${outcomeTagId}">
+	<lams:Input id="outcomeSearchInput${outcomeTagId}" labelCellSize="3" labelKey="outcome.authoring.title" inputCellClass="justify-content-start flex-wrap">
+		<div class="input-group">
+			<div class="input-group-prepend">
+		    	<span class="input-group-text"><i class="fa fa-search"></i></span>
+		    </div>
+		    <input type="text" id="outcomeSearchInput${outcomeTagId}" class="form-control" 
+		    	   placeholder='<fmt:message key="outcome.authoring.input" />'></input>
 		</div>
-	</c:otherwise>
-</c:choose>
+		<div class="outcomeMappings">
+			<div class="mt-2 mr-2"><fmt:message key="outcome.authoring.existing" />: </div><div id="outcomeMappings${outcomeTagId}"></div>
+		</div>
+	</lams:Input>
+</div>

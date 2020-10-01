@@ -24,7 +24,7 @@
  
  /**
   * AuthoringButton.tag
-  *	Author: Dapeng Ni
+  *	Author: Dapeng Ni, Marcin Cieslak
   *	Description: Creates the save/cancel button for authoring page
   */
  
@@ -122,12 +122,14 @@
     	window.close();
     }  				
 </script>	
-<div id="saveCancelButtons" >
-		<a href="javascript:doSubmit_Form_Only();" id="saveButton" name="submit" class="btn btn-primary pull-right">
-			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
-		</a>
-		<a href="javascript:;" name="cancel" id="cancelButton" onclick="javascript:doCancel()" class="btn btn-default roffset5 pull-right">
-			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
-		</a>
+<div id="saveCancelButtons" class="d-flex justify-content-end">
+	<button id="cancelButton" onclick="javascript:doCancel()" type="button" class="btn btn-outline-secondary mr-2">
+		<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
+	</button>
+	
+	<button id="saveButton" onClick="javascript:doSubmit_Form_Only();" class="btn btn-primary">
+		<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
+	</button>
+
 </div>
 <!-- end tab content -->

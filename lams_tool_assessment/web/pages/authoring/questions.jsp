@@ -166,7 +166,7 @@
 				<%@ include file="/pages/authoring/parts/questionlistRestricted.jsp"%>
 			</c:when>
 			<c:otherwise>
-				<%@ include file="/pages/authoring/parts/questionlist5.jsp"%>
+				<%@ include file="/pages/authoring/parts/questionlist.jsp"%>
 			</c:otherwise>
 		</c:choose>
 	</div>

@@ -213,7 +213,7 @@ public class AuthoringController {
 	    throw new ServletException(e);
 	}
 
-	return "pages/authoring/authoring5";
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -349,7 +349,7 @@ public class AuthoringController {
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	return "pages/authoring/authoring5";
+	return "pages/authoring/authoring";
     }
 
     /**
@@ -485,9 +485,9 @@ public class AuthoringController {
 	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options
 	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
 	if (isAuthoringRestricted) {
-	    return "pages/authoring/parts/questionlistRestricted5";
+	    return "pages/authoring/parts/questionlistRestricted";
 	} else {
-	    return "pages/authoring/parts/questionlist5";
+	    return "pages/authoring/parts/questionlist";
 	}
     }
 
@@ -563,7 +563,7 @@ public class AuthoringController {
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist5";
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
@@ -580,7 +580,7 @@ public class AuthoringController {
 	}
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist5";
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
@@ -629,7 +629,7 @@ public class AuthoringController {
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return "pages/authoring/parts/questionlist5";
+	return "pages/authoring/parts/questionlist";
     }
 
     /**
@@ -663,7 +663,7 @@ public class AuthoringController {
 	List<QuestionReference> delList = getDeletedQuestionReferences(sessionMap);
 	delList.add(questionReference);
 
-	return "pages/authoring/parts/questionlist5";
+	return "pages/authoring/parts/questionlist";
     }
 
     @RequestMapping(path = "/toggleQuestionRequired", method = RequestMethod.POST)

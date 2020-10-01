@@ -19,78 +19,76 @@
 			break;
 	}
 	if (qbMessage) {
-		alert(qbMessage);
+		$('#toast-question').toast('show').find('.toast-body').text(qbMessage);
 	}
 
 	$(document).ready(function(){
-		
 	    //init questions sorting
 	    <c:if test="${not empty sessionMap.questionReferences}">
-	    new Sortable($('#referencesTable tbody')[0], {
-		    animation: 150,
-		    direction: 'vertical',
-			store: {
-				set: function (sortable) {
-					//update all sequenceIds
-					for (var i = 0; i < sortable.el.rows.length; i++) {
-					 	var tr = sortable.el.rows[i];
-					 	var input = $("input[name^=sequenceId]", tr);
-					 	input.val(i);
-					 	var displayOrder = $(".reference-display-order", tr);
-					 	displayOrder.text(i + 1 + ")");
-					}
-
-					//prepare SequenceIds parameter
-					var serializedSequenceIds = "";
-					$("[name^=sequenceId]").each(function() {
-						serializedSequenceIds += "&" + this.name + "="  + this.value;
-					});
-
-					$.ajax({ 
-					    url: '<c:url value="/authoring/cacheReferencesOrder.do"/>',
-						type: 'POST',
-						data: {
-							sessionMapID: "${sessionMapID}",
-							sequenceIds: serializedSequenceIds
+		    new Sortable($('#referencesTable tbody')[0], {
+			    animation: 150,
+			    direction: 'vertical',
+				store: {
+					set: function (sortable) {
+						//update all sequenceIds
+						for (var i = 0; i < sortable.el.rows.length; i++) {
+						 	var tr = sortable.el.rows[i];
+						 	var input = $("input[name^=sequenceId]", tr);
+						 	input.val(i);
+						 	var displayOrder = $(".reference-display-order", tr);
+						 	displayOrder.text(i + 1 + ")");
 						}
-					});
-
-					//update names
-					$("[name^=sequenceId]").each(function() {
-						var newSequenceId = this.value;
-						//update name of the hidden input
-						this.name = "sequenceId" + newSequenceId;
-					});
+	
+						//prepare SequenceIds parameter
+						var serializedSequenceIds = "";
+						$("[name^=sequenceId]").each(function() {
+							serializedSequenceIds += "&" + this.name + "="  + this.value;
+						});
+	
+						$.ajax({ 
+						    url: '<c:url value="/authoring/cacheReferencesOrder.do"/>',
+							type: 'POST',
+							data: {
+								sessionMapID: "${sessionMapID}",
+								sequenceIds: serializedSequenceIds
+							}
+						});
+	
+						//update names
+						$("[name^=sequenceId]").each(function() {
+							var newSequenceId = this.value;
+							//update name of the hidden input
+							this.name = "sequenceId" + newSequenceId;
+						});
+					}
 				}
-			}
-		});
+			});
 		</c:if>
 	});
 </script>
 
-<div class="panel panel-default voffset5">
-	<table class="table table-condensed" id="referencesTable">
-		<thead>
-			<tr>
-				<th>
-					#
-				</th>
-				<th>
-					<fmt:message key="label.authoring.basic.list.header.question" />
-				</th>
-				<th colspan="4">
-					<fmt:message key="label.authoring.basic.list.header.mark" />
-				</th>
-			</tr>
-		</thead>	
-
+<table class="table table-sm" id="referencesTable">
+	<thead>
+		<tr>
+			<th>
+				#
+			</th>
+			<th>
+				<fmt:message key="label.authoring.basic.list.header.question" />
+			</th>
+			<th colspan="4">
+				<fmt:message key="label.authoring.basic.list.header.mark" />
+			</th>
+		</tr>
+	</thead>	
+	<tbody>
 		<c:forEach var="questionReference" items="${sessionMap.questionReferences}" varStatus="status">
 			<c:set var="question" value="${questionReference.question}" />
 			<tr>
-				<td class="reference-display-order">
+				<td class="reference-display-order align-middle">
 					${status.count})
 				</td>
-				<td>
+				<td class="align-middle">
 					<input type="hidden" name="sequenceId${questionReference.sequenceId}" value="${status.index}" class="reference-sequence-id">
 				
 					<c:choose>
@@ -103,12 +101,12 @@
 					</c:choose>
 					
 					<c:if test="${!questionReference.randomQuestion}">
-				        <span class='pull-right alert-info btn-xs loffset5 roffset5'>
+				        <span class='float-right badge badge-primary mx-2'>
 				       		v.&nbsp;${question.qbQuestion.version}
 				        </span>
 			        </c:if>
 			        
-			       	<span class='pull-right alert-info btn-xs'>
+			       	<span class='float-right badge badge-primary'>
 						<c:choose>
 							<c:when test="${questionReference.randomQuestion}">
 								<fmt:message key="label.authoring.basic.type.random.question" />
@@ -141,27 +139,32 @@
 	       			</span>
 				</td>
 				
-				<td width="70px" style="padding-right: 10px;">
-					<input name="maxMark" value="${questionReference.maxMark}" class="form-control input-sm max-mark-input">
+				<td class="align-middle" style="width: 70px; padding-right: 10px;">
+					<input name="maxMark" value="${questionReference.maxMark}" class="form-control form-control-sm max-mark-input">
 				</td>
 				
-				<td width="30px">
+				<td class="align-middle" style="width: 30px">
 					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}" 
+								role="button"
 								title="<fmt:message key="label.answer.required"/>" 
 								alt="<fmt:message key="label.answer.required"/>"
 								onClick="javascript:toggleQuestionRequired(this)"></i>
 				</td>
 				
-				<td width="30px">
-					<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
-						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
+				<td class="align-middle" style="width: 30px">
+					<a class="edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
+						<i class="fa fa-pencil"	role="button" title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>
 				</td>
 
-				<td width="30px">
-					<i class="fa fa-times delete-reference-link" title="<fmt:message key="label.authoring.basic.delete" />"></i>
+				<td class="align-middle" style="width: 30px">
+					<i class="fa fa-times delete-reference-link" role="button" title="<fmt:message key="label.authoring.basic.delete" />"></i>
 				</td>
 			</tr>
 		</c:forEach>
-	</table>
+	</tbody>
+</table>
+
+<div id="toast-question" class="toast toast-top" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+  <div class="toast-body alert alert-info"></div>
 </div>

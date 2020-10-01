@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:OutcomeAuthor5 toolContentId="${assessmentForm.assessment.contentId}" />
+<lams:OutcomeAuthor toolContentId="${assessmentForm.assessment.contentId}" />
 
 <lams:Switch name="assessment.reflectOnActivity" id="reflectOnActivity"
 	useSpringForm="true"
