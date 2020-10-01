@@ -99,6 +99,19 @@ body.component .info_icon {
     border-bottom: 2px solid #C3CEDC;
 }
 
+.component-page-wrapper .card {
+	border-bottom: none;
+}
+
+.component-page-wrapper .card-header {
+	background-color: transparent;
+}
+
+.component-page-wrapper .card-body {
+	border-bottom: 1px rgba(0, 0, 0, 0.125) solid;
+	border-radius: 0.25rem;
+}
+
 .component-page-content {
 	width: 100%;
 	min-height: 100%;
