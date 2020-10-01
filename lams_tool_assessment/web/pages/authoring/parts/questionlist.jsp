@@ -67,7 +67,7 @@
 	});
 </script>
 
-<table class="table table-sm" id="referencesTable">
+<table class="table" id="referencesTable">
 	<thead>
 		<tr>
 			<th>

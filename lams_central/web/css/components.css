@@ -89,8 +89,14 @@ body.component .info_icon {
 	content: "\f054";
 }
 
-.component-page-wrapper table.table thead {
-	background-color: #e5e5e5;
+.component-page-wrapper table.table thead th {
+	border: none;
+    border-bottom: 2px solid #20639B;
+}
+
+.component-page-wrapper table.table tbody td {
+	border: none;
+    border-bottom: 2px solid #C3CEDC;
 }
 
 .component-page-content {
