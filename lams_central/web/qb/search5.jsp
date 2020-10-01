@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<link rel="stylesheet"href="<lams:LAMSURL/>css/free.ui.jqgrid.min5.css">
+<link rel="stylesheet"href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
+<link rel="stylesheet"href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-select.min5.css" />
 <link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 <link rel="stylesheet" href="<lams:LAMSURL/>css/components-responsive.css">

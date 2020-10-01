@@ -1,0 +1,124 @@
+#gbox_grid {
+	width: 100% !important;
+	border: 0;
+}
+
+.ui-jqgrid-hdiv, .ui-jqgrid-bdiv, .ui-jqgrid-btable, .ui-jqgrid-hbox,
+	.ui-jqgrid-htable {
+	width: 100% !important;
+	font-size: 0.9rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
+	background-color: #F6F5FA;
+}
+
+.ui-jqgrid .ui-jqgrid-bdiv {
+	overflow: inherit;
+}
+
+.ui-jqgrid-htable th {
+	border: 3px !important;
+	padding: 0 !important;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 700;
+	font-size: 1rem;
+	margin: 0;
+	width: 100%;
+	background-color: #fff;
+}
+
+.ui-jqgrid-labels th {
+	border-bottom: 2px solid #20639B !important;
+	padding-bottom: .4rem !important;
+	background-color: #fff;
+}
+
+.ui-jqgrid .ui-jqgrid-btable .jqgrow>.ui-sgcollapsed {
+	background-color: transparent !important;
+	border: 0;
+	box-shadow: 0 0 0 !important;
+	padding-left: .5rem;
+	padding-right: .5rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow .sgbutton-div .sgbutton.btn {
+	box-shadow: 0 0 0 !important;
+}
+
+.ui-jqgrid-bdiv .table-bordered td, .ui-jqgrid-bdiv .table-bordered th {
+	border: 0 !important;
+}
+
+.ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
+	border-bottom: 2px solid #C3CEDC !important;
+	height: initial !important;
+	font-family: 'Poppins', sans-serif;
+}
+
+.ui-jqgrid .ui-jqgrid-bdiv tr.ui-row-ltr>td:nth-child(4) {
+	padding-left: 3rem !important;
+}
+
+.ui-jqgrid .ui-row-ltr, .ui-jqgrid .ui-jqgrid-labels {
+	height: 3rem;
+}
+
+.ui-subgrid.ui-row-ltr td {
+	border-bottom: 1px solid #C3CEDC !important;
+}
+
+.ui-subgrid.ui-row-ltr th {
+	border-bottom: 2px solid #C3CEDC !important;
+}
+
+.ui-subgrid.ui-row-ltr td, .ui-jqgrid.ui-jqgrid-bootstrap {
+	border: 3px !important;
+}
+
+.ui-subgrid.ui-row-ltr .subgrid-cell, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-bootstrap-corner-bottom
+	{
+	background-color: #F6F5FA;
+}
+
+.table-hover tbody {
+	background-color: #FFF;
+}
+
+.table-hover tbody tr:hover {
+	background-color: #F6F5FA;
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close {
+	right: .6rem;
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close>span.fa {
+	font-size: 1.3rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button {
+	color: #fff;
+	background-color: #6c757d;
+	border-color: #6c757d;
+	margin-right: .4rem;
+	margin-left: .4rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button.disabled {
+	opacity: 0.65;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-selbox {
+	border: 1px solid #c3cedc;
+	border-radius: 5px;
+	font-size: 1rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-input {
+	border: 1px solid #c3cedc;
+	border-radius: 5px;
+	font-size: 1rem;
+	padding: 0;
+	text-align: center;
+}
