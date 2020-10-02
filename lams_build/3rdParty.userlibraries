@@ -7,7 +7,7 @@
         <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.17.jar" source="/3rdParty_sources/poi"/>
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
-        <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar" source="/3rdParty_sources/basiclti-util/src/main/java"/>
         <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
         <archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
         <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
