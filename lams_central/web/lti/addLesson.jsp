@@ -153,6 +153,8 @@
              alert("<fmt:message key='label.select.sequence' />");
              return false;
          }
+         
+         $('#addNewLtiConsumer').button('loading');
 	}
 		
      // Utility function to trim
@@ -234,7 +236,10 @@
 			</p>
 		</lams:SimplePanel>
 		
-		<input type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" value="<fmt:message key='authoring.fla.save.button' />" />
+		<button type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" 
+			    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <fmt:message key='authoring.fla.save.button' />">
+			<fmt:message key='authoring.fla.save.button' />
+		</button>
     </form>
 	   
 	<div id="footer"></div>
