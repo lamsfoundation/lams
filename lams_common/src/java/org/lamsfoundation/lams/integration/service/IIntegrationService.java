@@ -242,8 +242,8 @@ public interface IIntegrationService {
      * @param lessonId
      *            if supplied, user will be added to the according lesson; and only to the course otherwise
      */
-    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId)
-	    throws IOException, UserInfoFetchException, UserInfoValidationException;
+    void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String extCourseId, String resourceLinkId,
+	    String customContextMembershipUrl) throws IOException, UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Adds an external user to the course with specified courseId.
