@@ -973,16 +973,23 @@ public class IntegrationService implements IIntegrationService {
 
     @Override
     public void addUsersUsingMembershipService(ExtServer extServer, Long lessonId, String courseId,
-	    String resourceLinkId) throws IOException, UserInfoFetchException, UserInfoValidationException {
+	    String resourceLinkId, String customContextMembershipUrl)
+	    throws IOException, UserInfoFetchException, UserInfoValidationException {
 
-	String membershipUrl = extServer.getMembershipUrl();
-	//if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users
+	String membershipUrl = customContextMembershipUrl;
+	if (StringUtils.isBlank(membershipUrl)) {
+	    membershipUrl = extServer.getMembershipUrl();
+	}
+
+	// if tool consumer haven't provided  membershipUrl (ToolProxyBinding.memberships.url parameter) we can't add any users
 	if (StringUtils.isBlank(membershipUrl)) {
 	    return;
 	}
 
-	membershipUrl += membershipUrl.contains("?") ? "&" : "?";
-	membershipUrl += "rlid=" + resourceLinkId;
+	if (StringUtils.isNotBlank(resourceLinkId)) {
+	    membershipUrl += membershipUrl.contains("?") ? "&" : "?";
+	    membershipUrl += "rlid=" + resourceLinkId;
+	}
 
 	log.debug("Make a call to remote membershipUrl:" + membershipUrl);
 	HttpGet ltiServiceGetRequest = new HttpGet(membershipUrl);
