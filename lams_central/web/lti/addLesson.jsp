@@ -236,7 +236,7 @@
 			</p>
 		</lams:SimplePanel>
 		
-		<button type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" 
+		<button type="submit" class="btn btn-primary pull-right" name="addNewLtiConsumer" id="addNewLtiConsumer"
 			    data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <fmt:message key='authoring.fla.save.button' />">
 			<fmt:message key='authoring.fla.save.button' />
 		</button>
