@@ -194,6 +194,7 @@
     	<input type="hidden" name="resource_link_id" value="${resource_link_id}">
         <input type="hidden" name="courseId" value="${courseId}">
         <input type="hidden" name="context_id" value="${context_id}">
+        <input type="hidden" name="custom_context_memberships_url" value="${custom_context_memberships_url}">
     	<input type="hidden" name="ldId" id="ldId" value="0">
     	
     	<%-- ContentItemSelectionRequest items --%>
