@@ -972,7 +972,7 @@ public class MonitoringController {
 	request.setAttribute("lesson", lessonDTO);
 	request.setAttribute("isTBLSequence", learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID()));
 
-	return "monitor";
+	return "monitor5";
     }
 
     /**
