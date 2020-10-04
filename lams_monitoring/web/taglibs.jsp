@@ -4,7 +4,6 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-xml" prefix="x" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <c:set var="ALPHABET" value="${fn:split('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z', ',')}" scope="request"/>

@@ -961,7 +961,7 @@ public class MonitoringController {
 	request.setAttribute("lesson", lessonDTO);
 	request.setAttribute("isTBLSequence", isTBLSequence(lessonId));
 
-	return "monitor";
+	return "monitor5";
     }
 
     /**
