@@ -44,7 +44,7 @@ When true, hides the names and groups the comments.  -->
 		<tr>
 			<c:if test="${not currentUserDisplay}">
 			<td>
-				<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/></span>
+				<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight">&nbsp;<c:out value="${rating.itemDescription}" escapeXml="false"/></span>
 			</td>
 			</c:if>
 			<td>
@@ -82,7 +82,7 @@ When true, hides the names and groups the comments.  -->
 			<c:if test="${not empty rating.averageRating}">
 			<tr>
 				<td>
-					<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/></span>
+					<lams:Portrait userId="${rating.itemId}"/><span class="portrait-sm-lineheight">&nbsp;<c:out value="${rating.itemDescription}" escapeXml="false"/></span>
 				</td>
 				<td class="rating">
 					<div class="rating-stars-holder text-center center-block">
@@ -163,7 +163,7 @@ When true, hides the names and groups the comments.  -->
 				</c:choose>
 			:</strong>
 			&nbsp;<c:if test="${not currentUserDisplay}"><lams:Portrait userId="${rating.itemId}"/></c:if>
-			<span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;</span>
+			<span class="portrait-sm-lineheight">&nbsp;<c:out value="${rating.itemDescription}" escapeXml="false"/>&nbsp;</span>
 				<c:if test="${not currentUserDisplay && not empty rating.userRating}">
 					(${rating.userRating})
 				</c:if>
@@ -185,7 +185,7 @@ When true, hides the names and groups the comments.  -->
 				</c:choose>
 			:</strong>
 			&nbsp;<c:if test="${not currentUserDisplay}"><lams:Portrait userId="${rating.itemId}"/></c:if>
-			<span class="portrait-sm-lineheight"><c:out value="${rating.itemDescription}" escapeXml="true"/>&nbsp;</span>
+			<span class="portrait-sm-lineheight">&nbsp;<c:out value="${rating.itemDescription}" escapeXml="false"/>&nbsp;</span>
 				<c:if test="${not currentUserDisplay && not empty rating.userRating}">
 					(${rating.userRating})
 				</c:if>
