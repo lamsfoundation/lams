@@ -89,10 +89,8 @@
 		return instance;
 	}
 	
-	// run when page is loaded
-	document.addEventListener("DOMContentLoaded", function(){
-		initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${language}", ${displayExpanded}, "${contentFolderID}");
-	});
+	// run initialisation code
+	initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${language}", ${displayExpanded}, "${contentFolderID}");
 
 	function reinitializeCKEditorInstances(){
 		for (var instanceId in CKEDITOR.instances){
