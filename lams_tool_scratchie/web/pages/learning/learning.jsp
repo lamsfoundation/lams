@@ -41,6 +41,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
+		var isScratching = false;
+		
 		$(document).ready(function(){
 			//initialize tooltips showing user names next to confidence levels
 			$('[data-toggle="tooltip"]').tooltip();
@@ -97,6 +99,12 @@
 
 		//scratch MCQ answer
 		function scratchMcq(itemUid, optionUid){
+			if (isScratching) {
+				// do not allow parallel scratching
+				return;
+			}
+			
+			isScratching = true;
 	        $.ajax({
 	            url: '<c:url value="/learning/recordItemScratched.do"/>',
 	            data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
@@ -120,6 +128,10 @@
 		            	$('#imageLink' + id).removeAttr('onclick');
 		            	$('#imageLink' + id).css('cursor','default');
 		            }
+	            },
+	            complete : function(){
+    				// enable scratching again
+    				isScratching = false;
 	            }
 	       	});
 		}
@@ -132,6 +144,13 @@
 			if (answer == "") {
 				return;
 			}
+			
+			if (isScratching) {
+				// do not allow parallel scratching
+				return;
+			}
+			
+			isScratching = true;
 
 			$.ajax({
 		    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
@@ -183,7 +202,11 @@
 				           	$("#type-your-answer-" + itemUid).hide();
 				        }
 					}
-		        }
+		        },
+	            complete : function(){
+    				// enable scratching again
+    				isScratching = false;
+	            }
 	       	});
 
 	        //blank input field
