@@ -385,6 +385,9 @@ public class LearningController {
 	// loadupLastAttempt for displaying purposes
 	service.loadupLastAttempt(assessment.getUid(), user.getUserId(), pagedQuestionDtos);
 
+	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
+		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
+
 	if (showResults) {
 
 	    // display results page
@@ -396,9 +399,6 @@ public class LearningController {
 	    if (hasEditRight) {
 		service.setAttemptStarted(assessment, user, toolSessionId, pagedQuestionDtos);
 	    }
-
-	    sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
-		    Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
 	    // display Etherpads after each question
 	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
