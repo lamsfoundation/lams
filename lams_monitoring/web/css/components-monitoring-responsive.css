@@ -1,0 +1,107 @@
+.visible-xs {
+	display: none !important;
+}
+
+.hidden-xs {
+	display: block !important;
+}
+
+@media ( max-width : 1200px) {
+	html, body {
+		font-size: 14px;
+	}
+	.graph-con:after {
+		bottom: 2px;
+	}
+}
+
+@media ( max-width : 992px) {
+	.visible-xs {
+		display: block !important;
+	}
+	.hidden-xs {
+		display: none !important;
+	}
+	.content-left, .content-right {
+		-ms-flex: 0 0 100%;
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+	.content-right {
+		margin-top: 2rem;
+	}
+	.main-content-inner {
+		padding: 2rem 2.8rem;
+	}
+	.hamburger {
+		width: 1.5rem;
+	}
+	.top-menu form {
+		display: none;
+	}
+	.tasks-col-gate p {
+		padding-right: 1rem;
+	}
+	.content-left {
+		order: 2;
+	}
+	.content-right {
+		order: 1;
+	}
+	.tasks {
+		order: 3;
+	}
+	.insight {
+		order: 4;
+	}
+	.graph-con {
+		width: inherit !important;
+		height: inherit !important;
+		min-height: inherit !important;
+		overflow: auto;
+	}
+	.graph-con #myChart {
+		width: inherit !important;
+		height: inherit !important;
+		margin: 0 !important;
+	}
+	.graph-con:after {
+		bottom: 9px;
+	}
+	.content-left.content-left1 {
+		order: 1;
+	}
+	.user-table-main {
+		order: 2;
+	}
+	.user-page .score-col-inner {
+		margin-top: 2rem;
+	}
+	.table-content-left {
+		-ms-flex: 0 0 27rem;
+		flex: 0 0 27rem;
+		max-width: 100%;
+		padding-left: 3.5rem;
+		width: 27rem;
+	}
+	.table-content-right {
+		-ms-flex: 0 0 calc(100%);
+		flex: 0 0 calc(100%);
+		max-width: calc(100%);
+	}
+	.content-graph2:after {
+		bottom: .6rem;
+	}
+	.user-table {
+		width: 33rem;
+	}
+	.user-table-data {
+		overflow-x: auto;
+	}
+}
+
+@media ( max-width : 550px) {
+	.graph-col {
+		display: inline-block !important;
+	}
+}

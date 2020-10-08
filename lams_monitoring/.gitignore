@@ -2,3 +2,4 @@
 /build/
 /.sass-cache/
 /web/css/*.css
+!/web/css/components-monitoring*
