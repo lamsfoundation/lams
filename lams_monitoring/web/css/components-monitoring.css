@@ -1,16 +1,16 @@
 @font-face {
 	font-family: mont-semibold;
-	src: url(../fonts/mont-semibold.ttf);
+	src: url(/lams/includes/fonts/mont-semibold.ttf);
 }
 
 @font-face {
 	font-family: mont-bold;
-	src: url(../fonts/FontsFree-Net-Mont-Bold.ttf);
+	src: url(/lams/includes/fonts/FontsFree-Net-Mont-Bold.ttf);
 }
 
 @font-face {
 	font-family: mont-regular;
-	src: url(../fonts/FontsFree-Net-Mont1.ttf);
+	src: url(/lams/includes/fonts/FontsFree-Net-Mont1.ttf);
 }
 
 body, html {
