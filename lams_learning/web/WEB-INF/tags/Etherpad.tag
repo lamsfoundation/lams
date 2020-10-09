@@ -15,6 +15,7 @@
 <%@ attribute name="showChat" required="false" rtexprvalue="true" %>
 <%@ attribute name="height" required="false" rtexprvalue="true" %>
 <%@ attribute name="heightAutoGrow" required="false" rtexprvalue="true" %>
+<%@ attribute name="showOnDemand" required="false" rtexprvalue="true" %>
 
 <%@ tag  import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ tag  import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -33,11 +34,15 @@
 <%-- THIS TAG REQUIRES JQUERY --%>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/etherpad.js"></script>
 <script type="text/javascript">
-	$(document).ready(function(){
+	var etherpadInitMethods = typeof etherpadInitMethods == 'undefined' ? {} : etherpadInitMethods;
+	etherpadInitMethods['${groupId}'] = function intialiseEtherpad() {
+		var showOnDemand = '${showOnDemand}' == 'true';
 		// If there are mutliple Etherpads on a single page, there is a race condition while setting session ID cookie.
 		// One of pads usually responds with "access denied". It is better to wait 1.5 seconds and initialise the next pad.
-		var delayBeforeInitialise = typeof lamsEtherpadTagInitialiseDelay == 'undefined' ? 0 : lamsEtherpadTagInitialiseDelay;
-		lamsEtherpadTagInitialiseDelay = delayBeforeInitialise + 1500;
+		var delayBeforeInitialise = showOnDemand || typeof lamsEtherpadTagInitialiseDelay == 'undefined' ? 0 : lamsEtherpadTagInitialiseDelay;
+		if (!showOnDemand) {
+			lamsEtherpadTagInitialiseDelay = delayBeforeInitialise + 1500;
+		}
 		
 		<c:if test="${heightAutoGrow eq 'true'}">
 			// Resize Etherpad iframe when its content grows.
@@ -66,7 +71,6 @@
 				},
 				dataType : 'text',
 				success: function(padId, status, xhr) {
-					lamsEtherpadTagInitialising = false;
 					if ( status == "error" ) {
 						console.log( xhr.status + " " + xhr.statusText );
 					} else {
@@ -82,13 +86,20 @@
 								<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
 								,'userName':'<c:out value="${fullName}" />'
 							</c:if>
-						});
+						}).addClass('initialised');
 					}
 				}
 			});
 			// wait for other pad on the page to initialise
 		}, delayBeforeInitialise);
-	});
+	}
+	
+	if ('${showOnDemand}' != 'true') {
+		$(document).ready(function(){
+			etherpadInitMethods['${groupId}']();
+		});
+	}
+
 </script>
 
 <div class="etherpad-container" id='etherpad-container-${groupId}'></div>

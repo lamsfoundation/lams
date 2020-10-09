@@ -120,10 +120,10 @@
 					<fmt:message key="label.etherpad.discussion" />
 				</a>
 				
-				<div id="question-etherpad-${question.uid}" class="collapse">
+				<div id="question-etherpad-${question.uid}" class="question-etherpad-collapse collapse">
 					<div class="panel panel-default question-etherpad">
 						<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${question.uid}" 
-						   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true"
+						   showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true" showOnDemand="true"
 						>${questionEtherpadContent}</lams:Etherpad>
 					</div>
 				</div>
