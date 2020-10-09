@@ -20,24 +20,22 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 public class AssessmentEscapeUtils {
 
@@ -52,7 +50,7 @@ public class AssessmentEscapeUtils {
 	    }
 	}
     }
-    
+
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
@@ -64,7 +62,7 @@ public class AssessmentEscapeUtils {
 	    }
 	}
     }
-    
+
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
@@ -161,7 +159,8 @@ public class AssessmentEscapeUtils {
 		case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
 		case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
 		case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		    responseStr.append(questionResult.getAnswerString());
+		    responseStr.append(StringUtils.isBlank(questionResult.getAnswerString()) ? "-"
+			    : questionResult.getAnswerString());
 		    break;
 
 		case AssessmentConstants.QUESTION_TYPE_ORDERING:
