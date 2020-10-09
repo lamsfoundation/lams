@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -161,7 +162,8 @@ public class AssessmentEscapeUtils {
 		case QbQuestion.TYPE_NUMERICAL:
 		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		case QbQuestion.TYPE_ESSAY:
-		    responseStr.append(questionResult.getAnswer());
+		    responseStr
+			    .append(StringUtils.isBlank(questionResult.getAnswer()) ? "-" : questionResult.getAnswer());
 		    break;
 
 		case QbQuestion.TYPE_ORDERING:
