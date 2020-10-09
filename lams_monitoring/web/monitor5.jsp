@@ -8,6 +8,7 @@
 		
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap4.min.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring-responsive.css">
 	
@@ -18,7 +19,7 @@
 		$(document).ready(function(){
 			$('.hamburger').click(function(){
 				$(this).toggleClass('active');
-				$('.sidebar, .main-content').toggleClass('active');
+				$('.monitoring-page-wrapper .sidebar, .monitoring-page-content').toggleClass('active');
 			});
 			
 			var ctx = document.getElementById('myChart').getContext('2d');
@@ -79,10 +80,10 @@
 		});
 	</script>
 </head>
-<body>
-<div class="wrapper d-flex">
-	<div class="sidebar d-flex align-items-start flex-column">
-		<ul class="side-menu mb-auto">
+<body class="component">
+<div class="component-page-wrapper monitoring-page-wrapper">
+	<div class="sidebar">
+		<ul>
 			<li class="logo-li">
 				<a href="#"><img src="<lams:LAMSURL/>images/components/lams_logo_white.png" alt="#" /></a>
 			</li>
@@ -96,15 +97,17 @@
 				<a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><defs><style>.a{fill:none;}.b{fill:#acb5cc;}</style></defs><path class="a" d="M0,0H24V24H0Z"/><path class="b" d="M18,2H6A2.006,2.006,0,0,0,4,4V20a2.006,2.006,0,0,0,2,2H18a2.006,2.006,0,0,0,2-2V4A2.006,2.006,0,0,0,18,2ZM9,4h2V9l-1-.75L9,9Zm9,16H6V4H7v9l3-2.25L13,13V4h5Z"/></svg></a>
 			</li>
 		</ul>
+		<!-- 
 		<div class="user-col active">
 			<img src="<lams:LAMSURL/>images/components/img1.png" alt="#" />
 			<span></span>
 		</div>
+		 -->
 	</div>
-	<div class="main-content">
-		<div class="main-content-inner">
-			<header class="header d-flex justify-content-between">
-				<div class="menu-hamburger-col d-flex">
+	<div class="monitoring-page-content">
+		<div class="monitoring-page-content-inner">
+			<header class="d-flex justify-content-between">
+				<div class="hamburger-box">
 					<div class="hamburger">
 						<span></span>
 						<span></span>
@@ -112,12 +115,12 @@
 					</div>
 					<p>Lesson Name</p>
 				</div>
-				<div class="top-menu d-flex">
+				<div class="top-menu">
 					<form>
 						<input type="text" name="" placeholder="Search Student">
 						<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
 					</form>
-					<div class="top-menu-btn d-flex">
+					<div class="top-menu-btn">
 						<a href="#"><img src="<lams:LAMSURL/>images/components/icon1.svg" alt="#" /></a>
 						<a href="#"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
 						<a href="#"><img src="<lams:LAMSURL/>images/components/icon3.svg" alt="#" /></a>

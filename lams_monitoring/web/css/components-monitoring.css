@@ -13,130 +13,98 @@
 	src: url(/lams/includes/fonts/FontsFree-Net-Mont1.ttf);
 }
 
-body, html {
-	margin: 0;
-	font-size: 16px;
-	background-color: #E4E4E4;
-}
-
-ul, ol {
+.monitoring-page-wrapper ul, .monitoring-page-wrapper ol {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 }
 
-input:focus, button:focus, textarea:focus {
+.monitoring-page-wrapper input:focus, .monitoring-page-wrapper button:focus, .monitoring-page-wrapper textarea:focus {
 	outline: none;
 }
 
-img {
+.monitoring-page-wrapper img {
 	max-width: 100%;
 }
 
-a:hover, a:focus {
+.monitoring-page-wrapper a:hover, .monitoring-page-wrapper a:focus {
 	text-decoration: none;
 }
 
-.sidebar {
-	min-height: 100vh;
+.monitoring-page-content {
+	display: flex;
 	background-color: #fff;
-	width: 7rem;
-	max-width: 100%;
-	padding: 3.4rem 1.7rem;
-	text-align: center;
-	padding-bottom: 2rem;
-}
-
-.wrapper {
-	border-radius: 2rem;
-	min-height: 100vh;
-	overflow: hidden;
-	background-color: #F6F5FA;
-}
-
-.side-menu .logo-li {
-	margin-bottom: 4rem;
-}
-
-.side-menu .menu-li {
-	margin-bottom: 1.8rem;
-}
-
-.side-menu .menu-li a {
-	background-color: #3C42E01A;
-	display: inline-block;
-	width: 3rem;
-	height: 3rem;
-	border-radius: 1.2rem;
-	color: #fff;
-	line-height: 2.8rem;
-	cursor: pointer;
-}
-
-.side-menu .menu-li a svg {
-	height: 1.6rem;
-	width: 1.4rem;
+	padding-left: 7rem;
 	transition: all .3s ease;
 }
 
-.side-menu .menu-li a svg .c, .side-menu .menu-li a svg .d, .side-menu .menu-li a svg rect
-	{
+.monitoring-page-content.active {
+	padding-left: 0;
+}
+
+.monitoring-page-content-inner {
+	min-height: 100%;
+	background-color: #F6F5FA;
+	border-radius: 2rem;
+	padding: 2rem 4.8rem;
+}
+
+.monitoring-page-wrapper .sidebar .menu-li a svg .c,
+.monitoring-page-wrapper .sidebar .menu-li a svg .d,
+.monitoring-page-wrapper .sidebar .menu-li a svg rect {
 	stroke: #ACB5CC;
 	transition: all .3s ease;
 }
 
-.side-menu .menu-li a svg .a, .side-menu .menu-li a svg .b {
+.monitoring-page-wrapper .sidebar .menu-li a svg .a,
+.monitoring-page-wrapper .sidebar .menu-li a svg .b {
 	stroke: transparent;
 	transition: all .3s ease;
 }
 
-.side-menu .menu-li a svg rect.b {
+.monitoring-page-wrapper .sidebar .menu-li a svg rect.b {
 	fill: transparent;
 	stroke: #ACB5CC;
 	transition: all .3s ease;
 }
 
-.side-menu .menu-li:nth-child(3) a svg .a {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(3) a svg .a {
 	stroke: #ACB5CC;
 }
 
-.side-menu .menu-li:nth-child(3) a svg .b {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(3) a svg .b {
 	stroke: transparent;
 }
 
-.side-menu .menu-li:nth-child(2):hover a svg rect.b, .side-menu .menu-li:nth-child(2):hover a svg .d,
-	.side-menu .menu-li:nth-child(2):hover a svg .c {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2):hover a svg rect.b,
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2):hover a svg .d,
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2):hover a svg .c {
 	stroke: #3C42E0;
 }
 
-.side-menu .menu-li:nth-child(2).active a svg rect.b, .side-menu .menu-li:nth-child(2).active a svg .d,
-	.side-menu .menu-li:nth-child(2).active a svg .c {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2).active a svg rect.b,
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2).active a svg .d,
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(2).active a svg .c {
 	stroke: #3C42E0;
 }
 
-.side-menu .menu-li:nth-child(3):hover a svg .a {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(3):hover a svg .a {
 	stroke: #3C42E0;
 }
 
-.side-menu .menu-li:nth-child(3).active a svg .a {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(3).active a svg .a {
 	stroke: #3C42E0;
 }
 
-.side-menu .menu-li:nth-child(4):hover a svg path.b {
+.monitoring-page-wrapper .sidebar .menu-li:nth-child(4):hover a svg path.b {
 	fill: #3C42E0;
 }
 
-.main-content {
-	width: calc(100% - 7rem);
-	background-color: #fff;
+.monitoring-page-wrapper .top-menu-btn a:nth-child(3) img {
+	width: 1.3rem;
 }
 
-.main-content-inner {
-	min-height: 100%;
-	background-color: #F6F5FA;
-	border-radius: 2rem;
-}
-
+/* User icon in left lower corner - unused? 
 .user-col {
 	position: relative;
 	cursor: pointer;
@@ -165,104 +133,7 @@ a:hover, a:focus {
 .user-col.active span {
 	display: block;
 }
-
-.main-content-inner {
-	padding: 2rem 4.8rem;
-}
-
-.hamburger {
-	width: 1rem;
-	margin-top: .8rem;
-	cursor: pointer;
-}
-
-.hamburger span {
-	display: inline-block;
-	height: 2px;
-	background-color: #3C42E0;
-	width: 100%;
-	float: left;
-	margin-bottom: 3px;
-	transition: all .3s ease;
-}
-
-.hamburger span:last-child {
-	margin: 0;
-	width: 70%;
-}
-
-.hamburger.active span {
-	width: 100%;
-}
-
-.menu-hamburger-col {
-	padding-top: .5rem;
-}
-
-.menu-hamburger-col p {
-	font-family: mont-semibold, sans-serif;
-	font-size: 2rem;
-	font-weight: 400;
-	margin: 0;
-	line-height: 1;
-	color: #2E384D;
-	margin-left: 1.8rem;
-}
-
-.top-menu-btn a {
-	display: inline-block;
-	background-color: #3C42E0;
-	width: 3.1rem;
-	height: 3.1rem;
-	border-radius: 1rem;
-	margin-left: .6rem;
-	text-align: center;
-	line-height: 2.8rem;
-	box-shadow: 0px 3px 6px #3C42E040;
-	transition: all .3s ease;
-}
-
-.top-menu-btn a:hover {
-	background-color: #878bea;
-}
-
-.top-menu-btn a img {
-	width: 1rem;
-}
-
-.top-menu-btn a:nth-child(3) img {
-	width: 1.3rem;
-}
-
-.top-menu form {
-	position: relative;
-	width: 18.8rem;
-	margin-right: 3rem;
-}
-
-.top-menu input {
-	width: 100%;
-	height: 3.1rem;
-	border-radius: 1rem;
-	border: 0;
-	background-color: #fff;
-	padding-left: 1.2rem;
-	box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.02);
-	font-size: .95rem;
-	color: #ACB5CC;
-}
-
-.top-menu form img {
-	position: absolute;
-	right: 1.2rem;
-	top: .9rem;
-	cursor: pointer;
-	width: 1.2rem;
-}
-
-.top-menu input::placeholder {
-	color: #ACB5CC;
-}
+*/
 
 .user-map-col {
 	background-image: url(/lams/images/components/lines.png);
@@ -588,38 +459,6 @@ a:hover, a:focus {
 .insight-col p a {
 	text-decoration: underline;
 	color: #3C42E0;
-}
-
-.sidebar, .main-content {
-	transition: all .3s ease;
-}
-
-.sidebar.active {
-	transform: translateX(-7rem);
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-
-.main-content.active {
-	width: 100%;
-	padding-left: 0;
-}
-
-.sidebar {
-	position: absolute;
-	left: 0;
-	top: 0;
-	height: 100%;
-}
-
-.wrapper {
-	position: relative;
-}
-
-.main-content {
-	padding-left: 7rem;
-	width: 100%;
 }
 
 .graph-con {
