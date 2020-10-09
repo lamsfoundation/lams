@@ -115,6 +115,16 @@
 					'minLength' : 3
 				});
 			});
+			
+			// show etherpads only on Discussion expand
+			$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+				var etherpad = $('.etherpad-container', this);
+				if (!etherpad.hasClass('initialised')) {
+					var id = etherpad.attr('id'),
+						groupId = id.substring('etherpad-container-'.length);
+					etherpadInitMethods[groupId]();
+				}
+			});
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
