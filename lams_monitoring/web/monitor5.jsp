@@ -19,7 +19,7 @@
 		$(document).ready(function(){
 			$('.hamburger').click(function(){
 				$(this).toggleClass('active');
-				$('.monitoring-page-wrapper .sidebar, .monitoring-page-content').toggleClass('active');
+				$('.component-sidebar, .monitoring-page-content').toggleClass('active');
 			});
 			
 			var ctx = document.getElementById('myChart').getContext('2d');
@@ -81,8 +81,8 @@
 	</script>
 </head>
 <body class="component">
-<div class="component-page-wrapper monitoring-page-wrapper">
-	<div class="sidebar">
+<div class="monitoring-page-wrapper">
+	<div class="component-sidebar">
 		<ul>
 			<li class="logo-li">
 				<a href="#"><img src="<lams:LAMSURL/>images/components/lams_logo_white.png" alt="#" /></a>
@@ -104,140 +104,140 @@
 		</div>
 		 -->
 	</div>
-	<div class="monitoring-page-content">
-		<div class="monitoring-page-content-inner">
-			<header class="d-flex justify-content-between">
-				<div class="hamburger-box">
-					<div class="hamburger">
-						<span></span>
-						<span></span>
-						<span></span>
-					</div>
-					<p>Lesson Name</p>
+	<div class="component-page-wrapper monitoring-page-content">
+		<header class="d-flex justify-content-between">
+			<div class="hamburger-box">
+				<div class="hamburger">
+					<span></span>
+					<span></span>
+					<span></span>
 				</div>
-				<div class="top-menu">
-					<form>
-						<input type="text" name="" placeholder="Search Student">
-						<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
-					</form>
-					<div class="top-menu-btn">
-						<a href="#"><img src="<lams:LAMSURL/>images/components/icon1.svg" alt="#" /></a>
-						<a href="#"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
-						<a href="#"><img src="<lams:LAMSURL/>images/components/icon3.svg" alt="#" /></a>
-					</div>
+				<p>Lesson Name</p>
+			</div>
+			<div class="top-menu">
+				<form>
+					<input type="text" name="" placeholder="Search Student">
+					<img src="<lams:LAMSURL/>images/components/search.svg" alt="#" />
+				</form>
+				<div class="top-menu-btn">
+					<a href="#"><img src="<lams:LAMSURL/>images/components/icon1.svg" alt="#" /></a>
+					<a href="#"><img src="<lams:LAMSURL/>images/components/icon2.svg" alt="#" /></a>
+					<a href="#"><img src="<lams:LAMSURL/>images/components/icon3.svg" alt="#" /></a>
 				</div>
-			</header>
-			<div class="content row">
-				<div class="col-12 col-md-3 content-left">
-					<div class="row">
-						<div class="col-12 graph-col d-flex justify-content-between">
-							<div class="graph-con">
-								<canvas id="myChart" class="chartjs-render-monitor"></canvas>
-							</div>
-							<ul>
-								<li>
-									<h6>completion</h6>
-								</li>
-								<li>
-									<span class="graph-count"></span> - Not started
-								</li>
-								<li>
-									<span class="graph-count"></span> - In process
-								</li>
-								<li>
-									<span class="graph-count"></span> - Completed
-								</li>
-							</ul>
+			</div>
+		</header>
+		<div class="row pt-5">
+			<div class="col-12 col-md-3 content-left">
+				<div class="row">
+					<div class="col-12 graph-col d-flex justify-content-between">
+						<div class="graph-con">
+							<canvas id="myChart" class="chartjs-render-monitor"></canvas>
 						</div>
-						<div class="col-12 graph-grades">
-							<div class="graph-grades-inner d-flex justify-content-between">
-								<div class="graph-star-col">
-									<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />
-									<p>grades</p>
-								</div>
-								<div class="grades-progress-col">
-									<div class="grades-left">
-										<div class="grades-score d-flex">
-											<p><span>High:</span> 99</p>
-											<div class="grades-progress-bar">
-												<div class="progress-div" id="progress-bar-1" style="width: 99%">
-													<span></span>
-												</div>
+						<ul>
+							<li>
+								<h6>completion</h6>
+							</li>
+							<li>
+								<span class="graph-count"></span> - Not started
+							</li>
+							<li>
+								<span class="graph-count"></span> - In process
+							</li>
+							<li>
+								<span class="graph-count"></span> - Completed
+							</li>
+						</ul>
+					</div>
+					<div class="col-12 graph-grades">
+						<div class="graph-grades-inner d-flex justify-content-between">
+							<div class="graph-star-col">
+								<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />
+								<p>grades</p>
+							</div>
+							<div class="grades-progress-col">
+								<div class="grades-left">
+									<div class="grades-score d-flex">
+										<p><span>High:</span> 99</p>
+										<div class="grades-progress-bar">
+											<div class="progress-div" id="progress-bar-1" style="width: 99%">
+												<span></span>
 											</div>
 										</div>
-										<div class="grades-score d-flex">
-											<p><span>Median:</span> 68</p>
-											<div class="grades-progress-bar">
-												<div class="progress-div" id="progress-bar-2" style="width: 68%">
-													<span></span>
-												</div>
+									</div>
+									<div class="grades-score d-flex">
+										<p><span>Median:</span> 68</p>
+										<div class="grades-progress-bar">
+											<div class="progress-div" id="progress-bar-2" style="width: 68%">
+												<span></span>
 											</div>
 										</div>
-										<div class="grades-score d-flex">
-											<p><span>Low:</span> 28</p>
-											<div class="grades-progress-bar">
-												<div class="progress-div" id="progress-bar-3" style="width: 28%">
-													<span></span>
-												</div>
+									</div>
+									<div class="grades-score d-flex">
+										<p><span>Low:</span> 28</p>
+										<div class="grades-progress-bar">
+											<div class="progress-div" id="progress-bar-3" style="width: 28%">
+												<span></span>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-12 score-col">
-							<div class="row">
-								<div class="col-12 col-sm-6">
-									<div class="score-col-inner" id="score-col1">
-										<h1>8<span>%</span></h1>
-										<p>Students <br>at risk</p>
-										<img src="<lams:LAMSURL/>images/components/icon1.png" alt="#" />
-									</div>
+					</div>
+					<div class="col-12 score-col">
+						<div class="row">
+							<div class="col-12 col-sm-6">
+								<div class="score-col-inner" id="score-col1">
+									<h1>8<span>%</span></h1>
+									<p>Students <br>at risk</p>
+									<img src="<lams:LAMSURL/>images/components/icon1.png" alt="#" />
 								</div>
-								<div class="col-12 col-sm-6">
-									<div class="score-col-inner" id="score-col2">
-										<h1>98<span>%</span></h1>
-										<p>Average <br>Score</p>
-										<img src="<lams:LAMSURL/>images/components/icon2.png" alt="#" />
-									</div>
+							</div>
+							<div class="col-12 col-sm-6">
+								<div class="score-col-inner" id="score-col2">
+									<h1>98<span>%</span></h1>
+									<p>Average <br>Score</p>
+									<img src="<lams:LAMSURL/>images/components/icon2.png" alt="#" />
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="col-12 col-md-9 content-right">
-					<div class="user-map-col h-100">
-						<img src="<lams:LAMSURL/>images/components/user-map.png" alt="#" />
-						<div class="map-pn">
-							<span><img src="<lams:LAMSURL/>images/components/plus.svg" alt="#" /></span>
-							<span><img src="<lams:LAMSURL/>images/components/minus.svg" alt="#" /></span>
-						</div>
+			</div>
+			<div class="col-12 col-md-9 content-right">
+				<div class="user-map-col h-100">
+					<img src="<lams:LAMSURL/>images/components/user-map.png" alt="#" />
+					<div class="map-pn">
+						<span><img src="<lams:LAMSURL/>images/components/plus.svg" alt="#" /></span>
+						<span><img src="<lams:LAMSURL/>images/components/minus.svg" alt="#" /></span>
 					</div>
 				</div>
-				<div class="col-12 col-md-6 tasks">
-					<div class="tasks-col">
-						<h6>required tasks</h6>
-						<div class="tasks-col-gate d-flex justify-content-between">
-							<p>Gate</p>
-							<select>
-								<option>Open now</option>
-								<option>Open now</option>
-								<option>Open now</option>
-							</select>
-						</div>
-						<div class="tasks-col-gate d-flex justify-content-between">
-							<p>Grouping</p>
-							<button type="button">Set Groups</button>
-						</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6 tasks">
+				<div class="tasks-col">
+					<h6>required tasks</h6>
+					<div class="tasks-col-gate d-flex justify-content-between">
+						<p>Gate</p>
+						<select>
+							<option>Open now</option>
+							<option>Open now</option>
+							<option>Open now</option>
+						</select>
+					</div>
+					<div class="tasks-col-gate d-flex justify-content-between">
+						<p>Grouping</p>
+						<button type="button">Set Groups</button>
 					</div>
 				</div>
-				<div class="col-12 col-md-6 insight">
-					<div class="insight-col">
-						<h6>insights</h6>
-						<div class="insight-col-gate">
-							<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem</p>
-							<p><a href="#">read more...</a></p>
-						</div>
+			</div>
+			<div class="col-12 col-md-6 insight">
+				<div class="insight-col">
+					<h6>insights</h6>
+					<div class="insight-col-gate">
+						<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem</p>
+						<p><a href="#">read more...</a></p>
 					</div>
 				</div>
 			</div>
