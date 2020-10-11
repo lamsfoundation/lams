@@ -131,21 +131,54 @@
 }
 */
 
-.monitoring-page-wrapper .user-map-col {
-	background-image: url(/lams/images/components/lines.png);
-	background-size: cover;
-	background-position: 50%;
-	background-repeat: no-repeat;
-	border: 1px solid #D2D7E7;
-	border-radius: 1rem;
-	overflow: hidden;
+
+.monitoring-page-wrapper .content-left {
+	-ms-flex: 0 0 26.5rem;
+	flex: 0 0 26.5rem;
+	max-width: 26.5rem;
 }
 
-.grades-progress-col {
+.monitoring-page-wrapper .content-right {
+	-ms-flex: 0 0 calc(100% - 26.5rem);
+	flex: 0 0 calc(100% - 26.5rem);
+	max-width: calc(100% - 26.5rem);
+}
+
+.monitoring-page-wrapper .graph-grades {
+	background-color: #fff;
+	box-shadow: 0px 20px 20px #2E384D1A;
+	border-radius: 1.2rem;
+	margin-top: 2rem;
+	padding: 1rem 1.5rem;
+	display: flex;
+	justify-content: space-between;
+}
+
+
+.monitoring-page-wrapper .graph-star-col {
+	width: 5rem;
+}
+
+.monitoring-page-wrapper .graph-star-col img {
+	width: 3rem;
+	max-width: 100%;
+}
+
+.monitoring-page-wrapper .graph-star-col p {
+	color: #ACB5CC;
+	font-family: mont-bold, sans-serif;
+	text-transform: uppercase;
+	font-size: .7rem;
+	margin: 0;
+	margin-top: .4rem;
+	letter-spacing: 2px;
+}
+
+.monitoring-page-wrapper .grades-progress-col {
 	width: calc(100% - 5rem);
 }
 
-.grades-score p {
+.monitoring-page-wrapper .grades-score p {
 	width: 6rem;
 	text-align: right;
 	color: #2E384D;
@@ -155,40 +188,37 @@
 	margin-bottom: .5rem;
 }
 
-.grades-progress-bar {
+.monitoring-page-wrapper .grades-progress-bar {
 	margin-bottom: .5rem;
 	padding-left: 1.5rem;
+	width: calc(100% - 6rem);
 }
 
-.grades-score p span {
+.monitoring-page-wrapper .grades-score p span {
 	color: #ACB5CC;
 	margin-right: .4rem;
 }
 
-.grades-progress-bar {
-	width: calc(100% - 6rem);
-}
-
-.progress-div {
+.monitoring-page-wrapper .progress-div {
 	height: 60%;
 	margin-top: .2rem;
 	border-radius: 45px;
 	position: relative;
 }
 
-#progress-bar-1 {
+.monitoring-page-wrapper #progress-bar-1 {
 	background-color: #05CCD6;
 }
 
-#progress-bar-2 {
+.monitoring-page-wrapper #progress-bar-2 {
 	background-color: #FFC337;
 }
 
-#progress-bar-3 {
+.monitoring-page-wrapper #progress-bar-3 {
 	background-color: #F83BA3;
 }
 
-.progress-div span {
+.monitoring-page-wrapper .progress-div span {
 	width: .4rem;
 	height: .4rem;
 	border-radius: 50%;
@@ -198,19 +228,15 @@
 	background-color: #fff;
 }
 
-.content-left {
-	-ms-flex: 0 0 26.5rem;
-	flex: 0 0 26.5rem;
-	max-width: 26.5rem;
-}
 
-.content-right {
-	-ms-flex: 0 0 calc(100% - 26.5rem);
-	flex: 0 0 calc(100% - 26.5rem);
-	max-width: calc(100% - 26.5rem);
-}
-
-.user-map-col {
+.monitoring-page-wrapper .user-map-col {
+	background-image: url(/lams/images/components/lines.png);
+	background-size: cover;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	border: 1px solid #D2D7E7;
+	border-radius: 1rem;
+	overflow: hidden;
 	padding: 3rem;
 	position: relative;
 }
@@ -385,39 +411,6 @@
 	color: #3C42E0;
 }
 
-.graph-con {
-	min-height: 12rem;
-	width: calc(100% - 8rem);
-	overflow: hidden;
-	min-height: 11.11rem !important;
-}
-
-.graph-con #myChart {
-	width: 25rem !important;
-	height: 12rem !important;
-	margin-left: -5rem;
-	margin-bottom: -5rem;
-	border: 0;
-	float: left;
-}
-
-.graph-con {
-	position: relative;
-}
-
-.graph-con:after {
-	position: absolute;
-	content: "";
-	height: 2px;
-	background-color: #F6F5F9;
-	left: 0;
-	right: 0;
-	bottom: -1px;
-}
-
-.graph-col {
-	margin-top: 3rem;
-}
 
 .content-left.content-left1 {
 	-ms-flex: 0 0 100%;

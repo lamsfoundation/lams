@@ -50,30 +50,6 @@
 					animation : {
 						animateScale : true,
 						animateRotate : true
-					},
-					scales : {
-						xAxes : [ {
-							gridLines : {
-								color : "rgba(0, 0, 0, 0)",
-								zeroLineColor : 'transparent'
-							},
-							ticks : {
-								display : false
-							}
-						} ],
-						yAxes : [ {
-							gridLines : {
-								color : "rgba(0, 0, 0, 0)",
-							},
-							ticks : {
-								stepSize : 1,
-								beginAtZero : false,
-								display : false
-							}
-						} ]
-					},
-					gridLines : {
-						display : false
 					}
 				}
 			});
@@ -128,77 +104,73 @@
 		</header>
 		<div class="row pt-5">
 			<div class="col-12 col-md-3 content-left">
-				<div class="row">
-					<div class="col-12 graph-col d-flex justify-content-between">
-						<div class="graph-con">
-							<canvas id="myChart" class="chartjs-render-monitor"></canvas>
-						</div>
-						<ul>
-							<li>
-								<h6>completion</h6>
-							</li>
-							<li>
-								<span class="graph-count"></span> - Not started
-							</li>
-							<li>
-								<span class="graph-count"></span> - In process
-							</li>
-							<li>
-								<span class="graph-count"></span> - Completed
-							</li>
-						</ul>
+				<div class="graph-col">
+					<div class="graph-con">
+						<canvas id="myChart" class="chartjs-render-monitor"></canvas>
 					</div>
-					<div class="col-12 graph-grades">
-						<div class="graph-grades-inner d-flex justify-content-between">
-							<div class="graph-star-col">
-								<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />
-								<p>grades</p>
+					<ul>
+						<li>
+							<h6>completion</h6>
+						</li>
+						<li>
+							<span class="graph-count"></span> - Not started
+						</li>
+						<li>
+							<span class="graph-count"></span> - In process
+						</li>
+						<li>
+							<span class="graph-count"></span> - Completed
+						</li>
+					</ul>
+				</div>
+				<div class="graph-grades">
+					<div class="graph-star-col">
+						<img src="<lams:LAMSURL/>images/components/star.png" alt="#" />
+						<p>grades</p>
+					</div>
+					<div class="grades-progress-col">
+						<div class="grades-left">
+							<div class="grades-score d-flex">
+								<p><span>High:</span> 99</p>
+								<div class="grades-progress-bar">
+									<div class="progress-div" id="progress-bar-1" style="width: 99%">
+										<span></span>
+									</div>
+								</div>
 							</div>
-							<div class="grades-progress-col">
-								<div class="grades-left">
-									<div class="grades-score d-flex">
-										<p><span>High:</span> 99</p>
-										<div class="grades-progress-bar">
-											<div class="progress-div" id="progress-bar-1" style="width: 99%">
-												<span></span>
-											</div>
-										</div>
+							<div class="grades-score d-flex">
+								<p><span>Median:</span> 68</p>
+								<div class="grades-progress-bar">
+									<div class="progress-div" id="progress-bar-2" style="width: 68%">
+										<span></span>
 									</div>
-									<div class="grades-score d-flex">
-										<p><span>Median:</span> 68</p>
-										<div class="grades-progress-bar">
-											<div class="progress-div" id="progress-bar-2" style="width: 68%">
-												<span></span>
-											</div>
-										</div>
-									</div>
-									<div class="grades-score d-flex">
-										<p><span>Low:</span> 28</p>
-										<div class="grades-progress-bar">
-											<div class="progress-div" id="progress-bar-3" style="width: 28%">
-												<span></span>
-											</div>
-										</div>
+								</div>
+							</div>
+							<div class="grades-score d-flex">
+								<p><span>Low:</span> 28</p>
+								<div class="grades-progress-bar">
+									<div class="progress-div" id="progress-bar-3" style="width: 28%">
+										<span></span>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col-12 score-col">
-						<div class="row">
-							<div class="col-12 col-sm-6">
-								<div class="score-col-inner" id="score-col1">
-									<h1>8<span>%</span></h1>
-									<p>Students <br>at risk</p>
-									<img src="<lams:LAMSURL/>images/components/icon1.png" alt="#" />
-								</div>
+				</div>
+				<div class="score-col">
+					<div class="row">
+						<div class="col-12 col-sm-6">
+							<div class="score-col-inner" id="score-col1">
+								<h1>8<span>%</span></h1>
+								<p>Students <br>at risk</p>
+								<img src="<lams:LAMSURL/>images/components/icon1.png" alt="#" />
 							</div>
-							<div class="col-12 col-sm-6">
-								<div class="score-col-inner" id="score-col2">
-									<h1>98<span>%</span></h1>
-									<p>Average <br>Score</p>
-									<img src="<lams:LAMSURL/>images/components/icon2.png" alt="#" />
-								</div>
+						</div>
+						<div class="col-12 col-sm-6">
+							<div class="score-col-inner" id="score-col2">
+								<h1>98<span>%</span></h1>
+								<p>Average <br>Score</p>
+								<img src="<lams:LAMSURL/>images/components/icon2.png" alt="#" />
 							</div>
 						</div>
 					</div>

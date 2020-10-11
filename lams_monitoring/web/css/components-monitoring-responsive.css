@@ -16,92 +16,89 @@
 }
 
 @media ( max-width : 992px) {
-	.visible-xs {
+	.monitoring-page-wrapper .visible-xs {
 		display: block !important;
 	}
-	.hidden-xs {
+	.monitoring-page-wrapper .hidden-xs {
 		display: none !important;
 	}
-	.content-left, .content-right {
+	.monitoring-page-wrapper .content-left, .monitoring-page-wrapper .content-right {
 		-ms-flex: 0 0 100%;
 		flex: 0 0 100%;
 		max-width: 100%;
 	}
-	.content-right {
+	.monitoring-page-wrapper .content-right {
 		margin-top: 2rem;
 	}
 	.main-content-inner {
 		padding: 2rem 2.8rem;
 	}
-	.hamburger {
+	.monitoring-page-wrapper .hamburger {
 		width: 1.5rem;
 	}
-	.top-menu form {
+	.monitoring-page-wrapper .top-menu form {
 		display: none;
 	}
-	.tasks-col-gate p {
+	.monitoring-page-wrapper .tasks-col-gate p {
 		padding-right: 1rem;
 	}
-	.content-left {
+	.monitoring-page-wrapper .content-left {
 		order: 2;
 	}
-	.content-right {
+	.monitoring-page-wrapper .content-right {
 		order: 1;
 	}
-	.tasks {
+	.monitoring-page-wrapper .tasks {
 		order: 3;
 	}
-	.insight {
+	.monitoring-page-wrapper .insight {
 		order: 4;
 	}
-	.graph-con {
-		width: inherit !important;
-		height: inherit !important;
-		min-height: inherit !important;
-		overflow: auto;
+	
+	.monitoring-page-wrapper .graph-col {
+		margin-top: 3rem;
 	}
-	.graph-con #myChart {
-		width: inherit !important;
-		height: inherit !important;
+	
+	.monitoring-page-wrapper .graph-con #myChart {
+		width: initial !important;
+		height: initial !important;
 		margin: 0 !important;
 	}
-	.graph-con:after {
-		bottom: 9px;
-	}
-	.content-left.content-left1 {
+	
+	.monitoring-page-wrapper .content-left.content-left1 {
 		order: 1;
 	}
-	.user-table-main {
+	.monitoring-page-wrapper .user-table-main {
 		order: 2;
 	}
-	.user-page .score-col-inner {
+	.monitoring-page-wrapper .user-page .score-col-inner {
 		margin-top: 2rem;
 	}
-	.table-content-left {
+	.monitoring-page-wrapper .table-content-left {
 		-ms-flex: 0 0 27rem;
 		flex: 0 0 27rem;
 		max-width: 100%;
 		padding-left: 3.5rem;
 		width: 27rem;
 	}
-	.table-content-right {
+	.monitoring-page-wrapper .table-content-right {
 		-ms-flex: 0 0 calc(100%);
 		flex: 0 0 calc(100%);
 		max-width: calc(100%);
 	}
-	.content-graph2:after {
+	.monitoring-page-wrapper .content-graph2:after {
 		bottom: .6rem;
 	}
-	.user-table {
+	.monitoring-page-wrapper .user-table {
 		width: 33rem;
 	}
-	.user-table-data {
+	.monitoring-page-wrapper .user-table-data {
 		overflow-x: auto;
 	}
 }
 
 @media ( max-width : 550px) {
-	.graph-col {
+	.monitoring-page-wrapper .graph-col {
 		display: inline-block !important;
 	}
 }
