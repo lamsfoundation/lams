@@ -408,7 +408,22 @@ body.component .info_icon {
 }
 
 .component-page-wrapper .graph-con {
+	position: relative;
 	min-height: 12rem;
+	width: calc(100% - 8rem);
+}
+
+.component-page-wrapper .graph-con #myChart {
+	width: 25rem !important;
+	height: 12rem !important;
+	margin-left: -5rem;
+	margin-bottom: -5rem;
+	border: 0;
+}
+
+.component-page-wrapper .graph-col {
+	display: flex;
+	justify-content: space-between;
 }
 
 .component-page-wrapper .graph-col ul {
@@ -446,33 +461,6 @@ body.component .info_icon {
 
 .component-page-wrapper .graph-col ul li:nth-child(4) span {
 	background-color: #FD3CA5;
-}
-
-.component-page-wrapper .graph-grades-inner {
-	background-color: #fff;
-	box-shadow: 0px 20px 20px #2E384D1A;
-	border-radius: 1.2rem;
-	margin-top: 2rem;
-	padding: 1rem 1.5rem;
-}
-
-.component-page-wrapper .graph-star-col {
-	width: 5rem;
-}
-
-.component-page-wrapper .graph-star-col img {
-	width: 3rem;
-	max-width: 100%;
-}
-
-.component-page-wrapper .graph-star-col p {
-	color: #ACB5CC;
-	font-family: mont-bold, sans-serif;
-	text-transform: uppercase;
-	font-size: .7rem;
-	margin: 0;
-	margin-top: .4rem;
-	letter-spacing: 2px;
 }
 
 
