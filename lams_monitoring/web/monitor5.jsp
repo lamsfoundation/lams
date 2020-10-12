@@ -187,27 +187,35 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-12 col-md-6 tasks">
-				<div class="tasks-col">
+			<div class="col-12 col-md-6 mb-4">
+				<div class="monitoring-panel tasks-col">
 					<h6>required tasks</h6>
-					<div class="tasks-col-gate d-flex justify-content-between">
-						<p>Gate</p>
-						<select>
-							<option>Open now</option>
-							<option>Open now</option>
-							<option>Open now</option>
-						</select>
+					<div class="row">
+						<div class="col-3">
+							Gate
+						</div>
+						<div class="col-9">
+							<select>
+								<option>Open now</option>
+								<option>Open now</option>
+								<option>Open now</option>
+							</select>
+						</div>
 					</div>
-					<div class="tasks-col-gate d-flex justify-content-between">
-						<p>Grouping</p>
-						<button type="button">Set Groups</button>
+					<div class="row">
+						<div class="col-3">
+							Grouping
+						</div>
+						<div class="col-9">
+							<button type="button">Set Groups</button>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-12 col-md-6 insight">
-				<div class="insight-col">
+			<div class="col-12 col-md-6 mb-4">
+				<div class="monitoring-panel insight-col">
 					<h6>insights</h6>
-					<div class="insight-col-gate">
+					<div class="insight-col-content">
 						<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem</p>
 						<p><a href="#">read more...</a></p>
 					</div>
