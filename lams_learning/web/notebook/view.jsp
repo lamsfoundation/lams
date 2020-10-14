@@ -99,8 +99,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</div>
 							<div class="form-group" style="text-align: left;">
 								<label><fmt:message key="mynotes.entry.entry.label"></fmt:message></label>
-								<form:textarea path="entry" cssClass="form-control" id="entry" style="width: 100%" rows="10"
-									value="${entry.entry}" />
+								<textarea name="entry" cssClass="form-control" id="entry" style="width: 100%" rows="10"
+								><c:out value="${entry.entry}" /></textarea>
 							</div>
 						</c:when>
 						<c:otherwise>
