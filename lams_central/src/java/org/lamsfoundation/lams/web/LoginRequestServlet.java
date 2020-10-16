@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -231,8 +230,8 @@ public class LoginRequestServlet extends HttpServlet {
 	    UniversalLoginModule.setAuthenticationToken(token);
 
 	    redirectURL = WebUtil.getBaseServerURL() + redirectURL;
-	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
-	    response.sendRedirect("login.jsp?redirectURL=" + redirectURL);
+	    hses.setAttribute("redirectURL", redirectURL);
+	    response.sendRedirect("login.jsp");
 	} catch (AuthenticationException e) {
 	    log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
