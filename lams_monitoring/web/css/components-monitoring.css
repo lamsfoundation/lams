@@ -331,56 +331,45 @@
 	margin-bottom: 2rem;
 }
 
-.monitoring-page-wrapper .tasks-col .row {
-	margin-bottom: 1rem;
+.monitoring-page-wrapper #required-tasks-content .row {
+	margin-bottom: 1.5rem;
 }
 
-.monitoring-page-wrapper .tasks-col .row > div:first-child {
+.monitoring-page-wrapper #required-tasks-content .label {
 	color: #2E384D;
 	font-family: mont-regular, sans-serif;
 	font-size: .8rem;
 	margin: 0;
-	margin-top: .6rem;
 }
 
-.monitoring-page-wrapper .tasks-col select {
-	width: 100%;
-	border: 0;
-	background-color: #F6F5FA;
-	height: 2.8rem;
+.monitoring-page-wrapper #required-tasks-content .label.contribute-activity-title {
+	font-family: mont-bold, sans-serif;
+}
+
+.monitoring-page-wrapper #required-tasks-content .badge {
 	padding: .5rem 1rem;
-	border-radius: .9rem;
-	-moz-appearance: none; /* Firefox */
-	-webkit-appearance: none; /* Safari and Chrome */
-	appearance: none;
-	font-size: .8rem;
-	color: #ACB5CC;
-	font-family: mont-regular, sans-serif;
-	background-repeat: no-repeat;
-	background-position: calc(100% - 1.3rem) 1.3rem;
-	background-size: .6rem;
-	background-image: url(/lams/images/components/arrow.svg);
+	vertical-align: middle;
 }
 
-.monitoring-page-wrapper .tasks-col select:focus {
-	outline: none;
-}
-
-.monitoring-page-wrapper .tasks-col button {
+.monitoring-page-wrapper #required-tasks-content button {
 	background-color: #3C42E0;
 	border: 0;
 	color: #fff;
 	font-family: mont-regular, sans-serif;
 	font-size: .8rem;
-	width: 10rem;
-	height: 2.7rem;
-	border-radius: .8rem;
 	box-shadow: 0px 3px 6px #3C42E040;
-	transition: all .3s ease;
 }
 
-.monitoring-page-wrapper .tasks-col button:hover {
+.monitoring-page-wrapper #required-tasks-content button.contribute-go-button {
+	min-width: 5rem;
+}
+
+.monitoring-page-wrapper #required-tasks-content button:hover {
 	background-color: #878bea;
+}
+
+.monitoring-page-wrapper #required-tasks-content .dropdown-item {
+	font-size: .8rem;
 }
 
 .monitoring-page-wrapper .insight-col-content p {
