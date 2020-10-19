@@ -350,6 +350,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return assessmentUserDao.getCountUsersByContentId(contentId);
     }
 
+    /**
+     * How many learners can possibly access this activity
+     */
+    @Override
+    public int getCountLessonLearnersByContentId(long contentId) {
+	long lessonId = lessonService.getLessonByToolContentId(contentId).getLessonId();
+	return lessonService.getCountLessonLearners(lessonId, null);
+    }
+
+    /**
+     * How many learners have already finished answering questions.
+     * They are either on results page or left the activity completely.
+     */
+    @Override
+    public int getCountLearnersWithFinishedCurrentAttempt(long contentId) {
+	return assessmentResultDao.countLastFinishedAssessmentResults(contentId);
+    }
+
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {

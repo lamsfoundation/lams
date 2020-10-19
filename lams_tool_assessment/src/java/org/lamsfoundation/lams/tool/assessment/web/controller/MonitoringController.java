@@ -236,6 +236,10 @@ public class MonitoringController {
 	    request.setAttribute("questions", questionDtos);
 	}
 
+	request.setAttribute("possibleLearners", service.getCountLessonLearnersByContentId(contentId));
+	request.setAttribute("startedLearners", service.getCountUsersByContentId(contentId));
+	request.setAttribute("finishedLearners", service.getCountLearnersWithFinishedCurrentAttempt(contentId));
+
 	return "pages/monitoring/monitoring";
     }
 
@@ -576,7 +580,7 @@ public class MonitoringController {
 		}
 
 		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
-		
+
 		if (StringUtils.isNotBlank(questionResult.getJustification())) {
 		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
 			    + questionResult.getJustificationEscaped();
