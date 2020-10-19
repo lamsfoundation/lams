@@ -310,7 +310,80 @@
 			}
 		}
 		initInidividualTimeLimitAutocomplete();
+		
+		drawCompletionChart();
 	});
+
+	
+	function drawCompletionChart(){
+		let ctx = document.getElementById('completion-chart').getContext('2d');
+		new Chart(ctx, {
+			type : 'doughnut',
+			borderWidth : 0,
+			data : {
+				elements : {
+					arc : {
+						borderWidth : 0,
+						fontSize : 0,
+					}
+				},
+				datasets : [ {
+					data : [ ${possibleLearners - startedLearners - completedLearners},
+							 ${startedLearners - completedLearners},
+							 ${completedLearners}
+						   ],
+					backgroundColor : [ 'rgba(5, 204, 214, 1)',
+										'rgba(255, 195, 55, 1)',
+										'rgba(253, 60, 165, 1)',
+									  ],
+					borderWidth : 0,
+				} ],
+				labels : [ '<fmt:message key="label.monitoring.summary.completion.possible"/>',
+						   '<fmt:message key="label.monitoring.summary.completion.started"/>',
+						   '<fmt:message key="label.monitoring.summary.completion.completed"/>' ]
+			},
+			options : {
+				responsive : true,
+				legend : {
+					display : true,
+					position: 'right',
+					labels : {
+						generateLabels : function(chart) {
+							var data = chart.data;
+							if (data.labels.length && data.datasets.length) {
+								return data.labels.map(function(label, i) {
+									var meta = chart.getDatasetMeta(0),
+										style = meta.controller.getStyle(i),
+										value = data.datasets[0].data[i];
+
+									return {
+										text: label + ": " + value,
+										fillStyle: style.backgroundColor,
+										strokeStyle: style.borderColor,
+										lineWidth: style.borderWidth,
+										hidden: isNaN(value) || meta.data[i].hidden,
+
+										// Extra data used for toggling the correct item
+										index: i
+									};
+								});
+							}
+							return [];
+						}
+					}
+				},
+				title : {
+					display: true,
+					fontSize : '15',
+					text : '<fmt:message key="label.monitoring.summary.completion" />'
+				},
+				animation : {
+					animateScale : true,
+					animateRotate : true
+				}
+			}
+		});
+	}
 
 	function resizeJqgrid(jqgrids) {
 		jqgrids.each(function(index) {
@@ -675,9 +748,12 @@
 		</lams:Alert>
 	</c:if>
 
+	<div id="completion-chart-container">
+		<canvas id="completion-chart"></canvas>
+	</div>
+
 	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="messageArea"></div>
-			
 </div>
 
 <c:if test="${not empty sessionDtos}">

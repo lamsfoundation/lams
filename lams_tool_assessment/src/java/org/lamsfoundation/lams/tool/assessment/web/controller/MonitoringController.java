@@ -238,7 +238,7 @@ public class MonitoringController {
 
 	request.setAttribute("possibleLearners", service.getCountLessonLearnersByContentId(contentId));
 	request.setAttribute("startedLearners", service.getCountUsersByContentId(contentId));
-	request.setAttribute("finishedLearners", service.getCountLearnersWithFinishedCurrentAttempt(contentId));
+	request.setAttribute("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(contentId));
 
 	return "pages/monitoring/monitoring";
     }
