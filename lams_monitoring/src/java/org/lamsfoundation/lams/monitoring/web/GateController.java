@@ -61,6 +61,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * <p>
@@ -137,6 +139,15 @@ public class GateController {
 	GateActivity gate = monitoringService.openGate(gateForm.getActivityId(), getUserId());
 
 	return findViewByGateType(gateForm, gate);
+    }
+
+    /**
+     * Close the gate again.
+     */
+    @RequestMapping(path = "/closeGate", method = RequestMethod.POST)
+    @ResponseBody
+    public void closeGate(@RequestParam long activityId) {
+	monitoringService.closeGate(activityId);
     }
 
     /**
