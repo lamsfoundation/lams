@@ -647,7 +647,8 @@ function updateContributeActivities(contributeActivities) {
 				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
-				var entryContent = '';
+				var entryContent = '',
+					closeable = false;
 				switch (this.contributionType) {
 					case 3  : entryContent = LABELS.CONTRIBUTE_GATE; break;
 					case 6  : entryContent = LABELS.CONTRIBUTE_GROUPING; break;
@@ -657,9 +658,17 @@ function updateContributeActivities(contributeActivities) {
 					case 12 : entryContent = LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
 				}
 				switch (this.contributionType) {
-					case 3  : 
+					case 3  : closeable = true;
 					case 12 : if (this.isComplete) {
-						 		entryContent += '<span class="pull-right"><span style="font-size: 12px;" class="label label-success">' + LABELS.CONTRIBUTE_OPENED_GATE + '</span></span>';
+						 		entryContent += '<div class="pull-right"><span class="gate-opened">' 
+						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
+						 					 + '</span>';
+						 		if (closeable) {
+						 			entryContent += '<button class="btn btn-xs btn-primary" title="' + LABELS.CONTRIBUTE_CLOSE_GATE_TOOLTIP 
+						 						 + '" onClick="javascript:closeGate(' + contributeActivity.activityID + ')">'
+						 						 + LABELS.CONTRIBUTE_CLOSE_GATE_BUTTON + '</button>'
+						 		}
+						 		entryContent += '</div>';
 							} else {
 								entryContent += '<div class="pull-right btn-group btn-group-xs"><button onClick="javascript:openGateNow('
                                      + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
@@ -668,7 +677,6 @@ function updateContributeActivities(contributeActivities) {
                                      + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
-									
 							}
 							break;
 					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
@@ -892,6 +900,20 @@ function openGateNow(activityId) {
 	});
 }
 
+function closeGate(activityId) {
+	var data = {
+		'activityId' : activityId
+	};
+	data[csrfTokenName] = csrfTokenValue;
+	$.ajax({
+		'type' : 'post',
+		'url'  : LAMS_URL + 'monitoring/gate/closeGate.do',
+		'data'  : data,
+		'success' : function(){
+			updateLessonTab();
+		}
+	});
+}
 //********** SEQUENCE TAB FUNCTIONS **********
 
 /**
