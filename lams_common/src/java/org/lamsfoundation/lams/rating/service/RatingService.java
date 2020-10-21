@@ -243,7 +243,7 @@ public class RatingService implements IRatingService {
 		isCommentsByOtherUsersRequired, userId);
 
 	//get all data from DB
-	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
+	List<Rating> userRatings = userId == null ? null : ratingDAO.getRatingsByUser(contentId, userId.intValue());
 	List<Object[]> itemsStatistics;
 	if (isSingleItem) {
 	    itemsStatistics = toolSessionId == null
@@ -273,17 +273,19 @@ public class RatingService implements IRatingService {
 		ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
 		criteriaDto.setRatingCriteria(criteria);
 
-		// set user's rating
-		Rating userRating = null;
-		for (Rating userRatingIter : userRatings) {
-		    if (userRatingIter.getItemId().equals(itemId)
-			    && userRatingIter.getRatingCriteria().getRatingCriteriaId().equals(criteriaId)) {
-			userRating = userRatingIter;
+		if (userId != null) {
+		    // set user's rating
+		    Rating userRating = null;
+		    for (Rating userRatingIter : userRatings) {
+			if (userRatingIter.getItemId().equals(itemId)
+				&& userRatingIter.getRatingCriteria().getRatingCriteriaId().equals(criteriaId)) {
+			    userRating = userRatingIter;
+			}
 		    }
+		    String userRatingStr = userRating == null ? "" : numberFormat.format(userRating.getRating());
+		    criteriaDto.setUserRating(userRatingStr);
 		}
-		String userRatingStr = userRating == null ? "" : numberFormat.format(userRating.getRating());
-		criteriaDto.setUserRating(userRatingStr);
-
+		
 		// check if there is any data returned from DB regarding this item and criteria
 		Object[] itemStatistics = null;
 		for (Object[] itemStatisticsIter : itemsStatistics) {

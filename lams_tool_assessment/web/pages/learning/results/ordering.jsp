@@ -1,9 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
-	<fmt:message key="label.learning.ordering.sort.answers" />
-</div>
-	
+<c:if test="${not empty toolSessionID}">
+	<div class="question-type">
+		<fmt:message key="label.learning.ordering.sort.answers" />
+	</div>
+</c:if>
+
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">

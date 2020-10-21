@@ -45,20 +45,23 @@
 		
 	<script type="text/javascript">
 		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
+		var pathToImageFolder = "${lams}images/css/",
 		
 		//vars for rating.js
-		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-		COMMENTS_MIN_WORDS_LIMIT = 0,
-		MAX_RATES = 0,
-		MIN_RATES = 0,
-		LAMS_URL = '${lams}',
-		COUNT_RATED_ITEMS = true,
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
-		ALLOW_RERATE = false,
-		SESSION_ID = ${toolSessionID};
+			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			MAX_RATES = 0,
+			MIN_RATES = 0,
+			LAMS_URL = '${lams}',
+			COUNT_RATED_ITEMS = true,
+			COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
+			WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+			ALLOW_RERATE = false;
+		<c:if test="${not empty toolSessionID}">
+			var SESSION_ID = ${toolSessionID};
+		</c:if>
+
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -135,14 +138,16 @@
 			</lams:Alert>
 		</c:if>
 		
-		<c:if test="${isLeadershipEnabled}">
+		<c:if test="${isLeadershipEnabled and not empty sessionMap.groupLeader}">
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
 		<lams:errors/>
 		<br>
 		
-		<%@ include file="results/attemptsummary.jsp"%>
+		<c:if test="${not empty result}">
+			<%@ include file="results/attemptsummary.jsp"%>
+		</c:if>
 		
 		<c:if test="${assessment.displaySummary}">
 			<div class="panel">
@@ -203,7 +208,7 @@
 					</button>
 				</c:if>	
 						
-				<c:if test="${! sessionMap.isUserFailed}">
+				<c:if test="${!sessionMap.isUserFailed}">
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 

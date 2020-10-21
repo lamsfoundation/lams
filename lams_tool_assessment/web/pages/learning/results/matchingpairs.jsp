@@ -1,8 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
-	<fmt:message key="label.learning.matching.pairs.pick.up" />
-</div>
+<c:if test="${not empty toolSessionID}">
+	<div class="question-type">
+		<fmt:message key="label.learning.matching.pairs.pick.up" />
+	</div>
+</c:if>
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">

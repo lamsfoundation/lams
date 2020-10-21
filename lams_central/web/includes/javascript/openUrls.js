@@ -93,8 +93,6 @@ function openTBLMonitorLesson( lessonID ) {
 	openMonitorLesson(lessonID, '/lams/monitoring/tblmonitor/start.do')
 }
 
-http://localhost:8080/lams/monitoring/tblmonitor/start.do?lessonID=31109
-
 function openLearner( lessonId ) {
 	var learnerUrl = '/lams/home/learner.do?lessonID=' + lessonId;
 	
