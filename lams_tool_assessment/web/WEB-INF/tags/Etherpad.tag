@@ -11,6 +11,8 @@
 <%@ taglib uri="tags-function" prefix="fn" %>
 
 <%@ attribute name="groupId" required="true" rtexprvalue="true" %>
+
+<%@ attribute name="padId" required="false" rtexprvalue="true" %>
 <%@ attribute name="showControls" required="false" rtexprvalue="true" %>
 <%@ attribute name="showChat" required="false" rtexprvalue="true" %>
 <%@ attribute name="height" required="false" rtexprvalue="true" %>
@@ -60,36 +62,50 @@
 		    });
 		</c:if>
 		
+		let initPad = function(padId) {
+			// proper initialisation
+			$('#etherpad-container-${groupId}').pad({
+				'padId': padId,
+				'host':'${etherpadServerUrl}',
+				'lang':'${fn:toLowerCase(localeLanguage)}',
+				'showControls':${empty showControls ? false : showControls},
+				'showChat': ${empty showChat ? false : showChat},
+				'height': ${empty height ? 'undefined' : height}
+				<c:if test="${showControls}">
+					<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
+					,'userName':'<c:out value="${fullName}" />'
+				</c:if>
+			}).addClass('initialised');
+		}
+		
 		window.setTimeout(function(){
-			$.ajax({
-				url: '<lams:LAMSURL/>etherpad/getPad.do',
-				cache : false,
-				type: "GET",
-				data: {
-					groupId : '${groupId}',
-					content : $('#etherpad-initial-content-${groupId}').html()
-				},
-				dataType : 'text',
-				success: function(padId, status, xhr) {
-					if ( status == "error" ) {
-						console.log( xhr.status + " " + xhr.statusText );
-					} else {
-						// proper initialisation
-						$('#etherpad-container-${groupId}').pad({
-							'padId': padId,
-							'host':'${etherpadServerUrl}',
-							'lang':'${fn:toLowerCase(localeLanguage)}',
-							'showControls':${empty showControls ? false : showControls},
-							'showChat': ${empty showChat ? false : showChat},
-							'height': ${empty height ? 'undefined' : height}
-							<c:if test="${showControls}">
-								<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
-								,'userName':'<c:out value="${fullName}" />'
-							</c:if>
-						}).addClass('initialised');
-					}
-				}
-			});
+			
+			<c:choose>
+				<c:when test="${empty padId}">
+					<%-- If pad ID was not provided, fetch it from back end --%>
+					$.ajax({
+						url: '<lams:LAMSURL/>etherpad/getPad.do',
+						cache : false,
+						type: "GET",
+						data: {
+							groupId : '${groupId}',
+							content : $('#etherpad-initial-content-${groupId}').html()
+						},
+						dataType : 'text',
+						success: function(padId, status, xhr) {
+							if ( status == "error" ) {
+								console.log( xhr.status + " " + xhr.statusText );
+							} else {
+								initPad(padId);
+							}
+						}
+					});
+				</c:when>
+				<c:otherwise>
+					initPad('${padId}');
+				</c:otherwise>
+			</c:choose>
+
 			// wait for other pad on the page to initialise
 		}, delayBeforeInitialise);
 	}
