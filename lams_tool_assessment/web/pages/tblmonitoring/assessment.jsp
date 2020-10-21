@@ -112,6 +112,11 @@
 	function disabledAndCheckButton(button){
 		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
 	}
+	
+	
+	function showResultsForTeacher(toolContentId) {
+		launchPopup("<c:url value='/learning/showResultsForTeacher.do'/>?toolContentID=" + toolContentId, 'Results');
+	}
 </script>
 
 <!-- Header -->
@@ -151,7 +156,7 @@
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.show.students.choices"/>
 			</a>
-		</div>       
+		</div>      
 	</c:if>                           
 </div>
 
@@ -186,6 +191,12 @@
 				<%-- Release correct/groups answers for all questions in this assessment --%>
 				<div class="row no-gutter">
 					<div class="col-xs-12 col-md-12 col-lg-12">
+						<div class="btn btn-sm btn-default pull-right loffset10"
+							  onclick="javascript:showResultsForTeacher(${assessmentDto.assessment.contentId})">
+							<i class="fa fa-check-circle-o"></i>
+							<fmt:message key="label.monitoring.summary.results.view"/>
+						</div>
+						
 						<div class="btn-group-sm pull-right disclose-all-button-group">
 							<div class="btn btn-default disclose-all-correct-button">
 								<fmt:message key="label.disclose.all.correct.answers"/>
@@ -194,6 +205,8 @@
 								<fmt:message key="label.disclose.all.groups.answers"/>
 							</div>
 						</div>
+						
+
 					</div>
 				</div>
 			</c:if>

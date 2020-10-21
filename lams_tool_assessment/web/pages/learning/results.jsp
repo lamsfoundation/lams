@@ -208,7 +208,7 @@
 					</button>
 				</c:if>	
 						
-				<c:if test="${! sessionMap.isUserFailed}">
+				<c:if test="${!sessionMap.isUserFailed}">
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 

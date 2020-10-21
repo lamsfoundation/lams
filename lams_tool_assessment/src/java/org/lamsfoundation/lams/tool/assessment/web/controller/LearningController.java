@@ -1196,7 +1196,7 @@ public class LearningController {
 		    // question results need to be in the same order as sessions, i.e. user group first
 		    questionResultsPerSession.add(0, questionResults);
 		}
-		
+
 		// count how many ratings user or his leader left
 		// maybe exact session ID matching should be used here to make sure
 		int ratedItemCount = 0;
@@ -1263,7 +1263,7 @@ public class LearningController {
 	populateDisclosedAnswers(request, assessment, null);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+	sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS, pagedQuestionDtos);
