@@ -5,6 +5,8 @@
 <lams:head>
 	<title><fmt:message key="authoring.fla.page.svg.generator.title" /></title>
 	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring-svg.css" type="text/css" media="screen" />
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
