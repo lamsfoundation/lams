@@ -11,6 +11,7 @@
 </c:set>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
+<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 <script>
 	$(document).ready(function(){
 		// change attempted and all learners numbers
