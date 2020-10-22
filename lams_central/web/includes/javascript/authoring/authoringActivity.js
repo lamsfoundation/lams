@@ -383,7 +383,7 @@ ActivityDraw = {
 
 		// create activity SVG elements
 		var shape = paper.circle(x, y, 20)
-						 .addClass('branching branching-' + (this.isStart ? 'start' : 'end'));
+						 .addClass('svg-branching svg-branching-' + (this.isStart ? 'start' : 'end'));
 		
 		this.items = paper.g(shape);
 		if (this.readOnly && !isReadOnlyMode) {
@@ -681,9 +681,9 @@ ActivityDraw = {
 			shapePath = bannerPath + ' h ' + (width - 2 * curve) + ' q ' + curve + ' 0 ' + curve + ' ' + curve +
 						' v ' + (height - 2 * curve) + ' q 0 ' + curve + ' ' + -curve + ' ' + curve + ' z',
 			shape = paper.path(shapePath)
-						 .addClass('tool-activity-background'),
+						 .addClass('svg-tool-activity-background'),
 			shapeBorder = paper.path(shapePath)
-							 .addClass('tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
+							 .addClass('svg-tool-activity-border' + (this.requireGrouping ? '-require-grouping' : '')),
 			// check for icon in the library
 			imageData = null, // ActivityIcons[this.learningLibraryID],
 			icon = imageData ? paper.image(imageData, x + 5, y + 3, 20, 20) : null,
@@ -697,7 +697,7 @@ ActivityDraw = {
 		
 		bannerPath += ' h ' + bannerWidth + ' v ' + height + ' z';
 		var banner = paper.path(bannerPath)
-						  .addClass('tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
+						  .addClass('svg-tool-activity-category-' + layout.toolMetadata[this.learningLibraryID].activityCategoryID);
 		this.items = paper.g(shape, banner, shapeBorder, label);
 		
 		if (icon) {
@@ -780,13 +780,13 @@ ActivityDraw = {
 				path += Snap.format(' L {endX} {endY}', points);
 			}
 			
-			this.items.shape = paper.path(path).addClass('transition');
+			this.items.shape = paper.path(path).addClass('svg-transition');
 			this.items.append(this.items.shape);
 			
-			var dot = paper.circle(points.startX, points.startY, layout.transition.dotRadius).addClass('transition-element'),
+			var dot = paper.circle(points.startX, points.startY, layout.transition.dotRadius).addClass('svg-transition-element'),
 				side = layout.transition.arrowLength,
 				triangle = paper.polygon(0, 0, side, 2 * side, -side, 2 * side)
-								.addClass('transition-element')
+								.addClass('svg-transition-element')
 								.transform(Snap.format('translate({endX} {endY}) rotate({arrowAngle})', points));
 			this.items.append(dot);
 			this.items.append(triangle);
@@ -937,7 +937,7 @@ ActivityLib = {
 						activityBox.width,
 						activityBox.height,
 						5, 5)
-				   .addClass('tool-activity-border');
+				   .addClass('svg-tool-activity-border');
 			
 			activity.items.prepend(activity.items.groupingEffect);
 			

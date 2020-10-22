@@ -1,0 +1,80 @@
+.svg-tool-activity-border {
+	fill: none;
+	stroke: black;
+	stroke-width: 1;
+}
+
+.svg-tool-activity-border-require-grouping {
+	fill: none;
+	stroke: red;
+	stroke-width: 3;
+}
+
+.svg-tool-activity-background {
+	stroke: none;
+	fill: white;
+}
+
+.svg-tool-activity-category-1 {
+	stroke: none;
+	fill: #caddfb;
+}
+
+.svg-tool-activity-category-2 {
+	stroke: none;
+	fill: #ffffbb;
+}
+
+.svg-tool-activity-category-3 {
+	stroke: none;
+	fill: #ece9f7;
+}
+
+.svg-tool-activity-category-4 {
+	stroke: none;
+	fill: #fdf1d3;
+}
+
+.svg-tool-activity-category-5 {
+	stroke: none;
+	fill: #caddfb;
+}
+
+.svg-tool-activity-category-6 {
+	stroke: none;
+	fill: #e9f9c0;
+}
+
+.svg-branching {
+	stroke-width: 3;
+	fill: white;
+}
+
+.svg-branching-start {
+	stroke: green;
+}
+
+.svg-branching-end {
+	stroke: red;
+}
+
+.svg-branching-match {
+	stroke: blue;
+}
+
+.svg-transition {
+	stroke-width: 1;
+	stroke: rgb(119, 126, 157);
+	fill: none;
+}
+
+.svg-transition-element {
+	stroke: rgb(119, 126, 157);
+	fill: rgb(119, 126, 157);
+}
+
+.svg-transition-draw {
+	stroke-width: 2;
+	stroke: rgb(119, 126, 157);
+	stroke-dasharray: 5, 3;
+}

@@ -292,6 +292,19 @@ var MenuLib = {
 		// reset any cursor=pointer styles
 		$('*[style*="cursor"]', svg).css('cursor', 'default');
 		
+		// append SVG CSS straight into SVG file
+		$.ajax({
+			'url'     : LAMS_URL + 'css/authoring-svg.css',
+			'dataType': 'text',
+			'async'   : false,
+			'success' : function(css) {
+				let styleElement = document.createElement("style"),
+					styleContent = document.createTextNode(css);
+				styleElement.appendChild(styleContent);
+				svg.appendChild(styleElement);
+			}
+		});
+		
 		return crop.canvasClone.html();
 	},
 	

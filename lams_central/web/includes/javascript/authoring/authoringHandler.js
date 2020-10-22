@@ -409,8 +409,8 @@ HandlerActivityLib = {
 			startItems = branchingActivity.start.items,
 			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.addClass('branching-match');
-			endItems.shape.addClass('branching-match');
+			startItems.shape.addClass('svg-branching-match');
+			endItems.shape.addClass('svg-branching-match');
 		}
 	},
 	
@@ -424,8 +424,8 @@ HandlerActivityLib = {
 			endItems = branchingActivity.end.items;
 		
 		if (!startItems.isDragged && !endItems.isDragged) {
-			startItems.shape.removeClass('branching-match');
-			endItems.shape.removeClass('branching-match');
+			startItems.shape.removeClass('svg-branching-match');
+			endItems.shape.removeClass('svg-branching-match');
 		}
 	}
 },
@@ -721,7 +721,7 @@ HandlerTransitionLib = {
 															 'endX'   : endX,
 															 'endY'   : endY
 															}))
-										  .addClass('transition-draw')
+										  .addClass('svg-transition-draw')
 									);
 	},
 	
