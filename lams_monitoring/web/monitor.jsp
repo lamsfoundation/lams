@@ -166,12 +166,10 @@
 				CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
 				<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
 				CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
-				<fmt:message key="button.task.gate.close" var="CONTRIBUTE_CLOSE_GATE_BUTTON_VAR"/>
-				CONTRIBUTE_CLOSE_GATE_BUTTON : '<c:out value="${CONTRIBUTE_CLOSE_GATE_BUTTON_VAR}" />',
-				<fmt:message key="button.task.gate.close.tooltip" var="CONTRIBUTE_CLOSE_GATE_TOOLTIP_VAR"/>
-				CONTRIBUTE_CLOSE_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_CLOSE_GATE_TOOLTIP_VAR}" />',
-				<fmt:message key="label.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
+				<fmt:message key="button.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
 				CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
+				<fmt:message key="button.task.gate.opened.tooltip" var="CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPENED_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>

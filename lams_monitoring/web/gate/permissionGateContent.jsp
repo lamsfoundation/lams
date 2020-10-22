@@ -55,7 +55,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:if test="${not gateForm.gate.gateOpen}" >
 						<%@ include file="openGateSingleUser.jsp" %>
 			</c:if>
-	
 		</lams:Page>
 
 		<div id="footer">

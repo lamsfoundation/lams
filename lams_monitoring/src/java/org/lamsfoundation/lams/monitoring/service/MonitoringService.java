@@ -1256,23 +1256,10 @@ public class MonitoringService implements IMonitoringFullService {
     public GateActivity openGate(Long gateId, Integer openerId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null) {
-	    gate.setGateOpen(new Boolean(true));
+	    gate.setGateOpen(true);
 	    gate.setGateOpenTime(new Date());
 	    if (openerId != null) {
 		gate.setGateOpenUser(baseDAO.find(User.class, openerId));
-	    }
-
-	    // we un-schedule the gate from the scheduler if it's of a scheduled
-	    // gate (LDEV-1271)
-	    if (gate.isScheduleGate()) {
-		try {
-		    scheduler.unscheduleJob(TriggerKey.triggerKey("openGateTrigger:" + gate.getActivityId()));
-		} catch (SchedulerException e) {
-		    MonitoringService.log
-			    .error("Error unscheduling trigger for gate activity id:" + gate.getActivityId(), e);
-		    throw new MonitoringServiceException(
-			    "Error unscheduling trigger for gate activity id:" + gate.getActivityId(), e);
-		}
 	    }
 
 	    activityDAO.update(gate);
