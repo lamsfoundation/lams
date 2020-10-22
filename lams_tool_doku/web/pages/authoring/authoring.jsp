@@ -6,7 +6,12 @@
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
 	<%@ include file="/common/tabbedheader.jsp"%>
-
+	
+	<style>
+		#timeLimit {
+			width: 70px;
+		}
+	</style>
 	<script type="text/javascript">
         function init(){
             var tag = document.getElementById("currentTab");
@@ -24,6 +29,16 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         }
+        
+        $(document).ready(function(){
+			$('#timeLimit').change(function() {
+				let widget = $(this),
+					timeLimit = widget.val();
+				if (!timeLimit || timeLimit < 0) {
+					widget.val(0);
+				}
+			});
+        });
     </script>
 </lams:head>
 
