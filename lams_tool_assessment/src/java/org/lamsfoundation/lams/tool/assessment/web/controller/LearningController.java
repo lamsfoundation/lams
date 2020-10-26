@@ -1222,6 +1222,7 @@ public class LearningController {
     @RequestMapping("/showResultsForTeacher")
     public String showResultsForTeacher(HttpServletRequest request) {
 	long toolContentId = WebUtil.readLongParam(request, AssessmentConstants.PARAM_TOOL_CONTENT_ID);
+	boolean embedded = WebUtil.readBooleanParam(request, "embedded", false);
 	UserDTO user = LearningController.getCurrentUser();
 	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 
@@ -1273,7 +1274,7 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
-	return "pages/learning/results";
+	return "pages/learning/results" + (embedded ? "/allquestions" : "");
     }
 
     /**

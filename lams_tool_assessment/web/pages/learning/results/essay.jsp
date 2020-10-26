@@ -68,7 +68,7 @@
 							</td>
 						</tr>
 					</c:if>
-					
+
 					<c:if test="${showRating}">
 						<tr>
 							<td>
