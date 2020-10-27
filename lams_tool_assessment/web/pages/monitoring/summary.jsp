@@ -328,7 +328,7 @@
 					}
 				},
 				datasets : [ {
-					data : [ ${possibleLearners - startedLearners - completedLearners},
+					data : [ ${possibleLearners - startedLearners},
 							 ${startedLearners - completedLearners},
 							 ${completedLearners}
 						   ],
