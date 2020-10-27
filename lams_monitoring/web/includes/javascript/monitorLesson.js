@@ -624,8 +624,8 @@ function updatePresenceAvailableCount(){
 
 function updateContributeActivities(contributeActivities) {
 	$('.contributeRow').remove();
-	var header = $('#contributeHeader');
-	var row = header;
+	var header = $('#contributeHeader'),
+		row = header;
 	
 	// special case - add a Live Edit option. This does not directly map to an activity
 	if ( lockedForEdit && lockedForEditUserId == userId) {
@@ -641,10 +641,10 @@ function updateContributeActivities(contributeActivities) {
 	}
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
-			var contributeId = 'contribute' + this.activityID;
-			var contributeActivity = this,
+			var contributeId = 'contribute' + this.activityID,
+				contributeActivity = this,
 				cell = $('<div />').addClass('contributeActivityCell').text(this.title).attr('id', contributeId);
-				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
+			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
 				var entryContent = '';
@@ -659,19 +659,28 @@ function updateContributeActivities(contributeActivities) {
 				switch (this.contributionType) {
 					case 3  : 
 					case 12 : if (this.isComplete) {
-						 		entryContent += '<span class="pull-right"><span style="font-size: 12px;" class="label label-success">' + LABELS.CONTRIBUTE_OPENED_GATE + '</span></span>';
+						 		entryContent += '<div class="pull-right"><button class="btn btn-xs btn-success" '
+						 					 + 'onClick="javascript:openPopUp(\'' + this.url 
+						 					 + '\',\'ContributeActivity\', 800, 1280, true)" '
+						 					 + 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
+						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
+						 					 + '</button></div>';
 							} else {
 								entryContent += '<div class="pull-right btn-group btn-group-xs"><button onClick="javascript:openGateNow('
-                                     + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
+                                    + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button><ul class="dropdown-menu"><li><a href="#" onClick="javascript:openPopUp(\''
-                                     + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button>'
+									+ '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" '
+									+ 		   'aria-expanded="false"><span class="caret"></span><span class="sr-only"'
+									+ '>Toggle Dropdown</span></button><ul class="dropdown-menu"><li>'
+									+ '<a href="#" onClick="javascript:openPopUp(\''
+                                    + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
-									
 							}
 							break;
-					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" '
+						 + 'onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
 						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 				}
@@ -892,6 +901,20 @@ function openGateNow(activityId) {
 	});
 }
 
+function closeGate(activityId) {
+	var data = {
+		'activityId' : activityId
+	};
+	data[csrfTokenName] = csrfTokenValue;
+	$.ajax({
+		'type' : 'post',
+		'url'  : LAMS_URL + 'monitoring/gate/closeGate.do',
+		'data'  : data,
+		'success' : function(){
+			updateLessonTab();
+		}
+	});
+}
 //********** SEQUENCE TAB FUNCTIONS **********
 
 /**

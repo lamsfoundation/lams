@@ -24,7 +24,7 @@
 	<div class="form-inline">
 		<label for="timeLimit">
 			<fmt:message key="label.time.limit" />&nbsp;
-			<form:input path="dokumaran.timeLimit" size="3" id="timeLimit" cssClass="form-control input-sm"/>
+			<form:input path="dokumaran.timeLimit" type="number" min="0" size="3" id="timeLimit" cssClass="form-control input-sm"/>
 		</label>
 	</div>
 	

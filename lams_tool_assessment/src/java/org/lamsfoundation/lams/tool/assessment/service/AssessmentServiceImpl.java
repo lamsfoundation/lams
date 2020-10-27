@@ -3494,167 +3494,172 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
-	for (JsonNode questionJSONData : questions) {
 
-	    boolean addToCollection = collection != null;
+	if (questions != null) {
+	    for (JsonNode questionJSONData : questions) {
 
-	    AssessmentQuestion question = new AssessmentQuestion();
-	    Integer type = JsonUtil.optInt(questionJSONData, "type");
-	    question.setToolContentId(toolContentID);
-	    question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
-	    question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
+		boolean addToCollection = collection != null;
 
-	    QbQuestion oldQbQuestion = null;
-	    QbQuestion qbQuestion = null;
-	    String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
+		AssessmentQuestion question = new AssessmentQuestion();
+		Integer type = JsonUtil.optInt(questionJSONData, "type");
+		question.setToolContentId(toolContentID);
+		question.setDisplayOrder(JsonUtil.optInt(questionJSONData, RestTags.DISPLAY_ORDER));
+		question.setAnswerRequired(JsonUtil.optBoolean(questionJSONData, "answerRequired", Boolean.FALSE));
 
-	    // try to match the question to an existing QB question in DB
-	    if (StringUtils.isNotBlank(uuid)) {
-		oldQbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
-	    }
-	    boolean isModification = oldQbQuestion != null;
+		QbQuestion oldQbQuestion = null;
+		QbQuestion qbQuestion = null;
+		String uuid = JsonUtil.optString(questionJSONData, RestTags.QUESTION_UUID);
 
-	    // are we modifying an existing question or creating a new one
-	    if (isModification) {
-		qbQuestion = oldQbQuestion.clone();
-		qbService.releaseFromCache(oldQbQuestion);
-	    } else {
-		qbQuestion = new QbQuestion();
-		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
-		qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
-	    }
+		// try to match the question to an existing QB question in DB
+		if (StringUtils.isNotBlank(uuid)) {
+		    oldQbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
+		}
+		boolean isModification = oldQbQuestion != null;
 
-	    qbQuestion.setType(type);
-	    qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
-	    qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));
-
-	    qbQuestion.setAllowRichEditor(
-		    JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
-	    qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
-	    qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
-	    qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
-	    qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
-	    qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
-	    qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
-	    qbQuestion
-		    .setFeedbackOnPartiallyCorrect(JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
-	    qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
-	    qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
-	    qbQuestion.setMultipleAnswersAllowed(
-		    JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
-	    qbQuestion.setIncorrectAnswerNullifiesMark(
-		    JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
-	    qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
-
-	    if (!isModification) {
-		// UUID normally gets generated in the DB, but we need it immediately,
-		// so we generate it programmatically.
-		// Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
-		// not from DB where UUID is filed
-		qbQuestion.setUuid(UUID.randomUUID());
-		assessmentDao.insert(qbQuestion);
-	    }
-
-	    if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		    || (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
-
-		if (!questionJSONData.has(RestTags.ANSWERS)) {
-		    throw new IOException("REST Authoring is missing answers for a question of type " + type + ". Data:"
-			    + toolContentJSON);
+		// are we modifying an existing question or creating a new one
+		if (isModification) {
+		    qbQuestion = oldQbQuestion.clone();
+		    qbService.releaseFromCache(oldQbQuestion);
+		} else {
+		    qbQuestion = new QbQuestion();
+		    qbQuestion.setQuestionId(qbService.generateNextQuestionId());
+		    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 		}
 
-		List<QbOption> optionList = new ArrayList<>();
-		ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
-		for (JsonNode answerData : optionsData) {
-		    int displayOrder = JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER);
-		    QbOption option = null;
-		    // check if existing question gets modified or do we create a new one
-		    for (QbOption existingOption : qbQuestion.getQbOptions()) {
-			if (existingOption.getDisplayOrder() == displayOrder) {
-			    option = existingOption;
-			    break;
-			}
-		    }
-		    if (option == null) {
-			option = new QbOption();
-			option.setDisplayOrder(displayOrder);
-			option.setQbQuestion(qbQuestion);
-		    }
+		qbQuestion.setType(type);
+		qbQuestion.setName(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TITLE));
+		qbQuestion.setDescription(JsonUtil.optString(questionJSONData, RestTags.QUESTION_TEXT));
 
-		    Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
-		    if (correct == null) {
-			Double grade = JsonUtil.optDouble(answerData, "grade");
-			option.setMaxMark(grade == null ? 0 : grade.floatValue());
-		    } else {
-			option.setMaxMark(correct ? 1 : 0);
-		    }
-		    option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
-		    option.setFeedback(JsonUtil.optString(answerData, "feedback"));
-		    option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
-		    option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
-		    // option.setQuestion(question); can't find the use for this field yet!
-		    optionList.add(option);
-		}
-		qbQuestion.setQbOptions(optionList);
-	    }
+		qbQuestion.setAllowRichEditor(
+			JsonUtil.optBoolean(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
+		qbQuestion.setCaseSensitive(JsonUtil.optBoolean(questionJSONData, "caseSensitive", Boolean.FALSE));
+		qbQuestion.setCorrectAnswer(JsonUtil.optBoolean(questionJSONData, "correctAnswer", Boolean.FALSE));
+		qbQuestion.setMaxMark(JsonUtil.optInt(questionJSONData, "defaultGrade", 1));
+		qbQuestion.setFeedback(JsonUtil.optString(questionJSONData, "feedback"));
+		qbQuestion.setFeedbackOnCorrect(JsonUtil.optString(questionJSONData, "feedbackOnCorrect"));
+		qbQuestion.setFeedbackOnIncorrect(JsonUtil.optString(questionJSONData, "feedbackOnIncorrect"));
+		qbQuestion.setFeedbackOnPartiallyCorrect(
+			JsonUtil.optString(questionJSONData, "feedbackOnPartiallyCorrect"));
+		qbQuestion.setMaxWordsLimit(JsonUtil.optInt(questionJSONData, "maxWordsLimit", 0));
+		qbQuestion.setMinWordsLimit(JsonUtil.optInt(questionJSONData, "minWordsLimit", 0));
+		qbQuestion.setMultipleAnswersAllowed(
+			JsonUtil.optBoolean(questionJSONData, "multipleAnswersAllowed", Boolean.FALSE));
+		qbQuestion.setIncorrectAnswerNullifiesMark(
+			JsonUtil.optBoolean(questionJSONData, "incorrectAnswerNullifiesMark", Boolean.FALSE));
+		qbQuestion.setPenaltyFactor(JsonUtil.optDouble(questionJSONData, "penaltyFactor", 0.0).floatValue());
 
-	    if (isModification) {
-		addToCollection &= !collectionUUIDs.contains(uuid);
-
-		int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
-		if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
-		    qbQuestion.clearID();
-		    qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
-		    qbQuestion.setCreateDate(new Date());
+		if (!isModification) {
+		    // UUID normally gets generated in the DB, but we need it immediately,
+		    // so we generate it programmatically.
+		    // Re-reading the QbQuestion we just saved does not help as it is read from Hibernate cache,
+		    // not from DB where UUID is filed
 		    qbQuestion.setUuid(UUID.randomUUID());
 		    assessmentDao.insert(qbQuestion);
-		} else if (isModified == IQbService.QUESTION_MODIFIED_NONE) {
-		    // Changes to question and option content does not count as version bump,
-		    // but rather as update of the original question
-		    // They should probably be marked as "update" rather than "none"
-		    assessmentDao.update(qbQuestion);
-		} else {
-		    throw new IllegalArgumentException(
-			    "Implement other Question Bank modification levels in Assessment tool");
 		}
-	    }
 
-	    // Store it back into JSON so Scratchie can read it
-	    // and use the same questions, not create new ones
-	    uuid = qbQuestion.getUuid().toString();
-	    ObjectNode questionData = (ObjectNode) questionJSONData;
-	    questionData.put(RestTags.QUESTION_UUID, uuid);
+		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
+			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
 
-	    // question.setUnits(units); Needed for numerical type question
-	    question.setQbQuestion(qbQuestion);
-	    checkType(question.getType());
-	    newQuestionSet.add(question);
+		    if (!questionJSONData.has(RestTags.ANSWERS)) {
+			throw new IOException("REST Authoring is missing answers for a question of type " + type
+				+ ". Data:" + toolContentJSON);
+		    }
 
-	    // all questions need to end up in user's private collection
-	    if (addToCollection) {
-		// qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
-		collectionUUIDs.add(uuid);
+		    List<QbOption> optionList = new ArrayList<>();
+		    ArrayNode optionsData = JsonUtil.optArray(questionJSONData, RestTags.ANSWERS);
+		    for (JsonNode answerData : optionsData) {
+			int displayOrder = JsonUtil.optInt(answerData, RestTags.DISPLAY_ORDER);
+			QbOption option = null;
+			// check if existing question gets modified or do we create a new one
+			for (QbOption existingOption : qbQuestion.getQbOptions()) {
+			    if (existingOption.getDisplayOrder() == displayOrder) {
+				option = existingOption;
+				break;
+			    }
+			}
+			if (option == null) {
+			    option = new QbOption();
+			    option.setDisplayOrder(displayOrder);
+			    option.setQbQuestion(qbQuestion);
+			}
+
+			Boolean correct = JsonUtil.optBoolean(answerData, RestTags.CORRECT, null);
+			if (correct == null) {
+			    Double grade = JsonUtil.optDouble(answerData, "grade");
+			    option.setMaxMark(grade == null ? 0 : grade.floatValue());
+			} else {
+			    option.setMaxMark(correct ? 1 : 0);
+			}
+			option.setAcceptedError(JsonUtil.optDouble(answerData, "acceptedError", 0.0).floatValue());
+			option.setFeedback(JsonUtil.optString(answerData, "feedback"));
+			option.setName(JsonUtil.optString(answerData, RestTags.ANSWER_TEXT));
+			option.setNumericalOption(JsonUtil.optDouble(answerData, "answerFloat", 0.0).floatValue());
+			// option.setQuestion(question); can't find the use for this field yet!
+			optionList.add(option);
+		    }
+		    qbQuestion.setQbOptions(optionList);
+		}
+
+		if (isModification) {
+		    addToCollection &= !collectionUUIDs.contains(uuid);
+
+		    int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
+		    if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
+			qbQuestion.clearID();
+			qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
+			qbQuestion.setCreateDate(new Date());
+			qbQuestion.setUuid(UUID.randomUUID());
+			assessmentDao.insert(qbQuestion);
+		    } else if (isModified == IQbService.QUESTION_MODIFIED_NONE) {
+			// Changes to question and option content does not count as version bump,
+			// but rather as update of the original question
+			// They should probably be marked as "update" rather than "none"
+			assessmentDao.update(qbQuestion);
+		    } else {
+			throw new IllegalArgumentException(
+				"Implement other Question Bank modification levels in Assessment tool");
+		    }
+		}
+
+		// Store it back into JSON so Scratchie can read it
+		// and use the same questions, not create new ones
+		uuid = qbQuestion.getUuid().toString();
+		ObjectNode questionData = (ObjectNode) questionJSONData;
+		questionData.put(RestTags.QUESTION_UUID, uuid);
+
+		// question.setUnits(units); Needed for numerical type question
+		question.setQbQuestion(qbQuestion);
+		checkType(question.getType());
+		newQuestionSet.add(question);
+
+		// all questions need to end up in user's private collection
+		if (addToCollection) {
+		    // qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		    collectionUUIDs.add(uuid);
+		}
 	    }
 	}
 
 	// **************************** Now set up the references to the questions in the bank *********************
 	ArrayNode references = JsonUtil.optArray(toolContentJSON, "references");
-	Set<QuestionReference> newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
+	if (references != null) {
+	    Set<QuestionReference> newReferenceSet = assessment.getQuestionReferences(); // the Assessment constructor will set up the
 
-	// collection
-	for (JsonNode referenceJSONData : references) {
-	    QuestionReference reference = new QuestionReference();
-	    reference.setMaxMark(JsonUtil.optInt(referenceJSONData, "maxMark", 1));
-	    reference.setSequenceId(JsonUtil.optInt(referenceJSONData, RestTags.DISPLAY_ORDER));
-	    AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
-		    JsonUtil.optInt(referenceJSONData, "questionDisplayOrder"));
-	    if (matchingQuestion == null) {
-		throw new IOException("Unable to find matching question for displayOrder "
-			+ referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
+	    // collection
+	    for (JsonNode referenceJSONData : references) {
+		QuestionReference reference = new QuestionReference();
+		reference.setMaxMark(JsonUtil.optInt(referenceJSONData, "maxMark", 1));
+		reference.setSequenceId(JsonUtil.optInt(referenceJSONData, RestTags.DISPLAY_ORDER));
+		AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
+			JsonUtil.optInt(referenceJSONData, "questionDisplayOrder"));
+		if (matchingQuestion == null) {
+		    throw new IOException("Unable to find matching question for displayOrder "
+			    + referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
+		}
+		reference.setQuestion(matchingQuestion);
+		reference.setRandomQuestion(JsonUtil.optBoolean(referenceJSONData, "randomQuestion", Boolean.FALSE));
+		newReferenceSet.add(reference);
 	    }
-	    reference.setQuestion(matchingQuestion);
-	    reference.setRandomQuestion(JsonUtil.optBoolean(referenceJSONData, "randomQuestion", Boolean.FALSE));
-	    newReferenceSet.add(reference);
 	}
 
 	saveOrUpdateAssessment(assessment);

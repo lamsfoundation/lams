@@ -1,18 +1,20 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
-	<fmt:message key="label.learning.short.answer.answer" />
-</div>
-
-<div class="table-responsive">
-	<table class="table table-hover table-condensed">
-		<tr>
-			<td>
-				${question.answer}
-			</td>
-		</tr>
-	</table>
-</div>
+<c:if test="${not empty toolSessionID}">
+	<div class="question-type">
+		<fmt:message key="label.learning.short.answer.answer" />
+	</div>
+	
+	<div class="table-responsive">
+		<table class="table table-hover table-condensed">
+			<tr>
+				<td>
+					${question.answer}
+				</td>
+			</tr>
+		</table>
+	</div>
+</c:if>
 
 <c:if test="${assessment.allowDiscloseAnswers && fn:length(sessions) > 1}">
 	<table class="table table-responsive table-striped table-bordered table-hover table-condensed" id="rating-table-${question.uid}">
@@ -66,7 +68,7 @@
 							</td>
 						</tr>
 					</c:if>
-					
+
 					<c:if test="${showRating}">
 						<tr>
 							<td>

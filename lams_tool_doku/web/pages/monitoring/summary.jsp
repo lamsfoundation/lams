@@ -71,33 +71,15 @@
 	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
-		// Resize Etherpad iframe when its content grows.
-		// It does not support shrinking, only growing.
-		// This feature requires ep_resize plugin installed in Etherpad and customised with code in Doku tool
-		$(window).on('message onmessage', function (e) {
-			var msg = e.originalEvent.data;
-	        if (msg.name === 'ep_resize') {
-	        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
-	        		iframe = $('iframe[src^="' + src + '"]'),
-	            	// height should be no less than 200 px
-	            	height = Math.max(200, msg.data.height - 10);
-	           	iframe.height(height);
-	        }
-	    });
-		
-		<c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
-		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-			$('#etherpad-container-${groupSummary.sessionId}').pad({
-				'padId':'${groupSummary.padId}',
-				'host':'${etherpadServerUrl}',
-				//'lang':'',
-				'showControls':'true',
-				'showChat':'${dokumaran.showChat}',
-				'showLineNumbers':'${dokumaran.showLineNumbers}',
-				'height':'600',
-				'userName':'<c:out value="${fullName}" />'
-			});			
-		</c:forEach>
+		// show etherpads only on Group expand
+		$('.etherpad-collapse').on('show.bs.collapse', function(){
+			var etherpad = $('.etherpad-container', this);
+			if (!etherpad.hasClass('initialised')) {
+				var id = etherpad.attr('id'),
+					groupId = id.substring('etherpad-container-'.length);
+				etherpadInitMethods[groupId]();
+			}
+		});
 		
 		$(".fix-faulty-pad").click(function() {
 			var toolSessionId = $(this).data("session-id");
@@ -405,7 +387,8 @@
 			</span>
         </div>
         
-        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
 	<c:choose>
@@ -429,8 +412,10 @@
 					<fmt:message key="label.export.pad.html" />
 				</a>
 			</div>	
-					
-			<div id="etherpad-container-${groupSummary.sessionId}"></div>		
+			
+			<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
+						   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="true"
+						   heightAutoGrow="true" height="600" />	
 		</c:otherwise>
 	</c:choose>
 	

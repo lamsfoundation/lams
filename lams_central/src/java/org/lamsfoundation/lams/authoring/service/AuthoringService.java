@@ -88,6 +88,8 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
+import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
@@ -118,6 +120,8 @@ import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -1407,6 +1411,27 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	return newToolContentID;
     }
 
+    @Override
+    public Long createToolContent(UserDTO user, String toolSignature, ObjectNode toolContentJSON) throws IOException {
+	try {
+	    Tool tool = toolDAO.getToolBySignature(toolSignature);
+	    Long toolContentID = insertToolContentID(tool.getToolId());
+
+	    // Tools' services implement an interface for processing REST requests
+	    ToolRestManager toolRestService = (ToolRestManager) lamsCoreToolService.findToolService(tool);
+	    toolRestService.createRestToolContent(user.getUserID(), toolContentID, toolContentJSON);
+
+	    return toolContentID;
+	} catch (Exception e) {
+	    log.error("Unable to create tool content for " + toolSignature + " with details " + toolContentJSON
+		    + ". \nThe tool probably threw an exception - check the server logs for more details.\n"
+		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
+		    + " then the tool has not implemented the ToolRestManager interface / createRestToolContent() method.");
+	    throw new ToolException(
+		    "Unable to create tool content for " + toolSignature + " with details " + toolContentJSON);
+	}
+    }
+
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getAvailableLicenses()
      */
@@ -1573,5 +1598,87 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public FolderContentDTO getUserWorkspaceFolder(Integer userID) throws IOException {
 	return workspaceManagementService.getUserWorkspaceFolder(userID);
+    }
+
+    /**
+     * Helper method to create a Assessment tool content. Assessment is one of the unusuals tool in that it caches
+     * user's login names and
+     * first/last names Mandatory fields in toolContentJSON: title, instructions, resources, user fields firstName,
+     * lastName and loginName.
+     *
+     * Required fields in toolContentJSON: "title", "instructions", "questions", "firstName", "lastName", "lastName",
+     * "questions" and "references".
+     *
+     * The questions entry should be ArrayNode containing JSON objects, which in turn must contain
+     * "questionTitle", "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice,
+     * Numerical or Matching Pairs
+     * then a ArrayNode "answers" is required.
+     *
+     * The answers entry should be ArrayNode
+     * containing JSON objects, which in turn must contain "answerText" or "answerFloat", "displayOrder" (Integer),
+     * "grade" (Integer).
+     *
+     * For the templates, all the questions that are created will be set up as references, therefore the questions in
+     * the assessment == the bank of questions.
+     * So references entry will be a ArrayNode containing JSON objects, which in turn must contain "displayOrder"
+     * (Integer),
+     * "questionDisplayOrder" (Integer - to match to the question). If default grade or random questions are needed then
+     * this method needs
+     * to be expanded.
+     */
+    public Long createTblAssessmentToolContent(UserDTO user, String title, String instructions,
+	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
+	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,
+	    ArrayNode questions) throws IOException {
+
+	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
+		reflectionInstructions, null, null, user);
+	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
+	toolContentJSON.put(RestTags.ENABLE_CONFIDENCE_LEVELS, enableConfidenceLevels);
+	toolContentJSON.put("numbered", enableNumbering);
+	toolContentJSON.put("displaySummary", Boolean.TRUE);
+	toolContentJSON.put("allowDiscloseAnswers", allowDiscloseAnswers);
+	toolContentJSON.put("allowAnswerJustification", allowAnswerJustification);
+
+	if (questions != null) {
+	    toolContentJSON.set(RestTags.QUESTIONS, questions);
+
+	    ArrayNode references = JsonNodeFactory.instance.arrayNode();
+	    for (int i = 0; i < questions.size(); i++) {
+		ObjectNode question = (ObjectNode) questions.get(i);
+		question.put("answerRequired", true);
+
+		Integer questionDisplayOrder = question.get(RestTags.DISPLAY_ORDER).asInt();
+		Integer defaultGrade = JsonUtil.optInt(question, "defaultGrade", 1);
+		references.add(JsonNodeFactory.instance.objectNode().put(RestTags.DISPLAY_ORDER, questionDisplayOrder)
+			.put("questionDisplayOrder", questionDisplayOrder).put("defaultGrade", defaultGrade));
+	    }
+	    toolContentJSON.set("references", references);
+	}
+
+	return createToolContent(user, "laasse10", toolContentJSON);
+    }
+
+    /** Sets up the standard fields that are used by many TBL template tools */
+    public static ObjectNode createStandardToolContent(String title, String instructions, String reflectionInstructions,
+	    Boolean lockWhenFinished, Boolean allowRichTextEditor, UserDTO user) {
+	ObjectNode toolContentJSON = JsonNodeFactory.instance.objectNode();
+	toolContentJSON.put(RestTags.TITLE, title != null ? title : "");
+	toolContentJSON.put(RestTags.INSTRUCTIONS, instructions != null ? instructions : "");
+
+	if (reflectionInstructions != null) {
+	    toolContentJSON.put(RestTags.REFLECT_ON_ACTIVITY, true);
+	    toolContentJSON.put(RestTags.REFLECT_INSTRUCTIONS, reflectionInstructions);
+	}
+
+	toolContentJSON.put(RestTags.LOCK_WHEN_FINISHED, lockWhenFinished);
+	toolContentJSON.put(RestTags.ALLOW_RICH_TEXT_EDITOR, allowRichTextEditor);
+
+	if (user != null) {
+	    toolContentJSON.put("firstName", user.getFirstName());
+	    toolContentJSON.put("lastName", user.getLastName());
+	    toolContentJSON.put("loginName", user.getLogin());
+	}
+	return toolContentJSON;
     }
 }

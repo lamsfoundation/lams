@@ -31,12 +31,18 @@
 			//change button's data-expanded attribute
 			$(this).data("expanded", !isExpanded);
 		});
+		
+		$('.options-show-link').click(function(e){
+			// so browser does not go to the top of page
+			e.preventDefault();
+			
+			// hide link, show answers
+			let link = $(this),
+				itemUid = link.data('itemUid');
+			link.remove();
+			$('#options-' + itemUid).show();
+		});
 	});
-	
-	function showOptions(itemUid) {
-		$('#options-show-' + itemUid).remove();
-		$('#options-' + itemUid).show();
-	}
 </script>
 
 <!-- Header -->
@@ -107,7 +113,8 @@
 					</span>
 					
 					<c:if test="${not empty burningQuestionItemDto.scratchieItem.uid}">
-						<a id="options-show-${item.uid}" href="#" onClick="javascript:showOptions(${item.uid})">
+						<a id="options-show-${item.uid}" href="#" class="options-show-link" 
+						   data-item-uid="${item.uid}">
 							<fmt:message key='label.options.show' />
 						</a>
 						<div  id="options-${item.uid}" class="voffset10 table-responsive" style="display: none">

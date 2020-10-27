@@ -38,4 +38,15 @@
 			</div>
 		</div>
 	</div>
+	
+			
+	<form:form action="closeGate.do">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+		<input type="hidden" name="activityId" value="${gateForm.activityId}" />
+		<p>
+			<input type="submit" class="btn btn-danger btn-sm voffset10"
+				   title="<fmt:message key="button.task.gate.close.tooltip"/>"
+				   value="<fmt:message key="button.task.gate.close"/>" />
+		</p>
+	</form:form>
 </c:if>

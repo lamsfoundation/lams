@@ -8,25 +8,6 @@
 	<%@ include file="/common/header.jsp"%>
 	<lams:css suffix="jquery.jRating"/>
 	
-	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
-	<style>
-		tr.selected-by-groups td {
-			border-top: none !important;
-		}
-		
-		tr.selected-by-groups span {
-			font-weight: bold;
-		}
-		.slider.slider-horizontal {
-			margin-left: 40px;
-		}
-	</style>
-	
-	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script> 
-	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
-
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -41,44 +22,8 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-	
 		
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-		
-		//vars for rating.js
-		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-		COMMENTS_MIN_WORDS_LIMIT = 0,
-		MAX_RATES = 0,
-		MIN_RATES = 0,
-		LAMS_URL = '${lams}',
-		COUNT_RATED_ITEMS = true,
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
-		ALLOW_RERATE = false,
-		SESSION_ID = ${toolSessionID};
-	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-	
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$("time.timeago").timeago();
-
-			//initialize bootstrap-sliders if "Enable confidence level" option is ON
-			$('.bootstrap-slider').bootstrapSlider();
-
-			// command websocket stuff for refreshing
-			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
-			commandWebsocketHookTrigger = 'assessment-results-refresh-${assessment.contentId}';
-			// if the trigger is recognised, the following action occurs
-			commandWebsocketHook = function() {
-				location.reload();
-			};
-		});
-
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
 		}
@@ -104,15 +49,6 @@
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
 		}
-		
-		function refreshToRating(questionUid) {
-			// LDEV-5052 Refresh page and scroll to the given ID on comment submit
-
-			// setting href does not navigate if url contains #, we still need a reload
-			location.hash = '#rating-table-' + questionUid;
-			location.reload();
-			return false;
-		}
     </script>
 </lams:head>
 <body class="stripes">
@@ -135,14 +71,16 @@
 			</lams:Alert>
 		</c:if>
 		
-		<c:if test="${isLeadershipEnabled}">
+		<c:if test="${isLeadershipEnabled and not empty sessionMap.groupLeader}">
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
 		<lams:errors/>
 		<br>
 		
-		<%@ include file="results/attemptsummary.jsp"%>
+		<c:if test="${not empty result}">
+			<%@ include file="results/attemptsummary.jsp"%>
+		</c:if>
 		
 		<c:if test="${assessment.displaySummary}">
 			<div class="panel">
@@ -203,7 +141,7 @@
 					</button>
 				</c:if>	
 						
-				<c:if test="${! sessionMap.isUserFailed}">
+				<c:if test="${!sessionMap.isUserFailed}">
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 
