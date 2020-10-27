@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.assessment.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
@@ -103,4 +104,6 @@ public interface AssessmentResultDAO extends DAO {
      * Count how many last finished attempts selected specified option.
      */
     int countAttemptsPerOption(Long toolContentId, Long optionUid);
+
+    Map<Integer, Integer> countAnsweredQuestionsByUsers(long toolContentId);
 }

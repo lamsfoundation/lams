@@ -548,4 +548,6 @@ public interface IAssessmentService extends ICommonToolService {
     Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+
+    Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId);
 }

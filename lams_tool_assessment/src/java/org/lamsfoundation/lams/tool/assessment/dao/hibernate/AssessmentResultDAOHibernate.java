@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -104,6 +106,24 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
+
+    private static final String ANSWERED_QUESTIONS_BY_USER_COUNT = ""
+	    + "SELECT answered_question_count, COUNT(user_uid) AS user_count FROM "
+	    + " (SELECT user_uid,                                                 "
+	    + "         SUM(IF(answer_boolean = 1 OR (answer IS NOT NULL AND TRIM(answer) <> ''), 1, 0)) AS answered_question_count FROM"
+	    + "  (SELECT ar.user_uid, oa.question_result_uid, oa.answer_boolean, qba.answer"
+	    + "	  FROM      tl_laasse10_assessment         AS a"
+	    + "	  JOIN      tl_laasse10_assessment_result  AS ar  ON a.uid =  ar.assessment_uid"
+	    + "	  LEFT JOIN tl_laasse10_question_result    AS qr  ON ar.uid = qr.result_uid"
+	    + "	  LEFT JOIN lams_qb_tool_answer            AS qba ON qba.answer_uid = qr.uid"
+	    + "	  LEFT JOIN tl_laasse10_option_answer      AS oa  ON oa.question_result_uid = qr.uid"
+	    + "	  WHERE ar.latest = 1                                  "
+	    + "   AND (oa.answer_boolean IS NULL OR oa.answer_boolean = 1)"
+	    + "	  AND   a.content_id = :toolContentId                  "
+	    + "   GROUP BY oa.question_result_uid, ar.user_uid         "
+	    + "  ) AS answered_questions                               "
+	    + " GROUP BY user_uid) AS answered_questions_by_user_count "
+	    + "GROUP BY answered_question_count                        ";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -319,6 +339,18 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	query.setParameter("toolContentId", toolContentId);
 	query.setParameter("optionUid", optionUid);
 	return query.uniqueResult().intValue();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Integer, Integer> countAnsweredQuestionsByUsers(long toolContentId) {
+	Map<Integer, Integer> answeredQuestions = new TreeMap<>();
+	List<Object[]> results = getSession().createNativeQuery(ANSWERED_QUESTIONS_BY_USER_COUNT)
+		.setParameter("toolContentId", toolContentId).getResultList();
+	for (Object[] result : results) {
+	    answeredQuestions.put(((Number) result[0]).intValue(), ((Number) result[1]).intValue());
+	}
+	return answeredQuestions;
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {

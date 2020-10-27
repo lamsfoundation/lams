@@ -5,6 +5,11 @@
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 
 <script type="text/javascript">
+	var activityCompletionChart = null,
+		answeredQuestionsChart = null;
+	// how often completion charts will be updated
+	const COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
+
 	$(document).ready(function(){
 		
 		initializePortraitPopover("<lams:LAMSURL />");
@@ -311,13 +316,46 @@
 		}
 		initInidividualTimeLimitAutocomplete();
 		
-		drawCompletionChart();
+		drawCompletionCharts(false);
 	});
 
-	
-	function drawCompletionChart(){
-		let ctx = document.getElementById('completion-chart').getContext('2d');
-		new Chart(ctx, {
+	function drawCompletionCharts(isUpdate) {
+		$.ajax({
+			'url' : '<lams:WebAppURL />monitoring/getCompletionChartsData.do',
+			'data': {
+				'toolContentId' : ${assessment.contentId}
+			},
+			'dataType' : 'json',
+			'success'  : function(data) {
+				// draw charts for the first time
+				drawActivityCompletionChart(data, isUpdate);
+				drawAnsweredQuestionsChart(data, isUpdate);
+			}
+		});
+		
+		if (!isUpdate) {
+			// set up update interval for the charts
+			window.setInterval(function(){
+				drawCompletionCharts(true);
+			}, COMPLETION_CHART_UPDATE_INTERVAL);
+		}
+	}
+
+	function drawActivityCompletionChart(data, isUpdate){
+		var newData = [ data.possibleLearners - data.startedLearners,
+			 			data.startedLearners - data.completedLearners,
+			 			data.completedLearners
+		   			  ];
+		if (isUpdate) {
+			// chart already exists, just update data
+			activityCompletionChart.data.datasets[0].data = newData;
+			activityCompletionChart.update();
+			return;
+		}
+		
+		let ctx = document.getElementById('activity-completion-chart').getContext('2d');
+		
+		activityCompletionChart = new Chart(ctx, {
 			type : 'doughnut',
 			borderWidth : 0,
 			data : {
@@ -328,10 +366,7 @@
 					}
 				},
 				datasets : [ {
-					data : [ ${possibleLearners - startedLearners},
-							 ${startedLearners - completedLearners},
-							 ${completedLearners}
-						   ],
+					data : newData,
 					backgroundColor : [ 'rgba(5, 204, 214, 1)',
 										'rgba(255, 195, 55, 1)',
 										'rgba(253, 60, 165, 1)',
@@ -343,9 +378,12 @@
 						   '<fmt:message key="label.monitoring.summary.completion.completed"/>' ]
 			},
 			options : {
-				responsive : true,
+				layout : {
+					padding : {
+						top: 10
+					}
+				},
 				legend : {
-					display : true,
 					position: 'right',
 					labels : {
 						generateLabels : function(chart) {
@@ -380,6 +418,76 @@
 				animation : {
 					animateScale : true,
 					animateRotate : true
+				}
+			}
+		});
+	}
+	
+	function drawAnsweredQuestionsChart(data, isUpdate){
+		if (!data.answeredQuestionsByUsers) {
+			return;
+		}
+		
+		var newData = Object.values(data.answeredQuestionsByUsers);
+		if (isUpdate && answeredQuestionsChart != null) {
+			// chart already exists, just update data
+			answeredQuestionsChart.data.datasets[0].data = newData;
+			answeredQuestionsChart.update();
+			return;
+		}
+		
+		let ctx = document.getElementById('answered-questions-chart').getContext('2d');
+		
+		answeredQuestionsChart = new Chart(ctx, {
+			type : 'bar',
+			data : {
+				datasets : [ {
+					data : newData,
+					backgroundColor : 'rgba(255, 195, 55, 1)'
+									  
+				} ],
+				labels :  Object.keys(data.answeredQuestionsByUsers),
+			},
+			options : {
+				layout : {
+					paddint : {
+						top : 30
+					}
+				},
+				legend : {
+					display : false
+				},
+				title : {
+					display: true,
+					fontSize : '15',
+					lineHeight: 3,
+					text : '<fmt:message key="label.monitoring.summary.answered.questions" />'
+				},
+				scales : {
+					xAxes : [{
+							scaleLabel : {
+								display : true,
+								labelString : '<fmt:message key="label.monitoring.summary.answered.questions.x.axis" />'
+							}
+						}
+					],
+					yAxes : [
+						{
+						    ticks : {
+								beginAtZero   : true,
+								stepSize      : 1,
+								maxTicksLimit : 5,
+								// prevent scale to change on each update
+								// set suggested max number of students to 3/4 of all possible learners
+								suggestedMax  : 3 * data.possibleLearners / 4
+							},
+							scaleLabel : {
+								display : true,
+								labelString : '<fmt:message key="label.monitoring.summary.answered.questions.y.axis" />',
+								fontSize : 14
+							}
+						}
+					]
 				}
 			}
 		});
@@ -746,15 +854,25 @@
 	  <c:out value="${assessment.instructions}" escapeXml="false"/>
 	</div>
 	
-	<c:if test="${empty sessionDtos}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
+	<c:choose>
+		<c:when test="${empty sessionDtos}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				<fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:when>
+		<c:otherwise>
+		<div id="completion-charts-container">
+			<div>
+				<canvas id="activity-completion-chart"></canvas>
+			</div>
+			
+			<div>
+				<canvas id="answered-questions-chart"></canvas>
+			</div>
+		</div>
+		</c:otherwise>
+	</c:choose>
 
-	<div id="completion-chart-container">
-		<canvas id="completion-chart"></canvas>
-	</div>
 
 	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="messageArea"></div>

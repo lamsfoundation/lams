@@ -3734,4 +3734,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
     }
+
+    @Override
+    public Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId) {
+	Map<Integer, Integer> answeredQuestions = assessmentResultDao.countAnsweredQuestionsByUsers(toolContentId);
+	if (answeredQuestions.isEmpty()) {
+	    return answeredQuestions;
+	}
+
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	int questionCount = assessment.getQuestions().size();
+
+	// list all question counts, from 0 to maximum possible questions
+	Map<Integer, Integer> result = new HashMap<>();
+	for (int i = 0; i <= questionCount; i++) {
+	    result.put(i, 0);
+	}
+	result.putAll(answeredQuestions);
+	return result;
+    }
 }

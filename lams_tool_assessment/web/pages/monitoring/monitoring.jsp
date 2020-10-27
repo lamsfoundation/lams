@@ -32,8 +32,12 @@
 	  			text-align: center;
 	  		}
 	  		
-	  		#completion-chart-container {
-	  			width: 400px;
+	  		#completion-charts-container {
+	  			display: flex;
+	  		}
+	  		
+	  		#completion-charts-container > div {
+	  			width: 40%;
 	  			margin: auto;
 	  		}
  		</style>
