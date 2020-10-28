@@ -384,7 +384,7 @@
 					}
 				},
 				legend : {
-					position: 'right',
+					position: 'left',
 					labels : {
 						generateLabels : function(chart) {
 							var data = chart.data;
@@ -861,15 +861,15 @@
 			</lams:Alert>
 		</c:when>
 		<c:otherwise>
-		<div id="completion-charts-container">
-			<div>
-				<canvas id="activity-completion-chart"></canvas>
+			<div id="completion-charts-container">
+				<div class="col-sm-12 col-md-6">
+					<canvas id="activity-completion-chart"></canvas>
+				</div>
+				
+				<div class="col-sm-12 col-md-6">
+					<canvas id="answered-questions-chart"></canvas>
+				</div>
 			</div>
-			
-			<div>
-				<canvas id="answered-questions-chart"></canvas>
-			</div>
-		</div>
 		</c:otherwise>
 	</c:choose>
 

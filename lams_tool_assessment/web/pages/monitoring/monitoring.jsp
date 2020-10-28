@@ -32,13 +32,8 @@
 	  			text-align: center;
 	  		}
 	  		
-	  		#completion-charts-container {
-	  			display: flex;
-	  		}
-	  		
 	  		#completion-charts-container > div {
-	  			width: 40%;
-	  			margin: auto;
+	  			padding: 5rem 2rem;
 	  		}
  		</style>
  		
