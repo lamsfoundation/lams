@@ -350,6 +350,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return assessmentUserDao.getCountUsersByContentId(contentId);
     }
 
+    /**
+     * How many learners can possibly access this activity
+     */
+    @Override
+    public int getCountLessonLearnersByContentId(long contentId) {
+	long lessonId = lessonService.getLessonByToolContentId(contentId).getLessonId();
+	return lessonService.getCountLessonLearners(lessonId, null);
+    }
+
+    /**
+     * How many learners have already finished answering questions.
+     * They are either on results page or left the activity completely.
+     */
+    @Override
+    public int getCountLearnersWithFinishedCurrentAttempt(long contentId) {
+	return assessmentResultDao.countLastFinishedAssessmentResults(contentId);
+    }
+
     @Override
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
@@ -3715,5 +3733,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     public List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString) {
 	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
 	return lessonService.getLessonLearners(lesson.getLessonId(), searchString, null, null, true);
+    }
+
+    @Override
+    public Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId) {
+	Map<Integer, Integer> answeredQuestions = assessmentResultDao.countAnsweredQuestionsByUsers(toolContentId);
+	if (answeredQuestions.isEmpty()) {
+	    return answeredQuestions;
+	}
+
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	int questionCount = assessment.getQuestions().size();
+
+	// list all question counts, from 0 to maximum possible questions
+	Map<Integer, Integer> result = new HashMap<>();
+	for (int i = 0; i <= questionCount; i++) {
+	    result.put(i, 0);
+	}
+	result.putAll(answeredQuestions);
+	return result;
     }
 }

@@ -20,10 +20,10 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 public interface AssessmentResultDAO extends DAO {
 
     List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId);
-    
+
     List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid);
 
     List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId);
@@ -40,10 +40,10 @@ public interface AssessmentResultDAO extends DAO {
     List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId);
 
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
-    
+
     /**
      * Checks whether the last attempt started by user is finished.
-     * 
+     *
      * @param user
      * @return true if user has finished it, false otherwise
      */
@@ -56,15 +56,15 @@ public interface AssessmentResultDAO extends DAO {
     List<AssessmentUserDTO> getLastTotalScoresByContentId(Long assessmentUid);
 
     Float getBestTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getBestTotalScoresByContentId(Long assessmentUid);
 
     Float getFirstTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long assessmentUid);
 
     Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long assessmentUid);
 
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
@@ -78,28 +78,32 @@ public interface AssessmentResultDAO extends DAO {
      * @return
      */
     List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId);
-    
+
+    int countLastFinishedAssessmentResults(long contentId);
+
     List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId);
-    
+
     /**
      * Get results for all leaders in current activity.
-     * 
+     *
      * @param contentId
      * @return
      */
     List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId);
 
     int getAssessmentResultCount(Long assessmentUid, Long userId);
-    
+
     /**
      * Checks whether anyone has attempted this assessment.
      */
     boolean isAssessmentAttempted(Long assessmentUid);
 
     AssessmentResult getAssessmentResultByUid(Long assessmentResultUid);
-    
+
     /**
      * Count how many last finished attempts selected specified option.
      */
     int countAttemptsPerOption(Long toolContentId, Long optionUid);
+
+    Map<Integer, Integer> countAnsweredQuestionsByUsers(long toolContentId);
 }

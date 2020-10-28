@@ -108,6 +108,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -237,6 +238,25 @@ public class MonitoringController {
 	}
 
 	return "pages/monitoring/monitoring";
+    }
+
+    @RequestMapping(path = "/getCompletionChartsData")
+    @ResponseBody
+    public String getCompletionChartsData(@RequestParam long toolContentId, HttpServletResponse response)
+	    throws JsonProcessingException, IOException {
+	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
+
+	chartJson.put("possibleLearners", service.getCountLessonLearnersByContentId(toolContentId));
+	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
+	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
+
+	Map<Integer, Integer> answeredQuestionsByUsers = service.getCountAnsweredQuestionsByUsers(toolContentId);
+	if (!answeredQuestionsByUsers.isEmpty()) {
+	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	return chartJson.toString();
     }
 
     @RequestMapping("/userMasterDetail")
@@ -576,7 +596,7 @@ public class MonitoringController {
 		}
 
 		String response = AssessmentEscapeUtils.printResponsesForJqgrid(questionResult);
-		
+
 		if (StringUtils.isNotBlank(questionResult.getJustification())) {
 		    response += "<br><i>" + service.getMessage("label.answer.justification") + "</i><br>"
 			    + questionResult.getJustificationEscaped();

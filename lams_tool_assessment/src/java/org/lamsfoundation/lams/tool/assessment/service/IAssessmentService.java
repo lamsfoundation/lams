@@ -117,6 +117,10 @@ public interface IAssessmentService extends ICommonToolService {
 
     int getCountUsersByContentId(Long contentId);
 
+    int getCountLessonLearnersByContentId(long contentId);
+
+    int getCountLearnersWithFinishedCurrentAttempt(long contentId);
+
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
 
@@ -544,4 +548,6 @@ public interface IAssessmentService extends ICommonToolService {
     Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+
+    Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId);
 }

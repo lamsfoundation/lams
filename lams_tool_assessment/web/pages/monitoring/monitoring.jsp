@@ -31,6 +31,15 @@
 	  		#time-limit-table td.centered {
 	  			text-align: center;
 	  		}
+	  		
+	  		#completion-charts-container {
+	  			display: flex;
+	  		}
+	  		
+	  		#completion-charts-container > div {
+	  			width: 40%;
+	  			margin: auto;
+	  		}
  		</style>
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
@@ -66,6 +75,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/chart.bundle.min.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
