@@ -163,20 +163,22 @@
 			<c:if test="${question.type != 8}">
 				<%@ include file="markandpenaltyarea.jsp"%>
 			</c:if>
-								
-			<%@ include file="historyresponses.jsp"%>
 			
-			<c:if test="${assessment.enableConfidenceLevels}">
-				<%@ include file="confidencelevel.jsp"%>
-			</c:if>
-			
-			<c:if test="${assessment.allowAnswerJustification and not empty question.justification}">
-				<div class="question-type">
-					<fmt:message key="label.answer.justification" />
-				</div>
-				<p>
-					<c:out value="${question.justificationHtml}" escapeXml="false" />
-				</p>
+			<c:if test="${not empty toolSessionID}">			
+				<%@ include file="historyresponses.jsp"%>
+				
+				<c:if test="${assessment.enableConfidenceLevels}">
+					<%@ include file="confidencelevel.jsp"%>
+				</c:if>
+				
+				<c:if test="${assessment.allowAnswerJustification and not empty question.justification}">
+					<div class="question-type">
+						<fmt:message key="label.answer.justification" />
+					</div>
+					<p>
+						<c:out value="${question.justificationHtml}" escapeXml="false" />
+					</p>
+				</c:if>
 			</c:if>
 		</div>
 					
