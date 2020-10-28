@@ -393,7 +393,7 @@
 			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
 				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
-				<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" />
+				<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
 				
 				<!--File path row -->
 				<div class="panel panel-default">
