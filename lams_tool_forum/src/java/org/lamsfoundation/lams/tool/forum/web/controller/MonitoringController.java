@@ -69,6 +69,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -380,7 +381,8 @@ public class MonitoringController {
 
 		    cell = row.createCell(idx++);
 		    if (dto.getMessage() != null && dto.getMessage().getReport() != null) {
-			cell.setCellValue(dto.getMessage().getReport().getComment());
+			cell.setCellValue(
+				ExcelUtil.ensureCorrectCellLength(dto.getMessage().getReport().getComment()));
 		    } else {
 			cell.setCellValue("");
 		    }

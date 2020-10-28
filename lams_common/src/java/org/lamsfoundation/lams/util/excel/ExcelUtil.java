@@ -20,14 +20,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.util.excel;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -66,7 +63,7 @@ public class ExcelUtil {
     private static short dateFormat;
     private static short timeFormat;
     private static short percentageFormat;
-    
+
     private static CellStyle defaultStyle;
     private static CellStyle boldStyle;
 
@@ -86,8 +83,11 @@ public class ExcelUtil {
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
+    private final static int MAX_CELL_TEXT_LENGTH = 32767;
+
     /**
-     * Create .xlsx file out of provided data and then write out it to an OutputStream. It will be saved with the .xlsx extension.
+     * Create .xlsx file out of provided data and then write out it to an OutputStream. It will be saved with the .xlsx
+     * extension.
      *
      * @param out
      *            output stream to which the file written; usually taken from HTTP response
@@ -105,11 +105,11 @@ public class ExcelUtil {
 	    boolean displaySheetTitle) throws IOException {
 	ExcelUtil.createExcel(out, sheets, dateHeader, displaySheetTitle, true);
     }
-    
+
     /**
-     * Creates Excel file based on the provided data and writes it out to an OutputStream. 
-     * 
-     * 
+     * Creates Excel file based on the provided data and writes it out to an OutputStream.
+     *
+     *
      * Warning: The styling is untested with this option and may fail. If you want full styling look at createExcel()
      *
      * @param out
@@ -122,7 +122,7 @@ public class ExcelUtil {
      *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
      * @param displaySheetTitle
      *            whether to display title (printed in the first (0,0) cell)
-     * 
+     *
      * @param produceXlsxFile
      *            whether excel file should be of .xlsx or .xls format. Use .xls only if you want to read the file back
      *            in again afterwards.
@@ -130,16 +130,16 @@ public class ExcelUtil {
      */
     public static void createExcel(OutputStream out, List<ExcelSheet> sheets, String dateHeader,
 	    boolean displaySheetTitle, boolean produceXlsxFile) throws IOException {
-	//set user time zone, which is required for outputting cells of time format 
+	//set user time zone, which is required for outputting cells of time format
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone userTimeZone = user.getTimeZone();
 	LocaleUtil.setUserTimeZone(userTimeZone);
-	
+
 	//in case .xlsx is requested use SXSSFWorkbook.class (which keeps 100 rows in memory, exceeding rows will be flushed to disk)
-	Workbook workbook = produceXlsxFile ? new SXSSFWorkbook(100): new HSSFWorkbook();
+	Workbook workbook = produceXlsxFile ? new SXSSFWorkbook(100) : new HSSFWorkbook();
 	ExcelUtil.initStyles(workbook);
-	
+
 	for (ExcelSheet sheet : sheets) {
 	    ExcelUtil.createSheet(workbook, sheet, dateHeader, displaySheetTitle);
 	}
@@ -147,7 +147,7 @@ public class ExcelUtil {
 	workbook.write(out);
 	out.close();
     }
-    
+
     private static void initStyles(Workbook workbook) {
 	Font defaultFont = workbook.createFont();
 	defaultFont.setFontName(DEFAULT_FONT_NAME);
@@ -187,8 +187,8 @@ public class ExcelUtil {
 	// create data formats
 	floatFormat = workbook.createDataFormat().getFormat("0.00");
 	numberFormat = workbook.createDataFormat().getFormat("0");
-	dateFormat = (short)14;// built-in 0xe format - "m/d/yy"
-	timeFormat = (short)19;// built-in 0x13 format - "h:mm:ss AM/PM"
+	dateFormat = (short) 14;// built-in 0xe format - "m/d/yy"
+	timeFormat = (short) 19;// built-in 0x13 format - "h:mm:ss AM/PM"
 	percentageFormat = workbook.createDataFormat().getFormat(FORMAT_PERCENTAGE);
 
 	//create border style
@@ -218,8 +218,8 @@ public class ExcelUtil {
 	borderStyleBottomThinBoldFont.setFont(boldFont);
     }
 
-    private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader, boolean displaySheetTitle)
-	    throws IOException {
+    private static void createSheet(Workbook workbook, ExcelSheet excelSheet, String dateHeader,
+	    boolean displaySheetTitle) throws IOException {
 	// Modify sheet name if required. It should contain only allowed letters and sheets are not allowed with
 	// the same names (case insensitive)
 	String sheetName = WorkbookUtil.createSafeSheetName(excelSheet.getSheetName());
@@ -230,7 +230,7 @@ public class ExcelUtil {
 	Sheet sheet = workbook.createSheet(sheetName);
 	//make sure columns are tracked prior to auto-sizing them
 	if (workbook instanceof SXSSFWorkbook) {
-	    ((SXSSFSheet)sheet).trackAllColumnsForAutoSizing();
+	    ((SXSSFSheet) sheet).trackAllColumnsForAutoSizing();
 	}
 
 	// Print title if requested
@@ -274,7 +274,7 @@ public class ExcelUtil {
 
     private static void createRow(ExcelRow excelRow, int rowIndex, Sheet sheet) {
 	Row row = sheet.createRow(rowIndex);
-	
+
 	int columnIndex = 0;
 	for (ExcelCell excelCell : excelRow.getCells()) {
 	    if (excelCell == null) {
@@ -305,7 +305,7 @@ public class ExcelUtil {
 		    cell.setCellValue(((Integer) excelCellValue).doubleValue());
 
 		} else {
-		    cell.setCellValue(excelCellValue.toString());
+		    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(excelCellValue.toString()));
 		}
 	    }
 
@@ -407,6 +407,10 @@ public class ExcelUtil {
 		}
 	    }
 	}
+    }
+
+    public static String ensureCorrectCellLength(String cellText) {
+	return cellText.length() > MAX_CELL_TEXT_LENGTH ? cellText.substring(0, MAX_CELL_TEXT_LENGTH) : cellText;
     }
 
 }
