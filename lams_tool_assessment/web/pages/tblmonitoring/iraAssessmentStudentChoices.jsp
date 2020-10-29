@@ -1,6 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
+
+<style>
+	#completion-charts-container > div {
+		padding: 5rem 0;
+	}
+</style>
+
 <script>
+	var activityCompletionChart = null,
+		answeredQuestionsChart = null,
+		// do not refresh charts automatically
+		// they will be redrawn on page auto reload
+		COMPLETION_CHART_UPDATE_INTERVAL = 0;
+	
+	$(document).ready(function(){
+		drawCompletionCharts(${toolContentID}, false);
+	});
+			
 	function exportExcel(){
 		//dynamically create a form and submit it
 		var exportExcelUrl = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
@@ -45,6 +62,16 @@
 </div>
 <br>
 <!-- End notifications -->
+
+<div id="completion-charts-container">
+	<div class="col-sm-12 col-md-6">
+		<canvas id="activity-completion-chart"></canvas>
+	</div>
+	
+	<div class="col-sm-12 col-md-6">
+		<canvas id="answered-questions-chart"></canvas>
+	</div>
+</div>
 
 <%-- Include student's choices part --%>
 <%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
