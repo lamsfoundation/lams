@@ -39,26 +39,43 @@
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		<script>
-			// pass settings to monitorToolSummaryAdvanced.js
-			var submissionDeadlineSettings = {
-				lams: '<lams:LAMSURL />',
-				submissionDeadline: '${submissionDeadline}',
-				submissionDateString: '${submissionDateString}',
-				setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
-				toolContentID: '${param.toolContentID}',
-				messageNotification: '<fmt:message key="monitor.summary.notification" />',
-				messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-				messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
-			},
-			confidenceLevelsSettings = {
-				type: "${assessment.confidenceLevelsType}",
-				LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
-				LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
-				LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
-				LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
-				LABEL_SURE : '<fmt:message key="label.sure" />',
-				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
-			};
+			var WEB_APP_URL = '<lams:WebAppURL />',
+				LABELS = {
+					<fmt:message key="label.monitoring.summary.completion" var="ACTIVITY_COMPLETION_CHART_TITLE_VAR"/>
+					ACTIVITY_COMPLETION_CHART_TITLE : '<c:out value="${ACTIVITY_COMPLETION_CHART_TITLE_VAR}" />',
+					<fmt:message key="label.monitoring.summary.completion.possible" var="ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR"/>
+					ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR}" />',
+					<fmt:message key="label.monitoring.summary.completion.started" var="ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR"/>
+					ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR}" />',	
+					<fmt:message key="label.monitoring.summary.completion.completed" var="ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR"/>
+					ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR}" />',	
+					<fmt:message key="label.monitoring.summary.answered.questions" var="ANSWERED_QUESTIONS_CHART_TITLE_VAR"/>
+					ANSWERED_QUESTIONS_CHART_TITLE : '<c:out value="${ANSWERED_QUESTIONS_CHART_TITLE_VAR}" />',
+					<fmt:message key="label.monitoring.summary.answered.questions.x.axis" var="ANSWERED_QUESTIONS_CHART_X_AXIS_VAR"/>
+					ANSWERED_QUESTIONS_CHART_X_AXIS : '<c:out value="${ANSWERED_QUESTIONS_CHART_X_AXIS_VAR}" />',
+					<fmt:message key="label.monitoring.summary.answered.questions.y.axis" var="ANSWERED_QUESTIONS_CHART_Y_AXIS_VAR"/>
+					ANSWERED_QUESTIONS_CHART_Y_AXIS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_VAR}" />'
+				},
+				// pass settings to monitorToolSummaryAdvanced.js
+			    submissionDeadlineSettings = {
+					lams: '<lams:LAMSURL />',
+					submissionDeadline: '${submissionDeadline}',
+					submissionDateString: '${submissionDateString}',
+					setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
+					toolContentID: '${param.toolContentID}',
+					messageNotification: '<fmt:message key="monitor.summary.notification" />',
+					messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+					messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+				},
+				confidenceLevelsSettings = {
+					type: "${assessment.confidenceLevelsType}",
+					LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
+					LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
+					LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
+					LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
+					LABEL_SURE : '<fmt:message key="label.sure" />',
+					LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
+				};
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
@@ -71,11 +88,13 @@
    		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/chart.bundle.min.js"></script>
+ 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
- 		<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
- 		<script type="text/javascript" src="${lams}/includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+
  		
 		<script>        
 		    function doSelectTab(tabId) {
