@@ -336,10 +336,6 @@
 		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
-	function showResultsForTeacher() {
-		launchPopup("<c:url value='/learning/showResultsForTeacher.do'/>?toolContentID=${sessionMap.toolContentID}", 'Results');
-	}
-	
 	
 	// TIME LIMIT
 	
@@ -711,11 +707,6 @@
 		
 		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
 	</c:if>
-	
-	<button onclick="javascript:showResultsForTeacher()" class="btn btn-default btn-sm btn-disable-on-submit pull-right loffset10">
-		<i class="fa fa-check-circle-o" aria-hidden="true"></i> 
-		<fmt:message key="label.monitoring.summary.results.view" />
-	</button>
 	
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
