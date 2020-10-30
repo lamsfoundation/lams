@@ -57,7 +57,7 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 			
 		function initFileUpload(tmpFileUploadId, language) {
-			var allowedFileTypes = ['.zip', '.xml'],
+			var allowedFileTypes = ['.zip', '.xml', '.docx'],
   	  			uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
