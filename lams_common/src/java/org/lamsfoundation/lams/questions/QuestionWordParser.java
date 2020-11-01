@@ -126,7 +126,7 @@ public class QuestionWordParser {
 
 		//iterate through the next paragraphs until we meet QUESTION_BREAK or the end of file
 		List<Node> questionParagraphs = new ArrayList<>();
-		while (!line.contains(QUESTION_BREAK) && counter < nodes.getLength()) {
+		while (!line.contains(QUESTION_BREAK) && counter <= nodes.getLength()) {
 		    Node lineNode = nodes.item(counter - 1);
 		    questionParagraphs.add(lineNode);
 
@@ -142,7 +142,7 @@ public class QuestionWordParser {
 
 		    boolean isOptionsStarted = false;
 		    boolean correctAnswerFound = false;
-		    int optionCount = 0;
+		    int optionCount = 1;
 		    for (Node questionParagraph : questionParagraphs) {
 			//formatted text that includes starting and ending <p> as well as all children tags
 			String formattedText = serializer.writeToString(questionParagraph);
@@ -167,12 +167,12 @@ public class QuestionWordParser {
 
 			} else if (isOptionsStarted) {
 			    //process ending after all options
-			    if (!correctAnswerFound && text.matches("^Answer:.*[a-zA-Z ,]+.*")) {
+			    if (!correctAnswerFound && text.toLowerCase().matches("^answer:.*[a-z ,]+.*")) {
 				correctAnswerFound = true;
 				String correctAnswerLetters = text.substring("Answer:".length()).replaceAll("\\s", "");
 				for (String correctAnswerLetter : correctAnswerLetters.split(",")) {
 				    char correctAnswerChar = Character.toLowerCase(correctAnswerLetter.charAt(0));
-				    int correctAnswerIndex = correctAnswerChar - 'a' - 1;
+				    int correctAnswerIndex = correctAnswerChar - 'a' + 1;
 
 				    for (Answer answer : question.getAnswers()) {
 					if (answer.getDisplayOrder() == correctAnswerIndex) {
@@ -194,7 +194,7 @@ public class QuestionWordParser {
 				//remove "[IMAGE: ]" tags
 				String title = text.replaceAll(QuestionWordParser.CUSTOM_IMAGE_TAG_REGEX, "");
 				//trim to 200 characters while preserving the last full word
-				title =  title.replaceAll("(?<=.{200})\\b.*", "...");
+				title = title.replaceAll("(?<=.{200})\\b.*", "...");
 				question.setTitle(title);
 			    }
 
