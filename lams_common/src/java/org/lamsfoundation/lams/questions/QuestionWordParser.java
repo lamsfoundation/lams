@@ -142,8 +142,9 @@ public class QuestionWordParser {
 
 	    String title = null;
 	    String description = null;
-	    List<Answer> answers = new ArrayList<>();
 	    String feedback = null;
+	    List<Answer> answers = new ArrayList<>();
+	    List<String> learningOutcomes = new ArrayList<>();
 
 	    boolean optionsStarted = false;
 	    boolean isMultipleResponse = false;
@@ -197,7 +198,16 @@ public class QuestionWordParser {
 		if (text.startsWith(FEEDBACK_TAG)) {
 		    optionsStarted = true;
 
-		    feedback = feedback == null ? formattedText : feedback + formattedText;
+		    feedback = feedback == null ? formattedText.substring(FEEDBACK_TAG.length()).strip()
+			    : feedback + formattedText;
+		}
+
+		if (text.startsWith(LEARNING_OUTCOME_TAG)) {
+		    optionsStarted = true;
+
+		    String learningOutcome = WebUtil.removeHTMLtags(formattedText).strip()
+			    .substring(LEARNING_OUTCOME_TAG.length()).strip();
+		    learningOutcomes.add(learningOutcome);
 		}
 
 		// if we are still before all options and no answers section started,
@@ -238,6 +248,8 @@ public class QuestionWordParser {
 	    question.setTitle(title);
 	    question.setText(description);
 	    question.setFeedback(feedback);
+	    question.setLearningOutcomes(learningOutcomes);
+
 	    if (answers.isEmpty()) {
 		question.setType(Question.QUESTION_TYPE_ESSAY);
 	    } else {

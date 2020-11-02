@@ -12,9 +12,13 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -23,9 +27,12 @@ import org.lamsfoundation.lams.questions.Answer;
 import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionExporter;
 import org.lamsfoundation.lams.questions.QuestionParser;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -56,9 +63,13 @@ public class ImsQtiController {
     @Autowired
     private IUserManagementService userManagementService;
 
+    @Autowired
+    private IOutcomeService outcomeService;
+
     /**
      * Parses questions extracted from IMS QTI file and adds them as new QB questions.
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping(path = "/saveQTI", produces = "text/plain", method = RequestMethod.POST)
     @ResponseBody
     public String saveQTI(HttpServletRequest request, @RequestParam long collectionUid,
@@ -339,6 +350,26 @@ public class ImsQtiController {
 	    qbQuestion.setMaxMark(questionMark);
 	    userManagementService.save(qbQuestion);
 
+	    if (question.getLearningOutcomes() != null && !question.getLearningOutcomes().isEmpty()) {
+		for (String learningOutcomeText : question.getLearningOutcomes()) {
+		    learningOutcomeText = learningOutcomeText.strip();
+		    List<Outcome> learningOutcomes = userManagementService.findByProperty(Outcome.class, "name",
+			    learningOutcomeText);
+		    Outcome learningOutcome = null;
+		    if (learningOutcomes.isEmpty()) {
+			learningOutcome = outcomeService.createOutcome(learningOutcomeText,
+				ImsQtiController.getUserDTO().getUserID());
+		    } else {
+			learningOutcome = learningOutcomes.get(0);
+		    }
+
+		    OutcomeMapping outcomeMapping = new OutcomeMapping();
+		    outcomeMapping.setOutcome(learningOutcome);
+		    outcomeMapping.setQbQuestionId(questionId);
+		    userManagementService.save(outcomeMapping);
+		}
+	    }
+
 	    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 
 	    qbQuestionUidsString.append(qbQuestion.getUid()).append(',');
@@ -548,5 +579,10 @@ public class ImsQtiController {
 
 	QuestionExporter exporter = new QuestionExporter(fileTitle, questions.toArray(Question.QUESTION_ARRAY_TYPE));
 	exporter.exportQTIPackage(request, response);
+    }
+
+    private static UserDTO getUserDTO() {
+	HttpSession ss = SessionManager.getSession();
+	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 }

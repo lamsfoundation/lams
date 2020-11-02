@@ -467,6 +467,20 @@ public class QuestionParser {
 		    }
 		}
 
+		// extract learning outcomes
+		String learningOutcomeCountParam = request.getParameter("learningOutcomeCount" + questionIndex);
+		int learningOutcomeCount = learningOutcomeCountParam == null ? 0
+			: Integer.parseInt(learningOutcomeCountParam);
+		if (learningOutcomeCount > 0) {
+		    question.setLearningOutcomes(new ArrayList<String>());
+		    for (int learningOutcomeIndex = 0; learningOutcomeIndex < learningOutcomeCount; learningOutcomeIndex++) {
+			String learningOutcomeId = "question" + questionIndex + "learningOutcome"
+				+ learningOutcomeIndex;
+			String learningOutcomeText = request.getParameter(learningOutcomeId);
+			question.getLearningOutcomes().add(learningOutcomeText);
+		    }
+		}
+
 		result.add(question);
 	    }
 	}
