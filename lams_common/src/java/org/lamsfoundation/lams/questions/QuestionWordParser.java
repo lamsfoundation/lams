@@ -320,7 +320,6 @@ public class QuestionWordParser {
 	private Set<MediaType> types;
 
 	private String imgFolder = null;
-	private int count = 0;
 
 	private TikaImageExtractingParser(String imgFolder) {
 	    // Our expected types
@@ -368,11 +367,9 @@ public class QuestionWordParser {
 		return;
 	    }
 
-	    count++;
-
 	    // Give it a sensible name if needed
 	    if (filename == null) {
-		filename = "image-" + count + ".";
+		filename = "image-" + System.currentTimeMillis() + ".";
 		filename += type.substring(type.indexOf('/') + 1);
 	    }
 
