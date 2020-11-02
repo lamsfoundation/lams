@@ -156,11 +156,13 @@ public class QuestionWordParser {
 			} else if (isTypeParagraph && text.matches("^[a-zA-Z]\\).*")) {
 			    //process a-z) option
 
-			    //remove "a-z)"
-			    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "<p>");
+			    //remove <p> formatting "a-z)"
+				// 
+			    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "");
+				formattedText = formattedText.replace("</p>","");
 
 			    Answer answer = new Answer();
-			    answer.setText(formattedText);
+				answer.setText(formattedText.trim());
 			    answer.setDisplayOrder(optionCount++);
 			    question.getAnswers().add(answer);
 			    isOptionsStarted = true;
@@ -193,8 +195,8 @@ public class QuestionWordParser {
 			    if (StringUtils.isBlank(question.getTitle())) {
 				//remove "[IMAGE: ]" tags
 				String title = text.replaceAll(QuestionWordParser.CUSTOM_IMAGE_TAG_REGEX, "");
-				//trim to 200 characters while preserving the last full word
-				title = title.replaceAll("(?<=.{200})\\b.*", "...");
+				//trim to 80 characters while preserving the last full word
+				title = title.replaceAll("(?<=.{80})\\b.*", "...");
 				question.setTitle(title);
 			    }
 
