@@ -511,6 +511,31 @@ public class QuestionParser {
 				    + fileName;
 			    try {
 				FileUtils.copyFile(sourceFile, destinationFile);
+
+				// ensure that img-responsive class is always added to img tag
+				int classAttributeIndex = -1;
+				for (int attributeIndex = 0; attributeIndex < imageAttributes
+					.size(); attributeIndex++) {
+				    String attribute = imageAttributes.get(attributeIndex).strip().toLowerCase();
+				    if (attribute.startsWith("class")) {
+					classAttributeIndex = attributeIndex;
+				    }
+				}
+
+				if (classAttributeIndex == -1) {
+				    imageAttributes.add("class=\"img-responsive\"");
+				} else {
+				    String attribute = imageAttributes.get(classAttributeIndex);
+				    if (!attribute.toLowerCase().contains("img-responsive")) {
+					int endQuoationMarkIndex = attribute.lastIndexOf("\"");
+					if (endQuoationMarkIndex > 0) {
+					    attribute = attribute.substring(0, endQuoationMarkIndex)
+						    + " img-responsive\"";
+					    imageAttributes.set(classAttributeIndex, attribute);
+					}
+				    }
+				}
+
 				replacement = "<img src=\"" + uploadWebPath + "\" " + String.join("", imageAttributes)
 					+ " />";
 			    } catch (IOException e) {
