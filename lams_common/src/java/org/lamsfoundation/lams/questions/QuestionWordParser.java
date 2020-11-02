@@ -38,6 +38,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 import org.apache.tika.sax.ContentHandlerDecorator;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.w3c.dom.Document;
@@ -60,7 +61,10 @@ import org.xml.sax.helpers.AttributesImpl;
 public class QuestionWordParser {
     private static Logger log = Logger.getLogger(QuestionWordParser.class);
 
-    private final static String QUESTION_BREAK = "{question}";
+    private final static String QUESTION_TAG = "question:";
+    private final static String ANSWER_TAG = "answer:";
+    private final static String FEEDBACK_TAG = "feedback:";
+    private final static String LEARNING_OUTCOME_TAG = "lo:";
     private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
 
     /**
@@ -117,105 +121,135 @@ public class QuestionWordParser {
 	List<Question> questions = new LinkedList<>();
 	int counter = 0;
 	String line = QuestionWordParser.readNextLine(serializer, nodes, counter++);
-	while (counter < nodes.getLength()) {
+	while (line != null) {
+	    String strippedLine = line == null ? "" : WebUtil.removeHTMLtags(line).toLowerCase();
 
-	    //start processing question
-	    if (line.contains(QUESTION_BREAK)) {
-		//read next line
+	    // skip content outside question
+	    if (!strippedLine.startsWith(QUESTION_TAG)) {
 		line = QuestionWordParser.readNextLine(serializer, nodes, counter++);
+		continue;
+	    }
 
-		//iterate through the next paragraphs until we meet QUESTION_BREAK or the end of file
-		List<Node> questionParagraphs = new ArrayList<>();
-		while (!line.contains(QUESTION_BREAK) && counter <= nodes.getLength()) {
-		    Node lineNode = nodes.item(counter - 1);
-		    questionParagraphs.add(lineNode);
+	    // iterate through the next paragraphs until we meet QUESTION_BREAK or the end of file
+	    List<Node> questionParagraphs = new ArrayList<>();
+	    do {
+		Node lineNode = nodes.item(counter - 1);
+		questionParagraphs.add(lineNode);
+		line = QuestionWordParser.readNextLine(serializer, nodes, counter++);
+		strippedLine = line == null ? "" : WebUtil.removeHTMLtags(line).toLowerCase();
 
-		    line = QuestionWordParser.readNextLine(serializer, nodes, counter++);
+	    } while (line != null && !strippedLine.startsWith(QUESTION_TAG));
+
+	    String title = null;
+	    String description = null;
+	    List<Answer> answers = new ArrayList<>();
+	    String feedback = null;
+
+	    boolean optionsStarted = false;
+	    boolean isMultipleResponse = false;
+	    boolean answerTagFound = false;
+	    for (Node questionParagraph : questionParagraphs) {
+		// formatted text that includes starting and ending <p> as well as all children tags
+		String formattedText = serializer.writeToString(questionParagraph).strip();
+		//text without HTML tags
+		String text = questionParagraph.getTextContent().strip().toLowerCase();
+		boolean isTypeParagraph = "p".equals(questionParagraph.getNodeName());
+
+		// check if answers section started
+		if (isTypeParagraph && text.matches("^[a-z]\\).*")) {
+		    optionsStarted = true;
+
+		    //process a-z) answers
+		    //remove <p> formatting "a-z)"
+		    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "").replace("</p>", "").strip();
+
+		    Answer answer = new Answer();
+		    answer.setText(formattedText);
+		    answer.setDisplayOrder(answers.size() + 1);
+		    answers.add(answer);
+		    continue;
 		}
 
-		//process question
-		if (!questionParagraphs.isEmpty()) {
-		    Question question = new Question();
-		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-		    question.setResourcesFolderPath(TEMP_IMAGE_FOLDER);
-		    question.setAnswers(new ArrayList<Answer>());
+		// check if correct answer line is found
+		if (text.startsWith(ANSWER_TAG)) {
+		    optionsStarted = true;
+		    answerTagFound = true;
 
-		    boolean isOptionsStarted = false;
-		    boolean correctAnswerFound = false;
-		    int optionCount = 1;
-		    for (Node questionParagraph : questionParagraphs) {
-			//formatted text that includes starting and ending <p> as well as all children tags
-			String formattedText = serializer.writeToString(questionParagraph);
-			//text without HTML tags
-			String text = questionParagraph.getTextContent().trim();
-			boolean isTypeParagraph = "p".equals(questionParagraph.getNodeName());
+		    String correctAnswerLetters = text.substring(ANSWER_TAG.length()).replaceAll("\\s", "");
+		    String[] correctAnswersTable = correctAnswerLetters.split(",");
 
-			if (StringUtils.isBlank(text) && !questionParagraph.hasChildNodes()) {
-			    //skip empty paragraphs
+		    for (String correctAnswerLetter : correctAnswersTable) {
+			char correctAnswerChar = correctAnswerLetter.charAt(0);
+			int correctAnswerIndex = correctAnswerChar - 'a' + 1;
 
-			} else if (isTypeParagraph && text.matches("^[a-zA-Z]\\).*")) {
-			    //process a-z) option
-
-			    //remove <p> formatting "a-z)"
-				// 
-			    formattedText = formattedText.replaceFirst("^<p.*>\\s*[a-zA-Z]\\)", "");
-				formattedText = formattedText.replace("</p>","");
-
-			    Answer answer = new Answer();
-				answer.setText(formattedText.trim());
-			    answer.setDisplayOrder(optionCount++);
-			    question.getAnswers().add(answer);
-			    isOptionsStarted = true;
-
-			} else if (isOptionsStarted) {
-			    //process ending after all options
-			    if (!correctAnswerFound && text.toLowerCase().matches("^answer:.*[a-z ,]+.*")) {
-				correctAnswerFound = true;
-				String correctAnswerLetters = text.substring("Answer:".length()).replaceAll("\\s", "");
-				for (String correctAnswerLetter : correctAnswerLetters.split(",")) {
-				    char correctAnswerChar = Character.toLowerCase(correctAnswerLetter.charAt(0));
-				    int correctAnswerIndex = correctAnswerChar - 'a' + 1;
-
-				    for (Answer answer : question.getAnswers()) {
-					if (answer.getDisplayOrder() == correctAnswerIndex) {
-					    //correct answer
-					    answer.setScore(1f);
-					}
-				    }
-				}
-
-				//add question feedback that goes after all options and correct answer
-			    } else {
-				String feedback = question.getFeedback() == null ? formattedText
-					: question.getFeedback() + formattedText;
-				question.setFeedback(feedback);
+			for (Answer answer : answers) {
+			    if (answer.getDisplayOrder() == correctAnswerIndex) {
+				//correct answer
+				answer.setScore(1f);
+				isMultipleResponse |= correctAnswersTable.length > 1;
 			    }
-
-			} else {
-			    if (StringUtils.isBlank(question.getTitle())) {
-				//remove "[IMAGE: ]" tags
-				String title = text.replaceAll(QuestionWordParser.CUSTOM_IMAGE_TAG_REGEX, "");
-				//trim to 80 characters while preserving the last full word
-				title = title.replaceAll("(?<=.{80})\\b.*", "...");
-				question.setTitle(title);
-			    }
-
-			    //add question description that goes before all options
-			    String description = question.getText() == null ? formattedText
-				    : question.getText() + formattedText;
-			    question.setText(description);
 			}
 		    }
 
-		    if (StringUtils.isNotBlank(question.getTitle())) {
-			questions.add(question);
-		    }
+		    continue;
 		}
 
-	    } else {
-		//skip all lines before {question}
-		line = QuestionWordParser.readNextLine(serializer, nodes, counter++);
+		if (text.startsWith(FEEDBACK_TAG)) {
+		    optionsStarted = true;
+
+		    feedback = feedback == null ? formattedText : feedback + formattedText;
+		}
+
+		// if we are still before all options and no answers section started,
+		// then interpret it as question title or description
+		if (!optionsStarted) {
+		    if (text.startsWith(QUESTION_TAG)) {
+			title = text.substring(QUESTION_TAG.length()).strip();
+			continue;
+		    }
+		    description = description == null ? formattedText : description + formattedText;
+		}
 	    }
+
+	    if (StringUtils.isBlank(title)) {
+		if (StringUtils.isBlank(description)) {
+		    log.error("No question title found. Skipping question.");
+		    continue;
+		}
+		// remove "[IMAGE: ]" tags
+		title = description.replaceAll(QuestionWordParser.CUSTOM_IMAGE_TAG_REGEX, "");
+		// remove all HTML tags
+		title = WebUtil.removeHTMLtags(title);
+		// trim to 80 characters while preserving the last full word
+		title = title.replaceAll("(?<=.{80})\\b.*", "...");
+	    }
+
+	    if (answers.isEmpty() && answerTagFound) {
+		log.error("ANSWER tag found, but no answers were found in question: " + title);
+		continue;
+	    }
+	    if (!answers.isEmpty() && !answerTagFound) {
+		log.error("Answers were found, but no ANSWER tag was found in question: " + title);
+		continue;
+	    }
+
+	    Question question = new Question();
+	    question.setResourcesFolderPath(TEMP_IMAGE_FOLDER);
+	    question.setTitle(title);
+	    question.setText(description);
+	    question.setFeedback(feedback);
+	    if (answers.isEmpty()) {
+		question.setType(Question.QUESTION_TYPE_ESSAY);
+	    } else {
+		question.setAnswers(answers);
+		if (isMultipleResponse) {
+		    question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
+		} else {
+		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
+		}
+	    }
+	    questions.add(question);
+
 	}
 
 	return questions.toArray(Question.QUESTION_ARRAY_TYPE);
@@ -224,11 +258,11 @@ public class QuestionWordParser {
     private static String readNextLine(LSSerializer serializer, NodeList nodes, int counter) {
 	//check it's not the end of file
 	if (counter >= nodes.getLength()) {
-	    return "";
+	    return null;
 	}
 
 	Node node = nodes.item(counter);
-	String htmlText = serializer.writeToString(node);
+	String htmlText = serializer.writeToString(node).strip();
 	log.debug("Reading the next line from word document: " + htmlText);
 	return htmlText;
     }
