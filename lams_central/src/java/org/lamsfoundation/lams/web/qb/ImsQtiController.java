@@ -117,15 +117,16 @@ public class ImsQtiController {
 	    QbQuestion qbQuestion = new QbQuestion();
 	    qbQuestion.setUuid(uuid);
 	    qbQuestion.setName(question.getTitle());
-	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
-	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
-		    question.getResourcesFolderPath()));
+	    qbQuestion.setContentFolderId(
+		    StringUtils.isBlank(contentFolderID) ? FileUtil.generateUniqueContentFolderID() : contentFolderID);
+	    qbQuestion.setDescription(QuestionParser.processHTMLField(question.getText(), false,
+		    qbQuestion.getContentFolderId(), question.getResourcesFolderPath()));
+	    qbQuestion.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), false,
+		    qbQuestion.getContentFolderId(), question.getResourcesFolderPath()));
 	    qbQuestion.setPenaltyFactor(0);
 	    int questionId = qbService.generateNextQuestionId();
 	    qbQuestion.setQuestionId(questionId);
 	    qbQuestion.setVersion(1);
-	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 
 	    int questionMark = 1;
 
