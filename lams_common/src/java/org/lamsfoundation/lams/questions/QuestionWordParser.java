@@ -147,6 +147,7 @@ public class QuestionWordParser {
 	    List<String> learningOutcomes = new ArrayList<>();
 
 	    boolean optionsStarted = false;
+	    boolean feedbackStarted = false;
 	    boolean isMultipleResponse = false;
 	    boolean answerTagFound = false;
 	    for (Node questionParagraph : questionParagraphs) {
@@ -156,8 +157,13 @@ public class QuestionWordParser {
 		String text = questionParagraph.getTextContent().strip().toLowerCase();
 		boolean isTypeParagraph = "p".equals(questionParagraph.getNodeName());
 
+		if (StringUtils.isBlank(text) && !questionParagraph.hasChildNodes()) {
+		    //skip empty paragraphs
+		    continue;
+		}
+
 		// check if answers section started
-		if (isTypeParagraph && text.matches("^[a-z]\\).*")) {
+		if (!feedbackStarted && isTypeParagraph && text.matches("^[a-z]\\).*")) {
 		    optionsStarted = true;
 
 		    //process a-z) answers
@@ -174,9 +180,10 @@ public class QuestionWordParser {
 		// check if correct answer line is found
 		if (text.startsWith(ANSWER_TAG)) {
 		    optionsStarted = true;
+		    feedbackStarted = false;
 		    answerTagFound = true;
 
-		    String correctAnswerLetters = text.substring(ANSWER_TAG.length()).replaceAll("\\s", "");
+		    String correctAnswerLetters = text.replaceAll("(?i)" + ANSWER_TAG, "").replaceAll("\\s", "");
 		    String[] correctAnswersTable = correctAnswerLetters.split(",");
 
 		    for (String correctAnswerLetter : correctAnswersTable) {
@@ -195,30 +202,36 @@ public class QuestionWordParser {
 		    continue;
 		}
 
-		if (text.startsWith(FEEDBACK_TAG)) {
-		    optionsStarted = true;
-
-		    feedback = feedback == null
-			    ? WebUtil.removeHTMLtags(formattedText).strip().substring(FEEDBACK_TAG.length()).strip()
-			    : feedback + formattedText;
-		}
-
 		if (text.startsWith(LEARNING_OUTCOME_TAG)) {
 		    optionsStarted = true;
+		    feedbackStarted = false;
 
-		    String learningOutcome = WebUtil.removeHTMLtags(formattedText).strip()
-			    .substring(LEARNING_OUTCOME_TAG.length()).strip();
+		    String learningOutcome = WebUtil.removeHTMLtags(formattedText)
+			    .replaceAll("(?i)" + LEARNING_OUTCOME_TAG + "\\s*", "").strip();
 		    learningOutcomes.add(learningOutcome);
+		    continue;
 		}
 
-		// if we are still before all options and no answers section started,
-		// then interpret it as question title or description
+		if (text.startsWith(FEEDBACK_TAG)) {
+		    optionsStarted = true;
+		    feedbackStarted = true;
+		}
+
+		if (feedbackStarted) {
+		    String strippedFormattedText = formattedText.replaceAll("(?i)" + FEEDBACK_TAG + "\\s*", "").strip();
+		    feedback = feedback == null ? strippedFormattedText : feedback + strippedFormattedText;
+		    continue;
+		}
+
 		if (!optionsStarted) {
+		    // if we are still before all options and no answers section started,
+		    // then interpret it as question title or description
 		    if (text.startsWith(QUESTION_TAG)) {
-			title = text.substring(QUESTION_TAG.length()).strip();
+			title = WebUtil.removeHTMLtags(formattedText).replaceAll("(?i)" + QUESTION_TAG + "\\s*", "")
+				.strip();
 			continue;
 		    }
-		    description = description == null ? formattedText : description + formattedText;
+		    description = description == null ? formattedText.strip() : description + formattedText.strip();
 		}
 	    }
 
