@@ -198,7 +198,8 @@ public class QuestionWordParser {
 		if (text.startsWith(FEEDBACK_TAG)) {
 		    optionsStarted = true;
 
-		    feedback = feedback == null ? formattedText.substring(FEEDBACK_TAG.length()).strip()
+		    feedback = feedback == null
+			    ? WebUtil.removeHTMLtags(formattedText).strip().substring(FEEDBACK_TAG.length()).strip()
 			    : feedback + formattedText;
 		}
 
@@ -278,51 +279,6 @@ public class QuestionWordParser {
 	log.debug("Reading the next line from word document: " + htmlText);
 	return htmlText;
     }
-
-//    private static String parseUsingAutoDetect(String filename, TikaConfig tikaConfig, Metadata metadata)
-//	    throws Exception {
-//	System.out.println("Handling using AutoDetectParser: [" + filename + "]");
-//
-//	OOXMLParser parser = new OOXMLParser();
-//	ToXMLContentHandler handler = new ToXMLContentHandler();
-//	TikaInputStream stream = TikaInputStream.get(new File(filename), metadata);
-//	parser.parse(stream, handler, metadata, new ParseContext());
-//	return handler.toString();
-//    }
-//
-//    private static String parseUsingComponents(String filename, TikaConfig tikaConfig, Metadata metadata)
-//	    throws Exception {
-//	MimeTypes mimeRegistry = tikaConfig.getMimeRepository();
-//
-//	System.out.println("Examining: [" + filename + "]");
-//
-//	metadata.set(Metadata.RESOURCE_NAME_KEY, filename);
-//	System.out.println("The MIME type (based on filename) is: [" + mimeRegistry.detect(null, metadata) + "]");
-//
-//	InputStream stream = TikaInputStream.get(new File(filename));
-//	System.out.println("The MIME type (based on MAGIC) is: [" + mimeRegistry.detect(stream, metadata) + "]");
-//
-//	stream = TikaInputStream.get(new File(filename));
-//	Detector detector = tikaConfig.getDetector();
-//	System.out.println(
-//		"The MIME type (based on the Detector interface) is: [" + detector.detect(stream, metadata) + "]");
-//
-//	LanguageIdentifier lang = new LanguageIdentifier(
-//		new LanguageProfile(FileUtils.readFileToString(new File(filename), UTF_8)));
-//
-//	System.out.println("The language of this content is: [" + lang.getLanguage() + "]");
-//
-//// Get a non-detecting parser that handles all the types it can
-//	OOXMLParser parser = new OOXMLParser();
-//// Tell it what we think the content is
-//	MediaType type = detector.detect(stream, metadata);
-//	metadata.set(Metadata.CONTENT_TYPE, type.toString());
-//// Have the file parsed to get the content and metadata
-//	ToXMLContentHandler handler = new ToXMLContentHandler();
-//	parser.parse(stream, handler, metadata, new ParseContext());
-//
-//	return handler.toString();
-//    }
 
     /**
      * A nested Tika parser which extracts out any images as they come along.
