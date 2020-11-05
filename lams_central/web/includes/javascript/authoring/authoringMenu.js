@@ -516,6 +516,9 @@ var MenuLib = {
 		layout.weightsDialog.modal('show');
 	},
 	
+	openQuestionBank : function(){
+		window.open(LAMS_URL + 'qb/collection/show.do', '_blank');
+	},
 	
 	/**
 	 * Make a copy of an existing activity.

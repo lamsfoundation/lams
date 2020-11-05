@@ -412,7 +412,12 @@
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
-				
+		
+		<button id="questionBankButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openQuestionBank()">
+			<i class="fa fa-bank"></i> 
+			<span><fmt:message key="label.question.bank" /></span>
+		</button>
+		
 		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()"
 				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
 			<i class="fa fa-search-plus"></i> 
