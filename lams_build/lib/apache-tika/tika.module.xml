@@ -22,12 +22,10 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.5" name="org.apache.poi">
+<module xmlns="urn:jboss:module:1.5" name="org.apache.tika">
   <resources>
-    <resource-root path="poi-4.0.1.jar"/>
-    <resource-root path="poi-ooxml-4.0.1.jar"/>
-    <resource-root path="poi-ooxml-schemas-4.0.1.jar"/>
-    <resource-root path="poi-scratchpad-4.0.1.jar"/>
+    <resource-root path="tika-core-1.24.jar"/>
+    <resource-root path="tika-parsers-1.24.jar"/>
   </resources>
   <dependencies>
     <module name="javax.api"/>
@@ -35,5 +33,7 @@
     <module name="org.apache.commons.collections4"/>
     <module name="org.apache.commons.compress"/>
     <module name="org.dom4j"/>
+    <module name="org.apache.poi"/>
+    <module name="org.slf4j"/>
   </dependencies>
 </module>

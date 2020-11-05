@@ -263,6 +263,16 @@
 					</c:if>
 				</div>
 			</c:if>
+			
+			 <%-- Learning Outcomes, if required and exist --%>
+			<c:if test="${fn:length(question.learningOutcomes) > 0}">
+				<input type="hidden" name="learningOutcomeCount${questionStatus.index}" 
+					       value="${fn:length(question.learningOutcomes)}" />
+				<c:forEach var="learningOutcome" items="${question.learningOutcomes}" varStatus="learningOutcomeStatus">
+					<input name="question${questionStatus.index}learningOutcome${learningOutcomeStatus.index}"
+					       value="<c:out value='${learningOutcome}'/>" type="hidden" />
+				</c:forEach>
+			</c:if>
 		</c:forEach>
 		
 		<div id="buttonsDiv" class="voffset10 pull-right">

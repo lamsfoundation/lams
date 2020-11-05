@@ -29,6 +29,7 @@ public class Answer {
     private String text;
     private String feedback;
     private Float score;
+    private int displayOrder = 1;
 
     public String getText() {
 	return text;
@@ -52,6 +53,14 @@ public class Answer {
 
     public void setScore(Float score) {
 	this.score = score;
+    }
+    
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
     }
 
     @Override

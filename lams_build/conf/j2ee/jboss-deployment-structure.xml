@@ -19,6 +19,7 @@
     <dependencies>
       <module name="org.javassist" export="true" />
       <module name="org.apache.poi" export="true" />
+      <module name="org.apache.tika" export="true" />
       <module name="net.fckeditor" export="true" />
       <module name="org.apache.commons.beanutils" export="true" />
       <module name="org.apache.commons.collections" export="true" />

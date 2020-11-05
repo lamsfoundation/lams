@@ -5,6 +5,16 @@
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="tmpFileUploadId"><%=FileUtil.generateTmpFileUploadId()%></c:set>
+<c:set var="title" scope="request">
+	<c:choose>
+		<c:when test="${param.importType == 'word'}">
+			<fmt:message key="label.choose.word.document" />
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="label.questions.file.title" />	
+		</c:otherwise>
+	</c:choose>
+</c:set>
 
 <lams:html>
 <lams:head>
@@ -47,7 +57,7 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 			
 		function initFileUpload(tmpFileUploadId, language) {
-			var allowedFileTypes = ['.zip', '.xml'],
+			var allowedFileTypes = ['.zip', '.xml', '.docx'],
   	  			uppyProperties = {
 				  // upload immediately 
 				  autoProceed: true,
@@ -123,17 +133,13 @@
 </lams:head>
 
 <body class="stripes">
-
-	<c:set var="title" scope="request">
-		<fmt:message key="label.questions.file.title" />
-	</c:set>
 	<lams:Page type="admin" title="${title}">
-			
 		<lams:errors/>				
 
 		<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post">
 			<input type="hidden" name="tmpFileUploadId" value="${tmpFileUploadId}" /> 
 			<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" /> 
+			<input type="hidden" name="importType" value="${empty param.importType ? importType : param.importType}" /> 
 			<input type="hidden" name="callerID" value="${empty param.callerID ? callerID : param.callerID}" /> 
 			<input type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" /> 
 			<input type="hidden" name="collectionChoice" value="${empty param.collectionChoice ? collectionChoice : param.collectionChoice}" /> 

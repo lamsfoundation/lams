@@ -54,6 +54,7 @@ public class Question {
     private List<Answer> answers;
     private List<Answer> matchAnswers;
     private Map<Integer, Integer> matchMap;
+    private List<String> learningOutcomes;
     private String resourcesFolderPath;
 
     // UUID in QTI question label is LAMS custom idea
@@ -124,6 +125,14 @@ public class Question {
 
     public void setMatchMap(Map<Integer, Integer> matchMap) {
 	this.matchMap = matchMap;
+    }
+
+    public List<String> getLearningOutcomes() {
+	return learningOutcomes;
+    }
+
+    public void setLearningOutcomes(List<String> learningOutcomes) {
+	this.learningOutcomes = learningOutcomes;
     }
 
     public String getResourcesFolderPath() {

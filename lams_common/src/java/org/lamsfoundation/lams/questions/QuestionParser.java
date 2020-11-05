@@ -467,6 +467,20 @@ public class QuestionParser {
 		    }
 		}
 
+		// extract learning outcomes
+		String learningOutcomeCountParam = request.getParameter("learningOutcomeCount" + questionIndex);
+		int learningOutcomeCount = learningOutcomeCountParam == null ? 0
+			: Integer.parseInt(learningOutcomeCountParam);
+		if (learningOutcomeCount > 0) {
+		    question.setLearningOutcomes(new ArrayList<String>());
+		    for (int learningOutcomeIndex = 0; learningOutcomeIndex < learningOutcomeCount; learningOutcomeIndex++) {
+			String learningOutcomeId = "question" + questionIndex + "learningOutcome"
+				+ learningOutcomeIndex;
+			String learningOutcomeText = request.getParameter(learningOutcomeId);
+			question.getLearningOutcomes().add(learningOutcomeText);
+		    }
+		}
+
 		result.add(question);
 	    }
 	}
@@ -511,7 +525,31 @@ public class QuestionParser {
 				    + fileName;
 			    try {
 				FileUtils.copyFile(sourceFile, destinationFile);
-				replacement = "<img src=\"" + uploadWebPath + "\" " + String.join("", imageAttributes)
+
+				// ensure that img-responsive class is always added to img tag
+				int classAttributeIndex = QuestionParser.getImageAttributeIndex(imageAttributes,
+					"class");
+				if (classAttributeIndex == -1) {
+				    imageAttributes.add("class=\"img-responsive\"");
+				} else {
+				    String attribute = imageAttributes.get(classAttributeIndex);
+				    if (!attribute.toLowerCase().contains("img-responsive")) {
+					int endQuoationMarkIndex = attribute.lastIndexOf("\"");
+					if (endQuoationMarkIndex > 0) {
+					    attribute = attribute.substring(0, endQuoationMarkIndex)
+						    + " img-responsive\"";
+					    imageAttributes.set(classAttributeIndex, attribute);
+					}
+				    }
+				}
+
+				// add default "alt" attribute value in case there is none
+				int altAttributeIndex = QuestionParser.getImageAttributeIndex(imageAttributes, "alt");
+				if (altAttributeIndex == -1) {
+				    imageAttributes.add("alt=\"Image\"");
+				}
+
+				replacement = "<img src=\"" + uploadWebPath + "\" " + String.join(" ", imageAttributes)
 					+ " />";
 			    } catch (IOException e) {
 				log.error("Could not store image " + fileName);
@@ -528,6 +566,16 @@ public class QuestionParser {
 	}
 
 	return StringUtils.isBlank(result) ? null : result;
+    }
+
+    private static int getImageAttributeIndex(List<String> imageAttributes, String attibuteName) {
+	for (int attributeIndex = 0; attributeIndex < imageAttributes.size(); attributeIndex++) {
+	    String attribute = imageAttributes.get(attributeIndex).strip().toLowerCase();
+	    if (attribute.startsWith(attibuteName)) {
+		return attributeIndex;
+	    }
+	}
+	return -1;
     }
 
     /**
