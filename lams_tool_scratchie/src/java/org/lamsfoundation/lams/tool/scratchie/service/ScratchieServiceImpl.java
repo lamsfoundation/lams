@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +53,7 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -160,6 +160,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private IEventNotificationService eventNotificationService;
 
     private IQbService qbService;
+
+    private ILearnerService learnerService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
 
@@ -337,7 +339,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		// create new user in a DB
 		if (leader == null) {
 		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
 		    this.createUser(leader);
 		}
@@ -505,7 +507,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		toolService.updateActivityMark(Double.valueOf(mark), null, user.getUserId().intValue(),
+		Double userMark = 0.0;
+		if (isLearnerEligibleForMark(user.getUserId(), scratchie.getContentId())) {
+		    userMark = Double.valueOf(mark);
+		}
+		toolService.updateActivityMark(userMark, null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -2011,6 +2017,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return model;
     }
 
+    @Override
+    public boolean isLearnerEligibleForMark(long learnerId, long toolContentId) {
+	return learnerService.isLearnerStartedLessonByContentId(Long.valueOf(learnerId).intValue(), toolContentId);
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -2368,7 +2379,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		throw new ToolException(e);
 	    }
 	}
-	return getScratchieOutputFactory().getToolOutputDefinitions(this, content, definitionType);
+	return scratchieOutputFactory.getToolOutputDefinitions(this, content, definitionType);
     }
 
     @Override
@@ -2523,12 +2534,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return getScratchieOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
+	return scratchieOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return getScratchieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+	return scratchieOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     @Override
@@ -2579,10 +2590,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     /* =================================================================================== */
 
-    public IExportToolContentService getExportContentService() {
-	return exportContentService;
-    }
-
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
     }
@@ -2591,16 +2598,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	this.logEventService = logEventService;
     }
 
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
     }
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
@@ -2634,15 +2633,15 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return getScratchieOutputFactory().getSupportedDefinitionClasses(definitionType);
-    }
-
-    public ScratchieOutputFactory getScratchieOutputFactory() {
-	return scratchieOutputFactory;
+	return scratchieOutputFactory.getSupportedDefinitionClasses(definitionType);
     }
 
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     @Override
