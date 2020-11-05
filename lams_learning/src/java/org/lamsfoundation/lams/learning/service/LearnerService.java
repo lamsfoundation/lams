@@ -1658,4 +1658,9 @@ public class LearnerService implements ILearnerFullService {
 	return kumalive == null || kumalive.getFinished();
     }
 
+    @Override
+    public boolean isLearnerStartedLessonByContentId(int userId, long toolContentId) {
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	return lesson != null && getProgress(userId, lesson.getLessonId()) != null;
+    }
 }
