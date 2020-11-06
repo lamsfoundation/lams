@@ -18,7 +18,7 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="title.lams" /> :: <fmt:message key="label.questions.file.title" /></title>
+    <title><fmt:message key="title.lams" /> :: <c:out value="${title}"/></title>
 
 	<lams:css />
 	<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
