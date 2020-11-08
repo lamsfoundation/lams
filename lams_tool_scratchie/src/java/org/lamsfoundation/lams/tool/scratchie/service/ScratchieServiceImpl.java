@@ -2221,6 +2221,20 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	return result;
     }
 
+    @Override
+    public void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	QbQuestion newQbQuestion = null;
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
+	    if (item.getQbQuestion().getUid().equals(oldQbQuestionUid)) {
+		if (newQbQuestion == null) {
+		    newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+		}
+		item.setQbQuestion(newQbQuestion);
+	    }
+	}
+    }
+
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************

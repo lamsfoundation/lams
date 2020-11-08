@@ -11,9 +11,25 @@
 	switch (qbQuestionModified) {
 		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
 			qbMessage = '<fmt:message key="message.qb.modified.update" />';
-			break;
 		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
-			qbMessage = '<fmt:message key="message.qb.modified.version" />';
+			let showMessage = true;
+		
+			// check if we are in main authoring environment
+			if (typeof window.parent.GeneralLib != 'undefined') {
+				// check if any other activities require updating
+				let activitiesWithQuestion = window.parent.GeneralLib.checkQuestionExistsInToolActivities('${oldQbQuestionUid}');
+				if (activitiesWithQuestion.length > 1) {
+					showMessage = false;
+					// update, if teacher agrees to it
+					window.parent.GeneralLib.replaceQuestionInToolActivities('${sessionMap.toolContentID}', activitiesWithQuestion, 
+																			 '${oldQbQuestionUid}','${newQbQuestionUid}');
+				}
+			}
+
+			if (showMessage) {
+				qbMessage = '<fmt:message key="message.qb.modified.version" />';
+			}
+
 			break;
 		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
 			qbMessage = '<fmt:message key="message.qb.modified.new" />';

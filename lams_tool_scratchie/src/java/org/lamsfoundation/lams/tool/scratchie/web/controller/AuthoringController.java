@@ -554,7 +554,12 @@ public class AuthoringController {
 	}
 	userManagementService.save(updatedQuestion);
 	item.setQbQuestion(updatedQuestion);
+
 	request.setAttribute("qbQuestionModified", isQbQuestionModified);
+	if (isQbQuestionModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
+	    request.setAttribute("oldQbQuestionUid", qbQuestion.getUid());
+	    request.setAttribute("newQbQuestionUid", updatedQuestion.getUid());
+	}
 
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();

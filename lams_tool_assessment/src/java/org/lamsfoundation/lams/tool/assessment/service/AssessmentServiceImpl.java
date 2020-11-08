@@ -2767,6 +2767,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	return result;
     }
+
+    @Override
+    public void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	QbQuestion newQbQuestion = null;
+	for (AssessmentQuestion assessmentQuestion : assessment.getQuestions()) {
+	    if (assessmentQuestion.getQbQuestion().getUid().equals(oldQbQuestionUid)) {
+		if (newQbQuestion == null) {
+		    newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+		}
+		assessmentQuestion.setQbQuestion(newQbQuestion);
+	    }
+	}
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************

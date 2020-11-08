@@ -37,8 +37,10 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -733,6 +735,28 @@ public class QbService implements IQbService {
 	long defaultContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	Collection<QbQuestion> qbQuestions = qbDAO.getQuestionsByToolContentId(defaultContentId);
 	return qbQuestions.stream().anyMatch(q -> q.getUid().equals(qbQuestionUid));
+    }
+
+    @Override
+    public Collection<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> toolContentIds) {
+	return qbDAO.getQuestionActivities(qbQuestionUid, toolContentIds);
+    }
+
+    @Override
+    public void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid,
+	    long newQbQuestionUid) {
+	for (Long toolContentId : toolContentIds) {
+	    ToolContent toolContent = qbDAO.findByProperty(ToolContent.class, "toolContentId", toolContentId).get(0);
+	    Object toolService = lamsCoreToolService.findToolService(toolContent.getTool());
+	    if (toolService instanceof IQbToolService) {
+		try {
+		    ((IQbToolService) toolService).replaceQuestion(toolContentId, oldQbQuestionUid, newQbQuestionUid);
+		} catch (UnsupportedOperationException e) {
+		    log.warn("Could not replace a question for activity with tool content ID " + toolContentId
+			    + " as the tool does not support question replacement");
+		}
+	    }
+	}
     }
 
     private static Integer getUserId() {

@@ -1661,6 +1661,39 @@ GeneralLib = {
 	},
 	
 	/**
+	 * Check if given question exists in tool activities in this sequence
+	 */
+	checkQuestionExistsInToolActivities : function(qbQuestionUid) {
+		let resultToolContentIds = [],
+			candidateToolContentIds = [];
+		
+		// list all tool activities
+		$.each(layout.activities, function() {
+			if (this.toolContentID) {
+				candidateToolContentIds.push(this.toolContentID);
+			}
+		});
+		
+		// ask back end if given activities contain the given question
+		$.ajax({
+			cache    : false,
+			async    : false,
+			url      : LAMS_URL + "qb/edit/checkQuestionExistsInToolActivities.do",
+			dataType : 'json',
+			data     : {
+				'toolContentIds' : candidateToolContentIds,
+				'qbQuestionUid' : qbQuestionUid
+			},
+			success : function(responseToolContentIds){
+				// the response is list of tool content IDs which contain the given question
+				resultToolContentIds = responseToolContentIds;
+			}
+		});
+		
+		return resultToolContentIds;
+	},
+	
+	/**
 	 * Escapes HTML tags to prevent XSS injection.
 	 */
 	escapeHtml : function(unsafe) {
@@ -2793,6 +2826,42 @@ GeneralLib = {
 			'branchMappings'     : branchMappings,
 			'annotations'		 : annotations
 		};
+	},
+	
+	/**
+	 * Replaces the old question with new question in given tool activities in this sequence
+	 */
+	replaceQuestionInToolActivities : function(thisToolContentId, allToolContentIds, oldQbQuestionUid, newQbQuestionUid) {
+		let activityTitles = '',
+			questionReplaced = false;
+		
+		// list names of all tool activities which contain the old question
+		$.each(layout.activities, function() {
+			if (this.toolContentID && this.toolContentID != thisToolContentId && allToolContentIds.indexOf(this.toolContentID) > -1) {
+				activityTitles += '"' + this.title + '", ';
+			}
+		});
+	
+		// ask teacher if he wants to update other activities too
+		if (activityTitles != '' && confirm(LABELS.REPLACE_QUESTION_PROMPT.replace('[0]', activityTitles.substring(0, activityTitles.length - 2)))) {
+			$.ajax({
+				type     : 'POST',
+				cache    : false,
+				async    : false,
+				url      : LAMS_URL + "qb/edit/replaceQuestionInToolActivities.do",
+				dataType : 'text',
+				data     : {
+					'toolContentIds'   : allToolContentIds,
+					'oldQbQuestionUid' : oldQbQuestionUid,
+					'newQbQuestionUid' : newQbQuestionUid
+				},
+				success : function(){
+					questionReplaced = true;
+				}
+			});
+		}
+		
+		return questionReplaced;
 	},
 	
 	
