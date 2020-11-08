@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%-- Application Exercise. It should have one or more essay or multiple choice questions. If QTI Import is used then all the questions are put into one exercise. --%>
 
-<%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript. But that won't be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
+<%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript. But that will not be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
 <c:set var="appexTitle"><fmt:message key="authoring.label.application.exercise.num"><fmt:param value="${appexNumber}"/></fmt:message></c:set>
 <c:set var="appexTitleDisplay">divappex${appexNumber}TitleDisplay</c:set>
 <c:set var="appexTitleField">divappex${appexNumber}Title</c:set>
@@ -26,12 +26,25 @@
 		 	<input type="hidden" name="numAssessments${appexNumber}" id="numAssessments${appexNumber}" value="0"/>
 			<div id="divass${appexNumber}"></div>
 			<div class="space-top space-sides">
-				<a href="#" id="divass${appexNumber}CEssay" onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.essay.question"/></a>
-				<a href="#" id="divass${appexNumber}CMCQ"  onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.mc.question"/></a>
-				
-				<a href="#" id="divass${appexNumber}CQB" onClick="javascript:openQuestionBank(${appexNumber})" class="btn btn-default"><i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb" /></a>
-				
-				<a href="#" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('appex${appexNumber}')" class="btn btn-default pull-right"><i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
+				<div>
+
+                    <div class="dropdown">
+                      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.create.question"/>&nbsp;
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+                          <li><a href="javascript:void(0)" id="divass${appexNumber}CEssay" onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');"><i class="fa fa-align-justify text-primary"></i> <fmt:message key="authoring.create.essay.question"/></a></li>
+                          <li><a href="javascript:void(0)" id="divass${appexNumber}CMCQ" onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');"><i class="fa fa-list-ul text-primary"></i> <fmt:message key="authoring.create.mc.question"/></a></li>
+                          <li><a href="javascript:void(0)" id="divass${appexNumber}CQB" onClick="javascript:openQuestionBank(${appexNumber})"><i class="fa fa-bank text-primary"></i> <fmt:message key="authoring.create.question.qb" /></a></li>
+                          <li role="separator" class="divider"></li>
+                          <li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
+                          <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('appex${appexNumber}', 'mc', 'word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...</a></li>
+                        <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('appex${appexNumber}', 'mc', 'qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...</a></li>
+                      </ul>
+                    </div>
+				</div>
+
 			</div>
 			<div class="space-top space-sides space-bottom">
 				<div class="checkbox"><label for="divappex${appexNumber}NB">

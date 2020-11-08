@@ -263,20 +263,28 @@
 					<button id="createQuestionButton"
 							onClick="javascript:createQuestion('numQuestions', 'divq', 'divquestions', '', '')" 
 							type="button" class="btn btn-default">
-								<i class="fa fa-plus"></i> <fmt:message key="authoring.create.question"/>
+								<i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.create.question"/>
 					</button>
 					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
 					</button>
-					<ul class="dropdown-menu">
-						<li><a href="#" onClick="javascript:openQuestionBank()"> 
-							<i class="fa fa-upload"></i> <fmt:message key="authoring.create.question.qb"/>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a href="javascript:void(0)" onClick="javascript:openQuestionBank()"> 
+							<i class="fa fa-bank text-primary" ></i> <fmt:message key="authoring.create.question.qb"/>
 							</a>
 						</li>
+                        <li role="separator" class="divider"></li>
+						<li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
+						<li><a style="margin-left: 1em;" href="javascript:void(0)" id="importWordButton" onClick="javascript:importQTI('mcq', 'mc', 'word')">
+								<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
+                            </a>
+                        </li>	
+						<li><a style="margin-left: 1em;" href="javascript:void(0)" onClick="javascript:importQTI('mcq', 'mc', 'qti')" id="importQTIButton">
+								<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
+                            </a>
+                        </li>
 					</ul>
 				</div>
-				
-				<a href="#"  id="importQTIButton" onClick="javascript:importQTI('mcq', 'mc')" class="btn btn-default pull-right">	<i class="fa fa-upload"></i> <fmt:message key="authoring.template.basic.import.qti" /></a>
 			</span>
 			
 			<!-- Question Bank -->
