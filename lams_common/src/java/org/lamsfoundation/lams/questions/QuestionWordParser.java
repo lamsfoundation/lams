@@ -70,7 +70,7 @@ public class QuestionWordParser {
     /**
      * Extracts questions from IMS QTI zip file.
      */
-    public static Question[] parseWordFile(InputStream uploadedFileStream, String fileName)
+    public static Question[] parseWordFile(InputStream uploadedFileStream, String fileName, Set<String> limitType)
 	    throws XPathExpressionException, ZipFileUtilException, TransformerConfigurationException, IOException,
 	    SAXException, TikaException, ParserConfigurationException {
 	final String TEMP_IMAGE_FOLDER = ZipFileUtil.prepareTempDirectory(fileName);
@@ -258,24 +258,26 @@ public class QuestionWordParser {
 	    }
 
 	    Question question = new Question();
+	    if (answers.isEmpty()) {
+		if (!QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
+		    continue;
+		}
+	    } else {
+		if (!QuestionParser
+			.isQuestionTypeAcceptable(isMultipleResponse ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
+				: Question.QUESTION_TYPE_MULTIPLE_CHOICE, limitType, question)) {
+		    continue;
+		}
+		question.setAnswers(answers);
+	    }
+
 	    question.setResourcesFolderPath(TEMP_IMAGE_FOLDER);
 	    question.setTitle(title);
 	    question.setText(description);
 	    question.setFeedback(feedback);
 	    question.setLearningOutcomes(learningOutcomes);
 
-	    if (answers.isEmpty()) {
-		question.setType(Question.QUESTION_TYPE_ESSAY);
-	    } else {
-		question.setAnswers(answers);
-		if (isMultipleResponse) {
-		    question.setType(Question.QUESTION_TYPE_MULTIPLE_RESPONSE);
-		} else {
-		    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
-		}
-	    }
 	    questions.add(question);
-
 	}
 
 	return questions.toArray(Question.QUESTION_ARRAY_TYPE);

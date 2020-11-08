@@ -114,7 +114,7 @@ public class QuestionsController {
 	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
 
 	} else if (packageName.endsWith(".docx")) {
-	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName);
+	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName, limitType);
 
 	} else {
 	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);

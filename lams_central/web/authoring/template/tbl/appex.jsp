@@ -39,8 +39,8 @@
                           <li><a href="javascript:void(0)" id="divass${appexNumber}CQB" onClick="javascript:openQuestionBank(${appexNumber})"><i class="fa fa-bank text-primary"></i> <fmt:message key="authoring.create.question.qb" /></a></li>
                           <li role="separator" class="divider"></li>
                           <li class="dropdown-header"><fmt:message key="authoring.tbl.import.questions.from"/></li>
-                          <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('appex${appexNumber}', 'mc', 'word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...</a></li>
-                        <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('appex${appexNumber}', 'mc', 'qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...</a></li>
+                          <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,es', 'word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...</a></li>
+                        <li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,es', 'qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...</a></li>
                       </ul>
                     </div>
 				</div>

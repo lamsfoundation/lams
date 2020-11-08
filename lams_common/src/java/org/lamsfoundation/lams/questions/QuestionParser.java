@@ -611,7 +611,7 @@ public class QuestionParser {
     /**
      * Checks if given type has a correct value and should be processed. Also sets question property for convenience.
      */
-    private static boolean isQuestionTypeAcceptable(String type, Set<String> limitType, Question question) {
+    static boolean isQuestionTypeAcceptable(String type, Set<String> limitType, Question question) {
 	if ((type == null) || !Question.QUESTION_TYPES.contains(type)) {
 	    return false;
 	}
