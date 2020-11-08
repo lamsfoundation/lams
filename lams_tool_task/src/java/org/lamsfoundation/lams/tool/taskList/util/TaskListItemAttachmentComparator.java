@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.taskList.util;
 
 import java.util.Comparator;
@@ -40,7 +39,13 @@ public class TaskListItemAttachmentComparator implements Comparator<TaskListItem
     @Override
     public int compare(TaskListItemAttachment o1, TaskListItemAttachment o2) {
 	if (o1 != null && o2 != null) {
-	    return o1.getCreated().compareTo(o2.getCreated());
+	    int timestampComparision = o1.getCreated().compareTo(o2.getCreated());
+	    if (timestampComparision == 0) {
+		return o1.getUid() == null ? (o2.getUid() == null ? 0 : -1)
+			: (o2.getUid() == null ? 1 : o1.getUid().compareTo(o2.getUid()));
+	    } else {
+		return timestampComparision;
+	    }
 	} else if (o1 != null) {
 	    return 1;
 	} else {

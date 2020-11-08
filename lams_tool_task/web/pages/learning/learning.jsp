@@ -157,8 +157,9 @@
 		/**
 		 * Initialised Uppy as the file upload widget
 		 */
-		function initFileUpload(tmpFileUploadId, language) {
+		function initFileUpload(target, tmpFileUploadId, language) {
 			  var uppyProperties = {
+				  id : 'uppy-' + target,
 				  // upload immediately 
 				  autoProceed: true,
 				  allowMultipleUploads: true,
@@ -193,8 +194,7 @@
 			  }
 			  
 			  
-			  // global variable
-			  uppy = Uppy.Core(uppyProperties);
+			  let uppy = Uppy.Core(uppyProperties);
 			  // upload using Ajax
 			  uppy.use(Uppy.XHRUpload, {
 				  endpoint: LAMS_URL + 'tmpFileUpload',
@@ -204,18 +204,18 @@
 			  });
 			  
 			  uppy.use(Uppy.DragDrop, {
-				  target: '#image-upload-area',
+				  target: target,
 				  inline: true,
 				  height: 120,
 				  width: '100%'
 				});
 			  
 			  uppy.use(Uppy.Informer, {
-				  target: '#image-upload-area'
+				  target: target
 			  });
 			  
 			  uppy.use(Uppy.StatusBar, {
-				  target: '#image-upload-area',
+				  target: target,
 				  hideAfterFinish: false,
 				  hideUploadButton: true,
 				  hideRetryButton: true,
