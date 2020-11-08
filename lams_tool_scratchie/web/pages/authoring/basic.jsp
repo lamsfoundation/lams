@@ -82,8 +82,8 @@
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	}
 	
-    function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true',
+    function importQTI(type){
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?limitType=mc&collectionChoice=true&importType='+type,
     			    'QuestionFile','width=500,height=370,scrollbars=yes');
     }
   	
@@ -144,7 +144,19 @@
 		<a onclick="initNewItemHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="item-init-href">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.another.scratchie" />"></i>
 		</a>
+        
+       <div class="dropdown pull-right" style="padding-left: 1em;">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-plus text-primary"></i> <fmt:message key="label.authoring.import"/>&nbsp;
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.authoring.basic.import.word"/>...</a></li>
+            <li><a href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.authoring.basic.import.qti"/>...</a></li>
+           </ul>
+        </div>
 	</div>
+
 	
 	<!-- Question Bank -->
 	<div class="panel-group" id="question-bank-div" role="tablist" aria-multiselectable="true"> 
