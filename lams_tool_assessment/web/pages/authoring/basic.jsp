@@ -141,8 +141,8 @@
 		}
 	};
 	
-	function importQTI(){
-    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=true',
+	function importQTI(type){
+    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=true&importType='+type,
 			'QuestionFile','width=500,height=370,scrollbars=yes');
     }
 	
@@ -213,7 +213,7 @@
 </div>
 
 <c:if test="${!isAuthoringRestricted}">
-	<!-- Dropdown menu for choosing a question type -->
+    <!-- Dropdown menu for choosing a question type -->
 	<div id="add-question-div" class="form-inline form-group pull-right">
 		<select id="questionType" class="form-control input-sm">
 			<option selected="selected" value="1"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
@@ -228,14 +228,23 @@
 				<fmt:message key="label.authoring.basic.type.random.question" />
 			</option>
 		</select>
-		
-		<a onclick="initNewReferenceHref();return false;" href="#nogo" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
+
+        <a onclick="initNewReferenceHref();return false;" href="javascript:void(0)" class="btn btn-default btn-sm thickbox" id="newQuestionInitHref">  
 			<i class="fa fa-lg fa-plus-circle" aria-hidden="true" title="<fmt:message key="label.authoring.basic.add.question.to.pool" />"></i>
 		</a>
-		
-		<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default btn-sm loffset20">
-			<fmt:message key="label.authoring.basic.import.qti" /> 
-		</a>
+    
+        <!-- Import question widget -->
+        <div class="dropdown pull-right" style="padding-left: 1em;">
+          <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-plus text-primary"></i> <fmt:message key="authoring.title.import"/>&nbsp;
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="javascript:void(0)" id="divass${appexNumber}CQTI" onClick="javascript:importQTI('word')"><i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.authoring.basic.import.word"/>...</a></li>
+            <li><a href="javascript:void(0)" id="divass${appexNumber}CWord" onClick="javascript:importQTI('qti')"><i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.authoring.basic.import.qti"/>...</a></li>
+          </ul>
+        </div>
+                
 	</div>
 
 	<!-- Question Bank -->
