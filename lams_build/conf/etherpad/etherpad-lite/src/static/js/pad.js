@@ -75,7 +75,7 @@ var getParameters = [
   { name: "noColors",         checkVal: "true",  callback: function(val) { settings.noColors = true; $('#clearAuthorship').hide(); } },
   { name: "showControls",     checkVal: "true",  callback: function(val) { $('#editbar').css('display', 'flex') } },
   { name: "showChat",         checkVal: "true", callback: function(val) { $('#chaticon').show(); } },
-  { name: "showLineNumbers",  checkVal: "false", callback: function(val) { settings.LineNumbersDisabled = true; } },
+  { name: "showLineNumbers",  checkVal: null, callback: function(val) { settings.LineNumbersDisabled = val == 'false'; } },
   { name: "useMonospaceFont", checkVal: "true",  callback: function(val) { settings.useMonospaceFontGlobal = true; } },
   // If the username is set as a parameter we should set a global value that we can call once we have initiated the pad.
   { name: "userName",         checkVal: null,    callback: function(val) { settings.globalUserName = decodeURIComponent(val); clientVars.userName = decodeURIComponent(val); } },
