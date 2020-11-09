@@ -34,7 +34,8 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 	    + "ORDER BY l.organisation.name, l.lessonName";
 
     private static final String FIND_QUESTION_ACTIVITIES_FILTERED_BY_TOOL_CONTENT_ID = "SELECT c FROM QbToolQuestion AS q, ToolContent AS c "
-	    + "WHERE c.toolContentId = q.toolContentId AND q.qbQuestion.uid = :qbQuestionUid AND q.toolContentId IN (:toolContentIds)";
+	    + "WHERE c.toolContentId = q.toolContentId AND c.tool.toolSignature IN ('laasse10', 'lascrt11') AND "
+	    + "q.qbQuestion.uid = :qbQuestionUid AND q.toolContentId IN (:toolContentIds)";
 
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
