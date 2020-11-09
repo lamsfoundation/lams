@@ -1578,6 +1578,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
+		if (!isLearnerEligibleForMark(user.getUserId(), contentId)) {
+		    continue;
+		}
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(user.getFirstName() + " " + user.getLastName());
 		row.addCell(Long.valueOf(summary.getTotalAttempts()));
