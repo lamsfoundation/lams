@@ -476,6 +476,9 @@ public class AuthoringController {
 		    break;
 		}
 	    }
+
+	    request.setAttribute("oldQbQuestionUid", oldQbQuestionUid);
+	    request.setAttribute("newQbQuestionUid", qbQuestionUid);
 	}
 	request.setAttribute("qbQuestionModified", questionModificationStatus);
 
