@@ -125,6 +125,9 @@
    		<property name="qbService">
    			<ref bean="qbService"/>
    		</property>
+   		<property name="outcomeService">
+   			<ref bean="outcomeService"/>
+   		</property>
     </bean>
 
     <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

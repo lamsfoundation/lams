@@ -69,6 +69,9 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -182,6 +185,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private IEventNotificationService eventNotificationService;
 
     private IQbService qbService;
+
+    private IOutcomeService outcomeService;
 
     // *******************************************************************************
     // Service method
@@ -3357,6 +3362,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	this.qbService = qbService;
     }
 
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
+    }
+
     public AssessmentOutputFactory getAssessmentOutputFactory() {
 	return assessmentOutputFactory;
     }
@@ -3421,6 +3430,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
      *
      * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON)
 	    throws IOException {
@@ -3619,6 +3629,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			throw new IllegalArgumentException(
 				"Implement other Question Bank modification levels in Assessment tool");
 		    }
+		} else {
+		    // only process learning outcomes when this is not a modification, i.e. it is a new question
+		    ArrayNode learningOutcomesJSON = JsonUtil.optArray(questionJSONData, RestTags.LEARNING_OUTCOMES);
+		    if (learningOutcomesJSON != null && learningOutcomesJSON.size() > 0) {
+			for (JsonNode learningOutcomeJSON : learningOutcomesJSON) {
+			    String learningOutcomeText = learningOutcomeJSON.asText();
+			    learningOutcomeText = learningOutcomeText.strip();
+			    List<Outcome> learningOutcomes = userManagementService.findByProperty(Outcome.class, "name",
+				    learningOutcomeText);
+			    Outcome learningOutcome = null;
+			    if (learningOutcomes.isEmpty()) {
+				learningOutcome = outcomeService.createOutcome(learningOutcomeText, userID);
+			    } else {
+				learningOutcome = learningOutcomes.get(0);
+			    }
+
+			    OutcomeMapping outcomeMapping = new OutcomeMapping();
+			    outcomeMapping.setOutcome(learningOutcome);
+			    outcomeMapping.setQbQuestionId(qbQuestion.getQuestionId());
+			    userManagementService.save(outcomeMapping);
+			}
+		    }
 		}
 
 		// Store it back into JSON so Scratchie can read it
@@ -3634,7 +3666,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		// all questions need to end up in user's private collection
 		if (addToCollection) {
-		    // qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
 		    collectionUUIDs.add(uuid);
 		}
 	    }

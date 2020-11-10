@@ -63,5 +63,6 @@ public class RestTags {
     public static String ANSWER_TEXT = "answerText";
     public static String DISPLAY_ORDER = "displayOrder";
     public static String CORRECT = "correct";
+    public static String LEARNING_OUTCOMES = "learningOutcomes";
 
 }

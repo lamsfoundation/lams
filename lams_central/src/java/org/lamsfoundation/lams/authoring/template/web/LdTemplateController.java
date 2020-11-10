@@ -1462,6 +1462,8 @@ public abstract class LdTemplateController {
 	    }
 
 	    assessment.setDefaultGrade(defaultGrade);
+
+	    assessment.setLearningOutcomes(question.getLearningOutcomes());
 	}
 
 	return assessments;
