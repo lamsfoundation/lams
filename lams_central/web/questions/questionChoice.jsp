@@ -136,6 +136,15 @@
 				// FF does not seem to do it right
 				$(this).attr('checked', $(this).is(':checked'));
 			});
+			
+			// as the form HTML is being passed, not its real values
+			// we need to alter HTML manually on collection change
+			$('#collectionUid').change(function(){
+				let collectionSelect = $(this),
+					value = collectionSelect.val();
+				$('option', collectionSelect).removeAttr('selected');
+				$('option[value="' + value + '"]', collectionSelect).attr('selected', 'selected');
+			});
 		});
 	</script>
 </lams:head>
@@ -161,7 +170,7 @@
 			<!-- Choose a collection where questions should be imported to -->
 			<label id="collectionSelect">
 				<fmt:message key="label.questions.choice.collection" />&nbsp;
-				<select name="collectionUid">
+				<select name="collectionUid" id="collectionUid">
 					<c:forEach items="${collections}" var="collection">
 						<option value="${collection.uid}" ${empty collection.userId ? "selected" : ""}>
 							<c:out value="${collection.name}" />
