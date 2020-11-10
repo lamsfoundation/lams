@@ -62,6 +62,9 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -114,6 +117,7 @@ import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -162,6 +166,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private IQbService qbService;
 
     private ILearnerService learnerService;
+
+    private IOutcomeService outcomeService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
 
@@ -2622,6 +2628,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	this.qbService = qbService;
     }
 
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
+    }
+
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
@@ -2666,6 +2676,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * "questionText", "displayOrder" (Integer) and a ArrayNode "answers". The answers entry should be ArrayNode
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
@@ -2747,6 +2758,28 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		qbQuestion.setQbOptions(newOptions);
+
+		// only process learning outcomes when this is not a modification, i.e. it is a new question
+		ArrayNode learningOutcomesJSON = JsonUtil.optArray(questionData, RestTags.LEARNING_OUTCOMES);
+		if (learningOutcomesJSON != null && learningOutcomesJSON.size() > 0) {
+		    for (JsonNode learningOutcomeJSON : learningOutcomesJSON) {
+			String learningOutcomeText = learningOutcomeJSON.asText();
+			learningOutcomeText = learningOutcomeText.strip();
+			List<Outcome> learningOutcomes = userManagementService.findByProperty(Outcome.class, "name",
+				learningOutcomeText);
+			Outcome learningOutcome = null;
+			if (learningOutcomes.isEmpty()) {
+			    learningOutcome = outcomeService.createOutcome(learningOutcomeText, userID);
+			} else {
+			    learningOutcome = learningOutcomes.get(0);
+			}
+
+			OutcomeMapping outcomeMapping = new OutcomeMapping();
+			outcomeMapping.setOutcome(learningOutcome);
+			outcomeMapping.setQbQuestionId(qbQuestion.getQuestionId());
+			userManagementService.save(outcomeMapping);
+		    }
+		}
 	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
 		addToCollection = true;
 	    }

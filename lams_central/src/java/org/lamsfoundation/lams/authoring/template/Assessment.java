@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.authoring.template;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.lamsfoundation.lams.rest.RestTags;
+import org.lamsfoundation.lams.util.JsonUtil;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -57,6 +59,7 @@ public class Assessment {
     boolean multipleAnswersAllowed = false; // only used if type == 1
     Set<AssessMCAnswer> answers = null; // only used if type == 1
     String uuid = null; // used when QTI gets imported and it contains QB question UUID
+    List<String> learningOutcomes;
 
     public void setType(short type) {
 	this.type = type;
@@ -122,6 +125,14 @@ public class Assessment {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
 
+    public List<String> getLearningOutcomes() {
+	return learningOutcomes;
+    }
+
+    public void setLearningOutcomes(List<String> learningOutcomes) {
+	this.learningOutcomes = learningOutcomes;
+    }
+
     public String getUuid() {
 	return uuid;
     }
@@ -130,7 +141,7 @@ public class Assessment {
 	this.uuid = uuid;
     }
 
-    public ObjectNode getAsObjectNode(int displayOrder) {
+    public ObjectNode getAsObjectNode(int displayOrder) throws IOException {
 	ObjectNode json = JsonNodeFactory.instance.objectNode();
 	json.put(RestTags.QUESTION_TITLE, title != null ? title : "");
 	json.put(RestTags.QUESTION_TEXT, text != null ? text : "");
@@ -150,6 +161,9 @@ public class Assessment {
 	    json.put("incorrectAnswerNullifiesMark", multipleAnswersAllowed);
 	} else {
 	    json.put("type", ASSESSMENT_QUESTION_TYPE_ESSAY);
+	}
+	if (learningOutcomes != null && !learningOutcomes.isEmpty()) {
+	    json.set(RestTags.LEARNING_OUTCOMES, JsonUtil.readArray(learningOutcomes));
 	}
 	return json;
     }
