@@ -155,4 +155,6 @@ public interface IQbService {
     Collection<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> toolContentIds);
 
     void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid, long newQbQuestionUid);
+
+    void fillVersionMap(QbQuestion qbQuestion);
 }

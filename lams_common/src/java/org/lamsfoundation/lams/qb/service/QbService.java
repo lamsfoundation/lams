@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -757,6 +758,16 @@ public class QbService implements IQbService {
 		}
 	    }
 	}
+    }
+
+    @Override
+    public void fillVersionMap(QbQuestion qbQuestion) {
+	List<QbQuestion> allVersions = getQuestionsByQuestionId(qbQuestion.getQuestionId());
+	Map<Integer, Long> versionMap = new TreeMap<>();
+	for (QbQuestion questionVersion : allVersions) {
+	    versionMap.put(questionVersion.getVersion(), questionVersion.getUid());
+	}
+	qbQuestion.setVersionMap(versionMap);
     }
 
     private static Integer getUserId() {
