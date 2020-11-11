@@ -115,6 +115,7 @@ public class TblMonitoringController {
 	request.setAttribute("questions", questionDtos);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
 
@@ -255,6 +256,7 @@ public class TblMonitoringController {
 	request.setAttribute("sessions", sessions);
 	request.setAttribute("questionDtos", tblQuestionDtos);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	return "pages/tblmonitoring/assessmentStudentChoices";
     }
 

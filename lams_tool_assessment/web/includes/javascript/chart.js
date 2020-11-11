@@ -1,4 +1,4 @@
-function drawCompletionCharts(toolContentId, animate) {
+function drawCompletionCharts(toolContentId, useGroups,animate) {
 	$.ajax({
 		'url' : WEB_APP_URL + 'monitoring/getCompletionChartsData.do',
 		'data': {
@@ -8,7 +8,7 @@ function drawCompletionCharts(toolContentId, animate) {
 		'success'  : function(data) {
 			// draw charts for the first time
 			drawActivityCompletionChart(data, animate);
-			drawAnsweredQuestionsChart(data, animate);
+			drawAnsweredQuestionsChart(data, useGroups, animate);
 		}
 	});
 	
@@ -19,7 +19,7 @@ function drawCompletionCharts(toolContentId, animate) {
 		
 		// set up update interval for the charts
 		completionChartInterval = window.setInterval(function(){
-			drawCompletionCharts(toolContentId, animate);
+			drawCompletionCharts(toolContentId, useGroups,animate);
 		}, COMPLETION_CHART_UPDATE_INTERVAL);
 	}
 }
@@ -108,7 +108,7 @@ function drawActivityCompletionChart(data, animate){
 	});
 }
 
-function drawAnsweredQuestionsChart(data, animate){
+function drawAnsweredQuestionsChart(data, useGroups, animate){
 	if (!data.answeredQuestionsByUsers) {
 		return;
 	}
@@ -167,11 +167,11 @@ function drawAnsweredQuestionsChart(data, animate){
 							// prevent scale to change on each update
 							// set suggested max number of students to 3/4
 							// of all possible learners
-							suggestedMax  : 3 * data.possibleLearners / 4
+							suggestedMax  : Math.max(2, Math.floor(3 * (useGroups ? data.sessionCount : data.possibleLearners) / 4))
 						},
 						scaleLabel : {
 							display : true,
-							labelString : LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS,
+							labelString : useGroups ? LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS,
 							fontSize : 14
 						}
 					}
