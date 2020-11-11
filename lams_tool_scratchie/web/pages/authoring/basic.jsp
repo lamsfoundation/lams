@@ -69,7 +69,7 @@
 		);
 	}
 	
-	function changeItemQuestionVersion(itemIndex, newQbQuestionUid) {
+	function changeItemQuestionVersion(itemIndex, oldQbQuestionUid, newQbQuestionUid) {
 		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
 		$(itemTargetDiv).load(
 			url,
@@ -80,6 +80,17 @@
 			},
 			function(){
 				refreshThickbox();
+				
+				// check if we are in main authoring environment
+				if (typeof window.parent.GeneralLib != 'undefined') {
+					// check if any other activities require updating
+					let activitiesWithQuestion = window.parent.GeneralLib.checkQuestionExistsInToolActivities(oldQbQuestionUid);
+					if (activitiesWithQuestion.length > 1) {
+						// update, if teacher agrees to it
+						window.parent.GeneralLib.replaceQuestionInToolActivities('${sessionMap.toolContentID}', activitiesWithQuestion,
+																				 oldQbQuestionUid, newQbQuestionUid);
+					}
+				}
 			}
 		);
 	}

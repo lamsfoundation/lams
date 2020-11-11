@@ -94,7 +94,9 @@
 										 <c:set var="maxQuestionVersion" value="${otherVersion.key}" />
 										 
 							    		<li <c:if test="${item.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
-							    			<a href="#nogo" onclick="javascript:changeItemQuestionVersion(${status.index}, ${otherVersion.value});">Version ${otherVersion.key}</a>
+							    			<a href="#nogo" onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
+							    				Version ${otherVersion.key}
+							    			</a>
 							    		</li>
 							    	</c:forEach>
 								</ul>
