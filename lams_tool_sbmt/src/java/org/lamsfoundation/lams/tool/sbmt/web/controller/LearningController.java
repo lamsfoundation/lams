@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -199,8 +198,6 @@ public class LearningController implements SbmtConstants {
 		    IEventNotificationService.DELIVERY_METHOD_MAIL);
 	}
 
-	SortedMap<SubmitUserDTO, List<FileDetailsDTO>> submittedFilesMap = submitFilesService
-		.getFilesUploadedBySession(toolSessionID, request.getLocale());
 	// support for leader select feature
 	SubmitUser groupLeader = content.isUseSelectLeaderToolOuput()
 		? submitFilesService.checkLeaderSelectToolForSessionLeader(learner, toolSessionID)
@@ -210,11 +207,8 @@ public class LearningController implements SbmtConstants {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null) {
-		List<SubmitUser> groupUsers = submitFilesService.getUsersBySession(toolSessionID);
-		request.setAttribute(SbmtConstants.ATTR_GROUP_USERS, groupUsers);
-		request.setAttribute(SbmtConstants.ATTR_SUBMIT_FILES, submittedFilesMap);
 		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
-		return "learner/waitForLeaderTimeLimit";
+		return "learner/waitforleader";
 	    }
 
 	    // forwards to the waitForLeader pages
@@ -227,13 +221,13 @@ public class LearningController implements SbmtConstants {
 		if (filesUploadedByLeader == null) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.launch.time.limit");
-		    return "learner/waitForLeaderTimeLimit";
+		    return "learner/waitforleader";
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		if (!groupLeader.isFinished()) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
-		    return "learner/waitForLeaderTimeLimit";
+		    return "learner/waitforleader";
 		}
 	    }
 
