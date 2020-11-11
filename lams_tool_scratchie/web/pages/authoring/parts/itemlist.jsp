@@ -97,7 +97,7 @@
 							    			<a href="#nogo" 
 							    			   title="<fmt:message key="label.authoring.question.version.change.tooltip" />"
 							    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
-							    				  <fmt:message key="label.authoring.question.version" /> ${otherVersion.key}
+							    				  <fmt:message key="label.authoring.question.version" />&nbsp;${otherVersion.key}
 							    			</a>
 							    			<a href="#nogo" class="pull-right"
 							    			   title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
@@ -115,7 +115,7 @@
 				
 				<td style="width: 3%">
 					<c:if test="${not empty maxOtherVersion and item.qbQuestion.version < maxOtherVersion.key}">
-						<i class="fa fa-exclamation newer-version-prompt" title="<fmt:message key="label.authoring.question.version.newer.tooltip" />"
+						<i class="fa fa-exclamation-triangle newer-version-prompt" data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.question.version.newer.tooltip" />" 
 						   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${maxOtherVersion.value}", "_blank")'>
 					</i>
 					</c:if>

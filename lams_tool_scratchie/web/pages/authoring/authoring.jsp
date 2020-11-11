@@ -32,6 +32,8 @@
 		.newer-version-prompt {
 			text-align: left;
 			margin-top: 6px;
+			color: orange;
+			font-size: 1.3em;
 		}
 		.question-version-dropdown {
 			margin-top: 3px;
@@ -66,6 +68,9 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);	    	
         }
+        $(document).ready(function(){
+        	$('[data-toggle="tooltip"]').tooltip();
+        });		   
     </script>
  
 </lams:head>
