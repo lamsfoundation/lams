@@ -1061,7 +1061,7 @@ public class MonitoringController {
 
 	String searchPhrase = request.getParameter("searchPhrase");
 	Integer pageNumber = WebUtil.readIntParam(request, "pageNumber", true);
-	if (pageNumber == null) {
+	if (pageNumber == null || pageNumber < 1) {
 	    pageNumber = 1;
 	}
 	// are the learners sorted by the most completed first?
