@@ -79,7 +79,7 @@
 				    <c:choose>
 						<c:when test="${fn:length(item.qbQuestion.versionMap) == 1}">
 							<button class="btn btn-default btn-xs dropdown-toggle2 question-version-dropdown" disabled="disabled">
-							    Version ${item.qbQuestion.version}
+							   <fmt:message key="label.authoring.question.version" /> ${item.qbQuestion.version}
 							</button>
 						</c:when>
 			
@@ -95,14 +95,14 @@
 										 
 							    		<li <c:if test="${item.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
 							    			<a href="#nogo" 
-							    			   title="Change to this version"
+							    			   title="<fmt:message key="label.authoring.question.version.change.tooltip" />"
 							    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
-							    				Version ${otherVersion.key}
+							    				  <fmt:message key="label.authoring.question.version" /> ${otherVersion.key}
 							    			</a>
 							    			<a href="#nogo" class="pull-right"
-							    			   title="See this version's stats page"
+							    			   title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
 							    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${otherVersion.value}", "_blank")'>
-								    			<i class='fa fa-bar-chart'></i>
+								    			  <i class='fa fa-bar-chart'></i>
 											</a>
 							    		</li>
 							    	</c:forEach>
@@ -115,7 +115,7 @@
 				
 				<td style="width: 3%">
 					<c:if test="${not empty maxOtherVersion and item.qbQuestion.version < maxOtherVersion.key}">
-						<i class="fa fa-exclamation newer-version-prompt" title="There is a newer version of this question"
+						<i class="fa fa-exclamation newer-version-prompt" title="<fmt:message key="label.authoring.question.version.newer.tooltip" />"
 						   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${maxOtherVersion.value}", "_blank")'>
 					</i>
 					</c:if>
