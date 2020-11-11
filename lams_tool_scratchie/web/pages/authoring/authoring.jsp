@@ -36,6 +36,17 @@
 		.question-version-dropdown {
 			margin-top: 3px;
 		}
+		
+		.question-version-dropdown .dropdown-menu {
+			min-width: 160px;
+		}
+		
+		.question-version-dropdown li a {
+			display: inline-block;
+		}
+		.question-version-dropdown li.disabled a:first-child {
+			text-decoration: underline;
+		}
 	</style>
 	
 	<script>

@@ -75,7 +75,7 @@
 	       			</span>
 				</td>
 				<td style="width:1%">
-				    <c:set var="maxQuestionVersion" value="1" />
+				    <c:set var="maxOtherVersion" />
 				    <c:choose>
 						<c:when test="${fn:length(item.qbQuestion.versionMap) == 1}">
 							<button class="btn btn-default btn-xs dropdown-toggle2 question-version-dropdown" disabled="disabled">
@@ -91,12 +91,19 @@
 								
 								<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 									<c:forEach items="${item.qbQuestion.versionMap}" var="otherVersion">
-										 <c:set var="maxQuestionVersion" value="${otherVersion.key}" />
+										 <c:set var="maxOtherVersion" value="${otherVersion}" />
 										 
 							    		<li <c:if test="${item.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
-							    			<a href="#nogo" onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
+							    			<a href="#nogo" 
+							    			   title="Change to this version"
+							    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
 							    				Version ${otherVersion.key}
 							    			</a>
+							    			<a href="#nogo" class="pull-right"
+							    			   title="See this version's stats page"
+							    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${otherVersion.value}", "_blank")'>
+								    			<i class='fa fa-bar-chart'></i>
+											</a>
 							    		</li>
 							    	</c:forEach>
 								</ul>
@@ -107,8 +114,10 @@
 				</td>
 				
 				<td style="width: 3%">
-					<c:if test="${item.qbQuestion.version < maxQuestionVersion}">
-						<i class="fa fa-exclamation newer-version-prompt" title="There is a newer version of this question"></i>
+					<c:if test="${not empty maxOtherVersion and item.qbQuestion.version < maxOtherVersion.key}">
+						<i class="fa fa-exclamation newer-version-prompt" title="There is a newer version of this question"
+						   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${maxOtherVersion.value}", "_blank")'>
+					</i>
 					</c:if>
 				</td>
 				

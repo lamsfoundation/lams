@@ -70,6 +70,10 @@
 	}
 	
 	function changeItemQuestionVersion(itemIndex, oldQbQuestionUid, newQbQuestionUid) {
+		if (oldQbQuestionUid == newQbQuestionUid) {
+			return;
+		}
+		
 		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
 		$(itemTargetDiv).load(
 			url,
