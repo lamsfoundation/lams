@@ -93,10 +93,6 @@ public interface SbmtConstants {
     
     public static final String ATTR_SUBMIT_FILES = "submittedFilesMap";
     
-    public static final String WAIT_FOR_LEADER = "waitForLeader";
-    
-    public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
-    
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     
     public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";

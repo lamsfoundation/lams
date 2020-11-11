@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
 <lams:head>
@@ -19,29 +20,15 @@
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${content.title}">
+	<lams:Page type="learner" title="${sessionMap.title}">
 	
-				
-		<c:if test="${isLeadershipEnabled}">
-			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
-		</c:if>
-	
-		
-		<h4>
-			<fmt:message key="label.waiting.for.leader" />
-		</h4>
+		<div class="panel">
+			<c:out value="${sessionMap.instruction}" escapeXml="false" />
+		</div>
 
-		<div>
-			<fmt:message key="label.users.from.group" />
-		</div>
-		
-		<div>
-			<c:forEach var="user" items="${groupUsers}" varStatus="status">
-				<div class="user">
-					<c:out value="${user.firstName}" escapeXml="true"/> <c:out value="${user.lastName}" escapeXml="true"/>
-				</div>
-			</c:forEach>
-		</div>
+		<h4>
+			<fmt:message key="${waitingMessageKey}" />
+		</h4>
 		
 		<button name="refreshButton" onclick="refresh();" class="btn btn-sm btn-primary pull-right">
 			<fmt:message key="label.refresh" />
