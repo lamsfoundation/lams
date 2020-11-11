@@ -68,6 +68,22 @@
 			}
 		);
 	}
+	
+	function changeItemQuestionVersion(itemIndex, newQbQuestionUid) {
+		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
+		$(itemTargetDiv).load(
+			url,
+			{
+				itemIndex: itemIndex,
+				sessionMapID: "${sessionMapID}",
+				newQbQuestionUid : newQbQuestionUid
+			},
+			function(){
+				refreshThickbox();
+			}
+		);
+	}
+	
 	function initNewItemHref() {
 		var itemTypeDropdown = document.getElementById("item-type");
 		var itemType = itemTypeDropdown.value;

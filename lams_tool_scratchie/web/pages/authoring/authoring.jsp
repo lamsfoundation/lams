@@ -24,6 +24,18 @@
 		#add-question-div {
 			margin-top: -5px;
 		}
+		.question-type-alert {
+			white-space: nowrap;
+			padding-top: 2px;
+			padding-bottom: 2px;
+		}
+		.newer-version-prompt {
+			text-align: left;
+			margin-top: 6px;
+		}
+		.question-version-dropdown {
+			margin-top: 3px;
+		}
 	</style>
 	
 	<script>

@@ -60,12 +60,10 @@
 				</td>
 				<td style="padding-top:15px; padding-bottom:15px;">
 					<c:out value="${item.qbQuestion.name}" escapeXml="true"/>
-					
-				    <span class='pull-right alert-info btn-xs loffset5 roffset5'>
-				    	v.&nbsp;${item.qbQuestion.version}
-				    </span>
-				    
-				   	<span class='pull-right alert-info btn-xs'>
+				</td>
+				
+				<td style="width:1%">
+					<span class='alert-info btn-xs question-type-alert'>
 						<c:choose>
 							<c:when test="${item.qbQuestion.type == 1}">
 								<fmt:message key="label.type.multiple.choice" />
@@ -75,6 +73,41 @@
 							</c:when>
 						</c:choose>
 	       			</span>
+				</td>
+				<td style="width:1%">
+				    <c:set var="maxQuestionVersion" value="1" />
+				    <c:choose>
+						<c:when test="${fn:length(item.qbQuestion.versionMap) == 1}">
+							<button class="btn btn-default btn-xs dropdown-toggle2 question-version-dropdown" disabled="disabled">
+							    Version ${item.qbQuestion.version}
+							</button>
+						</c:when>
+			
+						<c:otherwise>
+							<div class="dropdown question-version-dropdown">
+								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							    	Version ${item.qbQuestion.version}&nbsp;<span class="caret"></span>
+								</button>
+								
+								<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									<c:forEach items="${item.qbQuestion.versionMap}" var="otherVersion">
+										 <c:set var="maxQuestionVersion" value="${otherVersion.key}" />
+										 
+							    		<li <c:if test="${item.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
+							    			<a href="#nogo" onclick="javascript:changeItemQuestionVersion(${status.index}, ${otherVersion.value});">Version ${otherVersion.key}</a>
+							    		</li>
+							    	</c:forEach>
+								</ul>
+	
+							</div>			
+						</c:otherwise>
+					</c:choose>
+				</td>
+				
+				<td style="width: 3%">
+					<c:if test="${item.qbQuestion.version < maxQuestionVersion}">
+						<i class="fa fa-exclamation newer-version-prompt" title="There is a newer version of this question"></i>
+					</c:if>
 				</td>
 				
 				<c:if test="${!isAuthoringRestricted}">
