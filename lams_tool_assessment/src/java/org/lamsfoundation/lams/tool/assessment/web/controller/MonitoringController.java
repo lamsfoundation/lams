@@ -250,6 +250,7 @@ public class MonitoringController {
 	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
 	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
 
+	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
 	Map<Integer, Integer> answeredQuestionsByUsers = service.getCountAnsweredQuestionsByUsers(toolContentId);
 	if (!answeredQuestionsByUsers.isEmpty()) {
 	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));

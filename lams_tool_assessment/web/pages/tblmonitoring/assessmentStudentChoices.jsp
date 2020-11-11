@@ -18,7 +18,7 @@
 		COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, true);
+		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, true);
 	});
 		
 	function exportExcel(){

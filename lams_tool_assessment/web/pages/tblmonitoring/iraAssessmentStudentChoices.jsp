@@ -15,7 +15,7 @@
 		COMPLETION_CHART_UPDATE_INTERVAL = 0;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, false);
+		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, false);
 	});
 			
 	function exportExcel(){

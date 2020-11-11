@@ -316,7 +316,7 @@
 		}
 		initInidividualTimeLimitAutocomplete();
 		
-		drawCompletionCharts(${assessment.contentId}, true);
+		drawCompletionCharts(${assessment.contentId}, ${assessment.useSelectLeaderToolOuput}, true);
 	});
 
 	function resizeJqgrid(jqgrids) {
