@@ -68,9 +68,9 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);	    	
         }
-        $(document).ready(function(){
-        	$('[data-toggle="tooltip"]').tooltip();
-        });		   
+        
+        // avoid name clash between bootstrap and jQuery UI
+        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
     </script>
  
 </lams:head>

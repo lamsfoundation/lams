@@ -38,6 +38,10 @@
 	if (qbMessage) {
 		alert(qbMessage);
 	}
+	
+    $(document).ready(function(){
+    	$('[data-toggle="tooltip"]').bootstrapTooltip();
+    });	
 </script>
 
 <!-- Dropdown menu for choosing a question from question bank -->
