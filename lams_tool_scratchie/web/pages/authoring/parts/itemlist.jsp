@@ -66,7 +66,7 @@
 					<c:out value="${item.qbQuestion.name}" escapeXml="true"/>
 				</td>
 				
-				<td style="width:1%">
+				<td style="width:1%; vertical-align: top">
 					<span class='alert-info btn-xs question-type-alert'>
 						<c:choose>
 							<c:when test="${item.qbQuestion.type == 1}">
@@ -78,7 +78,7 @@
 						</c:choose>
 	       			</span>
 				</td>
-				<td style="width:1%">
+				<td style="width:3%">
 				    <c:set var="maxOtherVersion" />
 				    <c:choose>
 						<c:when test="${fn:length(item.qbQuestion.versionMap) == 1}">
@@ -90,7 +90,7 @@
 						<c:otherwise>
 							<div class="dropdown question-version-dropdown">
 								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							    	Version ${item.qbQuestion.version}&nbsp;<span class="caret"></span>
+							    	<fmt:message key="label.authoring.question.version" />&nbsp;${item.qbQuestion.version}&nbsp;<span class="caret"></span>
 								</button>
 								
 								<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -119,14 +119,21 @@
 				
 				<td style="width: 3%">
 					<c:if test="${not empty maxOtherVersion and item.qbQuestion.version < maxOtherVersion.key}">
-						<i class="fa fa-exclamation-triangle newer-version-prompt" data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.question.version.newer.tooltip" />" 
+						<i class="fa fa-exclamation-triangle newer-version-prompt" data-toggle="tooltip" data-placement="top"
+						   title="<fmt:message key="label.authoring.question.version.newer.tooltip" />" 
 						   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${maxOtherVersion.value}", "_blank")'>
 					</i>
 					</c:if>
 				</td>
 				
+				<td align="center" style="width:3%">
+		    		<i class='fa fa-bar-chart' title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
+	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${item.qbQuestion.version}", "_blank")'>
+	    			</i>
+				</td>	
+				
 				<c:if test="${!isAuthoringRestricted}">
-					<td class="arrows" style="width:5%">
+					<td class="arrows" style="width:3%">
 						<c:if test="${not status.first}">
 							<lams:Arrow state="up" titleKey="label.up" onclick="return upItem(${status.index})"/>
 						</c:if>
@@ -137,7 +144,7 @@
 					</td>
 				</c:if>
 					
-				<td align="center" style="width:5%">
+				<td align="center" style="width:3%">
 					<c:set var="editItemUrl" >
 						<c:url value='/authoring/editItem.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>		
@@ -147,7 +154,7 @@
 				</td>			
 				
 				<c:if test="${!isAuthoringRestricted}">
-					<td align="center" style="width:5%">
+					<td align="center" style="width:3%">
 						<i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
 							onclick="removeItem(${status.index})"></i>
 					</td>

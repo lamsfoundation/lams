@@ -26,17 +26,16 @@
 		}
 		.question-type-alert {
 			white-space: nowrap;
-			padding-top: 2px;
-			padding-bottom: 2px;
+			display: inline-block;
+			margin-top: 8px;
 		}
 		.newer-version-prompt {
 			text-align: left;
-			margin-top: 6px;
 			color: orange;
 			font-size: 1.3em;
 		}
 		.question-version-dropdown {
-			margin-top: 3px;
+			margin-top: -3px;
 		}
 		
 		.question-version-dropdown .dropdown-menu {
