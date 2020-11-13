@@ -98,12 +98,12 @@
 										 <c:set var="maxOtherVersion" value="${otherVersion}" />
 										 
 							    		<li <c:if test="${item.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
-							    			<a href="#nogo" 
+							    			<a href="#nogo" data-toggle="tooltip" data-placement="top"
 							    			   title="<fmt:message key="label.authoring.question.version.change.tooltip" />"
 							    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${item.qbQuestion.uid}, ${otherVersion.value})">
 							    				  <fmt:message key="label.authoring.question.version" />&nbsp;${otherVersion.key}
 							    			</a>
-							    			<a href="#nogo" class="pull-right"
+							    			<a href="#nogo" class="pull-right" data-toggle="tooltip" data-placement="top"
 							    			   title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
 							    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${otherVersion.value}", "_blank")'>
 								    			  <i class='fa fa-bar-chart'></i>
@@ -127,7 +127,7 @@
 				</td>
 				
 				<td align="center" style="width:3%">
-		    		<i class='fa fa-bar-chart' title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
+		    		<i class='fa fa-bar-chart' data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
 	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${item.qbQuestion.version}", "_blank")'>
 	    			</i>
 				</td>	
