@@ -66,6 +66,7 @@ public class NotebookPrintDTO {
     private String title;
     private String instructions;
     private boolean groupedActivity;
+	private boolean allowRichEditor;
     private Map<String, List<NotebookPrintUserDTO>> usersBySession = new TreeMap<>();
 
     public String getTitle() {
@@ -90,6 +91,14 @@ public class NotebookPrintDTO {
 
     public void setGroupedActivity(boolean groupedActivity) {
 	this.groupedActivity = groupedActivity;
+    }
+
+    public boolean isAllowRichEditor() {
+    return allowRichEditor;
+    }
+
+    public void setAllowRichEditor(boolean allowRichEditor) {
+    this.allowRichEditor = allowRichEditor;
     }
 
     public Map<String, List<NotebookPrintUserDTO>> getUsersBySession() {
