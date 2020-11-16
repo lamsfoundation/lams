@@ -23,13 +23,11 @@
 
 package org.lamsfoundation.lams.learning.web.controller;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.AssertionFailure;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
@@ -54,7 +52,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LoadToolActivityController {
     private static Logger log = Logger.getLogger(LoadToolActivityController.class);
     @Autowired
-    private ILearnerFullService learnerService; 
+    private ILearnerFullService learnerService;
     @Autowired
     private ActivityMapping activityMapping;
 
@@ -106,6 +104,22 @@ public class LoadToolActivityController {
 	    log.warn(e.getMessage());
 	    request.setAttribute("messageKey", e.getMessage());
 	    return "msgContent";
+	} catch (AssertionFailure e) {
+	    /*
+	     * If this error is
+	     * "null id in org.lamsfoundation.lams.tool.GroupedToolSession entry (don't flush the Session after an exception occurs)"
+	     * then it is probably because two users tried to create a tool session and the same time.
+	     * Our DB unique key kicked in and prevented a duplicate session.
+	     * Our Transaction retry interceptor tried to repeat the transaction and failed because the transaction is
+	     * marked as rollback and we flush it.
+	     * This rollback should not happen as we create a new (nested) transaction for each retry, but it does not
+	     * seem
+	     * to work very well with current libraries.
+	     * What we do now is just silence the error log.
+	     * The exception we get means: there is already a session. And this is what we wanted - an existing session,
+	     * so we can just carry on without showing the exception to the user.
+	     */
+	    log.warn("Error while creating a tool session: " + e.getMessage());
 	}
 
 	form.setActivityID(activity.getActivityId());
