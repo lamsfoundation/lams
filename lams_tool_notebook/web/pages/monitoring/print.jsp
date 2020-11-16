@@ -56,10 +56,10 @@
 					<div class="panel-body" style="margin-left: 1em;">
 						<c:choose> 
 							<c:when test="${printDTO.allowRichEditor}">
-								<c:out value="${printUserDTO.entry}"  escapeXml='false' />  @@@ ${printDTO.allowRichEditor}
+								<c:out value="${printUserDTO.entry}"  escapeXml='false' />
 							</c:when>
 							<c:otherwise>
-								<lams:out  value="${printUserDTO.entry}" escapeHtml="false"/> @@@ ${printDTO.allowRichEditor} @@@ TRU
+								<lams:out  value="${printUserDTO.entry}" escapeHtml='false' />
 							</c:otherwise>
 						</c:choose>	
 					</div>
