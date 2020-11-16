@@ -414,13 +414,13 @@
 			</div>	
 			
 			<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
-						   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="true"
+						   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
 						   heightAutoGrow="true" height="600" />	
 		</c:otherwise>
 	</c:choose>
 	
 
-	<!-- Editable marsk section -->
+	<!-- Editable marks section -->
 	<div class="voffset10">	
 		<h4>
 		   <fmt:message key="label.monitoring.learner.marks.header"/>
