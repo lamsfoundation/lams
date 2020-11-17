@@ -119,5 +119,5 @@ public class DokumaranConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.dokumaran";
+    public static final String MANUAL_GRADING_DEFINITION_NAME = "manual.grading";
 }

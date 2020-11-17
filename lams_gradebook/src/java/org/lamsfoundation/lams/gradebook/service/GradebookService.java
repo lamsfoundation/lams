@@ -22,10 +22,12 @@
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -119,9 +121,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class GradebookService implements IGradebookFullService {
     private static Logger logger = Logger.getLogger(GradebookService.class);
 
-    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
-    public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
-    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
+    private static final Set<String> LESSON_EXPORT_TOOL_ACTIVITIES = new HashSet<>(
+	    Arrays.asList("laasse10", "lascrt11", "lamc11", "ladoku11"));
 
     // Services
     private ILamsCoreToolService toolService;
@@ -1216,8 +1217,7 @@ public class GradebookService implements IGradebookFullService {
 	for (ToolActivity activity : activityToUserDTOMap.keySet()) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    //check whether toolActivity has a NumericToolOutput
-	    if (activity.getEvaluation() != null && (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature))) {
+	    if (activity.getEvaluation() != null && LESSON_EXPORT_TOOL_ACTIVITIES.contains(toolSignature)) {
 		filteredActivityToUserDTOMap.put(activity, activityToUserDTOMap.get(activity));
 	    }
 	}

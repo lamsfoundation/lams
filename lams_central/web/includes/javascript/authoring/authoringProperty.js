@@ -1579,15 +1579,17 @@ PropertyLib = {
 			optionsFound = true;
 			
 			var suffix = '';
-			switch(this.type) {
-				case 'OUTPUT_BOOLEAN' :
-					suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
-					break;
-                                                            
-				case 'OUTPUT_LONG' :
-					suffix = LABELS.RANGE_OUTPUT_SUFFIX;
-					break;
-			};
+			if (!this.showConditionNameOnly) {
+				switch(this.type) {
+					case 'OUTPUT_BOOLEAN' :
+						suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+						break;
+	                                                            
+					case 'OUTPUT_LONG' :
+						suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+						break;
+				};
+			}
 			
 			var option = $('<option />')
 						   .text(this.description + ' ' + suffix)
