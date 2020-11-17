@@ -21,9 +21,20 @@
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" />
 				</a>
-				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="button.save" />
-				</a>
+				
+				<div class="btn-group btn-group-sm dropup">
+					<a id="saveButton" type="button" class="btn btn-sm btn-default button-add-item" onClick="javascript:saveQuestion(false)">
+						<fmt:message key="button.save" />
+					</a>
+					<button id="saveDropButton" type="button" class="btn btn-default dropdown-toggle"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li id="saveAsButton" onClick="javascript:saveQuestion(true)"><a href="#"><fmt:message key="button.save.new.version" /></a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
    	</div>

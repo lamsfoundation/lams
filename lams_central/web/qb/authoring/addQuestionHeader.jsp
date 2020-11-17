@@ -19,6 +19,15 @@
 	const SLIDER_NONE_LABEL = "<fmt:message key="label.authoring.basic.none" />";
 	const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 	const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+	
+	function saveQuestion(isNewVersion) {
+		let form = $('#assessmentQuestionForm');
+		if (isNewVersion) {
+			action = form.attr('action');
+			form.attr('action', action + '?newVersion=true');
+		}
+		form.submit();
+	}
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-option.js"></script>
