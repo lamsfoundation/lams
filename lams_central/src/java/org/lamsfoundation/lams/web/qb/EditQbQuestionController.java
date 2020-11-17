@@ -167,7 +167,8 @@ public class EditQbQuestionController {
      */
     @RequestMapping(path = "/saveOrUpdateQuestion", method = RequestMethod.POST)
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
 	//find according question
 	QbQuestion qbQuestion = null;
 	Long oldQuestionUid = null;
@@ -187,6 +188,9 @@ public class EditQbQuestionController {
 	}
 
 	int questionModificationStatus = extractFormToQbQuestion(qbQuestion, form, request);
+	if (questionModificationStatus < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    questionModificationStatus = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	switch (questionModificationStatus) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
 		// new version of the old question gets created
