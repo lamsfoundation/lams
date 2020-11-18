@@ -58,7 +58,7 @@
 		<c:set var="csrfToken"><csrf:token/></c:set>
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
 			
-			<form:form action="updateMark.do${csrfToken}" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
+			<form:form action="updateMark.do?${csrfToken}" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="reportID" />
