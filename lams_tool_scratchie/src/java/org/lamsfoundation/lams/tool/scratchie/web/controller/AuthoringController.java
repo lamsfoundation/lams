@@ -459,7 +459,8 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request) {
+    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(form.getSessionMapID());
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
@@ -527,6 +528,9 @@ public class AuthoringController {
 
 	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
 		: qbQuestion.isQbQuestionModified(oldQbQuestion);
+	if (isQbQuestionModified < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    isQbQuestionModified = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	QbQuestion updatedQuestion = null;
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
