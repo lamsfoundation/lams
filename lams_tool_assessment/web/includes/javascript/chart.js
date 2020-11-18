@@ -145,7 +145,7 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 				display: true,
 				fontSize : '15',
 				lineHeight: 3,
-				text : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
+				text : useGroups ? LABELS.ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
 			},
 			animation : {
 				duration : animate ? 1000 : 0
