@@ -233,6 +233,12 @@
 		        mark = $this.text() ? +$this.text() : null,
 		        toolSessionId = +$this.closest('.tablesorter').attr('toolSessionId'),
 		        userId = +$this.closest('tr').attr('userId'); 
+		        
+		        // max mark is 100
+		        if (mark > 100) {
+		        	mark = 100;
+		        	$this.text(mark);
+		        }
 
 		        $.ajax({
 		        	async: true,
