@@ -172,8 +172,9 @@
 				<fmt:message key="label.questions.choice.collection" />&nbsp;
 				<select name="collectionUid" id="collectionUid">
 					<c:forEach items="${collections}" var="collection">
-						<option value="${collection.uid}" ${empty collection.userId ? "selected" : ""}>
-							<c:out value="${collection.name}" />
+						
+						<option value="${collection.uid}">
+						<c:out value="${collection.name}" /> 
 						</option>
 					</c:forEach>
 				</select>
