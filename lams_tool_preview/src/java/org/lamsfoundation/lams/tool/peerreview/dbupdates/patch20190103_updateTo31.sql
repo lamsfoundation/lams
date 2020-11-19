@@ -1,7 +1,7 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20170215.sql to patch20190103.sql
+-- This patch contains files patch20170215.sql to patch20200607.sql
 -- It should upgrade this tool to version 3.1
 
 -- LDEV-4233: Ability to remove users from Peer Review tool
@@ -47,6 +47,11 @@ DROP TABLE tmp_peerreview_rating_sessionid;
 -- LDEV-4558 Increase db text size for all user inputs
 ALTER TABLE tl_laprev11_peerreview MODIFY instructions MEDIUMTEXT;
 ALTER TABLE tl_laprev11_peerreview MODIFY reflect_instructions MEDIUMTEXT;
+
+
+
+--LDEV-5035 Add tolerance to SAP and SAPA factors in Peer Review
+ALTER TABLE tl_laprev11_peerreview ADD COLUMN tolerance TINYINT UNSIGNED NOT NULL DEFAULT 0;
 
 
 

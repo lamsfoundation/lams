@@ -28,6 +28,7 @@ create table tl_laasse10_assessment (
    reflect_instructions MEDIUMTEXT,
    numbered tinyint(1) DEFAULT 1,
    use_select_leader_tool_ouput tinyint(1) NOT NULL DEFAULT 0,
+   question_etherpad_enabled TINYINT(1) DEFAULT 0,
    enable_confidence_levels TINYINT(1) NOT NULL DEFAULT 0,
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
@@ -123,7 +124,7 @@ create table tl_laasse10_question_option (
    sequence_id integer,
    question MEDIUMTEXT,
    option_string MEDIUMTEXT,
-   option_float float,
+   option_float double,
    accepted_error float,
    grade float,
    feedback MEDIUMTEXT,
@@ -167,6 +168,7 @@ create table tl_laasse10_assessment_result (
    time_limit_launched_date datetime,
    primary key (uid),
    UNIQUE KEY `UQ_tl_laasse10_assessment_result_5` (`assessment_uid`,`user_uid`,`latest`),
+   INDEX (latest),
    CONSTRAINT FK_tl_laasse10_assessment_result_2 FOREIGN KEY (user_uid)
    		REFERENCES tl_laasse10_user (uid) ON DELETE CASCADE ON UPDATE CASCADE,
    CONSTRAINT FK_tl_laasse10_assessment_result_3 FOREIGN KEY (assessment_uid)
@@ -200,8 +202,11 @@ create table tl_laasse10_option_answer (
    answer_boolean tinyint(1),
    answer_int integer,
    primary key (uid),
+   INDEX (answer_boolean),
    CONSTRAINT FK_tl_laasse10_option_answer_1 FOREIGN KEY (question_result_uid)
-   		REFERENCES tl_laasse10_question_result (uid) ON DELETE CASCADE ON UPDATE CASCADE
+   		REFERENCES tl_laasse10_question_result (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+   CONSTRAINT FK_tl_laasse10_option_answer_2 FOREIGN KEY (question_option_uid)
+	REFERENCES tl_laasse10_question_option (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 

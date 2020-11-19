@@ -1,7 +1,7 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20170308.sql to patch20190103.sql
+-- This patch contains files patch20170308.sql to patch20190121.sql
 -- It should upgrade this tool to version 3.1
 
 -- LDEV-4261 Remove optimistic locking management
@@ -68,6 +68,11 @@ UPDATE lams_tool SET tool_version='20180806' WHERE tool_signature='lafrum11';
 						    
 -- Trigger class name rename when importing an old LD
 UPDATE lams_tool SET tool_version='20181202' WHERE tool_signature='lafrum11';
+
+
+
+-- LDEV-4756 Unable to add attachments in Forum
+UPDATE lams_cr_credential set name = "forum" where name = "forumw";
 
 
 
