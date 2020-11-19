@@ -14,6 +14,7 @@ create table tl_lascrt11_scratchie (
    extra_point TINYINT(1),
    submission_deadline datetime,
    burning_questions_enabled TINYINT(1) DEFAULT 1,
+   question_etherpad_enabled TINYINT(1) DEFAULT 0,
    time_limit int(11) DEFAULT 0,
    shuffle_items TINYINT(1) DEFAULT 0,
    confidence_levels_activity_uiid INT(11),
