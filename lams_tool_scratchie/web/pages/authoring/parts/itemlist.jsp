@@ -27,11 +27,6 @@
 <!-- Dropdown menu for choosing a question from question bank -->
 <div class="panel panel-default voffset20">
 	<div class="panel-heading panel-title">
-		<div id="importExport" class="btn-group pull-right">
-			<a href="#" id="importQTILink" onClick="javascript:importQTI();return false;" class="btn btn-default btn-xs loffset5">
-				<fmt:message key="label.authoring.import.qti" /> 
-			</a>
-		</div> 
 		<fmt:message key="label.questions"/>
 	</div>
 	<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
