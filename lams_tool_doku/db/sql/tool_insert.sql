@@ -48,5 +48,5 @@ NULL,
 'org.lamsfoundation.lams.tool.dokumaran.ApplicationResources',
 NOW(),
 NOW(),
-'tool/ladoku11/ladoku11admin.do'
+NULL
 )

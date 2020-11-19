@@ -1,7 +1,7 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20180917.sql to patch20190103.sql
+-- This patch contains files patch20180917.sql to patch20200514.sql
 -- It should upgrade this tool to version 3.1
 
 
@@ -17,6 +17,17 @@ WHERE tool_signature = 'lazoom10';
 
 UPDATE lams_tool SET tool_version='20180917' WHERE tool_signature='lazoom10';
 
+
+
+-- LDEV-5006 Password protect Zoom meetings
+ALTER TABLE tl_lazoom10_zoom ADD COLUMN enable_meeting_password TINYINT(1) DEFAULT 0,
+							 ADD COLUMN meeting_password CHAR(6);
+
+						 
+		
+-- LDEV-5026 Always password protect Zoom meetings
+ALTER TABLE tl_lazoom10_zoom DROP COLUMN enable_meeting_password;
+		
 
 
 -- LDEV-4743 Update tool version to mark LAMS 3.1 release

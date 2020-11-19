@@ -17,6 +17,7 @@ CREATE TABLE tl_lazoom10_zoom (
   api_id bigint(20),
   meeting_id varchar(64),
   meeting_start_url varchar(1000),
+  meeting_password CHAR(6),
   PRIMARY KEY (uid),
   CONSTRAINT fk_lazoom10_zoom_to_api FOREIGN KEY (api_id)
   	REFERENCES tl_lazoom10_api (uid) ON DELETE SET NULL ON UPDATE CASCADE

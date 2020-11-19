@@ -20,6 +20,7 @@ create table tl_laprev11_peerreview (
    self_review tinyint(1) DEFAULT 0,
    notify_users_of_results tinyint(1) DEFAULT 1,
    show_ratings_left_by_user tinyint(1) DEFAULT 0,
+   tolerance TINYINT UNSIGNED NOT NULL DEFAULT 0,
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
 );
