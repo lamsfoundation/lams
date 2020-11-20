@@ -32,6 +32,9 @@
 			<%-- Default answer value, when answers are not disclosed yet --%>
 			<c:set var="answer"><i><fmt:message key="label.not.yet.disclosed"/></i></c:set>
 			
+			<%-- Reset variable value --%>
+			<c:set var="showRating" value="false" />
+			
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
 				<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
