@@ -2234,6 +2234,11 @@ public class McService
     }
 
     @Override
+    public void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid) {
+	throw new UnsupportedOperationException("MCQ tool does not support single question replacement yet");
+    }
+
+    @Override
     public void setConfigValue(String key, String value) {
 	mcConfigDAO.setConfigValue(key, value);
     }

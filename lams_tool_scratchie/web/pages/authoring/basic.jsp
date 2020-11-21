@@ -68,6 +68,37 @@
 			}
 		);
 	}
+	
+	function changeItemQuestionVersion(itemIndex, oldQbQuestionUid, newQbQuestionUid) {
+		if (oldQbQuestionUid == newQbQuestionUid) {
+			return;
+		}
+		
+		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
+		$(itemTargetDiv).load(
+			url,
+			{
+				itemIndex: itemIndex,
+				sessionMapID: "${sessionMapID}",
+				newQbQuestionUid : newQbQuestionUid
+			},
+			function(){
+				refreshThickbox();
+				
+				// check if we are in main authoring environment
+				if (typeof window.parent.GeneralLib != 'undefined') {
+					// check if any other activities require updating
+					let activitiesWithQuestion = window.parent.GeneralLib.checkQuestionExistsInToolActivities(oldQbQuestionUid);
+					if (activitiesWithQuestion.length > 1) {
+						// update, if teacher agrees to it
+						window.parent.GeneralLib.replaceQuestionInToolActivities('${sessionMap.toolContentID}', activitiesWithQuestion,
+																				 oldQbQuestionUid, newQbQuestionUid);
+					}
+				}
+			}
+		);
+	}
+	
 	function initNewItemHref() {
 		var itemTypeDropdown = document.getElementById("item-type");
 		var itemType = itemTypeDropdown.value;

@@ -22,6 +22,31 @@
 	#add-question-div {
 		margin-top: -5px;
 	}
+	
+	.question-type-alert {
+		white-space: nowrap;
+		display: inline-block;
+		margin-top: 3px;
+	}
+	.newer-version-prompt {
+		text-align: left;
+		color: orange;
+		font-size: 1.3em;
+	}
+	.question-version-dropdown {
+		margin-top: -3px;
+	}
+	
+	.question-version-dropdown .dropdown-menu {
+		min-width: 160px;
+	}
+	
+	.question-version-dropdown li a {
+		display: inline-block;
+	}
+	.question-version-dropdown li.disabled a:first-child {
+		text-decoration: underline;
+	}
 </style>
 
 <script lang="javascript">
@@ -121,10 +146,41 @@
 			}
 		});
 	}
+
+	function changeItemQuestionVersion(sequenceId, oldQbQuestionUid, newQbQuestionUid) {
+		if (oldQbQuestionUid == newQbQuestionUid) {
+			return;
+		}
+		
+		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
+		$(questionListTargetDiv).load(
+			url,
+			{
+				referenceSequenceId : sequenceId,
+				sessionMapID: "${sessionMapID}",
+				newQbQuestionUid : newQbQuestionUid
+			},
+			function(){
+				refreshThickbox();
+				
+				// check if we are in main authoring environment
+				if (typeof window.parent.GeneralLib != 'undefined') {
+					// check if any other activities require updating
+					let activitiesWithQuestion = window.parent.GeneralLib.checkQuestionExistsInToolActivities(oldQbQuestionUid);
+					if (activitiesWithQuestion.length > 1) {
+						// update, if teacher agrees to it
+						window.parent.GeneralLib.replaceQuestionInToolActivities('${sessionMap.toolContentID}', activitiesWithQuestion,
+																				 oldQbQuestionUid, newQbQuestionUid);
+					}
+				}
+			}
+		);
+	}
 	
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
-	};
+	}
+	
 	function reinitializePassingMarkSelect(isPageFresh){
 		var oldValue = (isPageFresh) ? "${assessmentForm.assessment.passingMark}" : $("#passingMark").val();
 		$('#passingMark').empty();

@@ -10,6 +10,7 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.tool.ToolContent;
 
 public interface IQbDAO extends IBaseDAO {
 
@@ -36,6 +37,8 @@ public interface IQbDAO extends IBaseDAO {
     int getMaxQuestionVersion(Integer qbQuestionId);
 
     List<ToolActivity> getQuestionActivities(long qbQuestionUid);
+
+    List<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> filteringToolContentIds);
 
     int getCountQuestionActivitiesByUid(long qbQuestionUid);
 

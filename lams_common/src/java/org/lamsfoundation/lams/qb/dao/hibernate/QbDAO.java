@@ -19,6 +19,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.qb.dao.IQbDAO;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.tool.ToolContent;
 
 public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 
@@ -31,6 +32,10 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
     private static final String FIND_QUESTION_ACTIVITIES = "SELECT a FROM QbToolQuestion AS q, ToolActivity AS a JOIN a.learningDesign.lessons AS l "
 	    + "WHERE a.toolContentId = q.toolContentId AND l IS NOT EMPTY AND l.lessonStateId IN (3,4,5,6) AND q.qbQuestion.uid = :qbQuestionUid "
 	    + "ORDER BY l.organisation.name, l.lessonName";
+
+    private static final String FIND_QUESTION_ACTIVITIES_FILTERED_BY_TOOL_CONTENT_ID = "SELECT c FROM QbToolQuestion AS q, ToolContent AS c "
+	    + "WHERE c.toolContentId = q.toolContentId AND c.tool.toolSignature IN ('laasse10', 'lascrt11') AND "
+	    + "q.qbQuestion.uid = :qbQuestionUid AND q.toolContentId IN (:toolContentIds)";
 
     private static final String FIND_QUESTION_VERSIONS = "SELECT q FROM QbQuestion AS q, QbQuestion AS r "
 	    + "WHERE q.questionId = r.questionId AND q.uid <> r.uid AND r.uid = :qbQuestionUid";
@@ -192,6 +197,14 @@ public class QbDAO extends LAMSBaseDAO implements IQbDAO {
 		.createQuery(FIND_QUESTION_ACTIVITIES.replace("SELECT a", "SELECT COUNT(a)")
 			.replace("uid = :qbQuestionUid", "questionId = :qbQuestionId"))
 		.setParameter("qbQuestionId", qbQuestionId).getSingleResult()).intValue();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> filteringToolContentIds) {
+	return this.getSession().createQuery(FIND_QUESTION_ACTIVITIES_FILTERED_BY_TOOL_CONTENT_ID)
+		.setParameter("qbQuestionUid", qbQuestionUid)
+		.setParameterList("toolContentIds", filteringToolContentIds).list();
     }
 
     @Override

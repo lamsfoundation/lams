@@ -11,6 +11,7 @@ import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
 public interface IQbService {
@@ -150,4 +151,10 @@ public interface IQbService {
     int mergeQuestions(long sourceQbQuestionUid, long targetQbQuestionUid);
 
     boolean isQuestionDefaultInTool(long qbQuestionUid, String toolSignature);
+
+    Collection<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> toolContentIds);
+
+    void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid, long newQbQuestionUid);
+
+    void fillVersionMap(QbQuestion qbQuestion);
 }
