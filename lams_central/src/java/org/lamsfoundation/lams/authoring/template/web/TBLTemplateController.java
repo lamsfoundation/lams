@@ -437,7 +437,7 @@ public class TBLTemplateController extends LdTemplateController {
 			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, optionIndex));
 			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
 			    processTestQuestion(name, null, null, questionDisplayOrder, null, optionDisplayOrder,
-				    getTrimmedString(request, name, true), null);
+				    getTrimmedString(request, name, true), null, null);
 			} else {
 			    int titleIndex = name.indexOf("title");
 			    if (titleIndex > 0) { // question1title
@@ -446,14 +446,17 @@ public class TBLTemplateController extends LdTemplateController {
 				// get all learning outcomes straight away instead of iterating over them
 				String[] learningOutcomes = request
 					.getParameterValues("question" + questionDisplayOrder + "learningOutcome");
+				Long collectionUid = WebUtil.readLongParam(request,
+					"question" + questionDisplayOrder + "collection", true);
 				processTestQuestion(name, null, getTrimmedString(request, name, false),
-					questionDisplayOrder, null, null, null, learningOutcomes);
-			    } else if (name.indexOf("uuid") < 0 && name.indexOf("learningOutcome") < 0) {
+					questionDisplayOrder, null, null, null, learningOutcomes, collectionUid);
+			    } else if (name.indexOf("uuid") < 0 && name.indexOf("learningOutcome") < 0
+				    && name.indexOf("collection") < 0) {
 				Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset));
 				processTestQuestion(name, getTrimmedString(request, name, true), null,
 					questionDisplayOrder,
 					getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false),
-					null, null, null);
+					null, null, null, null);
 			    }
 			}
 		    }
@@ -556,6 +559,7 @@ public class TBLTemplateController extends LdTemplateController {
 		String questionUuid = getTrimmedString(request, assessmentPrefix + "uuid", false);
 		String markAsString = getTrimmedString(request, assessmentPrefix + "mark", false);
 		String[] learningOutcomes = request.getParameterValues(assessmentPrefix + "learningOutcome");
+		String collectionUid = getTrimmedString(request, assessmentPrefix + "collection", false);
 		Assessment assessment = new Assessment();
 		if (questionText != null) {
 		    assessment.setTitle(questionTitle);
@@ -605,6 +609,10 @@ public class TBLTemplateController extends LdTemplateController {
 			assessment.setLearningOutcomes(Arrays.asList(learningOutcomes));
 		    }
 
+		    if (collectionUid != null) {
+			assessment.setCollectionUid(Long.valueOf(collectionUid));
+		    }
+
 		    applicationExercises.put(i, assessment);
 		}
 	    }
@@ -639,7 +647,8 @@ public class TBLTemplateController extends LdTemplateController {
 	}
 
 	void processTestQuestion(String name, String questionText, String questionTitle, Integer questionDisplayOrder,
-		String questionUuid, Integer optionDisplayOrder, String optionText, String[] learningOutcomes) {
+		String questionUuid, Integer optionDisplayOrder, String optionText, String[] learningOutcomes,
+		Long collectionUid) {
 
 	    ObjectNode question = testQuestions.get(questionDisplayOrder);
 	    if (question == null) {
@@ -682,6 +691,10 @@ public class TBLTemplateController extends LdTemplateController {
 		    log.error("Error while processing learning outcomes for question: "
 			    + question.get(RestTags.QUESTION_TITLE));
 		}
+	    }
+
+	    if (collectionUid != null) {
+		question.put(RestTags.COLLECTION_UID, collectionUid);
 	    }
 	}
 

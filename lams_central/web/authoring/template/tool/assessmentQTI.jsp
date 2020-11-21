@@ -21,6 +21,7 @@ which are passed on to the individual question jsps to generate the form fields.
 <c:forEach var="learningOutcome" items="${question.learningOutcomes}">
 	<input type="hidden" name="${containingDivName}assessment${questionNumber}learningOutcome" value="${learningOutcome}"/>
 </c:forEach>
+<input type="hidden" name="${containingDivName}assessment${questionNumber}collection" value="${param.collectionUid}" />
 </div>
 
 <c:set var="currentNumber" scope="page">${currentNumber + 1}</c:set>

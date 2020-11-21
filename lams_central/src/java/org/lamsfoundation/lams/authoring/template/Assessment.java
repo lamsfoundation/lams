@@ -60,6 +60,7 @@ public class Assessment {
     Set<AssessMCAnswer> answers = null; // only used if type == 1
     String uuid = null; // used when QTI gets imported and it contains QB question UUID
     List<String> learningOutcomes;
+    Long collectionUid;
 
     public void setType(short type) {
 	this.type = type;
@@ -133,6 +134,14 @@ public class Assessment {
 	this.learningOutcomes = learningOutcomes;
     }
 
+    public Long getCollectionUid() {
+	return collectionUid;
+    }
+
+    public void setCollectionUid(Long collectionUid) {
+	this.collectionUid = collectionUid;
+    }
+
     public String getUuid() {
 	return uuid;
     }
@@ -164,6 +173,9 @@ public class Assessment {
 	}
 	if (learningOutcomes != null && !learningOutcomes.isEmpty()) {
 	    json.set(RestTags.LEARNING_OUTCOMES, JsonUtil.readArray(learningOutcomes));
+	}
+	if (collectionUid != null) {
+	    json.put(RestTags.COLLECTION_UID, collectionUid);
 	}
 	return json;
     }

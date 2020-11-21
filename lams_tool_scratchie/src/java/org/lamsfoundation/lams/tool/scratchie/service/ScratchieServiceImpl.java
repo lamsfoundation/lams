@@ -2720,14 +2720,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// Scratchie Items
 	Set<ScratchieItem> newItems = new TreeSet<>();
 
-	QbCollection collection = qbService.getUserPrivateCollection(userID);
-	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
-		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
-			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
-
+	QbCollection collection = null;
+	Set<String> collectionUUIDs = null;
+	
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (int i = 0; i < questions.size(); i++) {
-	    boolean addToCollection = false;
+
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
@@ -2743,9 +2741,24 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
-	    if (qbQuestion == null) {
-		addToCollection = collection != null;
+	    Long collectionUid = JsonUtil.optLong(questionData, RestTags.COLLECTION_UID);
+	    boolean addToCollection = collectionUid != null;
 
+	    if (addToCollection) {
+		// check if it is the same collection - there is a good chance it is
+		if (collection == null || collectionUid != collection.getUid()) {
+		    collection = qbService.getCollection(collectionUid);
+		    if (collection == null) {
+			addToCollection = false;
+		    } else {
+			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+				.filter(q -> q.getUuid() != null)
+				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+		    }
+		}
+	    }
+
+	    if (qbQuestion == null) {
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
@@ -2794,8 +2807,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 			userManagementService.save(outcomeMapping);
 		    }
 		}
-	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
-		addToCollection = true;
+	    } else if (addToCollection && collectionUUIDs.contains(uuid)) {
+		addToCollection = false;
 	    }
 
 	    item.setQbQuestion(qbQuestion);

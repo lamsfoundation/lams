@@ -3512,19 +3512,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	assessment.setCreatedBy(assessmentUser);
 
-	// **************************** Set the question bank *********************
-	QbCollection collection = qbService.getUserPrivateCollection(userID);
-	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
-		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
-			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, "questions");
 	Set<AssessmentQuestion> newQuestionSet = assessment.getQuestions(); // the Assessment constructor will set up the collection
 
 	if (questions != null) {
+
+	    QbCollection collection = null;
+	    Set<String> collectionUUIDs = null;
+
 	    for (JsonNode questionJSONData : questions) {
-
-		boolean addToCollection = collection != null;
-
 		AssessmentQuestion question = new AssessmentQuestion();
 		Integer type = JsonUtil.optInt(questionJSONData, "type");
 		question.setToolContentId(toolContentID);
@@ -3625,6 +3621,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    qbQuestion.setQbOptions(optionList);
 		}
 
+		Long collectionUid = JsonUtil.optLong(questionJSONData, RestTags.COLLECTION_UID);
+		boolean addToCollection = collectionUid != null;
+		if (addToCollection) {
+		    // check if it is the same collection - there is a good chance it is
+		    if (collection == null || collectionUid != collection.getUid()) {
+			collection = qbService.getCollection(collectionUid);
+			if (collection == null) {
+			    addToCollection = false;
+			} else {
+			    collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+				    .filter(q -> q.getUuid() != null)
+				    .collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+			}
+		    }
+		}
+
 		if (isModification) {
 		    addToCollection &= !collectionUUIDs.contains(uuid);
 
@@ -3681,7 +3693,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		// all questions need to end up in user's private collection
 		if (addToCollection) {
-		    qbService.addQuestionToCollection(collection.getUid(), qbQuestion.getQuestionId(), false);
+		    qbService.addQuestionToCollection(collectionUid, qbQuestion.getQuestionId(), false);
 		    collectionUUIDs.add(uuid);
 		}
 	    }
