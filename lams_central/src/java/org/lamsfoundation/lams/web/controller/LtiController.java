@@ -222,6 +222,8 @@ public class LtiController {
 	request.setAttribute(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL, customContextMembershipUrl);
 	request.setAttribute(CentralConstants.PARAM_TITLE, resourceLinkTitle);
 	request.setAttribute(CentralConstants.PARAM_DESC, resourceLinkDescription);
+	request.setAttribute(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE,
+		request.getParameter(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE));
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -262,6 +264,7 @@ public class LtiController {
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String customContextMembershipUrl = request.getParameter(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL);
+	String toolConsumerFamily = request.getParameter(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE);
 	Integer organisationId = WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID);
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
@@ -304,9 +307,11 @@ public class LtiController {
 	 * The real ID is only received when an user enters the lesson and only then we can create the mapping.
 	 *
 	 * BUT if there is another integration client which does not use deep linking and sends proper resource link ID
-	 * right away, then this may need adjusting.
+	 * right away, then we use this link. Currently we are aware of desire2learn that uses this approach.
 	 */
-	integrationService.createExtServerLessonMap(lessonId, extServer);
+	boolean useResourceLinkId = toolConsumerFamily == null
+		|| !toolConsumerFamily.toLowerCase().contains("blackboard");
+	integrationService.createExtServerLessonMap(lessonId, useResourceLinkId ? resourceLinkId : null, extServer);
 
 	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId,
 		customContextMembershipUrl);

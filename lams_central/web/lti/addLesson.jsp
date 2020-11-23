@@ -177,6 +177,7 @@
         <input type="hidden" name="courseId" value="${courseId}">
         <input type="hidden" name="context_id" value="${context_id}">
         <input type="hidden" name="custom_context_memberships_url" value="${custom_context_memberships_url}">
+        <input type="hidden" name="tool_consumer_info_product_family_code" value="${tool_consumer_info_product_family_code}">
     	<input type="hidden" name="ldId" id="ldId" value="0">
     	
     	<%-- ContentItemSelectionRequest items --%>
