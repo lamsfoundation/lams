@@ -546,6 +546,20 @@
 		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 		    return wordCount;
 		}
+		
+		function logLearnerInteractionEvent(eventType, qbToolQuestionUid, optionUid) {
+			$.ajax({
+				url: '<c:url value="/learning/logLearnerInteractionEvent.do"/>',
+				data: {
+					eventType         : eventType,
+					qbToolQuestionUid : qbToolQuestionUid,
+					optionUid         : optionUid
+				},
+				cache : false,
+				type  : 'post',
+				dataType : 'text'
+			});
+		}
     </script>
 </lams:head>
 <body class="stripes">
