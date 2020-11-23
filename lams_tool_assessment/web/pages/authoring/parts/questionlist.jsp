@@ -92,7 +92,7 @@
 				<th>
 					#
 				</th>
-				<th>
+				<th colspan="5">
 					<fmt:message key="label.authoring.basic.list.header.question" />
 				</th>
 				<th colspan="4">
