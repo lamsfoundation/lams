@@ -46,7 +46,6 @@
 
 			// validate the main form
 			var validator = $("#templateForm").validate({
-	    		ignore : 'div.cke_editable',
 				rules: {
 					sequenceTitle: {
 						required: true,
