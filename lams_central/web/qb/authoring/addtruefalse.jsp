@@ -4,6 +4,7 @@
 		
 <lams:html>
 	<lams:head>
+	
 		<lams:css />
 		<link href="<lams:LAMSURL/>/tool/laasse10/includes/css/assessment.css" rel="stylesheet" type="text/css">
 		<link href="<lams:LAMSURL/>/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
@@ -69,6 +70,15 @@
 					unhighlight: formValidationUnhighlight
 		  		});
 			});
+			
+			function saveQuestion(isNewVersion) {
+				let form = $('#assessmentQuestionForm');
+				if (isNewVersion) {
+					action = form.attr('action');
+					form.attr('action', action + '?newVersion=true');
+				}
+				form.submit();
+			}
   		</script>
 </lams:head>
 <body>
