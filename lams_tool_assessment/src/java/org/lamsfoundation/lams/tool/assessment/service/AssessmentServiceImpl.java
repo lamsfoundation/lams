@@ -3638,8 +3638,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		if (isModification) {
-		    addToCollection &= !collectionUUIDs.contains(uuid);
-
+		    if (collectionUUIDs != null) {
+			addToCollection &= !collectionUUIDs.contains(uuid);
+		    }
+		    
 		    int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
 		    if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
 			qbQuestion.clearID();
