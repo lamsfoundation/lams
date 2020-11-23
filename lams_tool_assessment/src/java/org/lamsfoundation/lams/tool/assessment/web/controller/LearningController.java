@@ -53,6 +53,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -98,6 +100,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -126,6 +130,9 @@ public class LearningController {
 
     @Autowired
     private ILessonService lessonService;
+
+    @Autowired
+    private ILearnerInteractionService learnerInteractionService;
 
     @Autowired
     private ISecurityService securityService;
@@ -1275,6 +1282,19 @@ public class LearningController {
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
 
 	return "pages/learning/results" + (embedded ? "/allquestions" : "");
+    }
+
+    @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)
+    @ResponseStatus(code = HttpStatus.OK)
+    public void logLearnerInteractionEvent(@RequestParam int eventType, @RequestParam long qbToolQuestionUid,
+	    @RequestParam long optionUid) {
+	UserDTO user = LearningController.getCurrentUser();
+
+	LearnerInteractionEvent learnerInteractionEvent = new LearnerInteractionEvent(eventType, user.getUserID());
+	learnerInteractionEvent.setQbToolQuestionUid(qbToolQuestionUid);
+	learnerInteractionEvent.setOptionUid(optionUid);
+
+	learnerInteractionService.saveEvent(learnerInteractionEvent);
     }
 
     /**

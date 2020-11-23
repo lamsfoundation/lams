@@ -21,7 +21,8 @@
 						<c:when test="${question.multipleAnswersAllowed}">
 							<c:set var="inputName">question${status.index}_${option.uid}</c:set>
 							<c:set var="inputId" value="${inputName}" />
-							<input type="checkbox" name="${inputName}" id="${inputId}" value="${true}" 
+							<input type="checkbox" name="${inputName}" id="${inputId}" value="${true}"
+								   onclick="javascript:logLearnerInteractionEvent($(this).is(':checked') ? 2 : 3, ${question.uid}, ${option.uid})" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
@@ -29,7 +30,8 @@
 						<c:otherwise>
 							<c:set var="inputName">question${status.index}</c:set>
 							<c:set var="inputId">${inputName}_${option.uid}</c:set>
-							<input type="radio" name="${inputName}" id="${inputId}" value="${option.uid}" 
+							<input type="radio" name="${inputName}" id="${inputId}" value="${option.uid}"
+								   onclick="javascript:logLearnerInteractionEvent(1, ${question.uid}, ${option.uid})" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>

@@ -486,6 +486,28 @@
 		</property>
 	</bean>	
 	
+	<!-- Learner Interaction Service -->
+	
+	<bean id="learnerInteractionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.logevent.service.LearnerInteractionService">
+				<property name="baseDAO"><ref bean="baseDAO"/></property>
+			</bean>	
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>	
+	
 	<!--  Configuration service -->
 	<bean id="configurationService"  class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
