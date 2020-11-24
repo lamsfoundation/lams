@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -37,6 +38,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.util.excel.ExcelRow;
 
 public class AssessmentEscapeUtils {
 
@@ -228,33 +230,43 @@ public class AssessmentEscapeUtils {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    public static Object printResponsesForExcelExport(AssessmentQuestionResult questionResult) {
-	Object ret = null;
-
-	if (questionResult != null) {
-	    switch (questionResult.getQbQuestion().getType()) {
-		case QbQuestion.TYPE_ESSAY:
-		    String answer = questionResult.getAnswer();
-		    return AssessmentEscapeUtils.escapeStringForExcelExport(answer);
-		case QbQuestion.TYPE_MATCHING_PAIRS:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS);
-		case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE);
-		case QbQuestion.TYPE_NUMERICAL:
-		    return questionResult.getAnswer();
-		case QbQuestion.TYPE_ORDERING:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING);
-		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
-		    return questionResult.getAnswer();
-		case QbQuestion.TYPE_TRUE_FALSE:
-		    return questionResult.getAnswerBoolean();
-		case QbQuestion.TYPE_MARK_HEDGING:
-		    //taken care beforehand
-		default:
-		    return null;
-	    }
+    public static void addResponseCellForExcelExport(AssessmentQuestionResult questionResult, ExcelRow row,
+	    boolean useLettersForMcq) {
+	if (questionResult == null) {
+	    row.addEmptyCell();
+	    return;
 	}
-	return ret;
+
+	Object value = null;
+	switch (questionResult.getQbQuestion().getType()) {
+	    case QbQuestion.TYPE_ESSAY:
+		value = AssessmentEscapeUtils.escapeStringForExcelExport(questionResult.getAnswer());
+		break;
+	    case QbQuestion.TYPE_MATCHING_PAIRS:
+		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS, row,
+			useLettersForMcq);
+		return;
+	    case QbQuestion.TYPE_MULTIPLE_CHOICE:
+		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE, row,
+			useLettersForMcq);
+		return;
+	    case QbQuestion.TYPE_NUMERICAL:
+		value = questionResult.getAnswer();
+		break;
+	    case QbQuestion.TYPE_ORDERING:
+		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING, row,
+			useLettersForMcq);
+		return;
+	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
+		value = questionResult.getAnswer();
+		break;
+	    case QbQuestion.TYPE_TRUE_FALSE:
+		value = questionResult.getAnswerBoolean();
+		break;
+	    case QbQuestion.TYPE_MARK_HEDGING:
+		//taken care beforehand
+	}
+	row.addCell(value);
     }
 
     public static String escapeStringForExcelExport(String input) {
@@ -264,26 +276,37 @@ public class AssessmentEscapeUtils {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private static String getOptionResponse(AssessmentQuestionResult questionResult, int type) {
+    private static void getOptionResponse(AssessmentQuestionResult questionResult, int type, ExcelRow row,
+	    boolean useLettersForMcq) {
 
 	StringBuilder sb = new StringBuilder();
 	//whether there is a need to remove last comma
 	boolean trimLastComma = false;
+	boolean highlightCell = false;
 
 	List<QbOption> options = questionResult.getQbQuestion().getQbOptions();
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	if (optionAnswers != null) {
-
 	    if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
-		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-		    if (optionAnswer.getAnswerBoolean()) {
-			for (QbOption option : options) {
-			    if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				sb.append(option.getName() + ", ");
+		highlightCell = useLettersForMcq;
+		int letter = 'A';
+		for (QbOption option : options) {
+		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
+			if (option.getUid().equals(optionAnswer.getOptionUid())) {
+			    if (optionAnswer.getAnswerBoolean()) {
+				// either we display full answers or just letters of chosen options
+				sb.append((useLettersForMcq ? String.valueOf((char) letter) : option.getName()) + ", ");
 				trimLastComma = true;
+
+				// if any answer is wrong, we do not highlight correct answer
+				if (option.getMaxMark() <= 0) {
+				    highlightCell = false;
+				}
 			    }
+			    break;
 			}
 		    }
+		    letter++;
 		}
 
 	    } else if (type == QbQuestion.TYPE_ORDERING) {
@@ -327,7 +350,6 @@ public class AssessmentEscapeUtils {
 	    ret = ret.substring(0, ret.lastIndexOf(","));
 	}
 
-	return ret;
+	row.addCell(ret, highlightCell ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
     }
-
 }

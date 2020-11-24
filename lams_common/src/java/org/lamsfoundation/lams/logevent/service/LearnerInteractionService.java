@@ -1,18 +1,28 @@
 package org.lamsfoundation.lams.logevent.service;
 
-import org.lamsfoundation.lams.dao.IBaseDAO;
+import java.util.Map;
+
 import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.dao.ILearnerInteractionDAO;
 
 public class LearnerInteractionService implements ILearnerInteractionService {
 
-    private IBaseDAO baseDAO;
+    private ILearnerInteractionDAO learnerInteractionDAO;
 
     @Override
     public void saveEvent(LearnerInteractionEvent event) {
-	baseDAO.insert(event);
+	learnerInteractionDAO.insert(event);
     }
 
-    public void setBaseDAO(IBaseDAO baseDAO) {
-	this.baseDAO = baseDAO;
+    /**
+     * Returns a map of QbToolQuestion UID -> learner interaction event with the question the first time
+     */
+    @Override
+    public Map<Long, LearnerInteractionEvent> getFirstLearnerInteractions(long toolContentId, int userId) {
+	return learnerInteractionDAO.getFirstLearnerInteractions(toolContentId, userId);
+    }
+
+    public void setLearnerInteractionDAO(ILearnerInteractionDAO learnerInteractionDAO) {
+	this.learnerInteractionDAO = learnerInteractionDAO;
     }
 }
