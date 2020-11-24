@@ -42,6 +42,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.LocaleUtil;
@@ -264,6 +265,11 @@ public class ExcelUtil {
 	    if (cellsNumber > maxCellsNumber) {
 		maxCellsNumber = cellsNumber;
 	    }
+	}
+
+	// merge cells
+	for (CellRangeAddress mergedCells : excelSheet.mergedCells) {
+	    sheet.addMergedRegion(mergedCells);
 	}
 
 	//autoSizeColumns
