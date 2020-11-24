@@ -174,12 +174,12 @@
 											 
 								    		<li <c:if test="${question.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
 								    			<a href="#nogo" 
-								    			   title="<fmt:message key="label.authoring.basic.question.version.change.tooltip" />"
+								    			   data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.change.tooltip" />"
 								    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${question.qbQuestion.uid}, ${otherVersion.value})">
 								    				  <fmt:message key="label.authoring.basic.question.version" />&nbsp;${otherVersion.key}
 								    			</a>
 								    			<a href="#nogo" class="pull-right"
-								    			   title="<fmt:message key="label.authoring.basic.question.version.stats.tooltip" />"
+								    			   data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.stats.tooltip" />"
 								    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${otherVersion.value}", "_blank")'>
 									    			  <i class='fa fa-bar-chart'></i>
 												</a>
@@ -196,14 +196,14 @@
 				<td width="30px">
 					<c:if test="${not empty maxOtherVersion and question.qbQuestion.version < maxOtherVersion.key}">
 						<i class="fa fa-exclamation-triangle newer-version-prompt" data-toggle="tooltip" data-placement="top"
-						   title="<fmt:message key="label.authoring.basic.question.version.newer.tooltip" />" 
+						   data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.newer.tooltip" />" 
 						   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${maxOtherVersion.value}", "_blank")'>
 					</i>
 					</c:if>
 				</td>
 				
 				<td align="center"  width="30px">
-		    		<i class='fa fa-bar-chart' title="<fmt:message key="label.authoring.basic.question.version.stats.tooltip" />"
+		    		<i class='fa fa-bar-chart' data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.stats.tooltip" />"
 	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${question.qbQuestion.version}", "_blank")'>
 	    			</i>
 				</td>	
@@ -214,14 +214,14 @@
 				
 				<td width="30px">
 					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}" 
-								title="<fmt:message key="label.answer.required"/>" 
+								data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.answer.required"/>" 
 								alt="<fmt:message key="label.answer.required"/>"
 								onClick="javascript:toggleQuestionRequired(this)"></i>
 				</td>
 				
 				<td width="30px">
 					<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
-						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
+						<i class="fa fa-pencil"	 title="<fmt:message key="label.authoring.basic.edit" />"></i>
 					</a>
 				</td>
 
