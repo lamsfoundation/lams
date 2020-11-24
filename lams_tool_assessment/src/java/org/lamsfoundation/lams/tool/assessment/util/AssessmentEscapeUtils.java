@@ -261,8 +261,11 @@ public class AssessmentEscapeUtils {
 		value = questionResult.getAnswer();
 		break;
 	    case QbQuestion.TYPE_TRUE_FALSE:
-		value = questionResult.getAnswerBoolean();
-		break;
+		boolean isCorrect = questionResult.getQbQuestion().getCorrectAnswer() == questionResult
+			.getAnswerBoolean();
+		row.addCell(questionResult.getAnswerBoolean(),
+			isCorrect ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
+		return;
 	    case QbQuestion.TYPE_MARK_HEDGING:
 		//taken care beforehand
 	}
