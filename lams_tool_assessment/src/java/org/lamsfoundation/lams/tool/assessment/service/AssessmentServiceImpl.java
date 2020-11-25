@@ -2158,7 +2158,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    // if there is no grouping, then we skip "Group" column
 	    int questionLeftPadding = isActivityGrouped ? 3 : 2;
 	    userSummaryTitle.addEmptyCells(questionLeftPadding);
-	    userSummaryTitle.addCell("Questions", true, ExcelCell.BORDER_STYLE_LEFT_THIN);
+	    userSummaryTitle.addCell(getMessage("label.export.questions"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 
 	    // Row with question titles
 	    ExcelRow questionTitlesRow = userSummarySheet.initRow();
@@ -2201,28 +2201,29 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    // Row with column header below question titles
 	    ExcelRow userSummaryUserHeadersRow = userSummarySheet.initRow();
 	    if (isActivityGrouped) {
-		userSummaryUserHeadersRow.addCell("Group", true);
+		userSummaryUserHeadersRow.addCell(getMessage("label.export.group"), true);
 	    }
-	    userSummaryUserHeadersRow.addCell("User name", true);
-	    userSummaryUserHeadersRow.addCell("Full name", true);
+	    userSummaryUserHeadersRow.addCell(getMessage("label.export.user.id"), true);
+	    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
 
 	    for (QuestionReference questionReference : questionReferences) {
-		userSummaryUserHeadersRow.addCell("Score", ExcelCell.BORDER_STYLE_LEFT_THIN);
-		userSummaryUserHeadersRow.addCell("Answer");
+		userSummaryUserHeadersRow.addCell(getMessage("label.export.mark"), ExcelCell.BORDER_STYLE_LEFT_THIN);
+		userSummaryUserHeadersRow.addCell(getMessage("label.authoring.basic.option.answer"));
 
 		AssessmentQuestion question = questionReference.getQuestion();
 		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 			|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 		if (addAnsweredDateColumn) {
-		    userSummaryUserHeadersRow.addCell("Date time");
+		    userSummaryUserHeadersRow.addCell(getMessage("monitor.summary.after.date"));
 		}
 		if (assessment.isEnableConfidenceLevels()) {
-		    userSummaryUserHeadersRow.addCell("Confidence");
+		    userSummaryUserHeadersRow.addCell(getMessage("label.confidence"));
 		}
 	    }
 
 	    // a single column at the end of previous headers
-	    userSummaryUserHeadersRow.addCell("Total", ExcelCell.BORDER_STYLE_LEFT_THIN);
+	    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.summary.total"),
+		    ExcelCell.BORDER_STYLE_LEFT_THIN);
 
 	    List<AssessmentResult> assessmentResults = assessmentResultDao
 		    .getLastFinishedAssessmentResults(assessment.getContentId());
