@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -38,9 +37,18 @@ import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.util.excel.ExcelRow;
 
 public class AssessmentEscapeUtils {
+
+    public static class AssessmentExcelCell {
+	public Object value;
+	public boolean isHighlighted;
+
+	private AssessmentExcelCell(Object value, boolean isHighlighted) {
+	    this.value = value;
+	    this.isHighlighted = isHighlighted;
+	}
+    }
 
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
@@ -230,46 +238,35 @@ public class AssessmentEscapeUtils {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    public static void addResponseCellForExcelExport(AssessmentQuestionResult questionResult, ExcelRow row,
+    public static AssessmentExcelCell addResponseCellForExcelExport(AssessmentQuestionResult questionResult,
 	    boolean useLettersForMcq) {
 	if (questionResult == null) {
-	    row.addEmptyCell();
-	    return;
+	    return null;
 	}
 
-	Object value = null;
 	switch (questionResult.getQbQuestion().getType()) {
 	    case QbQuestion.TYPE_ESSAY:
-		value = AssessmentEscapeUtils.escapeStringForExcelExport(questionResult.getAnswer());
-		break;
+		Object value = AssessmentEscapeUtils.escapeStringForExcelExport(questionResult.getAnswer());
+		return new AssessmentExcelCell(value, false);
 	    case QbQuestion.TYPE_MATCHING_PAIRS:
-		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS, row,
-			useLettersForMcq);
-		return;
+		return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MATCHING_PAIRS, false);
 	    case QbQuestion.TYPE_MULTIPLE_CHOICE:
-		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE, row,
+		return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_MULTIPLE_CHOICE,
 			useLettersForMcq);
-		return;
 	    case QbQuestion.TYPE_NUMERICAL:
-		value = questionResult.getAnswer();
-		break;
+		return new AssessmentExcelCell(questionResult.getAnswer(), false);
 	    case QbQuestion.TYPE_ORDERING:
-		AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING, row,
-			useLettersForMcq);
-		return;
+		return AssessmentEscapeUtils.getOptionResponse(questionResult, QbQuestion.TYPE_ORDERING, false);
 	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
-		value = questionResult.getAnswer();
-		break;
+		return new AssessmentExcelCell(questionResult.getAnswer(), false);
 	    case QbQuestion.TYPE_TRUE_FALSE:
 		boolean isCorrect = questionResult.getQbQuestion().getCorrectAnswer() == questionResult
 			.getAnswerBoolean();
-		row.addCell(questionResult.getAnswerBoolean(),
-			isCorrect ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
-		return;
+		return new AssessmentExcelCell(questionResult.getAnswerBoolean(), isCorrect);
 	    case QbQuestion.TYPE_MARK_HEDGING:
 		//taken care beforehand
 	}
-	row.addCell(value);
+	return null;
     }
 
     public static String escapeStringForExcelExport(String input) {
@@ -279,7 +276,7 @@ public class AssessmentEscapeUtils {
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
-    private static void getOptionResponse(AssessmentQuestionResult questionResult, int type, ExcelRow row,
+    private static AssessmentExcelCell getOptionResponse(AssessmentQuestionResult questionResult, int type,
 	    boolean useLettersForMcq) {
 
 	StringBuilder sb = new StringBuilder();
@@ -291,7 +288,7 @@ public class AssessmentEscapeUtils {
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 	if (optionAnswers != null) {
 	    if (type == QbQuestion.TYPE_MULTIPLE_CHOICE) {
-		highlightCell = useLettersForMcq;
+		highlightCell = true;
 		int letter = 'A';
 		for (QbOption option : options) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
@@ -312,6 +309,10 @@ public class AssessmentEscapeUtils {
 		    letter++;
 		}
 
+		// do not highlight if we use full answers, not letters,
+		// or if no answer was provided
+		highlightCell &= useLettersForMcq && StringUtils.isNotBlank(sb.toString());
+		
 	    } else if (type == QbQuestion.TYPE_ORDERING) {
 		for (int i = 0; i < optionAnswers.size(); i++) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
@@ -347,12 +348,12 @@ public class AssessmentEscapeUtils {
 	    }
 
 	}
-	String ret = sb.toString().replaceAll("\\<.*?\\>|\\r|\\n", "");
+	String ret = sb.toString().replaceAll("\\<.*?\\>|\\r|\\n", "").strip();
 
 	if (trimLastComma) {
 	    ret = ret.substring(0, ret.lastIndexOf(","));
 	}
 
-	row.addCell(ret, highlightCell ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
+	return new AssessmentExcelCell(StringUtils.isBlank(ret) ? null : ret, highlightCell);
     }
 }
