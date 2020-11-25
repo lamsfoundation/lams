@@ -2305,10 +2305,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 		    }
 		    userResultRow.addCell(assessmentResult.getGrade(), ExcelCell.BORDER_STYLE_LEFT_THIN);
-
-		    userSummarySheet.addEmptyRow();
-		    userSummarySheet.addEmptyRow();
 		}
+
+		userSummarySheet.addEmptyRow();
+		userSummarySheet.addEmptyRow();
 	    }
 	}
 	return sheets;
