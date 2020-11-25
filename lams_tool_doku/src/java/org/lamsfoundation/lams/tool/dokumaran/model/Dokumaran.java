@@ -107,8 +107,13 @@ public class Dokumaran implements Cloneable {
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
-    // general information
+    @Column(name = "gallery_walk_enabled")
+    private boolean galleryWalkEnabled;
 
+    @Column(name = "gallery_walk_read_only")
+    private boolean galleryWalkReadOnly;
+
+    // general information
     @Column(name = "create_date")
     private Date created;
 
@@ -407,5 +412,21 @@ public class Dokumaran implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
     }
 }

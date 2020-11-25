@@ -2,6 +2,18 @@
 
 <!-- Advance Tab Content -->
 
+<script>
+	$(document).ready(function() {
+		$('#galleryWalkEnabled').change(function(){
+			if ($(this).is(':checked')) {
+				$('#galleryWalkReadOnly').prop('disabled', false);
+			} else {
+				$('#galleryWalkReadOnly').prop('disabled', true).prop('checked', false);
+			}
+		}).change();
+	});
+</script>
+
 <lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
 		<label for="useSelectLeaderToolOuput">
@@ -59,6 +71,20 @@
 <lams:OutcomeAuthor toolContentId="${authoringForm.dokumaran.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
+
+	<div class="checkbox">
+		<label for="galleryWalkEnabled">
+			<form:checkbox path="dokumaran.galleryWalkEnabled" id="galleryWalkEnabled" />
+			<fmt:message key="label.authoring.advance.gallery.walk.enabled" />
+		</label>
+	</div>
+	
+	<div class="checkbox loffset20">
+		<label for="galleryWalkReadOnly">
+			<form:checkbox path="dokumaran.galleryWalkReadOnly" id="galleryWalkReadOnly" />
+			<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
+		</label>
+	</div>
 
 	<div class="checkbox">
 		<label for="lockWhenFinished">
