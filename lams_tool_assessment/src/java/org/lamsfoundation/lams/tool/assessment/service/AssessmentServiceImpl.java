@@ -1975,14 +1975,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	/*
 	 * ------------------------------------------------------------------
 	 * // -------------- Third tab: User Summary ---------------------------
-	 * 
+	 *
 	 * ExcelSheet userSummarySheet = new ExcelSheet(getMessage("label.export.summary.by.user"));
 	 * sheets.add(userSummarySheet);
-	 * 
+	 *
 	 * // Create the question summary
 	 * ExcelRow userSummaryTitle = userSummarySheet.initRow();
 	 * userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
-	 * 
+	 *
 	 * ExcelRow summaryRowTitle = userSummarySheet.initRow();
 	 * summaryRowTitle.addCell("#", true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
@@ -1995,44 +1995,44 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.average.mark"), true,
 	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	 * 
+	 *
 	 * Float totalGradesPossible = 0F;
 	 * Float totalAverage = 0F;
 	 * int questionIndex = 1;
 	 * if (assessment.getQuestionReferences() != null) {
 	 * Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	 * questionReferences.addAll(assessment.getQuestionReferences());
-	 * 
+	 *
 	 * int randomQuestionsCount = 1;
 	 * for (QuestionReference questionReference : questionReferences) {
-	 * 
+	 *
 	 * String title;
 	 * String questionType;
 	 * Float penaltyFactor;
 	 * Float averageMark = null;
 	 * if (questionReference.isRandomQuestion()) {
-	 * 
+	 *
 	 * title = getMessage("label.authoring.basic.type.random.question") + randomQuestionsCount++;
 	 * questionType = getMessage("label.authoring.basic.type.random.question");
 	 * penaltyFactor = null;
 	 * averageMark = null;
 	 * } else {
-	 * 
+	 *
 	 * AssessmentQuestion question = questionReference.getQuestion();
 	 * title = question.getQbQuestion().getName();
 	 * questionType = AssessmentServiceImpl.getQuestionTypeLanguageLabel(question.getType());
 	 * penaltyFactor = question.getQbQuestion().getPenaltyFactor();
-	 * 
+	 *
 	 * QuestionSummary questionSummary = questionSummaries.get(question.getUid());
 	 * if (questionSummary != null) {
 	 * averageMark = questionSummary.getAverageMark();
 	 * totalAverage += questionSummary.getAverageMark();
 	 * }
 	 * }
-	 * 
+	 *
 	 * int maxGrade = questionReference.getMaxMark();
 	 * totalGradesPossible += maxGrade;
-	 * 
+	 *
 	 * ExcelRow questCellRow = userSummarySheet.initRow();
 	 * questCellRow.addCell(questionIndex++);
 	 * questCellRow.addCell(title);
@@ -2041,7 +2041,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * questCellRow.addCell(maxGrade);
 	 * questCellRow.addCell(averageMark);
 	 * }
-	 * 
+	 *
 	 * if (totalGradesPossible.floatValue() > 0) {
 	 * ExcelRow totalCellRow = userSummarySheet.initRow();
 	 * totalCellRow.addEmptyCells(2);
@@ -2051,7 +2051,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * }
 	 * userSummarySheet.addEmptyRow();
 	 * }
-	 * 
+	 *
 	 * if (sessionDtos != null) {
 	 * List<AssessmentResult> assessmentResults = assessmentResultDao
 	 * .getLastFinishedAssessmentResults(assessment.getContentId());
@@ -2059,13 +2059,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * for (AssessmentResult assessmentResult : assessmentResults) {
 	 * userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
 	 * }
-	 * 
+	 *
 	 * for (SessionDTO sessionDTO : sessionDtos) {
 	 * userSummarySheet.addEmptyRow();
-	 * 
+	 *
 	 * ExcelRow sessionTitle = userSummarySheet.initRow();
 	 * sessionTitle.addCell(sessionDTO.getSessionName(), true);
-	 * 
+	 *
 	 * AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 	 * Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 	 * if (assessmentUsers != null) {
@@ -2080,11 +2080,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * userTitleRow.addCell(getMessage("label.confidence"), true);
 	 * }
 	 * userTitleRow.addCell(getMessage("label.export.mark"), true);
-	 * 
+	 *
 	 * if (assessment.isAllowAnswerJustification()) {
 	 * userTitleRow.addCell(getMessage("label.answer.justification"), true);
 	 * }
-	 * 
+	 *
 	 * AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
 	 * if (assessmentResult != null) {
 	 * Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
@@ -2095,13 +2095,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * userResultRow.addCell(assessmentUser.getFullName());
 	 * userResultRow.addCell(assessmentResult.getStartDate());
 	 * userResultRow.addCell(questionResult.getQbQuestion().getName());
-	 * 
+	 *
 	 * AssessmentEscapeUtils.addResponseCellForExcelExport(questionResult,
 	 * userResultRow, false);
-	 * 
+	 *
 	 * if (assessment.isEnableConfidenceLevels()) {
 	 * String confidenceLevel = null;
-	 * 
+	 *
 	 * switch (assessment.getConfidenceLevelsType()) {
 	 * case 2:
 	 * confidenceLevel = new String[] { getMessage("label.not.confident"),
@@ -2118,19 +2118,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	 * default:
 	 * confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
 	 * }
-	 * 
+	 *
 	 * userResultRow.addCell(confidenceLevel);
 	 * }
-	 * 
+	 *
 	 * userResultRow.addCell(questionResult.getMark());
-	 * 
+	 *
 	 * if (assessment.isAllowAnswerJustification()) {
 	 * userResultRow.addCell(AssessmentEscapeUtils
 	 * .escapeStringForExcelExport(questionResult.getJustification()));
 	 * }
 	 * }
 	 * }
-	 * 
+	 *
 	 * ExcelRow userTotalRow = userSummarySheet.initRow();
 	 * userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
 	 * userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
@@ -2270,8 +2270,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 			if (addAnsweredDateColumn) {
-			    LearnerInteractionEvent interaction = learnerInteractions
-				    .get(questionResult.getQbToolQuestion().getUid());
+			    // only put interaction time into sheet if auto submit picked up answer
+			    LearnerInteractionEvent interaction = assessmentCell.value == null ? null
+				    : learnerInteractions.get(questionResult.getQbToolQuestion().getUid());
 			    if (interaction == null) {
 				userResultRow.addEmptyCell();
 			    } else {
