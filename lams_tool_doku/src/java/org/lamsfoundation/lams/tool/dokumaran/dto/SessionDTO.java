@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.dokumaran.dto;
 
 public class SessionDTO {
@@ -28,6 +27,7 @@ public class SessionDTO {
     private Long sessionId;
     private String sessionName;
     private String padId;
+    private String readOnlyPadId;
     private boolean sessionFaulty;
 
     public Long getSessionId() {
@@ -45,7 +45,7 @@ public class SessionDTO {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-    
+
     public String getPadId() {
 	return padId;
     }
@@ -53,7 +53,15 @@ public class SessionDTO {
     public void setPadId(String padId) {
 	this.padId = padId;
     }
-    
+
+    public String getReadOnlyPadId() {
+	return readOnlyPadId;
+    }
+
+    public void setReadOnlyPadId(String readOnlyPadId) {
+	this.readOnlyPadId = readOnlyPadId;
+    }
+
     public boolean isSessionFaulty() {
 	return sessionFaulty;
     }

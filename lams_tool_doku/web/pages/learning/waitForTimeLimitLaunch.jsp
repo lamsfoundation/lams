@@ -17,7 +17,7 @@
 		//init the connection with server using server URL but with different protocol
 		var dokuWebsocketInitTime = Date.now(),
 			dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-						+ 'learningWebsocket?toolContentID=' + ${toolContentID}),
+						+ 'learningWebsocket?toolContentID=' + ${sessionMap.toolContentID}),
 			dokuWebsocketPingTimeout = null,
 			dokuWebsocketPingFunc = null;
 		

@@ -429,9 +429,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    SessionDTO group = new SessionDTO();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
-
-	    String padId = session.getPadId();
-	    group.setPadId(padId);
+	    group.setPadId(session.getPadId());
+	    group.setReadOnlyPadId(session.getEtherpadReadOnlyId());
 
 	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
 	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId())

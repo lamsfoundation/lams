@@ -106,11 +106,15 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
+		function startGalleryWalk(){
+			document.location.href='<c:url value="/learning/startGalleryWalk.do?sessionMapID=${sessionMapID}"/>';
+		}
+		
 		<c:if test="${isTimeLimitEnabled}">
 			//init the connection with server using server URL but with different protocol
 			var dokuWebsocketInitTime = Date.now(),
 				dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-							+ 'learningWebsocket?toolContentID=' + ${toolContentID}),
+							+ 'learningWebsocket?toolContentID=' + ${sessionMap.toolContentID}),
 				dokuWebsocketPingTimeout = null,
 				dokuWebsocketPingFunc = null;
 			
@@ -271,6 +275,12 @@
 		<c:if test="${mode != 'teacher'}">
 			<div>
 				<c:choose>
+					<c:when test="${dokumaran.galleryWalkEnabled}">
+						<button name="FinishButton" id="finish-button"
+								onclick="return startGalleryWalk()" class="btn btn-default voffset5 pull-right">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" id="finish-button"
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">

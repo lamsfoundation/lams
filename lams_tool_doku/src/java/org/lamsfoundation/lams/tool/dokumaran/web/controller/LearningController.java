@@ -41,6 +41,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
+import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
@@ -57,8 +58,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -80,7 +83,7 @@ public class LearningController {
      * method run successfully.
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws EtherpadException
      *
      * @throws DokumaranConfigurationException
@@ -96,15 +99,14 @@ public class LearningController {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	Long toolSessionId = new Long(request.getParameter(DokumaranConstants.PARAM_TOOL_SESSION_ID));
+	Long toolSessionId = WebUtil.readLongParam(request, DokumaranConstants.PARAM_TOOL_SESSION_ID);
 	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionId);
-	request.setAttribute(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
 	boolean isFirstTimeAccess = false;
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // dokumaranUser may be null if the user was force completed.
@@ -128,7 +130,6 @@ public class LearningController {
 		: new ArrayList<>();
 	// forwards to the leaderSelection page
 	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
-
 	    // get group users and store it to request as DTO objects
 	    List<DokumaranUser> groupUsers = dokumaranService.getUsersBySession(toolSessionId);
 	    List<User> groupUserDtos = new ArrayList<>();
@@ -164,6 +165,7 @@ public class LearningController {
 	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED,
 		dokumaranService.isLeaderResponseFinalized(leaders));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// reflection information
@@ -216,6 +218,7 @@ public class LearningController {
 		return "pages/learning/notconfigured";
 	    }
 	}
+
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
 
 	//add new sessionID cookie in order to access pad
@@ -254,7 +257,7 @@ public class LearningController {
      * @return
      */
     @RequestMapping("/finish")
-    private String finish(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm, HttpServletRequest request) {
+    private String finish(HttpServletRequest request) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -290,6 +293,7 @@ public class LearningController {
      * @param response
      * @return
      */
+    @SuppressWarnings("unchecked")
     @RequestMapping("/newReflection")
     private String newReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
 	    HttpServletRequest request) {
@@ -314,6 +318,23 @@ public class LearningController {
 	}
 
 	return "pages/learning/notebook";
+    }
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping("/startGalleryWalk")
+    private String startGalleryWalk(@RequestParam String sessionMapID, HttpServletResponse response,
+	    HttpSession session, Model model) throws EtherpadException {
+	SessionMap<String, Object> map = (SessionMap<String, Object>) session.getAttribute(sessionMapID);
+	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionID);
+	List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId());
+	model.addAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
+
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	Cookie cookie = dokumaranService.createEtherpadCookieForMonitor(userDto, dokumaran.getContentId());
+	response.addCookie(cookie);
+
+	return "pages/learning/galleryWalk";
     }
 
     /**
@@ -350,7 +371,7 @@ public class LearningController {
 	    dokumaranService.updateEntry(entry);
 	}
 
-	return finish(reflectionForm, request);
+	return finish(request);
     }
 
     // *************************************************************************************
