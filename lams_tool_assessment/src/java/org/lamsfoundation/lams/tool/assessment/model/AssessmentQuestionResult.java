@@ -52,7 +52,7 @@ import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 @Table(name = "tl_laasse10_question_result")
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
 @PrimaryKeyJoinColumn(name = "uid")
-public class AssessmentQuestionResult extends QbToolAnswer implements Comparable<AssessmentQuestionResult> {
+public class AssessmentQuestionResult extends QbToolAnswer {
 
     @Column(name = "answer_float")
     private float answerFloat;
@@ -224,14 +224,4 @@ public class AssessmentQuestionResult extends QbToolAnswer implements Comparable
     public void setQuestionDto(QuestionDTO questionDto) {
 	this.questionDto = questionDto;
     }
-
-    @Override
-    public int compareTo(AssessmentQuestionResult o) {
-	if (o != null) {
-	    return qbToolQuestion.getDisplayOrder() - o.qbToolQuestion.getDisplayOrder();
-	} else {
-	    return 1;
-	}
-    }
-
 }
