@@ -2167,12 +2167,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
 
+	    int questionCounter = 1;
 	    // print out all question titles
 	    for (QuestionReference questionReference : questionReferences) {
 		AssessmentQuestion question = questionReference.getQuestion();
 		String title = question.getQbQuestion().getName();
 		// leave pure text of title
 		title = WebUtil.removeHTMLtags(title).strip();
+		// add question numbering in front of title
+		title = questionCounter + ". " + title;
+		questionCounter++;
 
 		// shorten long title
 		if (title.length() > 80) {
