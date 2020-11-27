@@ -56,6 +56,7 @@ public class AssessmentEscapeUtils {
      */
     public static void escapeQuotes(UserSummary userSummary) {
 	for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
+	    AssessmentEscapeUtils.escapeQuotes(userSummaryItem.getQuestionDto());
 	    for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
 		AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
 	    }
@@ -94,6 +95,10 @@ public class AssessmentEscapeUtils {
 	QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
 	questionResult.setQuestionDto(questionDto);
 
+	AssessmentEscapeUtils.escapeQuotes(questionDto);
+    }
+
+    private static void escapeQuotes(QuestionDTO questionDto) {
 	String title = questionDto.getTitle();
 	if (title != null) {
 	    String titleEscaped = StringEscapeUtils.escapeJavaScript(title);
@@ -312,7 +317,7 @@ public class AssessmentEscapeUtils {
 		// do not highlight if we use full answers, not letters,
 		// or if no answer was provided
 		highlightCell &= useLettersForMcq && StringUtils.isNotBlank(sb.toString());
-		
+
 	    } else if (type == QbQuestion.TYPE_ORDERING) {
 		for (int i = 0; i < optionAnswers.size(); i++) {
 		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
