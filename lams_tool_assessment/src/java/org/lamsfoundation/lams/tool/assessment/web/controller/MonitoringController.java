@@ -55,6 +55,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -133,6 +135,9 @@ public class MonitoringController {
 
     @Autowired
     private IRatingService ratingService;
+
+    @Autowired
+    private ILearnerInteractionService learnerInteractionService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
@@ -313,6 +318,10 @@ public class MonitoringController {
 
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
+
+	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
+		.getFirstLearnerInteractions(contentId, userId.intValue());
+	request.setAttribute("learnerInteractions", learnerInteractions);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()

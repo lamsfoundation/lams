@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.logevent;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,8 @@ public class LearnerInteractionEvent {
     public static final int RADIO_BUTTON_SELECTED = 1;
     public static final int CHECKBOX_CHECKED = 2;
     public static final int CHECKBOX_UNCHECKED = 3;
+
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     @Id
     @Column
@@ -70,6 +73,10 @@ public class LearnerInteractionEvent {
 
     public void setOccuredDateTime(LocalDateTime occuredDateTime) {
 	this.occuredDateTime = occuredDateTime;
+    }
+
+    public String getFormattedDate() {
+	return this.occuredDateTime.format(DATE_FORMATTER);
     }
 
     public int getUserId() {

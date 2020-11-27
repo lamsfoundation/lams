@@ -108,13 +108,14 @@
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
+	  	   	        	<c:set var="learnerInteraction" value="${learnerInteractions[questionResult.qbToolQuestion.uid]}" />
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		var table = jQuery("#user${question.uid}");
 	  	   	     		table.addRowData(${i.index + 1}, {
 	  	   	   	     		id:"${i.index + 1}",
 	  	   	   	   			questionResultUid:"${questionResult.uid}",
-	  	   	   	   			time:"${questionResult.finishDate}",
+	  	   	   	   			time:"${empty learnerInteraction ? questionResult.finishDate : learnerInteraction.formattedDate}",
 	  	   	   	   			response:responseStr,
 		  	   	   	   		<c:if test="${assessment.enableConfidenceLevels}">
 		  	 	   	   			confidence:"${questionResult.confidenceLevel}",

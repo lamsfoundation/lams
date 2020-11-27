@@ -2281,8 +2281,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    if (interaction == null) {
 				userResultRow.addEmptyCell();
 			    } else {
-				userResultRow.addCell(interaction.getOccuredDateTime()
-					.format(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMATTER));
+				userResultRow.addCell(interaction.getFormattedDate());
 			    }
 			}
 
