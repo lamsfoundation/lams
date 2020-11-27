@@ -173,7 +173,7 @@ public class MonitoringController {
 	}
 
 	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<>();
+	List<AssessmentQuestion> questionList = new LinkedList<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
