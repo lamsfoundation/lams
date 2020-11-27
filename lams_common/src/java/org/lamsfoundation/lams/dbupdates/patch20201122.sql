@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 -- Put all sql statements below here
 
---LDEV- Log learner clicks on MCQ questions in Assessment
+--LDEV-5123 Log learner clicks on MCQ questions in Assessment
 
 CREATE TABLE lams_learner_interaction_event (
 	uid BIGINT UNSIGNED auto_increment,

@@ -51,7 +51,7 @@ import org.lamsfoundation.lams.qb.model.QbToolAnswer;
 @Table(name = "tl_lamc11_usr_attempt")
 //in this entity's table primary key is "uid", but it references "answer_uid" in lams_qb_tool_answer
 @PrimaryKeyJoinColumn(name = "uid")
-public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparable<McUsrAttempt> {
+public class McUsrAttempt extends QbToolAnswer implements Serializable {
     private static final long serialVersionUID = 4514268732673337338L;
 
     @Column(name = "attempt_time")
@@ -183,15 +183,5 @@ public class McUsrAttempt extends QbToolAnswer implements Serializable, Comparab
 //	}
 
 	return getMark();
-    }
-
-    @Override
-    public int compareTo(McUsrAttempt other) {
-	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (uid == null) {
-	    return 1;
-	} else {
-	    return (int) (uid.longValue() - other.uid.longValue());
-	}
     }
 }

@@ -497,7 +497,7 @@
 		</property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.logevent.service.LearnerInteractionService">
-				<property name="baseDAO"><ref bean="baseDAO"/></property>
+				<property name="learnerInteractionDAO"><ref bean="learnerInteractionDAO"/></property>
 			</bean>	
 		</property>
 		<property name="proxyTargetClass"><value>true</value></property> 
@@ -727,6 +727,11 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>		
 	
+	<!-- Learner Interaction related beans -->
+	<bean id="learnerInteractionDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LearnerInteractionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>		
+		
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

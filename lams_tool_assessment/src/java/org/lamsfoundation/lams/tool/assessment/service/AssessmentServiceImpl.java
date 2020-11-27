@@ -65,6 +65,8 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -114,6 +116,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils.AssessmentExcelCell;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.controller.LearningWebsocketServer;
@@ -129,6 +132,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
@@ -187,6 +191,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     private IQbService qbService;
 
     private IOutcomeService outcomeService;
+
+    private ILearnerInteractionService learnerInteractionService;
 
     // *******************************************************************************
     // Service method
@@ -1904,7 +1910,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 
 			} else {
-			    userResultRow.addCell(AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
+			    AssessmentExcelCell assessmentCell = AssessmentEscapeUtils
+				    .addResponseCellForExcelExport(questionResult, false);
+			    userResultRow.addCell(assessmentCell.value,
+				    assessmentCell.isHighlighted ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
 
 			    if (doSummaryTable) {
 				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers,
@@ -1963,173 +1972,349 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
+	/*
+	 * ------------------------------------------------------------------
+	 * // -------------- Third tab: User Summary ---------------------------
+	 *
+	 * ExcelSheet userSummarySheet = new ExcelSheet(getMessage("label.export.summary.by.user"));
+	 * sheets.add(userSummarySheet);
+	 *
+	 * // Create the question summary
+	 * ExcelRow userSummaryTitle = userSummarySheet.initRow();
+	 * userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
+	 *
+	 * ExcelRow summaryRowTitle = userSummarySheet.initRow();
+	 * summaryRowTitle.addCell("#", true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
+	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 * summaryRowTitle.addCell(getMessage("label.authoring.basic.list.header.type"), true,
+	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 * summaryRowTitle.addCell(getMessage("label.authoring.basic.penalty.factor"), true,
+	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.default.mark"), true,
+	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 * summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.average.mark"), true,
+	 * ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	 *
+	 * Float totalGradesPossible = 0F;
+	 * Float totalAverage = 0F;
+	 * int questionIndex = 1;
+	 * if (assessment.getQuestionReferences() != null) {
+	 * Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
+	 * questionReferences.addAll(assessment.getQuestionReferences());
+	 *
+	 * int randomQuestionsCount = 1;
+	 * for (QuestionReference questionReference : questionReferences) {
+	 *
+	 * String title;
+	 * String questionType;
+	 * Float penaltyFactor;
+	 * Float averageMark = null;
+	 * if (questionReference.isRandomQuestion()) {
+	 *
+	 * title = getMessage("label.authoring.basic.type.random.question") + randomQuestionsCount++;
+	 * questionType = getMessage("label.authoring.basic.type.random.question");
+	 * penaltyFactor = null;
+	 * averageMark = null;
+	 * } else {
+	 *
+	 * AssessmentQuestion question = questionReference.getQuestion();
+	 * title = question.getQbQuestion().getName();
+	 * questionType = AssessmentServiceImpl.getQuestionTypeLanguageLabel(question.getType());
+	 * penaltyFactor = question.getQbQuestion().getPenaltyFactor();
+	 *
+	 * QuestionSummary questionSummary = questionSummaries.get(question.getUid());
+	 * if (questionSummary != null) {
+	 * averageMark = questionSummary.getAverageMark();
+	 * totalAverage += questionSummary.getAverageMark();
+	 * }
+	 * }
+	 *
+	 * int maxGrade = questionReference.getMaxMark();
+	 * totalGradesPossible += maxGrade;
+	 *
+	 * ExcelRow questCellRow = userSummarySheet.initRow();
+	 * questCellRow.addCell(questionIndex++);
+	 * questCellRow.addCell(title);
+	 * questCellRow.addCell(questionType);
+	 * questCellRow.addCell(penaltyFactor);
+	 * questCellRow.addCell(maxGrade);
+	 * questCellRow.addCell(averageMark);
+	 * }
+	 *
+	 * if (totalGradesPossible.floatValue() > 0) {
+	 * ExcelRow totalCellRow = userSummarySheet.initRow();
+	 * totalCellRow.addEmptyCells(2);
+	 * totalCellRow.addCell(getMessage("label.monitoring.summary.total"), true);
+	 * totalCellRow.addCell(totalGradesPossible);
+	 * totalCellRow.addCell(totalAverage);
+	 * }
+	 * userSummarySheet.addEmptyRow();
+	 * }
+	 *
+	 * if (sessionDtos != null) {
+	 * List<AssessmentResult> assessmentResults = assessmentResultDao
+	 * .getLastFinishedAssessmentResults(assessment.getContentId());
+	 * Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
+	 * for (AssessmentResult assessmentResult : assessmentResults) {
+	 * userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
+	 * }
+	 *
+	 * for (SessionDTO sessionDTO : sessionDtos) {
+	 * userSummarySheet.addEmptyRow();
+	 *
+	 * ExcelRow sessionTitle = userSummarySheet.initRow();
+	 * sessionTitle.addCell(sessionDTO.getSessionName(), true);
+	 *
+	 * AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
+	 * Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
+	 * if (assessmentUsers != null) {
+	 * for (AssessmentUser assessmentUser : assessmentUsers) {
+	 * ExcelRow userTitleRow = userSummarySheet.initRow();
+	 * userTitleRow.addCell(getMessage("label.export.user.id"), true);
+	 * userTitleRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
+	 * userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
+	 * userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
+	 * userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
+	 * if (assessment.isEnableConfidenceLevels()) {
+	 * userTitleRow.addCell(getMessage("label.confidence"), true);
+	 * }
+	 * userTitleRow.addCell(getMessage("label.export.mark"), true);
+	 *
+	 * if (assessment.isAllowAnswerJustification()) {
+	 * userTitleRow.addCell(getMessage("label.answer.justification"), true);
+	 * }
+	 *
+	 * AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
+	 * if (assessmentResult != null) {
+	 * Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
+	 * if (questionResults != null) {
+	 * for (AssessmentQuestionResult questionResult : questionResults) {
+	 * ExcelRow userResultRow = userSummarySheet.initRow();
+	 * userResultRow.addCell(assessmentUser.getLoginName());
+	 * userResultRow.addCell(assessmentUser.getFullName());
+	 * userResultRow.addCell(assessmentResult.getStartDate());
+	 * userResultRow.addCell(questionResult.getQbQuestion().getName());
+	 *
+	 * AssessmentEscapeUtils.addResponseCellForExcelExport(questionResult,
+	 * userResultRow, false);
+	 *
+	 * if (assessment.isEnableConfidenceLevels()) {
+	 * String confidenceLevel = null;
+	 *
+	 * switch (assessment.getConfidenceLevelsType()) {
+	 * case 2:
+	 * confidenceLevel = new String[] { getMessage("label.not.confident"),
+	 * getMessage("label.confident"),
+	 * getMessage("label.very.confident") }[questionResult
+	 * .getConfidenceLevel() / 5];
+	 * break;
+	 * case 3:
+	 * confidenceLevel = new String[] { getMessage("label.not.sure"),
+	 * getMessage("label.sure"),
+	 * getMessage("label.very.sure") }[questionResult
+	 * .getConfidenceLevel() / 5];
+	 * break;
+	 * default:
+	 * confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
+	 * }
+	 *
+	 * userResultRow.addCell(confidenceLevel);
+	 * }
+	 *
+	 * userResultRow.addCell(questionResult.getMark());
+	 *
+	 * if (assessment.isAllowAnswerJustification()) {
+	 * userResultRow.addCell(AssessmentEscapeUtils
+	 * .escapeStringForExcelExport(questionResult.getJustification()));
+	 * }
+	 * }
+	 * }
+	 *
+	 * ExcelRow userTotalRow = userSummarySheet.initRow();
+	 * userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
+	 * userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
+	 * userTotalRow.addCell(assessmentResult.getGrade());
+	 * userSummarySheet.addEmptyRow();
+	 * }
+	 * }
+	 * }
+	 * }
+	 * }
+	 */
+
 	// ------------------------------------------------------------------
-	// -------------- Third tab: User Summary ---------------------------
+	// -------------- Third tab: Learner summary ---------------------------
 
 	ExcelSheet userSummarySheet = new ExcelSheet(getMessage("label.export.summary.by.user"));
 	sheets.add(userSummarySheet);
 
-	// Create the question summary
-	ExcelRow userSummaryTitle = userSummarySheet.initRow();
-	userSummaryTitle.addCell(getMessage("label.export.user.summary"), true);
+	if (sessionDtos != null && assessment.getQuestionReferences() != null) {
+	    // if there are multiple session, then the activity has to be grouped
+	    boolean isActivityGrouped = sessionDtos.size() > 1;
 
-	ExcelRow summaryRowTitle = userSummarySheet.initRow();
-	summaryRowTitle.addCell("#", true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.question"), true,
-		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle.addCell(getMessage("label.authoring.basic.list.header.type"), true,
-		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle.addCell(getMessage("label.authoring.basic.penalty.factor"), true,
-		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.default.mark"), true,
-		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
-	summaryRowTitle.addCell(getMessage("label.monitoring.question.summary.average.mark"), true,
-		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    // Row with just "Questions" header
+	    ExcelRow userSummaryTitle = userSummarySheet.initRow();
+	    // if there is no grouping, then we skip "Group" column
+	    int questionLeftPadding = isActivityGrouped ? 3 : 2;
+	    userSummaryTitle.addEmptyCells(questionLeftPadding);
+	    userSummaryTitle.addCell(getMessage("label.export.questions"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 
-	Float totalGradesPossible = 0F;
-	Float totalAverage = 0F;
-	int questionIndex = 1;
-	if (assessment.getQuestionReferences() != null) {
+	    // Row with question titles
+	    ExcelRow questionTitlesRow = userSummarySheet.initRow();
+	    questionTitlesRow.addEmptyCells(questionLeftPadding);
+
 	    Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
 	    questionReferences.addAll(assessment.getQuestionReferences());
 
-	    int randomQuestionsCount = 1;
+	    int questionCounter = 1;
+	    // print out all question titles
 	    for (QuestionReference questionReference : questionReferences) {
+		AssessmentQuestion question = questionReference.getQuestion();
+		String title = question.getQbQuestion().getName();
+		// leave pure text of title
+		title = WebUtil.removeHTMLtags(title).strip();
+		// add question numbering in front of title
+		title = questionCounter + ". " + title;
+		questionCounter++;
 
-		String title;
-		String questionType;
-		Float penaltyFactor;
-		Float averageMark = null;
-		if (questionReference.isRandomQuestion()) {
-
-		    title = getMessage("label.authoring.basic.type.random.question") + randomQuestionsCount++;
-		    questionType = getMessage("label.authoring.basic.type.random.question");
-		    penaltyFactor = null;
-		    averageMark = null;
-		} else {
-
-		    AssessmentQuestion question = questionReference.getQuestion();
-		    title = question.getQbQuestion().getName();
-		    questionType = AssessmentServiceImpl.getQuestionTypeLanguageLabel(question.getType());
-		    penaltyFactor = question.getQbQuestion().getPenaltyFactor();
-
-		    QuestionSummary questionSummary = questionSummaries.get(question.getUid());
-		    if (questionSummary != null) {
-			averageMark = questionSummary.getAverageMark();
-			totalAverage += questionSummary.getAverageMark();
-		    }
+		// shorten long title
+		if (title.length() > 80) {
+		    title = title.substring(0, 80) + "...";
 		}
+		questionTitlesRow.addCell(title, true, ExcelCell.BORDER_STYLE_LEFT_THIN);
 
-		int maxGrade = questionReference.getMaxMark();
-		totalGradesPossible += maxGrade;
+		int columnShift = 1;
+		// currently only MCQ and True/False questions have learner interaction logged
+		// for other question types, do not include the column
+		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
+			|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
+		if (addAnsweredDateColumn) {
+		    columnShift++;
+		}
+		if (assessment.isEnableConfidenceLevels()) {
+		    columnShift++;
+		}
+		questionTitlesRow.addEmptyCells(columnShift);
+		userSummarySheet.addMergedCells(5, questionLeftPadding, questionLeftPadding + columnShift);
 
-		ExcelRow questCellRow = userSummarySheet.initRow();
-		questCellRow.addCell(questionIndex++);
-		questCellRow.addCell(title);
-		questCellRow.addCell(questionType);
-		questCellRow.addCell(penaltyFactor);
-		questCellRow.addCell(maxGrade);
-		questCellRow.addCell(averageMark);
+		questionLeftPadding += columnShift + 1;
+	    }
+	    questionTitlesRow.addCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
+
+	    // Row with column header below question titles
+	    ExcelRow userSummaryUserHeadersRow = userSummarySheet.initRow();
+	    if (isActivityGrouped) {
+		userSummaryUserHeadersRow.addCell(getMessage("label.export.group"), true);
+	    }
+	    userSummaryUserHeadersRow.addCell(getMessage("label.export.user.id"), true);
+	    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
+
+	    for (QuestionReference questionReference : questionReferences) {
+		userSummaryUserHeadersRow.addCell(getMessage("label.export.mark"), ExcelCell.BORDER_STYLE_LEFT_THIN);
+		userSummaryUserHeadersRow.addCell(getMessage("label.authoring.basic.option.answer"));
+
+		AssessmentQuestion question = questionReference.getQuestion();
+		boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
+			|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
+		if (addAnsweredDateColumn) {
+		    userSummaryUserHeadersRow.addCell(getMessage("monitor.summary.after.date"));
+		}
+		if (assessment.isEnableConfidenceLevels()) {
+		    userSummaryUserHeadersRow.addCell(getMessage("label.confidence"));
+		}
 	    }
 
-	    if (totalGradesPossible.floatValue() > 0) {
-		ExcelRow totalCellRow = userSummarySheet.initRow();
-		totalCellRow.addEmptyCells(2);
-		totalCellRow.addCell(getMessage("label.monitoring.summary.total"), true);
-		totalCellRow.addCell(totalGradesPossible);
-		totalCellRow.addCell(totalAverage);
-	    }
-	    userSummarySheet.addEmptyRow();
-	}
+	    // a single column at the end of previous headers
+	    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.summary.total"),
+		    ExcelCell.BORDER_STYLE_LEFT_THIN);
 
-	if (sessionDtos != null) {
 	    List<AssessmentResult> assessmentResults = assessmentResultDao
 		    .getLastFinishedAssessmentResults(assessment.getContentId());
-	    Map<Long, AssessmentResult> userUidToResultMap = new HashMap<>();
-	    for (AssessmentResult assessmentResult : assessmentResults) {
-		userUidToResultMap.put(assessmentResult.getUser().getUid(), assessmentResult);
-	    }
+	    Map<Long, AssessmentResult> userUidToResultMap = assessmentResults.stream()
+		    .collect(Collectors.toMap(r -> r.getUser().getUid(), r -> r));
 
 	    for (SessionDTO sessionDTO : sessionDtos) {
-		userSummarySheet.addEmptyRow();
-
-		ExcelRow sessionTitle = userSummarySheet.initRow();
-		sessionTitle.addCell(sessionDTO.getSessionName(), true);
-
 		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
-		if (assessmentUsers != null) {
-		    for (AssessmentUser assessmentUser : assessmentUsers) {
-			ExcelRow userTitleRow = userSummarySheet.initRow();
-			userTitleRow.addCell(getMessage("label.export.user.id"), true);
-			userTitleRow.addCell(getMessage("label.monitoring.user.summary.full.name"), true);
-			userTitleRow.addCell(getMessage("label.export.date.attempted"), true);
-			userTitleRow.addCell(getMessage("label.monitoring.question.summary.question"), true);
-			userTitleRow.addCell(getMessage("label.authoring.basic.option.answer"), true);
+		for (AssessmentUser assessmentUser : assessmentUsers) {
+		    ExcelRow userResultRow = userSummarySheet.initRow();
+		    if (isActivityGrouped) {
+			userResultRow.addCell(sessionDTO.getSessionName());
+		    }
+		    userResultRow.addCell(assessmentUser.getLoginName());
+		    userResultRow.addCell(assessmentUser.getFullName());
+
+		    AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
+		    if (assessmentResult == null) {
+			continue;
+		    }
+
+		    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
+		    if (questionResults == null) {
+			continue;
+		    }
+
+		    // get information when a learner started interaction with given questions
+		    Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
+			    .getFirstLearnerInteractions(assessment.getContentId(),
+				    assessmentUser.getUserId().intValue());
+
+		    for (AssessmentQuestionResult questionResult : questionResults) {
+			// mark
+			userResultRow.addCell(questionResult.getMark(), ExcelCell.BORDER_STYLE_LEFT_THIN);
+
+			// option chosen or full answer
+			AssessmentExcelCell assessmentCell = AssessmentEscapeUtils
+				.addResponseCellForExcelExport(questionResult, true);
+			userResultRow.addCell(assessmentCell.value,
+				assessmentCell.isHighlighted ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
+
+			// learner interaction
+			QbQuestion question = questionResult.getQbQuestion();
+			boolean addAnsweredDateColumn = QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
+				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
+			if (addAnsweredDateColumn) {
+			    // only put interaction time into sheet if auto submit picked up answer
+			    LearnerInteractionEvent interaction = assessmentCell.value == null ? null
+				    : learnerInteractions.get(questionResult.getQbToolQuestion().getUid());
+			    if (interaction == null) {
+				userResultRow.addEmptyCell();
+			    } else {
+				userResultRow.addCell(interaction.getFormattedDate());
+			    }
+			}
+
+			// confidence level
 			if (assessment.isEnableConfidenceLevels()) {
-			    userTitleRow.addCell(getMessage("label.confidence"), true);
-			}
-			userTitleRow.addCell(getMessage("label.export.mark"), true);
+			    String confidenceLevel = null;
 
-			if (assessment.isAllowAnswerJustification()) {
-			    userTitleRow.addCell(getMessage("label.answer.justification"), true);
-			}
-
-			AssessmentResult assessmentResult = userUidToResultMap.get(assessmentUser.getUid());
-			if (assessmentResult != null) {
-			    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
-			    if (questionResults != null) {
-				for (AssessmentQuestionResult questionResult : questionResults) {
-				    ExcelRow userResultRow = userSummarySheet.initRow();
-				    userResultRow.addCell(assessmentUser.getLoginName());
-				    userResultRow.addCell(assessmentUser.getFullName());
-				    userResultRow.addCell(assessmentResult.getStartDate());
-				    userResultRow.addCell(questionResult.getQbQuestion().getName());
-				    userResultRow.addCell(
-					    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult));
-				    if (assessment.isEnableConfidenceLevels()) {
-					String confidenceLevel = null;
-
-					switch (assessment.getConfidenceLevelsType()) {
-					    case 2:
-						confidenceLevel = new String[] { getMessage("label.not.confident"),
-							getMessage("label.confident"),
-							getMessage("label.very.confident") }[questionResult
-								.getConfidenceLevel() / 5];
-						break;
-					    case 3:
-						confidenceLevel = new String[] { getMessage("label.not.sure"),
-							getMessage("label.sure"),
-							getMessage("label.very.sure") }[questionResult
-								.getConfidenceLevel() / 5];
-						break;
-					    default:
-						confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
-					}
-
-					userResultRow.addCell(confidenceLevel);
-				    }
-
-				    userResultRow.addCell(questionResult.getMark());
-
-				    if (assessment.isAllowAnswerJustification()) {
-					userResultRow.addCell(AssessmentEscapeUtils
-						.escapeStringForExcelExport(questionResult.getJustification()));
-				    }
-				}
+			    switch (assessment.getConfidenceLevelsType()) {
+				case 2:
+				    confidenceLevel = new String[] { getMessage("label.not.confident"),
+					    getMessage("label.confident"),
+					    getMessage("label.very.confident") }[questionResult.getConfidenceLevel()
+						    / 5];
+				    break;
+				case 3:
+				    confidenceLevel = new String[] { getMessage("label.not.sure"),
+					    getMessage("label.sure"),
+					    getMessage("label.very.sure") }[questionResult.getConfidenceLevel() / 5];
+				    break;
+				default:
+				    confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
 			    }
 
-			    ExcelRow userTotalRow = userSummarySheet.initRow();
-			    userTotalRow.addEmptyCells(assessment.isEnableConfidenceLevels() ? 5 : 4);
-			    userTotalRow.addCell(getMessage("label.monitoring.summary.total"), true);
-			    userTotalRow.addCell(assessmentResult.getGrade());
-			    userSummarySheet.addEmptyRow();
+			    userResultRow.addCell(confidenceLevel);
 			}
 		    }
+		    userResultRow.addCell(assessmentResult.getGrade(), ExcelCell.BORDER_STYLE_LEFT_THIN);
 		}
+
+		userSummarySheet.addEmptyRow();
+		userSummarySheet.addEmptyRow();
 	    }
 	}
-
 	return sheets;
     }
 
@@ -3389,6 +3574,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	this.assessmentOutputFactory = assessmentOutputFactory;
     }
 
+    public void setLearnerInteractionService(ILearnerInteractionService learnerInteractionService) {
+	this.learnerInteractionService = learnerInteractionService;
+    }
+
     @Override
     public Class<?>[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
@@ -3641,7 +3830,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    if (collectionUUIDs != null) {
 			addToCollection &= !collectionUUIDs.contains(uuid);
 		    }
-		    
+
 		    int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
 		    if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
 			qbQuestion.clearID();

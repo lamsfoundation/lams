@@ -34,6 +34,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -81,6 +82,8 @@ public class FileUtil {
     public static final String ENCODING_UTF_8 = "UTF8";
     public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = new SimpleDateFormat(
 	    "dd/MM/yyyy HH:mm:ss");
+    public static final DateTimeFormatter EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMATTER = DateTimeFormatter
+	    .ofPattern("dd/MM/yyyy HH:mm:ss");
     public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
