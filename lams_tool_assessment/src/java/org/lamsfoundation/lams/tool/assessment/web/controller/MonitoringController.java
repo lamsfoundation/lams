@@ -298,8 +298,27 @@ public class MonitoringController {
     public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
 	    @RequestParam Long questionResultUid) {
-	Optional<Long> optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
-		questionResultUid);
+	Optional<Long> optionUid = null;
+	/*
+	 * We need to synchronise this operation.
+	 * When multiple requests are made to modify the same option, for example to add a VSA answer,
+	 * we have a case of dirty reads.
+	 * One answer gets added, but while DB is still flushing,
+	 * another answer reads the option without the first answer,
+	 * because it is not there yet.
+	 * The second answer gets added, but the first one gets lost.
+	 *
+	 * We can not synchronise the method in service
+	 * as the "dirty" transaction is already started before synchronisation kicks in.
+	 * We do it here, before transaction starts.
+	 * It will not work for distributed environment, though.
+	 * If teachers allocate answers on different LAMS servers,
+	 * we can still get the same problem. We will need a more sophisticated solution then.
+	 */
+	synchronized (service) {
+	    optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
+		    questionResultUid);
+	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put("isAnswerDuplicated", optionUid.isPresent());
