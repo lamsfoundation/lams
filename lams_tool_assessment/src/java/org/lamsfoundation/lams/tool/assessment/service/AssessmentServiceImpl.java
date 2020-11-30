@@ -1439,22 +1439,26 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	//adding
 	if (previousOptionUid.equals(-1L)) {
 	    //search for duplicates and, if found, return false
+	    QbOption targetOption = null;
 	    for (QbOption option : qbQuestion.getQbOptions()) {
 		String name = option.getName();
 		String[] alternatives = name.split("\r\n");
 		if (Arrays.asList(alternatives).contains(answer)) {
 		    return Optional.of(option.getUid());
 		}
+		if (option.getUid().equals(targetOptionUid)) {
+		    targetOption = option;
+		}
 	    }
 
-	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
-		if (targetOption.getUid().equals(targetOptionUid)) {
-		    String name = targetOption.getName();
-		    name += "\r\n" + answer;
-		    targetOption.setName(name);
-		    assessmentDao.saveObject(targetOption);
-		    break;
-		}
+	    String name = targetOption.getName();
+	    name += "\r\n" + answer;
+	    targetOption.setName(name);
+	    assessmentDao.saveObject(targetOption);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
+			+ questionUid);
 	    }
 
 	}
@@ -1465,10 +1469,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    String name = previousOption.getName();
 		    String[] alternatives = name.split("\r\n");
 
-		    String nameWithoutUserAnswer = "";
+		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
 		    for (String alternative : alternatives) {
 			if (!alternative.equals(answer)) {
-			    nameWithoutUserAnswer += alternative + "\r\n";
+			    nameWithoutUserAnswer.append(alternative).append("\r\n");
 			}
 		    }
 		    if (nameWithoutUserAnswer.length() > 2) {
@@ -1501,30 +1505,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    String name = previousOption.getName();
 		    String[] alternatives = name.split("\r\n");
 
-		    String nameWithoutUserAnswer = "";
+		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
 		    for (String alternative : alternatives) {
 			if (!alternative.equals(answer)) {
-			    nameWithoutUserAnswer += alternative + "\r\n";
+			    nameWithoutUserAnswer.append(alternative).append("\r\n");
 			}
 		    }
-		    if (nameWithoutUserAnswer.length() > 2) {
-			nameWithoutUserAnswer = nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2);
-		    }
-		    previousOption.setName(nameWithoutUserAnswer);
+		    previousOption.setName(nameWithoutUserAnswer.length() > 2
+			    ? nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2)
+			    : "");
 		    assessmentDao.saveObject(previousOption);
 		    break;
 		}
 	    }
 	}
-	assessmentResultDao.flush();
+	assessmentDao.flush();
 
 	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
 	if (!targetOptionUid.equals(previousOptionUid)) {
 
 	    // get all finished user results
 	    List<AssessmentResult> assessmentResults = assessmentResultDao
-		    .getAssessmentResultsByQbQuestion(qbQuestion.getUid());
-
+		    .getAssessmentResultsByQbQuestionAndAnswer(qbQuestion.getUid(), answer);
 	    //stores userId->lastFinishedAssessmentResult
 	    Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
 	    for (AssessmentResult assessmentResult : assessmentResults) {

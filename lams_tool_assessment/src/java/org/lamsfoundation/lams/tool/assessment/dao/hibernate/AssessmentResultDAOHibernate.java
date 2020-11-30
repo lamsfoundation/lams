@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -142,13 +143,24 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentResult> getAssessmentResultsByQbQuestion(Long qbQuestionUid) {
-	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT r FROM  " + AssessmentQuestionResult.class.getName()
+	return getAssessmentResultsByQbQuestionAndAnswer(qbQuestionUid, null);
+    }
+
+    @Override
+    public List<AssessmentResult> getAssessmentResultsByQbQuestionAndAnswer(Long qbQuestionUid, String answer) {
+	String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT r FROM  " + AssessmentQuestionResult.class.getName()
 		+ " AS q, " + AssessmentResult.class.getName() + " AS r "
-		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid AND (r.finishDate != null) ORDER BY r.startDate ASC";
+		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid AND (r.finishDate != null) ";
+	if (StringUtils.isNotBlank(answer)) {
+	    FIND_BY_QBQUESTION_AND_FINISHED += "AND TRIM(q.answer) = TRIM(:answer) ";
+	}
+	FIND_BY_QBQUESTION_AND_FINISHED += "ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
-//	q.addEntity("bq", AssessmentResult.class);
+	if (StringUtils.isNotBlank(answer)) {
+	    q.setParameter("answer", answer);
+	}
 	return q.list();
     }
 
