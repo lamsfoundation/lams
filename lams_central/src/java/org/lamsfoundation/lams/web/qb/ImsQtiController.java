@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -129,13 +130,12 @@ public class ImsQtiController {
 	    qbQuestion.setVersion(1);
 
 	    int questionMark = 1;
+	    boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
+	    boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
+	    boolean isVsaType = Question.QUESTION_TYPE_FILL_IN_BLANK.contentEquals(question.getType());
 
 	    // options are different depending on the type
-	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
-		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())
-		    || Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType())) {
-		boolean isMultipleChoice = Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType());
-		boolean isMarkHedgingType = Question.QUESTION_TYPE_MARK_HEDGING.equals(question.getType());
+	    if (isMultipleChoice || isMarkHedgingType || isVsaType) {
 
 		// setting answers is very similar in both types, so they were put together here
 		if (isMarkHedgingType) {
@@ -147,7 +147,7 @@ public class ImsQtiController {
 		    qbQuestion.setShuffle(false);
 		    qbQuestion.setPrefixAnswersWithLetters(false);
 
-		} else {
+		} else if (isVsaType) {
 		    qbQuestion.setType(QbQuestion.TYPE_VERY_SHORT_ANSWERS);
 		    qbQuestion.setCaseSensitive(false);
 		}
@@ -164,6 +164,11 @@ public class ImsQtiController {
 			    continue;
 			}
 			QbOption option = new QbOption();
+			if (isVsaType) {
+			    // convert comma-separated answers to ones accepted by QB VSA questions
+			    answerText = Stream.of(answerText.split(",")).map(String::strip)
+				    .collect(Collectors.joining("\r\n"));
+			}
 			option.setName(answerText);
 			option.setDisplayOrder(orderId++);
 			option.setFeedback(answer.getFeedback());
@@ -292,56 +297,6 @@ public class ImsQtiController {
 	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
 		qbQuestion.setType(QbQuestion.TYPE_ESSAY);
 		qbQuestion.setAllowRichEditor(false);
-
-	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
-		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
-		qbQuestion.setShuffle(false);
-		qbQuestion.setPrefixAnswersWithLetters(false);
-
-		String correctAnswer = null;
-		if (question.getAnswers() != null) {
-		    TreeSet<QbOption> optionList = new TreeSet<>();
-		    int orderId = 1;
-		    for (Answer answer : question.getAnswers()) {
-			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
-			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
-			    log.warn("Skipping an answer with same text as the correct answer: " + answerText);
-			    continue;
-			}
-			QbOption option = new QbOption();
-			option.setName(answerText);
-			option.setDisplayOrder(orderId++);
-			option.setFeedback(answer.getFeedback());
-			option.setQbQuestion(qbQuestion);
-
-			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
-			    // for fill in blanks question all answers are correct and get full mark
-			    if (correctAnswer == null) {
-				// whatever the correct answer holds, it becomes the question score
-				questionMark = Double.valueOf(Math.ceil(answer.getScore())).intValue();
-				// 100% goes to the correct answer
-				option.setMaxMark(1);
-				correctAnswer = answerText;
-			    } else {
-				log.warn("Choosing only first correct answer, despite another one was found: "
-					+ answerText);
-				option.setMaxMark(0);
-			    }
-			} else {
-			    option.setMaxMark(0);
-			}
-
-			optionList.add(option);
-		    }
-
-		    qbQuestion.setQbOptions(new ArrayList<>(optionList));
-		}
-
-		if (correctAnswer == null) {
-		    log.warn("No correct answer found for question: " + question.getText());
-		    continue;
-		}
 
 	    } else {
 		log.warn("Unknow QTI question type: " + question.getType());
