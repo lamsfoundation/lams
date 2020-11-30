@@ -63,6 +63,8 @@ public class QuestionWordParser {
 
     private final static String QUESTION_TAG = "question:";
     private final static String ANSWER_TAG = "answer:";
+    private final static String CORRECT_TAG = "correct:";
+    private final static String INCORRECT_TAG = "incorrect:";
     private final static String FEEDBACK_TAG = "feedback:";
     private final static String LEARNING_OUTCOME_TAG = "lo:";
     private static final String CUSTOM_IMAGE_TAG_REGEX = "\\[IMAGE: .*?]";
@@ -144,6 +146,8 @@ public class QuestionWordParser {
 	    String description = null;
 	    String feedback = null;
 	    List<Answer> answers = new ArrayList<>();
+	    Answer correctVsaAnswer = null;
+	    Answer incorrectVsaAnswer = null;
 	    List<String> learningOutcomes = new ArrayList<>();
 
 	    boolean optionsStarted = false;
@@ -177,11 +181,16 @@ public class QuestionWordParser {
 		    continue;
 		}
 
-		// check if correct answer line is found
+		// check if MCQ answer line is found
 		if (text.startsWith(ANSWER_TAG)) {
+		    answerTagFound = true;
+		    if (correctVsaAnswer != null || incorrectVsaAnswer != null) {
+			// question is malformed, display an error after this loop
+			break;
+		    }
+
 		    optionsStarted = true;
 		    feedbackStarted = false;
-		    answerTagFound = true;
 
 		    String correctAnswerLetters = text.replaceAll("(?i)" + ANSWER_TAG, "").replaceAll("\\s", "");
 		    String[] correctAnswersTable = correctAnswerLetters.split(",");
@@ -197,6 +206,29 @@ public class QuestionWordParser {
 				isMultipleResponse |= correctAnswersTable.length > 1;
 			    }
 			}
+		    }
+
+		    continue;
+		}
+
+		// check if VSA answer line is found
+		if (text.startsWith(CORRECT_TAG) || text.startsWith(INCORRECT_TAG)) {
+		    optionsStarted = true;
+		    feedbackStarted = false;
+
+		    String vsaAnswers = WebUtil.removeHTMLtags(formattedText).replaceAll("(?i)" + CORRECT_TAG, "")
+			    .replaceAll("(?i)" + INCORRECT_TAG, "").strip();
+
+		    Answer answer = new Answer();
+		    answer.setText(vsaAnswers);
+		    // there are only two answers, correct one and incorrect one
+		    if (text.startsWith(CORRECT_TAG)) {
+			answer.setDisplayOrder(1);
+			answer.setScore(1F);
+			correctVsaAnswer = answer;
+		    } else {
+			answer.setDisplayOrder(2);
+			incorrectVsaAnswer = answer;
 		    }
 
 		    continue;
@@ -257,8 +289,22 @@ public class QuestionWordParser {
 		continue;
 	    }
 
+	    if (answerTagFound && (correctVsaAnswer != null || incorrectVsaAnswer != null)) {
+		log.error(
+			"ANSWER tag found, but also CORRECT and/or INCORRECT tag found. Can not categorise the question as MCQ or VSA.");
+		continue;
+	    }
+
 	    Question question = new Question();
-	    if (answers.isEmpty()) {
+	    if (correctVsaAnswer != null) {
+		if (!QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK, limitType,
+			question)) {
+		    continue;
+		}
+		answers.add(correctVsaAnswer);
+		answers.add(incorrectVsaAnswer);
+		question.setAnswers(answers);
+	    } else if (answers.isEmpty()) {
 		if (!QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
 		    continue;
 		}
