@@ -1,10 +1,10 @@
 Etherpad is required for Dokumaran tool and for Etherpad tag
 
-1) Modifications are required for Etherpad server version 1.8.4, available at
-	https://github.com/ether/etherpad-lite/tree/1.8.4
+1) Modifications are required for Etherpad server version 1.8.5, available at
+	https://github.com/ether/etherpad-lite/tree/1.8.5
 
-2) Install ep_resize plugin
-	https://github.com/tiblu/ep_resize
+2) Install ep_resize plugin version 0.0.7 with command
+   npm install ep_resize@0.0.7
 
 3) Copy contents of folder /lams_tool_doku/conf/etherpad-lite/ over to /${etherpad-lite-server-folder}/
 	It customises Etherpad and the plugin
@@ -12,15 +12,14 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 4) In order to hide Etherpad index page make the following file empty: /${etherpad-lite-server-folder}/src/templates/index.html.
 	Besides, one can turn on "editOnly" option in /${etherpad-lite-server-folder}/settings.json. This option's description: "Users may edit pads but not create new ones. Pad creation is only via the API. This applies both to group pads and regular pads."
 
-5) Other plugins (optional):
+5) Other plugins. Optional. Newer versions of plugins can be incompatible with Etherpad 1.8.5:
 	adminpads2: 		plugin to list and delete pads in /admin 2.1.16
 	authornames:		Adds author names to span titles (shows on hover) 0.2.0
 	author_neat:		Neat author display 0.0.31
-	comments_page:		Adds comments on sidebar and link it to the text 0.1.27
+	comments_page:		Adds comments on sidebar and link it to the text 0.1.41
 	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
-	headings2:			Adds heading support 0.1.15
+	headings2:			Adds heading support 0.2.7
 	message_all:		Use the Etherpad admin backend to send a message to all connected users 1.1.0
-	tables4:			Insert tables into your Etherpad documents 1.0.5
 	stats:				See pad Stats 0.0.6
 
 	
