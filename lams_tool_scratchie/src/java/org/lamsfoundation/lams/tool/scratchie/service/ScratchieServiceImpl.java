@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -592,8 +591,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
-	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid);
+    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
@@ -2722,7 +2721,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	QbCollection collection = null;
 	Set<String> collectionUUIDs = null;
-	
+
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (int i = 0; i < questions.size(); i++) {
 

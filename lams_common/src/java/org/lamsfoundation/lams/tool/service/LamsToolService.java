@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Jacky Fang
@@ -238,7 +237,7 @@ public class LamsToolService implements ILamsToolService {
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
-	    User learner = (User) toolContentDAO.find(User.class, learnerId);
+	    User learner = toolContentDAO.find(User.class, learnerId);
 	    String outputName = LamsToolService.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
 		    leaderSelectionActivity);
@@ -277,7 +276,7 @@ public class LamsToolService implements ILamsToolService {
     public Set<Long> getLeaderUserId(Long leaderSelectionActivityId) {
 	Activity activity = activityDAO.getActivityByActivityId(leaderSelectionActivityId);
 	List<ToolSession> toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
-	Set<Long> result = new TreeSet<Long>();
+	Set<Long> result = new TreeSet<>();
 	for (ToolSession toolSession : toolSessions) {
 	    ToolOutput output = lamsCoreToolService.getOutputFromTool(LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID,
 		    toolSession, null);
@@ -371,10 +370,10 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
 
-	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<Long>();
+	Set<Long> confidenceProvidingActivityIds = new LinkedHashSet<>();
 	findPrecedingAssessmentAndMcqActivities(specifiedActivity, confidenceProvidingActivityIds, true);
 
-	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<ToolActivity>();
+	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
 	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO
 		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
@@ -389,8 +388,8 @@ public class LamsToolService implements ILamsToolService {
      * them). Please note, it does not check whether enableConfidenceLevels advanced option is ON in those activities.
      */
     @SuppressWarnings("rawtypes")
-    private void findPrecedingAssessmentAndMcqActivities(Activity activity,
-	    Set<Long> confidenceProvidingActivityIds, boolean isMcqIncluded) {
+    private void findPrecedingAssessmentAndMcqActivities(Activity activity, Set<Long> confidenceProvidingActivityIds,
+	    boolean isMcqIncluded) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
 	if (activityClass.equals(ToolActivity.class)) {
@@ -442,7 +441,7 @@ public class LamsToolService implements ILamsToolService {
 	    return;
 	}
     }
-    
+
     @Override
     public Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId) {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
@@ -452,10 +451,10 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
 
-	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<Long>();
+	Set<Long> providingVsaAnswersActivityIds = new LinkedHashSet<>();
 	findPrecedingAssessmentAndMcqActivities(specifiedActivity, providingVsaAnswersActivityIds, false);
 
-	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<ToolActivity>();
+	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : providingVsaAnswersActivityIds) {
 	    ToolActivity activityProvidingVsaAnswers = (ToolActivity) activityDAO
 		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
@@ -468,7 +467,7 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid,
 	    Integer requestorUserId, Long requestorToolSessionId) {
-	User user = (User) activityDAO.find(User.class, requestorUserId);
+	User user = activityDAO.find(User.class, requestorUserId);
 	if (user == null) {
 	    throw new ToolException("No user found for userId=" + requestorUserId);
 	}
@@ -494,11 +493,11 @@ public class LamsToolService implements ILamsToolService {
 		.getConfidenceLevelsByToolSession(confidenceLevelSession);
 	return confidenceLevelDtos;
     }
-    
+
     @Override
     public Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
 	    Integer requestorUserId, Long requestorToolSessionId) {
-	User user = (User) activityDAO.find(User.class, requestorUserId);
+	User user = activityDAO.find(User.class, requestorUserId);
 	if (user == null) {
 	    throw new ToolException("No user found for userId=" + requestorUserId);
 	}
@@ -513,13 +512,13 @@ public class LamsToolService implements ILamsToolService {
 	ToolSession assessmentSession = toolSessionDAO.getToolSessionByLearner(user, activityProvidingVsaAnswers);
 	return lamsCoreToolService.getVsaAnswersByToolSession(assessmentSession);
     }
-    
+
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
+    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
 	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
 		.findToolService(scratchieTool);
-	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid);
+	sessionManager.recalculateScratchieMarksForVsaQuestion(qbQuestionUid, answer);
     }
 
     @Override

@@ -298,31 +298,32 @@ public class MonitoringController {
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
 	    @RequestParam Long questionResultUid) {
 
-	AssessmentQuestionResult questionRes = service.getAssessmentQuestionResultByUid(questionResultUid);
-	String answer = questionRes.getAnswer();
-	/*
-	 * We need to synchronise this operation.
-	 * When multiple requests are made to modify the same option, for example to add a VSA answer,
-	 * we have a case of dirty reads.
-	 * One answer gets added, but while DB is still flushing,
-	 * another answer reads the option without the first answer,
-	 * because it is not there yet.
-	 * The second answer gets added, but the first one gets lost.
-	 *
-	 * We can not synchronise the method in service
-	 * as the "dirty" transaction is already started before synchronisation kicks in.
-	 * We do it here, before transaction starts.
-	 * It will not work for distributed environment, though.
-	 * If teachers allocate answers on different LAMS servers,
-	 * we can still get the same problem. We will need a more sophisticated solution then.
-	 */
 	Long optionUid = null;
-	synchronized (service) {
-	    optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, answer);
-	}
 
-	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
 	if (!targetOptionUid.equals(previousOptionUid)) {
+	    AssessmentQuestionResult questionRes = service.getAssessmentQuestionResultByUid(questionResultUid);
+	    String answer = questionRes.getAnswer();
+	    /*
+	     * We need to synchronise this operation.
+	     * When multiple requests are made to modify the same option, for example to add a VSA answer,
+	     * we have a case of dirty reads.
+	     * One answer gets added, but while DB is still flushing,
+	     * another answer reads the option without the first answer,
+	     * because it is not there yet.
+	     * The second answer gets added, but the first one gets lost.
+	     *
+	     * We can not synchronise the method in service
+	     * as the "dirty" transaction is already started before synchronisation kicks in.
+	     * We do it here, before transaction starts.
+	     * It will not work for distributed environment, though.
+	     * If teachers allocate answers on different LAMS servers,
+	     * we can still get the same problem. We will need a more sophisticated solution then.
+	     */
+
+	    synchronized (service) {
+		optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, answer);
+	    }
+	    //recalculate marks for all lessons in all cases except for reshuffling inside the same container
 	    service.recalculateMarksForAllocatedAnswer(questionUid, answer);
 	}
 

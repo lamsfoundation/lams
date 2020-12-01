@@ -1559,7 +1559,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 
 	//recalculate marks in all Scratchie activities, that use modified QbQuestion
-	toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
+	toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid(), answer);
     }
 
     @Override
