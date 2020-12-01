@@ -38,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -1428,13 +1427,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
-	    Long questionResultUid) {
+    public Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer) {
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
-	AssessmentQuestionResult questionRes = assessmentQuestionResultDao
-		.getAssessmentQuestionResultByUid(questionResultUid);
-	String answer = questionRes.getAnswer();
 
 	//adding
 	if (previousOptionUid.equals(-1L)) {
@@ -1444,7 +1439,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		String name = option.getName();
 		String[] alternatives = name.split("\r\n");
 		if (Arrays.asList(alternatives).contains(answer)) {
-		    return Optional.of(option.getUid());
+		    return option.getUid();
 		}
 		if (option.getUid().equals(targetOptionUid)) {
 		    targetOption = option;
@@ -1460,10 +1455,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		log.debug("Adding answer \"" + answer + "\" to option " + targetOptionUid + " in question "
 			+ questionUid);
 	    }
-
+	    return null;
 	}
+
 	//removing
-	else if (targetOptionUid.equals(-1L)) {
+	if (targetOptionUid.equals(-1L)) {
 	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
 		if (previousOption.getUid().equals(previousOptionUid)) {
 		    String name = previousOption.getName();
@@ -1482,94 +1478,88 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    break;
 		}
 	    }
-
+	    return null;
 	}
-	//reshuffling inside the same container - do nothing
-	else if (targetOptionUid.equals(previousOptionUid)) {
 
-	}
 	//moving from one to another
-	else {
-	    for (QbOption targetOption : qbQuestion.getQbOptions()) {
-		if (targetOption.getUid().equals(targetOptionUid)) {
-		    String name = targetOption.getName();
-		    name += "\r\n" + answer;
-		    targetOption.setName(name);
-		    assessmentDao.saveObject(targetOption);
+	for (QbOption targetOption : qbQuestion.getQbOptions()) {
+	    if (targetOption.getUid().equals(targetOptionUid)) {
+		String name = targetOption.getName();
+		name += "\r\n" + answer;
+		targetOption.setName(name);
+		assessmentDao.saveObject(targetOption);
+		break;
+	    }
+	}
+
+	for (QbOption previousOption : qbQuestion.getQbOptions()) {
+	    if (previousOption.getUid().equals(previousOptionUid)) {
+		String name = previousOption.getName();
+		String[] alternatives = name.split("\r\n");
+
+		StringBuilder nameWithoutUserAnswer = new StringBuilder();
+		for (String alternative : alternatives) {
+		    if (!alternative.equals(answer)) {
+			nameWithoutUserAnswer.append(alternative).append("\r\n");
+		    }
+		}
+		previousOption.setName(nameWithoutUserAnswer.length() > 2
+			? nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2)
+			: "");
+		assessmentDao.saveObject(previousOption);
+		break;
+	    }
+	}
+	return null;
+    }
+
+    @Override
+    public void recalculateMarksForAllocatedAnswer(Long questionUid, String answer) {
+	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
+	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+	// get all finished user results
+	List<AssessmentResult> assessmentResults = assessmentResultDao
+		.getAssessmentResultsByQbQuestionAndAnswer(qbQuestion.getUid(), answer);
+	//stores userId->lastFinishedAssessmentResult
+	Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
+	for (AssessmentResult assessmentResult : assessmentResults) {
+	    Long userId = assessmentResult.getUser().getUserId();
+	    lastFinishedAssessmentResults.put(userId, assessmentResult);
+	}
+
+	for (AssessmentResult assessmentResult : assessmentResults) {
+	    AssessmentUser user = assessmentResult.getUser();
+	    float assessmentMark = assessmentResult.getGrade();
+	    int assessmentMaxMark = assessmentResult.getMaximumGrade();
+
+	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+		if (questionResult.getQbQuestion().getUid().equals(qbQuestion.getUid())) {
+		    Float oldQuestionAnswerMark = questionResult.getMark();
+		    int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
+			    : questionResult.getMaxMark().intValue();
+
+		    //actually recalculate marks
+		    QuestionDTO questionDto = new QuestionDTO(assessmentQuestion);
+		    questionDto.setMaxMark(oldResultMaxMark);
+		    loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
+		    calculateAnswerMark(assessmentResult.getAssessment().getUid(), user.getUserId(), questionResult,
+			    questionDto);
+		    assessmentQuestionResultDao.saveObject(questionResult);
+
+		    float newQuestionAnswerMark = questionResult.getMark();
+		    assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
 		    break;
 		}
 	    }
 
-	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
-		if (previousOption.getUid().equals(previousOptionUid)) {
-		    String name = previousOption.getName();
-		    String[] alternatives = name.split("\r\n");
-
-		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
-		    for (String alternative : alternatives) {
-			if (!alternative.equals(answer)) {
-			    nameWithoutUserAnswer.append(alternative).append("\r\n");
-			}
-		    }
-		    previousOption.setName(nameWithoutUserAnswer.length() > 2
-			    ? nameWithoutUserAnswer.substring(0, nameWithoutUserAnswer.length() - 2)
-			    : "");
-		    assessmentDao.saveObject(previousOption);
-		    break;
-		}
-	    }
-	}
-	assessmentDao.flush();
-
-	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
-	if (!targetOptionUid.equals(previousOptionUid)) {
-
-	    // get all finished user results
-	    List<AssessmentResult> assessmentResults = assessmentResultDao
-		    .getAssessmentResultsByQbQuestionAndAnswer(qbQuestion.getUid(), answer);
-	    //stores userId->lastFinishedAssessmentResult
-	    Map<Long, AssessmentResult> lastFinishedAssessmentResults = new LinkedHashMap<>();
-	    for (AssessmentResult assessmentResult : assessmentResults) {
-		Long userId = assessmentResult.getUser().getUserId();
-		lastFinishedAssessmentResults.put(userId, assessmentResult);
-	    }
-
-	    for (AssessmentResult assessmentResult : assessmentResults) {
-		AssessmentUser user = assessmentResult.getUser();
-		float assessmentMark = assessmentResult.getGrade();
-		int assessmentMaxMark = assessmentResult.getMaximumGrade();
-
-		for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
-		    if (questionResult.getQbQuestion().getUid().equals(qbQuestion.getUid())) {
-			Float oldQuestionAnswerMark = questionResult.getMark();
-			int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
-				: questionResult.getMaxMark().intValue();
-
-			//actually recalculate marks
-			QuestionDTO questionDto = new QuestionDTO(assessmentQuestion);
-			questionDto.setMaxMark(oldResultMaxMark);
-			loadupQuestionResultIntoQuestionDto(questionDto, questionResult);
-			calculateAnswerMark(assessmentResult.getAssessment().getUid(), user.getUserId(), questionResult,
-				questionDto);
-			assessmentQuestionResultDao.saveObject(questionResult);
-
-			float newQuestionAnswerMark = questionResult.getMark();
-			assessmentMark += newQuestionAnswerMark - oldQuestionAnswerMark;
-			break;
-		    }
-		}
-
-		// store new mark and maxMark if they were changed
-		AssessmentResult lastFinishedAssessmentResult = lastFinishedAssessmentResults.get(user.getUserId());
-		storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
-			assessmentMaxMark, user);
-	    }
-
-	    //recalculate marks in all Scratchie activities, that use modified QbQuestion
-	    toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
+	    // store new mark and maxMark if they were changed
+	    AssessmentResult lastFinishedAssessmentResult = lastFinishedAssessmentResults.get(user.getUserId());
+	    storeAssessmentResultMarkAndMaxMark(assessmentResult, lastFinishedAssessmentResult, assessmentMark,
+		    assessmentMaxMark, user);
 	}
 
-	return Optional.empty();
+	//recalculate marks in all Scratchie activities, that use modified QbQuestion
+	toolService.recalculateScratchieMarksForVsaQuestion(qbQuestion.getUid());
     }
 
     @Override

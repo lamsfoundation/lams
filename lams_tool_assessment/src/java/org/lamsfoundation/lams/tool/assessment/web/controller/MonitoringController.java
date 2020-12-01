@@ -36,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -298,7 +297,9 @@ public class MonitoringController {
     public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
 	    @RequestParam Long questionResultUid) {
-	Optional<Long> optionUid = null;
+
+	AssessmentQuestionResult questionRes = service.getAssessmentQuestionResultByUid(questionResultUid);
+	String answer = questionRes.getAnswer();
 	/*
 	 * We need to synchronise this operation.
 	 * When multiple requests are made to modify the same option, for example to add a VSA answer,
@@ -315,14 +316,19 @@ public class MonitoringController {
 	 * If teachers allocate answers on different LAMS servers,
 	 * we can still get the same problem. We will need a more sophisticated solution then.
 	 */
+	Long optionUid = null;
 	synchronized (service) {
-	    optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
-		    questionResultUid);
+	    optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, answer);
+	}
+
+	//recalculate marks for all lessons in all cases except for reshuffling inside the same container
+	if (!targetOptionUid.equals(previousOptionUid)) {
+	    service.recalculateMarksForAllocatedAnswer(questionUid, answer);
 	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isAnswerDuplicated", optionUid.isPresent());
-	responseJSON.put("optionUid", optionUid.orElse(-1L));
+	responseJSON.put("isAnswerDuplicated", optionUid != null);
+	responseJSON.put("optionUid", optionUid == null ? -1 : optionUid);
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }

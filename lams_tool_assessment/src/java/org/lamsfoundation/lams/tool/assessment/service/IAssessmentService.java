@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -435,8 +434,12 @@ public interface IAssessmentService extends ICommonToolService {
      * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
      *         another teacher working in parallel)
      */
-    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
-	    Long questionResultUid);
+    Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer);
+
+    /**
+     * Recalculate learners' marks after a VSA answer was allocated as correct or incorrect.
+     */
+    void recalculateMarksForAllocatedAnswer(Long questionUid, String answer);
 
     /**
      * For export purposes
