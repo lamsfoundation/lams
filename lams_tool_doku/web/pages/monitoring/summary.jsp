@@ -352,6 +352,23 @@
 			},
 			'success' : function(){
 				$('#gallery-walk-start').hide();
+				$('#gallery-walk-finish').hide();
+			}
+		});
+	}
+	
+	function finishGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/finishGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				$('#gallery-walk-finish').hide();
 			}
 		});
 	}
@@ -396,9 +413,16 @@
 			<c:if test="${dokumaran.galleryWalkEnabled}">
 				<button id="gallery-walk-start" type="button"
 				        class="btn btn-default 
-				        	   ${dokumaran.galleryWalkEnabled and not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:startGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+				</button>
+				
+				<button id="gallery-walk-finish" type="button"
+				        class="btn btn-default 
+				        	   ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:finishGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
 				</button>
 			</c:if>
 		</div>

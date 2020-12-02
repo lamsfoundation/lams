@@ -282,6 +282,13 @@ public class MonitoringController {
 
 	dokumaranService.startGalleryWalk(toolContentId);
     }
+    
+    @RequestMapping("/finishGalleryWalk")
+    private void finishGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.finishGalleryWalk(toolContentId);
+    }
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();

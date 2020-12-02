@@ -28,6 +28,16 @@
 				}
 			});
 		});
+		
+		function finishSession(){
+			document.getElementById("finish-button").disabled = true;
+			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
+			return false;
+		}
+		
+		function continueReflect(){
+			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		}
 	</script>
 	
 	<%@ include file="websocket.jsp"%>	
@@ -62,6 +72,34 @@
 			</div>
 		</c:forEach>
 	</div>
+	
+	<c:if test="${mode != 'teacher' and dokumaran.galleryWalkFinished}">
+		<div>
+			<c:choose>
+				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					<button name="FinishButton" id="finish-button"
+							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+						<fmt:message key="label.continue" />
+					</button>
+				</c:when>
+				<c:otherwise>
+					<a href="#nogo" name="FinishButton" id="finish-button"
+							onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+						<span class="nextActivity">
+							<c:choose>
+			 					<c:when test="${sessionMap.isLastActivity}">
+			 						<fmt:message key="label.submit" />
+			 					</c:when>
+			 					<c:otherwise>
+			 		 				<fmt:message key="label.finished" />
+			 					</c:otherwise>
+			 				</c:choose>
+						</span>
+					</a>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</c:if>
 </lams:Page>
 </body>
 </lams:html>

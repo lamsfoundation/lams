@@ -166,7 +166,7 @@ public class LearningController {
 	}
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 
-	if (dokumaran.isGalleryWalkStarted() && !dokumaran.isGalleryWalkFinished()) {
+	if (dokumaran.isGalleryWalkStarted()) {
 	    List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId());
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
 	    if (currentUserDto == null) {

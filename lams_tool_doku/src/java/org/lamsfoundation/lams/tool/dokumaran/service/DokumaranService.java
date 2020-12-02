@@ -516,7 +516,21 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 	dokumaran.setGalleryWalkStarted(true);
 	dokumaranDao.saveObject(dokumaran);
-	
+
+	LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) throws IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	if (!dokumaran.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not finish Gallery Walk as it is not enabled for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	dokumaran.setGalleryWalkFinished(true);
+	dokumaranDao.saveObject(dokumaran);
+
 	LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
     }
 
