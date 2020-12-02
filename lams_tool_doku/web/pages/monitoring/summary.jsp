@@ -341,6 +341,10 @@
 	}
 	
 	function startGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+			return;
+		}
+		
 		$.ajax({
 			'url' : '<c:url value="/monitoring/startGalleryWalk.do"/>',
 			'data': {
