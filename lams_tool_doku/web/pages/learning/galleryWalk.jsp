@@ -55,7 +55,7 @@
 		       	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					
 					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}"
-								   showControls="true" showOnDemand="true" height="600" />	
+								   showControls="${hasEditRight}" showOnDemand="true" height="600" />	
 				</div>
 			</div>
 		</c:forEach>
