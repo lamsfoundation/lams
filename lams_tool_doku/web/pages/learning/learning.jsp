@@ -106,11 +106,7 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-		function startGalleryWalk(){
-			document.location.href='<c:url value="/learning/startGalleryWalk.do?sessionMapID=${sessionMapID}"/>';
-		}
-		
-		<c:if test="${isTimeLimitEnabled}">
+		<c:if test="${isTimeLimitEnabled or dokumaran.galleryWalkEnabled}">
 			//init the connection with server using server URL but with different protocol
 			var dokuWebsocketInitTime = Date.now(),
 				dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
@@ -151,6 +147,12 @@
 				
 				// create JSON object
 				var input = JSON.parse(e.data);
+				
+				// force page refresh, for example to go to Gallery Walk
+				if (input.pageRefresh) {
+					location.reload();
+					return;
+				}
 				
 				//monitor has added one minute to the total timeLimit time
 				if (input.addTime) {
@@ -272,15 +274,9 @@
 		</c:if>
 		<!-- End Reflection -->
 
-		<c:if test="${mode != 'teacher'}">
+		<c:if test="${mode != 'teacher' and not dokumaran.galleryWalkEnabled}">
 			<div>
 				<c:choose>
-					<c:when test="${dokumaran.galleryWalkEnabled}">
-						<button name="FinishButton" id="finish-button"
-								onclick="return startGalleryWalk()" class="btn btn-default voffset5 pull-right">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" id="finish-button"
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">

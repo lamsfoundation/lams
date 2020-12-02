@@ -113,6 +113,12 @@ public class Dokumaran implements Cloneable {
     @Column(name = "gallery_walk_read_only")
     private boolean galleryWalkReadOnly;
 
+    @Column(name = "gallery_walk_started")
+    private boolean galleryWalkStarted;
+
+    @Column(name = "gallery_walk_finished")
+    private boolean galleryWalkFinished;
+
     // general information
     @Column(name = "create_date")
     private Date created;
@@ -428,5 +434,21 @@ public class Dokumaran implements Cloneable {
 
     public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
 	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public boolean isGalleryWalkStarted() {
+	return galleryWalkStarted;
+    }
+
+    public void setGalleryWalkStarted(boolean galleryWalkStarted) {
+	this.galleryWalkStarted = galleryWalkStarted;
+    }
+
+    public boolean isGalleryWalkFinished() {
+	return galleryWalkFinished;
+    }
+
+    public void setGalleryWalkFinished(boolean galleryWalkFinished) {
+	this.galleryWalkFinished = galleryWalkFinished;
     }
 }

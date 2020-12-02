@@ -262,4 +262,6 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     DokumaranUser getUser(Long uid);
+
+    void startGalleryWalk(long toolContentId) throws IOException;
 }

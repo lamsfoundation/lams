@@ -47,10 +47,13 @@
 	.panel {
 		overflow: auto;
 	}
-	#time-limit-buttons {
+	#control-buttons {
 		padding-bottom: 20px;
 	}
 	
+	#gallery-walk-start {
+		margin-left: 20px;
+	}
 	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
 	  outline: #337ab7 2px solid;
 	}
@@ -336,15 +339,28 @@
 			$('#countdown').countdown('pause');
 		}
 	}
+	
+	function startGalleryWalk(){
+		$.ajax({
+			'url' : '<c:url value="/monitoring/startGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				$('#gallery-walk-start').hide();
+			}
+		});
+	}
 </script>
 
 <div class="panel">
 	<h4>
-	    <c:out value="${sessionMap.dokumaran.title}" escapeXml="true"/>
+	    <c:out value="${dokumaran.title}" escapeXml="true"/>
 	</h4>
 	
-	<c:out value="${sessionMap.dokumaran.description}" escapeXml="false"/>
-	 
+	<c:out value="${dokumaran.description}" escapeXml="false"/>
+	
+	
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			 <fmt:message key="message.monitoring.summary.no.session" />
@@ -355,21 +371,32 @@
 	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div>
 
-	<c:if test="${dokumaran.timeLimit > 0}">
-		
+	<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
+		<div class="pull-right" id="control-buttons">
 	
-		<div class="pull-right" id="time-limit-buttons">
-			<div id="countdown"></div>
-		
-			<c:if test="${empty dokumaran.timeLimitLaunchedDate}">
-				<a href="#nogo" class="btn btn-default btn-xs" id="start-activity">
-					<fmt:message key="label.start.activity" />
-				</a>		
+			
+			<c:if test="${dokumaran.timeLimit > 0}">
+				<div id="countdown"></div>
+			
+				<c:if test="${empty dokumaran.timeLimitLaunchedDate}">
+					<a href="#nogo" class="btn btn-default btn-xs" id="start-activity">
+						<fmt:message key="label.start.activity" />
+					</a>		
+				</c:if>
+				
+				<a href="#nogo" class="btn btn-default btn-xs" id="add-one-minute">
+					<fmt:message key="label.plus.one.minute" />
+				</a>	
 			</c:if>
 			
-			<a href="#nogo" class="btn btn-default btn-xs" id="add-one-minute">
-				<fmt:message key="label.plus.one.minute" />
-			</a>	
+			<c:if test="${dokumaran.galleryWalkEnabled}">
+				<button id="gallery-walk-start" type="button"
+				        class="btn btn-default 
+				        	   ${dokumaran.galleryWalkEnabled and not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:startGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+				</button>
+			</c:if>
 		</div>
 		
 		<br>

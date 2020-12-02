@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
+import org.lamsfoundation.lams.tool.dokumaran.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -500,6 +501,25 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return (DokumaranUser) dokumaranUserDao.getObject(DokumaranUser.class, uid);
     }
 
+    @Override
+    public void startGalleryWalk(long toolContentId) throws IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	if (!dokumaran.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is not enabled for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	if (dokumaran.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is already finished for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	dokumaran.setGalleryWalkStarted(true);
+	dokumaranDao.saveObject(dokumaran);
+	
+	LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -761,7 +781,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		ToolSession toolSession = toolService.getToolSession(toolSessionId);
 		Long lessonId = toolSession.getLesson().getLessonId();
 		groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
-		
+
 		etherpadHtml = EtherpadUtil.preparePadContent(dokumaran.getInstructions());
 	    } else {
 		session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());

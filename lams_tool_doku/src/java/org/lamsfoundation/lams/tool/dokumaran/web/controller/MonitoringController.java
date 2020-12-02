@@ -267,9 +267,6 @@ public class MonitoringController {
 
     /**
      * Stores date when user has started activity with time limit
-     *
-     * @throws IOException
-     * @throws JSONException
      */
     @RequestMapping("/addOneMinute")
     private void addOneMinute(HttpServletRequest request) throws IOException {
@@ -277,6 +274,13 @@ public class MonitoringController {
 
 	dokumaranService.addOneMinute(toolContentId);
 
+    }
+
+    @RequestMapping("/startGalleryWalk")
+    private void startGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.startGalleryWalk(toolContentId);
     }
 
     private Integer getUserId() {
