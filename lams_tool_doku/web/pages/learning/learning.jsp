@@ -106,70 +106,6 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-		<c:if test="${isTimeLimitEnabled or dokumaran.galleryWalkEnabled}">
-			//init the connection with server using server URL but with different protocol
-			var dokuWebsocketInitTime = Date.now(),
-				dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-							+ 'learningWebsocket?toolContentID=' + ${sessionMap.toolContentID}),
-				dokuWebsocketPingTimeout = null,
-				dokuWebsocketPingFunc = null;
-			
-			dokuWebsocket.onclose = function(){
-				// react only on abnormal close
-				if (e.code === 1006 &&
-					Date.now() - dokuWebsocketInitTime > 1000) {
-					location.reload();
-				}
-			};
-			
-			dokuWebsocketPingFunc = function(skipPing){
-				if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
-						|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				dokuWebsocketPingTimeout = setTimeout(dokuWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					dokuWebsocket.send("ping");
-				}
-			};
-			
-			// set up timer for the first time
-			dokuWebsocketPingFunc(true);
-			
-			// run when the server pushes new reports and vote statistics
-			dokuWebsocket.onmessage = function(e) {
-				// reset ping timer
-				clearTimeout(dokuWebsocketPingTimeout);
-				dokuWebsocketPingFunc(true);
-				
-				// create JSON object
-				var input = JSON.parse(e.data);
-				
-				// force page refresh, for example to go to Gallery Walk
-				if (input.pageRefresh) {
-					location.reload();
-					return;
-				}
-				
-				//monitor has added one minute to the total timeLimit time
-				if (input.addTime) {
-					//reload page in order to allow editing the pad again
-					if (!$('#countdown').length) {
-						location.reload();
-					}
-					
-			    	var times = $("#countdown").countdown('getTimes'),
-			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + input.addTime*60;
-			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
-					
-					return;
-				}
-			};			
-		</c:if>
-		
 		function displayCountdown() {
 			$.blockUI({
 				message: '<div id="countdown"></div>', 
@@ -207,6 +143,10 @@
 			});
 		}
 	</script>
+	
+	<c:if test="${isTimeLimitEnabled or dokumaran.galleryWalkEnabled}">
+		<%@ include file="websocket.jsp"%>		
+	</c:if>
 </lams:head>
 <body class="stripes">
 

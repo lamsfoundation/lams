@@ -29,6 +29,8 @@
 			});
 		});
 	</script>
+	
+	<%@ include file="websocket.jsp"%>	
 </lams:head>
 <body class="stripes">
 
