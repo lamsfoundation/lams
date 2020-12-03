@@ -478,7 +478,7 @@
 									
 		</c:when>
 		<c:otherwise>
-			<c:if test="${dokumaran.galleryWalkStarted}">
+			<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
 				<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
 			</c:if>
 			

@@ -82,13 +82,14 @@
 		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
-		       	    <c:if test="${dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId}">
+		       	    <c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
 								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 
 					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}"
-								   showControls="${not dokumaran.galleryWalkFinished and hasEditRight}" showOnDemand="true" height="600" />	
+								   showControls="${not dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly and hasEditRight}"
+								   showOnDemand="true" height="600" />	
 				</div>
 			</div>
 		</c:forEach>
