@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.dto;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+
 public class SessionDTO {
 
     private Long sessionId;
@@ -29,6 +31,7 @@ public class SessionDTO {
     private String padId;
     private String readOnlyPadId;
     private boolean sessionFaulty;
+    private ItemRatingDTO itemRatingDto;
 
     public Long getSessionId() {
 	return sessionId;
@@ -68,5 +71,13 @@ public class SessionDTO {
 
     public void setSessionFaulty(boolean sessionFaulty) {
 	this.sessionFaulty = sessionFaulty;
+    }
+
+    public ItemRatingDTO getItemRatingDto() {
+	return itemRatingDto;
+    }
+
+    public void setItemRatingDto(ItemRatingDTO ratingDto) {
+	this.itemRatingDto = ratingDto;
     }
 }

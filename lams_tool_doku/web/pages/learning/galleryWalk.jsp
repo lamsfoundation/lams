@@ -11,12 +11,27 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
+	
 	<%@ include file="/common/header.jsp"%>
+	<lams:css suffix="jquery.jRating"/>
+	
 	<style>
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
+			//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/",
+			//vars for rating.js
+			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			MAX_RATES = 0,
+			MIN_RATES = 0,
+			LAMS_URL = '${lams}',
+			COUNT_RATED_ITEMS = true,
+			ALLOW_RERATE = false,
+			SESSION_ID = ${toolSessionID};
+
 		$(document).ready(function(){
 			// show etherpads only on Group expand
 			$('.etherpad-collapse').on('show.bs.collapse', function(){
@@ -39,6 +54,8 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	
 	<%@ include file="websocket.jsp"%>	
 </lams:head>
@@ -62,12 +79,16 @@
 					</a>
 				</span>
 		       </div>
-		       
 		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
-		       	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
-					
+		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+					<%-- Do not show rating to own group before Gallery Walk is finished --%>
+		       	    <c:if test="${dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId}">
+		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
+								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+		       	    </c:if>
+		 
 					<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.readOnlyPadId}"
-								   showControls="${hasEditRight}" showOnDemand="true" height="600" />	
+								   showControls="${not dokumaran.galleryWalkFinished and hasEditRight}" showOnDemand="true" height="600" />	
 				</div>
 			</div>
 		</c:forEach>

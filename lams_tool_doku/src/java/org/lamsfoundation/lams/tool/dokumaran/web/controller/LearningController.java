@@ -166,9 +166,22 @@ public class LearningController {
 	}
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 
+	// reflection information
+	String entryText = new String();
+	if (user != null) {
+	    NotebookEntry notebookEntry = dokumaranService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    DokumaranConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+	    if (notebookEntry != null) {
+		entryText = notebookEntry.getEntry();
+	    }
+	}
+	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_INSTRUCTION, dokumaran.getReflectInstructions());
+	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ENTRY, entryText);
+
 	if (dokumaran.isGalleryWalkStarted()) {
-	    List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId());
+	    List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
+
 	    if (currentUserDto == null) {
 		currentUserDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    }
@@ -188,18 +201,6 @@ public class LearningController {
 
 	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED,
 		dokumaranService.isLeaderResponseFinalized(leaders));
-
-	// reflection information
-	String entryText = new String();
-	if (user != null) {
-	    NotebookEntry notebookEntry = dokumaranService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    DokumaranConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_INSTRUCTION, dokumaran.getReflectInstructions());
-	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (dokumaran.isDefineLater()) {

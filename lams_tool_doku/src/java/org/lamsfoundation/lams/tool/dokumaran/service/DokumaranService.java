@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 
@@ -47,6 +49,10 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -101,6 +107,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private ILamsToolService toolService;
 
     private IUserManagementService userManagementService;
+
+    private IRatingService ratingService;
 
     private IExportToolContentService exportContentService;
 
@@ -418,13 +426,48 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public List<SessionDTO> getSummary(Long contentId) {
-	List<SessionDTO> groupList = new ArrayList<>();
-
+    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) {
 	// get all sessions in a dokumaran and retrieve all dokumaran items under this session
 	// plus initial dokumaran items by author creating (resItemList)
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
+	Dokumaran dokumaran = dokumaranDao.getByContentId(contentId);
 
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	if (dokumaran.isGalleryWalkStarted()) {
+	    // Dokumaran currently supports only one place for ratings.
+	    // It is rating other groups' pads on results page.
+	    // Criterion gets automatically created and there must be only one.
+	    List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(contentId);
+	    if (criteria.size() >= 2) {
+		throw new IllegalArgumentException("There can be only one criterion for a Dokumaran activity. "
+			+ "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	    }
+	    ToolActivityRatingCriteria criterion = null;
+	    if (criteria.isEmpty()) {
+		criterion = (ToolActivityRatingCriteria) RatingCriteria
+			.getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+		criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
+		criterion.setOrderId(1);
+		criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+		criterion.setToolContentId(contentId);
+
+		userManagementService.save(criterion);
+	    } else {
+		criterion = (ToolActivityRatingCriteria) criteria.get(0);
+	    }
+
+	    // Item IDs are DokumaranSession session IDs, i.e. a single Etherpad
+	    Set<Long> itemIds = sessionList.stream()
+		    .collect(Collectors.mapping(DokumaranSession::getSessionId, Collectors.toSet()));
+
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, false,
+		    ratingUserId);
+	    // Mapping of Item ID -> DTO
+	    itemRatingDtoMap = itemRatingDtos.stream()
+		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+	}
+
+	List<SessionDTO> groupList = new ArrayList<>();
 	for (DokumaranSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
@@ -437,6 +480,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId())
 		    || StringUtils.isEmpty(session.getEtherpadGroupId())) {
 		group.setSessionFaulty(true);
+	    }
+
+	    if (itemRatingDtoMap != null) {
+		group.setItemRatingDto(itemRatingDtoMap.get(session.getSessionId()));
 	    }
 
 	    groupList.add(group);
@@ -1007,6 +1054,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
     }
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {

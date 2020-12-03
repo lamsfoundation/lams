@@ -71,7 +71,18 @@
 <script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
-	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
+	//var for jquery.jRating.js
+	var pathToImageFolder = "${lams}images/css/",
+		//vars for rating.js
+		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		MAX_RATES = 0,
+		MIN_RATES = 0,
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = true,
+		ALLOW_RERATE = false,
+		
+		isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
 		// show etherpads only on Group expand
@@ -373,6 +384,8 @@
 		});
 	}
 </script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <div class="panel">
 	<h4>
@@ -437,7 +450,7 @@
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 	
-	<c:if test="${sessionMap.isGroupedActivity}">	
+	<c:if test="${sessionMap.isGroupedActivity}">
 	    <div class="panel panel-default" >
         <div class="panel-heading" id="heading${groupSummary.sessionId}">
         	<span class="panel-title collapsable-icon-left">
@@ -465,6 +478,10 @@
 									
 		</c:when>
 		<c:otherwise>
+			<c:if test="${dokumaran.galleryWalkStarted}">
+				<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
+			</c:if>
+			
 			<div class="btn-group btn-group-xs pull-right">
 				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
 				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 

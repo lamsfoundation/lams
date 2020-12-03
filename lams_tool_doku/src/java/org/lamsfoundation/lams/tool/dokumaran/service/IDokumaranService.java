@@ -213,11 +213,8 @@ public interface IDokumaranService extends ICommonToolService {
 
     /**
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
-     *
-     * @param contentId
-     * @return
      */
-    List<SessionDTO> getSummary(Long contentId);
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
 
     /**
      * Create refection entry into notebook tool.

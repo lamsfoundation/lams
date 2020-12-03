@@ -106,7 +106,7 @@ public class MonitoringController {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> groupList = dokumaranService.getSummary(contentId);
+	List<SessionDTO> groupList = dokumaranService.getSummary(contentId, null);
 	boolean hasFaultySession = false;
 	for (SessionDTO group : groupList) {
 	    hasFaultySession |= group.isSessionFaulty();
@@ -282,7 +282,7 @@ public class MonitoringController {
 
 	dokumaranService.startGalleryWalk(toolContentId);
     }
-    
+
     @RequestMapping("/finishGalleryWalk")
     private void finishGalleryWalk(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
