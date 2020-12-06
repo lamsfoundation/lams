@@ -363,7 +363,7 @@
 			},
 			'success' : function(){
 				$('#gallery-walk-start').hide();
-				$('#gallery-walk-finish').hide();
+				$('#gallery-walk-finish').removeClass('hidden');
 			}
 		});
 	}
@@ -432,8 +432,7 @@
 				</button>
 				
 				<button id="gallery-walk-finish" type="button"
-				        class="btn btn-default 
-				        	   ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
 				        onClick="javascript:finishGalleryWalk()">
 					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
 				</button>
