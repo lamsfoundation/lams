@@ -118,7 +118,7 @@ public class LearningController {
 		    toolSessionId);
 	    if (user == null) {
 		user = new DokumaranUser(currentUserDto, session);
-		dokumaranService.saveUser(user);
+		dokumaranService.saveOrUpdate(user);
 		isFirstTimeAccess = true;
 	    }
 	}
@@ -210,7 +210,7 @@ public class LearningController {
 	// set contentInUse flag to true!
 	dokumaran.setContentInUse(true);
 	dokumaran.setDefineLater(false);
-	dokumaranService.saveOrUpdateDokumaran(dokumaran);
+	dokumaranService.saveOrUpdate(dokumaran);
 
 	//time limit
 	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && dokumaran.getTimeLimit() != 0;

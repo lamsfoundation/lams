@@ -169,7 +169,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    //in case current user is leader - store his leader status
 		    if (leaderUserId.equals(user.getUserId())) {
 			user.setLeader(true);
-			saveUser(user);
+			saveOrUpdate(user);
 			leaders.add(user);
 			continue;
 		    }
@@ -189,7 +189,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 			DokumaranUser leader = new DokumaranUser(leaderDto.getUserDTO(), session);
 			leader.setLeader(true);
-			saveUser(leader);
+			saveOrUpdate(leader);
 			leaders.add(leader);
 		    }
 		}
@@ -210,7 +210,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			log.debug("creating new user with userId: " + leaderUserId);
 			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 			leader = new DokumaranUser(leaderDto.getUserDTO(), session);
-			saveUser(leader);
+			saveOrUpdate(leader);
 		    }
 
 		    // set group leader
@@ -328,11 +328,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void saveUser(DokumaranUser dokumaranUser) {
-	dokumaranUserDao.saveObject(dokumaranUser);
-    }
-
-    @Override
     public DokumaranUser getUserByIDAndContent(Long userId, Long contentId) {
 	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
@@ -356,8 +351,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void saveOrUpdateDokumaran(Dokumaran dokumaran) {
-	dokumaranDao.saveObject(dokumaran);
+    public void saveOrUpdate(Object entity) {
+	dokumaranDao.saveObject(entity);
     }
 
     @Override
@@ -372,11 +367,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public DokumaranSession getDokumaranSessionBySessionId(Long sessionId) {
 	return dokumaranSessionDao.getSessionBySessionId(sessionId);
-    }
-
-    @Override
-    public void saveOrUpdateDokumaranSession(DokumaranSession resSession) {
-	dokumaranSessionDao.saveObject(resSession);
     }
 
     @Override
@@ -434,26 +424,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
 	if (dokumaran.isGalleryWalkStarted()) {
-	    // Dokumaran currently supports only one place for ratings.
-	    // It is rating other groups' pads on results page.
-	    // Criterion gets automatically created and there must be only one.
-	    List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(contentId);
-	    if (criteria.size() >= 2) {
-		throw new IllegalArgumentException("There can be only one criterion for a Dokumaran activity. "
-			+ "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
-	    }
-	    ToolActivityRatingCriteria criterion = null;
-	    if (criteria.isEmpty()) {
-		criterion = (ToolActivityRatingCriteria) RatingCriteria
-			.getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
-		criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
-		criterion.setOrderId(1);
-		criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
-		criterion.setToolContentId(contentId);
-
-		userManagementService.save(criterion);
-	    } else {
-		criterion = (ToolActivityRatingCriteria) criteria.get(0);
+	    if (!dokumaran.isGalleryWalkReadOnly()) {
+		// it should have been creating on lesson create,
+		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
+		createGalleryWalkRatingCriterion(dokumaran.getContentId());
 	    }
 
 	    // Item IDs are DokumaranSession session IDs, i.e. a single Etherpad
@@ -546,6 +520,29 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public DokumaranUser getUser(Long uid) {
 	return (DokumaranUser) dokumaranUserDao.getObject(DokumaranUser.class, uid);
+    }
+
+    private List<RatingCriteria> createGalleryWalkRatingCriterion(long toolContentId) {
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+	if (criteria.size() >= 2) {
+	    // Dokumaran currently supports only one place for ratings.
+	    // It is rating other groups' pads on results page.
+	    // Criterion gets automatically created and there must be only one.
+	    throw new IllegalArgumentException("There can be only one criterion for a Dokumaran activity. "
+		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	}
+	if (criteria.isEmpty()) {
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
+		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
+	    criterion.setOrderId(1);
+	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setToolContentId(toolContentId);
+
+	    dokumaranDao.insert(criterion);
+	    criteria.add(criterion);
+	}
+	return criteria;
     }
 
     @Override
@@ -718,6 +715,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	Dokumaran toContent = Dokumaran.newInstance(dokumaran, toContentId);
 	dokumaranDao.saveObject(toContent);
+
+	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {
+	    createGalleryWalkRatingCriterion(toContentId);
+	}
     }
 
     @Override
@@ -1121,7 +1122,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	dokumaran.setCreatedBy(dokumaranUser);
 
-	saveOrUpdateDokumaran(dokumaran);
+	saveOrUpdate(dokumaran);
 
     }
 }
