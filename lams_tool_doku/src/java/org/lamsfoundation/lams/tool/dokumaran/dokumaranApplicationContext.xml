@@ -61,6 +61,9 @@
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
    		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
    		<property name="ratingService">
    			<ref bean="ratingService"/>
    		</property>

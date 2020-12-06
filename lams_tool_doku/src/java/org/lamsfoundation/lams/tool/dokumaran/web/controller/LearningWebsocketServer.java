@@ -184,7 +184,7 @@ public class LearningWebsocketServer {
      * Monitor has launched time limit. All learners will need to refresh the page in order to stop showing them
      * waitForTimeLimitLaunch page.
      */
-    public static void sendPageRefreshRequest(Long toolContentId) throws IOException {
+    private static void sendPageRefreshRequest(Long toolContentId) throws IOException {
 	Set<Session> toolContentWebsockets = websockets.get(toolContentId);
 	if (toolContentWebsockets == null) {
 	    return;

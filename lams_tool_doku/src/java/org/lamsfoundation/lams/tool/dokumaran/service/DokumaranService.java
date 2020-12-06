@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -71,7 +72,6 @@ import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
-import org.lamsfoundation.lams.tool.dokumaran.web.controller.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -81,6 +81,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.gjerull.etherpad.client.EPLiteClient;
@@ -107,6 +108,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private ILamsToolService toolService;
 
     private IUserManagementService userManagementService;
+
+    private ILearnerService learnerService;
 
     private IRatingService ratingService;
 
@@ -561,7 +564,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setGalleryWalkStarted(true);
 	dokumaranDao.saveObject(dokumaran);
 
-	LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+	sendGalleryWalkRefreshRequest(dokumaran);
     }
 
     @Override
@@ -575,7 +578,18 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setGalleryWalkFinished(true);
 	dokumaranDao.saveObject(dokumaran);
 
-	LearningWebsocketServer.sendPageRefreshRequest(toolContentId);
+	sendGalleryWalkRefreshRequest(dokumaran);
+    }
+
+    private void sendGalleryWalkRefreshRequest(Dokumaran dokumaran) {
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "gallery-walk-refresh-" + dokumaran.getContentId());
+	// get all learners in this doku
+	Set<Integer> userIds = dokumaranSessionDao.getByContentId(dokumaran.getContentId()).stream()
+		.flatMap(session -> dokumaranUserDao.getBySessionID(session.getSessionId()).stream())
+		.collect(Collectors.mapping(user -> user.getUserId().intValue(), Collectors.toSet()));
+
+	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
     }
 
     // *****************************************************************************
@@ -1055,6 +1069,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     public void setRatingService(IRatingService ratingService) {
