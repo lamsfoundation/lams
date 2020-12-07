@@ -75,7 +75,14 @@
 		       	<span class="panel-title collapsable-icon-left">
 		       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
 							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" data-parent="#doku-group-panels">
-						<c:out value="${groupSummary.sessionName}" />
+						<c:choose>
+							<c:when test="${toolSessionID == groupSummary.sessionId}">
+								<b><c:out value="${groupSummary.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
+							</c:when>
+							<c:otherwise>
+								<c:out value="${groupSummary.sessionName}" />
+							</c:otherwise>
+						</c:choose>
 					</a>
 				</span>
 		       </div>
