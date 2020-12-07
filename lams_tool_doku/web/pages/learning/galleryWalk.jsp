@@ -29,7 +29,7 @@
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
-			ALLOW_RERATE = false,
+			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 
 		$(document).ready(function(){
