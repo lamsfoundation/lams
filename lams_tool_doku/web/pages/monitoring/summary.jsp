@@ -54,6 +54,27 @@
 	#gallery-walk-start {
 		margin-left: 20px;
 	}
+	
+	#gallery-walk-rating-table {
+		width: 60%;
+		margin: 50px auto;
+		border-bottom: 1px solid #ddd;
+	}
+	
+	#gallery-walk-rating-table th {
+		font-weight: bold;
+		font-style: normal;
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table td {
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
+		text-align: right;
+	}
+	
 	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
 	  outline: #337ab7 2px solid;
 	}
@@ -379,7 +400,14 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				$('#gallery-walk-finish').hide();
+				<c:choose>
+					<c:when test="${dokumaran.galleryWalkReadOnly}">
+						$('#gallery-walk-finish').hide();
+					</c:when>
+					<c:otherwise>
+						location.reload();
+					</c:otherwise>
+				</c:choose>
 			}
 		});
 	}
@@ -442,6 +470,29 @@
 		<br>
 	</c:if>
 </div>
+
+<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+	<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+	  <thead class="thead-light">
+	    <tr>
+	      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+	      <th scope="col"><fmt:message key="label.rating" /></th>
+	    </tr>
+	  </thead>
+	  <tbody>
+		<c:forEach var="groupSummary" items="${summaryList}">
+			<tr>
+				<td>${groupSummary.sessionName}</td>
+				<td>
+					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+								 isItemAuthoredByUser="true"
+								 hideCriteriaTitle="true" />
+				</td>
+			</tr>
+		</c:forEach>
+	  </tbody>
+	</table>
+</c:if>
 
 <c:if test="${sessionMap.isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
