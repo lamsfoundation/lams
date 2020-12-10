@@ -4,11 +4,12 @@
 
 <script>
 	$(document).ready(function() {
-		$('#galleryWalkEnabled').change(function(){
+		$('#gallery-walk-enabled').change(function(){
 			if ($(this).is(':checked')) {
-				$('#galleryWalkReadOnly').prop('disabled', false);
+				$('#gallery-walk-options').slideDown();
 			} else {
-				$('#galleryWalkReadOnly').prop('disabled', true).prop('checked', false);
+				$('#gallery-walk-options').slideUp()
+					.find('#gallery-walk-read-only').prop('checked', false);
 			}
 		}).change();
 	});
@@ -68,23 +69,34 @@
 
 </lams:SimplePanel>
 
-<lams:OutcomeAuthor toolContentId="${authoringForm.dokumaran.contentId}" />
-
-<lams:SimplePanel titleKey="label.activity.completion">
-
+<lams:SimplePanel titleKey="label.gallery.walk">
+	<p>
+		<fmt:message key="label.authoring.advance.gallery.walk.info1" />
+	</p>
+	<p>
+		<fmt:message key="label.authoring.advance.gallery.walk.info2" />
+	</p>
+	
 	<div class="checkbox">
-		<label for="galleryWalkEnabled">
-			<form:checkbox path="dokumaran.galleryWalkEnabled" id="galleryWalkEnabled" />
+		<label for="gallery-walk-enabled">
+			<form:checkbox path="dokumaran.galleryWalkEnabled" id="gallery-walk-enabled" />
 			<fmt:message key="label.authoring.advance.gallery.walk.enabled" />
 		</label>
 	</div>
 	
-	<div class="checkbox loffset20">
-		<label for="galleryWalkReadOnly">
-			<form:checkbox path="dokumaran.galleryWalkReadOnly" id="galleryWalkReadOnly" />
-			<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
-		</label>
+	<div id="gallery-walk-options">
+		<div class="checkbox">
+			<label for="gallery-walk-read-only">
+				<form:checkbox path="dokumaran.galleryWalkReadOnly" id="gallery-walk-read-only" />
+				<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
+			</label>
+		</div>
 	</div>
+</lams:SimplePanel>
+
+<lams:OutcomeAuthor toolContentId="${authoringForm.dokumaran.contentId}" />
+
+<lams:SimplePanel titleKey="label.activity.completion">
 
 	<div class="checkbox">
 		<label for="lockWhenFinished">
