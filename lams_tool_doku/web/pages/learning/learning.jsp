@@ -40,6 +40,9 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
+	    // avoid name clash between bootstrap and jQuery UI
+	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+	    
 		$(document).ready(function(){
 			// Resize Etherpad iframe when its content grows.
 			// It does not support shrinking, only growing.
@@ -75,6 +78,7 @@
 				displayCountdown()
 			}
 			
+			$('[data-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -214,9 +218,15 @@
 		</c:if>
 		<!-- End Reflection -->
 
-		<c:if test="${mode != 'teacher' and not dokumaran.galleryWalkEnabled}">
+		<c:if test="${mode != 'teacher'}">
 			<div>
 				<c:choose>
+					<c:when test="${dokumaran.galleryWalkEnabled}">
+						<button class="btn btn-default voffset5 pull-right disabled"
+								data-toggle="tooltip"  title="<fmt:message key='label.gallery.walk.wait.start' />">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" id="finish-button"
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">

@@ -50,8 +50,11 @@
 			COUNT_RATED_ITEMS = true,
 			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
-
-		$(document).ready(function(){
+			
+	    // avoid name clash between bootstrap and jQuery UI
+	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+		
+	    $(document).ready(function(){
 			// show etherpads only on Group expand
 			$('.etherpad-collapse').on('show.bs.collapse', function(){
 				var etherpad = $('.etherpad-container', this);
@@ -61,6 +64,8 @@
 					etherpadInitMethods[groupId]();
 				}
 			});
+			
+			$('[data-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		function finishSession(){
@@ -144,10 +149,16 @@
 		</c:forEach>
 	</div>
 	
-	<c:if test="${mode != 'teacher' and dokumaran.galleryWalkFinished}">
+	<c:if test="${mode != 'teacher'}">
 		<div>
 			<c:choose>
-				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+				<c:when test="${not dokumaran.galleryWalkFinished}">
+					<button class="btn btn-default voffset5 pull-right disabled"
+							data-toggle="tooltip" title="<fmt:message key='label.gallery.walk.wait.finish' />">
+						<fmt:message key="label.continue" />
+					</button>
+				</c:when>
+				<c:when test="${sessionMap.reflectOn and not sessionMap.userFinished}">
 					<button name="FinishButton" id="finish-button"
 							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 						<fmt:message key="label.continue" />
