@@ -119,6 +119,9 @@ public class Dokumaran implements Cloneable {
     @Column(name = "gallery_walk_finished")
     private boolean galleryWalkFinished;
 
+    @Column(name = "gallery_walk_instructions")
+    private String galleryWalkInstructions;
+
     // general information
     @Column(name = "create_date")
     private Date created;
@@ -450,5 +453,13 @@ public class Dokumaran implements Cloneable {
 
     public void setGalleryWalkFinished(boolean galleryWalkFinished) {
 	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
     }
 }

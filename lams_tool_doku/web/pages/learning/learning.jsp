@@ -172,9 +172,8 @@
 
 		<lams:errors/>
 		
-		<c:out value="${dokumaran.description}" escapeXml="false" />
+		<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 		
-
 		<div class='panel panel-default 
 				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			
 			<div id="etherpad-container"></div>

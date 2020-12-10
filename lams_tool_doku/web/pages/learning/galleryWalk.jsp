@@ -89,8 +89,13 @@
 
 	<lams:errors/>
 	
-	<c:out value="${dokumaran.description}" escapeXml="false" />
+	<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 	
+	<c:if test="${not empty dokumaran.galleryWalkInstructions}">
+		<hr>
+		<p><c:out value="${dokumaran.galleryWalkInstructions}" escapeXml="false" /></p>
+	</c:if>
+		
 	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
 		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
 		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">

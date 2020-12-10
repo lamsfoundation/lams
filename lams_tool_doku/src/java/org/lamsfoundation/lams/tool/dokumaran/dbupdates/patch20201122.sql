@@ -8,7 +8,8 @@ SET FOREIGN_KEY_CHECKS=0;
 ALTER TABLE tl_ladoku11_dokumaran ADD COLUMN gallery_walk_enabled TINYINT NOT NULL DEFAULT 0,
 								  ADD COLUMN gallery_walk_read_only TINYINT NOT NULL DEFAULT 0,
 								  ADD COLUMN gallery_walk_started TINYINT NOT NULL DEFAULT 0,
-								  ADD COLUMN gallery_walk_finished TINYINT NOT NULL DEFAULT 0;
+								  ADD COLUMN gallery_walk_finished TINYINT NOT NULL DEFAULT 0,
+								  ADD COLUMN gallery_walk_instructions TEXT;
 
 -- Put all sql statements above here
 
