@@ -92,6 +92,7 @@
 	<c:out value="${dokumaran.description}" escapeXml="false" />
 	
 	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
 		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
 		  <thead class="thead-light">
 		    <tr>
@@ -113,6 +114,8 @@
 		  </tbody>
 		</table>
 	</c:if>
+	
+	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
 
 	<div id="doku-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">

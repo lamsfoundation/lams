@@ -472,6 +472,7 @@
 </div>
 
 <c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
 	<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
 	  <thead class="thead-light">
 	    <tr>
