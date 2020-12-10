@@ -2,7 +2,10 @@
 
 <!-- Advance Tab Content -->
 
-<script>
+<script>			
+	// avoid name clash between bootstrap and jQuery UI
+	$.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+	
 	$(document).ready(function() {
 		$('#gallery-walk-enabled').change(function(){
 			if ($(this).is(':checked')) {
@@ -12,6 +15,8 @@
 					.find('#gallery-walk-read-only').prop('checked', false);
 			}
 		}).change();
+		
+		$('[data-toggle="tooltip"]').bootstrapTooltip();
 	});
 </script>
 
@@ -90,6 +95,8 @@
 				<form:checkbox path="dokumaran.galleryWalkReadOnly" id="gallery-walk-read-only" />
 				<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
 			</label>
+			<i class="fa fa-question-circle" 
+			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only' />"></i>
 		</div>
 	</div>
 </lams:SimplePanel>
