@@ -65,6 +65,8 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
     private List<OptionDTO> optionDtos = null;
     @Transient
     private int mark;
+    @Transient
+    private String correctAnswerLetter;
 
     @Override
     public Object clone() {
@@ -121,4 +123,11 @@ public class ScratchieItem extends QbToolQuestion implements Serializable, Clone
 	this.mark = mark;
     }
 
+    public String getCorrectAnswerLetter() {
+	return correctAnswerLetter;
+    }
+
+    public void setCorrectAnswerLetter(String correctAnswerLetters) {
+	this.correctAnswerLetter = correctAnswerLetters;
+    }
 }

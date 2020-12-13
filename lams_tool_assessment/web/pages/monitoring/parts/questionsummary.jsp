@@ -355,10 +355,10 @@
 							</c:choose>
 						</h4>
 						
+						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>
+						
 						<fmt:message key="label.answer.alternatives" />: 
 						${fn:replace(option0.name, newLineChar, ', ')}
-						
-						<div class="list-group col sortable-on" data-option-uid="${option0.uid}" id="answer-group${option0.uid}"></div>	
 					</div>
 					
 					<div class="col-sm-4 text-center">
@@ -391,10 +391,10 @@
 							</c:choose>
 						</h4>
 						
+						<div class="list-group col sortable-on" data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
+						
 						<fmt:message key="label.answer.alternatives" />: 
 						${fn:replace(option1.name, newLineChar, ', ')}
-						
-						<div class="list-group col sortable-on" data-option-uid="${option1.uid}" id="answer-group${option1.uid}"></div>	
 					</div>
 				</div>
 				
@@ -408,11 +408,11 @@
 						<h4>
 							<fmt:message key="label.authoring.basic.option.grade"/>: ${optionDto.maxMark}
 						</h4>
-	
-						<fmt:message key="label.answer.alternatives" />: 
-						${fn:replace(optionDto.name, newLineChar, ', ')}
 						
 						<div class="list-group col sortable-on" data-option-uid="${optionDto.uid}" id="answer-group${optionDto.uid}"></div>	
+						
+						<fmt:message key="label.answer.alternatives" />: 
+						${fn:replace(optionDto.name, newLineChar, ', ')}
 					</div>
 					
 					<c:if test="${status.count % 3 == 0 || status.last}">

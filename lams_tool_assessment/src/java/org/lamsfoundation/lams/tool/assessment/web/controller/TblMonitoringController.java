@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +75,7 @@ public class TblMonitoringController {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
 	//prepare list of the questions, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<>();
+	Set<AssessmentQuestion> questionList = new LinkedHashSet<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
@@ -86,12 +87,13 @@ public class TblMonitoringController {
 	    }
 	}
 	//keep only MCQ type of questions
-	Set<QuestionDTO> questionDtos = new TreeSet<>();
+	Set<QuestionDTO> questionDtos = new LinkedHashSet<>();
 	int maxOptionsInQuestion = 0;
+	int displayOrder = 1;
 	for (AssessmentQuestion question : questionList) {
 	    if (QbQuestion.TYPE_MULTIPLE_CHOICE == question.getType()
 		    || QbQuestion.TYPE_VERY_SHORT_ANSWERS == question.getType()) {
-		questionDtos.add(new QuestionDTO(question));
+		questionDtos.add(new QuestionDTO(question, displayOrder++));
 
 		//calculate maxOptionsInQuestion
 		if (question.getQbQuestion().getQbOptions().size() > maxOptionsInQuestion) {
