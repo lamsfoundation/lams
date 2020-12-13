@@ -89,14 +89,14 @@
 		</label>
 	</div>
 	
-	<div id="gallery-walk-options">
+	<div id="gallery-walk-options" class="loffset10">
 		<div class="checkbox">
 			<label for="gallery-walk-read-only">
 				<form:checkbox path="dokumaran.galleryWalkReadOnly" id="gallery-walk-read-only" />
 				<fmt:message key="label.authoring.advance.gallery.walk.read.only" />
 			</label>
 			<i class="fa fa-question-circle" 
-			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only' />"></i>
+			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only.tooltip' />"></i>
 		</div>
 		
 		<div class="form-group">
