@@ -44,6 +44,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -2243,16 +2244,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    }
 
 		    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
-		    if (questionResults == null) {
+		    if (questionResults == null || questionResults.isEmpty()) {
 			continue;
 		    }
+		    Map<Long, AssessmentQuestionResult> questionResultsMap = questionResults.stream().collect(Collectors
+			    .toMap(questionResult -> questionResult.getQbToolQuestion().getUid(), Function.identity()));
 
 		    // get information when a learner started interaction with given questions
 		    Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
 			    .getFirstLearnerInteractions(assessment.getContentId(),
 				    assessmentUser.getUserId().intValue());
 
-		    for (AssessmentQuestionResult questionResult : questionResults) {
+		    // follow question reference ordering, to QbToolQuestion's
+		    for (QuestionReference questionReference : questionReferences) {
+			AssessmentQuestionResult questionResult = questionResultsMap
+				.get(questionReference.getQuestion().getUid());
 			// mark
 			userResultRow.addCell(questionResult.getMark(), ExcelCell.BORDER_STYLE_LEFT_THIN);
 
