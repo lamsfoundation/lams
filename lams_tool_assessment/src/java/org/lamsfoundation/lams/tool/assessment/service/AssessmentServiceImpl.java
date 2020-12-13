@@ -3060,6 +3060,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
 	    qbService.prepareQuestionForExport(assessmentQuestion.getQbQuestion());
 	}
+	// do not export time limits if the LD gets exported from a running sequence
+	toolContentObj.setTimeLimitAdjustments(null);
+	toolContentObj.setAbsoluteTimeLimit(null);
 
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
