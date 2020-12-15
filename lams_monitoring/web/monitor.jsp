@@ -706,17 +706,21 @@
 			</tr>
 		</table>
 		<div class="btn-group pull-right">
-			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-default roffset5 pull-right">
+				<span><fmt:message key="button.force.complete.all" /></span>
+			</button>
+			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 pull-right">
 				<span><fmt:message key="button.force.complete" /></span>
 			</button>
-			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
-				<span><fmt:message key="button.view.learner" /></span>
+			<br>
+			<button id="learnerGroupDialogCloseButton" class="btn btn-default voffset10 pull-right">
+				<span><fmt:message key="button.close" /></span>
 			</button>
-			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
 				<span><fmt:message key="button.email" /></span>
 			</button>
-			<button id="learnerGroupDialogCloseButton" class="btn btn-default">
-				<span><fmt:message key="button.close" /></span>
+			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
+				<span><fmt:message key="button.view.learner" /></span>
 			</button>
 		</div>
 	</div>
