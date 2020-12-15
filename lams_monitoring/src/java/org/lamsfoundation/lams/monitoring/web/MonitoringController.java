@@ -583,7 +583,9 @@ public class MonitoringController {
 	}
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	String learnerIDs = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
+	String learnerIDsParam = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
+	// are we moving selected learners or all of learners who are currently in the activity
+	Long moveAllFromActivityId = WebUtil.readLongParam(request, "moveAllFromActivityID", true);
 	Integer requesterId = getUserId();
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
@@ -600,39 +602,45 @@ public class MonitoringController {
 		    .toString();
 	}
 
-	StringBuffer learnerIdNameBuf = new StringBuffer();
-	String message = null;
-	User learner = null;
-	boolean oneOrMoreProcessed = false;
-	try {
-	    for (String learnerIDString : learnerIDs.split(",")) {
-		if (oneOrMoreProcessed) {
-		    learnerIdNameBuf.append(", ");
-		} else {
-		    oneOrMoreProcessed = true;
-		}
+	List<User> learners = null;
+	if (moveAllFromActivityId == null) {
+	    learners = new LinkedList<>();
+	    for (String learnerIDString : learnerIDsParam.split(",")) {
 		Integer learnerID = Integer.valueOf(learnerIDString);
-		message = monitoringService.forceCompleteActivitiesByUser(learnerID, requesterId, lessonId, activityId,
-			removeLearnerContent);
+		User learner = (User) userManagementService.findById(User.class, learnerID);
+		learners.add(learner);
+	    }
+	} else {
+	    learners = monitoringService.getLearnersByActivities(new Long[] { moveAllFromActivityId }, null, null,
+		    true);
+	}
 
-		learner = (User) userManagementService.findById(User.class, learnerID);
+	String message = null;
+	StringBuilder learnerIdNameBuilder = new StringBuilder();
+
+	try {
+	    for (User learner : learners) {
+		message = monitoringService.forceCompleteActivitiesByUser(learner.getUserId(), requesterId, lessonId,
+			activityId, removeLearnerContent);
 		learnerService.createCommandForLearner(lessonId, learner.getLogin(), command);
-		learnerIdNameBuf.append(learner.getLogin()).append(" (").append(learnerID).append(")");
+		learnerIdNameBuilder.append(learner.getLogin()).append(" (").append(learner.getUserId()).append(")")
+			.append(", ");
 	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return;
 	}
 
+	String learnerIdNameString = learnerIdNameBuilder.substring(0, learnerIdNameBuilder.length() - 2);
 	if (log.isDebugEnabled()) {
-	    log.debug("Force complete for learners " + learnerIdNameBuf.toString() + " lesson " + lessonId + ". "
+	    log.debug("Force complete for learners " + learnerIdNameString.toString() + " lesson " + lessonId + ". "
 		    + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
 
-	Object[] args = new Object[] { learnerIdNameBuf.toString(), activityDescription, lessonId };
+	Object[] args = new Object[] { learnerIdNameString, activityDescription, lessonId };
 	String auditMessage = messageService.getMessage(messageKey, args);
 	logEventService.logEvent(LogEvent.TYPE_FORCE_COMPLETE, requesterId, null, lessonId, activityId,
 		auditMessage + " " + message);
