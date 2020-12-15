@@ -24,6 +24,8 @@ package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +41,9 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 
 public class AssessmentEscapeUtils {
+
+    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
+    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
 
     public static class AssessmentExcelCell {
 	public Object value;
@@ -360,5 +365,14 @@ public class AssessmentEscapeUtils {
 	}
 
 	return new AssessmentExcelCell(StringUtils.isBlank(ret) ? null : ret, highlightCell);
+    }
+
+    public static String normaliseVSAnswer(String answer) {
+	return answer == null ? null : answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+    }
+
+    public static Set<String> normaliseVSOption(String option) {
+	return Stream.of(option.split("\r\n")).collect(
+		Collectors.mapping(answer -> AssessmentEscapeUtils.normaliseVSAnswer(answer), Collectors.toSet()));
     }
 }

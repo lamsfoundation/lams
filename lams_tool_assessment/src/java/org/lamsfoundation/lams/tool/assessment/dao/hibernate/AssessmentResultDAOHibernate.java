@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
@@ -152,14 +153,17 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ " AS q, " + AssessmentResult.class.getName() + " AS r "
 		+ " WHERE q.assessmentResult.uid = r.uid AND q.qbToolQuestion.qbQuestion.uid =:qbQuestionUid AND (r.finishDate != null) ";
 	if (StringUtils.isNotBlank(answer)) {
-	    FIND_BY_QBQUESTION_AND_FINISHED += "AND TRIM(q.answer) = TRIM(:answer) ";
+
+	    FIND_BY_QBQUESTION_AND_FINISHED += "AND REGEXP_REPLACE(q.answer, '"
+		    + AssessmentEscapeUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
 	}
 	FIND_BY_QBQUESTION_AND_FINISHED += "ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, AssessmentResult.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
 	if (StringUtils.isNotBlank(answer)) {
-	    q.setParameter("answer", answer);
+	    String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
+	    q.setParameter("answer", normalisedAnswer);
 	}
 	return q.list();
     }

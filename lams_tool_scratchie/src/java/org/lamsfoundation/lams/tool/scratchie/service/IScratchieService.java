@@ -56,6 +56,9 @@ import org.quartz.SchedulerException;
  */
 public interface IScratchieService extends ICommonToolService {
 
+    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
+    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
+
     /**
      * Get <code>Scratchie</code> by toolContentID.
      *

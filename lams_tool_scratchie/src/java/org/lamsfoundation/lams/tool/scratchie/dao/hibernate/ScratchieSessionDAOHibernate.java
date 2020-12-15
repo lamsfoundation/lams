@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.springframework.stereotype.Repository;
 
@@ -116,11 +117,13 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 		+ ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName() + " AS session, "
 		+ ScratchieAnswerVisitLog.class.getName()
 		+ " AS visitLog WHERE session.scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid"
-		+ " AND session.sessionId = visitLog.sessionId AND TRIM(visitLog.answer) = TRIM(:answer)";
+		+ " AND session.sessionId = visitLog.sessionId AND REGEXP_REPLACE(visitLog.answer, '"
+		+ IScratchieService.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
 
 	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
-	q.setParameter("answer", answer);
+	String normalisedAnswer = answer.replaceAll(IScratchieService.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }
 }
