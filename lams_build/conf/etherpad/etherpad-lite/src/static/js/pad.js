@@ -72,7 +72,15 @@ function randomString()
 //   callback: the function to call when all above succeeds, `val` is the value supplied by the user
 var getParameters = [
   { name: "noColors",         checkVal: "true",  callback: function(val) { settings.noColors = true; $('#clearAuthorship').hide(); } },
-  { name: "showControls",     checkVal: "true",  callback: function(val) { $('#editbar').css('display', 'flex') } },
+  { name: "showControls",     checkVal: "true",  callback: function(val) { 
+	  $('#editbar').css('display', 'flex');
+	  let settingsPopup = $('#settings .popup-content');
+	  $('h1, h2, span, a, div.dropdowns-container, p.hide-for-mobile', settingsPopup)
+	  	.add($('#options-colorscheck', settingsPopup).closest('p'))
+	  	.add($('#options-linenoscheck', settingsPopup).closest('p'))
+	  	.add($('#options-rtlcheck', settingsPopup).closest('p'))
+	  	.hide();
+  } },
   { name: "showChat",         checkVal: null,    callback: function(val) { if(val==="false"){settings.hideChat = true;chat.hide();$('#chaticon').hide();} } },
   { name: "showLineNumbers",  checkVal: null, callback: function(val) { settings.LineNumbersDisabled = val == 'false'; } },
   { name: "useMonospaceFont", checkVal: "true",  callback: function(val) { settings.useMonospaceFontGlobal = true; } },
