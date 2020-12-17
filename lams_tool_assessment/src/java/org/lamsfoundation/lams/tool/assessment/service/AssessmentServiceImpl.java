@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -786,46 +786,34 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+
 	    //clear previous answer
 	    questionResult.setQbOption(null);
 
-	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-		String[] optionAnswers = optionDto.getName().strip().split("\\r\\n");
-		boolean isAnswerMatchedCurrentOption = false;
-		for (String optionAnswer : optionAnswers) {
-		    optionAnswer = optionAnswer.strip();
+	    if (questionDto.getAnswer() != null) {
+		boolean isQuestionCaseSensitive = questionDto.isCaseSensitive();
+		String normalisedQuestionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(questionDto.getAnswer());
 
-		    //prepare regex which takes into account only * special character
-		    String regexWithOnlyAsteriskSymbolActive = "\\Q";
-		    for (int i = 0; i < optionAnswer.length(); i++) {
-			//everything in between \\Q and \\E are taken literally no matter which characters it contains
-			if (optionAnswer.charAt(i) == '*') {
-			    regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
-			} else {
-			    regexWithOnlyAsteriskSymbolActive += optionAnswer.charAt(i);
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		    Collection<String> optionAnswers = AssessmentEscapeUtils.normaliseVSOption(optionDto.getName());
+		    boolean isAnswerMatchedCurrentOption = false;
+		    for (String optionAnswer : optionAnswers) {
+			String normalisedOptionAnswer = AssessmentEscapeUtils.normaliseVSAnswer(optionAnswer);
+
+			// check is item unraveled
+			if (isQuestionCaseSensitive ? normalisedQuestionAnswer.equals(normalisedOptionAnswer)
+				: normalisedQuestionAnswer.equalsIgnoreCase(normalisedOptionAnswer)) {
+			    isAnswerMatchedCurrentOption = true;
+			    break;
 			}
 		    }
-		    regexWithOnlyAsteriskSymbolActive += "\\E";
 
-		    //check whether answer matches regex
-		    Pattern pattern;
-		    if (questionDto.isCaseSensitive()) {
-			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
-		    } else {
-			pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
-				java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-		    }
-		    if (questionDto.getAnswer() != null && pattern.matcher(questionDto.getAnswer().strip()).matches()) {
-			isAnswerMatchedCurrentOption = true;
+		    if (isAnswerMatchedCurrentOption) {
+			mark = optionDto.getMaxMark() * maxMark;
+			QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
+			questionResult.setQbOption(qbOption);
 			break;
 		    }
-		}
-
-		if (isAnswerMatchedCurrentOption) {
-		    mark = optionDto.getMaxMark() * maxMark;
-		    QbOption qbOption = qbService.getOptionByUid(optionDto.getUid());
-		    questionResult.setQbOption(qbOption);
-		    break;
 		}
 	    }
 
@@ -1394,13 +1382,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		boolean isAnswerAllocated = false;
+		boolean isQuestionCaseSensitive = question.getQbQuestion().isCaseSensitive();
+		String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
 		for (QbOption option : qbQuestion.getQbOptions()) {
-		    String[] alternatives = option.getName().split("\r\n");
+		    Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(option.getName());
 		    for (String alternative : alternatives) {
-			if (AssessmentServiceImpl.isAnswersEqual(question, answer, alternative)) {
+			if (isQuestionCaseSensitive ? normalisedAnswer.equals(alternative)
+				: normalisedAnswer.equalsIgnoreCase(alternative)) {
 			    isAnswerAllocated = true;
 			    break;
 			}
+		    }
+		    if (isAnswerAllocated) {
+			break;
 		    }
 		}
 
@@ -1422,14 +1416,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	if (answer1 == null || answer2 == null) {
 	    return false;
 	}
+	String normalisedAnswer1 = AssessmentEscapeUtils.normaliseVSAnswer(answer1);
+	String normalisedAnswer2 = AssessmentEscapeUtils.normaliseVSAnswer(answer2);
 
-	return question.getQbQuestion().isCaseSensitive() ? answer1.equals(answer2) : answer1.equalsIgnoreCase(answer2);
+	return question.getQbQuestion().isCaseSensitive() ? normalisedAnswer1.equals(normalisedAnswer2)
+		: normalisedAnswer1.equalsIgnoreCase(normalisedAnswer2);
     }
 
     @Override
     public Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer) {
 	AssessmentQuestion assessmentQuestion = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = assessmentQuestion.getQbQuestion();
+	String normalisedAnswer = AssessmentEscapeUtils.normaliseVSAnswer(answer);
 
 	//adding
 	if (previousOptionUid.equals(-1L)) {
@@ -1437,8 +1435,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    QbOption targetOption = null;
 	    for (QbOption option : qbQuestion.getQbOptions()) {
 		String name = option.getName();
-		String[] alternatives = name.split("\r\n");
-		if (Arrays.asList(alternatives).contains(answer)) {
+		Collection<String> alternatives = AssessmentEscapeUtils.normaliseVSOption(name);
+		if (alternatives.contains(normalisedAnswer)) {
 		    return option.getUid();
 		}
 		if (option.getUid().equals(targetOptionUid)) {
@@ -1463,11 +1461,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (QbOption previousOption : qbQuestion.getQbOptions()) {
 		if (previousOption.getUid().equals(previousOptionUid)) {
 		    String name = previousOption.getName();
-		    String[] alternatives = name.split("\r\n");
+		    String[] alternatives = name.split(",");
 
 		    StringBuilder nameWithoutUserAnswer = new StringBuilder();
 		    for (String alternative : alternatives) {
-			if (!alternative.equals(answer)) {
+			String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
+			if (!normalisedAlternative.equals(normalisedAnswer)) {
 			    nameWithoutUserAnswer.append(alternative).append("\r\n");
 			}
 		    }
@@ -1495,11 +1494,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (QbOption previousOption : qbQuestion.getQbOptions()) {
 	    if (previousOption.getUid().equals(previousOptionUid)) {
 		String name = previousOption.getName();
-		String[] alternatives = name.split("\r\n");
+		String[] alternatives = name.split(",");
 
 		StringBuilder nameWithoutUserAnswer = new StringBuilder();
 		for (String alternative : alternatives) {
-		    if (!alternative.equals(answer)) {
+		    String normalisedAlternative = AssessmentEscapeUtils.normaliseVSAnswer(alternative);
+		    if (!normalisedAlternative.equals(normalisedAnswer)) {
 			nameWithoutUserAnswer.append(alternative).append("\r\n");
 		    }
 		}
@@ -2243,16 +2243,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    }
 
 		    Set<AssessmentQuestionResult> questionResults = assessmentResult.getQuestionResults();
-		    if (questionResults == null) {
+		    if (questionResults == null || questionResults.isEmpty()) {
 			continue;
 		    }
+		    Map<Long, AssessmentQuestionResult> questionResultsMap = questionResults.stream().collect(Collectors
+			    .toMap(questionResult -> questionResult.getQbToolQuestion().getUid(), Function.identity()));
 
 		    // get information when a learner started interaction with given questions
 		    Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
 			    .getFirstLearnerInteractions(assessment.getContentId(),
 				    assessmentUser.getUserId().intValue());
 
-		    for (AssessmentQuestionResult questionResult : questionResults) {
+		    // follow question reference ordering, to QbToolQuestion's
+		    for (QuestionReference questionReference : questionReferences) {
+			AssessmentQuestionResult questionResult = questionResultsMap
+				.get(questionReference.getQuestion().getUid());
 			// mark
 			userResultRow.addCell(questionResult.getMark(), ExcelCell.BORDER_STYLE_LEFT_THIN);
 
@@ -3060,6 +3065,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	for (AssessmentQuestion assessmentQuestion : toolContentObj.getQuestions()) {
 	    qbService.prepareQuestionForExport(assessmentQuestion.getQbQuestion());
 	}
+	// do not export time limits if the LD gets exported from a running sequence
+	toolContentObj.setTimeLimitAdjustments(null);
+	toolContentObj.setAbsoluteTimeLimit(null);
 
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,

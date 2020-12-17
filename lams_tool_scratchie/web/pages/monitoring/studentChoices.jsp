@@ -38,6 +38,10 @@
 	  color: white;
 	  border-radius: 3px; }
 	
+	span.user-response .fa, .question-detail-modal .fa {
+	  cursor: default;
+	}
+	
 	span.successful-response {
 	  background-color: #5cb85c; }
 	
@@ -128,9 +132,11 @@
 						<fmt:message key="label.correct.answer"/>
 					</b>
 				</th>
-				<c:forEach var="correctAnswerLetter"  items="${correctAnswerLetters}" varStatus="status">
+				<c:forEach var="item" items="${items}">
 					<td class="text-center">
-						${correctAnswerLetter}
+						<c:if test="${item.qbQuestion.type == 1}">
+							${item.correctAnswerLetter}
+						</c:if>
 					</td>
 				</c:forEach>
 				
@@ -152,7 +158,7 @@
 						<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
 							<c:choose>
 								<c:when test="${empty sessionDto.leaderUid}">
-							${sessionDto.sessionName}
+									{sessionDto.sessionName}
 								</c:when>
 								<c:otherwise>
 									<c:url var="userSummaryUrl" value='/learning/start.do'>
@@ -180,7 +186,14 @@
 									<c:forEach var="optionDto" items="${itemDto.optionDtos}">
 										<c:if test="${optionDto.answer != ''}">
 											<span class="user-response <c:if test="${optionDto.correct}">successful-response</c:if> <c:if test="${!optionDto.correct}">wrong-response</c:if>">
-												<c:out value="${optionDto.answer}" escapeXml="${!optionDto.mcqType}"/>
+												<c:choose>
+													<c:when test="${itemDto.type == 1}">
+														<c:out value="${optionDto.answer}" escapeXml="false"/>
+													</c:when>
+													<c:when test="${optionDto.correct}"><i class="fa fa-check"></i></c:when>
+													<c:otherwise><i class="fa fa-close"></i></c:otherwise>
+												</c:choose>
+												
 											</span>
 										</c:if>
 									</c:forEach>
@@ -209,7 +222,7 @@
 
 <!-- Question detail modal -->
 <c:forEach var="item" items="${items}" varStatus="i">
-	<div class="modal fade" id="question${i.index}Modal">
+	<div class="modal fade question-detail-modal" id="question${i.index}Modal">
 	<div class="modal-dialog">
 	<div class="modal-content">
 	<div class="modal-body">
@@ -230,24 +243,34 @@
 						
 							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
 								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
-								
-								<tr>
-									<td width="5px" class="${cssClass}">
-										${ALPHABET[j.index]}.
-									</td>									
-									<td class="${cssClass}">
+									<tr>
 										<c:choose>
 											<c:when test="${item.qbQuestion.type == 1}">
-												<c:out value="${qbOption.name}" escapeXml="false"/>
+												<td width="5px" class="${cssClass}">
+													${ALPHABET[j.index]}.
+												</td>
+												<td class="${cssClass}">
+													<c:out value="${qbOption.name}" escapeXml="false"/>
+												</td>
 											</c:when>
 											<c:otherwise>
-												${fn:replace(qbOption.name, newLineChar, ', ')}
+												<td width="5px" class="${cssClass}">
+													<c:choose>
+														<c:when test="${qbOption.correct}">
+															<i class="fa fa-check"></i>
+														</c:when>
+														<c:otherwise>
+															<i class="fa fa-close"></i>
+														</c:otherwise>
+													</c:choose>
+												</td>
+												<td class="${cssClass}">
+													${fn:replace(qbOption.name, newLineChar, ', ')}
+												</td>
 											</c:otherwise>
 										</c:choose>
-									</td>
-								</tr>					
+									</tr>
 							</c:forEach>
-							
 						</tbody>
 					</table>
 				</div>

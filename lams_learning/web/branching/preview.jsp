@@ -58,11 +58,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				alert("<fmt:message key="message.activity.options.noActivitySelected" />");
 				return false;
 			}
-			
-			function submitForm(methodName) {
-				var f = document.getElementById('messageForm');
-				f.submit();
-			}
 		</script>
 		
 		<c:set var="title"><c:out value="${branchingForm.title}" /></c:set>
@@ -134,13 +129,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</tr>
 						</c:forEach>
 					</table>
-		
-					<button class="btn btn-primary pull-right">
+			
+					<button class="btn btn-primary pull-left">
 						<fmt:message key="label.activity.options.choose" />
 					</button>
 		
 				</form:form>
+				
+									
+				<form action="/lams/learning/CompleteActivity.do" method="post">
+					<input type="hidden" name="activityID" value="${branchingForm.activityID}">
+					<input type="hidden" name="progressID" value="${branchingForm.progressID}">
+			
+					<button class="btn btn-primary pull-right na" onclick="finishActivity()">
+						<fmt:message key="label.finish.button" />
+					</button>
+			
+				</form>
 			</div>
+			
+
 		<!--closes content-->
 		
 		<div id="footer"></div>

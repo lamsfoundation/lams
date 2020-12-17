@@ -100,14 +100,17 @@ public class QuestionDTO implements Comparable<QuestionDTO> {
 
     /**
      * Expanded version of the constructor which also sets correctAnswersDisclosed and groupsAnswersDisclosed.
-     *
-     * @param assessmentQuestion
      */
     public QuestionDTO(AssessmentQuestion assessmentQuestion) {
 	this((QbToolQuestion) assessmentQuestion);
 
 	this.correctAnswersDisclosed = assessmentQuestion.isCorrectAnswersDisclosed();
 	this.groupsAnswersDisclosed = assessmentQuestion.isGroupsAnswersDisclosed();
+    }
+
+    public QuestionDTO(AssessmentQuestion assessmentQuestion, int displayOrder) {
+	this(assessmentQuestion);
+	this.displayOrder = displayOrder;
     }
 
     /**

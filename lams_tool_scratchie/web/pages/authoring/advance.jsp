@@ -81,6 +81,13 @@
 	</div>
 	
 	<div class="checkbox">
+		<label for="reveal-on-double-click">
+			<form:checkbox path="scratchie.revealOnDoubleClick" id="reveal-on-double-click"/>
+			<fmt:message key="label.authoring.advanced.reveal.double.click" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
 		<label for="show-scratchies-in-results">
 			<form:checkbox path="scratchie.showScrachiesInResults" styleId="show-scratchies-in-results"/>
 			<fmt:message key="label.authoring.advanced.show.scratchies.in.results" />

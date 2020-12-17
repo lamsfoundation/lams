@@ -103,6 +103,9 @@ public class Scratchie implements Cloneable {
     @Column(name = "time_limit")
     private int timeLimit;
 
+    @Column(name = "double_click")
+    private boolean revealOnDoubleClick;
+
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
 
@@ -375,6 +378,14 @@ public class Scratchie implements Cloneable {
      */
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
+    }
+
+    public boolean isRevealOnDoubleClick() {
+	return revealOnDoubleClick;
+    }
+
+    public void setRevealOnDoubleClick(boolean revealOnDoubleClick) {
+	this.revealOnDoubleClick = revealOnDoubleClick;
     }
 
     /**

@@ -922,36 +922,47 @@ function closeGate(activityId) {
  */
 function initSequenceTab(){
 	var learnerGroupDialogContents = $('#learnerGroupDialogContents');
-	$('#learnerGroupDialogForceCompleteButton', learnerGroupDialogContents).click(function() {
+	$('#learnerGroupDialogForceCompleteButton, #learnerGroupDialogForceCompleteAllButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearners = $('.dialogList div.dialogListItemSelected', dialog),
-			// go to "force complete" mode, similar to draggin user to an activity
+			// are we moving selected learners or all of learners who are currently in the activity
+			moveAll = $(this).attr('id') == 'learnerGroupDialogForceCompleteAllButton',
+			selectedLearners = moveAll ? null : $('.dialogList div.dialogListItemSelected', dialog),
+			// go to "force complete" mode, similar to dragging user to an activity
 			activityId = dialog.data('ajaxProperties').data.activityID,
 			dropArea = sequenceCanvas.add('#completedLearnersContainer');
 		dropArea.css('cursor', 'url('
 						+ LAMS_URL + 'images/icons/' 
-						+ (selectedLearners.length > 1 ? 'group' : 'user')
+						+ (moveAll || selectedLearners.length > 1 ? 'group' : 'user')
 						+ '.png),pointer')
 				.one('click', function(event) {
-					var learners = [];
-					selectedLearners.each(function(){
-						var learner = $(this);
-						learners.push({
-							'id'     : learner.attr('userId'),
-							'name'   : learner.text()
-						});
-					});
 					dropArea.off('click').css('cursor', 'default');
-					forceComplete(activityId, learners, event.pageX, event.pageY);
+					if (moveAll) {
+						// setting learners as 'true' is a special switch meaning "move all"
+						forceComplete(activityId, true, event.pageX, event.pageY);
+					} else {
+						var learners = [];
+						selectedLearners.each(function(){
+							var learner = $(this);
+							learners.push({
+								'id'     : learner.attr('userId'),
+								'name'   : learner.text()
+							});
+						});
+						forceComplete(activityId, learners, event.pageX, event.pageY);
+					}
 				});
 		dialog.modal('hide');
 		
-		var learnerNames = '';
-		selectedLearners.each(function(){
-			learnerNames += $(this).text() + ', ';
-		});
-		learnerNames = learnerNames.slice(0, -2);
-		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]',learnerNames));
+		if (moveAll) {
+			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', ''));
+		} else {
+			var learnerNames = '';
+			selectedLearners.each(function(){
+				learnerNames += $(this).text() + ', ';
+			});
+			learnerNames = learnerNames.slice(0, -2);
+			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', '"' + learnerNames + '"'));
+		}
 	});
 	
 	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
@@ -1059,7 +1070,7 @@ function initSequenceTab(){
 	
 	$('#forceBackwardsRemoveContentNoButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
 			 forceBackwardsDialog.data('activityId'),
 			 false);
 		forceBackwardsDialog.modal('hide');
@@ -1067,7 +1078,7 @@ function initSequenceTab(){
 
 	$('#forceBackwardsRemoveContentYesButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
 			 forceBackwardsDialog.data('activityId'),
 			 true);
 		forceBackwardsDialog.modal('hide');
@@ -1347,7 +1358,10 @@ function forceComplete(currentActivityId, learners, x, y) {
 	autoRefreshBlocked = true;
 	
 	var foundActivities = [],
-		targetActivity = null;
+		targetActivity = null,
+		// if "true", then we are moving all learners from the given activity
+		// otherwise it is a list of selected learners IDs
+		moveAll = learners === true;
 	// check all activities and "users who finished lesson" bar
 	$('g[id]:not([id*="_to_"])', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
@@ -1395,14 +1409,17 @@ function forceComplete(currentActivityId, learners, x, y) {
 		isEndLesson = !targetActivity.is('g'),
 		learnerNames = '';
 	
-	$.each(learners, function(){
-		learnerNames += this.name + ', ';
-	});
-	learnerNames = learnerNames.slice(0, -2);
+	if (!moveAll) {
+		$.each(learners, function(){
+			learnerNames += this.name + ', ';
+		});
+		learnerNames = '"' + learnerNames.slice(0, -2) + '"';
+	}
+
 	
 	if (isEndLesson) {
 		executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
-				.replace('[0]',learnerNames));
+				.replace('[0]', learnerNames));
 	} else {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
@@ -1447,7 +1464,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 	}
 	
 	if (executeForceComplete) {
-		forceCompleteExecute(learners, targetActivityId, false);
+		forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
 	}
 
 	autoRefreshBlocked = false;
@@ -1457,16 +1474,23 @@ function forceComplete(currentActivityId, learners, x, y) {
 /**
  * Tell server to force complete the learner.
  */
-function forceCompleteExecute(learners, activityId, removeContent) {
+function forceCompleteExecute(learners, moveAllFromActivityId, activityId, removeContent) {
 	var learnerIds = '';
-	$.each(learners, function() {
-		learnerIds += this.id + ',';
-	})
+	if (learners) {
+		$.each(learners, function() {
+			learnerIds += this.id + ',';
+		});
+		learnerIds = learnerIds.slice(0, -1);
+	}
+	
 	var data={
-		'lessonID'   		 : lessonId,
-		'learnerID'  		 : learnerIds.slice(0, -1),
-		'activityID' 		 : activityId,
-		'removeContent'		 : removeContent
+		'lessonID'   		    : lessonId,
+		// either we list selected learners to move
+		// or we move all learners from the given activity
+		'learnerID'  		    : learnerIds,
+		'moveAllFromActivityID' : moveAllFromActivityId,
+		'activityID' 		    : activityId,
+		'removeContent'		    : removeContent
 	};
 	data[csrfTokenName] = csrfTokenValue;
 	
@@ -1539,7 +1563,7 @@ function addActivityIcons(activity) {
 					var learnerDisplayName = getLearnerDisplayName(learner);
 						activityLearnerId = 'act' + activity.id + 'learner' + learner.id,
 						elementAttributes = {
-									'id'			 : activityLearnerId,
+									'id'		 : activityLearnerId,
 									'x'          : coord.x + learnerIndex*15 + 1,
 									// a bit lower for Optional Activity
 									'y'          : coord.y,

@@ -401,6 +401,16 @@
 				</lams:Alert>
 			</div>
 		</c:if>
+		
+		<c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
+			<div class="row no-gutter voffset20">
+				<div class="col-xs-12 col-sm-offset-2 col-sm-8">
+					<div class="alert alert-info">
+						<fmt:message key="label.learning.reveal.double.click" />
+					</div>
+				</div>
+			</div>
+		</c:if>
 
 		<div class="panel">
 			<c:out value="${scratchie.instructions}" escapeXml="false" />

@@ -1428,7 +1428,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		    + "If the exception is \"Servlet.service() for servlet ToolContentRestServlet threw exception java.lang.ClassCastException: com.sun.proxy.$ProxyXXX cannot be cast to org.lamsfoundation.lams.rest.ToolRestManager)\""
 		    + " then the tool has not implemented the ToolRestManager interface / createRestToolContent() method.");
 	    throw new ToolException(
-		    "Unable to create tool content for " + toolSignature + " with details " + toolContentJSON);
+		    "Unable to create tool content for " + toolSignature + " with details " + toolContentJSON, e);
 	}
     }
 
@@ -1626,6 +1626,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * this method needs
      * to be expanded.
      */
+    @Override
     public Long createTblAssessmentToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
 	    boolean enableConfidenceLevels, boolean allowDiscloseAnswers, boolean allowAnswerJustification,

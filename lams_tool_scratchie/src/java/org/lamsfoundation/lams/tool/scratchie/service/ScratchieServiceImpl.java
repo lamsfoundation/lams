@@ -41,8 +41,8 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1007,34 +1007,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
-	String[] correctAnswers = correctAnswersGroup.getName().strip().split("\\r\\n");
+	Collection<String> correctAnswers = Stream.of(correctAnswersGroup.getName().split("\r\n")).collect(Collectors
+		.mapping(answer -> answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, ""), Collectors.toSet()));
+
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 	for (String correctAnswer : correctAnswers) {
-	    correctAnswer = correctAnswer.strip();
-
-	    //prepare regex which takes into account only * special character
-	    String regexWithOnlyAsteriskSymbolActive = "\\Q";
-	    for (int i = 0; i < correctAnswer.length(); i++) {
-		//everything in between \\Q and \\E are taken literally no matter which characters it contains
-		if (correctAnswer.charAt(i) == '*') {
-		    regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
-		} else {
-		    regexWithOnlyAsteriskSymbolActive += correctAnswer.charAt(i);
-		}
-	    }
-	    regexWithOnlyAsteriskSymbolActive += "\\E";
-
-	    //check whether answer matches regex
-	    Pattern pattern;
-	    if (qbQuestion.isCaseSensitive()) {
-		pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
-	    } else {
-		pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
-			java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-	    }
-
 	    for (String userAnswer : userAnswers) {
+		String normalisedUserAnswer = userAnswer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
 		// check is item unraveled
-		if (pattern.matcher(userAnswer.strip()).matches()) {
+		if (isQuestionCaseSensitive ? normalisedUserAnswer.equals(correctAnswer)
+			: normalisedUserAnswer.equalsIgnoreCase(correctAnswer)) {
 		    return true;
 		}
 	    }
@@ -1324,8 +1306,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     /**
      * Return list of correct AnswerLetters, one per each item
      */
-    public static List<String> getCorrectAnswerLetters(Collection<ScratchieItem> items) {
-	List<String> correctAnswerLetters = new ArrayList<>();
+    public static void fillCorrectAnswerLetters(Collection<ScratchieItem> items) {
 	for (ScratchieItem item : items) {
 	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 
@@ -1347,10 +1328,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    correctAnswerLetter = options.get(0).isCorrect() ? "A" : "B";
 		}
 	    }
-	    correctAnswerLetters.add(correctAnswerLetter);
+	    item.setCorrectAnswerLetter(correctAnswerLetter);
 	}
-
-	return correctAnswerLetters;
     }
 
     @Override
@@ -1444,8 +1423,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.correct.answer"));
-	for (String correctAnswerLetter : ScratchieServiceImpl.getCorrectAnswerLetters(items)) {
-	    row.addCell(correctAnswerLetter);
+	ScratchieServiceImpl.fillCorrectAnswerLetters(items);
+	for (ScratchieItem item : items) {
+	    row.addCell(item.getCorrectAnswerLetter());
 	}
 
 	row = reportByTeamSheet.initRow();
@@ -1967,11 +1947,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
-	model.put("items", items);
+	List<ScratchieItem> itemList = new LinkedList<>(items);
+	model.put("items", itemList);
 
 	//correct answers row
-	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
-	model.put("correctAnswerLetters", correctAnswerLetters);
+	ScratchieServiceImpl.fillCorrectAnswerLetters(itemList);
 
 	Map<String, ScratchieSession> sessionsByName = scratchieSessionDao.getByContentId(scratchie.getContentId())
 		.stream().filter(s -> s.getGroupLeader() != null)
@@ -1993,7 +1973,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		List<OptionDTO> optionDtos = new LinkedList<>();
 		for (int j = 0; j < optionLetters.length; j++) {
 		    String optionLetter = optionLetters[j];
-		    String correctOptionLetter = correctAnswerLetters.get(i);
+		    String correctOptionLetter = itemList.get(i).getCorrectAnswerLetter();
 
 		    OptionDTO optionDto = new OptionDTO();
 		    optionDto.setAnswer(optionLetter);
