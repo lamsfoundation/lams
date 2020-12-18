@@ -2,7 +2,6 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_ladoku11_dokumaran;
 DROP TABLE IF EXISTS tl_ladoku11_session;
 DROP TABLE IF EXISTS tl_ladoku11_user;
-DROP TABLE IF EXISTS tl_ladoku11_configuration;
 CREATE TABLE tl_ladoku11_dokumaran (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -50,12 +49,6 @@ CREATE TABLE tl_ladoku11_user (
    session_uid bigint,
    dokumaran_uid bigint,
    primary key (uid)
-)ENGINE=InnoDB;
-CREATE TABLE tl_ladoku11_configuration (
-	uid bigint not null auto_increment, 
-	config_key varchar(30) unique, 
-	config_value varchar(255), 
-	primary key (uid)
 )ENGINE=InnoDB;
 ALTER TABLE tl_ladoku11_dokumaran ADD INDEX FK_NEW_680978081_89093BF758092FB (create_by), ADD CONSTRAINT FK_NEW_680978081_89093BF758092FB FOREIGN KEY (create_by) REFERENCES tl_ladoku11_user (uid)  ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE tl_ladoku11_session ADD INDEX FK_NEW_680978081_24AA78C530E79035 (dokumaran_uid), ADD CONSTRAINT FK_NEW_680978081_24AA78C530E79035 FOREIGN KEY (dokumaran_uid) REFERENCES tl_ladoku11_dokumaran (uid) ON DELETE CASCADE ON UPDATE CASCADE;

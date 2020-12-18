@@ -47,8 +47,32 @@
 	.panel {
 		overflow: auto;
 	}
-	#time-limit-buttons {
+	#control-buttons {
 		padding-bottom: 20px;
+	}
+	
+	#gallery-walk-start {
+		margin-left: 20px;
+	}
+	
+	#gallery-walk-rating-table {
+		width: 60%;
+		margin: 50px auto;
+		border-bottom: 1px solid #ddd;
+	}
+	
+	#gallery-walk-rating-table th {
+		font-weight: bold;
+		font-style: normal;
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table td {
+		text-align: center;
+	}
+	
+	#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
+		text-align: right;
 	}
 	
 	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
@@ -68,7 +92,18 @@
 <script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
-	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
+	//var for jquery.jRating.js
+	var pathToImageFolder = "${lams}images/css/",
+		//vars for rating.js
+		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		MAX_RATES = 0,
+		MIN_RATES = 0,
+		LAMS_URL = '${lams}',
+		COUNT_RATED_ITEMS = true,
+		ALLOW_RERATE = false,
+		
+		isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
 		// show etherpads only on Group expand
@@ -336,15 +371,58 @@
 			$('#countdown').countdown('pause');
 		}
 	}
+	
+	function startGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/startGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				$('#gallery-walk-start').hide();
+				$('#gallery-walk-finish').removeClass('hidden');
+			}
+		});
+	}
+	
+	function finishGalleryWalk(){
+		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+			return;
+		}
+		
+		$.ajax({
+			'url' : '<c:url value="/monitoring/finishGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				<c:choose>
+					<c:when test="${dokumaran.galleryWalkReadOnly}">
+						$('#gallery-walk-finish').hide();
+					</c:when>
+					<c:otherwise>
+						location.reload();
+					</c:otherwise>
+				</c:choose>
+			}
+		});
+	}
 </script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <div class="panel">
 	<h4>
-	    <c:out value="${sessionMap.dokumaran.title}" escapeXml="true"/>
+	    <c:out value="${dokumaran.title}" escapeXml="true"/>
 	</h4>
 	
-	<c:out value="${sessionMap.dokumaran.description}" escapeXml="false"/>
-	 
+	<c:out value="${dokumaran.description}" escapeXml="false"/>
+	
+	
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			 <fmt:message key="message.monitoring.summary.no.session" />
@@ -355,26 +433,67 @@
 	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div>
 
-	<c:if test="${dokumaran.timeLimit > 0}">
-		
+	<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
+		<div class="pull-right" id="control-buttons">
 	
-		<div class="pull-right" id="time-limit-buttons">
-			<div id="countdown"></div>
-		
-			<c:if test="${empty dokumaran.timeLimitLaunchedDate}">
-				<a href="#nogo" class="btn btn-default btn-xs" id="start-activity">
-					<fmt:message key="label.start.activity" />
-				</a>		
+			
+			<c:if test="${dokumaran.timeLimit > 0}">
+				<div id="countdown"></div>
+			
+				<c:if test="${empty dokumaran.timeLimitLaunchedDate}">
+					<a href="#nogo" class="btn btn-default btn-xs" id="start-activity">
+						<fmt:message key="label.start.activity" />
+					</a>		
+				</c:if>
+				
+				<a href="#nogo" class="btn btn-default btn-xs" id="add-one-minute">
+					<fmt:message key="label.plus.one.minute" />
+				</a>	
 			</c:if>
 			
-			<a href="#nogo" class="btn btn-default btn-xs" id="add-one-minute">
-				<fmt:message key="label.plus.one.minute" />
-			</a>	
+			<c:if test="${dokumaran.galleryWalkEnabled}">
+				<button id="gallery-walk-start" type="button"
+				        class="btn btn-default 
+				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:startGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+				</button>
+				
+				<button id="gallery-walk-finish" type="button"
+				        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+				        onClick="javascript:finishGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
+				</button>
+			</c:if>
 		</div>
 		
 		<br>
 	</c:if>
 </div>
+
+<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+	<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+	  <thead class="thead-light">
+	    <tr>
+	      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+	      <th scope="col"><fmt:message key="label.rating" /></th>
+	    </tr>
+	  </thead>
+	  <tbody>
+		<c:forEach var="groupSummary" items="${summaryList}">
+			<tr>
+				<td>${groupSummary.sessionName}</td>
+				<td>
+					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+								 isItemAuthoredByUser="true"
+								 hideCriteriaTitle="true" />
+				</td>
+			</tr>
+		</c:forEach>
+	  </tbody>
+	</table>
+</c:if>
 
 <c:if test="${sessionMap.isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
@@ -382,7 +501,7 @@
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 	
-	<c:if test="${sessionMap.isGroupedActivity}">	
+	<c:if test="${sessionMap.isGroupedActivity}">
 	    <div class="panel panel-default" >
         <div class="panel-heading" id="heading${groupSummary.sessionId}">
         	<span class="panel-title collapsable-icon-left">
@@ -410,6 +529,10 @@
 									
 		</c:when>
 		<c:otherwise>
+			<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
+				<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
+			</c:if>
+			
 			<div class="btn-group btn-group-xs pull-right">
 				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
 				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 

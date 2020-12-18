@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 
@@ -41,12 +43,17 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -74,6 +81,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.gjerull.etherpad.client.EPLiteClient;
@@ -100,6 +108,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private ILamsToolService toolService;
 
     private IUserManagementService userManagementService;
+
+    private ILearnerService learnerService;
+
+    private IRatingService ratingService;
 
     private IExportToolContentService exportContentService;
 
@@ -160,7 +172,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    //in case current user is leader - store his leader status
 		    if (leaderUserId.equals(user.getUserId())) {
 			user.setLeader(true);
-			saveUser(user);
+			saveOrUpdate(user);
 			leaders.add(user);
 			continue;
 		    }
@@ -180,7 +192,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 			DokumaranUser leader = new DokumaranUser(leaderDto.getUserDTO(), session);
 			leader.setLeader(true);
-			saveUser(leader);
+			saveOrUpdate(leader);
 			leaders.add(leader);
 		    }
 		}
@@ -201,7 +213,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 			log.debug("creating new user with userId: " + leaderUserId);
 			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
 			leader = new DokumaranUser(leaderDto.getUserDTO(), session);
-			saveUser(leader);
+			saveOrUpdate(leader);
 		    }
 
 		    // set group leader
@@ -319,11 +331,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void saveUser(DokumaranUser dokumaranUser) {
-	dokumaranUserDao.saveObject(dokumaranUser);
-    }
-
-    @Override
     public DokumaranUser getUserByIDAndContent(Long userId, Long contentId) {
 	return dokumaranUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
@@ -347,8 +354,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void saveOrUpdateDokumaran(Dokumaran dokumaran) {
-	dokumaranDao.saveObject(dokumaran);
+    public void saveOrUpdate(Object entity) {
+	dokumaranDao.saveObject(entity);
     }
 
     @Override
@@ -363,11 +370,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public DokumaranSession getDokumaranSessionBySessionId(Long sessionId) {
 	return dokumaranSessionDao.getSessionBySessionId(sessionId);
-    }
-
-    @Override
-    public void saveOrUpdateDokumaranSession(DokumaranSession resSession) {
-	dokumaranSessionDao.saveObject(resSession);
     }
 
     @Override
@@ -417,26 +419,48 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public List<SessionDTO> getSummary(Long contentId) {
-	List<SessionDTO> groupList = new ArrayList<>();
-
+    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) {
 	// get all sessions in a dokumaran and retrieve all dokumaran items under this session
 	// plus initial dokumaran items by author creating (resItemList)
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
+	Dokumaran dokumaran = dokumaranDao.getByContentId(contentId);
 
+	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
+	if (dokumaran.isGalleryWalkStarted()) {
+	    if (!dokumaran.isGalleryWalkReadOnly()) {
+		// it should have been creating on lesson create,
+		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
+		createGalleryWalkRatingCriterion(dokumaran.getContentId());
+	    }
+
+	    // Item IDs are DokumaranSession session IDs, i.e. a single Etherpad
+	    Set<Long> itemIds = sessionList.stream()
+		    .collect(Collectors.mapping(DokumaranSession::getSessionId, Collectors.toSet()));
+
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, false,
+		    ratingUserId);
+	    // Mapping of Item ID -> DTO
+	    itemRatingDtoMap = itemRatingDtos.stream()
+		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
+	}
+
+	List<SessionDTO> groupList = new ArrayList<>();
 	for (DokumaranSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
-
-	    String padId = session.getPadId();
-	    group.setPadId(padId);
+	    group.setPadId(session.getPadId());
+	    group.setReadOnlyPadId(session.getEtherpadReadOnlyId());
 
 	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
 	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId())
 		    || StringUtils.isEmpty(session.getEtherpadGroupId())) {
 		group.setSessionFaulty(true);
+	    }
+
+	    if (itemRatingDtoMap != null) {
+		group.setItemRatingDto(itemRatingDtoMap.get(session.getSessionId()));
 	    }
 
 	    groupList.add(group);
@@ -499,6 +523,73 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @Override
     public DokumaranUser getUser(Long uid) {
 	return (DokumaranUser) dokumaranUserDao.getObject(DokumaranUser.class, uid);
+    }
+
+    private List<RatingCriteria> createGalleryWalkRatingCriterion(long toolContentId) {
+	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+	if (criteria.size() >= 2) {
+	    // Dokumaran currently supports only one place for ratings.
+	    // It is rating other groups' pads on results page.
+	    // Criterion gets automatically created and there must be only one.
+	    throw new IllegalArgumentException("There can be only one criterion for a Dokumaran activity. "
+		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	}
+	if (criteria.isEmpty()) {
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
+		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
+	    criterion.setOrderId(1);
+	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setToolContentId(toolContentId);
+
+	    dokumaranDao.insert(criterion);
+	    criteria.add(criterion);
+	}
+	return criteria;
+    }
+
+    @Override
+    public void startGalleryWalk(long toolContentId) throws IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	if (!dokumaran.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is not enabled for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	if (dokumaran.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not start Gallery Walk as it is already finished for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	dokumaran.setGalleryWalkStarted(true);
+	dokumaranDao.saveObject(dokumaran);
+
+	sendGalleryWalkRefreshRequest(dokumaran);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) throws IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	if (!dokumaran.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not finish Gallery Walk as it is not enabled for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	dokumaran.setGalleryWalkFinished(true);
+	dokumaranDao.saveObject(dokumaran);
+
+	sendGalleryWalkRefreshRequest(dokumaran);
+    }
+
+    private void sendGalleryWalkRefreshRequest(Dokumaran dokumaran) {
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "gallery-walk-refresh-" + dokumaran.getContentId());
+	// get all learners in this doku
+	Set<Integer> userIds = dokumaranSessionDao.getByContentId(dokumaran.getContentId()).stream()
+		.flatMap(session -> dokumaranUserDao.getBySessionID(session.getSessionId()).stream())
+		.collect(Collectors.mapping(user -> user.getUserId().intValue(), Collectors.toSet()));
+
+	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
     }
 
     // *****************************************************************************
@@ -638,6 +729,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	Dokumaran toContent = Dokumaran.newInstance(dokumaran, toContentId);
 	dokumaranDao.saveObject(toContent);
+
+	if (toContent.isGalleryWalkEnabled() && !toContent.isGalleryWalkReadOnly()) {
+	    createGalleryWalkRatingCriterion(toContentId);
+	}
     }
 
     @Override
@@ -762,7 +857,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		ToolSession toolSession = toolService.getToolSession(toolSessionId);
 		Long lessonId = toolSession.getLesson().getLessonId();
 		groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
-		
+
 		etherpadHtml = EtherpadUtil.preparePadContent(dokumaran.getInstructions());
 	    } else {
 		session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());
@@ -976,6 +1071,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.userManagementService = userManagementService;
     }
 
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
+    }
+
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
     }
@@ -1037,7 +1140,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	dokumaran.setCreatedBy(dokumaranUser);
 
-	saveOrUpdateDokumaran(dokumaran);
+	saveOrUpdate(dokumaran);
 
     }
 }

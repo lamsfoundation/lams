@@ -61,6 +61,12 @@
    		<property name="userManagementService">
    			<ref bean="userManagementService"/>
    		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="ratingService">
+   			<ref bean="ratingService"/>
+   		</property>
    		<property name="etherpadService">
    			<ref bean="etherpadService"/>
    		</property>
@@ -94,7 +100,7 @@
                 <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>      
                 <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
-                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
+                <prop key="finish*">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
                 <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
                 <prop key="get*">PROPAGATION_REQUIRED</prop>
 			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>    
@@ -106,6 +112,7 @@
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
                 <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
+                <prop key="start*">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
             </props>
         </property>
     </bean>

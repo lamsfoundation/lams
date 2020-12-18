@@ -107,8 +107,22 @@ public class Dokumaran implements Cloneable {
     @Column(name = "reflect_instructions")
     private String reflectInstructions;
 
-    // general information
+    @Column(name = "gallery_walk_enabled")
+    private boolean galleryWalkEnabled;
 
+    @Column(name = "gallery_walk_read_only")
+    private boolean galleryWalkReadOnly;
+
+    @Column(name = "gallery_walk_started")
+    private boolean galleryWalkStarted;
+
+    @Column(name = "gallery_walk_finished")
+    private boolean galleryWalkFinished;
+
+    @Column(name = "gallery_walk_instructions")
+    private String galleryWalkInstructions;
+
+    // general information
     @Column(name = "create_date")
     private Date created;
 
@@ -407,5 +421,45 @@ public class Dokumaran implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isGalleryWalkEnabled() {
+	return galleryWalkEnabled;
+    }
+
+    public void setGalleryWalkEnabled(boolean galleryWalkEnabled) {
+	this.galleryWalkEnabled = galleryWalkEnabled;
+    }
+
+    public boolean isGalleryWalkReadOnly() {
+	return galleryWalkReadOnly;
+    }
+
+    public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
+	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public boolean isGalleryWalkStarted() {
+	return galleryWalkStarted;
+    }
+
+    public void setGalleryWalkStarted(boolean galleryWalkStarted) {
+	this.galleryWalkStarted = galleryWalkStarted;
+    }
+
+    public boolean isGalleryWalkFinished() {
+	return galleryWalkFinished;
+    }
+
+    public void setGalleryWalkFinished(boolean galleryWalkFinished) {
+	this.galleryWalkFinished = galleryWalkFinished;
+    }
+
+    public String getGalleryWalkInstructions() {
+	return galleryWalkInstructions;
+    }
+
+    public void setGalleryWalkInstructions(String galleryWalkInstructions) {
+	this.galleryWalkInstructions = galleryWalkInstructions;
     }
 }
