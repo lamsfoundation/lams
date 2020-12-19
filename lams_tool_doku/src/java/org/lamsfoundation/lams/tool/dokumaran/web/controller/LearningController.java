@@ -125,7 +125,7 @@ public class LearningController {
 
 	// support for leader select feature
 	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
-		? dokumaranService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(),
+		? dokumaranService.checkLeaderSelectToolForSessionLeader(user, toolSessionId,
 			isFirstTimeAccess)
 		: new ArrayList<>();
 	// forwards to the leaderSelection page

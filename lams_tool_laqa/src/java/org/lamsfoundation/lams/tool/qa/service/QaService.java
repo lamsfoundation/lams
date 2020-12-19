@@ -141,17 +141,9 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	if (leader == null) {
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    if (leaderUserId != null) {
-		leader = getUserByIdAndSession(leaderUserId, toolSessionId);
-
-		// create new user in a DB
-		if (leader == null) {
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new QaQueUsr(leaderUserId, userName, fullName, qaSession, new TreeSet<>());
-		    qaQueUsrDAO.createUsr(user);
-		}
+	    // set leader only if current user is the leader
+	    if (user.getQueUsrId().equals(leaderUserId)) {
+		leader = user;
 
 		// set group leader
 		qaSession.setGroupLeader(leader);

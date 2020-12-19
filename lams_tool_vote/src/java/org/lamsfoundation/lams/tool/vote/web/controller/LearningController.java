@@ -182,7 +182,7 @@ public class LearningController implements VoteAppConstants {
 
 	    List<VoteUsrAttempt> attempts = voteService.getAttemptsForUser(voteQueUsr.getUid());
 
-	    Map<String, String> mapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapQuestionsContent = new TreeMap<>(new VoteComparator());
 	    Iterator<VoteUsrAttempt> listIterator = attempts.iterator();
 	    int order = 0;
 	    while (listIterator.hasNext()) {
@@ -411,7 +411,7 @@ public class LearningController implements VoteAppConstants {
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() == 0 && (userEntryAvailable == true))) {
-	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
 		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
@@ -419,7 +419,7 @@ public class LearningController implements VoteAppConstants {
 	}
 
 	if ((mapGeneralCheckedOptionsContent.size() > 0) && (userEntryAvailable == true)) {
-	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	    Map<String, String> mapLeanerCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 
 	    if (userEntry.length() > 0) {
 		voteService.createAttempt(user, mapLeanerCheckedOptionsContent, userEntry, session, voteContentUid);
@@ -477,7 +477,7 @@ public class LearningController implements VoteAppConstants {
 	Map<String, String> mapQuestionsContent = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(MAP_QUESTION_CONTENT_LEARNER, mapQuestionsContent);
 
-	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 	request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 
 	voteLearningForm.setUserEntry("");
@@ -864,7 +864,7 @@ public class LearningController implements VoteAppConstants {
 	if (user != null) {
 	    attempts = voteService.getAttemptsForUser(user.getUid());
 	}
-	Map<String, String> localMapQuestionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> localMapQuestionsContent = new TreeMap<>(new VoteComparator());
 
 	if (attempts != null) {
 
@@ -902,7 +902,7 @@ public class LearningController implements VoteAppConstants {
     private static void setupAttributes(HttpServletRequest request, VoteContent voteContent,
 	    VoteLearningForm voteLearningForm, VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO) {
 
-	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<String, String>(new VoteComparator());
+	Map<String, String> mapGeneralCheckedOptionsContent = new TreeMap<>(new VoteComparator());
 	request.setAttribute(VoteAppConstants.MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapGeneralCheckedOptionsContent);
 
 	voteLearningForm.setActivityTitle(voteContent.getTitle());

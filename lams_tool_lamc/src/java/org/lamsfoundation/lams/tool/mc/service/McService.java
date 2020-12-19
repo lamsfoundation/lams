@@ -168,19 +168,9 @@ public class McService
 	if (leader == null) {
 
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
-	    if (leaderUserId != null) {
-
-		leader = getMcUserBySession(leaderUserId, mcSession.getUid());
-
-		// create new user in a DB
-		if (leader == null) {
-		    logger.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-		    String userName = leaderDto.getLogin();
-		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    leader = new McQueUsr(leaderUserId, userName, fullName, mcSession);
-		    mcUserDAO.saveMcUser(user);
-		}
+	    // set leader only if current user is the leader
+	    if (user.getQueUsrId().equals(leaderUserId)) {
+		leader = user;
 
 		// set group leader
 		mcSession.setGroupLeader(leader);

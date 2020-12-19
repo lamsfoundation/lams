@@ -126,7 +126,8 @@ public class LearningController implements QaAppConstants {
 	request.setAttribute("qaLearningForm", qaLearningForm);
 	QaQueUsr groupLeader = null;
 	if (qaContent.isUseSelectLeaderToolOuput()) {
-	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID).longValue());
+	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(user,
+		    Long.valueOf(toolSessionID).longValue());
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {

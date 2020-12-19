@@ -338,16 +338,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
-	    if (leaderUserId != null) {
-		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
-
-		// create new user in a DB
-		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
-		    this.createUser(leader);
-		}
+	    // set leader only if current user is the leader
+	    if (user.getUserId().equals(leaderUserId)) {
+		leader = user;
 
 		// set group leader
 		scratchieSession.setGroupLeader(leader);
