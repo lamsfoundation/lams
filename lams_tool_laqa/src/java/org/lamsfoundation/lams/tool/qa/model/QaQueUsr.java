@@ -44,9 +44,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * 
+ *
  * Represents tool users.
- * 
+ *
  * @author Ozgur Demirtas
  */
 @Entity
@@ -83,7 +83,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
     private Set<QaUsrResp> qaUsrResps;
 
     public QaQueUsr() {
-	this.qaUsrResps = new TreeSet<QaUsrResp>();
+	this.qaUsrResps = new TreeSet<>();
     };
 
     /** full constructor */
@@ -92,7 +92,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 	this.username = username;
 	this.fullname = fullname;
 	this.qaSession = qaSession;
-	this.qaUsrResps = qaUsrResps != null ? qaUsrResps : new TreeSet<QaUsrResp>();
+	this.qaUsrResps = qaUsrResps != null ? qaUsrResps : new TreeSet<>();
     }
 
     /**

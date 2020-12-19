@@ -35,9 +35,9 @@
 		</ul>
 
 		<div class="right-buttons">
-			<html:button property="refreshButton" onclick="refresh();" styleClass="btn btn-default voffset5">
+			<button onclick="refresh();" class="btn btn-default voffset5">
 				<fmt:message key="label.refresh" />
-			</html:button>
+			</button>
 		</div>
 
 
