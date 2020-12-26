@@ -134,9 +134,9 @@ public class EmailAnalysisBuilder {
     public class LearnerData {
 
 	public class SingleCriteriaData {
-	    Double selfRating;
-	    Double peerRatingExcSelf;
-	    Double peerRatingIncSelf;
+	    public Double selfRating;
+	    public Double peerRatingExcSelf;
+	    public Double peerRatingIncSelf;
 
 	    SingleCriteriaData(Double selfRating, Double peerRatingExcSelf, Double peerRatingIncSelf) {
 		this.selfRating = selfRating;
@@ -163,7 +163,7 @@ public class EmailAnalysisBuilder {
 	}
 
 	// must not be called until data analysis calculations are done - needs averageOfAverages
-	protected Double getSPAFactor() {
+	public Double getSPAFactor() {
 	    if (spa == null) {
 		spa = (averageOfAverages > 0 && individualCriteriaAverage != null)
 			// round twice for consistency with Spreadsheet export
@@ -173,7 +173,7 @@ public class EmailAnalysisBuilder {
 	    return spa;
 	}
 
-	protected Double getSAPAFactor() {
+	public Double getSAPAFactor() {
 	    if (sapa == null) {
 		double sumSelfRatings = 0d;
 		double sumPeerRatings = 0d;
@@ -212,7 +212,7 @@ public class EmailAnalysisBuilder {
     }
 
     /* Only needs to be called once for the session - works out all the basic data for the whole team */
-    private void generateTeamData() {
+    public Map<Long, LearnerData> generateTeamData() {
 
 	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
 	for (PeerreviewUser user : users) {
@@ -276,6 +276,7 @@ public class EmailAnalysisBuilder {
 	}
 	averageOfAverages = averageOfAveragesCount > 0 ? averageOfAveragesSum / averageOfAveragesCount : 0D;
 
+	return learnerDataMap;
     }
 
     class SummingData {
