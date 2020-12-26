@@ -1173,6 +1173,7 @@ public class LearningController {
 	// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
 	// Get all item IDs no matter which session they belong to.
 	Set<Long> itemIds = questionSummaries.values().stream().flatMap(s -> s.getQuestionResultsPerSession().stream())
+		.filter(l -> l != null && !l.isEmpty())
 		.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
 
 	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(), null,
