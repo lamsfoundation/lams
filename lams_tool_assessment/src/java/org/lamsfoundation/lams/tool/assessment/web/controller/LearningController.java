@@ -1145,6 +1145,19 @@ public class LearningController {
 	request.setAttribute("sessions", sessionList);
 
 	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
+
+	// filter out empty results, when a group has not provided any answers
+	for (QuestionSummary questionSummary : questionSummaries.values()) {
+	    Iterator<List<AssessmentQuestionResult>> questionResultsIterator = questionSummary
+		    .getQuestionResultsPerSession().iterator();
+	    while (questionResultsIterator.hasNext()) {
+		List<AssessmentQuestionResult> questionResults = questionResultsIterator.next();
+		if (questionResults == null || questionResults.isEmpty()
+			|| questionResults.get(questionResults.size() - 1).getUid() == null) {
+		    questionResultsIterator.remove();
+		}
+	    }
+	}
 	request.setAttribute("questionSummaries", questionSummaries);
 
 	// Assessment currently supports only one place for ratings.
@@ -1173,7 +1186,6 @@ public class LearningController {
 	// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
 	// Get all item IDs no matter which session they belong to.
 	Set<Long> itemIds = questionSummaries.values().stream().flatMap(s -> s.getQuestionResultsPerSession().stream())
-		.filter(l -> l != null && !l.isEmpty())
 		.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
 
 	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(), null,
@@ -1188,36 +1200,37 @@ public class LearningController {
 		    : user.getSession().getGroupLeader().getUserId();
 	}
 
-	for (QuestionSummary summary : questionSummaries.values()) {
+	if (userSessionIndex != null) {
+	    for (QuestionSummary summary : questionSummaries.values()) {
 
-	    List<List<AssessmentQuestionResult>> questionResultsPerSession = summary.getQuestionResultsPerSession();
-	    if (questionResultsPerSession != null) {
-		List<AssessmentQuestionResult> questionResults = userSessionIndex == null ? null
-			: questionResultsPerSession.remove((int) userSessionIndex);
-		// user or his leader should rate all other groups' answers in order to show ratings left for own group
-		int expectedRatedItemCount = questionResultsPerSession.size();
+		List<List<AssessmentQuestionResult>> questionResultsPerSession = summary.getQuestionResultsPerSession();
+		if (questionResultsPerSession != null) {
+		    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
+			    .remove((int) userSessionIndex);
 
-		Set<Long> questionItemIds = questionResultsPerSession.stream()
-			.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+		    // user or his leader should rate all other groups' answers in order to show ratings left for own group
+		    int expectedRatedItemCount = questionResults.size();
 
-		if (questionResults != null) {
+		    Set<Long> questionItemIds = questionResultsPerSession.stream()
+			    .collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
 		    // question results need to be in the same order as sessions, i.e. user group first
 		    questionResultsPerSession.add(0, questionResults);
-		}
 
-		// count how many ratings user or his leader left
-		// maybe exact session ID matching should be used here to make sure
-		int ratedItemCount = 0;
-		for (Long questionItemId : questionItemIds) {
-		    ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
-		    for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
-			if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
-			    ratedItemCount++;
+		    // count how many ratings user or his leader left
+		    // maybe exact session ID matching should be used here to make sure
+		    int ratedItemCount = 0;
+		    for (Long questionItemId : questionItemIds) {
+			ItemRatingDTO itemRatingDTO = itemRatingDtoMap.get(questionItemId);
+			for (RatingCommentDTO ratingCommentDTO : itemRatingDTO.getCommentDtos()) {
+			    if (ratingCommentDTO.getUserId().equals(ratingUserId)) {
+				ratedItemCount++;
+			    }
 			}
 		    }
-		}
 
-		summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		    summary.setShowOwnGroupRating(ratedItemCount == expectedRatedItemCount);
+		}
 	    }
 	}
 

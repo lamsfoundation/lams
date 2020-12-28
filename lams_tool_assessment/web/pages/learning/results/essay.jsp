@@ -34,6 +34,7 @@
 			
 			<%-- Reset variable value --%>
 			<c:set var="showRating" value="false" />
+			<c:set var="sessionResults" value="" />
 			
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
@@ -49,7 +50,7 @@
 			</c:if>
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
-			<c:if test="${toolSessionID != session.sessionId or showRating}">
+			<c:if test="${not empty sessionResults and (toolSessionID != session.sessionId or showRating)}">
 				<tr role="row" ${toolSessionID == session.sessionId ? 'class="bg-success"' : ''}>
 					<td class="text-center" style="width: 20%" ${showRating ? 'rowspan="2"' : ''}>
 						<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
