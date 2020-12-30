@@ -11,7 +11,33 @@
 </c:set>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
+<script src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
+<script src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 <script>
+	var WEB_APP_URL = '<lams:WebAppURL />',
+		
+	LABELS = $.extend(LABELS, {
+		<fmt:message key="label.monitoring.summary.completion" var="ACTIVITY_COMPLETION_CHART_TITLE_VAR"/>
+		ACTIVITY_COMPLETION_CHART_TITLE : '<c:out value="${ACTIVITY_COMPLETION_CHART_TITLE_VAR}" />',
+		<fmt:message key="label.monitoring.summary.completion.possible" var="ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR"/>
+		ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR}" />',
+		<fmt:message key="label.monitoring.summary.completion.started" var="ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR"/>
+		ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR}" />',	
+		<fmt:message key="label.monitoring.summary.completion.completed" var="ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR"/>
+		ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR}" />',	
+		<fmt:message key="label.monitoring.summary.answered.questions" var="ANSWERED_QUESTIONS_CHART_TITLE_VAR"/>
+		ANSWERED_QUESTIONS_CHART_TITLE : '<c:out value="${ANSWERED_QUESTIONS_CHART_TITLE_VAR}" />',
+		<fmt:message key="label.monitoring.summary.answered.questions.groups" var="ANSWERED_QUESTIONS_CHART_TITLE_GROUPS_VAR"/>
+		ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : '<c:out value="${ANSWERED_QUESTIONS_CHART_TITLE_GROUPS_VAR}" />',
+		<fmt:message key="label.monitoring.summary.answered.questions.x.axis" var="ANSWERED_QUESTIONS_CHART_X_AXIS_VAR"/>
+		ANSWERED_QUESTIONS_CHART_X_AXIS : '<c:out value="${ANSWERED_QUESTIONS_CHART_X_AXIS_VAR}" />',
+		<fmt:message key="label.monitoring.summary.answered.questions.y.axis.students" var="ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS_VAR"/>
+		ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS_VAR}" />',
+		<fmt:message key="label.monitoring.summary.answered.questions.y.axis.groups" var="ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS_VAR"/>
+		ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS_VAR}" />'
+	});
+	
 	$(document).ready(function(){
 		// change attempted and all learners numbers
 		$('.nav-tabs').bind('click', function (event) {
@@ -27,9 +53,17 @@
 		//insert total learners number taken from the parent tblmonitor.jsp
 		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
 
-		// go through each AE and set up disclose buttons there
-		$('.assessmentPane').each(function(){
-			var assessmentPane = $(this),
+		$('.results').each(function(){
+			// load results div for the first time
+			loadResultsPane($(this), false);
+		});
+	});
+	
+	function loadResultsPane(resultsPane, isRefresh) {
+		// load an embedded results list
+		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&toolContentID=" 
+					 + resultsPane.data('toolContentId'), function(){
+			var assessmentPane = resultsPane.closest('.assessmentPane'),
 				// are any correct/groups buttons clickable?
 				discloseAllCorrectEnabled = false,
 				discloseAllGroupsEnabled = false; 
@@ -44,21 +78,15 @@
 					discloseAllGroupsEnabled = true;
 				}
 				
-				button.one('click', function() {		
-					$.ajax({
-						'url'  : '<lams:WebAppURL />monitoring/' 
-								  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
-								  + '.do',
-						'type': 'POST',
-						'data' : {
-							'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
-							'toolContentID' : $('#selected-content-id').val(),
-							'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
-						}
-					}).done(function(){
-						// disable the button after click
-						disabledAndCheckButton(button);
-					});
+				
+				
+				button.click(function(event) {	
+					if (!confirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
+												: "<fmt:message key='message.disclose.groups.answers' />")) {
+						return;
+					}
+					
+					discloseAnswers(button, resultsPane);
 				});
 			});
 
@@ -66,25 +94,60 @@
 			// and disable if not
 			var allCorrectButton = $('.disclose-all-correct-button', assessmentPane);
 			if (discloseAllCorrectEnabled) {
-				allCorrectButton.one('click', function(){
-					$('.disclose-correct-button', assessmentPane).not('[disabled]').click();
-					disabledAndCheckButton(allCorrectButton);
-				});
+				// do not add a handler twice
+				if (!isRefresh) {
+					allCorrectButton.click(function(){
+						if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+							return;
+						}
+						$('.disclose-correct-button', assessmentPane).not('[disabled]').each(function() {
+							discloseAnswers($(this), resultsPane);
+						});
+						disabledAndCheckButton(allCorrectButton);
+					});
+				}
 			} else {
 				disabledAndCheckButton(allCorrectButton);
 			}
 
 			var allGroupsButton = $('.disclose-all-groups-button', assessmentPane);
 			if (discloseAllGroupsEnabled) {
-				allGroupsButton.one('click', function(){
-					$('.disclose-groups-button', assessmentPane).not('[disabled]').click();
-					disabledAndCheckButton(allGroupsButton);
-				});
+				// do not add a handler twice
+				if (!isRefresh) {
+					allGroupsButton.click(function(){
+						if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+							return;
+						}
+						$('.disclose-groups-button', assessmentPane).not('[disabled]').each(function() {
+							discloseAnswers($(this), resultsPane);
+						});
+						disabledAndCheckButton(allGroupsButton);
+					});
+				}
 			} else {
 				disabledAndCheckButton(allGroupsButton);
 			}
 		});
-	});
+	}
+	
+	function discloseAnswers(button, resultsPane) {
+		let isCorrectButton = button.hasClass('disclose-correct-button');
+		
+		$.ajax({
+			'url'  : '<lams:WebAppURL />monitoring/' 
+					  + (isCorrectButton ? 'discloseCorrectAnswers' : 'discloseGroupsAnswers')
+					  + '.do',
+			'type': 'POST',
+			'data' : {
+				'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
+				'toolContentID' : $('#selected-content-id').val(),
+				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+			}
+		}).done(function(){
+			// reload results after disclosing answers
+			loadResultsPane(resultsPane, true);
+		});
+	}
 
 	function disabledAndCheckButton(button){
 		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
@@ -128,7 +191,7 @@
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.show.students.choices"/>
 			</a>
-		</div>       
+		</div>      
 	</c:if>                           
 </div>
 
@@ -171,147 +234,13 @@
 								<fmt:message key="label.disclose.all.groups.answers"/>
 							</div>
 						</div>
+						
+
 					</div>
 				</div>
 			</c:if>
 			
-			<c:forEach var="question" items="${assessmentDto.questions}" varStatus="i">
-				<c:set var="qbQuestion" value="${question.qbQuestion}"/>
-				<div class="row no-gutter">
-				<div class="col-xs-12 col-md-12 col-lg-12">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="panel-title">
-							<c:if test="${assessmentDto.assessment.numbered}">
-								<span class="float-left space-right">Q${i.index+1})</span>
-							</c:if> 
-							
-							<c:out value="${qbQuestion.name}" escapeXml="false"/>
-							
-							<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
-								<div class="btn-group-xs pull-right disclose-button-group" questionUid="${question.uid}">
-									<%-- Allow disclosing correct answers only for multiple choice questions --%>
-									<c:if test="${qbQuestion.type == 1}">
-										<div class="btn btn-default disclose-correct-button"
-											<c:if test="${question.correctAnswersDisclosed}">
-												disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
-											</c:if>
-											>
-											<fmt:message key="label.disclose.correct.answers"/>
-										</div>
-									</c:if>
-									<div class="btn btn-default disclose-groups-button"
-										<c:if test="${question.groupsAnswersDisclosed}">
-											disabled="disabled"><i class="fa fa-check text-success">&nbsp;</i
-										</c:if>
-										>
-										<fmt:message key="label.disclose.groups.answers"/>
-									</div>
-								</div>
-							</c:if>
-						</div>
-					</div>
-					
-					<div class="panel-body">
-						<div class="table-responsive">	
-							<c:out value="${qbQuestion.description}" escapeXml="false"/>
-							
-							<table class="table table-striped">
-								<tbody>
-									
-									<c:choose>
-										<c:when test="${qbQuestion.type == 1 || qbQuestion.type == 3}">
-											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
-												<tr>
-													<td width="5px">
-														${ALPHABET[j.index]}.
-													</td>									
-													<td>
-														<c:choose>
-															<c:when test="${qbQuestion.type == 1}">
-																<c:out value="${qbOption.name}" escapeXml="false"/>
-															</c:when>
-															<c:otherwise>
-																${fn:replace(qbOption.name, newLineChar, ', ')}
-															</c:otherwise>
-														</c:choose>
-													</td>
-												</tr>					
-											</c:forEach>						
-										</c:when>
-										
-										
-										<c:when test="${qbQuestion.type == 2}">
-											<tr style="background: none;">
-												<td style="border-top: none;">
-												</td>
-																
-												<td style="border-top: none; font-weight: bold;">
-													Possible answers
-												</td>
-											</tr>
-										
-											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
-												<tr>
-													<td>
-														<span class="pull-left">${ALPHABET[j.index]}.</span>
-																
-														<c:out value="${qbOption.matchingPair}" escapeXml="false"/>
-													</td>
-																
-													<td>
-														<c:out value="${qbOption.name}" escapeXml="false"/>
-													</td>
-												</tr>
-											</c:forEach>
-										</c:when>
-										
-										<c:when test="${(qbQuestion.type == 4) || (qbQuestion.type == 6)}">
-										</c:when>
-															
-										<c:when test="${qbQuestion.type == 5}">
-											<tr>
-												<td width="5px">
-													a.
-												</td>
-												<td>
-													<fmt:message key="label.learning.true.false.true"/>
-												</td>
-											</tr>
-											<tr>
-												<td width="5px">
-													b.
-												</td>								
-												<td>
-													<fmt:message key="label.learning.true.false.false"/>
-												</td>
-											</tr>
-										</c:when>
-															
-										<c:when test="${(qbQuestion.type == 7) || (qbQuestion.type == 8)}">
-											<c:forEach var="qbOption" items="${qbQuestion.qbOptions}" varStatus="j">
-															
-												<tr>
-													<td width="5px">
-														${ALPHABET[j.index]}.
-													</td>
-													<td>
-														<c:out value="${qbOption.name}" escapeXml="false"/>
-													</td>
-												</tr>
-												
-											</c:forEach>
-										</c:when>						
-										
-									</c:choose>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>  
-				</div>
-				</div>
-			</c:forEach>
+			<div class="results" data-tool-content-id="${assessmentDto.assessment.contentId}"></div>
 		</div>
 	</c:forEach>
 </div>

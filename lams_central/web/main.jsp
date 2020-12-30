@@ -215,7 +215,7 @@
 					<c:if test="${showQbCollectionsLink}">
 						<li>
 							<a href="#" id="showQbCollectionsButton" onclick="javascript:openQbCollections(); return false;">
-								<i class="fa fa-question"></i> <fmt:message key="index.qb.collections"/>
+								<i class="fa fa-bank"></i> <fmt:message key="index.qb.collections"/>
 							</a>
 						</li>
 					</c:if>

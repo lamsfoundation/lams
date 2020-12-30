@@ -29,11 +29,16 @@
 		    selectTab(tabId);
         }
 
-        function validateQuestionBankIsNotEmpty() {
+        function validateForm() {
             //check with a teacher whether he forgot to add questions to the question bank
             var referenceCount = $("#referencesTable tr").length - 1;
 			if ((referenceCount == 0) && !confirm("<fmt:message key="label.no.questions.in.question.bank"/>")) {
 				return false;
+			}
+
+			var timeLimit = $('#relativeTimeLimit').val();
+			if (!timeLimit) {
+				$('#relativeTimeLimit').val(0);
 			}
 
 			//serialize overallFeedbackForm
@@ -44,11 +49,14 @@
 
         	return true;
         }
+        
+        // avoid name clash between bootstrap and jQuery UI
+        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
 	<form:form action="updateContent.do" method="post" modelAttribute="assessmentForm" id="authoringForm" 
-			onsubmit="return validateQuestionBankIsNotEmpty();">
+			onsubmit="return validateForm();">
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 	
 		<c:set var="title"><fmt:message key="label.author.title" /></c:set>

@@ -94,20 +94,33 @@
 				<table class="table table-striped">
 					<tbody>
 						<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
+							<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
 							<tr>
-								<td width="5px">
-									${ALPHABET[j.index]}.
-								</td>									
-								<td>
-									<c:choose>
-										<c:when test="${item.qbQuestion.type == 1}">
+								<c:choose>
+									<c:when test="${item.qbQuestion.type == 1}">
+										<td width="5px" class="${cssClass}">
+											${ALPHABET[j.index]}.
+										</td>
+										<td class="${cssClass}">
 											<c:out value="${qbOption.name}" escapeXml="false"/>
-										</c:when>
-										<c:otherwise>
+										</td>
+									</c:when>
+									<c:otherwise>
+										<td width="5px" class="${cssClass}">
+											<c:choose>
+												<c:when test="${qbOption.correct}">
+													<i class="fa fa-check"></i>
+												</c:when>
+												<c:otherwise>
+													<i class="fa fa-close"></i>
+												</c:otherwise>
+											</c:choose>
+										</td>
+										<td class="${cssClass}">
 											${fn:replace(qbOption.name, newLineChar, ', ')}
-										</c:otherwise>
-									</c:choose>
-								</td>
+										</td>
+									</c:otherwise>
+								</c:choose>
 							</tr>					
 						</c:forEach>
 					</tbody>

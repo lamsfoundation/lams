@@ -358,7 +358,8 @@ public class AuthoringController implements QaAppConstants {
      * saveQuestion
      */
     @RequestMapping(value = "/saveQuestion", method = RequestMethod.POST)
-    public String saveQuestion(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request)
+    public String saveQuestion(@ModelAttribute("newQuestionForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion)
 	    throws IOException, ServletException {
 	SessionMap<String, Object> sessionMap = getSessionMap(form, request);
 	SortedSet<QaQueContent> qaQuestions = getQuestions(sessionMap);
@@ -421,13 +422,19 @@ public class AuthoringController implements QaAppConstants {
 
 	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
 		: qbQuestion.isQbQuestionModified(oldQbQuestion);
+	if (isQbQuestionModified < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    isQbQuestionModified = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	QbQuestion updatedQuestion = null;
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
-		// impossible scenario as long as ESSAY question type can't have version
-		throw new RuntimeException(
-			"Impossible scenario as long as ESSAY question type can't have new versions");
+		// new version of the old question gets created
+		updatedQuestion = qbQuestion.clone();
+		updatedQuestion.clearID();
+		updatedQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
+		updatedQuestion.setCreateDate(new Date());
 	    }
+		break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
 		// new question gets created
 		updatedQuestion = qbQuestion.clone();

@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -331,7 +332,8 @@ public class MonitoringController {
 	    // survey instruction
 	    row = sheet.createRow(idx++);
 	    cell = row.createCell(0);
-	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getInstructions()));
+	    cell.setCellValue(
+		    ExcelUtil.ensureCorrectCellLength(SurveyWebUtils.removeHTMLTags(survey.getInstructions())));
 
 	    // display 2 empty row
 	    row = sheet.createRow(idx++);
@@ -383,7 +385,8 @@ public class MonitoringController {
 		    cell = row.createCell(0);
 		    cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 		    cell = row.createCell(1);
-		    cell.setCellValue(SurveyWebUtils.removeHTMLTags(option.getDescription()));
+		    cell.setCellValue(
+			    ExcelUtil.ensureCorrectCellLength(SurveyWebUtils.removeHTMLTags(option.getDescription())));
 		}
 		if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 		    optionIdx++;
@@ -456,7 +459,8 @@ public class MonitoringController {
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			cell = row.createCell(++cellIdx);
 			if (answer.getAnswer() != null) {
-			    cell.setCellValue(SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText()));
+			    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(
+				    SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText())));
 			}
 		    }
 

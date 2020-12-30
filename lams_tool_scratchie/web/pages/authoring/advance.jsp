@@ -64,18 +64,28 @@
 		</label>
 	</div>
 	
-	<div class="checkbox">
-		<label for="question-etherpad-enabled">
-			<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
-			<fmt:message key="label.authoring.advanced.question.etherpad" />
-		</label>
-	</div>
+	<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
+		<div class="checkbox">
+			<label for="question-etherpad-enabled">
+				<form:checkbox path="scratchie.questionEtherpadEnabled" id="question-etherpad-enabled"/>
+				<fmt:message key="label.authoring.advanced.question.etherpad" />
+			</label>
+		</div>
+	</c:if>
 	
 	<div class="checkbox">
 		<label for="shuffle-items">
 			<form:checkbox path="scratchie.shuffleItems" id="shuffle-items"/>
 			<fmt:message key="label.authoring.advanced.shuffle.items" />
 		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="reveal-on-double-click">
+			<form:checkbox path="scratchie.revealOnDoubleClick" id="reveal-on-double-click"/>
+			<fmt:message key="label.authoring.advanced.reveal.double.click" />
+		</label>
+		<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.authoring.advanced.reveal.double.click.tooltip" />"></i>
 	</div>
 	
 	<div class="checkbox">

@@ -141,11 +141,6 @@ public interface IDokumaranService extends ICommonToolService {
 
     // ********** for user methods *************
     /**
-     * Create a new user in database.
-     */
-    void saveUser(DokumaranUser dokumaranUser);
-
-    /**
      * Get user by given userID and toolContentID.
      *
      * @param long1
@@ -173,51 +168,29 @@ public interface IDokumaranService extends ICommonToolService {
     List<DokumaranUser> getUsersBySession(Long toolSessionId);
 
     /**
-     * Save or update dokumaran into database.
-     *
-     * @param Dokumaran
+     * Save or update any object into database.
      */
-    void saveOrUpdateDokumaran(Dokumaran Dokumaran);
+    void saveOrUpdate(Object entity);
 
     /**
      * Get dokumaran which is relative with the special toolSession.
-     *
-     * @param sessionId
-     * @return
      */
     Dokumaran getDokumaranBySessionId(Long sessionId);
 
     /**
      * Get dokumaran toolSession by toolSessionId
-     *
-     * @param sessionId
-     * @return
      */
     DokumaranSession getDokumaranSessionBySessionId(Long sessionId);
 
     /**
-     * Save or update dokumaran session.
-     *
-     * @param resSession
-     */
-    void saveOrUpdateDokumaranSession(DokumaranSession resSession);
-
-    /**
      * If success return next activity's url, otherwise return null.
-     *
-     * @param toolSessionId
-     * @param userId
-     * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws DokumaranApplicationException;
 
     /**
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
-     *
-     * @param contentId
-     * @return
      */
-    List<SessionDTO> getSummary(Long contentId);
+    List<SessionDTO> getSummary(Long contentId, Long ratingUserId);
 
     /**
      * Create refection entry into notebook tool.
@@ -262,4 +235,8 @@ public interface IDokumaranService extends ICommonToolService {
      * @return
      */
     DokumaranUser getUser(Long uid);
+
+    void startGalleryWalk(long toolContentId) throws IOException;
+
+    void finishGalleryWalk(long toolContentId) throws IOException;
 }

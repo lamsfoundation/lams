@@ -74,6 +74,7 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder;
+import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData;
 import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -272,7 +273,7 @@ public class PeerreviewServiceImpl
 
     @Override
     public PeerreviewUser getUser(Long uid) {
-	return (PeerreviewUser) peerreviewUserDao.find(PeerreviewUser.class, uid);
+	return peerreviewUserDao.find(PeerreviewUser.class, uid);
     }
 
     @Override
@@ -462,6 +463,13 @@ public class PeerreviewServiceImpl
 
     private String getResultsEmailSubject(Peerreview peerreview) {
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
+    }
+
+    public Map<Long, LearnerData> getLearnerData(Long toolContentId, Long sessionId) {
+	PeerreviewSession session = peerreviewSessionDao.getSessionBySessionId(sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	return new EmailAnalysisBuilder(peerreview, session, ratingService, peerreviewSessionDao, peerreviewUserDao,
+		this, messageService).generateTeamData();
     }
 
     @Override
@@ -1028,4 +1036,5 @@ public class PeerreviewServiceImpl
 
 	saveOrUpdatePeerreview(peerreview);
     }
+
 }

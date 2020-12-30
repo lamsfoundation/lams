@@ -166,8 +166,10 @@
 				CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
 				<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
 				CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
-				<fmt:message key="label.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
+				<fmt:message key="button.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
 				CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
+				<fmt:message key="button.task.gate.opened.tooltip" var="CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR"/>
+				CONTRIBUTE_OPENED_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
@@ -704,17 +706,21 @@
 			</tr>
 		</table>
 		<div class="btn-group pull-right">
-			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogForceCompleteAllButton" class="btn btn-default roffset5 pull-right">
+				<span><fmt:message key="button.force.complete.all" /></span>
+			</button>
+			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 pull-right">
 				<span><fmt:message key="button.force.complete" /></span>
 			</button>
-			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
-				<span><fmt:message key="button.view.learner" /></span>
+			<br>
+			<button id="learnerGroupDialogCloseButton" class="btn btn-default voffset10 pull-right">
+				<span><fmt:message key="button.close" /></span>
 			</button>
-			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
+			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
 				<span><fmt:message key="button.email" /></span>
 			</button>
-			<button id="learnerGroupDialogCloseButton" class="btn btn-default">
-				<span><fmt:message key="button.close" /></span>
+			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5 voffset10 pull-right">
+				<span><fmt:message key="button.view.learner" /></span>
 			</button>
 		</div>
 	</div>

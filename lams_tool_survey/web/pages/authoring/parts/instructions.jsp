@@ -24,12 +24,10 @@
 
 					<td class="arrows" style="width:5%">
 						<c:if test="${not status.first}">
-							<c:set var="title"><fmt:message key="label.up"/></c:set>
-							<lams:Arrow state="up" title="${title}" onclick="upItem('${status.index}')"/>
+							<lams:Arrow state="up" titleKey="label.up" onclick="upItem('${status.index}')"/>
 						</c:if>
 						<c:if test="${not status.last}">
-							<c:set var="title"><fmt:message key="label.down"/></c:set>
-							<lams:Arrow state="down" title="${title}" onclick="downItem('${status.index}')"/>
+							<lams:Arrow state="down" titleKey="label.down" onclick="downItem('${status.index}')"/>
 						</c:if>
 					</td>
 					<td class="text-center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete"/>"

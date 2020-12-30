@@ -372,7 +372,7 @@
 
 	    function importWordQuestions(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?importType=word',
-				'QuestionFile','width=500,height=240,scrollbars=yes');
+				'QuestionFile','width=500,height=370,scrollbars=yes');
 	    }
 
 	    function importQTI(){
@@ -505,7 +505,7 @@
 				</a>
 			</div>
 				
-			<div class="btn-group-xs pull-right" style="display: flex;">
+			<div class="btn-group-xs pull-right voffset10" style="display: flex;">
 				<select id="question-type" class="form-control btn-xs">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
 					<option><fmt:message key="label.question.type.matching.pairs" /></option>

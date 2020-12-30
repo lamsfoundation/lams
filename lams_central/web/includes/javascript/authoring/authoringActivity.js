@@ -1500,38 +1500,16 @@ ActivityLib = {
 		});
 	},
 	
-
+	
 	/**
 	 * Open separate window with activity authoring on double click.
 	 */
 	openActivityAuthoring : function(activity){
-		// fetch authoring URL for a Tool Activity
-		if (!activity.authorURL && activity.toolID) {
-			$.ajax({
-				async : true,
-				cache : false,
-				url : LAMS_URL + "authoring/createToolContent.do",
-				dataType : 'json',
-				data : {
-					'toolID'          : activity.toolID,
-					// if toolContentID exists, a new content will not be created, only authorURL will be fetched
-					'toolContentID'   : activity.toolContentID,
-					'contentFolderID' : layout.ld.contentFolderID
-				},
-				success : function(response) {
-					activity.authorURL = response.authorURL;
-					if (!activity.toolContentID) {
-						activity.toolContentID = response.toolContentID;
-					}
-					if (!layout.ld.contentFolderID) {
-						// if LD did not have contentFolderID, it was just generated
-						// so remember it
-						layout.ld.contentFolderID = response.contentFolderID;
-					}
-				}
-			});
+		if (activity.isAuthoringOpening) {
+			return;
 		}
 		
+		activity.isAuthoringOpening = true;
 		if (activity.authorURL) {
 			var dialogID = "dialogActivity" + activity.toolContentID;
 			showDialog(dialogID, {
@@ -1568,12 +1546,51 @@ ActivityLib = {
 			}, true);
 			
 			GeneralLib.setModified(true);
+			activity.isAuthoringOpening = false;
+			return;
+		}
+		
+		// if there is no authoring URL, fetch it for a Tool Activity
+		if (activity.toolID) {
+			$.ajax({
+				async : true,
+				cache : false,
+				url : LAMS_URL + "authoring/createToolContent.do",
+				dataType : 'json',
+				data : {
+					'toolID'          : activity.toolID,
+					// if toolContentID exists, a new content will not be created, only authorURL will be fetched
+					'toolContentID'   : activity.toolContentID,
+					'contentFolderID' : layout.ld.contentFolderID
+				},
+				success : function(response) {
+					// make sure that response contains valid data
+					if (response.authorURL) {
+						activity.authorURL = response.authorURL;
+						activity.toolContentID = response.toolContentID;
+						// the response should always return a correct content folder ID,
+						// but just to make sure use it only when it is needed
+						if (!layout.ld.contentFolderID) {
+							layout.ld.contentFolderID = response.contentFolderID;
+						}
+						
+						activity.isAuthoringOpening = false;
+						// this time open it properly
+						ActivityLib.openActivityAuthoring(activity);
+					}
+				},
+				complete : function(){
+					activity.isAuthoringOpening = false;
+				}
+			});
+		} else {
+			activity.isAuthoringOpening = false;
 		}
 	},
 	
 	
 	/**
-	 * Draw each of activity's inboud and outbound transitions again.
+	 * Draw each of activity's inbound and outbound transitions again.
 	 */
 	redrawTransitions : function(activity) {
 		if (activity.transitions) {

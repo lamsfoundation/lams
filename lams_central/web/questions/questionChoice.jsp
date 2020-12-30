@@ -136,6 +136,15 @@
 				// FF does not seem to do it right
 				$(this).attr('checked', $(this).is(':checked'));
 			});
+			
+			// as the form HTML is being passed, not its real values
+			// we need to alter HTML manually on collection change
+			$('#collectionUid').change(function(){
+				let collectionSelect = $(this),
+					value = collectionSelect.val();
+				$('option', collectionSelect).removeAttr('selected');
+				$('option[value="' + value + '"]', collectionSelect).attr('selected', 'selected');
+			});
 		});
 	</script>
 </lams:head>
@@ -161,10 +170,10 @@
 			<!-- Choose a collection where questions should be imported to -->
 			<label id="collectionSelect">
 				<fmt:message key="label.questions.choice.collection" />&nbsp;
-				<select name="collectionUid">
+				<select name="collectionUid" id="collectionUid">
 					<c:forEach items="${collections}" var="collection">
-						<option value="${collection.uid}" ${empty collection.userId ? "selected" : ""}>
-							<c:out value="${collection.name}" />
+						<option value="${collection.uid}" ${empty collection.personal ? "selected" : ""}>
+							<c:out value="${collection.name}"/> 
 						</option>
 					</c:forEach>
 				</select>
@@ -262,6 +271,16 @@
 					    </c:forEach>
 					</c:if>
 				</div>
+			</c:if>
+			
+			 <%-- Learning Outcomes, if required and exist --%>
+			<c:if test="${fn:length(question.learningOutcomes) > 0}">
+				<input type="hidden" name="learningOutcomeCount${questionStatus.index}" 
+					       value="${fn:length(question.learningOutcomes)}" />
+				<c:forEach var="learningOutcome" items="${question.learningOutcomes}" varStatus="learningOutcomeStatus">
+					<input name="question${questionStatus.index}learningOutcome${learningOutcomeStatus.index}"
+					       value="<c:out value='${learningOutcome}'/>" type="hidden" />
+				</c:forEach>
 			</c:if>
 		</c:forEach>
 		

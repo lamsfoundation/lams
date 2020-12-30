@@ -5,6 +5,11 @@
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 
 <script type="text/javascript">
+	var activityCompletionChart = null,
+		answeredQuestionsChart = null;
+	// how often completion charts will be updated
+	const COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
+
 	$(document).ready(function(){
 		
 		initializePortraitPopover("<lams:LAMSURL />");
@@ -212,6 +217,10 @@
 
 		// ajax calls to disclose correct/groups answers
 	    correctButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseCorrectAnswers.do?<csrf:token/>',
@@ -226,6 +235,10 @@
 		});
 
 	    groupsButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 			$.ajax({
                 type: 'POST',
 				'url'  : '<lams:WebAppURL />monitoring/discloseGroupsAnswers.do?<csrf:token/>',
@@ -240,6 +253,10 @@
 		});
 
 	    correctAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[correctDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
@@ -261,6 +278,10 @@
 		});
 
 	    groupsAllButton.click(function(){
+	    	if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+	    		return;
+	    	};
+	    	
 		    $('option[groupsDisclosed="false"]', questionUidSelect).each(function(){
 			    var option = $(this),
 			    	questionUid = option.val();
@@ -294,6 +315,8 @@
 			}
 		}
 		initInidividualTimeLimitAutocomplete();
+		
+		drawCompletionCharts(${assessment.contentId}, ${assessment.useSelectLeaderToolOuput}, true);
 	});
 
 	function resizeJqgrid(jqgrids) {
@@ -653,15 +676,28 @@
 	  <c:out value="${assessment.instructions}" escapeXml="false"/>
 	</div>
 	
-	<c:if test="${empty sessionDtos}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
+	<c:choose>
+		<c:when test="${empty sessionDtos}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				<fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:when>
+		<c:otherwise>
+			<div id="completion-charts-container">
+				<div class="col-sm-12 col-md-6">
+					<canvas id="activity-completion-chart"></canvas>
+				</div>
+				
+				<div class="col-sm-12 col-md-6">
+					<canvas id="answered-questions-chart"></canvas>
+				</div>
+			</div>
+		</c:otherwise>
+	</c:choose>
+
 
 	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 	<div class="voffset5 help-block" id="messageArea"></div>
-			
 </div>
 
 <c:if test="${not empty sessionDtos}">
@@ -761,9 +797,11 @@
 			<a id="questionDiscloseCorrect" class="btn btn-default disabled">
 				<fmt:message key="label.disclose.correct.answers" />
 			</a>
-			<a id="questionDiscloseGroups" class="btn btn-default disabled">
-				<fmt:message key="label.disclose.groups.answers" />
-			</a>
+			<c:if test="${sessionMap.isGroupedActivity}">
+				<a id="questionDiscloseGroups" class="btn btn-default disabled">
+					<fmt:message key="label.disclose.groups.answers" />
+				</a>
+			</c:if>
 		</c:if>
 	</div>
 
@@ -775,12 +813,14 @@
 					</c:if>
 					<fmt:message key="label.disclose.all.correct.answers" />
 				</a>
-				<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
-					<c:if test="${allGroupsDisclosed}">
-						<i class="fa fa-check text-success">&nbsp;</i>
-					</c:if>
-					<fmt:message key="label.disclose.all.groups.answers" />
-				</a>
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
+						<c:if test="${allGroupsDisclosed}">
+							<i class="fa fa-check text-success">&nbsp;</i>
+						</c:if>
+						<fmt:message key="label.disclose.all.groups.answers" />
+					</a>
+				</c:if>
 			</div>
 		</c:if>
 </c:if>

@@ -89,6 +89,7 @@ public class SysAdminStartController {
 	    if (Configuration.getAsBoolean(ConfigurationKeys.WORKFLOW_AUTOMATION_ENABLE)) {
 		links = new ArrayList<>();
 		links.add(new LinkBean("../wa/blueprint/show.do", "admin.workflow.automation.module.management"));
+		links.add(new LinkBean("../wa/container/list.do", "admin.workflow.automation.container.list"));
 		groupedLinks.add(new Object[] { AdminConstants.START_WORKFLOW_AUTOMATION, links });
 	    }
 

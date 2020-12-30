@@ -108,13 +108,14 @@
 	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
+	  	   	        	<c:set var="learnerInteraction" value="${learnerInteractions[questionResult.qbToolQuestion.uid]}" />
 	  	   	        	var responseStr = "";
 	  	   	       		<%@ include file="userresponse.jsp"%>
 	  	   	     		var table = jQuery("#user${question.uid}");
 	  	   	     		table.addRowData(${i.index + 1}, {
 	  	   	   	     		id:"${i.index + 1}",
 	  	   	   	   			questionResultUid:"${questionResult.uid}",
-	  	   	   	   			time:"${questionResult.finishDate}",
+	  	   	   	   			time:"${empty learnerInteraction ? questionResult.finishDate : learnerInteraction.formattedDate}",
 	  	   	   	   			response:responseStr,
 		  	   	   	   		<c:if test="${assessment.enableConfidenceLevels}">
 		  	 	   	   			confidence:"${questionResult.confidenceLevel}",
@@ -140,6 +141,16 @@
 	  		        }
 	  			});
 	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+	  			
+				// show etherpads only on Discussion expand
+				$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+					var etherpad = $('.etherpad-container', this);
+					if (!etherpad.hasClass('initialised')) {
+						var id = etherpad.attr('id'),
+							groupId = id.substring('etherpad-container-'.length);
+						etherpadInitMethods[groupId]();
+					}
+				});
 	  		});  	    	
 
     		function refreshSummaryPage()  { 
@@ -245,10 +256,10 @@
 							<fmt:message key="label.etherpad.discussion" />
 						</a>
 						
-						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="collapse">
+						<div id="question-etherpad-${userSummaryItem.questionDto.uid}" class="question-etherpad-collapse collapse">
 							<div class="panel panel-default question-etherpad">
 								<lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${userSummaryItem.questionDto.uid}" 
-								   showControls="true" showChat="false" heightAutoGrow="true" />
+								   showControls="true" showChat="false" heightAutoGrow="true" showOnDemand="true" />
 							</div>
 						</div>
 					</div>

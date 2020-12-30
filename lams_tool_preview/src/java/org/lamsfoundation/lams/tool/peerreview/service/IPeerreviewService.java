@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.tool.peerreview.util.EmailAnalysisBuilder.LearnerData;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
@@ -304,9 +305,11 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
      */
     List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting, String searchString);
 
+    Map<Long, LearnerData> getLearnerData(Long toolContentId, Long sessionId);
+
     /** Generate and return the email that would be sent to a learner. Used to preview the email */
     String generateEmailReportToUser(Long toolContentId, Long sessionId, Long userId);
-    
+
     /** Send an email with the user's results to each user in the session */
     int emailReportToSessionUsers(Long toolContentId, Long sessionId);
 

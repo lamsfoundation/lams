@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -36,8 +38,10 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -54,6 +58,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class QbService implements IQbService {
+
+    protected Logger log = Logger.getLogger(QbService.class);
+
     private IQbDAO qbDAO;
 
     private IGradebookService gradebookService;
@@ -375,6 +382,11 @@ public class QbService implements IQbService {
 	collection.setName(name);
 	collection.setUserId(userId);
 	qbDAO.insert(collection);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User " + userId + " created a new QB collection: " + name);
+	}
+
 	return collection;
     }
 
@@ -387,7 +399,13 @@ public class QbService implements IQbService {
 	if (collection.getUserId() == null || collection.isPersonal()) {
 	    throw new InvalidParameterException("Attempt to remove a private or the public question bank collection");
 	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Removed collection with UID: " + collectionUid + " and name: " + collection.getName());
+	}
+
 	qbDAO.delete(collection);
+
     }
 
     @Override
@@ -397,6 +415,11 @@ public class QbService implements IQbService {
 	    // if the question is used in a Learning Design, do not allow to remove it
 	    return false;
 	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Removed QB question with UID: " + qbQuestionUid);
+	}
+
 	qbDAO.deleteById(QbQuestion.class, qbQuestionUid);
 	return true;
     }
@@ -411,6 +434,11 @@ public class QbService implements IQbService {
 	Map<String, Object> properties = new HashMap<>();
 	properties.put("questionId", qbQuestionId);
 	qbDAO.deleteByProperties(QbQuestion.class, properties);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Removed QB questions with question ID: " + qbQuestionId);
+	}
+
 	return true;
     }
 
@@ -476,6 +504,11 @@ public class QbService implements IQbService {
 	    qbDAO.insert(newQuestion);
 	}
 	qbDAO.addCollectionQuestion(collectionUid, addQbQuestionId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Added QB questions with question ID: " + qbQuestionId + " to collection with UID: "
+		    + collectionUid);
+	}
     }
 
     @Override
@@ -504,6 +537,12 @@ public class QbService implements IQbService {
 	    return removeQuestionByQuestionId(qbQuestionId);
 	}
 	qbDAO.removeCollectionQuestion(collectionUid, qbQuestionId);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Removed QB questions with question ID: " + qbQuestionId + " from collection with UID: "
+		    + collectionUid);
+	}
+
 	return true;
     }
 
@@ -643,6 +682,10 @@ public class QbService implements IQbService {
 		qbDAO.insert(qbOption);
 	    }
 	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("Created a new QB question with UID: " + qbQuestion.getUid());
+	}
     }
 
     /**
@@ -693,6 +736,38 @@ public class QbService implements IQbService {
 	long defaultContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	Collection<QbQuestion> qbQuestions = qbDAO.getQuestionsByToolContentId(defaultContentId);
 	return qbQuestions.stream().anyMatch(q -> q.getUid().equals(qbQuestionUid));
+    }
+
+    @Override
+    public Collection<ToolContent> getQuestionActivities(long qbQuestionUid, Collection<Long> toolContentIds) {
+	return qbDAO.getQuestionActivities(qbQuestionUid, toolContentIds);
+    }
+
+    @Override
+    public void replaceQuestionInToolActivities(Collection<Long> toolContentIds, long oldQbQuestionUid,
+	    long newQbQuestionUid) {
+	for (Long toolContentId : toolContentIds) {
+	    ToolContent toolContent = qbDAO.findByProperty(ToolContent.class, "toolContentId", toolContentId).get(0);
+	    Object toolService = lamsCoreToolService.findToolService(toolContent.getTool());
+	    if (toolService instanceof IQbToolService) {
+		try {
+		    ((IQbToolService) toolService).replaceQuestion(toolContentId, oldQbQuestionUid, newQbQuestionUid);
+		} catch (UnsupportedOperationException e) {
+		    log.warn("Could not replace a question for activity with tool content ID " + toolContentId
+			    + " as the tool does not support question replacement");
+		}
+	    }
+	}
+    }
+
+    @Override
+    public void fillVersionMap(QbQuestion qbQuestion) {
+	List<QbQuestion> allVersions = getQuestionsByQuestionId(qbQuestion.getQuestionId());
+	Map<Integer, Long> versionMap = new TreeMap<>();
+	for (QbQuestion questionVersion : allVersions) {
+	    versionMap.put(questionVersion.getVersion(), questionVersion.getUid());
+	}
+	qbQuestion.setVersionMap(versionMap);
     }
 
     private static Integer getUserId() {

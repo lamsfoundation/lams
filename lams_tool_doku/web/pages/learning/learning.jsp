@@ -40,6 +40,9 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
+	    // avoid name clash between bootstrap and jQuery UI
+	    $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+	    
 		$(document).ready(function(){
 			// Resize Etherpad iframe when its content grows.
 			// It does not support shrinking, only growing.
@@ -50,7 +53,7 @@
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height - 10);
+		            	height = Math.max(200, msg.data.height - (${hasEditRight} ? 0 : 64));
 		           	iframe.height(height);
 		        }
 		    });
@@ -75,6 +78,7 @@
 				displayCountdown()
 			}
 			
+			$('[data-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -105,64 +109,6 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
-		<c:if test="${isTimeLimitEnabled}">
-			//init the connection with server using server URL but with different protocol
-			var dokuWebsocketInitTime = Date.now(),
-				dokuWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-							+ 'learningWebsocket?toolContentID=' + ${toolContentID}),
-				dokuWebsocketPingTimeout = null,
-				dokuWebsocketPingFunc = null;
-			
-			dokuWebsocket.onclose = function(){
-				// react only on abnormal close
-				if (e.code === 1006 &&
-					Date.now() - dokuWebsocketInitTime > 1000) {
-					location.reload();
-				}
-			};
-			
-			dokuWebsocketPingFunc = function(skipPing){
-				if (dokuWebsocket.readyState == dokuWebsocket.CLOSING 
-						|| dokuWebsocket.readyState == dokuWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				dokuWebsocketPingTimeout = setTimeout(dokuWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					dokuWebsocket.send("ping");
-				}
-			};
-			
-			// set up timer for the first time
-			dokuWebsocketPingFunc(true);
-			
-			// run when the server pushes new reports and vote statistics
-			dokuWebsocket.onmessage = function(e) {
-				// reset ping timer
-				clearTimeout(dokuWebsocketPingTimeout);
-				dokuWebsocketPingFunc(true);
-				
-				// create JSON object
-				var input = JSON.parse(e.data);
-				
-				//monitor has added one minute to the total timeLimit time
-				if (input.addTime) {
-					//reload page in order to allow editing the pad again
-					if (!$('#countdown').length) {
-						location.reload();
-					}
-					
-			    	var times = $("#countdown").countdown('getTimes'),
-			    		secondsLeft = times[4]*3600 + times[5]*60 + times[6] + input.addTime*60;
-			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
-					
-					return;
-				}
-			};			
-		</c:if>
 		
 		function displayCountdown() {
 			$.blockUI({
@@ -201,6 +147,10 @@
 			});
 		}
 	</script>
+	
+	<c:if test="${isTimeLimitEnabled or dokumaran.galleryWalkEnabled}">
+		<%@ include file="websocket.jsp"%>		
+	</c:if>
 </lams:head>
 <body class="stripes">
 
@@ -222,9 +172,8 @@
 
 		<lams:errors/>
 		
-		<c:out value="${dokumaran.description}" escapeXml="false" />
+		<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 		
-
 		<div class='panel panel-default 
 				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			
 			<div id="etherpad-container"></div>
@@ -271,6 +220,12 @@
 		<c:if test="${mode != 'teacher'}">
 			<div>
 				<c:choose>
+					<c:when test="${dokumaran.galleryWalkEnabled}">
+						<button class="btn btn-default voffset5 pull-right disabled"
+								data-toggle="tooltip"  title="<fmt:message key='label.gallery.walk.wait.start' />">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" id="finish-button"
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">

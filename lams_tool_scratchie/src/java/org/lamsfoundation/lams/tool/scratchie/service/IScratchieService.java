@@ -56,6 +56,9 @@ import org.quartz.SchedulerException;
  */
 public interface IScratchieService extends ICommonToolService {
 
+    public static final String VSA_ANSWER_NORMALISE_JAVA_REG_EXP = "\\W";
+    public static final String VSA_ANSWER_NORMALISE_SQL_REG_EXP = "[^[:alpha:][:alnum:]_]";
+
     /**
      * Get <code>Scratchie</code> by toolContentID.
      *
@@ -326,7 +329,8 @@ public interface IScratchieService extends ICommonToolService {
      *            whether it should include questions that don't have any burning questions
      * @return
      */
-    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems, boolean prepareForHTML);
+    List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId, boolean includeEmptyItems,
+	    boolean prepareForHTML);
 
     boolean addLike(Long burningQuestionUid, Long sessionId);
 
@@ -449,4 +453,6 @@ public interface IScratchieService extends ICommonToolService {
     LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
 
     Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
+
+    boolean isLearnerEligibleForMark(long learnerId, long toolContentId);
 }

@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO"%>
+<c:set var="sessionMapID" value="${assessmentForm.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <script lang="javascript">
 	$(document).ready(function(){
@@ -73,12 +75,16 @@
 	</label>
 </div>
 
-<div class="checkbox loffset20" <c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
-	<label for="questionEtherpadEnabled">
-		<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"/>
-		<fmt:message key="label.authoring.advance.question.etherpad" />
-	</label>
-</div>
+<c:if test="${sessionMap.isQuestionEtherpadEnabled}">
+	<div class="checkbox loffset20"
+		<c:if test="${!assessmentForm.assessment.useSelectLeaderToolOuput}">style="display:none;"</c:if>>
+		<label for="questionEtherpadEnabled">
+			<form:checkbox path="assessment.questionEtherpadEnabled" id="questionEtherpadEnabled"/>
+			<fmt:message key="label.authoring.advance.question.etherpad" />
+		</label>
+	</div>
+</c:if>
+
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.question.options">
@@ -125,7 +131,7 @@
 <div class="form-inline">
 	<label for="relativeTimeLimit">
 		<fmt:message key="label.authoring.advance.time.limit" />&nbsp;
-		<form:input path="assessment.relativeTimeLimit" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
+		<form:input path="assessment.relativeTimeLimit" type="number" min="0" max="999" size="3" id="relativeTimeLimit" cssClass="form-control input-sm"/>
 	</label>
 </div>
 

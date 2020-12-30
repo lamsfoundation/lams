@@ -16,6 +16,8 @@ import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.questions.QuestionWordParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -49,7 +51,7 @@ public class QuestionsController {
 	    HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	String fileName = null;
+	String packageName = null;
 
 	File file = null;
 	File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
@@ -59,9 +61,10 @@ public class QuestionsController {
 		errorMap.add("GLOBAL", "Uploaded more than 1 file");
 	    } else if (files.length == 1) {
 		file = files[0];
-		fileName = file.getName().toLowerCase();
+		packageName = file.getName().toLowerCase();
 	    }
 	}
+
 	// this parameter is not really used at the moment
 	request.setAttribute("returnURL", returnURL);
 
@@ -80,9 +83,21 @@ public class QuestionsController {
 	}
 
 	// user did not choose a file
-	if (file == null || !(fileName.endsWith(".zip") || fileName.endsWith(".xml")) && !isWordInput
-		|| !fileName.endsWith(".docx") && isWordInput) {
+	if (file == null || (isWordInput ? !packageName.endsWith(".docx")
+		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml")))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
+	}
+
+	if (!errorMap.isEmpty()) {
+	    request.setAttribute("tmpFileUploadId", tmpFileUploadId);
+	    request.setAttribute("errorMap", errorMap);
+	    return "questions/questionFile";
+	}
+
+	String tempDirName = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
+	File tempDir = new File(tempDirName);
+	if (!tempDir.exists()) {
+	    tempDir.mkdirs();
 	}
 
 	Set<String> limitType = null;
@@ -95,11 +110,11 @@ public class QuestionsController {
 	InputStream uploadedFileStream = new FileInputStream(file);
 
 	Question[] questions;
-	if (fileName.endsWith(".xml")) {
+	if (packageName.endsWith(".xml")) {
 	    questions = QuestionParser.parseQTIFile(uploadedFileStream, null, limitType);
 
-	} else if (fileName.endsWith(".docx")) {
-	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, fileName);
+	} else if (packageName.endsWith(".docx")) {
+	    questions = QuestionWordParser.parseWordFile(uploadedFileStream, packageName, limitType);
 
 	} else {
 	    questions = QuestionParser.parseQTIPackage(uploadedFileStream, limitType);

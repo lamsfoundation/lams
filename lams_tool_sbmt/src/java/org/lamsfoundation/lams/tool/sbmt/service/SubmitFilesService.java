@@ -1360,23 +1360,9 @@ public class SubmitFilesService
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserID().intValue());
-	    if (leaderUserId != null) {
-		leader = submitUserDAO.getLearner(toolSessionId, leaderUserId.intValue());
-		// create new user in a DB
-		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-//		    String userName = leaderDto.getLogin();
-//		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
-		    //  leader = new SubmitUser(leaderDto.getUserDTO(), submitFileSession);
-		    leader = new SubmitUser();
-		    leader.setLogin(leaderDto.getLogin());
-		    leader.setFirstName(leaderDto.getFirstName());
-		    leader.setLastName(leaderDto.getLastName());
-		    leader.setUserID(leaderDto.getUserId());
-
-		    createUser(leader);
-		}
+	    // set leader only if current user is the leader
+	    if (user.getUserID().equals(leaderUserId.intValue())) {
+		leader = user;
 
 		// set group leader
 		submitFileSession.setGroupLeader(leader);

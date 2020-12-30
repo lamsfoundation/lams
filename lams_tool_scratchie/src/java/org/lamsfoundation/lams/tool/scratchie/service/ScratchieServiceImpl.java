@@ -31,9 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -43,8 +41,8 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +52,7 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -62,6 +61,9 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.outcome.Outcome;
+import org.lamsfoundation.lams.outcome.OutcomeMapping;
+import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -114,6 +116,7 @@ import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -160,6 +163,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     private IEventNotificationService eventNotificationService;
 
     private IQbService qbService;
+
+    private ILearnerService learnerService;
+
+    private IOutcomeService outcomeService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
 
@@ -331,16 +338,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	// up previous scratches done
 	if (leader == null) {
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
-	    if (leaderUserId != null) {
-		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
-
-		// create new user in a DB
-		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
-		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
-		    this.createUser(leader);
-		}
+	    // set leader only if current user is the leader
+	    if (user.getUserId().equals(leaderUserId)) {
+		leader = user;
 
 		// set group leader
 		scratchieSession.setGroupLeader(leader);
@@ -505,7 +505,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	if (isPropagateToGradebook) {
 	    List<ScratchieUser> users = getUsersBySession(sessionId);
 	    for (ScratchieUser user : users) {
-		toolService.updateActivityMark(Double.valueOf(mark), null, user.getUserId().intValue(),
+		Double userMark = 0.0;
+		if (isLearnerEligibleForMark(user.getUserId(), scratchie.getContentId())) {
+		    userMark = Double.valueOf(mark);
+		}
+		toolService.updateActivityMark(userMark, null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
 	}
@@ -580,8 +584,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid) {
-	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid);
+    public void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer) {
+	List<Long> sessionIds = scratchieSessionDao.getSessionIdsByQbQuestion(qbQuestionUid, answer);
 	// recalculate marks if it's required
 	for (Long sessionId : sessionIds) {
 	    recalculateMarkForSession(sessionId, true);
@@ -996,34 +1000,16 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	QbOption correctAnswersGroup = qbQuestion.getQbOptions().get(0).isCorrect() ? qbQuestion.getQbOptions().get(0)
 		: qbQuestion.getQbOptions().get(1);
-	String[] correctAnswers = correctAnswersGroup.getName().strip().split("\\r\\n");
+	Collection<String> correctAnswers = Stream.of(correctAnswersGroup.getName().split("\r\n")).collect(Collectors
+		.mapping(answer -> answer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, ""), Collectors.toSet()));
+
+	boolean isQuestionCaseSensitive = qbQuestion.isCaseSensitive();
 	for (String correctAnswer : correctAnswers) {
-	    correctAnswer = correctAnswer.strip();
-
-	    //prepare regex which takes into account only * special character
-	    String regexWithOnlyAsteriskSymbolActive = "\\Q";
-	    for (int i = 0; i < correctAnswer.length(); i++) {
-		//everything in between \\Q and \\E are taken literally no matter which characters it contains
-		if (correctAnswer.charAt(i) == '*') {
-		    regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
-		} else {
-		    regexWithOnlyAsteriskSymbolActive += correctAnswer.charAt(i);
-		}
-	    }
-	    regexWithOnlyAsteriskSymbolActive += "\\E";
-
-	    //check whether answer matches regex
-	    Pattern pattern;
-	    if (qbQuestion.isCaseSensitive()) {
-		pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
-	    } else {
-		pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
-			java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
-	    }
-
 	    for (String userAnswer : userAnswers) {
+		String normalisedUserAnswer = userAnswer.replaceAll(VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
 		// check is item unraveled
-		if (pattern.matcher(userAnswer.strip()).matches()) {
+		if (isQuestionCaseSensitive ? normalisedUserAnswer.equals(correctAnswer)
+			: normalisedUserAnswer.equalsIgnoreCase(correctAnswer)) {
 		    return true;
 		}
 	    }
@@ -1313,8 +1299,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     /**
      * Return list of correct AnswerLetters, one per each item
      */
-    public static List<String> getCorrectAnswerLetters(Collection<ScratchieItem> items) {
-	List<String> correctAnswerLetters = new ArrayList<>();
+    public static void fillCorrectAnswerLetters(Collection<ScratchieItem> items) {
 	for (ScratchieItem item : items) {
 	    boolean isMcqItem = item.getQbQuestion().getType() == QbQuestion.TYPE_MULTIPLE_CHOICE;
 
@@ -1336,10 +1321,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		    correctAnswerLetter = options.get(0).isCorrect() ? "A" : "B";
 		}
 	    }
-	    correctAnswerLetters.add(correctAnswerLetter);
+	    item.setCorrectAnswerLetter(correctAnswerLetter);
 	}
-
-	return correctAnswerLetters;
     }
 
     @Override
@@ -1433,8 +1416,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	row = reportByTeamSheet.initRow();
 	row.addCell(getMessage("label.correct.answer"));
-	for (String correctAnswerLetter : ScratchieServiceImpl.getCorrectAnswerLetters(items)) {
-	    row.addCell(correctAnswerLetter);
+	ScratchieServiceImpl.fillCorrectAnswerLetters(items);
+	for (ScratchieItem item : items) {
+	    row.addCell(item.getCorrectAnswerLetter());
 	}
 
 	row = reportByTeamSheet.initRow();
@@ -1572,6 +1556,9 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
+		if (!isLearnerEligibleForMark(user.getUserId(), contentId)) {
+		    continue;
+		}
 		row = researchAndAnalysisSheet.initRow();
 		row.addCell(user.getFirstName() + " " + user.getLastName());
 		row.addCell(Long.valueOf(summary.getTotalAttempts()));
@@ -1953,11 +1940,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	Set<ScratchieItem> items = new TreeSet<>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
-	model.put("items", items);
+	List<ScratchieItem> itemList = new LinkedList<>(items);
+	model.put("items", itemList);
 
 	//correct answers row
-	List<String> correctAnswerLetters = ScratchieServiceImpl.getCorrectAnswerLetters(items);
-	model.put("correctAnswerLetters", correctAnswerLetters);
+	ScratchieServiceImpl.fillCorrectAnswerLetters(itemList);
 
 	Map<String, ScratchieSession> sessionsByName = scratchieSessionDao.getByContentId(scratchie.getContentId())
 		.stream().filter(s -> s.getGroupLeader() != null)
@@ -1979,7 +1966,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		List<OptionDTO> optionDtos = new LinkedList<>();
 		for (int j = 0; j < optionLetters.length; j++) {
 		    String optionLetter = optionLetters[j];
-		    String correctOptionLetter = correctAnswerLetters.get(i);
+		    String correctOptionLetter = itemList.get(i).getCorrectAnswerLetter();
 
 		    OptionDTO optionDto = new OptionDTO();
 		    optionDto.setAnswer(optionLetter);
@@ -2009,6 +1996,11 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	model.put("sessionDtos", groupSummaries);
 	return model;
+    }
+
+    @Override
+    public boolean isLearnerEligibleForMark(long learnerId, long toolContentId) {
+	return learnerService.isLearnerStartedLessonByContentId(Long.valueOf(learnerId).intValue(), toolContentId);
     }
 
     // *****************************************************************************
@@ -2180,7 +2172,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
     }
 
     @Override
-    public void replaceQuestions(long toolContentId, String newActivityName, List<QbQuestion> newQuestions) {
+    public List<QbToolQuestion> replaceQuestions(long toolContentId, String newActivityName,
+	    List<QbQuestion> newQuestions) {
 	Scratchie scratchie = getScratchieByContentId(toolContentId);
 	if (newActivityName != null) {
 	    scratchie.setTitle(newActivityName);
@@ -2196,6 +2189,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	// populate Scratchie with new questions
 	int displayOrder = 1;
+	List<QbToolQuestion> result = new ArrayList<>(newQuestions.size());
 	for (QbQuestion qbQuestion : newQuestions) {
 	    ScratchieItem scratchieItem = new ScratchieItem();
 	    scratchieItem.setDisplayOrder(displayOrder++);
@@ -2205,6 +2199,21 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	    scratchie.getScratchieItems().add(scratchieItem);
 	}
 	scratchieDao.update(scratchie);
+	return result;
+    }
+
+    @Override
+    public void replaceQuestion(long toolContentId, long oldQbQuestionUid, long newQbQuestionUid) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	QbQuestion newQbQuestion = null;
+	for (ScratchieItem item : scratchie.getScratchieItems()) {
+	    if (item.getQbQuestion().getUid().equals(oldQbQuestionUid)) {
+		if (newQbQuestion == null) {
+		    newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+		}
+		item.setQbQuestion(newQbQuestion);
+	    }
+	}
     }
 
     // *****************************************************************************
@@ -2365,7 +2374,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		throw new ToolException(e);
 	    }
 	}
-	return getScratchieOutputFactory().getToolOutputDefinitions(this, content, definitionType);
+	return scratchieOutputFactory.getToolOutputDefinitions(this, content, definitionType);
     }
 
     @Override
@@ -2520,12 +2529,12 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return getScratchieOutputFactory().getToolOutput(names, this, toolSessionId, learnerId);
+	return scratchieOutputFactory.getToolOutput(names, this, toolSessionId, learnerId);
     }
 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
-	return getScratchieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+	return scratchieOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
 
     @Override
@@ -2576,10 +2585,6 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     /* =================================================================================== */
 
-    public IExportToolContentService getExportContentService() {
-	return exportContentService;
-    }
-
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
     }
@@ -2588,16 +2593,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	this.logEventService = logEventService;
     }
 
-    public IUserManagementService getUserManagementService() {
-	return userManagementService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
     }
 
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
@@ -2617,6 +2614,10 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	this.qbService = qbService;
     }
 
+    public void setOutcomeService(IOutcomeService outcomeService) {
+	this.outcomeService = outcomeService;
+    }
+
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
@@ -2631,15 +2632,15 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-	return getScratchieOutputFactory().getSupportedDefinitionClasses(definitionType);
-    }
-
-    public ScratchieOutputFactory getScratchieOutputFactory() {
-	return scratchieOutputFactory;
+	return scratchieOutputFactory.getSupportedDefinitionClasses(definitionType);
     }
 
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     @Override
@@ -2661,6 +2662,7 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
      * "questionText", "displayOrder" (Integer) and a ArrayNode "answers". The answers entry should be ArrayNode
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {
 
@@ -2688,16 +2690,14 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		JsonUtil.optInt(toolContentJSON, "activityUiidProvidingVsaAnswers"));
 
 	// Scratchie Items
-	Set<ScratchieItem> newItems = new LinkedHashSet<>();
+	Set<ScratchieItem> newItems = new TreeSet<>();
 
-	QbCollection collection = qbService.getUserPrivateCollection(userID);
-	Set<String> collectionUUIDs = collection == null ? new HashSet<>()
-		: qbService.getCollectionQuestions(collection.getUid()).stream().filter(q -> q.getUuid() != null)
-			.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+	QbCollection collection = null;
+	Set<String> collectionUUIDs = null;
 
 	ArrayNode questions = JsonUtil.optArray(toolContentJSON, RestTags.QUESTIONS);
 	for (int i = 0; i < questions.size(); i++) {
-	    boolean addToCollection = false;
+
 	    ObjectNode questionData = (ObjectNode) questions.get(i);
 
 	    ScratchieItem item = new ScratchieItem();
@@ -2713,9 +2713,24 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		qbQuestion = qbService.getQuestionByUUID(UUID.fromString(uuid));
 	    }
 
-	    if (qbQuestion == null) {
-		addToCollection = collection != null;
+	    Long collectionUid = JsonUtil.optLong(questionData, RestTags.COLLECTION_UID);
+	    boolean addToCollection = collectionUid != null;
 
+	    if (addToCollection) {
+		// check if it is the same collection - there is a good chance it is
+		if (collection == null || collectionUid != collection.getUid()) {
+		    collection = qbService.getCollection(collectionUid);
+		    if (collection == null) {
+			addToCollection = false;
+		    } else {
+			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
+				.filter(q -> q.getUuid() != null)
+				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+		    }
+		}
+	    }
+
+	    if (qbQuestion == null) {
 		qbQuestion = new QbQuestion();
 		qbQuestion.setType(QbQuestion.TYPE_MULTIPLE_CHOICE);
 		qbQuestion.setQuestionId(qbService.generateNextQuestionId());
@@ -2742,8 +2757,30 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 		}
 
 		qbQuestion.setQbOptions(newOptions);
-	    } else if (collection != null && !collectionUUIDs.contains(uuid)) {
-		addToCollection = true;
+
+		// only process learning outcomes when this is not a modification, i.e. it is a new question
+		ArrayNode learningOutcomesJSON = JsonUtil.optArray(questionData, RestTags.LEARNING_OUTCOMES);
+		if (learningOutcomesJSON != null && learningOutcomesJSON.size() > 0) {
+		    for (JsonNode learningOutcomeJSON : learningOutcomesJSON) {
+			String learningOutcomeText = learningOutcomeJSON.asText();
+			learningOutcomeText = learningOutcomeText.strip();
+			List<Outcome> learningOutcomes = userManagementService.findByProperty(Outcome.class, "name",
+				learningOutcomeText);
+			Outcome learningOutcome = null;
+			if (learningOutcomes.isEmpty()) {
+			    learningOutcome = outcomeService.createOutcome(learningOutcomeText, userID);
+			} else {
+			    learningOutcome = learningOutcomes.get(0);
+			}
+
+			OutcomeMapping outcomeMapping = new OutcomeMapping();
+			outcomeMapping.setOutcome(learningOutcome);
+			outcomeMapping.setQbQuestionId(qbQuestion.getQuestionId());
+			userManagementService.save(outcomeMapping);
+		    }
+		}
+	    } else if (addToCollection && collectionUUIDs.contains(uuid)) {
+		addToCollection = false;
 	    }
 
 	    item.setQbQuestion(qbQuestion);

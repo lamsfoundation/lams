@@ -624,8 +624,8 @@ function updatePresenceAvailableCount(){
 
 function updateContributeActivities(contributeActivities) {
 	$('.contributeRow').remove();
-	var header = $('#contributeHeader');
-	var row = header;
+	var header = $('#contributeHeader'),
+		row = header;
 	
 	// special case - add a Live Edit option. This does not directly map to an activity
 	if ( lockedForEdit && lockedForEditUserId == userId) {
@@ -641,10 +641,10 @@ function updateContributeActivities(contributeActivities) {
 	}
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
-			var contributeId = 'contribute' + this.activityID;
-			var contributeActivity = this,
+			var contributeId = 'contribute' + this.activityID,
+				contributeActivity = this,
 				cell = $('<div />').addClass('contributeActivityCell').text(this.title).attr('id', contributeId);
-				row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
+			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
 				var entryContent = '';
@@ -659,19 +659,28 @@ function updateContributeActivities(contributeActivities) {
 				switch (this.contributionType) {
 					case 3  : 
 					case 12 : if (this.isComplete) {
-						 		entryContent += '<span class="pull-right"><span style="font-size: 12px;" class="label label-success">' + LABELS.CONTRIBUTE_OPENED_GATE + '</span></span>';
+						 		entryContent += '<div class="pull-right"><button class="btn btn-xs btn-success" '
+						 					 + 'onClick="javascript:openPopUp(\'' + this.url 
+						 					 + '\',\'ContributeActivity\', 800, 1280, true)" '
+						 					 + 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
+						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
+						 					 + '</button></div>';
 							} else {
 								entryContent += '<div class="pull-right btn-group btn-group-xs"><button onClick="javascript:openGateNow('
-                                     + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
+                                    + contributeActivity.activityID + ')" type="button" class="btn btn-xs btn-primary" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button><ul class="dropdown-menu"><li><a href="#" onClick="javascript:openPopUp(\''
-                                     + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
+									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON + '</button>'
+									+ '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" '
+									+ 		   'aria-expanded="false"><span class="caret"></span><span class="sr-only"'
+									+ '>Toggle Dropdown</span></button><ul class="dropdown-menu"><li>'
+									+ '<a href="#" onClick="javascript:openPopUp(\''
+                                    + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
 									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
-									
 							}
 							break;
-					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+					default : entryContent += '<span id="' + contributeId + 'Btn" class="btn btn-xs btn-primary pull-right" '
+						 + 'onClick="javascript:openPopUp(\''
 						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
 						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 				}
@@ -892,6 +901,20 @@ function openGateNow(activityId) {
 	});
 }
 
+function closeGate(activityId) {
+	var data = {
+		'activityId' : activityId
+	};
+	data[csrfTokenName] = csrfTokenValue;
+	$.ajax({
+		'type' : 'post',
+		'url'  : LAMS_URL + 'monitoring/gate/closeGate.do',
+		'data'  : data,
+		'success' : function(){
+			updateLessonTab();
+		}
+	});
+}
 //********** SEQUENCE TAB FUNCTIONS **********
 
 /**
@@ -899,36 +922,47 @@ function openGateNow(activityId) {
  */
 function initSequenceTab(){
 	var learnerGroupDialogContents = $('#learnerGroupDialogContents');
-	$('#learnerGroupDialogForceCompleteButton', learnerGroupDialogContents).click(function() {
+	$('#learnerGroupDialogForceCompleteButton, #learnerGroupDialogForceCompleteAllButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
-			selectedLearners = $('.dialogList div.dialogListItemSelected', dialog),
-			// go to "force complete" mode, similar to draggin user to an activity
+			// are we moving selected learners or all of learners who are currently in the activity
+			moveAll = $(this).attr('id') == 'learnerGroupDialogForceCompleteAllButton',
+			selectedLearners = moveAll ? null : $('.dialogList div.dialogListItemSelected', dialog),
+			// go to "force complete" mode, similar to dragging user to an activity
 			activityId = dialog.data('ajaxProperties').data.activityID,
 			dropArea = sequenceCanvas.add('#completedLearnersContainer');
 		dropArea.css('cursor', 'url('
 						+ LAMS_URL + 'images/icons/' 
-						+ (selectedLearners.length > 1 ? 'group' : 'user')
+						+ (moveAll || selectedLearners.length > 1 ? 'group' : 'user')
 						+ '.png),pointer')
 				.one('click', function(event) {
-					var learners = [];
-					selectedLearners.each(function(){
-						var learner = $(this);
-						learners.push({
-							'id'     : learner.attr('userId'),
-							'name'   : learner.text()
-						});
-					});
 					dropArea.off('click').css('cursor', 'default');
-					forceComplete(activityId, learners, event.pageX, event.pageY);
+					if (moveAll) {
+						// setting learners as 'true' is a special switch meaning "move all"
+						forceComplete(activityId, true, event.pageX, event.pageY);
+					} else {
+						var learners = [];
+						selectedLearners.each(function(){
+							var learner = $(this);
+							learners.push({
+								'id'     : learner.attr('userId'),
+								'name'   : learner.text()
+							});
+						});
+						forceComplete(activityId, learners, event.pageX, event.pageY);
+					}
 				});
 		dialog.modal('hide');
 		
-		var learnerNames = '';
-		selectedLearners.each(function(){
-			learnerNames += $(this).text() + ', ';
-		});
-		learnerNames = learnerNames.slice(0, -2);
-		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]',learnerNames));
+		if (moveAll) {
+			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', ''));
+		} else {
+			var learnerNames = '';
+			selectedLearners.each(function(){
+				learnerNames += $(this).text() + ', ';
+			});
+			learnerNames = learnerNames.slice(0, -2);
+			alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', '"' + learnerNames + '"'));
+		}
 	});
 	
 	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
@@ -1036,7 +1070,7 @@ function initSequenceTab(){
 	
 	$('#forceBackwardsRemoveContentNoButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
 			 forceBackwardsDialog.data('activityId'),
 			 false);
 		forceBackwardsDialog.modal('hide');
@@ -1044,7 +1078,7 @@ function initSequenceTab(){
 
 	$('#forceBackwardsRemoveContentYesButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+		forceCompleteExecute(forceBackwardsDialog.data('learners'), null,
 			 forceBackwardsDialog.data('activityId'),
 			 true);
 		forceBackwardsDialog.modal('hide');
@@ -1324,7 +1358,10 @@ function forceComplete(currentActivityId, learners, x, y) {
 	autoRefreshBlocked = true;
 	
 	var foundActivities = [],
-		targetActivity = null;
+		targetActivity = null,
+		// if "true", then we are moving all learners from the given activity
+		// otherwise it is a list of selected learners IDs
+		moveAll = learners === true;
 	// check all activities and "users who finished lesson" bar
 	$('g[id]:not([id*="_to_"])', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
@@ -1372,14 +1409,17 @@ function forceComplete(currentActivityId, learners, x, y) {
 		isEndLesson = !targetActivity.is('g'),
 		learnerNames = '';
 	
-	$.each(learners, function(){
-		learnerNames += this.name + ', ';
-	});
-	learnerNames = learnerNames.slice(0, -2);
+	if (!moveAll) {
+		$.each(learners, function(){
+			learnerNames += this.name + ', ';
+		});
+		learnerNames = '"' + learnerNames.slice(0, -2) + '"';
+	}
+
 	
 	if (isEndLesson) {
 		executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
-				.replace('[0]',learnerNames));
+				.replace('[0]', learnerNames));
 	} else {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
@@ -1424,7 +1464,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 	}
 	
 	if (executeForceComplete) {
-		forceCompleteExecute(learners, targetActivityId, false);
+		forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
 	}
 
 	autoRefreshBlocked = false;
@@ -1434,16 +1474,23 @@ function forceComplete(currentActivityId, learners, x, y) {
 /**
  * Tell server to force complete the learner.
  */
-function forceCompleteExecute(learners, activityId, removeContent) {
+function forceCompleteExecute(learners, moveAllFromActivityId, activityId, removeContent) {
 	var learnerIds = '';
-	$.each(learners, function() {
-		learnerIds += this.id + ',';
-	})
+	if (learners) {
+		$.each(learners, function() {
+			learnerIds += this.id + ',';
+		});
+		learnerIds = learnerIds.slice(0, -1);
+	}
+	
 	var data={
-		'lessonID'   		 : lessonId,
-		'learnerID'  		 : learnerIds.slice(0, -1),
-		'activityID' 		 : activityId,
-		'removeContent'		 : removeContent
+		'lessonID'   		    : lessonId,
+		// either we list selected learners to move
+		// or we move all learners from the given activity
+		'learnerID'  		    : learnerIds,
+		'moveAllFromActivityID' : moveAllFromActivityId,
+		'activityID' 		    : activityId,
+		'removeContent'		    : removeContent
 	};
 	data[csrfTokenName] = csrfTokenValue;
 	
@@ -1516,7 +1563,7 @@ function addActivityIcons(activity) {
 					var learnerDisplayName = getLearnerDisplayName(learner);
 						activityLearnerId = 'act' + activity.id + 'learner' + learner.id,
 						elementAttributes = {
-									'id'			 : activityLearnerId,
+									'id'		 : activityLearnerId,
 									'x'          : coord.x + learnerIndex*15 + 1,
 									// a bit lower for Optional Activity
 									'y'          : coord.y,
@@ -2262,6 +2309,10 @@ function updateGradebookTab() {
 
 //********** COMMON FUNCTIONS **********
 
+function isAutoRefreshBlocked(){
+	return autoRefreshBlocked || $('#learnerGroupDialog').hasClass('in');
+}
+
 /**
  * Updates all changeable elements of monitoring screen.
  */
@@ -2273,12 +2324,12 @@ function refreshMonitor(tabName, isAuto){
 
 	if (!autoRefreshIntervalObject) {
 		autoRefreshIntervalObject = setInterval(function(){
-			if (!autoRefreshBlocked) {
+			if (!isAutoRefreshBlocked()) {
 				refreshMonitor(null, true);
 			}
 		}, autoRefreshInterval);
 	}
-	
+
 	if (!tabName) {
 		// update Lesson tab widgets (state, number of learners etc.)
 		updateLessonTab();

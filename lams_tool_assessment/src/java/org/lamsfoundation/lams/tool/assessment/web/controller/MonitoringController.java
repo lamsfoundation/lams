@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -56,6 +55,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
+import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -109,6 +110,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -133,6 +135,9 @@ public class MonitoringController {
 
     @Autowired
     private IRatingService ratingService;
+
+    @Autowired
+    private ILearnerInteractionService learnerInteractionService;
 
     @RequestMapping("/summary")
     public String summary(HttpServletRequest request, HttpServletResponse response) {
@@ -168,7 +173,7 @@ public class MonitoringController {
 	}
 
 	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered
-	Set<AssessmentQuestion> questionList = new TreeSet<>();
+	List<AssessmentQuestion> questionList = new LinkedList<>();
 	//in case there is at least one random question - we need to show all questions in a drop down select
 	if (assessment.hasRandomQuestion()) {
 	    questionList.addAll(assessment.getQuestions());
@@ -250,6 +255,26 @@ public class MonitoringController {
 	return "pages/monitoring/monitoring";
     }
 
+    @RequestMapping(path = "/getCompletionChartsData")
+    @ResponseBody
+    public String getCompletionChartsData(@RequestParam long toolContentId, HttpServletResponse response)
+	    throws JsonProcessingException, IOException {
+	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
+
+	chartJson.put("possibleLearners", service.getCountLessonLearnersByContentId(toolContentId));
+	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
+	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
+
+	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
+	Map<Integer, Integer> answeredQuestionsByUsers = service.getCountAnsweredQuestionsByUsers(toolContentId);
+	if (!answeredQuestionsByUsers.isEmpty()) {
+	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	return chartJson.toString();
+    }
+
     @RequestMapping("/userMasterDetail")
     public String userMasterDetail(HttpServletRequest request, HttpServletResponse response) {
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
@@ -283,12 +308,39 @@ public class MonitoringController {
     public String allocateUserAnswer(HttpServletRequest request, HttpServletResponse response,
 	    @RequestParam Long questionUid, @RequestParam Long targetOptionUid, @RequestParam Long previousOptionUid,
 	    @RequestParam Long questionResultUid) {
-	Optional<Long> optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid,
-		questionResultUid);
+
+	Long optionUid = null;
+
+	if (!targetOptionUid.equals(previousOptionUid)) {
+	    AssessmentQuestionResult questionRes = service.getAssessmentQuestionResultByUid(questionResultUid);
+	    String answer = questionRes.getAnswer();
+	    /*
+	     * We need to synchronise this operation.
+	     * When multiple requests are made to modify the same option, for example to add a VSA answer,
+	     * we have a case of dirty reads.
+	     * One answer gets added, but while DB is still flushing,
+	     * another answer reads the option without the first answer,
+	     * because it is not there yet.
+	     * The second answer gets added, but the first one gets lost.
+	     *
+	     * We can not synchronise the method in service
+	     * as the "dirty" transaction is already started before synchronisation kicks in.
+	     * We do it here, before transaction starts.
+	     * It will not work for distributed environment, though.
+	     * If teachers allocate answers on different LAMS servers,
+	     * we can still get the same problem. We will need a more sophisticated solution then.
+	     */
+
+	    synchronized (service) {
+		optionUid = service.allocateAnswerToOption(questionUid, targetOptionUid, previousOptionUid, answer);
+	    }
+	    //recalculate marks for all lessons in all cases except for reshuffling inside the same container
+	    service.recalculateMarksForAllocatedAnswer(questionUid, answer);
+	}
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("isAnswerDuplicated", optionUid.isPresent());
-	responseJSON.put("optionUid", optionUid.orElse(-1L));
+	responseJSON.put("isAnswerDuplicated", optionUid != null);
+	responseJSON.put("optionUid", optionUid == null ? -1 : optionUid);
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
     }
@@ -303,6 +355,10 @@ public class MonitoringController {
 
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
+
+	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
+		.getFirstLearnerInteractions(contentId, userId.intValue());
+	request.setAttribute("learnerInteractions", learnerInteractions);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()

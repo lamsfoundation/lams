@@ -26,17 +26,18 @@
 				</td>
 				
 				<td style="width: 100px;">
-				
-					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
-							disabled="disabled">
-						
-						<c:forEach var="i" begin="0" end="${question.maxMark}">
-							<option
-								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
-							>${i}</option>
-						</c:forEach>
-						
-					</select>
+					<c:if test="${not empty toolSessionID}">
+						<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
+								disabled="disabled">
+							
+							<c:forEach var="i" begin="0" end="${question.maxMark}">
+								<option
+									<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
+								>${i}</option>
+							</c:forEach>
+							
+						</select>
+					</c:if>
 				</td>
 				
 				<c:if test="${assessment.allowQuestionFeedback}">
@@ -51,7 +52,7 @@
 		</c:forEach>
 	</table>
 		
-	<c:if test="${question.hedgingJustificationEnabled}">
+	<c:if test="${not empty toolSessionID and question.hedgingJustificationEnabled}">
 		<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select margin-top-minus-10"
 						disabled="disabled" rows="4" cols="60">
 			<c:out value="${question.answer}" />
@@ -81,15 +82,17 @@
 		<c:out value="${question.feedback}" escapeXml="false" />
 	</div>
 </c:if>
-	
-<div class="question-feedback" style="padding-bottom: 10px;">
-	<fmt:message key="label.learning.marks" >
-		<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
-		<fmt:param>${question.maxMark}</fmt:param>
-	</fmt:message>
-	<c:if test="${(question.mark != question.maxMark) && (fn:length(question.questionResults) > 1)}">
-		<fmt:message key="label.learning.penalty" >
-			<fmt:param><fmt:formatNumber value="${question.penalty}" maxFractionDigits="2"/></fmt:param>
+
+<c:if test="${not empty toolSessionID}">
+	<div class="question-feedback" style="padding-bottom: 10px;">
+		<fmt:message key="label.learning.marks" >
+			<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
+			<fmt:param>${question.maxMark}</fmt:param>
 		</fmt:message>
-	</c:if>
-</div>
+		<c:if test="${(question.mark != question.maxMark) && (fn:length(question.questionResults) > 1)}">
+			<fmt:message key="label.learning.penalty" >
+				<fmt:param><fmt:formatNumber value="${question.penalty}" maxFractionDigits="2"/></fmt:param>
+			</fmt:message>
+		</c:if>
+	</div>
+</c:if>

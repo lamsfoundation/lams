@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="confidenceLevelString">
 <c:choose>
-	<c:when test="${confidenceLevelDto.type == 1 && confidenceLevelDto.level == -1}">
+	<c:when test="${confidenceLevelDto.type <= 1 && confidenceLevelDto.level == -1}">
 	</c:when>
 	
 	<c:when test="${confidenceLevelDto.type == 1}">

@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.spreadsheet.web.form.MarkForm;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -280,7 +281,7 @@ public class MonitoringController {
 		    }
 
 		    cell = row.createCell(count++);
-		    cell.setCellValue(mark.getComments());
+		    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(mark.getComments()));
 		}
 	    }
 

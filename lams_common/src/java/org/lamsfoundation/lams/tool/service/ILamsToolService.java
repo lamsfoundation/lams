@@ -226,11 +226,9 @@ public interface ILamsToolService {
 	    Integer requestorUserId, Long requestorToolSessionId);
     
     /**
-     * Recalculate marks for all Scratchie activities that use specified QbQuestion.
-     * 
-     * @param qbQuestionUid
+     * Recalculate marks for all Scratchie activities that use specified QbQuestion with given answer.
      */
-    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid);
+    void recalculateScratchieMarksForVsaQuestion(Long qbQuestionUid, String answer);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);

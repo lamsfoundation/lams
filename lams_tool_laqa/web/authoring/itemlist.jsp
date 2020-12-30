@@ -41,12 +41,12 @@
 				<td class="arrows" style="width:5%">
 					<!-- Don't display up icon if first line -->
 					<c:if test="${not status.first}">
-		 				<lams:Arrow state="up" title="<fmt:message key='label.tip.moveQuestionUp'/>"
+		 				<lams:Arrow state="up" titleKey="label.tip.moveQuestionUp"
 		 							onclick="javascript:moveQuestion(${status.index},'moveQuestionUp')" />
 		 			</c:if>
 					<!-- Don't display down icon if last line -->
 					<c:if test="${not status.last}">
-						<lams:Arrow state="down" title="<fmt:message key='label.tip.moveQuestionDown'/>"
+						<lams:Arrow state="down" titleKey="label.tip.moveQuestionDown"
 									onclick="javascript:moveQuestion(${status.index},'moveQuestionDown') "/>
 		 			</c:if>
 				</td>

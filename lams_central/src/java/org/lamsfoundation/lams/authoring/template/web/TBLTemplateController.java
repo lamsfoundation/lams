@@ -22,10 +22,12 @@
  */
 package org.lamsfoundation.lams.authoring.template.web;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -152,7 +154,8 @@ public class TBLTemplateController extends LdTemplateController {
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.ira.title");
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
-	    Long iRAToolContentId = createAssessmentToolContent(userDTO, activityTitle,
+
+	    Long iRAToolContentId = authoringService.createTblAssessmentToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.ira.instructions"), null, false, true, data.confidenceLevelEnable, false,
 		    false, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
@@ -196,7 +199,6 @@ public class TBLTemplateController extends LdTemplateController {
 	// Application Exercises - multiple exercises with gates between each exercise. There may also be a grouped
 	// notebook after an exercise if indicated by the user. Each Application Exercise will have one or more questions.
 	// Start a new row so that they group nicely together
-	int displayOrder = 1;
 	int noticeboardCount = 0;
 	if (data.useApplicationExercises) {
 
@@ -226,9 +228,9 @@ public class TBLTemplateController extends LdTemplateController {
 		    questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
 		    assessmentNumber++;
 		}
-		Long aetoolContentId = createAssessmentToolContent(userDTO, applicationExerciseTitle,
-			data.getText("boilerplate.ae.instructions"), null, true, false, false, true, true,
-			questionsJSONArray);
+		Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
+			applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, false, false,
+			true, true, questionsJSONArray);
 		activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 
@@ -252,8 +254,6 @@ public class TBLTemplateController extends LdTemplateController {
 		    activities.add(createNoticeboardActivity(maxUIID, order++, currentActivityPosition,
 			    aeNoticeboardContentId, data.contentFolderID, groupingUIID, null, null, notebookTitle));
 		}
-
-		displayOrder++;
 	    }
 
 	}
@@ -282,7 +282,6 @@ public class TBLTemplateController extends LdTemplateController {
 			data.getText("boilerplate.peerreview.instructions"), null, criterias);
 		activities.add(createPeerReviewActivity(maxUIID, order++, currentActivityPosition, prtoolContentId,
 			data.contentFolderID, groupingUIID, null, null, peerReviewTitle));
-		displayOrder++;
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    }
 	}
@@ -438,20 +437,26 @@ public class TBLTemplateController extends LdTemplateController {
 			    Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset, optionIndex));
 			    Integer optionDisplayOrder = Integer.valueOf(name.substring(optionIndex + 6));
 			    processTestQuestion(name, null, null, questionDisplayOrder, null, optionDisplayOrder,
-				    getTrimmedString(request, name, true));
+				    getTrimmedString(request, name, true), null, null);
 			} else {
 			    int titleIndex = name.indexOf("title");
 			    if (titleIndex > 0) { // question1title
 				Integer questionDisplayOrder = Integer
 					.valueOf(name.substring(questionOffset, titleIndex));
+				// get all learning outcomes straight away instead of iterating over them
+				String[] learningOutcomes = request
+					.getParameterValues("question" + questionDisplayOrder + "learningOutcome");
+				Long collectionUid = WebUtil.readLongParam(request,
+					"question" + questionDisplayOrder + "collection", true);
 				processTestQuestion(name, null, getTrimmedString(request, name, false),
-					questionDisplayOrder, null, null, null);
-			    } else if (name.indexOf("uuid") < 0) {
+					questionDisplayOrder, null, null, null, learningOutcomes, collectionUid);
+			    } else if (name.indexOf("uuid") < 0 && name.indexOf("learningOutcome") < 0
+				    && name.indexOf("collection") < 0) {
 				Integer questionDisplayOrder = Integer.valueOf(name.substring(questionOffset));
 				processTestQuestion(name, getTrimmedString(request, name, true), null,
 					questionDisplayOrder,
 					getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false),
-					null, null);
+					null, null, null, null);
 			    }
 			}
 		    }
@@ -553,6 +558,8 @@ public class TBLTemplateController extends LdTemplateController {
 		String questionTitle = getTrimmedString(request, assessmentPrefix + "title", true);
 		String questionUuid = getTrimmedString(request, assessmentPrefix + "uuid", false);
 		String markAsString = getTrimmedString(request, assessmentPrefix + "mark", false);
+		String[] learningOutcomes = request.getParameterValues(assessmentPrefix + "learningOutcome");
+		String collectionUid = getTrimmedString(request, assessmentPrefix + "collection", false);
 		Assessment assessment = new Assessment();
 		if (questionText != null) {
 		    assessment.setTitle(questionTitle);
@@ -597,6 +604,15 @@ public class TBLTemplateController extends LdTemplateController {
 			    }
 			}
 		    }
+
+		    if (learningOutcomes != null && learningOutcomes.length > 0) {
+			assessment.setLearningOutcomes(Arrays.asList(learningOutcomes));
+		    }
+
+		    if (collectionUid != null) {
+			assessment.setCollectionUid(Long.valueOf(collectionUid));
+		    }
+
 		    applicationExercises.put(i, assessment);
 		}
 	    }
@@ -631,7 +647,8 @@ public class TBLTemplateController extends LdTemplateController {
 	}
 
 	void processTestQuestion(String name, String questionText, String questionTitle, Integer questionDisplayOrder,
-		String questionUuid, Integer optionDisplayOrder, String optionText) {
+		String questionUuid, Integer optionDisplayOrder, String optionText, String[] learningOutcomes,
+		Long collectionUid) {
 
 	    ObjectNode question = testQuestions.get(questionDisplayOrder);
 	    if (question == null) {
@@ -666,6 +683,19 @@ public class TBLTemplateController extends LdTemplateController {
 		((ArrayNode) question.get(RestTags.ANSWERS)).add(newOption);
 	    }
 
+	    if (learningOutcomes != null && learningOutcomes.length > 0) {
+		try {
+		    ArrayNode learningOutcomesJSON = JsonUtil.readArray(learningOutcomes);
+		    question.set(RestTags.LEARNING_OUTCOMES, learningOutcomesJSON);
+		} catch (IOException e) {
+		    log.error("Error while processing learning outcomes for question: "
+			    + question.get(RestTags.QUESTION_TITLE));
+		}
+	    }
+
+	    if (collectionUid != null) {
+		question.put(RestTags.COLLECTION_UID, collectionUid);
+	    }
 	}
 
 	void updateCorrectAnswers(TreeMap<Integer, Integer> correctAnswers) {

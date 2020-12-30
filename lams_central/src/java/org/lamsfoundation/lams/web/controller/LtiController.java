@@ -91,6 +91,7 @@ public class LtiController {
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String tcGradebookId = request.getParameter(BasicLTIConstants.LIS_RESULT_SOURCEDID);
 	String extUserId = request.getParameter(BasicLTIConstants.USER_ID);
+	String customContextMembershipUrl = request.getParameter(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL);
 	Long customLessonId = WebUtil.readLongParam(request, "custom_lessonid", true);
 	boolean isContentItemSelection = WebUtil.readBooleanParam(request, "custom_iscontentitemselection", false);
 	//parameter containing original resource_link_id, available after course copy (BB only)
@@ -130,7 +131,8 @@ public class LtiController {
 	    if (isLessonCopyRequired) {
 
 		//add users to the course
-		integrationService.addUsersUsingMembershipService(extServer, null, extCourseId, resourceLinkId);
+		integrationService.addUsersUsingMembershipService(extServer, null, extCourseId, resourceLinkId,
+			customContextMembershipUrl);
 
 		// clone lesson
 		Integer creatorId = lesson.getUser().getUserId();
@@ -195,6 +197,7 @@ public class LtiController {
 	    UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
 	Integer userId = getUser().getUserID();
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
+	String customContextMembershipUrl = request.getParameter(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL);
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String resourceLinkTitle = request.getParameter(BasicLTIConstants.RESOURCE_LINK_TITLE);
@@ -216,8 +219,11 @@ public class LtiController {
 	request.setAttribute(BasicLTIConstants.RESOURCE_LINK_ID, resourceLinkId);
 	request.setAttribute(CentralConstants.ATTR_COURSE_ID, organisationId);
 	request.setAttribute(BasicLTIConstants.CONTEXT_ID, contextId);
+	request.setAttribute(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL, customContextMembershipUrl);
 	request.setAttribute(CentralConstants.PARAM_TITLE, resourceLinkTitle);
 	request.setAttribute(CentralConstants.PARAM_DESC, resourceLinkDescription);
+	request.setAttribute(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE,
+		request.getParameter(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE));
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);
@@ -257,6 +263,8 @@ public class LtiController {
 	String desc = request.getParameter(CentralConstants.PARAM_DESC);
 	String ldIdStr = request.getParameter(CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	String extCourseId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
+	String customContextMembershipUrl = request.getParameter(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL);
+	String toolConsumerFamily = request.getParameter(BasicLTIConstants.TOOL_CONSUMER_INFO_PRODUCT_FAMILY_CODE);
 	Integer organisationId = WebUtil.readIntParam(request, CentralConstants.ATTR_COURSE_ID);
 	boolean enableLessonIntro = WebUtil.readBooleanParam(request, "enableLessonIntro", false);
 
@@ -299,11 +307,14 @@ public class LtiController {
 	 * The real ID is only received when an user enters the lesson and only then we can create the mapping.
 	 *
 	 * BUT if there is another integration client which does not use deep linking and sends proper resource link ID
-	 * right away, then this may need adjusting.
+	 * right away, then we use this link. Currently we are aware of desire2learn that uses this approach.
 	 */
-	integrationService.createExtServerLessonMap(lessonId, extServer);
+	boolean useResourceLinkId = toolConsumerFamily == null
+		|| !toolConsumerFamily.toLowerCase().contains("blackboard");
+	integrationService.createExtServerLessonMap(lessonId, useResourceLinkId ? resourceLinkId : null, extServer);
 
-	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId);
+	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId,
+		customContextMembershipUrl);
 
 	//support for ContentItemSelectionRequest
 	String ltiMessageType = request.getParameter(BasicLTIConstants.LTI_MESSAGE_TYPE);

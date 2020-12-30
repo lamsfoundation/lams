@@ -36,7 +36,7 @@ public class DokumaranSessionDAOHibernate extends LAMSBaseDAO implements Dokumar
     private static final String FIND_BY_SESSION_ID = "from " + DokumaranSession.class.getName()
 	    + " as p where p.sessionId=?";
     private static final String FIND_BY_CONTENT_ID = "from " + DokumaranSession.class.getName()
-	    + " as p where p.dokumaran.contentId=?";
+	    + " as p where p.dokumaran.contentId=? order by p.sessionName asc";
 
     @Override
     public DokumaranSession getSessionBySessionId(Long sessionId) {

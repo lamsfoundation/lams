@@ -125,12 +125,12 @@ function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 		  modes: ['picture']
 	  });
 	  
-	  uppy.on('upload-success', (file, response) => {
+	  uppy.on('upload-success', function (file, response) {
 		  // if file name was modified by server, reflect it in Uppy
 		  file.meta.name = response.body.name;
 	  });
 	  
-	  uppy.on('file-removed', (file, reason) => {
+	  uppy.on('file-removed', function (file, reason) {
 		  if (reason === 'removed-by-user') {
 			 // delete file from temporary folder on server
 		    $.ajax({

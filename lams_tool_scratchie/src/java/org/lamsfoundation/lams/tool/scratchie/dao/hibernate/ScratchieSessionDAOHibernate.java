@@ -34,9 +34,10 @@ import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
-import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieSessionComparator;
 import org.springframework.stereotype.Repository;
 
@@ -69,12 +70,12 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
     @Override
     @SuppressWarnings("unchecked")
     public List<ScratchieSession> getByContentId(Long toolContentId) {
-	List<ScratchieSession> sessions = (List<ScratchieSession>) doFind(FIND_BY_CONTENT_ID, toolContentId);
+	List<ScratchieSession> sessions = doFind(FIND_BY_CONTENT_ID, toolContentId);
 
-	Set<ScratchieSession> sortedSessions = new TreeSet<ScratchieSession>(new ScratchieSessionComparator());
+	Set<ScratchieSession> sortedSessions = new TreeSet<>(new ScratchieSessionComparator());
 	sortedSessions.addAll(sessions);
 
-	return new ArrayList<ScratchieSession>(sortedSessions);
+	return new ArrayList<>(sortedSessions);
     }
 
     @Override
@@ -94,33 +95,35 @@ public class ScratchieSessionDAOHibernate extends LAMSBaseDAO implements Scratch
 	query.setParameter("toolContentId", toolContentId);
 	return (List<Number>) query.list();
     }
-    
+
     @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
 	NativeQuery<?> query = getSession().createNativeQuery(FIND_MARK_STATS)
-		.addScalar("min_grade", FloatType.INSTANCE)
-		.addScalar("avg_grade", FloatType.INSTANCE)
-		.addScalar("max_grade", FloatType.INSTANCE)
-		.addScalar("num_complete", IntegerType.INSTANCE);
+		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE).addScalar("num_complete", IntegerType.INSTANCE);
 	query.setParameter("toolContentId", toolContentId);
 	@SuppressWarnings("unchecked")
 	List<Object[]> list = (List<Object[]>) query.list();
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	} else {
-	    return (Object[]) list.get(0);
+	    return list.get(0);
 	}
     }
 
     @Override
-    public List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid) {
-	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM  " + Scratchie.class.getName()
-		+ " AS scratchie, " + ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName()
-		+ " AS session "
-		+ " WHERE session.scratchie.uid = scratchie.uid AND scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid";
-	
+    public List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid, String answer) {
+	final String FIND_BY_QBQUESTION_AND_FINISHED = "SELECT DISTINCT session.sessionId FROM "
+		+ ScratchieItem.class.getName() + " AS item, " + ScratchieSession.class.getName() + " AS session, "
+		+ ScratchieAnswerVisitLog.class.getName()
+		+ " AS visitLog WHERE session.scratchie.uid = item.scratchieUid AND item.qbQuestion.uid =:qbQuestionUid"
+		+ " AND session.sessionId = visitLog.sessionId AND REGEXP_REPLACE(visitLog.answer, '"
+		+ IScratchieService.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '') = :answer";
+
 	Query<Long> q = getSession().createQuery(FIND_BY_QBQUESTION_AND_FINISHED, Long.class);
 	q.setParameter("qbQuestionUid", qbQuestionUid);
+	String normalisedAnswer = answer.replaceAll(IScratchieService.VSA_ANSWER_NORMALISE_JAVA_REG_EXP, "");
+	q.setParameter("answer", normalisedAnswer);
 	return q.list();
     }
 }

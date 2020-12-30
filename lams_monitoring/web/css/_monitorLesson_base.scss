@@ -426,6 +426,12 @@ td.progressBarLabel {
 	
 }
 
+.contributeEntryCell .gate-opened {
+	color: #5cb85c;
+	font-weight: 700;
+	margin-right: 10px;
+}
+
 /***** Group View Page **/
 .group-table>tbody>tr:nth-of-type(odd){
    background-color:$brand-primary-light;

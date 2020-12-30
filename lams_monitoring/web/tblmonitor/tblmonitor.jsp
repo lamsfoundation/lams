@@ -54,7 +54,7 @@
 			
 			// refresh automatically every X seconds
 			window.setInterval(function(){
-				loadTab(null, null, true);
+				refresh(true);
 			}, TAB_REFRESH_INTERVAL);
 		});
 
@@ -62,8 +62,10 @@
 			if (!method && !toolContentID) {
 				// tab was refreshed, get stored parameters
 				method = lastTabMethod;
-				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices')) {
+
+				if (autoRefresh && (method == 'burningQuestions' || method == 'aes' || method == 'aesStudentChoices' || method == 'sequence' || $('.modal').hasClass('in'))){
 					// do not auto refresh Burning Questions nor AES tabs
+					// or if a modal dialog is open
 					return;
 				}	
 				
@@ -154,8 +156,8 @@
 	        }, 100);
 		}
 
-		function refresh() {
-			loadTab();
+		function refresh(autoRefresh) {
+			loadTab(null, null, autoRefresh);
 		}
 
         function switchToRegularMonitor() {

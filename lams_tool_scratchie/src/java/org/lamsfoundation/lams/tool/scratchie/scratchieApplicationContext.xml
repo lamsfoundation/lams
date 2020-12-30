@@ -117,6 +117,12 @@
 		<property name="qbService">
 			<ref bean="qbService"/>
 		</property>
+		<property name="learnerService">
+			<ref bean="learnerService"/>
+		</property>
+		<property name="outcomeService">
+			<ref bean="outcomeService"/>
+		</property>
 		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
     </bean>
 

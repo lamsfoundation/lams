@@ -32,6 +32,15 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">
+			function saveQuestion(isNewVersion){
+				let form = $('#newQuestionForm');
+				if (isNewVersion) {
+					action = form.attr('action');
+					form.attr('action', action + '&newVersion=true');
+				}
+				form.submit();
+		  	}
+		
 			$(document).ready(function(){
 				
 		    	$("#newQuestionForm").validate({
@@ -186,9 +195,22 @@
 					    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 							<fmt:message key="label.cancel" />
 						</a>
-						<a href="#nogo" onclick="javascript:$('#newQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-							<fmt:message key="label.save.question" />
-						</a>
+						
+						<div class="btn-group btn-group-sm dropup">
+							<a id="saveButton" type="button" class="btn btn-sm btn-default button-add-item" onClick="javascript:saveQuestion(false)">
+								<fmt:message key="label.save.question" />
+							</a>
+							<button id="saveDropButton" type="button" class="btn btn-default dropdown-toggle"
+									data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="caret"></span>
+								<span class="sr-only">Toggle Dropdown</span>
+							</button>
+							<ul class="dropdown-menu">
+								<li id="saveAsButton" onClick="javascript:saveQuestion(true)"><a href="#">
+									<fmt:message key="label.save.question.new.version" />
+								</a></li>
+							</ul>
+						</div>
 					</div>
 				</div>
 		   	</div>

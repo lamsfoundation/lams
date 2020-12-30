@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -341,7 +342,7 @@ public class MonitoringController {
 			cell.setCellValue(marks != null ? marks : "");
 
 			cell = row.createCell(count++);
-			cell.setCellValue(dto.getComments());
+			cell.setCellValue(ExcelUtil.ensureCorrectCellLength(dto.getComments()));
 		    }
 		}
 	    }

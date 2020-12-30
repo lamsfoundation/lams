@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -43,6 +45,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 @Controller
 @RequestMapping("/qb/edit")
@@ -167,7 +172,8 @@ public class EditQbQuestionController {
      */
     @RequestMapping(path = "/saveOrUpdateQuestion", method = RequestMethod.POST)
     public String saveOrUpdateQuestion(@ModelAttribute("assessmentQuestionForm") QbQuestionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
 	//find according question
 	QbQuestion qbQuestion = null;
 	Long oldQuestionUid = null;
@@ -187,6 +193,9 @@ public class EditQbQuestionController {
 	}
 
 	int questionModificationStatus = extractFormToQbQuestion(qbQuestion, form, request);
+	if (questionModificationStatus < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    questionModificationStatus = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	switch (questionModificationStatus) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
 		// new version of the old question gets created
@@ -393,6 +402,26 @@ public class EditQbQuestionController {
 
 	request.setAttribute(QbConstants.ATTR_UNIT_LIST, unitList);
 	return "qb/authoring/unitlist";
+    }
+
+    @RequestMapping(path = "/checkQuestionExistsInToolActivities")
+    @ResponseBody
+    public String checkQuestionExistsInToolActivities(@RequestParam(name = "toolContentIds[]") Set<Long> toolContentIds,
+	    @RequestParam long qbQuestionUid, HttpServletResponse response) {
+	response.setContentType("application/json;charset=utf-8");
+	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
+	Collection<ToolContent> toolContents = qbService.getQuestionActivities(qbQuestionUid, toolContentIds);
+	for (ToolContent toolContent : toolContents) {
+	    responseJSON.add(toolContent.getToolContentId());
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/replaceQuestionInToolActivities", method = RequestMethod.POST)
+    @ResponseBody
+    public void replaceQuestionInToolActivities(@RequestParam(name = "toolContentIds[]") Set<Long> toolContentIds,
+	    @RequestParam long oldQbQuestionUid, @RequestParam long newQbQuestionUid) {
+	qbService.replaceQuestionInToolActivities(toolContentIds, oldQbQuestionUid, newQbQuestionUid);
     }
 
     /**

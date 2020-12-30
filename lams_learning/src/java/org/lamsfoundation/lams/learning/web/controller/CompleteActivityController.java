@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -42,7 +41,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -71,8 +69,8 @@ public class CompleteActivityController {
      * @throws ServletException
      */
     @RequestMapping("/CompleteActivity")
-    public String execute(@ModelAttribute("messageForm") ActivityForm messageForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException {
 	Integer learnerId = LearningWebUtil.getUserId();
 
 	// This must get the learner progress from the progress id, not cached from the request,

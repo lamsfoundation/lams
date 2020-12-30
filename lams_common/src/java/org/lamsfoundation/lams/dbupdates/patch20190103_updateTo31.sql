@@ -1,7 +1,8 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20170209.sql to patch20181214.sql
+-- This patch contains files patch20170209.sql to patch20200909.sql
+-- but 4.0 introduced other patches in between, so we officially say it is just 20190103 patch so 4.0 patches execute
 -- It should upgrade LAMS to version 3.1
 
 
@@ -918,7 +919,7 @@ DELETE FROM lams_configuration WHERE config_key = 'LDAPGroupAdminMap';
 
 
 
---     LDEV-4726 Update and add new creative common licenses 4.0 for sequences
+--  LDEV-4726 Update and add new creative common licenses 4.0 for sequences
 --  Add an order_id column so we can sequence them how we like
 ALTER TABLE lams_license 
 ADD COLUMN order_id TINYINT NULL DEFAULT '0';
@@ -961,6 +962,114 @@ VALUES (7, 'CC Attribution 4.0', 'by', 'https://creativecommons.org/licenses/by/
 
 INSERT into lams_license 
 VALUES (8, 'Public Domain', 'CC0', 'https://creativecommons.org/publicdomain/zero/1.0/', 0, '/images/license/publicdomain.svg', 7);
+
+
+
+-- SP-2 Add logout URL to integrated servers
+ALTER TABLE lams_ext_server_org_map
+ADD COLUMN logout_url TEXT AFTER lesson_finish_url;
+
+
+
+-- LDEV-4813 Add an index to process event log faster
+ALTER TABLE lams_log_event ADD KEY event_log_date_and_type (occurred_date_time, log_event_type_id);
+
+
+
+-- LDEV-4589 Add column for LTI Membership service
+ALTER TABLE lams_ext_server_org_map ADD COLUMN `membership_url` text COLLATE utf8mb4_unicode_ci;
+
+
+
+-- LDEV-4876 Ability for LTI servers to get userId from another request parameter name
+ALTER TABLE lams_ext_server_org_map ADD COLUMN `use_alternative_user_id_parameter_name` tinyint(1) DEFAULT '0';
+
+
+
+--  LDEV-4874 Restrict displaying names for students that are not within student's group
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('RestrictedGroupUserNames','true', 'config.restricted.displaying.user.names.in.groupings', 'config.header.privacy.settings', 'BOOLEAN', 0);
+
+
+
+--  LDEV-4914 Do not allow NULLs in Lesson settings
+-- set any null values to default value of 0
+UPDATE lams_lesson SET
+	learner_presence_avail = IFNULL(learner_presence_avail, 0),
+    learner_im_avail = IFNULL(learner_im_avail, 0),
+    live_edit_enabled = IFNULL(live_edit_enabled, 0),
+    enable_lesson_notifications = IFNULL(enable_lesson_notifications, 0),
+    locked_for_edit = IFNULL(locked_for_edit, 0),
+    marks_released = IFNULL(marks_released, 0),
+    enable_lesson_intro = IFNULL(enable_lesson_intro, 0),
+    display_design_image = IFNULL(display_design_image, 0),
+    force_restart = IFNULL(force_restart, 0),
+    allow_restart = IFNULL(allow_restart, 0),
+    gradebook_on_complete = IFNULL(gradebook_on_complete, 0);
+
+
+ALTER TABLE lams_lesson
+	MODIFY COLUMN learner_presence_avail TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN learner_im_avail TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN live_edit_enabled TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN enable_lesson_notifications TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN locked_for_edit TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN marks_released TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN enable_lesson_intro TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN display_design_image TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN force_restart TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN allow_restart TINYINT(1) NOT NULL DEFAULT 0,
+	MODIFY COLUMN gradebook_on_complete TINYINT(1) NOT NULL DEFAULT 0;
+
+	
+	
+--  LDEV-4918 Collapsible subcourses
+CREATE TABLE `lams_user_organisation_collapsed` (
+  `uid` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organisation_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `collapsed` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`uid`),
+  KEY `organisation_id` (`organisation_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_1` FOREIGN KEY (`organisation_id`) REFERENCES `lams_organisation` (`organisation_id`),
+  CONSTRAINT `FK_lams_user_organisation_collapsed_2` FOREIGN KEY (`user_id`) REFERENCES `lams_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add "Enable collapsing subcourses" to system settings and organisation
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required)
+VALUES ('EnableCollapsingSubcourses','false', 'config.enable.collapsing.subcourses', 'config.header.features', 'BOOLEAN', 0);
+	
+	
+
+--  LDEV-4989 Introduce Password Gate
+ALTER TABLE lams_learning_activity ADD COLUMN gate_password VARCHAR(32) AFTER gate_activity_completion_based;
+
+INSERT INTO lams_system_tool (system_tool_id, learning_activity_type_id, tool_display_name, description, 
+	learner_url, learner_preview_url, monitor_url,
+	contribute_url, create_date_time)
+VALUES (12, 16, 'Password Gate', 'Gate: Opens if learner provides correct password', 
+	'learning/gate/knockGate.do', 'learning/gate/knockGate.do', 'monitoring/gate/viewGate.do',
+	'monitoring/gate/viewGate.do', now());
+	
+INSERT INTO lams_learning_activity_type (learning_activity_type_id, description)
+VALUES (16, 'GATE_PASSWORD');
+	
+
+
+--  LDEV-4997 Etherpad as service
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required)
+VALUES ('EtherpadServerUrl', 'http://localhost:9001', 'config.etherpad.server.url',  'config.header.etherpad', 'STRING', 0),
+	   ('EtherpadApiKey',    '', 					  'config.etherpad.api.key',     'config.header.etherpad', 'STRING', 0),
+	   ('EtherpadInstanceID','LAMS', 				  'config.etherpad.instance.id','config.header.etherpad', 'STRING', 0);
+
+	   
+	   
+--  LDEV-5027 Convert a boolean value of LTI user ID parameter name into string
+ALTER TABLE lams_ext_server_org_map ADD COLUMN user_id_parameter_name VARCHAR(255);
+UPDATE lams_ext_server_org_map SET user_id_parameter_name = 'user_id' WHERE use_alternative_user_id_parameter_name = 0;
+UPDATE lams_ext_server_org_map SET user_id_parameter_name = 'lis_person_sourcedid' WHERE use_alternative_user_id_parameter_name = 1;
+ALTER TABLE lams_ext_server_org_map DROP COLUMN use_alternative_user_id_parameter_name;
 
 
 -- If there were no errors, commit and restore autocommit to on

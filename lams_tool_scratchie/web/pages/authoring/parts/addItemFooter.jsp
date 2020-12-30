@@ -1,5 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<script>
+	function saveItem(isNewVersion){
+		let form = $('#scratchieItemForm');
+		if (isNewVersion) {
+			action = form.attr('action');
+			form.attr('action', action + '?newVersion=true');
+		}
+		form.submit();
+  	}
+</script>
+
 <footer class="footer fixed-bottom">
 	<div class="panel-heading ">
        	<div class="col-xs-12x col-md-6x form-groupx rowx form-inlinex btn-group-md voffset5">
@@ -21,9 +32,22 @@
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.authoring.cancel.button" />
 				</a>
-				<a href="#nogo" onclick="javascript:$('#scratchieItemForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.save.button" />
-				</a>
+				
+				<div class="btn-group btn-group-sm dropup">
+					<a id="saveButton" type="button" class="btn btn-sm btn-default button-add-item" onClick="javascript:saveItem(false)">
+						<fmt:message key="label.authoring.save.button" />
+					</a>
+					<button id="saveDropButton" type="button" class="btn btn-default dropdown-toggle"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li id="saveAsButton" onClick="javascript:saveItem(true)"><a href="#">
+							<fmt:message key="label.authoring.save.new.version.button" />
+						</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
    	</div>

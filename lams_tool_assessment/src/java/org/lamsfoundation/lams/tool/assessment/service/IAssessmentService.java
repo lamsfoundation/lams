@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -117,6 +116,10 @@ public interface IAssessmentService extends ICommonToolService {
     int getCountUsersBySession(Long sessionId, String searchString);
 
     int getCountUsersByContentId(Long contentId);
+
+    int getCountLessonLearnersByContentId(long contentId);
+
+    int getCountLearnersWithFinishedCurrentAttempt(long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
@@ -432,8 +435,12 @@ public interface IAssessmentService extends ICommonToolService {
      * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
      *         another teacher working in parallel)
      */
-    Optional<Long> allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid,
-	    Long questionResultUid);
+    Long allocateAnswerToOption(Long questionUid, Long targetOptionUid, Long previousOptionUid, String answer);
+
+    /**
+     * Recalculate learners' marks after a VSA answer was allocated as correct or incorrect.
+     */
+    void recalculateMarksForAllocatedAnswer(Long questionUid, String answer);
 
     /**
      * For export purposes
@@ -550,4 +557,6 @@ public interface IAssessmentService extends ICommonToolService {
     Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
+
+    Map<Integer, Integer> getCountAnsweredQuestionsByUsers(long toolContentId);
 }

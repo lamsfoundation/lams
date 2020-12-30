@@ -20,7 +20,10 @@ INSERT INTO `lams_configuration` VALUES ('AdminScreenSize','1280x720','config.ad
 ('QbCollectionsTransferEnable', 'true', 'config.qb.collections.transfer.enable', 'config.header.qb', 'BOOLEAN', 1),
 ('RestrictedGroupUserNames','true', 'config.restricted.displaying.user.names.in.groupings', 'config.header.privacy.settings', 'BOOLEAN', 0),
 ('EnableCollapsingSubcourses','false', 'config.enable.collapsing.subcourses', 'config.header.features', 'BOOLEAN', 0),
-('LearningOutcomeQuickAddEnable', 'true', 'config.learning.outcome.add.enable', 'config.header.features', 'BOOLEAN', 1);
+('LearningOutcomeQuickAddEnable', 'true', 'config.learning.outcome.add.enable', 'config.header.features', 'BOOLEAN', 1),
+('EtherpadServerUrl','http://localhost:9001','config.etherpad.server.url','config.header.etherpad','STRING', 0),
+('EtherpadApiKey','','config.etherpad.api.key','config.header.etherpad','STRING', 0),
+('EtherpadInstanceID','LAMS','config.etherpad.instance.id','config.header.etherpad','STRING', 0);
 UNLOCK TABLES;
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -16,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -145,6 +147,10 @@ public class QbQuestion implements Serializable, Cloneable {
     @OneToMany(mappedBy = "qbQuestion", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<QbQuestionUnit> units = new ArrayList<>();
+
+    // non-persistent field, useful for displaying other versions of this question
+    @Transient
+    private Map<Integer, Long> versionMap;
 
     // checks if important parts of another question are the same as current question's.
     // And if not, determines whether another question/version be created.
@@ -507,5 +513,13 @@ public class QbQuestion implements Serializable, Cloneable {
 
     public void setUnits(List<QbQuestionUnit> units) {
 	this.units = units;
+    }
+
+    public Map<Integer, Long> getVersionMap() {
+	return versionMap;
+    }
+
+    public void setVersionMap(Map<Integer, Long> otherVersions) {
+	this.versionMap = otherVersions;
     }
 }

@@ -106,7 +106,7 @@ public class MonitoringController {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> groupList = dokumaranService.getSummary(contentId);
+	List<SessionDTO> groupList = dokumaranService.getSummary(contentId, null);
 	boolean hasFaultySession = false;
 	for (SessionDTO group : groupList) {
 	    hasFaultySession |= group.isSessionFaulty();
@@ -267,9 +267,6 @@ public class MonitoringController {
 
     /**
      * Stores date when user has started activity with time limit
-     *
-     * @throws IOException
-     * @throws JSONException
      */
     @RequestMapping("/addOneMinute")
     private void addOneMinute(HttpServletRequest request) throws IOException {
@@ -277,6 +274,20 @@ public class MonitoringController {
 
 	dokumaranService.addOneMinute(toolContentId);
 
+    }
+
+    @RequestMapping("/startGalleryWalk")
+    private void startGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.startGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/finishGalleryWalk")
+    private void finishGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.finishGalleryWalk(toolContentId);
     }
 
     private Integer getUserId() {

@@ -104,6 +104,8 @@
 				IMPORT_PART_CHOOSE_PROMPT : decoderDiv.html('<c:out value="${IMPORT_PART_CHOOSE_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.liveedit.cancel.confirm" var="LIVEEDIT_CANCEL_CONFIRM_VAR"/>
 				LIVEEDIT_CANCEL_CONFIRM : '<c:out value="${LIVEEDIT_CANCEL_CONFIRM_VAR}" />',
+				<fmt:message key="authoring.fla.replace.question.prompt" var="REPLACE_QUESTION_PROMPT_VAR"/>
+				REPLACE_QUESTION_PROMPT : decoderDiv.html('<c:out value="${REPLACE_QUESTION_PROMPT_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.not.selected.error" var="FOLDER_NOT_SELECTED_ERROR_VAR"/>
 				FOLDER_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.can.not.save.error" var="FOLDER_CAN_NOT_SAVE_ERROR_VAR"/>
@@ -412,7 +414,12 @@
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
-				
+		
+		<button id="questionBankButton" class="btn btn-default desktopButton" onClick="javascript:MenuLib.openQuestionBank()">
+			<i class="fa fa-bank"></i> 
+			<span><fmt:message key="label.question.bank" /></span>
+		</button>
+		
 		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()"
 				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
 			<i class="fa fa-search-plus"></i> 

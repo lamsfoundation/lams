@@ -486,6 +486,28 @@
 		</property>
 	</bean>	
 	
+	<!-- Learner Interaction Service -->
+	
+	<bean id="learnerInteractionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.logevent.service.LearnerInteractionService">
+				<property name="learnerInteractionDAO"><ref bean="learnerInteractionDAO"/></property>
+			</bean>	
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>	
+	
 	<!--  Configuration service -->
 	<bean id="configurationService"  class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
@@ -705,6 +727,11 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>		
 	
+	<!-- Learner Interaction related beans -->
+	<bean id="learnerInteractionDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LearnerInteractionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>		
+		
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

@@ -1,7 +1,8 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20170315.sql to patch20190103.sql
+-- This patch contains files patch20170209.sql to patch20200626.sql
+-- but 4.0 introduced other patches in between, so we officially say it is just 20190103 patch so 4.0 patches execute
 -- It should upgrade this tool to version 3.1
 
 
@@ -103,6 +104,28 @@ ALTER TABLE tl_laasse10_question_result MODIFY answer_string MEDIUMTEXT;
 -- LDEV-4582 Option to add prefix letter to assessment MCQ answers 
 ALTER TABLE tl_laasse10_assessment_question ADD COLUMN prefix_answers_with_letters TINYINT(1) NOT NULL DEFAULT 0;
 
+
+
+
+-- LDEV-4813 Add a missing foreign key and index to speed up queries
+ALTER TABLE tl_laasse10_option_answer ADD CONSTRAINT FK_tl_laasse10_option_answer_2 FOREIGN KEY (question_option_uid)
+	REFERENCES tl_laasse10_question_option (uid) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+-- LDEV-4813 Add missing indexes to speed up queries
+ALTER TABLE tl_laasse10_assessment_result ADD INDEX (latest);
+ALTER TABLE tl_laasse10_option_answer ADD INDEX (answer_boolean);
+
+
+
+--LDEV-5002 Add question Etherpads
+ALTER TABLE tl_laasse10_assessment ADD COLUMN question_etherpad_enabled TINYINT(1) DEFAULT 0 AFTER use_select_leader_tool_ouput;
+
+
+
+--LDEV-5047 Make numeric option more accurate as with large numbers it performs rounding
+ALTER TABLE tl_laasse10_question_option MODIFY COLUMN option_float DOUBLE;
 
 
 

@@ -99,14 +99,17 @@
 	        					alert('Save failed (expected parameters missing). Data returned by server was '+data);
 	        				}
 	        			}
+	        			$('.button-save').button('reset');
 				    } else {
 					    var title = encodeURIComponent(data.title);
 					    location.href='<lams:WebAppURL />authoring/template/createresult.jsp?learningDesignID='+learningDesignID
 					    		+'&learningDesigntitle='+title;
-       				}})
+       				}
+       			})
 				.fail(function() {
 					alert('Save failed. Please see the server logs for more details.\n\n');
-					});
+					$('.button-save').button('reset');
+				});
 		}
 		
 		function getSubmissionURL() {
@@ -126,16 +129,20 @@
 		}
 		// Called by save button
 		function doSaveForm() {
+			$('.button-save').button('loading');
 			$('#templateForm').submit();
 		}
 
 		// Triggers the import window. The saving is done in a method saveQTI(formHTML, formName, callerID) which should be defined in the main template jsp file.
 		// CallerID can be set to define which tab has triggered the QTI import, as TBL has import on both the RAT Questions and App Ex tabs.
-		function importQTI(callerID, limit){
-		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?callerID='+callerID;
+		function importQTI(callerID, limit, type){
+		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=true&callerID='+callerID;
 		 	if ( limit ) {
 		 		url = url + '&limitType='+limit;
 		 	}
+            if ( type ) {
+                url = url + '&importType='+type;
+            }
 			// open import pop up window, centered horizontally
 			var left = ((screen.width / 2) - (500 / 2));
 	    	window.open(url,'QuestionFile','width=500,height=370,scrollbars=yes,top=150,left=' + left);

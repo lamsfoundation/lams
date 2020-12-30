@@ -24,6 +24,30 @@
 		#add-question-div {
 			margin-top: -5px;
 		}
+		.question-type-alert {
+			white-space: nowrap;
+			display: inline-block;
+			margin-top: 8px;
+		}
+		.newer-version-prompt {
+			text-align: left;
+			color: orange;
+			font-size: 1.3em;
+		}
+		.question-version-dropdown {
+			margin-top: -3px;
+		}
+		
+		.question-version-dropdown .dropdown-menu {
+			min-width: 160px;
+		}
+		
+		.question-version-dropdown li a {
+			display: inline-block;
+		}
+		.question-version-dropdown li.disabled a:first-child {
+			text-decoration: underline;
+		}
 	</style>
 	
 	<script>
@@ -43,6 +67,9 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);	    	
         }
+        
+        // avoid name clash between bootstrap and jQuery UI
+        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
     </script>
  
 </lams:head>

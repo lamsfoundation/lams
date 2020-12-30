@@ -48,11 +48,8 @@ public interface ScratchieSessionDAO extends DAO {
     Object[] getStatsMarksForLeaders(Long toolContentId);
     
     /**
-     * Returns all session ids where specified qbQuestionUid is used.
-     * 
-     * @param qbQuestionUid
-     * @return
+     * Returns all session ids where specified qbQuestionUid is used with the given answer
      */
-    List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid);
+    List<Long> getSessionIdsByQbQuestion(Long qbQuestionUid, String answer);
 
 }

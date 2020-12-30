@@ -104,6 +104,16 @@
 	    		}
 	        });
 		});
+		
+		
+		function saveQuestion(isNewVersion) {
+			let form = $('#assessmentQuestionForm');
+			if (isNewVersion) {
+				action = form.attr('action');
+				form.attr('action', action + '?newVersion=true');
+			}
+			form.submit();
+		}
   	</script>
 </lams:head>
 	

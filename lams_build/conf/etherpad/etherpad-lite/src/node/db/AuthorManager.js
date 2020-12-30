@@ -22,7 +22,7 @@ var db = require("./DB");
 var customError = require("../utils/customError");
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-exports.getColorPalette = function(){
+exports.getColorPalette = function() {
 	  //*LAMS* modified the following array: replaced dark colors with the more lighter ones
 	  return ["#ffc7c7", "#fff1c7", "#e3ffc7", "#c7ffd5", "#c7ffff", "#c7d5ff", "#e3c7ff", "#ffc7f1", "#ff8f8f", "#ffe38f", "#c7ff8f", "#8fffab", "#8fffff", "#8fabff", "#c78fff", "#ff8fe3", "#ecbcbc", "#d9c179", "#a9d979", "#79d991", "#79d9d9", "#bcc8ec", "#dcc9ef", "#efc9e6", "#d9a9a9", "#d9cda9", "#c1d9a9", "#a9d9b5", "#a9d9d9", "#a9b5d9", "#c1a9d9", "#d9a9cd", "#c9e1d9", "#12d1ad", "#d5e8e5", "#d5daed", "#a091c7", "#c1dae5", "#e0d0f0", "#e6e76d", "#e3bfd0", "#f386e5", "#4ecc0c", "#c0c236", "#d2c1bd", "#b5de6a", "#9b88fd", "#c2dde1", "#c8d3c0", "#e267fe", "#f1c0cc", "#babad0", "#cde3c2", "#f7d2f1", "#86dc6c", "#b5a714", "#dfcdd2", "#ebd4e6", "#4b81c8", "#c4d2cd", "#c6c9b9", "#d16084", "#efe1ce", "#8c8bd8"];
 };

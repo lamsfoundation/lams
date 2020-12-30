@@ -87,7 +87,7 @@ public class AuthoringController {
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(contentId);
 
 	dokumaran.setDefineLater(true);
-	dokumaranService.saveOrUpdateDokumaran(dokumaran);
+	dokumaranService.saveOrUpdate(dokumaran);
 
 	//audit log the teacher has started editing activity in monitor
 	dokumaranService.auditLogStartEditingActivityInMonitor(contentId);
@@ -185,7 +185,6 @@ public class AuthoringController {
 	    dokumaranPO = dokumaran;
 	    dokumaranPO.setCreated(new Timestamp(new Date().getTime()));
 	    dokumaranPO.setUpdated(new Timestamp(new Date().getTime()));
-
 	} else {
 	    Long uid = dokumaranPO.getUid();
 	    PropertyUtils.copyProperties(dokumaranPO, dokumaran);
@@ -220,7 +219,7 @@ public class AuthoringController {
 	dokumaranPO.setCreatedBy(dokumaranUser);
 
 	// ***************************** finally persist dokumaranPO again
-	dokumaranService.saveOrUpdateDokumaran(dokumaranPO);
+	dokumaranService.saveOrUpdate(dokumaranPO);
 
 	authoringForm.setDokumaran(dokumaranPO);
 

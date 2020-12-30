@@ -170,6 +170,9 @@ public class AuthoringController {
 	List<AssessmentQuestion> randomPoolQuestions = getRandomPoolQuestions(sessionMap);
 	randomPoolQuestions.clear();
 	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    // since we are iterating anyway, here fill version information to each question
+	    qbService.fillVersionMap(question.getQbQuestion());
+	    
 	    if (question.isRandomQuestion()) {
 		randomPoolQuestions.add(question);
 	    }
@@ -191,6 +194,10 @@ public class AuthoringController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED, isAssessmentAttempted && mode.isTeacher());
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
+
+	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	sessionMap.put(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
 	return "pages/authoring/start";
     }
 
@@ -472,6 +479,9 @@ public class AuthoringController {
 		    break;
 		}
 	    }
+
+	    request.setAttribute("oldQbQuestionUid", oldQbQuestionUid);
+	    request.setAttribute("newQbQuestionUid", qbQuestionUid);
 	}
 	request.setAttribute("qbQuestionModified", questionModificationStatus);
 
@@ -674,6 +684,22 @@ public class AuthoringController {
 	question.setAnswerRequired(!question.isAnswerRequired());
 
 	return String.valueOf(question.isAnswerRequired());
+    }
+
+    @RequestMapping("/changeItemQuestionVersion")
+    private String changeItemQuestionVersion(@RequestParam int referenceSequenceId, @RequestParam long newQbQuestionUid,
+	    HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+
+	List<QuestionReference> rList = new ArrayList<>(questionReferences);
+	QuestionReference questionReference = rList.remove(referenceSequenceId);
+	AssessmentQuestion question = questionReference.getQuestion();
+	QbQuestion newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+	qbService.fillVersionMap(newQbQuestion);
+	question.setQbQuestion(newQbQuestion);
+
+	return "pages/authoring/parts/questionlist";
     }
 
     @RequestMapping("/getAllQbQuestionUids")

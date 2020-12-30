@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -68,6 +69,8 @@ public class SsoHandler implements ServletExtension {
     private static ILogEventService logEventService = null;
     private static IUserManagementService userManagementService = null;
 
+    private static Logger log = Logger.getLogger(SsoHandler.class);
+
     private static final String REDIRECT_KEY = "io.undertow.servlet.form.auth.redirect.location";
     static final String KEEP_SESSION_ID_KEY = "lams.keepSessionId";
 
@@ -100,6 +103,9 @@ public class SsoHandler implements ServletExtension {
 
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
+		UserDTO loggedInUserDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
+		String loggedInLogin = loggedInUserDTO == null ? "" : loggedInUserDTO.getLogin() + " ";
+
 		/*
 		 * Fetch UserDTO before completing request, so putting it later in session is done ASAP
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
@@ -107,33 +113,48 @@ public class SsoHandler implements ServletExtension {
 		 */
 
 		String login = request.getParameter("j_username");
-		User user = null;
 		if (StringUtils.isBlank(login)) {
+		    SsoHandler.clearLoginSessionAttributes(session);
 		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
+
+		    if (log.isDebugEnabled()) {
+			log.debug("Redirecting user " + loggedInLogin
+				+ "back to login page as he did not provide user name in login form.");
+		    }
 		    return;
 		}
-		user = SsoHandler.getUserManagementService(session.getServletContext()).getUserByLogin(login);
+		User user = SsoHandler.getUserManagementService(session.getServletContext()).getUserByLogin(login);
 		if (user == null) {
+		    SsoHandler.clearLoginSessionAttributes(session);
 		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?failed=true");
+
+		    if (log.isDebugEnabled()) {
+			log.debug("Redirecting user " + loggedInLogin + "back to login page as provided login \""
+				+ login + "\" does not exist in system.");
+		    }
+
 		    return;
 		}
 		UserDTO userDTO = user.getUserDTO();
 		String password = request.getParameter("j_password");
-		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()
-			&& password != null && !password.startsWith("#LAMS")) {
+		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()) {
+		    SsoHandler.clearLoginSessionAttributes(session);
 		    SsoHandler.serveLoginPage(exchange, request, response, "/login.jsp?lockedOut=true");
+
+		    if (log.isDebugEnabled()) {
+			log.debug("Redirecting user " + loggedInLogin + "back to login page as provided login \""
+				+ login + "\" is locked out.");
+		    }
+
 		    return;
 		}
 
 		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
 		String redirectURL = request.getParameter("redirectURL");
-		if (!StringUtils.isBlank(redirectURL)) {
-		    SsoHandler.handleRedirectBack(context, redirectURL);
-		}
 
 		//bypass 2FA if using Login-as
-		boolean isUsingLoginAsFeature = password.startsWith("#LAMS")
-			&& StringUtils.equals(redirectURL, "/lams/index.jsp");
+		boolean isPasswordToken = password.startsWith("#LAMS");
+		boolean isUsingLoginAsFeature = isPasswordToken && StringUtils.equals(redirectURL, "/lams/index.jsp");
 
 		// if user is not yet authorized and has 2FA shared secret set up - redirect him to
 		// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
@@ -154,12 +175,33 @@ public class SsoHandler implements ServletExtension {
 			session.setAttribute("password", password);
 
 			//verificationCodeStr equals null in case request came from login.jsp
-			String redirectUrl = "/lams/loginTwoFactorAuth.jsp"
+			redirectURL = "/lams/loginTwoFactorAuth.jsp"
 				+ ((verificationCodeStr == null) ? "" : "?failed=true");
-			response.sendRedirect(redirectUrl);
+			response.sendRedirect(redirectURL);
+
+			if (log.isDebugEnabled()) {
+			    log.debug("Redirecting user " + loggedInLogin
+				    + "back to 2FA page as token for provided login \"" + login + "\" is incorrect.");
+			}
+
 			return;
 		    }
+		}
 
+		// when user clicks
+		UserDTO loggedInUser = session == null ? null : (UserDTO) session.getAttribute(AttributeNames.USER);
+		if (isPasswordToken && loggedInUser != null && loggedInUser.getLogin().equals(login)) {
+		    response.sendRedirect(redirectURL);
+
+		    if (log.isDebugEnabled()) {
+			log.debug("Redirecting user " + loggedInLogin + "to " + redirectURL + "as provided login \""
+				+ login + "\" is already logged in.");
+		    }
+		    return;
+		}
+
+		if (!StringUtils.isBlank(redirectURL)) {
+		    SsoHandler.handleRedirectBack(context, redirectURL);
 		}
 
 		// store session so UniversalLoginModule can access it
@@ -167,6 +209,9 @@ public class SsoHandler implements ServletExtension {
 
 		String oldSessionID = session.getId();
 
+		if (log.isDebugEnabled()) {
+		    log.debug("Authenticating user " + loggedInLogin + "with login \"" + login + "\"");
+		}
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
 
@@ -177,8 +222,7 @@ public class SsoHandler implements ServletExtension {
 		    session.setAttribute(AttributeNames.USER, userDTO);
 
 		    Integer failedAttempts = user.getFailedAttempts();
-		    if (failedAttempts != null && failedAttempts > 0 && password != null
-			    && !password.startsWith("#LAMS")) {
+		    if (failedAttempts != null && failedAttempts > 0) {
 			user.setFailedAttempts(null);
 			user.setLockOutTime(null);
 			SsoHandler.getUserManagementService(session.getServletContext()).save(user);
@@ -187,13 +231,19 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.logLogin(userDTO, request);
 		} else {
 		    // clear after failed authentication, if it was set in LoginRequestServlet
-		    session.removeAttribute("integratedLogoutURL");
+		    SsoHandler.clearLoginSessionAttributes(session);
 
 		    Integer failedAttempts = user.getFailedAttempts();
 		    Integer failedAttemptsConfig = Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS);
 		    // do not allow more failed attempts than limit in config as we may overflow failedAttempts column in DB
 		    failedAttempts = failedAttempts == null ? 1 : Math.min(failedAttempts + 1, failedAttemptsConfig);
 		    user.setFailedAttempts(failedAttempts);
+
+		    if (log.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
+			    log.debug("User " + loggedInLogin + "with login \"" + login + "\" failed to authenticate.");
+			}
+		    }
 
 		    if (failedAttempts >= failedAttemptsConfig) {
 			Integer lockOutTimeConfig = Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME);
@@ -207,7 +257,14 @@ public class SsoHandler implements ServletExtension {
 				.append(failedAttempts).append(" failed attempts.").toString();
 			SsoHandler.getLogEventService(session.getServletContext()).logEvent(
 				LogEvent.TYPE_ACCOUNT_LOCKED, user.getUserId(), user.getUserId(), null, null, message);
+
+			if (log.isDebugEnabled()) {
+			    if (log.isDebugEnabled()) {
+				log.debug(message);
+			    }
+			}
 		    }
+
 		    SsoHandler.getUserManagementService(session.getServletContext()).save(user);
 		}
 
@@ -300,14 +357,25 @@ public class SsoHandler implements ServletExtension {
 		.append(") logged in from IP ").append(clientIP).toString();
 	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGIN,
 		user.getUserID(), user.getUserID(), null, null, message);
+
+	if (log.isDebugEnabled()) {
+	    log.debug(message);
+	}
     }
 
-    private static void logLogout(UserDTO user) {
-	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
-		.append(") got logged out from another browser").toString();
-	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGOUT,
-		user.getUserID(), user.getUserID(), null, null, message);
+    private static void clearLoginSessionAttributes(HttpSession session) {
+	session.removeAttribute("login");
+	session.removeAttribute("password");
+	session.removeAttribute("redirectURL");
+	session.removeAttribute("integratedLogoutURL");
     }
+
+//    private static void logLogout(UserDTO user) {
+//	String message = new StringBuilder("User ").append(user.getLogin()).append(" (").append(user.getUserID())
+//		.append(") got logged out from another browser").toString();
+//	SsoHandler.getLogEventService(SessionManager.getServletContext()).logEvent(LogEvent.TYPE_LOGOUT,
+//		user.getUserID(), user.getUserID(), null, null, message);
+//    }
 
     private static IUserManagementService getUserManagementService(ServletContext context) {
 	if (SsoHandler.userManagementService == null) {

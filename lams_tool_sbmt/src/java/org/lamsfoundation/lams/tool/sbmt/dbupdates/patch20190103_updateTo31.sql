@@ -1,7 +1,7 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- This patch contains files patch20171114.sql to patch20190103.sql
+-- This patch contains files patch20171114.sql to patch20190128.sql
 -- It should upgrade this tool to version 3.1
 
 -- LDEV-4482
@@ -57,6 +57,11 @@ UPDATE lams_tool SET tool_version='20180720' WHERE tool_signature='lasbmt11';
 -- Trigger class name rename when importing an old LD
 UPDATE lams_tool SET tool_version='20181202' WHERE tool_signature='lasbmt11';
 
+
+
+
+-- LDEV-4913 Include a minimum number of files to submit
+ALTER TABLE tl_lasbmt11_content ADD COLUMN min_limit_upload_number bigint;
 
 
 

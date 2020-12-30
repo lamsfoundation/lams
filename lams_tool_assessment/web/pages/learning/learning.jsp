@@ -115,6 +115,16 @@
 					'minLength' : 3
 				});
 			});
+			
+			// show etherpads only on Discussion expand
+			$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+				var etherpad = $('.etherpad-container', this);
+				if (!etherpad.hasClass('initialised')) {
+					var id = etherpad.attr('id'),
+						groupId = id.substring('etherpad-container-'.length);
+					etherpadInitMethods[groupId]();
+				}
+			});
 		});
 		
 		function countHedgeQuestionSelectTotal(questionIndex) {
@@ -535,6 +545,20 @@
 			
 		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 		    return wordCount;
+		}
+		
+		function logLearnerInteractionEvent(eventType, qbToolQuestionUid, optionUid) {
+			$.ajax({
+				url: '<c:url value="/learning/logLearnerInteractionEvent.do"/>',
+				data: {
+					eventType         : eventType,
+					qbToolQuestionUid : qbToolQuestionUid,
+					optionUid         : optionUid
+				},
+				cache : false,
+				type  : 'post',
+				dataType : 'text'
+			});
 		}
     </script>
 </lams:head>

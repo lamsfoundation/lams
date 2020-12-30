@@ -40,6 +40,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
 /**
  * Scratchie
@@ -83,6 +85,7 @@ public class Scratchie implements Cloneable {
 
     @OneToMany
     @JoinColumn(name = "scratchie_uid")
+    @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
     private Set<ScratchieItem> scratchieItems = new TreeSet<>();
 
     @Column(name = "extra_point")
@@ -99,6 +102,9 @@ public class Scratchie implements Cloneable {
 
     @Column(name = "time_limit")
     private int timeLimit;
+
+    @Column(name = "double_click")
+    private boolean revealOnDoubleClick;
 
     @Column(name = "confidence_levels_activity_uiid")
     private Integer confidenceLevelsActivityUiid;
@@ -372,6 +378,14 @@ public class Scratchie implements Cloneable {
      */
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
+    }
+
+    public boolean isRevealOnDoubleClick() {
+	return revealOnDoubleClick;
+    }
+
+    public void setRevealOnDoubleClick(boolean revealOnDoubleClick) {
+	this.revealOnDoubleClick = revealOnDoubleClick;
     }
 
     /**

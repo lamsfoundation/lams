@@ -14,18 +14,24 @@
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}"  varStatus="answerStatus">
+			
 			<tr>
 				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
-					<c:set var="inputName">question${status.index}<c:if test="${question.multipleAnswersAllowed}">_${option.uid}</c:if></c:set>
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
-							<input type="checkbox" name="${inputName}" id="${inputName}" value="${true}" 
+							<c:set var="inputName">question${status.index}_${option.uid}</c:set>
+							<c:set var="inputId" value="${inputName}" />
+							<input type="checkbox" name="${inputName}" id="${inputId}" value="${true}"
+								   onclick="javascript:logLearnerInteractionEvent($(this).is(':checked') ? 2 : 3, ${question.uid}, ${option.uid})" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:when>
 						<c:otherwise>
-							<input type="radio" name="${inputName}" id="${inputName}" value="${option.uid}" 
+							<c:set var="inputName">question${status.index}</c:set>
+							<c:set var="inputId">${inputName}_${option.uid}</c:set>
+							<input type="radio" name="${inputName}" id="${inputId}" value="${option.uid}"
+								   onclick="javascript:logLearnerInteractionEvent(1, ${question.uid}, ${option.uid})" 
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
@@ -37,7 +43,7 @@
 				</td>
 				
 				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
-					<label for="${inputName}">
+					<label for="${inputId}">
 						<c:out value="${option.name}" escapeXml="false" />
 					</label>
 				</td>

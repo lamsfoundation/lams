@@ -65,6 +65,8 @@ import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchieForm;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ScratchiePedagogicalPlannerForm;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -185,6 +187,9 @@ public class AuthoringController {
 		scratchieItem.setDisplayOrder(i);
 	    }
 	    i++;
+
+	    // prepare other version data for displaying
+	    qbService.fillVersionMap(scratchieItem.getQbQuestion());
 	}
 
 	//display confidence providing activities
@@ -206,6 +211,10 @@ public class AuthoringController {
 	}
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_FORM, authoringForm);
+
+	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	sessionMap.put(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
 	return "pages/authoring/start";
     }
 
@@ -430,6 +439,9 @@ public class AuthoringController {
 	itemList.add(item);
 	ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
+	// prepare other version data for displaying
+	qbService.fillVersionMap(item.getQbQuestion());
+
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/authoring/parts/itemlist";
@@ -454,7 +466,8 @@ public class AuthoringController {
      * persisted.
      */
     @RequestMapping(value = "/saveItem", method = RequestMethod.POST)
-    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request) {
+    private String saveItem(@ModelAttribute("scratchieItemForm") QbQuestionForm form, HttpServletRequest request,
+	    @RequestParam(name = "newVersion", required = false) boolean enforceNewVersion) {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(form.getSessionMapID());
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
@@ -522,6 +535,9 @@ public class AuthoringController {
 
 	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
 		: qbQuestion.isQbQuestionModified(oldQbQuestion);
+	if (isQbQuestionModified < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
+	    isQbQuestionModified = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
+	}
 	QbQuestion updatedQuestion = null;
 	switch (isQbQuestionModified) {
 	    case IQbService.QUESTION_MODIFIED_VERSION_BUMP: {
@@ -549,7 +565,12 @@ public class AuthoringController {
 	}
 	userManagementService.save(updatedQuestion);
 	item.setQbQuestion(updatedQuestion);
+
 	request.setAttribute("qbQuestionModified", isQbQuestionModified);
+	if (isQbQuestionModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
+	    request.setAttribute("oldQbQuestionUid", qbQuestion.getUid());
+	    request.setAttribute("newQbQuestionUid", updatedQuestion.getUid());
+	}
 
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
@@ -563,6 +584,9 @@ public class AuthoringController {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, updatedQuestion.getQuestionId(),
 		    false);
 	}
+
+	// prepare other version data for displaying
+	qbService.fillVersionMap(item.getQbQuestion());
 
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, form.getSessionMapID());
@@ -621,6 +645,21 @@ public class AuthoringController {
 	}
 	itemList.clear();
 	itemList.addAll(updatedItemList);
+    }
+
+    @RequestMapping("/changeItemQuestionVersion")
+    private String changeItemQuestionVersion(@RequestParam int itemIndex, @RequestParam long newQbQuestionUid,
+	    HttpServletRequest request) {
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
+	List<ScratchieItem> rList = new ArrayList<>(itemList);
+	ScratchieItem item = rList.get(itemIndex);
+	QbQuestion newQbQuestion = qbService.getQuestionByUid(newQbQuestionUid);
+	qbService.fillVersionMap(newQbQuestion);
+	item.setQbQuestion(newQbQuestion);
+
+	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, itemList);
+	return "pages/authoring/parts/itemlist";
     }
 
     // ----------------------- Options functions ---------------

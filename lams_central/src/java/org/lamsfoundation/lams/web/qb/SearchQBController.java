@@ -223,8 +223,7 @@ public class SearchQBController {
 	boolean isScratchie = WebUtil.readBooleanParam(request, "isScratchie", false);
 	request.setAttribute("isScratchie", isScratchie);
 
-	List<QbQuestion> otherVersions = qbService.getQuestionsByQuestionId(qbQuestion.getQuestionId());
-	request.setAttribute("otherVersions", otherVersions);
+	qbService.fillVersionMap(qbQuestion);
 
 	return "qb/qbQuestionDetails";
     }

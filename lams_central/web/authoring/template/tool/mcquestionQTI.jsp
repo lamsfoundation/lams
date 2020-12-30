@@ -10,7 +10,13 @@ which are passed on to the individual question jsps to generate the form fields.
 
 <div id="divq${currentNumber}">
 	<%@ include file="../tool/mcquestion.jsp" %>
+	
+	<c:forEach var="learningOutcome" items="${question.learningOutcomes}">
+		<input type="hidden" name="question${questionNumber}learningOutcome" value="${learningOutcome}"/>
+	</c:forEach>
+	<input type="hidden" name="question${questionNumber}collection" value="${param.collectionUid}" />
 </div>
+
 
 <c:set var="currentNumber" scope="page">${currentNumber + 1}</c:set>
 

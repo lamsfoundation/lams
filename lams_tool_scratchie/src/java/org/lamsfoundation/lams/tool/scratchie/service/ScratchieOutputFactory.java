@@ -57,7 +57,7 @@ public class ScratchieOutputFactory extends OutputFactory {
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(IScratchieService scratchieService,
 	    Object toolContentObject, int definitionType) throws ToolException {
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 
 	if (toolContentObject != null) {
 	    Scratchie scratchie = (Scratchie) toolContentObject;
@@ -81,9 +81,9 @@ public class ScratchieOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IScratchieService scratchieService,
 	    Long toolSessionId, Long learnerId) {
 
-	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> outputs = new TreeMap<>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
+	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<>();
 	if (names == null || names.contains(ScratchieConstants.LEARNER_MARK)) {
 	    outputs.put(ScratchieConstants.LEARNER_MARK,
 		    getToolOutput(ScratchieConstants.LEARNER_MARK, scratchieService, toolSessionId, learnerId));
@@ -106,9 +106,11 @@ public class ScratchieOutputFactory extends OutputFactory {
      * Get the mark scored by user. Will always return a ToolOutput object.
      */
     private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
-
 	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(toolSessionId);
-	int userMark = session.getMark();
+	int userMark = 0;
+	if (scratchieService.isLearnerEligibleForMark(learnerId.intValue(), session.getScratchie().getContentId())) {
+	    userMark = session.getMark();
+	}
 
 	return new ToolOutput(ScratchieConstants.LEARNER_MARK, getI18NText(ScratchieConstants.LEARNER_MARK, true),
 		userMark);
