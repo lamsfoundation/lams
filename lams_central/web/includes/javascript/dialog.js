@@ -386,7 +386,6 @@ function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 
 //used by both /lams_central/web/main.jsp and /lams_monitoring/web/monitor.jsp pages
 function showNotificationsDialog(orgID, lessonID) {
-	
 	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
 	//calculate width and height based on the dimensions of the window to which dialog is added
@@ -397,37 +396,32 @@ function showNotificationsDialog(orgID, lessonID) {
 		height = width < 798 ? 850 : 650;
 	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
-	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID),
-		dialog = showDialog(id, {
-			'data' : {
-				'orgID' : orgID,
-				'lessonID' : lessonID
-			},
-			'height': height,
-			'width' : width,
-			//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
-			"isCreateInParentWindow" : !isTopLevelWindow,		
-			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-			'open' : function() {
-				var dialog = $(this),
-					lessonID = dialog.data('lessonID');
-				// if lesson ID is given, use lesson view; otherwise use course view
-				if (lessonID) {
-					// load contents after opening the dialog
-					$('iframe', dialog).attr('src', LAMS_URL
-						+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
-						+ lessonID);
-				} else {
-					$('iframe', dialog).attr('src', LAMS_URL
-						+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
-						+ orgID);
-				}
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID,
+			'lessonID' : lessonID
+		},
+		'height': height,
+		'width' : width,
+		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
+		"isCreateInParentWindow" : !isTopLevelWindow,		
+		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+		'open' : function() {
+			var dialog = $(this);
+			// if lesson ID is given, use lesson view; otherwise use course view
+			if (lessonID) {
+				// load contents after opening the dialog
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications/getLessonView.do?lessonID='
+					+ lessonID);
+			} else {
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications/getCourseView.do?organisationID='
+					+ orgID);
 			}
-		}, true)
-		
-//	dialog.on('shown.bs.modal', function(){
-//		dialog.css('top', '15px');
-//	});
+		}
+	}, true);
 }
 
 
