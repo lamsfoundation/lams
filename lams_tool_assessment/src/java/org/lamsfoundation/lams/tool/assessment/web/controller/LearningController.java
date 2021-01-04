@@ -1145,19 +1145,6 @@ public class LearningController {
 	request.setAttribute("sessions", sessionList);
 
 	Map<Long, QuestionSummary> questionSummaries = service.getQuestionSummaryForExport(assessment);
-
-	// filter out empty results, when a group has not provided any answers
-	for (QuestionSummary questionSummary : questionSummaries.values()) {
-	    Iterator<List<AssessmentQuestionResult>> questionResultsIterator = questionSummary
-		    .getQuestionResultsPerSession().iterator();
-	    while (questionResultsIterator.hasNext()) {
-		List<AssessmentQuestionResult> questionResults = questionResultsIterator.next();
-		if (questionResults == null || questionResults.isEmpty()
-			|| questionResults.get(questionResults.size() - 1).getUid() == null) {
-		    questionResultsIterator.remove();
-		}
-	    }
-	}
 	request.setAttribute("questionSummaries", questionSummaries);
 
 	// Assessment currently supports only one place for ratings.
@@ -1186,6 +1173,7 @@ public class LearningController {
 	// Item IDs are AssessmentQuestionResults UIDs, i.e. a user answer for a particular question
 	// Get all item IDs no matter which session they belong to.
 	Set<Long> itemIds = questionSummaries.values().stream().flatMap(s -> s.getQuestionResultsPerSession().stream())
+		.filter(l -> l != null && !l.isEmpty() && l.get(l.size() - 1).getUid() != null)
 		.collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
 
 	List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(assessment.getContentId(), null,
@@ -1208,11 +1196,12 @@ public class LearningController {
 		    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
 			    .remove((int) userSessionIndex);
 
-		    // user or his leader should rate all other groups' answers in order to show ratings left for own group
-		    int expectedRatedItemCount = questionResults.size();
-
 		    Set<Long> questionItemIds = questionResultsPerSession.stream()
+			    .filter(l -> l != null && !l.isEmpty() && l.get(l.size() - 1).getUid() != null)
 			    .collect(Collectors.mapping(l -> l.get(l.size() - 1).getUid(), Collectors.toSet()));
+
+		    // user or his leader should rate all other groups' answers in order to show ratings left for own group
+		    int expectedRatedItemCount = questionItemIds.size();
 
 		    // question results need to be in the same order as sessions, i.e. user group first
 		    questionResultsPerSession.add(0, questionResults);

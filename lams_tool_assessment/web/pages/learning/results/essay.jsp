@@ -42,8 +42,17 @@
 				<c:set var="sessionResults" 
 					value="${questionSummary.questionResultsPerSession[status.index]}" />
 				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
-				<c:set var="answer" value="${sessionResults.answer}" />
-				<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
+				<c:choose>
+					<%-- If uid is NULL then it is a dummy session result, for a group that has not provided answers
+						 Do not display the group's rating then --%>
+					<c:when test="${empty sessionResults.uid}">
+						<c:set var="sessionResults" value="" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="answer" value="${sessionResults.answer}" />
+						<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
+					</c:otherwise>
+				</c:choose>
 				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
 				<c:set var="showRating" 
 					value="${canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating))}" />
