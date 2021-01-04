@@ -702,11 +702,16 @@
 
 <c:if test="${not empty sessionDtos}">
 	
-	<c:if test="${displayStudentChoices}">
-		<h5><fmt:message key="label.student.choices" /></h5>
-		
-		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
-	</c:if>
+	<c:choose>
+		<c:when test="${displayStudentChoices and not empty questions}">
+			<h5><fmt:message key="label.student.choices" /></h5>
+			<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
+		</c:when>
+		<c:otherwise>
+			<%-- To maintain structure as if student choices table was present --%>
+			<div class="row"></div>
+		</c:otherwise>
+	</c:choose>
 	
 	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
@@ -798,24 +803,24 @@
 		</c:if>
 	</div>
 
-		<c:if test="${assessment.allowDiscloseAnswers}">
-			<div class="voffset5">
-				<a id="discloseAllCorrect" class="btn btn-default ${allCorrectDisclosed ? 'disabled' : ''}">
-					<c:if test="${allCorrectDisclosed}">
+	<c:if test="${assessment.allowDiscloseAnswers}">
+		<div class="voffset5">
+			<a id="discloseAllCorrect" class="btn btn-default ${allCorrectDisclosed ? 'disabled' : ''}">
+				<c:if test="${allCorrectDisclosed}">
+					<i class="fa fa-check text-success">&nbsp;</i>
+				</c:if>
+				<fmt:message key="label.disclose.all.correct.answers" />
+			</a>
+			<c:if test="${sessionMap.isGroupedActivity}">
+				<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
+					<c:if test="${allGroupsDisclosed}">
 						<i class="fa fa-check text-success">&nbsp;</i>
 					</c:if>
-					<fmt:message key="label.disclose.all.correct.answers" />
+					<fmt:message key="label.disclose.all.groups.answers" />
 				</a>
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<a id="discloseAllGroups" class="btn btn-default ${allGroupsDisclosed ? 'disabled' : ''}">
-						<c:if test="${allGroupsDisclosed}">
-							<i class="fa fa-check text-success">&nbsp;</i>
-						</c:if>
-						<fmt:message key="label.disclose.all.groups.answers" />
-					</a>
-				</c:if>
-			</div>
-		</c:if>
+			</c:if>
+		</div>
+	</c:if>
 </c:if>
 
 <br/>

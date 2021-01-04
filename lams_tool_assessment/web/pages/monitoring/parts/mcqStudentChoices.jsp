@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <!-- Table -->
+<c:if test="${not empty questions}">
 <div class="row no-gutter">
 <div class="col-xs-12 col-md-12 col-lg-12">
 <div class="panel">
@@ -47,6 +48,7 @@
 </div>          
 </div>
 </div>
+
 <!-- End table -->
 
 <!-- Question detail modal -->
@@ -98,3 +100,4 @@
 	</div>
 </c:forEach>
 <!-- End question detail modal -->
+</c:if>
