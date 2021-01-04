@@ -347,7 +347,7 @@ function moveDialogToTop(id) {
 function showAuthoringDialog(learningDesignID, relaunchMonitorLessonID){
 	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
-		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
+		'width' : Math.max(600, Math.min(1290, $(window).width() - 60)),
 		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
