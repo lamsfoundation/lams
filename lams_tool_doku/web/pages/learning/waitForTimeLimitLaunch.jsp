@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="dokumaran" value="${sessionMap.dokumaran}" />
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
@@ -17,7 +20,7 @@
 		</lams:Alert>
 
 		<div class="voffset10">
-			<button name="refreshButton" onclick="refresh();" class="btn btn-sm btn-default pull-right">
+			<button name="refreshButton" onclick="javascript:location.reload();" class="btn btn-sm btn-default pull-right">
 				<fmt:message key="label.refresh" />
 			</button>
 		</div>

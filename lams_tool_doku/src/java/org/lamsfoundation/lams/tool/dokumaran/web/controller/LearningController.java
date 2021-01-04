@@ -100,6 +100,7 @@ public class LearningController {
 	Long toolSessionId = WebUtil.readLongParam(request, DokumaranConstants.PARAM_TOOL_SESSION_ID);
 	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionId);
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
+	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
@@ -125,8 +126,7 @@ public class LearningController {
 
 	// support for leader select feature
 	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
-		? dokumaranService.checkLeaderSelectToolForSessionLeader(user, toolSessionId,
-			isFirstTimeAccess)
+		? dokumaranService.checkLeaderSelectToolForSessionLeader(user, toolSessionId, isFirstTimeAccess)
 		: new ArrayList<>();
 	// forwards to the leaderSelection page
 	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
@@ -153,7 +153,6 @@ public class LearningController {
 		|| dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
-	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ON, dokumaran.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dokumaranService.isLastActivity(toolSessionId));
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
