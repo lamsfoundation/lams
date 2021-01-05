@@ -143,9 +143,14 @@ public class LearningController {
 	    request.setAttribute(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	    return "pages/learning/waitforleader";
 	}
-	//time limit is set but hasn't yet launched by a teacher - show waitForTimeLimitLaunch page
 	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
-	    return "pages/learning/waitForTimeLimitLaunch";
+	    if (dokumaran.isTimeLimitManualStart() && !mode.isAuthor()) {
+		// time limit is set but hasn't yet launched by a teacher - show waitForTimeLimitLaunch page
+		return "pages/learning/waitForTimeLimitLaunch";
+	    }
+	    // there is no manual start, so the first learner that enters starts the timer
+	    dokumaran.setTimeLimitLaunchedDate(new Date());
+	    dokumaranService.saveOrUpdate(dokumaran);
 	}
 
 	boolean isUserLeader = (user != null) && dokumaranService.isUserLeader(leaders, user.getUserId());
@@ -226,6 +231,7 @@ public class LearningController {
 	    if (padId == null) {
 		return "pages/learning/notconfigured";
 	    }
+	    sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, false);
 	}
 
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);

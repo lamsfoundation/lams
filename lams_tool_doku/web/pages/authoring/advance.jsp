@@ -46,6 +46,13 @@
 		</label>
 	</div>
 	
+	<div id="timeLimitManualStartDiv" class="checkbox">
+		<label for="timeLimitManualStart">
+			<form:checkbox path="dokumaran.timeLimitManualStart" id="timeLimitManualStart"/>
+			<fmt:message key="label.time.limit.manual.start" />
+		</label>
+	</div>
+	
 	<div class="checkbox">
 		<label for="showChat">
 			<form:checkbox path="dokumaran.showChat" id="showChat"/>

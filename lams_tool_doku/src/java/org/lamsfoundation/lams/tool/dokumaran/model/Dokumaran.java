@@ -79,6 +79,9 @@ public class Dokumaran implements Cloneable {
     @Column(name = "time_limit")
     private int timeLimit;
 
+    @Column(name = "time_limit_manual_start")
+    private boolean timeLimitManualStart;
+
     //date when teacher has started time counter (pressed start button)
     @Column(name = "time_limit_launched_date")
     private Date timeLimitLaunchedDate;
@@ -350,6 +353,14 @@ public class Dokumaran implements Cloneable {
      */
     public void setTimeLimit(int timeLimit) {
 	this.timeLimit = timeLimit;
+    }
+
+    public boolean isTimeLimitManualStart() {
+	return timeLimitManualStart;
+    }
+
+    public void setTimeLimitManualStart(boolean timeLimitManualStart) {
+	this.timeLimitManualStart = timeLimitManualStart;
     }
 
     /**
