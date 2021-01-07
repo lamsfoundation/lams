@@ -241,6 +241,7 @@ public class LearningController {
 	request.setAttribute(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
 	boolean isTimeLimitExceeded = dokumaranService.checkTimeLimitExceeded(dokumaran);
+	request.setAttribute("timeLimitExceeded", isTimeLimitExceeded);
 
 	String padId = session.getPadId();
 	//in case of non-leader or finished lock or isTimeLimitExceeded - show Etherpad in readonly mode
@@ -250,7 +251,6 @@ public class LearningController {
 	    if (padId == null) {
 		return "pages/learning/notconfigured";
 	    }
-	    sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, false);
 	}
 
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
