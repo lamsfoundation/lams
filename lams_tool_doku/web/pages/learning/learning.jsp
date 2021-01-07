@@ -69,8 +69,8 @@
 				<c:if test="${hasEditRight}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
 			});
 			
-			//hide finish button for non-leaders until leader will finish activity 
-			if (${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}) {
+			// hide finish button for non-leaders until leader will finish activity 
+			if (${mode != 'author' && !hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}) {
 				$("#finish-button").hide();
 			}
 			
@@ -221,8 +221,18 @@
 			<div>
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkEnabled}">
-						<button class="btn btn-default voffset5 pull-right disabled"
-								data-toggle="tooltip"  title="<fmt:message key='label.gallery.walk.wait.start' />">
+						<button data-toggle="tooltip" 
+								class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+								<c:choose>
+									<c:when test="${mode == 'author'}">
+										title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+										onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+									</c:when>
+									<c:otherwise>
+										title="<fmt:message key='label.gallery.walk.wait.start' />"
+									</c:otherwise>
+								</c:choose>
+							>
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
@@ -251,11 +261,11 @@
 			</div>
 		</c:if>
 
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+		<!--closes content-->
+	
+		<div id="footer">
+		</div>
+		<!--closes footer-->
 
 	</lams:Page>
 </body>

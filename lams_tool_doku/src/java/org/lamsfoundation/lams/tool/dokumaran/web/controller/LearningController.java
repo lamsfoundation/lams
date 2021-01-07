@@ -26,8 +26,10 @@ package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -144,8 +146,8 @@ public class LearningController {
 	    return "pages/learning/waitforleader";
 	}
 	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
-	    if (dokumaran.isTimeLimitManualStart() && !mode.isAuthor()) {
-		// time limit is set but hasn't yet launched by a teacher - show waitForTimeLimitLaunch page
+	    if (dokumaran.isTimeLimitManualStart() && (mode == null || !mode.isAuthor())) {
+		// time limit is set but hasn't yet launched by a teac1her - show waitForTimeLimitLaunch page
 		return "pages/learning/waitForTimeLimitLaunch";
 	    }
 	    // there is no manual start, so the first learner that enters starts the timer
@@ -161,6 +163,7 @@ public class LearningController {
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ON, dokumaran.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dokumaranService.isLastActivity(toolSessionId));
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// get the API key from the config table and add it to the session
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
@@ -182,6 +185,23 @@ public class LearningController {
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_INSTRUCTION, dokumaran.getReflectInstructions());
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ENTRY, entryText);
 
+	if (dokumaran.isGalleryWalkEnabled() && mode != null && mode.isAuthor()) {
+	    String[] galleryWalkParameterValuesArray = request.getParameterValues("galleryWalk");
+	    if (galleryWalkParameterValuesArray != null) {
+		Collection<String> galleryWalkParameterValues = Set.of(galleryWalkParameterValuesArray);
+
+		if (!dokumaran.isGalleryWalkStarted() && galleryWalkParameterValues.contains("forceStart")) {
+		    dokumaran.setGalleryWalkStarted(true);
+		    dokumaranService.saveOrUpdate(dokumaran);
+		}
+
+		if (!dokumaran.isGalleryWalkFinished() && galleryWalkParameterValues.contains("forceFinish")) {
+		    dokumaran.setGalleryWalkFinished(true);
+		    dokumaranService.saveOrUpdate(dokumaran);
+		}
+	    }
+	}
+
 	if (dokumaran.isGalleryWalkStarted()) {
 	    List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
@@ -194,7 +214,6 @@ public class LearningController {
 	    return "pages/learning/galleryWalk";
 	}
 
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// check whether finish lock is on/off
 	boolean finishedLock = dokumaran.getLockWhenFinished() && (user != null) && user.isSessionFinished();
 	sessionMap.put(DokumaranConstants.ATTR_TITLE, dokumaran.getTitle());
