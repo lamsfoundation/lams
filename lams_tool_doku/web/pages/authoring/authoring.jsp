@@ -11,6 +11,10 @@
 		#timeLimit {
 			width: 70px;
 		}
+		
+		#timeLimitManualStartDiv {
+			margin: 0 0 25px 0;
+		}
 	</style>
 	<script type="text/javascript">
         function init(){

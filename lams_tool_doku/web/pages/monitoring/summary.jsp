@@ -12,7 +12,8 @@
 	
 <style media="screen,projection" type="text/css">
 	#countdown {
-		width: 150px; 
+		min-width: 150px;
+		width: 100%;
 		font-size: 110%; 
 		font-style: italic; 
 		color:#47bc23; 
@@ -383,7 +384,7 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				$('#gallery-walk-start').hide();
+				$('#gallery-walk-start, #countdown, #add-one-minute, #start-activity').hide();
 				$('#gallery-walk-finish').removeClass('hidden');
 			}
 		});
@@ -436,17 +437,16 @@
 	<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
 		<div class="pull-right" id="control-buttons">
 	
-			
-			<c:if test="${dokumaran.timeLimit > 0}">
+			<c:if test="${dokumaran.timeLimit > 0 and not dokumaran.galleryWalkStarted}">
 				<div id="countdown"></div>
 			
-				<c:if test="${empty dokumaran.timeLimitLaunchedDate}">
-					<a href="#nogo" class="btn btn-default btn-xs" id="start-activity">
+				<c:if test="${empty dokumaran.timeLimitLaunchedDate and dokumaran.timeLimitManualStart}">
+					<a href="#nogo" class="btn btn-default" id="start-activity">
 						<fmt:message key="label.start.activity" />
 					</a>		
 				</c:if>
 				
-				<a href="#nogo" class="btn btn-default btn-xs" id="add-one-minute">
+				<a href="#nogo" class="btn btn-default" id="add-one-minute">
 					<fmt:message key="label.plus.one.minute" />
 				</a>	
 			</c:if>

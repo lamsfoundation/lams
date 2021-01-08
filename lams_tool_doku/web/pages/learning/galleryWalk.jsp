@@ -35,6 +35,10 @@
 		#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
 			text-align: right;
 		}
+		
+		#gallery-walk-preview-info {
+			margin-bottom: 20px;
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
@@ -121,6 +125,17 @@
 	</c:if>
 	
 	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
+	
+	<c:if test="${mode == 'author'}">
+		<div class="row no-gutter" id="gallery-walk-preview-info">
+			<div class="col-xs-12 col-sm-offset-2 col-sm-8">
+				<div class="alert alert-info leader-display">
+					<fmt:message key="label.gallery.walk.preview" />
+				</div>
+			</div>
+		</div>
+	</c:if>
+	
 
 	<div id="doku-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
@@ -161,8 +176,18 @@
 		<div>
 			<c:choose>
 				<c:when test="${not dokumaran.galleryWalkFinished}">
-					<button class="btn btn-default voffset5 pull-right disabled"
-							data-toggle="tooltip" title="<fmt:message key='label.gallery.walk.wait.finish' />">
+					<button data-toggle="tooltip" 
+							class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+							<c:choose>
+								<c:when test="${mode == 'author'}">
+									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
+									onClick="javascript:location.href = location.href + '&galleryWalk=forceFinish'"
+								</c:when>
+								<c:otherwise>
+									title="<fmt:message key='label.gallery.walk.wait.finish' />"
+								</c:otherwise>
+							</c:choose>
+					>
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>

@@ -53,7 +53,7 @@
 		        	var src = msg.data.location.substring(0, msg.data.location.indexOf('?')),
 		        		iframe = $('iframe[src^="' + src + '"]'),
 		            	// height should be no less than 200 px
-		            	height = Math.max(200, msg.data.height - (${hasEditRight} ? 0 : 64));
+		            	height = Math.max(200, msg.data.height - (${hasEditRight and not timeLimitExceeded} ? 0 : 64));
 		           	iframe.height(height);
 		        }
 		    });
@@ -62,17 +62,12 @@
 				'padId':'${padId}',
 				'host':'${etherpadServerUrl}',
 				'lang':'${fn:toLowerCase(localeLanguage)}',
-				'showControls':'${hasEditRight}',
+				'showControls':'${hasEditRight and not timeLimitExceeded}',
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
 				'height':'' + ($(window).height() - 200)
 				<c:if test="${hasEditRight}">,'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'</c:if>
 			});
-			
-			//hide finish button for non-leaders until leader will finish activity 
-			if (${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}) {
-				$("#finish-button").hide();
-			}
 			
 			if (${secondsLeft > 0}) {
 				displayCountdown()
@@ -221,8 +216,18 @@
 			<div>
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkEnabled}">
-						<button class="btn btn-default voffset5 pull-right disabled"
-								data-toggle="tooltip"  title="<fmt:message key='label.gallery.walk.wait.start' />">
+						<button data-toggle="tooltip" 
+								class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+								<c:choose>
+									<c:when test="${mode == 'author'}">
+										title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+										onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+									</c:when>
+									<c:otherwise>
+										title="<fmt:message key='label.gallery.walk.wait.start' />"
+									</c:otherwise>
+								</c:choose>
+							>
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
@@ -231,6 +236,9 @@
 								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
 							<fmt:message key="label.continue" />
 						</button>
+					</c:when>
+					<c:when test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
+						<%-- show no button for non-leaders until leader will finish activity  --%>
 					</c:when>
 					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finish-button"
@@ -251,11 +259,11 @@
 			</div>
 		</c:if>
 
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
+		<!--closes content-->
+	
+		<div id="footer">
+		</div>
+		<!--closes footer-->
 
 	</lams:Page>
 </body>
