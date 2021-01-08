@@ -13,6 +13,13 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="chart"/>
 	
+	
+	<style>
+		#releaseMarksPanel {
+			display: none;
+			margin: 20px 0;
+		}
+	</style>
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
@@ -69,6 +76,19 @@
 			}
 		}
 		</c:if>
+
+		function toggleReleaseMarksPanel(){
+			var releaseMarksPanel = $('#releaseMarksPanel');
+			if (releaseMarksPanel.is(':empty')) {
+				releaseMarksPanel.load('<lams:LAMSURL/>gradebook/gradebookMonitoring/displayReleaseMarksPanel.do',{
+					'lessonID' : ${lessonDetails.lessonID}
+				}, function(){
+					releaseMarksPanel.slideDown();
+				});
+			} else {
+				releaseMarksPanel.slideToggle();
+			}
+		}
 
 		function toggleRelease() {
 			var conf;
@@ -845,8 +865,8 @@
 	 
 	 		<div id="tour-release-marks">
 			<div id="marksNotReleased" style="display:none">
-				<a href="javascript:toggleRelease()" class="${btnclass}" 
-					title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+				<a href="javascript:toggleReleaseMarksPanel()" class="${btnclass}" 
+					title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
 					<i class="fa fa-share-alt "></i> <span class="hidden-xs">
 					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
 					</span>
@@ -867,7 +887,13 @@
 		</c:if>
 		
 		</div> <!-- Closes buttons -->
-		
+			
+			<div class="row">
+				<div class="col-xs-12">
+					<div id="releaseMarksPanel"></div>
+				</div>
+			</div>
+			
 			<div class="row">
 				 <div class="col-xs-12">
 				 <lams:WaitingSpinner id="markChartBusy"/>
@@ -876,24 +902,26 @@
 			</div>
 
 			<c:if test="${usesWeights}">
-			<div id="weights" class="grid-holder voffset20" style="display:none" >
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<fmt:message key="label.weights.title"/>
-				</div>
-				<div class="panel-body">
-				<%-- Display weights in four columns --%>
-				<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
-					<c:if test="${(weightCounter.index mod 3) == 0}">
-						<c:if test="${weightCounter.index gt 0}"></div></c:if>
-						<div class="row">
-					</c:if>
-					<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
-				</c:forEach>
-				</div> <%-- close off row started in the loop --%>
-				</div>
-			</div>	
-			</div>	
+				<div id="weights" class="grid-holder voffset20" style="display:none" >
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<fmt:message key="label.weights.title"/>
+						</div>
+						<div class="panel-body">
+							<%-- Display weights in four columns --%>
+							<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
+								<c:if test="${(weightCounter.index mod 3) == 0}">
+									<c:if test="${weightCounter.index gt 0}">
+										</div>
+									</c:if>
+									<div class="row">
+								</c:if>
+								<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
+							</c:forEach>
+									</div> <%-- close off row started in the loop --%>
+						</div>
+					</div>	
+				</div>	
 			</c:if>
 			
 			<div class="grid-holder voffset20">

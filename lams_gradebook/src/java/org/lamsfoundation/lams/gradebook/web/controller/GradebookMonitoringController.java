@@ -23,6 +23,8 @@
 package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,11 +35,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -58,6 +63,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -82,6 +88,10 @@ public class GradebookMonitoringController {
     private ILessonService lessonService;
     @Autowired
     private ISecurityService securityService;
+    @Autowired
+    private IEventNotificationService eventNotificationService;
+
+    private static final DateFormat RELEASE_MARKS_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -252,12 +262,86 @@ public class GradebookMonitoringController {
 	return "success";
     }
 
+    @RequestMapping("/displayReleaseMarksPanel")
+    public String displayReleaseMarksPanel(@RequestParam long lessonID) {
+	return "releaseLessonMarks";
+    }
+
+    @RequestMapping("/getReleaseMarksEmailContent")
+    @ResponseBody
+    public String getReleaseMarksEmailContent(@RequestParam long lessonID, @RequestParam int userID) {
+	StringBuilder content = new StringBuilder();
+
+	User user = userManagementService.getUserById(userID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+	LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userID, lessonID);
+	content.append("Hi ").append(user.getFirstName()).append(",<br><br>here are your results of lesson \"")
+		.append(lesson.getLessonName()).append("\" in which you participated on ")
+		.append(RELEASE_MARKS_DATE_FORMAT.format(learnerProgress.getStartDate())).append(".<br><br>");
+
+	content.append(
+		"<table style='width: 100%; max-width: 500px; margin: auto; border: thin darkgray solid; border-collapse: separate; border-radius: 10px;'>")
+		.append("<tr><th style='text-align: center; padding: 5px;'>Activity</th><th style='text-align: center; padding: 5px;'>Progress</th>")
+		.append("<th style='text-align: center; padding: 5px;'>Average score</th><th style='text-align: center; padding: 5px;'>Score</th></tr>");
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = gradebookService.getGBLessonComplete(lessonID, userID);
+	for (GradebookGridRowDTO activityDTO : gradebookActivityDTOs) {
+	    content.append("<tr><td style='padding: 5px;'>").append(activityDTO.getRowName())
+		    .append("</td><td style='text-align: center; padding: 5px; font-weight: bold;'>");
+
+	    if (activityDTO.getStatus().contains("success")) {
+		content.append("&check;");
+	    } else if (activityDTO.getStatus().contains("cog")) {
+		content.append("&#9881;");
+	    } else {
+		content.append("-");
+	    }
+
+	    content.append("</td><td style='text-align: center; padding: 5px;'>");
+	    if (activityDTO.getAverageMark() != null) {
+		content.append(GradebookUtil.niceFormatting(activityDTO.getAverageMark()));
+	    }
+
+	    content.append("</td><td style='text-align: center; padding: 5px;'>");
+	    if (activityDTO.getMark() != null) {
+		content.append(GradebookUtil.niceFormatting(activityDTO.getMark()));
+	    }
+
+	    content.append("</td></tr>");
+	}
+	content.append("</table><br>Regards,<br>LAMS team");
+
+	return content.toString();
+    }
+
+    @RequestMapping("/sendReleaseMarksEmails")
+    @ResponseBody
+    public String sendReleaseMarksEmails(@RequestParam long lessonID) {
+	try {
+	    Lesson lesson = lessonService.getLesson(lessonID);
+	    List<User> learners = lessonService.getActiveLessonLearners(lessonID);
+	    String emailSubject = new StringBuilder("Results of lesson \"").append(lesson.getLessonName()).append("\"")
+		    .toString();
+
+	    for (User learner : learners) {
+		eventNotificationService.sendMessage(null, learner.getUserId(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject,
+			getReleaseMarksEmailContent(lessonID, learner.getUserId()), true);
+	    }
+	} catch (Exception e) {
+	    return e.getMessage();
+	}
+
+	return "success";
+    }
+
     /**
      * Exports Lesson Gradebook into excel.
      */
     @RequestMapping("/exportExcelLessonGradebook")
     @ResponseBody
-    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
 		false)) {
@@ -292,7 +376,8 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelCourseGradebook")
     @ResponseBody
-    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
@@ -328,7 +413,8 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelSelectedLessons")
     @ResponseBody
-    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.isGroupMonitor(organisationID, user.getUserID(),

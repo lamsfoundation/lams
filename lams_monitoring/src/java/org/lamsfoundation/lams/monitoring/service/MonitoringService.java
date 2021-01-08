@@ -1903,8 +1903,8 @@ public class MonitoringService implements IMonitoringFullService {
 	Set<User> sortedUsers = new TreeSet<>(new Comparator<User>() {
 	    @Override
 	    public int compare(User usr0, User usr1) {
-		return ((usr0.getFirstName() + usr0.getLastName() + usr0.getLogin())
-			.compareTo(usr1.getFirstName() + usr1.getLastName() + usr1.getLogin()));
+		return ((usr0.getLastName() + usr0.getFirstName() + usr0.getLogin())
+			.compareTo(usr1.getLastName() + usr1.getFirstName() + usr1.getLogin()));
 	    }
 	});
 	sortedUsers.addAll(users);
