@@ -561,7 +561,7 @@ public class TBLTemplateController extends LdTemplateController {
 		String[] learningOutcomes = request.getParameterValues(assessmentPrefix + "learningOutcome");
 		String collectionUid = getTrimmedString(request, assessmentPrefix + "collection", false);
 		Assessment assessment = new Assessment();
-		if (questionText != null) {
+		if (!(questionTitle == null && questionText == null)) {
 		    assessment.setTitle(questionTitle);
 		    assessment.setText(questionText);
 		    assessment.setType(WebUtil.readStrParam(request, assessmentPrefix + "type"));
@@ -702,11 +702,11 @@ public class TBLTemplateController extends LdTemplateController {
 	    for (Entry<Integer, ObjectNode> entry : testQuestions.entrySet()) {
 		Integer questionNumber = entry.getKey();
 		ObjectNode question = entry.getValue();
-		if (!question.has(RestTags.QUESTION_TEXT)) {
-		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
-			    : questionNumber;
-		    addValidationErrorMessage("authoring.error.question.num", new Object[] { param }, ratErrors);
-		}
+//		if (!question.has(RestTags.QUESTION_TEXT)) {
+//		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+//			    : questionNumber;
+//		    addValidationErrorMessage("authoring.error.question.num", new Object[] { param }, ratErrors);
+//		}
 
 		Integer correctAnswerDisplay = correctAnswers.get(entry.getKey());
 		if (correctAnswerDisplay == null) {
