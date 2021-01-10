@@ -183,12 +183,6 @@ public class Assessment {
     public boolean validate(List<String> errorMessages, ResourceBundle appBundle, MessageFormat formatter,
 	    Integer applicationExerciseNumber, String applicationExerciseTitle, Integer questionNumber) {
 	boolean errorsExist = false;
-	if (text == null || text.length() == 0) {
-	    errorMessages.add(TextUtil.getText(appBundle, formatter,
-		    "authoring.error.application.exercise.question.must.not.be.blank.num",
-		    new Object[] { applicationExerciseTitle, title }));
-	    errorsExist = true;
-	}
 	if (type == ASSESSMENT_QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    if (answers.size() == 0) {
 		errorMessages.add(TextUtil.getText(appBundle, formatter,

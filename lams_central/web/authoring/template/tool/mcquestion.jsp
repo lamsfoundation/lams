@@ -13,8 +13,8 @@
 
 <div class="panel panel-default">
 	<div class="panel-heading" id="questionPanelHeading${questionNumber}">
-		<c:if test="${questionNumber > 1}"><a href="#" onclick="javascript:deleteMCQDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
-			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a></c:if>
+		<a href="#" onclick="javascript:deleteQuestionDiv('divq${questionNumber}', '${questionTitleField}');" class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${questionNumber}">
+			<i class="fa fa-lg fa-trash-o"></i> <fmt:message key="authoring.fla.delete.button"/></a>
 		<div class="panel-title collapsable-icon-left">	
 			<a role="button" data-toggle="collapse" href="#questionPanelCollapse${questionNumber}" 
 				aria-expanded="true" aria-controls="questionPanelCollapse${questionNumber}" >&nbsp;&nbsp;

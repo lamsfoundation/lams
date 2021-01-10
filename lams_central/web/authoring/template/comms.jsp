@@ -415,7 +415,7 @@
 			}		
 		}
 
-		function deleteMCQDiv(idOfDivToDelete, idOfTitleField) {
+		function deleteQuestionDiv(idOfDivToDelete, idOfTitleField) {
 			if ( confirm(mcqDeleteMsg.replace("{0}", "\""+$("#"+idOfTitleField).val()+"\"")) ) {
 				$("#"+idOfDivToDelete).remove();
 			}		
