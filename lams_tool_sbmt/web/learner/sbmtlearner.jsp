@@ -66,7 +66,7 @@
 					  'largeFilesAllowed' : false
 				  },
 				  onBeforeFileAdded: function(currentFile, files) {
-					  var name = currentFile.data.name,
+					  var name = currentFile.data.name || currentFile.name,
 					  	  extensionIndex = name.lastIndexOf('.'),
 					  	  valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim());
 					  if (!valid) {

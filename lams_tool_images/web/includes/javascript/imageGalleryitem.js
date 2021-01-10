@@ -81,7 +81,7 @@ function initFileUpload(tmpFileUploadId, singleFileUpload, language) {
 			  'largeFilesAllowed' : true
 		  },
 		  onBeforeFileAdded: function(currentFile, files) {
-			  var name = currentFile.data.name,
+			  var name = currentFile.data.name || currentFile.name,
 			  	  extensionIndex = name.lastIndexOf('.'),
 			  	  valid = UPLOAD_ALLOWED_EXTENSIONS.includes(name.substring(extensionIndex).trim());
 			  if (!valid) {

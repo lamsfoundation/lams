@@ -17,7 +17,7 @@
 			});	
 			
 			var extensionValidation = function(currentFile, files) {
-			  var name = currentFile.data.name,
+			  var name = currentFile.data.name || currentFile.name,
 			  	  extensionIndex = name.lastIndexOf('.'),
 			  	  valid = extensionIndex < 0 || name.substring(extensionIndex).trim() == '.zip';
 			  if (!valid) {
