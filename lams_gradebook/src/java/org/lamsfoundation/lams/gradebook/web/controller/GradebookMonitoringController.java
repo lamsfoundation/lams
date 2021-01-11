@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
@@ -66,6 +69,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -251,8 +256,7 @@ public class GradebookMonitoringController {
      */
     @RequestMapping(path = "/toggleReleaseMarks", method = RequestMethod.POST)
     @ResponseBody
-    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    public String toggleReleaseMarks(@RequestParam long lessonID, HttpServletResponse response) throws IOException {
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
@@ -263,7 +267,7 @@ public class GradebookMonitoringController {
     }
 
     @RequestMapping("/displayReleaseMarksPanel")
-    public String displayReleaseMarksPanel(@RequestParam long lessonID) {
+    public String displayReleaseMarksPanel() {
 	return "releaseLessonMarks";
     }
 
@@ -316,17 +320,50 @@ public class GradebookMonitoringController {
 
     @RequestMapping("/sendReleaseMarksEmails")
     @ResponseBody
-    public String sendReleaseMarksEmails(@RequestParam long lessonID) {
+    public String sendReleaseMarksEmails(@RequestParam long lessonID,
+	    @RequestParam(name = "includedLearners", required = false) String includedLearnersString,
+	    @RequestParam(name = "excludedLearners", required = false) String excludedLearnersString)
+	    throws JsonProcessingException, IOException {
+	ArrayNode includedLearners = StringUtils.isBlank(includedLearnersString) ? null
+		: JsonUtil.readArray(includedLearnersString);
+	ArrayNode excludedLearners = StringUtils.isBlank(excludedLearnersString) ? null
+		: JsonUtil.readArray(excludedLearnersString);
+	if (includedLearners == null && excludedLearners == null) {
+	    throw new IllegalArgumentException(
+		    "Neither included nor excluded learners found when sending an email with marks.");
+	}
+
 	try {
 	    Lesson lesson = lessonService.getLesson(lessonID);
-	    List<User> learners = lessonService.getActiveLessonLearners(lessonID);
-	    String emailSubject = new StringBuilder("Results of lesson \"").append(lesson.getLessonName()).append("\"")
+	    Set<Integer> recipients = new HashSet<>();
+	    if (excludedLearners == null) {
+		// we send emails only to selected learners
+		for (int learnerIndex = 0; learnerIndex < includedLearners.size(); learnerIndex++) {
+		    recipients.add(includedLearners.get(learnerIndex).asInt());
+		}
+	    } else {
+		List<User> learners = lessonService.getActiveLessonLearners(lessonID);
+		// we send emails to all lesson learners, excluding one who got deselected
+		for (User learner : learners) {
+		    boolean excludedLearnerFound = false;
+		    for (int learnerIndex = 0; learnerIndex < excludedLearners.size(); learnerIndex++) {
+			if (learner.getUserId().equals(excludedLearners.get(learnerIndex).asInt())) {
+			    excludedLearnerFound = true;
+			    break;
+			}
+		    }
+		    if (!excludedLearnerFound) {
+			recipients.add(learner.getUserId());
+		    }
+		}
+	    }
+
+	    String emailSubject = new StringBuilder("Results of LAMS lesson \"").append(lesson.getLessonName()).append("\"")
 		    .toString();
 
-	    for (User learner : learners) {
-		eventNotificationService.sendMessage(null, learner.getUserId(),
-			IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject,
-			getReleaseMarksEmailContent(lessonID, learner.getUserId()), true);
+	    for (Integer recipientId : recipients) {
+		eventNotificationService.sendMessage(null, recipientId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+			emailSubject, getReleaseMarksEmailContent(lessonID, recipientId), true);
 	    }
 	} catch (Exception e) {
 	    return e.getMessage();

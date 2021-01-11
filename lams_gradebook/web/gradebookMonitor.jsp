@@ -93,7 +93,7 @@
 		jQuery(document).ready(function(){
 			var jqgridWidth = $(window).width() - 100;
 			
-			// Create the user view grid with sub grid for activities	
+			// Create the user view grid with sub grid for activities
 			jQuery("#userView").jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
