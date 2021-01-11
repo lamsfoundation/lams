@@ -1152,8 +1152,18 @@ public class LearningController {
 	// Criterion gets automatically created and there must be only one.
 	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(assessment.getContentId());
 	if (criteria.size() >= 2) {
-	    throw new IllegalArgumentException("There can be only one criterion for an Assessment activity. "
-		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	    try {
+		for (int criterionIndex = 1; criterionIndex < criteria.size(); criterionIndex++) {
+		    RatingCriteria criterion = criteria.get(criterionIndex);
+		    Long criterionId = criterion.getRatingCriteriaId();
+		    userManagementService.delete(criterion);
+		    log.warn("Removed a duplicate criterion ID " + criterionId + " for Assessment tool content ID "
+			    + assessment.getContentId());
+		}
+	    } catch (Exception e) {
+		log.warn("Ignoring error while deleting a duplicate criterion for Assessment tool content ID "
+			+ assessment.getContentId() + ": " + e.getMessage());
+	    }
 	}
 	ToolActivityRatingCriteria criterion = null;
 	if (criteria.isEmpty()) {

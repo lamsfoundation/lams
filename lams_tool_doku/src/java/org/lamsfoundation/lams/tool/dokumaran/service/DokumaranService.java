@@ -420,9 +420,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
 	if (dokumaran.isGalleryWalkStarted()) {
 	    if (!dokumaran.isGalleryWalkReadOnly()) {
-		// it should have been creating on lesson create,
+		// it should have been created on lesson create,
 		// but in case Live Edit added Gallery Walk, we need to add it now, but just once
-		createGalleryWalkRatingCriterion(dokumaran.getContentId());
+		try {
+		    createGalleryWalkRatingCriterion(dokumaran.getContentId());
+		} catch (Exception e) {
+		    log.warn("Ignoring error while processing Dokumaran Gallery Walk criteria for tool content ID "
+			    + dokumaran.getContentId());
+		}
 	    }
 
 	    // Item IDs are DokumaranSession session IDs, i.e. a single Etherpad
@@ -519,13 +524,27 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     private List<RatingCriteria> createGalleryWalkRatingCriterion(long toolContentId) {
 	List<RatingCriteria> criteria = ratingService.getCriteriasByToolContentId(toolContentId);
+
 	if (criteria.size() >= 2) {
+	    criteria = ratingService.getCriteriasByToolContentId(toolContentId);
 	    // Dokumaran currently supports only one place for ratings.
 	    // It is rating other groups' pads on results page.
 	    // Criterion gets automatically created and there must be only one.
-	    throw new IllegalArgumentException("There can be only one criterion for a Dokumaran activity. "
-		    + "If other criteria are introduced, the criterion for rating other groups' answers needs to become uniquely identifiable.");
+	    try {
+		for (int criterionIndex = 1; criterionIndex < criteria.size(); criterionIndex++) {
+		    RatingCriteria criterion = criteria.get(criterionIndex);
+		    Long criterionId = criterion.getRatingCriteriaId();
+		    dokumaranDao.delete(criterion);
+		    log.warn("Removed a duplicate criterion ID " + criterionId + " for Dokumaran tool content ID "
+			    + toolContentId);
+		}
+	    } catch (Exception e) {
+		log.warn("Ignoring error while deleting a duplicate criterion for Dokumaran tool content ID "
+			+ toolContentId + ": " + e.getMessage());
+	    }
+	    return criteria;
 	}
+
 	if (criteria.isEmpty()) {
 	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
 		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);

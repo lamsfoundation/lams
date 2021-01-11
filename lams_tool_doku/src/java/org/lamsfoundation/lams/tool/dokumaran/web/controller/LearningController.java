@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -203,7 +204,14 @@ public class LearningController {
 	}
 
 	if (dokumaran.isGalleryWalkStarted()) {
-	    List<SessionDTO> groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+	    List<SessionDTO> groupList = null;
+	    try {
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+	    } catch (HibernateOptimisticLockingFailureException e) {
+		log.warn("Ignoring error caused probably by creating Gallery Walk criteria", e);
+		// simply run the transaction again
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+	    }
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
 
 	    if (currentUserDto == null) {
