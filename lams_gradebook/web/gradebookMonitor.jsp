@@ -90,56 +90,8 @@
 			}
 		}
 
-		function toggleRelease() {
-			var conf;
-			if (marksReleased) {
-				conf = confirm("<fmt:message key="gradebook.monitor.releasemarks.check2"/>");
-			} else {
-				conf = confirm("<fmt:message key="gradebook.monitor.releasemarks.check"/>");
-			}
-			
-			if (conf) {
-				$.post(
-					"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
-					{
-					  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
-						lessonID:"${lessonDetails.lessonID}"
-					}, 
-					function(xml) {
-						var str = new String(xml)
-				    	if (str.indexOf("success") != -1) {
-				    		if (marksReleased) {
-				    			marksReleased = false;
-				    		} else {
-				    			marksReleased = true;
-				    		}
-			    			displayReleaseOption();
-			    			
-				    	} else {
-				    		alert("<fmt:message key="error.releasemarks.fail"/>");
-				    	}
-			    	}
-			    );
-		    }
-		}
-		
-		function displayReleaseOption() {
-			if (marksReleased) {
-				document.getElementById("marksReleased").style.display="inline";
-				document.getElementById("marksNotReleased").style.display="none";
-				document.getElementById("padlockUnlocked").style.display="inline";
-				document.getElementById("padlockLocked").style.display="none";
-			} else {
-				document.getElementById("marksReleased").style.display="none";
-				document.getElementById("marksNotReleased").style.display="inline";
-				document.getElementById("padlockUnlocked").style.display="none";
-				document.getElementById("padlockLocked").style.display="inline";
-			}
-		}
-
 		jQuery(document).ready(function(){
 			var jqgridWidth = $(window).width() - 100;
-			displayReleaseOption();
 			
 			// Create the user view grid with sub grid for activities	
 			jQuery("#userView").jqGrid({
@@ -816,126 +768,117 @@
 	</c:if>
 	
 	<c:choose>
-	<c:when test="${!isInTabs}">
-		<%-- replacement for Page type admin --%>
-		<div class="row no-gutter no-margin">
-		<div class="col-xs-12">
-		<div class="container" id="content">
-
-		<div class="panel panel-default panel-admin-page">
-		<div class="panel-body panel-admin-body">
-
-		<h4><fmt:message key="gradebook.title.lessonGradebook">
-					<fmt:param>
-						<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
-					</fmt:param>
-				</fmt:message></h4>
-
-		<div class="gbTopButtonsContainer pull-right">
-			${chartButtonCode}
-			${weightButtonCode}
-			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
-				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
-			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
-		</div>
-
-		<div class="gbTopButtonsContainer pull-left" id="export-link-area">
-			${padlockCode}
-		
-	</c:when>
+		<c:when test="${!isInTabs}">
+			<%-- replacement for Page type admin --%>
+			<div class="row no-gutter no-margin">
+			<div class="col-xs-12">
+			<div class="container" id="content">
 	
-	<c:otherwise>
-	 	
-		<div class="gbTopButtonsContainer pull-left">
-			${padlockCode}
-		</div>
+			<div class="panel panel-default panel-admin-page">
+			<div class="panel-body panel-admin-body">
+	
+			<h4><fmt:message key="gradebook.title.lessonGradebook">
+						<fmt:param>
+							<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
+						</fmt:param>
+					</fmt:message></h4>
+	
+			<div class="gbTopButtonsContainer pull-right">
+				${chartButtonCode}
+				${weightButtonCode}
+				<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
+					   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
+				<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+			</div>
+	
+			<div class="gbTopButtonsContainer pull-left" id="export-link-area">
+				${padlockCode}
+			
+		</c:when>
 		
-		<div class="gbTopButtonsContainer pull-right" id="export-link-area">
-	 	
-	</c:otherwise>
+		<c:otherwise>
+		 	
+			<div class="gbTopButtonsContainer pull-left">
+				${padlockCode}
+			</div>
+			
+			<div class="gbTopButtonsContainer pull-right" id="export-link-area">
+		 	
+		</c:otherwise>
 	</c:choose>
 
-			<div>
-				<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
-					<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
-					<fmt:message key="gradebook.export.excel" />
-					</span>
-				</a> 
-			</div>
-	 
-	 		<div id="tour-release-marks">
-			<div id="marksNotReleased" style="display:none">
-				<a href="javascript:toggleReleaseMarksPanel()" class="${btnclass}" 
-					title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
-					<i class="fa fa-share-alt "></i> <span class="hidden-xs">
-					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-					</span>
-				</a>
-			</div>
-			<div id="marksReleased" style="display:none" class="tour-release-marks">
-				<a href="javascript:toggleRelease()" class="${btnclass}" 
-					title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-					<i class="fa fa-share-alt "></i> <span class="hidden-xs">
-					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" /></span>
-				</a> 
-			</div>
-			</div>
+				<div>
+					<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
+						<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
+						<fmt:message key="gradebook.export.excel" />
+						</span>
+					</a> 
+				</div>
+			
+					<div id="tour-release-marks">
+					<a href="javascript:toggleReleaseMarksPanel()" class="${btnclass}" 
+						title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
+						<i class="fa fa-share-alt "></i> <span class="hidden-xs">
+						<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+						</span>
+					</a>
+				</div>
 
-		<c:if test="${isInTabs}">
-	 		${chartButtonCode}
-	 		${weightButtonCode}
-		</c:if>
+				<c:if test="${isInTabs}">
+			 		${chartButtonCode}
+			 		${weightButtonCode}
+				</c:if>
 		
-		</div> <!-- Closes buttons -->
+			</div> <!-- Closes buttons -->
 			
-			<div class="row">
-				<div class="col-xs-12">
-					<div id="releaseMarksPanel"></div>
-				</div>
-			</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div id="releaseMarksPanel"></div>
+		</div>
+	</div>
 			
-			<div class="row">
-				 <div class="col-xs-12">
-				 <lams:WaitingSpinner id="markChartBusy"/>
- 				 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
-				</div>
-			</div>
+	<div class="row">
+		 <div class="col-xs-12">
+		 <lams:WaitingSpinner id="markChartBusy"/>
+			 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
+		</div>
+	</div>
 
-			<c:if test="${usesWeights}">
-				<div id="weights" class="grid-holder voffset20" style="display:none" >
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<fmt:message key="label.weights.title"/>
-						</div>
-						<div class="panel-body">
-							<%-- Display weights in four columns --%>
-							<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
-								<c:if test="${(weightCounter.index mod 3) == 0}">
-									<c:if test="${weightCounter.index gt 0}">
-										</div>
-									</c:if>
-									<div class="row">
-								</c:if>
-								<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
-							</c:forEach>
-									</div> <%-- close off row started in the loop --%>
-						</div>
-					</div>	
-				</div>	
-			</c:if>
-			
-			<div class="grid-holder voffset20">
-				<table id="userView" class="scroll" ></table>
-				<div id="userViewPager" class="scroll" ></div>
-				
-				<br />
-				<br />
-				
-				<table id="activityView" class="scroll" ></table>
-				<div id="activityViewPager" class="scroll" ></div>
-			</div>
+	<c:if test="${usesWeights}">
+		<div id="weights" class="grid-holder voffset20" style="display:none" >
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<fmt:message key="label.weights.title"/>
+				</div>
+				<div class="panel-body">
+					<%-- Display weights in four columns --%>
+					<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
+						<c:if test="${(weightCounter.index mod 3) == 0}">
+							<c:if test="${weightCounter.index gt 0}">
+								</div>
+							</c:if>
+							<div class="row">
+						</c:if>
+						<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
+					</c:forEach>
+							</div> <%-- close off row started in the loop --%>
+				</div>
+			</div>	
+		</div>	
+	</c:if>
+	
+	<div class="grid-holder voffset20">
+		<table id="userView" class="scroll" ></table>
+		<div id="userViewPager" class="scroll" ></div>
+		
+		<br />
+		<br />
+		
+		<table id="activityView" class="scroll" ></table>
+		<div id="activityViewPager" class="scroll" ></div>
+	</div>
 	 
-	<c:if test="not isInTabs">
+	<c:if test="${!isInTabs}">
  		</div>
  		</div>
  		</div>
