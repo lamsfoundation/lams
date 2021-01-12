@@ -1,5 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 <style>
+	#release-marks-alert {
+		display: none;
+		width: 50%;
+		margin: auto;
+		margin-bottom: 10px;
+		padding: 5px 15px;
+	}
+	
 	#release-marks-learner-list {
 		cursor: pointer;
 	}
@@ -38,9 +46,13 @@
 
 <script type="text/javascript">
 
-	var releaseMarksLessonID = ${param.lessonID};
+	var releaseMarksLessonID = ${param.lessonID},
+		releaseMarksAlertBox = null;
+		
 
 	jQuery(document).ready(function() {
+		releaseMarksAlertBox = $('#release-marks-alert');
+		
 		displayMarksReleaseOption();
 		
 		//initialize user list 
@@ -178,6 +190,8 @@
 	
 	function toggleMarksRelease() {
 		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check2"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check"/>")) {
+			releaseMarksAlertBox.hide();
+			
 			$.post(
 				"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
 				{
@@ -191,7 +205,7 @@
 		    			displayMarksReleaseOption();
 		    			
 			    	} else {
-			    		alert("<fmt:message key="error.releasemarks.fail"/>");
+						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<fmt:message key="error.releasemarks.fail"/>").show();
 			    	}
 		    	}
 		    );
@@ -212,6 +226,8 @@
 		let grid = $("#release-marks-learner-list"),
 			includedLearners = grid.data('included'),
 			excludedLearners = grid.data('excluded');
+		
+		releaseMarksAlertBox.hide();
 	
 		$.ajax({
 			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
@@ -224,15 +240,17 @@
 			'cache'    : false,
 			'success' : function(response) {
 				if (response == 'success') {
-					alert('Emails were sent');
+					releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
 					return;
 				}
 
-				alert('There was a problem with sending emails: ' + response);
+				releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
 			}
 		});
 	}
 </script>
+
+<div id="release-marks-alert" class="alert alert-dismissable"></div>
 
 <div class="row">
 	<div id="release-marks-content" class="col-xs-6">

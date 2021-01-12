@@ -86,7 +86,9 @@
 					releaseMarksPanel.slideDown();
 				});
 			} else {
-				releaseMarksPanel.slideToggle();
+				releaseMarksPanel.slideToggle(function(){
+					releaseMarksAlertBox.hide();
+				});
 			}
 		}
 
