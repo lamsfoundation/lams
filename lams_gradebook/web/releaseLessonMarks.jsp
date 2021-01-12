@@ -23,8 +23,15 @@
 		padding-bottom: 10px;
 	}
 	
+	#release-marks-buttons {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-end;
+	}
+	
 	#release-marks-buttons > button {
-		margin-top: 10px;
+		width: 70%;
 		margin-bottom: 20px;
 	}
 </style>
@@ -47,7 +54,7 @@
 		   		{name:'name',index:'name', sortable: false, sorttype: 'text'}
 		   	],
 		    rowList:[10,20,30,40,50,100],
-		   	rowNum:1,
+		   	rowNum:2,
 		   	pager: true,
 		   	sortname: 'name',
 		   	multiselect: true,
@@ -227,26 +234,31 @@
 	}
 </script>
 
-<table id="release-marks-learner-list"></table>
+<div class="row">
+	<div id="release-marks-content" class="col-xs-6">
+		<table id="release-marks-learner-list"></table>
+	</div>
+	<div id="release-marks-buttons" class="col-xs-6">
+			<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
+			
+			<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+				title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+				<i class="fa fa-share-alt "></i>
+				<span class="hidden-xs">
+					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</span>
+			</button>
+			<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+				title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+				<i class="fa fa-share-alt "></i>
+				<span class="hidden-xs">
+					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</span>
+			</button> 
+	</div>
+</div>
+
 <div id="release-marks-email-preview">
 	<h4>Email preview</h4>
 	<div id="release-marks-email-preview-content"></div>
-</div>
-<div id="release-marks-buttons">
-	<button type="button" class="btn btn-default pull-left" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
-			
-	<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary pull-right"
-		title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-		<i class="fa fa-share-alt "></i>
-		<span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-		</span>
-	</button>
-	<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary pull-right"
-		title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-		<i class="fa fa-share-alt "></i>
-		<span class="hidden-xs">
-			<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-		</span>
-	</button> 
 </div>
