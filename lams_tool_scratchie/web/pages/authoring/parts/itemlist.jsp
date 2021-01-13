@@ -78,7 +78,7 @@
 				    <c:choose>
 						<c:when test="${fn:length(item.qbQuestion.versionMap) == 1}">
 							<button class="btn btn-default btn-xs dropdown-toggle2 question-version-dropdown" disabled="disabled">
-							   <fmt:message key="label.authoring.question.version" /> ${item.qbQuestion.version}
+							   <fmt:message key="label.authoring.question.version" />&nbsp;${item.qbQuestion.version}
 							</button>
 						</c:when>
 			
@@ -123,7 +123,7 @@
 				
 				<td align="center" style="width:3%">
 		    		<i class='fa fa-bar-chart' data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.question.version.stats.tooltip" />"
-	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${item.qbQuestion.version}", "_blank")'>
+	    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${item.qbQuestion.uid}", "_blank")'>
 	    			</i>
 				</td>	
 				
