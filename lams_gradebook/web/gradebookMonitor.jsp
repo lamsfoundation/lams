@@ -87,7 +87,11 @@
 				});
 			} else {
 				releaseMarksPanel.slideToggle(function(){
-					releaseMarksAlertBox.hide();
+					if ($(this).is(':visible')) {
+						onReleaseMarksOpen();
+					} else {
+						onReleaseMarksClose();
+					}
 				});
 			}
 		}

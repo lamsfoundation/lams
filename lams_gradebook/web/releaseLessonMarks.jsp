@@ -8,15 +8,10 @@
 		padding: 5px 15px;
 	}
 	
-	#release-marks-learner-list {
+	#release-marks-learner-table {
 		cursor: pointer;
 	}
 
-	#gbox_release-marks-learner-list {
-		max-width: 600px;
-		margin: auto;
-	}
-	
 	#release-marks-email-preview {
 		display: none;
 	}
@@ -27,8 +22,6 @@
 	
 	#release-marks-email-preview-content {
 		border-top: thin darkgray solid;
-		border-bottom: thin darkgray solid;
-		padding-bottom: 10px;
 	}
 	
 	#release-marks-buttons {
@@ -53,10 +46,81 @@
 	jQuery(document).ready(function() {
 		releaseMarksAlertBox = $('#release-marks-alert');
 		
-		displayMarksReleaseOption();
+		onReleaseMarksOpen();
+	});
+
+	function onReleaseMarksOpen(){
+		displayReleaseMarksLearners();
+	}
+
+	function onReleaseMarksClose(){
+		$('#release-marks-email-preview').hide();
+		$('#release-marks-learners').empty();
+		releaseMarksAlertBox.hide();
+	}
+	
+	function toggleMarksRelease() {
+		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check2"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check"/>")) {
+			releaseMarksAlertBox.hide();
+			
+			$.post(
+				"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
+				{
+				  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
+					lessonID: releaseMarksLessonID
+				}, 
+				function(xml) {
+					var str = new String(xml)
+			    	if (str.indexOf("success") != -1) {
+				    	marksReleased = !marksReleased;
+		    			displayMarksReleaseOption();
+		    			
+			    	} else {
+						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<fmt:message key="error.releasemarks.fail"/>").show();
+			    	}
+		    	}
+		    );
+	    }
+	}
+	
+	function sendReleaseMarksEmails(){
+		let grid = $("#release-marks-learner-table"),
+			includedLearners = grid.data('included'),
+			excludedLearners = grid.data('excluded');
 		
-		//initialize user list 
-		var grid = jQuery("#release-marks-learner-list").jqGrid({
+		releaseMarksAlertBox.hide();
+	
+		$.ajax({
+			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
+			'data'     : {
+				'lessonID' : releaseMarksLessonID,
+				 'includedLearners' : includedLearners === null ? null : JSON.stringify(includedLearners),
+				 'excludedLearners' : excludedLearners === null ? null : JSON.stringify(excludedLearners)
+			 },
+			'dataType' : 'text',
+			'cache'    : false,
+			'success' : function(response) {
+				if (response == 'success') {
+					releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
+					return;
+				}
+
+				releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
+			}
+		});
+	}
+
+	function displayReleaseMarksLearners() {
+		if (marksReleased) {
+			$('#marksNotReleased, #padlockLocked').hide();
+			$('#marksReleased, #padlockUnlocked').show();
+		} else {
+			$('#marksReleased, #padlockUnlocked').hide();
+			$('#marksNotReleased, #padlockLocked').show();
+		}
+		
+		// initialize user list 
+		var grid = $('<table id="release-marks-learner-table"></table>').appendTo($('#release-marks-learners').show()).jqGrid({
 			guiStyle: "bootstrap",
 			iconSet: 'fontAwesome',
 		   	url: "<lams:LAMSURL/>monitoring/emailNotifications/getUsers.do?searchType=4&lessonID=" + releaseMarksLessonID,
@@ -186,97 +250,41 @@
 				});
 			}}).data({'included' : null, 
 				 	  'excluded' : []});
-	});
-	
-	function toggleMarksRelease() {
-		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check2"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check"/>")) {
-			releaseMarksAlertBox.hide();
-			
-			$.post(
-				"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
-				{
-				  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
-					lessonID: releaseMarksLessonID
-				}, 
-				function(xml) {
-					var str = new String(xml)
-			    	if (str.indexOf("success") != -1) {
-				    	marksReleased = !marksReleased;
-		    			displayMarksReleaseOption();
-		    			
-			    	} else {
-						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<fmt:message key="error.releasemarks.fail"/>").show();
-			    	}
-		    	}
-		    );
-	    }
-	}
-	
-	function displayMarksReleaseOption() {
-		if (marksReleased) {
-			$('#marksNotReleased, #padlockLocked').hide();
-			$('#marksReleased, #padlockUnlocked').show();
-		} else {
-			$('#marksReleased, #padlockUnlocked').hide();
-			$('#marksNotReleased, #padlockLocked').show();
-		}
-	}
-	
-	function sendReleaseMarksEmails(){
-		let grid = $("#release-marks-learner-list"),
-			includedLearners = grid.data('included'),
-			excludedLearners = grid.data('excluded');
-		
-		releaseMarksAlertBox.hide();
-	
-		$.ajax({
-			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
-			'data'     : {
-				'lessonID' : releaseMarksLessonID,
-				 'includedLearners' : includedLearners === null ? null : JSON.stringify(includedLearners),
-				 'excludedLearners' : excludedLearners === null ? null : JSON.stringify(excludedLearners)
-			 },
-			'dataType' : 'text',
-			'cache'    : false,
-			'success' : function(response) {
-				if (response == 'success') {
-					releaseMarksAlertBox.removeClass('alert-danger').addClass('alert-success').text('Emails were sent').show();
-					return;
-				}
-
-				releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with sending emails: ' + response).show();
-			}
-		});
 	}
 </script>
 
-<div id="release-marks-alert" class="alert alert-dismissable"></div>
-
-<div class="row">
-	<div id="release-marks-content" class="col-xs-6">
-		<table id="release-marks-learner-list"></table>
+<div id="release-marks-panel" class="panel panel-default panel-body">
+	<div id="release-marks-alert" class="alert alert-dismissable"></div>
+	
+	<div class="row">
+		<div id="release-marks-content" class="col-xs-6">
+			<div id="release-marks-learners">
+			</div>
+			<div id="release-marks-schedule">
+			</div>
+		</div>
+		<div id="release-marks-buttons" class="col-xs-6">
+				<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
+				
+				<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+					title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+					<i class="fa fa-share-alt "></i>
+					<span class="hidden-xs">
+						<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+					</span>
+				</button>
+				<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+					title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+					<i class="fa fa-share-alt "></i>
+					<span class="hidden-xs">
+						<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+					</span>
+				</button> 
+		</div>
 	</div>
-	<div id="release-marks-buttons" class="col-xs-6">
-			<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
-			
-			<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-				title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-				<i class="fa fa-share-alt "></i>
-				<span class="hidden-xs">
-					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-				</span>
-			</button>
-			<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-				title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-				<i class="fa fa-share-alt "></i>
-				<span class="hidden-xs">
-					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-				</span>
-			</button> 
+	
+	<div id="release-marks-email-preview">
+		<h4>Email preview</h4>
+		<div id="release-marks-email-preview-content"></div>
 	</div>
-</div>
-
-<div id="release-marks-email-preview">
-	<h4>Email preview</h4>
-	<div id="release-marks-email-preview-content"></div>
 </div>
