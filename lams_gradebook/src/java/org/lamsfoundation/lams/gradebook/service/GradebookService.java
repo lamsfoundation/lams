@@ -37,8 +37,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.dao.IGradebookDAO;
@@ -50,7 +52,9 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.model.GradebookUserActivityArchive;
 import org.lamsfoundation.lams.gradebook.model.GradebookUserLessonArchive;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
+import org.lamsfoundation.lams.gradebook.util.ReleaseMarksJob;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -104,6 +108,13 @@ import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -137,6 +148,8 @@ public class GradebookService implements IGradebookFullService {
     private static ILearnerService learnerService;
     private IIntegrationService integrationService;
     private IOutcomeService outcomeService;
+
+    private Scheduler scheduler;
 
     @Override
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone) {
@@ -915,15 +928,180 @@ public class GradebookService implements IGradebookFullService {
 
 	Lesson lesson = lessonService.getLesson(lessonId);
 
-	boolean isMarksReleased = lesson.getMarksReleased();
-	lesson.setMarksReleased(!isMarksReleased);
+	boolean isMarksReleased = !lesson.getMarksReleased();
+	lesson.setMarksReleased(isMarksReleased);
 	userService.save(lesson);
+
+	if (logger.isDebugEnabled()) {
+	    if (isMarksReleased) {
+		logger.debug("Marks were released for lesson ID: " + lessonId);
+	    } else {
+		logger.debug("Marks were hidden for lesson ID: " + lessonId);
+	    }
+	}
 
 	// audit log marks released
 	UserDTO monitor = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	String messageKey = (isMarksReleased) ? "audit.marks.released.off" : "audit.marks.released.on";
+	String messageKey = (isMarksReleased) ? "audit.marks.released.on" : "audit.marks.released.off";
 	String message = messageService.getMessage(messageKey, new String[] { lessonId.toString() });
 	logEventService.logEvent(LogEvent.TYPE_MARK_RELEASED, monitor.getUserID(), null, lessonId, null, message);
+    }
+
+    @Override
+    public boolean releaseMarks(Long lessonId, int userId) {
+	Lesson lesson = lessonService.getLesson(lessonId);
+
+	boolean wasMarksReleased = lesson.getMarksReleased();
+	if (wasMarksReleased) {
+	    return false;
+	}
+
+	lesson.setMarksReleased(true);
+	userService.save(lesson);
+
+	// audit log marks released
+	String message = messageService.getMessage("audit.marks.released.on", new String[] { lessonId.toString() });
+	logEventService.logEvent(LogEvent.TYPE_MARK_RELEASED, userId, null, lessonId, null, message);
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Marks were released for lesson ID: " + lessonId);
+	}
+
+	return true;
+    }
+
+    @Override
+    public Date getReleaseMarksScheduleDate(long lessonId, int currentUserId) {
+	String triggerName = "releaseMarksTrigger:" + lessonId;
+	try {
+	    Trigger releaseMarksTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+	    if (releaseMarksTrigger == null) {
+		return null;
+	    }
+	    User user = gradebookDAO.find(User.class, currentUserId);
+	    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	    Date scheduleDate = releaseMarksTrigger.getFireTimeAfter(new Date());
+	    if (scheduleDate == null) {
+		return null;
+	    }
+
+	    return DateUtil.convertToTimeZoneFromDefault(userTimeZone, scheduleDate);
+
+	} catch (SchedulerException e) {
+	    logger.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
+
+	return null;
+    }
+
+    @Override
+    public void scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
+	    throws SchedulerException {
+	User user = gradebookDAO.find(User.class, currentUserId);
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzScheduleDate = scheduleDate == null ? null
+		: DateUtil.convertFromTimeZoneToDefault(userTimeZone, scheduleDate);
+	String triggerName = "releaseMarksTrigger:" + lessonId;
+
+	Trigger releaseMarksTrigger = null;
+
+	try {
+	    releaseMarksTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
+	} catch (SchedulerException e) {
+	    logger.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
+	}
+
+	if (releaseMarksTrigger == null) {
+	    if (scheduleDate == null) {
+		// the job was not scheduled and we do not want to schedule it anyway, so just return
+		return;
+	    }
+	    // setup the message for scheduling job
+	    JobDetail releaseMarksJob = JobBuilder.newJob(ReleaseMarksJob.class)
+		    .withIdentity("releaseMarks:" + lessonId)
+		    .withDescription("Release marks for lesson " + lessonId + " by user " + currentUserId)
+		    .usingJobData(AttributeNames.PARAM_LESSON_ID, lessonId)
+		    .usingJobData(AttributeNames.PARAM_USER_ID, currentUserId).usingJobData("sendEmails", sendEmails)
+		    .build();
+
+	    // create customised triggers
+	    releaseMarksTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(tzScheduleDate).build();
+	    scheduler.scheduleJob(releaseMarksJob, releaseMarksTrigger);
+	} else if (scheduleDate == null) {
+	    scheduler.deleteJob(releaseMarksTrigger.getJobKey());
+	} else {
+	    releaseMarksTrigger = releaseMarksTrigger.getTriggerBuilder().startAt(tzScheduleDate).build();
+	    scheduler.rescheduleJob(releaseMarksTrigger.getKey(), releaseMarksTrigger);
+	}
+    }
+
+    @Override
+    public String getReleaseMarksEmailContent(long lessonID, int userID) {
+	StringBuilder content = new StringBuilder();
+
+	User user = gradebookDAO.find(User.class, userID);
+	Lesson lesson = lessonService.getLesson(lessonID);
+	LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userID, lessonID);
+	content.append("Hi ").append(user.getFirstName()).append(",<br><br>here are your results of lesson \"")
+		.append(lesson.getLessonName()).append("\" in which you participated on ")
+		.append(RELEASE_MARKS_EMAIL_DATE_FORMAT.format(learnerProgress.getStartDate())).append(".<br><br>");
+
+	content.append(
+		"<table style='width: 100%; max-width: 500px; margin: auto; border: thin darkgray solid; border-collapse: separate; border-radius: 10px;'>")
+		.append("<tr><th style='text-align: center; padding: 5px;'>Activity</th><th style='text-align: center; padding: 5px;'>Progress</th>")
+		.append("<th style='text-align: center; padding: 5px;'>Average score</th><th style='text-align: center; padding: 5px;'>Score</th></tr>");
+
+	List<GradebookGridRowDTO> gradebookActivityDTOs = getGBLessonComplete(lessonID, userID);
+	for (GradebookGridRowDTO activityDTO : gradebookActivityDTOs) {
+	    content.append("<tr><td style='padding: 5px;'>").append(activityDTO.getRowName())
+		    .append("</td><td style='text-align: center; padding: 5px; font-weight: bold;'>");
+
+	    if (activityDTO.getStatus().contains("success")) {
+		content.append("&check;");
+	    } else if (activityDTO.getStatus().contains("cog")) {
+		content.append("&#9881;");
+	    } else {
+		content.append("-");
+	    }
+
+	    content.append("</td><td style='text-align: center; padding: 5px;'>");
+	    if (activityDTO.getAverageMark() != null) {
+		content.append(GradebookUtil.niceFormatting(activityDTO.getAverageMark()));
+	    }
+
+	    content.append("</td><td style='text-align: center; padding: 5px;'>");
+	    if (activityDTO.getMark() != null) {
+		content.append(GradebookUtil.niceFormatting(activityDTO.getMark()));
+	    }
+
+	    content.append("</td></tr>");
+	}
+	content.append("</table><br>Regards,<br>LAMS team");
+
+	return content.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void sendReleaseMarksEmails(long lessonId, Collection<Integer> recipientIDs,
+	    IEventNotificationService eventNotificationService) {
+	Lesson lesson = lessonService.getLesson(lessonId);
+	String emailSubject = new StringBuilder("Results of LAMS lesson \"").append(lesson.getLessonName()).append("\"")
+		.toString();
+
+	if (recipientIDs == null) {
+	    recipientIDs = ((List<User>) lessonService.getActiveLessonLearners(lessonId)).stream()
+		    .collect(Collectors.mapping(User::getUserId, Collectors.toSet()));
+	}
+
+	for (Integer recipientId : recipientIDs) {
+	    eventNotificationService.sendMessage(null, recipientId, IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    emailSubject, getReleaseMarksEmailContent(lessonId, recipientId), true);
+	}
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Sent emails with marks to learners of lesson ID: " + lessonId);
+	}
     }
 
     @Override
@@ -2619,5 +2797,9 @@ public class GradebookService implements IGradebookFullService {
 
     public void setIntegrationService(IIntegrationService integrationService) {
 	this.integrationService = integrationService;
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+	this.scheduler = scheduler;
     }
 }

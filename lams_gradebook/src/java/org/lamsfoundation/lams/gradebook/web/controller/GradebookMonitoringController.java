@@ -24,8 +24,10 @@ package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,13 +41,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -62,8 +62,10 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -96,7 +98,7 @@ public class GradebookMonitoringController {
     @Autowired
     private IEventNotificationService eventNotificationService;
 
-    private static final DateFormat RELEASE_MARKS_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat RELEASE_MARKS_SCHEDULE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -267,55 +269,18 @@ public class GradebookMonitoringController {
     }
 
     @RequestMapping("/displayReleaseMarksPanel")
-    public String displayReleaseMarksPanel() {
+    public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
+	Date scheduleDate = gradebookService.getReleaseMarksScheduleDate(lessonID, getUser().getUserID());
+	if (scheduleDate != null) {
+	    model.addAttribute("releaseMarksScheduleDate", RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+	}
 	return "releaseLessonMarks";
     }
 
     @RequestMapping("/getReleaseMarksEmailContent")
     @ResponseBody
     public String getReleaseMarksEmailContent(@RequestParam long lessonID, @RequestParam int userID) {
-	StringBuilder content = new StringBuilder();
-
-	User user = userManagementService.getUserById(userID);
-	Lesson lesson = lessonService.getLesson(lessonID);
-	LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userID, lessonID);
-	content.append("Hi ").append(user.getFirstName()).append(",<br><br>here are your results of lesson \"")
-		.append(lesson.getLessonName()).append("\" in which you participated on ")
-		.append(RELEASE_MARKS_DATE_FORMAT.format(learnerProgress.getStartDate())).append(".<br><br>");
-
-	content.append(
-		"<table style='width: 100%; max-width: 500px; margin: auto; border: thin darkgray solid; border-collapse: separate; border-radius: 10px;'>")
-		.append("<tr><th style='text-align: center; padding: 5px;'>Activity</th><th style='text-align: center; padding: 5px;'>Progress</th>")
-		.append("<th style='text-align: center; padding: 5px;'>Average score</th><th style='text-align: center; padding: 5px;'>Score</th></tr>");
-
-	List<GradebookGridRowDTO> gradebookActivityDTOs = gradebookService.getGBLessonComplete(lessonID, userID);
-	for (GradebookGridRowDTO activityDTO : gradebookActivityDTOs) {
-	    content.append("<tr><td style='padding: 5px;'>").append(activityDTO.getRowName())
-		    .append("</td><td style='text-align: center; padding: 5px; font-weight: bold;'>");
-
-	    if (activityDTO.getStatus().contains("success")) {
-		content.append("&check;");
-	    } else if (activityDTO.getStatus().contains("cog")) {
-		content.append("&#9881;");
-	    } else {
-		content.append("-");
-	    }
-
-	    content.append("</td><td style='text-align: center; padding: 5px;'>");
-	    if (activityDTO.getAverageMark() != null) {
-		content.append(GradebookUtil.niceFormatting(activityDTO.getAverageMark()));
-	    }
-
-	    content.append("</td><td style='text-align: center; padding: 5px;'>");
-	    if (activityDTO.getMark() != null) {
-		content.append(GradebookUtil.niceFormatting(activityDTO.getMark()));
-	    }
-
-	    content.append("</td></tr>");
-	}
-	content.append("</table><br>Regards,<br>LAMS team");
-
-	return content.toString();
+	return gradebookService.getReleaseMarksEmailContent(lessonID, userID);
     }
 
     @RequestMapping("/sendReleaseMarksEmails")
@@ -334,12 +299,11 @@ public class GradebookMonitoringController {
 	}
 
 	try {
-	    Lesson lesson = lessonService.getLesson(lessonID);
-	    Set<Integer> recipients = new HashSet<>();
+	    Set<Integer> recipientIDs = new HashSet<>();
 	    if (excludedLearners == null) {
 		// we send emails only to selected learners
 		for (int learnerIndex = 0; learnerIndex < includedLearners.size(); learnerIndex++) {
-		    recipients.add(includedLearners.get(learnerIndex).asInt());
+		    recipientIDs.add(includedLearners.get(learnerIndex).asInt());
 		}
 	    } else {
 		List<User> learners = lessonService.getActiveLessonLearners(lessonID);
@@ -353,23 +317,27 @@ public class GradebookMonitoringController {
 			}
 		    }
 		    if (!excludedLearnerFound) {
-			recipients.add(learner.getUserId());
+			recipientIDs.add(learner.getUserId());
 		    }
 		}
 	    }
 
-	    String emailSubject = new StringBuilder("Results of LAMS lesson \"").append(lesson.getLessonName()).append("\"")
-		    .toString();
+	    gradebookService.sendReleaseMarksEmails(lessonID, recipientIDs, eventNotificationService);
 
-	    for (Integer recipientId : recipients) {
-		eventNotificationService.sendMessage(null, recipientId, IEventNotificationService.DELIVERY_METHOD_MAIL,
-			emailSubject, getReleaseMarksEmailContent(lessonID, recipientId), true);
-	    }
 	} catch (Exception e) {
 	    return e.getMessage();
 	}
 
 	return "success";
+    }
+
+    @RequestMapping("/scheduleReleaseMarks")
+    public void scheduleReleaseMarks(@RequestParam long lessonID, @RequestParam boolean sendEmails,
+	    @RequestParam(name = "scheduleDate", required = false) String scheduleDateString)
+	    throws ParseException, SchedulerException {
+	Date scheduleDate = StringUtils.isBlank(scheduleDateString) ? null
+		: RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
+	gradebookService.scheduleReleaseMarks(lessonID, getUser().getUserID(), sendEmails, scheduleDate);
     }
 
     /**

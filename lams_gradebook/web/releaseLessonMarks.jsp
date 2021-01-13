@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <style>
 	#release-marks-alert {
 		display: none;
@@ -24,38 +25,48 @@
 		border-top: thin darkgray solid;
 	}
 	
-	#release-marks-buttons {
+	.release-marks-buttons {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 		align-items: flex-end;
 	}
 	
-	#release-marks-buttons > button {
+	.release-marks-buttons > button {
 		width: 70%;
 		margin-bottom: 20px;
 	}
 </style>
-
+	
 <script type="text/javascript">
 
 	var releaseMarksLessonID = ${param.lessonID},
-		releaseMarksAlertBox = null;
+		releaseMarksAlertBox = null,
+		releaseMarksScheduleDate = '${releaseMarksScheduleDate}';
 		
 
 	jQuery(document).ready(function() {
 		releaseMarksAlertBox = $('#release-marks-alert');
+		$('#release-marks-schedule-date').datetimepicker({
+			minDate : 0,
+			dateFormat : 'yy-mm-dd'
+		});
 		
 		onReleaseMarksOpen();
 	});
 
 	function onReleaseMarksOpen(){
-		displayReleaseMarksLearners();
+		if (releaseMarksScheduleDate) {
+			$('#release-marks-schedule-date').val(releaseMarksScheduleDate);
+			displayReleaseMarksSchedule();
+		} else {
+			displayReleaseMarksLearners();
+		}
 	}
 
 	function onReleaseMarksClose(){
 		$('#release-marks-email-preview').hide();
-		$('#release-marks-learners').empty();
+		$('#release-marks-learners-panel').empty();
 		releaseMarksAlertBox.hide();
 	}
 	
@@ -84,7 +95,7 @@
 	}
 	
 	function sendReleaseMarksEmails(){
-		let grid = $("#release-marks-learner-table"),
+		let grid = $("#release-marks-learners-table"),
 			includedLearners = grid.data('included'),
 			excludedLearners = grid.data('excluded');
 		
@@ -111,6 +122,7 @@
 	}
 
 	function displayReleaseMarksLearners() {
+		
 		if (marksReleased) {
 			$('#marksNotReleased, #padlockLocked').hide();
 			$('#marksReleased, #padlockUnlocked').show();
@@ -119,8 +131,11 @@
 			$('#marksNotReleased, #padlockLocked').show();
 		}
 		
+		$('#release-marks-schedule').hide();
+		$('#release-marks-learners').show();
+		
 		// initialize user list 
-		var grid = $('<table id="release-marks-learner-table"></table>').appendTo($('#release-marks-learners').show()).jqGrid({
+		var grid = $('<table id="release-marks-learners-table"></table>').appendTo('#release-marks-learners-panel').jqGrid({
 			guiStyle: "bootstrap",
 			iconSet: 'fontAwesome',
 		   	url: "<lams:LAMSURL/>monitoring/emailNotifications/getUsers.do?searchType=4&lessonID=" + releaseMarksLessonID,
@@ -251,40 +266,106 @@
 			}}).data({'included' : null, 
 				 	  'excluded' : []});
 	}
+
+	function displayReleaseMarksSchedule(){
+		$('#release-marks-learners').hide();
+		$('#release-marks-email-preview').hide();
+		$('#release-marks-learners-panel').empty();
+
+		$('#release-marks-schedule').show();
+	}
+
+	function cancelScheduleReleaseMarks(){
+		var switchPanels = true;
+		if (releaseMarksScheduleDate) {
+			switchPanels = scheduleReleaseMarks(true);
+		}
+		if (switchPanels) {
+			displayReleaseMarksLearners();
+		}
+	}
+
+	function scheduleReleaseMarks(isCancel){
+		var scheduleDate = isCancel ? null : $('#release-marks-schedule-date').val(),
+			result = false;
+		$.ajax({
+				url : "<lams:LAMSURL/>gradebook/gradebookMonitoring/scheduleReleaseMarks.do", 
+				data: {
+				  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
+					lessonID: releaseMarksLessonID,
+					sendEmails : false,
+					scheduleDate : scheduleDate
+				}, 
+				type     : 'post',
+				dataType : 'text',
+				async    : false,
+				success: function(response) {
+					if (response == 'success') {
+						releaseMarksScheduleDate = scheduleDate;
+						result = true;
+					}
+		    	}
+		});
+		
+		return result;
+	}
 </script>
 
 <div id="release-marks-panel" class="panel panel-default panel-body">
 	<div id="release-marks-alert" class="alert alert-dismissable"></div>
 	
-	<div class="row">
-		<div id="release-marks-content" class="col-xs-6">
-			<div id="release-marks-learners">
+	<div id="release-marks-learners">
+		<div class="row">
+			<div id="release-marks-learners-panel" class="col-xs-6">
 			</div>
-			<div id="release-marks-schedule">
+			<div class="release-marks-buttons col-xs-6">
+					<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
+					<button type="button" class="btn btn-default" onClick="javascript:displayReleaseMarksSchedule()">Schedule release marks</button>
+					
+					<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+						title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+						<i class="fa fa-share-alt "></i>
+						<span class="hidden-xs">
+							<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+						</span>
+					</button>
+					<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
+						title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+						<i class="fa fa-share-alt "></i>
+						<span class="hidden-xs">
+							<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+						</span>
+					</button> 
 			</div>
 		</div>
-		<div id="release-marks-buttons" class="col-xs-6">
-				<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
-				
-				<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-					title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-					<i class="fa fa-share-alt "></i>
-					<span class="hidden-xs">
-						<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-					</span>
-				</button>
-				<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-					title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
-					<i class="fa fa-share-alt "></i>
-					<span class="hidden-xs">
-						<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-					</span>
-				</button> 
+		
+		<div id="release-marks-email-preview">
+			<h4>Email preview</h4>
+			<div id="release-marks-email-preview-content"></div>
 		</div>
 	</div>
 	
-	<div id="release-marks-email-preview">
-		<h4>Email preview</h4>
-		<div id="release-marks-email-preview-content"></div>
+	<div id="release-marks-schedule">
+		<div class="row">
+			<div class="col-xs-6">
+				Schedule date: <input type="text" id="release-marks-schedule-date" autocomplete="off" />
+			</div>
+			
+			<div class="release-marks-buttons col-xs-6">
+				<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-default"
+					title="" >
+						Cancel schedule
+				</button>
+				
+				<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-primary"
+					title="" >
+					<i class="fa fa-share-alt "></i>
+					<span class="hidden-xs">
+						Confirm release marks schedule date
+					</span>
+				</button>
+			</div>
+		</div>
+		
 	</div>
 </div>

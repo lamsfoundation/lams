@@ -13,14 +13,12 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable-lams.css"> 
 	<lams:css suffix="chart"/>
 	
-	
 	<style>
 		#releaseMarksPanel {
 			display: none;
 			margin: 20px 0;
 		}
 	</style>
-	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
@@ -28,6 +26,9 @@
  	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/x-editable.js"></script>
+	
+	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
+	
 	
 	<script type="text/javascript">
 	
