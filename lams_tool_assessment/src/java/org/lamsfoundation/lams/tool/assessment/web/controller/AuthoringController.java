@@ -484,6 +484,7 @@ public class AuthoringController {
 	    request.setAttribute("newQbQuestionUid", qbQuestionUid);
 	}
 	request.setAttribute("qbQuestionModified", questionModificationStatus);
+	qbService.fillVersionMap(qbQuestion);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
@@ -614,6 +615,7 @@ public class AuthoringController {
 	QbQuestion qbQuestion = qbService.getQuestionByUid(qbQuestionUid);
 	assessmentQuestion.setQbQuestion(qbQuestion);
 	assessmentQuestion.setDisplayOrder(getNextDisplayOrder(sessionMap));
+	qbService.fillVersionMap(qbQuestion);
 
 	QuestionReference reference = new QuestionReference();
 	reference.setQuestion(assessmentQuestion);
