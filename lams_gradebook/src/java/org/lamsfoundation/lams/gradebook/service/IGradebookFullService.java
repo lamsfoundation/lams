@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
@@ -203,9 +204,9 @@ public interface IGradebookFullService extends IGradebookService {
 
     boolean releaseMarks(Long lessonId, int userId);
 
-    Date getReleaseMarksScheduleDate(long lessonId, int currentUserId);
+    Map<String, Object> getReleaseMarksSchedule(long lessonId, int currentUserId);
 
-    void scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
+    boolean scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
 	    throws SchedulerException;
 
     String getReleaseMarksEmailContent(long lessonId, int userID);

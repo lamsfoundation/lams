@@ -971,21 +971,24 @@ public class GradebookService implements IGradebookFullService {
     }
 
     @Override
-    public Date getReleaseMarksScheduleDate(long lessonId, int currentUserId) {
+    public Map<String, Object> getReleaseMarksSchedule(long lessonId, int currentUserId) {
 	String triggerName = "releaseMarksTrigger:" + lessonId;
 	try {
 	    Trigger releaseMarksTrigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName));
 	    if (releaseMarksTrigger == null) {
 		return null;
 	    }
-	    User user = gradebookDAO.find(User.class, currentUserId);
-	    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+
 	    Date scheduleDate = releaseMarksTrigger.getFireTimeAfter(new Date());
 	    if (scheduleDate == null) {
 		return null;
 	    }
 
-	    return DateUtil.convertToTimeZoneFromDefault(userTimeZone, scheduleDate);
+	    Map<String, Object> result = new HashMap<>(releaseMarksTrigger.getJobDataMap());
+	    User user = gradebookDAO.find(User.class, currentUserId);
+	    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	    result.put("userTimeZoneScheduleDate", DateUtil.convertToTimeZoneFromDefault(userTimeZone, scheduleDate));
+	    return result;
 
 	} catch (SchedulerException e) {
 	    logger.error("Error while fetching Quartz trigger \"" + triggerName + "\"", e);
@@ -995,7 +998,7 @@ public class GradebookService implements IGradebookFullService {
     }
 
     @Override
-    public void scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
+    public boolean scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
 	    throws SchedulerException {
 	User user = gradebookDAO.find(User.class, currentUserId);
 	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
@@ -1014,7 +1017,7 @@ public class GradebookService implements IGradebookFullService {
 	if (releaseMarksTrigger == null) {
 	    if (scheduleDate == null) {
 		// the job was not scheduled and we do not want to schedule it anyway, so just return
-		return;
+		return true;
 	    }
 	    // setup the message for scheduling job
 	    JobDetail releaseMarksJob = JobBuilder.newJob(ReleaseMarksJob.class)
@@ -1027,12 +1030,23 @@ public class GradebookService implements IGradebookFullService {
 	    // create customised triggers
 	    releaseMarksTrigger = TriggerBuilder.newTrigger().withIdentity(triggerName).startAt(tzScheduleDate).build();
 	    scheduler.scheduleJob(releaseMarksJob, releaseMarksTrigger);
-	} else if (scheduleDate == null) {
-	    scheduler.deleteJob(releaseMarksTrigger.getJobKey());
-	} else {
-	    releaseMarksTrigger = releaseMarksTrigger.getTriggerBuilder().startAt(tzScheduleDate).build();
-	    scheduler.rescheduleJob(releaseMarksTrigger.getKey(), releaseMarksTrigger);
+
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Scheduled release marks for lesson ID " + lessonId + " by user ID " + currentUserId
+			+ " for date " + scheduleDate);
+	    }
+
+	    return true;
 	}
+	if (scheduleDate == null) {
+	    scheduler.deleteJob(releaseMarksTrigger.getJobKey());
+	    logger.debug("Unscheduled release marks for lesson ID " + lessonId);
+	    return true;
+	}
+
+	logger.warn("An attempt to reschedule release marks for lesson ID " + lessonId
+		+ ". First unschedule the release and only then schedule it again.");
+	return false;
     }
 
     @Override

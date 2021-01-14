@@ -27,9 +27,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
@@ -269,9 +271,13 @@ public class GradebookMonitoringController {
 
     @RequestMapping("/displayReleaseMarksPanel")
     public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
-	Date scheduleDate = gradebookService.getReleaseMarksScheduleDate(lessonID, getUser().getUserID());
-	if (scheduleDate != null) {
-	    model.addAttribute("releaseMarksScheduleDate", RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+	Map<String, Object> scheduleData = gradebookService.getReleaseMarksSchedule(lessonID, getUser().getUserID());
+	if (scheduleData != null) {
+	    Date scheduleDate = (Date) scheduleData.get("userTimeZoneScheduleDate");
+	    if (scheduleDate != null) {
+		model.addAttribute("releaseMarksScheduleDate", RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+		model.addAttribute("releaseMarksSendEmails", scheduleData.get("sendEmails"));
+	    }
 	}
 	return "releaseLessonMarks";
     }
@@ -335,10 +341,26 @@ public class GradebookMonitoringController {
     public String scheduleReleaseMarks(@RequestParam long lessonID, @RequestParam boolean sendEmails,
 	    @RequestParam(name = "scheduleDate", required = false) String scheduleDateString)
 	    throws ParseException, SchedulerException {
-	Date scheduleDate = StringUtils.isBlank(scheduleDateString) ? null
-		: RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
-	gradebookService.scheduleReleaseMarks(lessonID, getUser().getUserID(), sendEmails, scheduleDate);
-	return "success";
+	try {
+	    Date scheduleDate = null;
+	    if (StringUtils.isNotBlank(scheduleDateString)) {
+		scheduleDate = RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
+		Calendar calendarDate = Calendar.getInstance();
+		calendarDate.setTime(scheduleDate);
+		calendarDate.set(Calendar.SECOND, 0);
+		calendarDate.set(Calendar.MILLISECOND, 0);
+		scheduleDate = calendarDate.getTime();
+
+		if (scheduleDate.getTime() - 5000 < new Date().getTime()) {
+		    return "schedule date must be in future";
+		}
+	    }
+	    boolean result = gradebookService.scheduleReleaseMarks(lessonID, getUser().getUserID(), sendEmails,
+		    scheduleDate);
+	    return result ? "success" : "an illegal attempt to reschedule release marks";
+	} catch (Exception e) {
+	    return e.getMessage();
+	}
     }
 
     /**

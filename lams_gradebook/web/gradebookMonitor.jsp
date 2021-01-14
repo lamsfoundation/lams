@@ -78,8 +78,12 @@
 		}
 		</c:if>
 
-		function toggleReleaseMarksPanel(){
+		function toggleReleaseMarksPanel(reload){
 			var releaseMarksPanel = $('#releaseMarksPanel');
+			if (reload) {
+				releaseMarksPanel.empty();
+			}
+			
 			if (releaseMarksPanel.is(':empty')) {
 				releaseMarksPanel.load('<lams:LAMSURL/>gradebook/gradebookMonitoring/displayReleaseMarksPanel.do',{
 					'lessonID' : ${lessonDetails.lessonID}

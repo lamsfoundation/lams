@@ -283,11 +283,9 @@
 	}
 
 	function cancelScheduleReleaseMarks(){
-		var switchPanels = true;
 		if (releaseMarksScheduleDate) {
-			switchPanels = scheduleReleaseMarks(true);
-		}
-		if (switchPanels) {
+			scheduleReleaseMarks(true);
+		} else {
 			$('#release-marks-schedule-date').val(null);
 			displayReleaseMarksLearners();
 		}
@@ -301,7 +299,7 @@
 				data: {
 				  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
 					lessonID: releaseMarksLessonID,
-					sendEmails : false,
+					sendEmails : scheduleDate == null ? false : $('#release-marks-schedule-emails').prop('checked'),
 					scheduleDate : scheduleDate
 				}, 
 				type     : 'post',
@@ -309,7 +307,7 @@
 				async    : false,
 				success: function(response) {
 					if (response == 'success') {
-						releaseMarksScheduleDate = scheduleDate;
+						toggleReleaseMarksPanel(true);
 						result = true;
 					}
 		    	}
@@ -358,7 +356,18 @@
 	<div id="release-marks-schedule">
 		<div class="row">
 			<div class="col-xs-6">
-				Schedule date: <input type="text" id="release-marks-schedule-date" autocomplete="off" />
+				<c:choose>
+					<c:when test="${empty releaseMarksScheduleDate}">
+						Schedule date: <input type="text" id="release-marks-schedule-date" autocomplete="off" />
+						<label>
+						<input type="checkbox" id="release-marks-schedule-emails" /> send emails</label>
+					</c:when>
+					<c:otherwise>
+						Release marks are scheduled for ${releaseMarksScheduleDate}.
+						<br>Emails will ${releaseMarksSendEmails ? '' : 'not '}be sent.
+					</c:otherwise>
+				</c:choose>
+
 			</div>
 			
 			<div class="release-marks-buttons col-xs-6">
@@ -366,14 +375,15 @@
 					title="" >
 						Cancel schedule
 				</button>
-				
-				<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-primary"
-					title="" >
-					<i class="fa fa-share-alt "></i>
-					<span class="hidden-xs">
-						Confirm release marks schedule date
-					</span>
-				</button>
+				<c:if test="${empty releaseMarksScheduleDate}">
+					<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-primary"
+						title="" >
+						<i class="fa fa-share-alt "></i>
+						<span class="hidden-xs">
+							Confirm release marks schedule date
+						</span>
+					</button>
+				</c:if>
 			</div>
 		</div>
 		
