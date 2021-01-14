@@ -87,12 +87,8 @@
 					releaseMarksPanel.slideDown();
 				});
 			} else {
-				releaseMarksPanel.slideToggle(function(){
-					if ($(this).is(':visible')) {
-						onReleaseMarksOpen();
-					} else {
-						onReleaseMarksClose();
-					}
+				releaseMarksPanel.slideUp(function(){
+					$(this).empty();
 				});
 			}
 		}
