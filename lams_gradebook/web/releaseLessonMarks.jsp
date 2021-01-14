@@ -40,17 +40,26 @@
 	
 <script type="text/javascript">
 
+	// reset variables which was set in gradebookMonitor.jsp
+	marksReleased = ${marksReleased};
+
+	
 	var releaseMarksLessonID = ${param.lessonID},
 		releaseMarksAlertBox = null,
+		// is release marks scheduled?
 		releaseMarksScheduleDate = '${releaseMarksScheduleDate}';
 		
 
 	jQuery(document).ready(function() {
+		// store this frequently used element
 		releaseMarksAlertBox = $('#release-marks-alert');
+		
 		$('#release-marks-schedule-date').datetimepicker({
+			// date must be in future
 			minDate : 0,
 			dateFormat : 'yy-mm-dd'
 		}).change(function(){
+			// if there is no date selected, disable the confirmation button
 			var date = $(this).val();
 			$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
 		});
@@ -58,8 +67,10 @@
 		onReleaseMarksOpen();
 	});
 
+	// when this panels gets (re)loaded
 	function onReleaseMarksOpen(){
 		if (releaseMarksScheduleDate) {
+			// release marks are scheduled
 			$('#release-marks-schedule-date').val(releaseMarksScheduleDate);
 			displayReleaseMarksSchedule();
 		} else {
@@ -67,14 +78,9 @@
 		}
 	}
 
-	function onReleaseMarksClose(){
-		$('#release-marks-email-preview').hide();
-		$('#release-marks-learners-panel').empty();
-		releaseMarksAlertBox.hide();
-	}
-	
+	// release/hide marks
 	function toggleMarksRelease() {
-		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check2"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check"/>")) {
+		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>")) {
 			releaseMarksAlertBox.hide();
 			
 			$.ajax({
@@ -98,6 +104,9 @@
 	}
 	
 	function sendReleaseMarksEmails(){
+		if (!confirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />')){
+			return;
+		}
 		let grid = $("#release-marks-learners-table"),
 			includedLearners = grid.data('included'),
 			excludedLearners = grid.data('excluded');
@@ -136,7 +145,7 @@
 	
 	function displayReleaseMarksLearners() {
 		updateReleaseMarksDependantElements();
-		
+		releaseMarksAlertBox.hide();
 		$('#release-marks-schedule').hide();
 		$('#release-marks-learners').show();
 
@@ -150,8 +159,8 @@
 		   	colModel:[
 		   		{name:'name',index:'name', sortable: false, sorttype: 'text'}
 		   	],
-		    rowList:[10,20,30,40,50,100],
-		   	rowNum:2,
+		    rowList:[5, 10, 20],
+		   	rowNum: 5,
 		   	pager: true,
 		   	sortname: 'name',
 		   	multiselect: true,
@@ -179,6 +188,8 @@
 							'lessonID' : releaseMarksLessonID,
 							'userID'   : userID
 					   }, function(){
+						   // set learner name in email preview
+						   $('#release-marks-email-preview-user').text(row.find('td:nth-child(2)').text());
 						   $(this).parent().slideDown();
 					   });
 			   }
@@ -277,23 +288,26 @@
 		$('#release-marks-learners').hide();
 		$('#release-marks-email-preview').hide();
 		$('#release-marks-learners-panel').empty();
+		releaseMarksAlertBox.hide();
 
+		// disable/enable schedule confirmation button depending on its content
 		$('#release-marks-schedule-date').change();
 		$('#release-marks-schedule').show();
 	}
 
 	function cancelScheduleReleaseMarks(){
 		if (releaseMarksScheduleDate) {
+			// cancel schedule and reload panel
 			scheduleReleaseMarks(true);
 		} else {
+			// reset date field and switch to other tab
 			$('#release-marks-schedule-date').val(null);
 			displayReleaseMarksLearners();
 		}
 	}
 
 	function scheduleReleaseMarks(isCancel){
-		var scheduleDate = isCancel ? null : $('#release-marks-schedule-date').val(),
-			result = false;
+		var scheduleDate = isCancel ? null : $('#release-marks-schedule-date').val();
 		$.ajax({
 				url : "<lams:LAMSURL/>gradebook/gradebookMonitoring/scheduleReleaseMarks.do", 
 				data: {
@@ -307,13 +321,13 @@
 				async    : false,
 				success: function(response) {
 					if (response == 'success') {
+						// reload panel; function is defined in gradebookMonitor.jsp
 						toggleReleaseMarksPanel(true);
-						result = true;
+					} else {
+						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text('There was a problem with scheduling marks release: ' + response).show();
 					}
 		    	}
 		});
-		
-		return result;
 	}
 </script>
 
@@ -325,62 +339,83 @@
 			<div id="release-marks-learners-panel" class="col-xs-6">
 			</div>
 			<div class="release-marks-buttons col-xs-6">
-					<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
+					<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">
+						<fmt:message key="gradebook.monitor.releasemarks.send.emails" />
+					</button>
+					
 					<button type="button" id="release-marks-schedule-display" class="btn btn-default" onClick="javascript:displayReleaseMarksSchedule()">
-						Schedule release marks
+						<fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
 					</button>
 					
 					<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-						title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+						title="<fmt:message key="gradebook.monitor.releasemarks.release" />" >
 						<i class="fa fa-share-alt "></i>
 						<span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+							<fmt:message key="gradebook.monitor.releasemarks.release" />
 						</span>
 					</button>
 					<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-						title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+						title="<fmt:message key="gradebook.monitor.releasemarks.hide" />" >
 						<i class="fa fa-share-alt "></i>
 						<span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+							<fmt:message key="gradebook.monitor.releasemarks.hide" />
 						</span>
 					</button> 
 			</div>
 		</div>
 		
 		<div id="release-marks-email-preview">
-			<h4>Email preview</h4>
+			<h4><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></h4>
 			<div id="release-marks-email-preview-content"></div>
 		</div>
 	</div>
 	
 	<div id="release-marks-schedule">
 		<div class="row">
-			<div class="col-xs-6">
+			<div class="col-xs-1"></div>
+			
 				<c:choose>
 					<c:when test="${empty releaseMarksScheduleDate}">
-						Schedule date: <input type="text" id="release-marks-schedule-date" autocomplete="off" />
-						<label>
-						<input type="checkbox" id="release-marks-schedule-emails" /> send emails</label>
+						<div class="col-xs-3">
+							<label for="release-marks-schedule-date"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label><br><br>
+							<label for="release-marks-schedule-emails"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
+						</div>
+						<div class="col-xs-2">
+							<input type="text" id="release-marks-schedule-date" autocomplete="off" /><br><br>
+							<input type="checkbox" id="release-marks-schedule-emails" />
+						</div>
 					</c:when>
 					<c:otherwise>
-						Release marks are scheduled for ${releaseMarksScheduleDate}.
-						<br>Emails will ${releaseMarksSendEmails ? '' : 'not '}be sent.
+						<div class="col-xs-5">
+							<p>
+								<fmt:message key="gradebook.monitor.releasemarks.scheduled.date">
+									<fmt:param value="${releaseMarksScheduleDate}" />
+								</fmt:message>
+								<br>
+								<c:choose>
+									<c:when test="${releaseMarksSendEmails}">
+										<fmt:message key="gradebook.monitor.releasemarks.scheduled.send.emails" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="gradebook.monitor.releasemarks.scheduled.not.send.emails" />
+									</c:otherwise>
+								</c:choose>
+							</p>
+						</div>
 					</c:otherwise>
 				</c:choose>
 
-			</div>
 			
 			<div class="release-marks-buttons col-xs-6">
-				<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-default"
-					title="" >
-						Cancel schedule
+				<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-default">
+						<fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
 				</button>
 				<c:if test="${empty releaseMarksScheduleDate}">
 					<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-primary"
 						title="" >
 						<i class="fa fa-share-alt "></i>
 						<span class="hidden-xs">
-							Confirm release marks schedule date
+							<fmt:message key="gradebook.monitor.releasemarks.schedule.confirm" />
 						</span>
 					</button>
 				</c:if>

@@ -271,14 +271,24 @@ public class GradebookMonitoringController {
 
     @RequestMapping("/displayReleaseMarksPanel")
     public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
-	Map<String, Object> scheduleData = gradebookService.getReleaseMarksSchedule(lessonID, getUser().getUserID());
-	if (scheduleData != null) {
-	    Date scheduleDate = (Date) scheduleData.get("userTimeZoneScheduleDate");
-	    if (scheduleDate != null) {
-		model.addAttribute("releaseMarksScheduleDate", RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
-		model.addAttribute("releaseMarksSendEmails", scheduleData.get("sendEmails"));
+	Lesson lesson = lessonService.getLesson(lessonID);
+	if (lesson.getMarksReleased()) {
+	    model.addAttribute("marksReleased", true);
+	} else {
+	    model.addAttribute("marksReleased", false);
+
+	    Map<String, Object> scheduleData = gradebookService.getReleaseMarksSchedule(lessonID,
+		    getUser().getUserID());
+	    if (scheduleData != null) {
+		Date scheduleDate = (Date) scheduleData.get("userTimeZoneScheduleDate");
+		if (scheduleDate != null) {
+		    model.addAttribute("releaseMarksScheduleDate",
+			    RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+		    model.addAttribute("releaseMarksSendEmails", scheduleData.get("sendEmails"));
+		}
 	    }
 	}
+
 	return "releaseLessonMarks";
     }
 
@@ -288,6 +298,7 @@ public class GradebookMonitoringController {
 	return gradebookService.getReleaseMarksEmailContent(lessonID, userID);
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping("/sendReleaseMarksEmails")
     @ResponseBody
     public String sendReleaseMarksEmails(@RequestParam long lessonID,
@@ -300,7 +311,7 @@ public class GradebookMonitoringController {
 		: JsonUtil.readArray(excludedLearnersString);
 	if (includedLearners == null && excludedLearners == null) {
 	    throw new IllegalArgumentException(
-		    "Neither included nor excluded learners found when sending an email with marks.");
+		    "neither included nor excluded learners found when sending an email with marks.");
 	}
 
 	try {
@@ -327,6 +338,10 @@ public class GradebookMonitoringController {
 		}
 	    }
 
+	    if (recipientIDs.isEmpty()) {
+		return "list of recipients it empty";
+	    }
+
 	    gradebookService.sendReleaseMarksEmails(lessonID, recipientIDs, eventNotificationService);
 
 	} catch (Exception e) {
@@ -345,19 +360,22 @@ public class GradebookMonitoringController {
 	    Date scheduleDate = null;
 	    if (StringUtils.isNotBlank(scheduleDateString)) {
 		scheduleDate = RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
+		
+		// set seconds and miliseconds to 0
 		Calendar calendarDate = Calendar.getInstance();
 		calendarDate.setTime(scheduleDate);
 		calendarDate.set(Calendar.SECOND, 0);
 		calendarDate.set(Calendar.MILLISECOND, 0);
 		scheduleDate = calendarDate.getTime();
 
+		// if schedule is less then in 5 seconds or in the past, refuse it
 		if (scheduleDate.getTime() - 5000 < new Date().getTime()) {
 		    return "schedule date must be in future";
 		}
 	    }
-	    boolean result = gradebookService.scheduleReleaseMarks(lessonID, getUser().getUserID(), sendEmails,
-		    scheduleDate);
-	    return result ? "success" : "an illegal attempt to reschedule release marks";
+	    gradebookService.scheduleReleaseMarks(lessonID, scheduleDate == null ? null : getUser().getUserID(),
+		    sendEmails, scheduleDate);
+	    return "success";
 	} catch (Exception e) {
 	    return e.getMessage();
 	}

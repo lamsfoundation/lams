@@ -81,6 +81,7 @@
 		function toggleReleaseMarksPanel(reload){
 			var releaseMarksPanel = $('#releaseMarksPanel');
 			if (reload) {
+				// force reload
 				releaseMarksPanel.empty();
 			}
 			
@@ -826,7 +827,7 @@
 					<a href="javascript:toggleReleaseMarksPanel()" class="${btnclass}" 
 						title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
 						<i class="fa fa-share-alt "></i> <span class="hidden-xs">
-						<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+							<fmt:message key="gradebook.monitor.releasemarks.release" />
 						</span>
 					</a>
 				</div>

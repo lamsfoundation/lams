@@ -206,7 +206,7 @@ public interface IGradebookFullService extends IGradebookService {
 
     Map<String, Object> getReleaseMarksSchedule(long lessonId, int currentUserId);
 
-    boolean scheduleReleaseMarks(long lessonId, int currentUserId, boolean sendEmails, Date scheduleDate)
+    void scheduleReleaseMarks(long lessonId, Integer currentUserId, boolean sendEmails, Date scheduleDate)
 	    throws SchedulerException;
 
     String getReleaseMarksEmailContent(long lessonId, int userID);
