@@ -264,7 +264,6 @@ public class GradebookMonitoringController {
 	}
 
 	gradebookService.toggleMarksReleased(lessonID);
-	response.setContentType("text/plain; charset=utf-8");
 	return "success";
     }
 
@@ -331,13 +330,15 @@ public class GradebookMonitoringController {
 	return "success";
     }
 
-    @RequestMapping("/scheduleReleaseMarks")
-    public void scheduleReleaseMarks(@RequestParam long lessonID, @RequestParam boolean sendEmails,
+    @RequestMapping(path = "/scheduleReleaseMarks", method = RequestMethod.POST)
+    @ResponseBody
+    public String scheduleReleaseMarks(@RequestParam long lessonID, @RequestParam boolean sendEmails,
 	    @RequestParam(name = "scheduleDate", required = false) String scheduleDateString)
 	    throws ParseException, SchedulerException {
 	Date scheduleDate = StringUtils.isBlank(scheduleDateString) ? null
 		: RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
 	gradebookService.scheduleReleaseMarks(lessonID, getUser().getUserID(), sendEmails, scheduleDate);
+	return "success";
     }
 
     /**

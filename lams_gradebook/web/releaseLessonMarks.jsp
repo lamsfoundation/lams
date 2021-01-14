@@ -50,6 +50,9 @@
 		$('#release-marks-schedule-date').datetimepicker({
 			minDate : 0,
 			dateFormat : 'yy-mm-dd'
+		}).change(function(){
+			var date = $(this).val();
+			$('#release-marks-schedule-confirm').prop('disabled', !date || date.trim() == '');
 		});
 		
 		onReleaseMarksOpen();
@@ -74,23 +77,23 @@
 		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check2"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check"/>")) {
 			releaseMarksAlertBox.hide();
 			
-			$.post(
-				"<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
-				{
+			$.ajax({
+				url : "<lams:LAMSURL/>gradebook/gradebookMonitoring/toggleReleaseMarks.do", 
+				data : {
 				  	"<csrf:tokenname/>":"<csrf:tokenvalue/>",
 					lessonID: releaseMarksLessonID
 				}, 
-				function(xml) {
-					var str = new String(xml)
-			    	if (str.indexOf("success") != -1) {
+				type     : 'post',
+				dataType : 'text',
+				success : function(response) {
+			    	if (response == 'success') {
 				    	marksReleased = !marksReleased;
-		    			displayMarksReleaseOption();
-		    			
+				    	updateReleaseMarksDependantElements();
 			    	} else {
 						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<fmt:message key="error.releasemarks.fail"/>").show();
 			    	}
 		    	}
-		    );
+			});
 	    }
 	}
 	
@@ -121,19 +124,22 @@
 		});
 	}
 
-	function displayReleaseMarksLearners() {
-		
+	function updateReleaseMarksDependantElements(){
 		if (marksReleased) {
-			$('#marksNotReleased, #padlockLocked').hide();
+			$('#marksNotReleased, #padlockLocked, #release-marks-schedule-display').hide();
 			$('#marksReleased, #padlockUnlocked').show();
 		} else {
 			$('#marksReleased, #padlockUnlocked').hide();
-			$('#marksNotReleased, #padlockLocked').show();
+			$('#marksNotReleased, #padlockLocked, #release-marks-schedule-display').show();
 		}
+	}
+	
+	function displayReleaseMarksLearners() {
+		updateReleaseMarksDependantElements();
 		
 		$('#release-marks-schedule').hide();
 		$('#release-marks-learners').show();
-		
+
 		// initialize user list 
 		var grid = $('<table id="release-marks-learners-table"></table>').appendTo('#release-marks-learners-panel').jqGrid({
 			guiStyle: "bootstrap",
@@ -272,6 +278,7 @@
 		$('#release-marks-email-preview').hide();
 		$('#release-marks-learners-panel').empty();
 
+		$('#release-marks-schedule-date').change();
 		$('#release-marks-schedule').show();
 	}
 
@@ -281,6 +288,7 @@
 			switchPanels = scheduleReleaseMarks(true);
 		}
 		if (switchPanels) {
+			$('#release-marks-schedule-date').val(null);
 			displayReleaseMarksLearners();
 		}
 	}
@@ -320,7 +328,9 @@
 			</div>
 			<div class="release-marks-buttons col-xs-6">
 					<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">Send emails to all selected learners</button>
-					<button type="button" class="btn btn-default" onClick="javascript:displayReleaseMarksSchedule()">Schedule release marks</button>
+					<button type="button" id="release-marks-schedule-display" class="btn btn-default" onClick="javascript:displayReleaseMarksSchedule()">
+						Schedule release marks
+					</button>
 					
 					<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
 						title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
