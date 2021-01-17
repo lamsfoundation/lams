@@ -188,7 +188,7 @@
 				HttpSession hs = SessionManager.getSession();
 				if (hs != null) {
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
-					if (userDTO != null) {
+					if (userDTO != null && !userDTO.getLogin().equals(request.getAttribute("login"))) {
 					    // remove session from mapping
 					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
 					}
