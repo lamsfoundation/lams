@@ -14,30 +14,6 @@
 <script>
 	$(document).ready(function(){
 		initializePortraitPopover(LAMS_URL);
-	
-		//Change leader button handler 
-		$('.change-leader-button').click(function () {
-			var groupId = $(this).data("group-id");
-			var leaderUserId = $('#change-leader-select-' + groupId).val();
-
-	        $.ajax({
-	            url: '<lams:LAMSURL/>/tool/lalead11/tblmonitoring/changeLeader.do',
-	            data: {
-	            	userID: leaderUserId,
-	            	toolContentID: "${leaderselectionToolContentId}",
-	    			'<csrf:tokenname/>' : '<csrf:tokenvalue/>',
-		        },
-	            type: 'post',
-	            success: function (json) {
-		            if (json.isSuccessful) {
-		            		alert("<fmt:message key='label.leader.successfully.changed'/>");
-						loadTab("teams");
-					} else {
-						alert("Leader was not changed.");
-					}
-	            }
-	       	});
-		});
 
 		//use jqeury toggle instead of bootstrap collapse 
 		$(".group-title").on('click', function () {
@@ -166,8 +142,24 @@
 				}
 			);
 		});
-
 	});
+
+	function showChangeLeaderModal(groupID) {
+		$('#change-leader-modals').empty()
+		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialog.do',{
+			leaderSelectionToolContentId : '${leaderSelectionToolContentId}',
+			groupId : groupID
+		});
+	}
+
+	function onChangeLeaderCallback(response){
+        if (response.isSuccessful) {
+        	alert("<fmt:message key='label.leader.successfully.changed'/>");
+			loadTab("teams");
+		} else {
+			alert("Leader was not changed.");
+		}
+	}
 </script>            
 
 <!-- Header -->
@@ -283,8 +275,9 @@
 								</button>
 							</c:if>
 
-							<c:if test="${not empty leaderselectionToolContentId}">
-								<button data-toggle="modal" href="#change-leader-modal-${groupDto.groupID}" type="button" class="btn btn-sm btn-default pull-right" style="margin-right: 5px">
+							<c:if test="${not empty leaderselectionToolActivityId and not empty groupDto.userList}">
+								<button onClick="javascript:showChangeLeaderModal(${groupDto.groupID})" type="button"
+									    class="btn btn-sm btn-default pull-right" style="margin-right: 5px">
 									<fmt:message key="label.change.leader"/>
 								</button>
 							</c:if>
@@ -331,7 +324,7 @@
 <div class="modal-content">
 
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">ח</button>
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">?</button>
 		<h4 class="modal-title">
 			<fmt:message key="label.ira.responses.for"/>: <span id="ira-user-name-label"></span> 
 		</h4>
@@ -360,7 +353,7 @@
 <div class="modal-content">
 
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">ח</button>
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">?</button>
 		<h4 class="modal-title">
 			<fmt:message key="label.tra.responses.for"/>: <span id="tra-user-name-label"></span> 
 		</h4>
@@ -383,58 +376,6 @@
 </div>
 <!-- End tRA Modal -->
 
-<!-- Change leader Modal -->
-<c:forEach var="groupDto" items="${groupDtos}">
-	<div class="modal fade" id="change-leader-modal-${groupDto.groupID}">
-	<div class="modal-dialog modal-lg">
-	<div class="modal-content">
-	
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
-			<h4 class="modal-title">
-				<fmt:message key="label.change.leader"/>
-			</h4>
-			<small>
-				<fmt:message key="label.note.leader.change"/>
-			</small>
-		</div>
-	          
-		<!-- Begin -->
-		<div class="modal-body">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">${groupDto.groupName}:</h4> 
-					<small>
-						<fmt:message key="label.current.leader"/>
-						<c:if test="${not empty groupDto.groupLeader}">
-							${groupDto.groupLeader.lastName},&nbsp;${groupDto.groupLeader.firstName} 
-						</c:if>
-					</small>
-				</div>
-				
-				<div class="panel-body">
-					<select class="select-picker" id="change-leader-select-${groupDto.groupID}">
-						<c:forEach var="userDto" items="${groupDto.userList}">
-							<option value="${userDto.userID}">${userDto.lastName},&nbsp;${userDto.firstName}</option>
-						</c:forEach>
-					</select>
-				</div>
-			</div>
-			<!-- end -->  
-	              
-			<div class="modal-footer">	
-				<a href="#" data-dismiss="modal" class="btn btn-default">
-					<fmt:message key="button.close"/>
-				</a>
-				<a href="#" data-dismiss="modal" class="btn btn-default change-leader-button" 
-						data-group-id="${groupDto.groupID}">
-					<fmt:message key="button.save"/>
-				</a>
-			</div>
-		</div>
-	          
-	</div>
-	</div>
-	</div>
-</c:forEach>
-<!-- End Change leader Modal -->
+<!-- container for Change Leader modals -->
+<div id="change-leader-modals">
+</div>

@@ -112,8 +112,14 @@ public class TblMonitoringController {
 	    traGradebookUserActivities = gradebookService.getGradebookUserActivities(traToolActivityId);
 	}
 
-	Set<Long> leaderUserIds = leaderselectionToolActivityId == null ? new HashSet<>()
-		: lamsToolService.getLeaderUserId(leaderselectionToolActivityId);
+	Set<Long> leaderUserIds = null;
+	if (leaderselectionToolActivityId != null) {
+	    leaderUserIds = lamsToolService.getLeaderUserId(leaderselectionToolActivityId);
+	    ToolActivity leaderSelection = activityDAO.find(ToolActivity.class, leaderselectionToolActivityId);
+	    request.setAttribute("leaderSelectionToolContentId", leaderSelection.getToolContentId());
+	} else {
+	    leaderUserIds = new HashSet<>();
+	}
 
 	GroupingActivity groupingActivity = getGroupingActivity(lesson);
 	Grouping grouping = groupingActivity == null ? null : groupingActivity.getCreateGrouping();
@@ -284,12 +290,12 @@ public class TblMonitoringController {
 	//in case of branching activity - add all activities based on their orderId
 	if (activity.isBranchingActivity()) {
 	    BranchingActivity branchingActivity = (BranchingActivity) activity;
-	    Set<SequenceActivity> sequenceActivities = new TreeSet<SequenceActivity>(new ActivityOrderComparator());
+	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
 	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
 	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
 		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
 			.getActivityById(sequenceActivityNotInitialized.getActivityId());
-		Set<Activity> childActivities = new TreeSet<Activity>(new ActivityOrderComparator());
+		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
 		childActivities.addAll(sequenceActivity.getActivities());
 
 		//add one by one in order to initialize all activities
@@ -303,7 +309,7 @@ public class TblMonitoringController {
 	    // They will be sorted by orderId
 	} else if (activity.isComplexActivity()) {
 	    ComplexActivity complexActivity = (ComplexActivity) activity;
-	    Set<Activity> childActivities = new TreeSet<Activity>(new ActivityOrderComparator());
+	    Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
 	    childActivities.addAll(complexActivity.getActivities());
 
 	    // add one by one in order to initialize all activities

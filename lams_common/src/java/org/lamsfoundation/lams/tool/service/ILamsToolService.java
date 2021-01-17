@@ -30,6 +30,7 @@ import java.util.Set;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -92,7 +93,7 @@ public interface ILamsToolService {
      *             in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
-    
+
     /**
      * Checks whether specified activity is the last one in the learning design.
      */
@@ -122,6 +123,8 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
+
+    Group getGroup(long toolSessionId);
 
     /**
      * Audit log the teacher has started editing activity in monitor.
@@ -179,6 +182,8 @@ public interface ILamsToolService {
      */
     Set<Long> getLeaderUserId(Long leaderSelectionActivityId);
 
+    Long getNearestLeaderSelectionToolContentId(long toolSessionId);
+
     /**
      * Returns all activities that precede specified activity and produce confidence levels.
      *
@@ -187,7 +192,7 @@ public interface ILamsToolService {
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
-    
+
     /**
      * Returns all activities that precede specified activity and can provide VSA answers.
      *
@@ -210,7 +215,7 @@ public interface ILamsToolService {
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
 	    Long requestorToolSessionId);
-    
+
     /**
      * Returns VSA answers from the specified activity.
      *
@@ -224,7 +229,7 @@ public interface ILamsToolService {
      */
     Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
 	    Integer requestorUserId, Long requestorToolSessionId);
-    
+
     /**
      * Recalculate marks for all Scratchie activities that use specified QbQuestion with given answer.
      */
