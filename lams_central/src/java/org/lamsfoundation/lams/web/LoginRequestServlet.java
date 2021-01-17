@@ -214,7 +214,7 @@ public class LoginRequestServlet extends HttpServlet {
 		    ? IntegrationConstants.METHOD_LEARNER
 		    : method;
 	    // check if there is a redirect URL parameter already
-	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role)) {
+	    if ((loggedInLogin != null) && loggedInLogin.equals(login) && request.isUserInRole(role.toUpperCase())) {
 		response.sendRedirect(response.encodeRedirectURL(redirectURL));
 		return;
 	    }
