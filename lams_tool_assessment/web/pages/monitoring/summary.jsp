@@ -662,6 +662,38 @@
 			}
 		});
 	}
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do',{
+			toolSessionId : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 	
 	// END OF TIME LIMIT
 	
@@ -744,6 +776,12 @@
 							<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
 						</a>
 					</span>
+					<c:if test="${assessment.useSelectLeaderToolOuput and sessionDto.numberLearners > 0 and not sessionDto.leaderFinished}">
+						<button type="button" class="btn btn-default btn-xs pull-right"
+								onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
+							<fmt:message key='label.monotoring.change.leader'/>
+						</button>
+					</c:if>
 		        </div>
 	        
 	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
@@ -834,3 +872,5 @@
 <%@ include file="parts/timeLimit.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

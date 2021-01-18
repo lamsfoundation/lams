@@ -149,8 +149,15 @@ public class MonitoringController {
 
     @RequestMapping("/displayChangeLeaderForGroupDialogFromActivity")
     public String displayChangeLeaderForGroupDialog(@RequestParam long toolSessionId, Model model) {
-	long leaderSelectionToolContentId = toolService.getNearestLeaderSelectionToolContentId(toolSessionId);
+	Long leaderSelectionToolContentId = toolService.getNearestLeaderSelectionToolContentId(toolSessionId);
+	if (leaderSelectionToolContentId == null) {
+	    throw new InvalidParameterException(
+		    "No matching Leader Selection found for activity with tool session ID " + toolSessionId);
+	}
 	Group group = toolService.getGroup(toolSessionId);
+	if (group == null) {
+	    throw new InvalidParameterException("No group found for tool session ID " + toolSessionId);
+	}
 
 	model.addAttribute("toolSessionId", toolSessionId);
 

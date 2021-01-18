@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -1224,6 +1225,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    sessionDto.setMaxMark(markStats[2] != null
 			    ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
 			    : "0.00");
+		}
+	    } else if (session.getAssessment().isUseSelectLeaderToolOuput()) {
+		sessionDto.setNumberLearners(session.getAssessmentUsers().size());
+
+		AssessmentUser leader = session.getGroupLeader();
+		if (leader != null) {
+		    if (leader.isSessionFinished()) {
+			sessionDto.setLeaderFinished(true);
+		    } else {
+			AssessmentResult result = getLastAssessmentResult(session.getAssessment().getUid(),
+				leader.getUserId());
+			if (result != null && result.getFinishDate() != null) {
+			    leader.setSessionFinished(true);
+			}
+		    }
 		}
 	    }
 
@@ -3994,5 +4010,51 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	result.putAll(answeredQuestions);
 	return result;
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
+
+	AssessmentUser existingLeader = session.getGroupLeader();
+	if (existingLeader != null && existingLeader.getUserId().equals(leaderUserId)) {
+	    return;
+	}
+	Assessment assessment = session.getAssessment();
+	AssessmentUser newLeader = getUserByIdAndContent(leaderUserId, assessment.getContentId());
+	if (newLeader == null) {
+	    return;
+	}
+	if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
+	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
+		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
+	}
+	AssessmentResult existingLeaderResult = getLastAssessmentResult(assessment.getUid(),
+		existingLeader.getUserId());
+	if (existingLeaderResult == null) {
+	    return;
+	}
+	if (existingLeaderResult.getFinishDate() != null) {
+	    throw new InvalidParameterException(
+		    "Attempting to assing a finished result of leader with user ID " + existingLeader.getUserId()
+			    + " to a new leader with user ID " + leaderUserId + " in session wtih ID " + toolSessionId);
+	}
+	AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
+	if (newLeaderResult != null) {
+	    assessmentDao.delete(newLeaderResult);
+	}
+	
+	session.setGroupLeader(newLeader);
+	assessmentDao.update(session);
+
+	existingLeaderResult.setUser(newLeader);
+	assessmentDao.update(existingLeaderResult);
+
+	Set<Integer> userIds = session.getAssessmentUsers().stream().collect(
+		Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "assessment-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
     }
 }

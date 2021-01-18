@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.dto;
 
 import java.util.List;
@@ -40,7 +39,9 @@ public class SessionDTO {
     private int numberLearners;
     private String minMark;
     private String maxMark;
-    private String avgMark; 
+    private String avgMark;
+
+    private boolean leaderFinished;
 
     //used for export purposes only
     private List<AssessmentResult> assessmentResults;
@@ -118,4 +119,11 @@ public class SessionDTO {
 	this.maxMark = maxMark;
     }
 
+    public boolean isLeaderFinished() {
+	return leaderFinished;
+    }
+
+    public void setLeaderFinished(boolean leaderFinished) {
+	this.leaderFinished = leaderFinished;
+    }
 }
