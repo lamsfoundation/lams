@@ -13,7 +13,7 @@ Etherpad is required for Dokumaran tool and for Etherpad tag
 	adminpads2: 		plugin to list and delete pads in /admin 2.1.16
 	authornames:		Adds author names to span titles (shows on hover) 0.2.0
 	author_neat:		Neat author display 0.0.31
-	comments_page:		Adds comments on sidebar and link it to the text 0.1.41
+	comments_page:		Adds comments on sidebar and link it to the text 0.1.47
 	export_authors:		Etherpad plugin to add author information to the html export 0.1.1
 	headings2:			Adds heading support 0.2.7
 	message_all:		Use the Etherpad admin backend to send a message to all connected users 1.1.0
