@@ -49,6 +49,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT grade FROM tl_laasse10_assessment_result "
 	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
+
     private static final String FIND_MARK_STATS_FOR_SESSION = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade FROM tl_laasse10_assessment_result "
 	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
 
@@ -56,10 +57,19 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
+
+    private static final String LOAD_MARKS_FOR_CONTENT = "SELECT r.grade FROM tl_laasse10_assessment_result r "
+	    + " JOIN tl_laasse10_assessment a ON r.assessment_uid = a.uid "
+	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
+
     private static final String FIND_MARK_STATS_FOR_LEADERS = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade, COUNT(grade) num_complete "
 	    + " FROM tl_laasse10_assessment_result r "
 	    + " JOIN tl_laasse10_session s ON r.session_id = s.session_id AND r.user_uid = s.group_leader_uid "
 	    + " JOIN tl_laasse10_assessment a ON s.assessment_uid = a.uid "
+	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
+
+    private static final String FIND_MARK_STATS_FOR_CONTENT = "SELECT MIN(grade) min_grade, AVG(grade) avg_grade, MAX(grade) max_grade, COUNT(grade) num_complete "
+	    + " FROM tl_laasse10_assessment_result r " + " JOIN tl_laasse10_assessment a ON r.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
 
     @SuppressWarnings("rawtypes")
@@ -221,6 +231,21 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     @SuppressWarnings("unchecked")
     @Override
+    public Object[] getStatsMarksByContentId(Long toolContentId) {
+	NativeQuery<Object[]> query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_CONTENT)
+		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
+		.addScalar("max_grade", FloatType.INSTANCE).addScalar("num_complete", IntegerType.INSTANCE);
+	query.setParameter("toolContentId", toolContentId);
+	List list = query.list();
+	if ((list == null) || (list.size() == 0)) {
+	    return null;
+	} else {
+	    return (Object[]) list.get(0);
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public Object[] getStatsMarksForLeaders(Long toolContentId) {
 	NativeQuery<Object[]> query = getSession().createNativeQuery(FIND_MARK_STATS_FOR_LEADERS)
 		.addScalar("min_grade", FloatType.INSTANCE).addScalar("avg_grade", FloatType.INSTANCE)
@@ -310,6 +335,15 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	@SuppressWarnings("unchecked")
 	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_SESSION);
 	query.setParameter("sessionId", sessionId);
+	List<Number> list = query.list();
+	return list;
+    }
+
+    @Override
+    public List<Number> getRawUserMarksByToolContentId(Long toolContentId) {
+	@SuppressWarnings("unchecked")
+	NativeQuery<Number> query = getSession().createNativeQuery(LOAD_MARKS_FOR_CONTENT);
+	query.setParameter("toolContentId", toolContentId);
 	List<Number> list = query.list();
 	return list;
     }

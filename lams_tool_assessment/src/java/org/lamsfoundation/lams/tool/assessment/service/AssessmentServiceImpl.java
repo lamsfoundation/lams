@@ -1234,6 +1234,25 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
+    public SessionDTO getSessionDtoForActivity(Long contentId) {
+	SessionDTO activityDto = new SessionDTO();
+	Object[] markStats = assessmentUserDao.getStatsMarksByContentId(contentId);
+	if (markStats != null) {
+	    activityDto.setMinMark(
+		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
+			    : "0.00");
+	    activityDto.setAvgMark(
+		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
+			    : "0.00");
+	    activityDto.setMaxMark(
+		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
+			    : "0.00");
+	    activityDto.setNumberLearners((Integer) markStats[3]);
+	}
+	return activityDto;
+    }
+
+    @Override
     public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
 	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
 	Object[] markStats = assessmentUserDao.getStatsMarksForLeaders(contentId);
@@ -2829,6 +2848,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public List<Number> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
+    }
+
+    @Override
+    public List<Number> getMarksArrayByContentId(Long toolContentId) {
+	return assessmentUserDao.getRawUserMarksByToolContentId(toolContentId);
     }
 
     @Override

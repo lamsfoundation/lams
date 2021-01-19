@@ -400,6 +400,8 @@ public interface IAssessmentService extends ICommonToolService {
      */
     List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
+    SessionDTO getSessionDtoForActivity(Long contentId);
+
     /**
      * Prepares question results to be displayed in "Learner Summary" table. Shows all of them in case there is at least
      * one random question present, and just questions from the question list if no random questions.
@@ -471,11 +473,10 @@ public interface IAssessmentService extends ICommonToolService {
     /**
      * Prepares data for the marks summary graph on the statistics page
      *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
     List<Number> getMarksArray(Long sessionId);
+
+    List<Number> getMarksArrayByContentId(Long toolContentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders

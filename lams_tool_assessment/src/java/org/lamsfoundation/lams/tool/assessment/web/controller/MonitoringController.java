@@ -755,8 +755,9 @@ public class MonitoringController {
 	    if (assessment.isUseSelectLeaderToolOuput()) {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
-		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
-		results = service.getMarksArray(sessionId);
+		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID, true);
+		results = sessionId == null ? service.getMarksArrayByContentId(contentId)
+			: service.getMarksArray(sessionId);
 	    }
 	}
 
@@ -837,6 +838,9 @@ public class MonitoringController {
 	    } else {
 		List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
 		sessionMap.put("sessionDtos", sessionDtos);
+
+		SessionDTO activityDto = service.getSessionDtoForActivity(contentId);
+		sessionMap.put("activityDto", activityDto);
 	    }
 
 	    List<QbStatsActivityDTO> qbStats = new LinkedList<>();
