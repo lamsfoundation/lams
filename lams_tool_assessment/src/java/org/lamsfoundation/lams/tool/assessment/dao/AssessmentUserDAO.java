@@ -55,7 +55,12 @@ public interface AssessmentUserDAO extends DAO {
 
     Object[] getStatsMarksBySession(Long sessionId);
 
+    Object[] getStatsMarksByContentId(Long toolContentId);
+
+    List<Number> getRawUserMarksByToolContentId(Long toolContentId);
+
     List<Number> getRawLeaderMarksByToolContentId(Long toolContentId);
 
     Object[] getStatsMarksForLeaders(Long toolContentId);
+
 }

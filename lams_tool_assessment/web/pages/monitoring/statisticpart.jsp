@@ -2,6 +2,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="leaderDto" value="${sessionMap.leaderDto}"/>
+<c:set var="activityDto" value="${sessionMap.activityDto}"/>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -43,6 +44,10 @@
 					'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.groups.in.mark.range"/>');
 		</c:when>
 		<c:otherwise>
+			drawHistogram('chartDivActivity${sessionMap.toolContentID}', 
+				'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
+				'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
+			
 			<c:forEach var="sessionDto" items="${sessionDtos}">
 			drawHistogram('chartDivSession${sessionDto.sessionId}', 
 					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}"/>', 
@@ -111,30 +116,25 @@
 	</c:when>
 		
 	<c:otherwise>
-	<c:forEach var="sessionDto" items="${sessionDtos}">
-	    <div class="panel panel-default" >
-			<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput && sessionMap.isGroupedActivity}">	
-		        <div class="panel-heading" id="heading${sessionDto.sessionId}">
-					<span class="panel-title">
-						<fmt:message key="monitoring.label.group" />: <c:out value="${sessionDto.sessionName}" />
-					</span>
-		        </div>
-			</c:if>
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<h4 class="voffset20"><fmt:message key="label.activity.stats"/></h4>
+		</c:if>
+		<div class="panel panel-default" >
        		<div class="panel-body">
 			<table class="table table-condensed table-striped table-no-border">
 				<tr>
 					<td class="field-name" width="25%">
-						<fmt:message key="label.number.learners.per.session" />:
+						<fmt:message key="label.number.learners.per.activity" />:
 					</td>
 					<td>
-						<c:out value="${sessionDto.numberLearners}" />
+						<c:out value="${activityDto.numberLearners}" />
 					</td>
 					<td class="field-name" width="25%">
 						<fmt:message key="label.monitoring.question.summary.average.mark" />:
 					</td>
 					
 					<td>
-						<c:out value="${sessionDto.avgMark}" />
+						<c:out value="${activityDto.avgMark}" />
 					</td>
 				</tr>
 				<tr>
@@ -142,24 +142,74 @@
 						<fmt:message key="label.lowest.mark"/>
 					</td>
 					<td>
-						<c:out value="${sessionDto.minMark}" />
+						<c:out value="${activityDto.minMark}" />
 					</td>
 					<td class="field-name" width="25%">
 						<fmt:message key="label.highest.mark"/>
 					</td>
 					
 					<td>
-						<c:out value="${sessionDto.maxMark}" />
+						<c:out value="${activityDto.maxMark}" />
 					</td>
 				</tr>
 			</table>
 			<div class="row">
 				 <div class="col-xs-12"></div>
- 				 <div id="chartDivSession${sessionDto.sessionId}" class="markChartDiv"></div>
+ 				 <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
 				</div>
 			</div>
 		</div>
-	</c:forEach>
+		
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<h4 class="voffset20"><fmt:message key="label.group.stats"/></h4>
+			<c:forEach var="sessionDto" items="${sessionDtos}">
+			    <div class="panel panel-default" >
+			        <div class="panel-heading" id="heading${sessionDto.sessionId}">
+						<span class="panel-title">
+							<fmt:message key="monitoring.label.group" />: <c:out value="${sessionDto.sessionName}" />
+						</span>
+			        </div>
+		       		<div class="panel-body">
+					<table class="table table-condensed table-striped table-no-border">
+						<tr>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.number.learners.per.session" />:
+							</td>
+							<td>
+								<c:out value="${sessionDto.numberLearners}" />
+							</td>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.monitoring.question.summary.average.mark" />:
+							</td>
+							
+							<td>
+								<c:out value="${sessionDto.avgMark}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.lowest.mark"/>
+							</td>
+							<td>
+								<c:out value="${sessionDto.minMark}" />
+							</td>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.highest.mark"/>
+							</td>
+							
+							<td>
+								<c:out value="${sessionDto.maxMark}" />
+							</td>
+						</tr>
+					</table>
+					<div class="row">
+						 <div class="col-xs-12"></div>
+		 				 <div id="chartDivSession${sessionDto.sessionId}" class="markChartDiv"></div>
+						</div>
+					</div>
+				</div>
+			</c:forEach>
+		</c:if>
 	</c:otherwise>
 	</c:choose>		
 	
