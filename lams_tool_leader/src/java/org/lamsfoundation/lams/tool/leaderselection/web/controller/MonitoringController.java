@@ -183,8 +183,8 @@ public class MonitoringController {
 	    }
 	}
 
-	if (group == null) {
-	    throw new InvalidParameterException("No group with ID " + groupId
+	if (targetSession == null) {
+	    throw new InvalidParameterException("No session for group with ID " + groupId
 		    + " found for Leader Selection with tool content ID " + leaderSelectionToolContentId);
 	}
 
