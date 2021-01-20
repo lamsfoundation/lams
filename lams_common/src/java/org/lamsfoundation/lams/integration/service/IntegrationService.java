@@ -227,6 +227,7 @@ public class IntegrationService implements IIntegrationService {
      * @param org
      * @param method
      */
+    @Override
     public void updateUserRoles(User user, Organisation org, String method) {
 
 	//create UserOrganisation if it doesn't exist
@@ -985,6 +986,9 @@ public class IntegrationService implements IIntegrationService {
 	if (StringUtils.isBlank(membershipUrl)) {
 	    return;
 	}
+
+	// if the membership URL is configured to depend on context_id, replace the placeholder now
+	membershipUrl = membershipUrl.replace("{context_id}", courseId);
 
 	if (StringUtils.isNotBlank(resourceLinkId)) {
 	    membershipUrl += membershipUrl.contains("?") ? "&" : "?";
