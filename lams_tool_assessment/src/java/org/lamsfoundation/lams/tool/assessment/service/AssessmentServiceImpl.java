@@ -97,12 +97,11 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -1201,32 +1200,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
-	List<SessionDTO> sessionDtos = new ArrayList<>();
+    public List<GradeStatsDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
+	List<GradeStatsDTO> sessionDtos = new ArrayList<>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
+	    GradeStatsDTO sessionDto = null;
 
-	    //for statistics tab
 	    if (includeStatistics) {
-		int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
-		sessionDto.setNumberLearners(countUsers);
-		Object[] markStats = assessmentUserDao.getStatsMarksBySession(sessionId);
-		if (markStats != null) {
-		    sessionDto.setMinMark(markStats[0] != null
-			    ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
-			    : "0.00");
-		    sessionDto.setAvgMark(markStats[1] != null
-			    ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
-			    : "0.00");
-		    sessionDto.setMaxMark(markStats[2] != null
-			    ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
-			    : "0.00");
-		}
-	    }
+		List<Float> grades = assessmentUserDao.getRawUserMarksBySession(sessionId);
+		sessionDto = new GradeStatsDTO(sessionId, session.getSessionName(), grades);
+	    } else {
+		sessionDto = new GradeStatsDTO(sessionId, session.getSessionName());
 
+	    }
 	    sessionDtos.add(sessionDto);
 	}
 
@@ -1234,41 +1222,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public SessionDTO getSessionDtoForActivity(Long contentId) {
-	SessionDTO activityDto = new SessionDTO();
-	Object[] markStats = assessmentUserDao.getStatsMarksByContentId(contentId);
-	if (markStats != null) {
-	    activityDto.setMinMark(
-		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
-			    : "0.00");
-	    activityDto.setAvgMark(
-		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
-			    : "0.00");
-	    activityDto.setMaxMark(
-		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
-			    : "0.00");
-	    activityDto.setNumberLearners((Integer) markStats[3]);
-	}
-	return activityDto;
+    public GradeStatsDTO getStatsDtoForActivity(Long contentId) {
+	List<Float> grades = assessmentUserDao.getRawUserMarksByToolContentId(contentId);
+	return new GradeStatsDTO(grades);
     }
 
     @Override
-    public LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId) {
-	LeaderResultsDTO newDto = new LeaderResultsDTO(contentId);
-	Object[] markStats = assessmentUserDao.getStatsMarksForLeaders(contentId);
-	if (markStats != null) {
-	    newDto.setMinMark(
-		    markStats[0] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[0], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setAvgMark(
-		    markStats[1] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[1], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setMaxMark(
-		    markStats[2] != null ? NumberUtil.formatLocalisedNumber((Float) markStats[2], (Locale) null, 2)
-			    : "0.00");
-	    newDto.setNumberGroupsLeaderFinished((Integer) markStats[3]);
-	}
-	return newDto;
+    public GradeStatsDTO getStatsDtoForLeaders(Long contentId) {
+	List<Float> grades = assessmentUserDao.getRawLeaderMarksByToolContentId(contentId);
+	return new GradeStatsDTO(grades);
     }
 
     @Override
@@ -1668,7 +1630,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos) {
+    public List<ExcelSheet> exportSummary(Assessment assessment, List<GradeStatsDTO> sessionDtos) {
 	List<ExcelSheet> sheets = new LinkedList<>();
 
 	// -------------- First tab: Summary ----------------------------------------------------
@@ -1676,7 +1638,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	sheets.add(summarySheet);
 
 	if (sessionDtos != null) {
-	    for (SessionDTO sessionDTO : sessionDtos) {
+	    for (GradeStatsDTO sessionDTO : sessionDtos) {
 		Long sessionId = sessionDTO.getSessionId();
 
 		summarySheet.addEmptyRow();
@@ -1703,7 +1665,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    }
 
 		} else {
-		    int countSessionUsers = sessionDTO.getNumberLearners();
+		    int countSessionUsers = getCountUsersBySession(sessionId, null);
 
 		    // Get the user list from the db
 		    userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
@@ -2237,7 +2199,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    Map<Long, AssessmentResult> userUidToResultMap = assessmentResults.stream()
 		    .collect(Collectors.toMap(r -> r.getUser().getUid(), r -> r));
 
-	    for (SessionDTO sessionDTO : sessionDtos) {
+	    for (GradeStatsDTO sessionDTO : sessionDtos) {
 		AssessmentSession assessmentSession = getSessionBySessionId(sessionDTO.getSessionId());
 		Set<AssessmentUser> assessmentUsers = assessmentSession.getAssessmentUsers();
 		for (AssessmentUser assessmentUser : assessmentUsers) {
@@ -2846,17 +2808,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public List<Number> getMarksArray(Long sessionId) {
+    public List<Float> getMarksArray(Long sessionId) {
 	return assessmentUserDao.getRawUserMarksBySession(sessionId);
     }
 
     @Override
-    public List<Number> getMarksArrayByContentId(Long toolContentId) {
+    public List<Float> getMarksArrayByContentId(Long toolContentId) {
 	return assessmentUserDao.getRawUserMarksByToolContentId(toolContentId);
     }
 
     @Override
-    public List<Number> getMarksArrayForLeaders(Long toolContentId) {
+    public List<Float> getMarksArrayForLeaders(Long toolContentId) {
 	return assessmentUserDao.getRawLeaderMarksByToolContentId(toolContentId);
     }
 

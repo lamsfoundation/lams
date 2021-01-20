@@ -34,11 +34,10 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -398,9 +397,9 @@ public interface IAssessmentService extends ICommonToolService {
      * @param contentId
      * @return
      */
-    List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
+    List<GradeStatsDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
-    SessionDTO getSessionDtoForActivity(Long contentId);
+    GradeStatsDTO getStatsDtoForActivity(Long contentId);
 
     /**
      * Prepares question results to be displayed in "Learner Summary" table. Shows all of them in case there is at least
@@ -459,34 +458,28 @@ public interface IAssessmentService extends ICommonToolService {
      * @param sessionDtos
      * @return
      */
-    List<ExcelSheet> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos);
+    List<ExcelSheet> exportSummary(Assessment assessment, List<GradeStatsDTO> sessionDtos);
 
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
      * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
-     *
-     * @param contentId
-     * @return
      */
-    LeaderResultsDTO getLeaderResultsDTOForLeaders(Long contentId);
+    GradeStatsDTO getStatsDtoForLeaders(Long contentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page
      *
      */
-    List<Number> getMarksArray(Long sessionId);
+    List<Float> getMarksArray(Long sessionId);
 
-    List<Number> getMarksArrayByContentId(Long toolContentId);
+    List<Float> getMarksArrayByContentId(Long toolContentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
      * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
      *
-     * @param assessment
-     * @param sessionDtos
-     * @return
      */
-    List<Number> getMarksArrayForLeaders(Long contentId);
+    List<Float> getMarksArrayForLeaders(Long contentId);
 
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 

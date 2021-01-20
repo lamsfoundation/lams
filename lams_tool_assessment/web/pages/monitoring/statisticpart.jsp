@@ -82,13 +82,13 @@
 					<fmt:message key="label.number.groups.finished" />:
 				</td>
  				<td>
-					<c:out value="${leaderDto.numberGroupsLeaderFinished}" />
+					<c:out value="${leaderDto.count}" />
 				</td>
 				<td class="field-name" width="25%">
 					<fmt:message key="label.monitoring.question.summary.average.mark" />:
 				</td>
  				<td>
-					<c:out value="${leaderDto.avgMark}" />
+					<c:out value="${leaderDto.averageString}" />
 				</td>
  			</tr>
  			<tr>
@@ -96,15 +96,29 @@
 					<fmt:message key="label.lowest.mark"/>
 				</td>
 				<td>
-					<c:out value="${leaderDto.minMark}" />
+					<c:out value="${leaderDto.minString}" />
 				</td>
 				<td class="field-name" width="25%">
 					<fmt:message key="label.highest.mark"/>
 				</td>
 				<td>
-					<c:out value="${leaderDto.maxMark}" />
+					<c:out value="${leaderDto.maxString}" />
 				</td>
 			
+			</tr>
+			 <tr>
+				<td class="field-name" width="25%">
+					<fmt:message key="label.median.mark"/>
+				</td>
+				<td>
+					<c:out value="${leaderDto.medianString}" />
+				</td>
+				<td class="field-name" width="25%">
+					<fmt:message key="label.modes.mark"/>
+				</td>
+				<td>
+					<c:out value="${leaderDto.modesString}" />
+				</td>
 			</tr>
  		</table>
  		<div class="row">
@@ -127,14 +141,14 @@
 						<fmt:message key="label.number.learners.per.activity" />:
 					</td>
 					<td>
-						<c:out value="${activityDto.numberLearners}" />
+						<c:out value="${activityDto.count}" />
 					</td>
 					<td class="field-name" width="25%">
 						<fmt:message key="label.monitoring.question.summary.average.mark" />:
 					</td>
 					
 					<td>
-						<c:out value="${activityDto.avgMark}" />
+						<c:out value="${activityDto.averageString}" />
 					</td>
 				</tr>
 				<tr>
@@ -142,14 +156,28 @@
 						<fmt:message key="label.lowest.mark"/>
 					</td>
 					<td>
-						<c:out value="${activityDto.minMark}" />
+						<c:out value="${activityDto.minString}" />
 					</td>
 					<td class="field-name" width="25%">
 						<fmt:message key="label.highest.mark"/>
 					</td>
 					
 					<td>
-						<c:out value="${activityDto.maxMark}" />
+						<c:out value="${activityDto.maxString}" />
+					</td>
+				</tr>
+				<tr>
+					<td class="field-name" width="25%">
+						<fmt:message key="label.median.mark"/>
+					</td>
+					<td>
+						<c:out value="${activityDto.medianString}" />
+					</td>
+					<td class="field-name" width="25%">
+						<fmt:message key="label.modes.mark"/>
+					</td>
+					<td>
+						<c:out value="${activityDto.modesString}" />
 					</td>
 				</tr>
 			</table>
@@ -176,14 +204,14 @@
 								<fmt:message key="label.number.learners.per.session" />:
 							</td>
 							<td>
-								<c:out value="${sessionDto.numberLearners}" />
+								<c:out value="${sessionDto.count}" />
 							</td>
 							<td class="field-name" width="25%">
 								<fmt:message key="label.monitoring.question.summary.average.mark" />:
 							</td>
 							
 							<td>
-								<c:out value="${sessionDto.avgMark}" />
+								<c:out value="${sessionDto.averageString}" />
 							</td>
 						</tr>
 						<tr>
@@ -191,14 +219,28 @@
 								<fmt:message key="label.lowest.mark"/>
 							</td>
 							<td>
-								<c:out value="${sessionDto.minMark}" />
+								<c:out value="${sessionDto.minString}" />
 							</td>
 							<td class="field-name" width="25%">
 								<fmt:message key="label.highest.mark"/>
 							</td>
 							
 							<td>
-								<c:out value="${sessionDto.maxMark}" />
+								<c:out value="${sessionDto.maxString}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.median.mark"/>
+							</td>
+							<td>
+								<c:out value="${sessionDto.medianString}" />
+							</td>
+							<td class="field-name" width="25%">
+								<fmt:message key="label.modes.mark"/>
+							</td>
+							<td>
+								<c:out value="${sessionDto.modesString}" />
 							</td>
 						</tr>
 					</table>
