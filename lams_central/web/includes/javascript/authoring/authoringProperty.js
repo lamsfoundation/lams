@@ -1291,25 +1291,32 @@ PropertyLib = {
 						}
 						break;
 				}
+									
+				if (typeof condition.startValue != 'undefined' && typeof condition.endValue != 'undefined'
+				    && +condition.startValue > +condition.endValue) {
+					alert(LABELS.RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR);
+					return;
+				}
 				
 				$('td', rangeConditionNames).closest('tr').each(function(){
 					var existingCondition = $(this).data('mappingEntry').condition;
+
 					
 					// validate the new condition so it does not overlap with an existing one
-					if ((typeof condition.startValue == 'undefined' && existingCondition.startValue <= condition.endValue)
+					if ((typeof condition.startValue == 'undefined' && +existingCondition.startValue <= +condition.endValue)
 						|| (typeof condition.endValue == 'undefined'
-							&& (typeof existingCondition.endValue == 'undefined' || existingCondition.endValue >= condition.startValue))
-						|| (!(condition.startValue > existingCondition.endValue) && !(condition.endValue < existingCondition.startValue))) {
-						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_START_ERROR);
+							&& (typeof existingCondition.endValue == 'undefined' || +existingCondition.endValue >= +condition.startValue))
+						|| (!(+condition.startValue > +existingCondition.endValue) && !(+condition.endValue < +existingCondition.startValue))) {
+						alert(LABELS.RANGE_CONDITION_ADD_START_ERROR);
 						condition = null;
 						return false;
 					}
 					
-					if ((typeof condition.endValue == 'undefined' && existingCondition.endValue >= condition.startValue)
+					if ((typeof condition.endValue == 'undefined' && +existingCondition.endValue >= +condition.startValue)
 						|| (typeof condition.startValue == 'undefined'
-							&& (typeof existingCondition.startValue == 'undefined' || existingCondition.startValue <= condition.endValue))
-						|| (!(condition.endValue < existingCondition.startValue) && !(condition.startValue > existingCondition.endValue))) {
-						layout.infoDialog.data('show')(LABELS.RANGE_CONDITION_ADD_END_ERROR);
+							&& (typeof existingCondition.startValue == 'undefined' || +existingCondition.startValue <= +condition.endValue))
+						|| (!(+condition.endValue < +existingCondition.startValue) && !(+condition.startValue > +existingCondition.endValue))) {
+						alert(LABELS.RANGE_CONDITION_ADD_END_ERROR);
 						condition = null;
 						return false;
 					}

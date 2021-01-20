@@ -269,6 +269,8 @@
 				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.groups.to.default.branch.confirm" var="GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
 				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
+				<fmt:message key="authoring.fla.range.condition.add.start.greater.than.end.error" var="RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR_VAR"/>
+				RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR: decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.range.condition.add.start.error" var="RANGE_CONDITION_ADD_START_ERROR_VAR"/>
 				RANGE_CONDITION_ADD_START_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_START_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.range.condition.add.end.error" var="RANGE_CONDITION_ADD_END_ERROR_VAR"/>
