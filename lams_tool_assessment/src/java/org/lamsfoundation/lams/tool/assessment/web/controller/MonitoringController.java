@@ -66,12 +66,11 @@ import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.LeaderResultsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -147,7 +146,7 @@ public class MonitoringController {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, false);
+	List<GradeStatsDTO> sessionDtos = service.getSessionDtos(contentId, false);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 
@@ -749,7 +748,7 @@ public class MonitoringController {
 
 	Long contentId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	List<Number> results = null;
+	List<Float> results = null;
 
 	if (assessment != null) {
 	    if (assessment.isUseSelectLeaderToolOuput()) {
@@ -785,13 +784,13 @@ public class MonitoringController {
 	String fileName = null;
 
 	Long contentId = null;
-	List<SessionDTO> sessionDtos;
+	List<GradeStatsDTO> sessionDtos;
 	if (sessionMapID != null) {
 	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		    .getAttribute(sessionMapID);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    contentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	    sessionDtos = (List<SessionDTO>) sessionMap.get("sessionDtos");
+	    sessionDtos = (List<GradeStatsDTO>) sessionMap.get("sessionDtos");
 
 	} else {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
@@ -833,13 +832,13 @@ public class MonitoringController {
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	if (assessment != null) {
 	    if (assessment.isUseSelectLeaderToolOuput()) {
-		LeaderResultsDTO leaderDto = service.getLeaderResultsDTOForLeaders(contentId);
+		GradeStatsDTO leaderDto = service.getStatsDtoForLeaders(contentId);
 		sessionMap.put("leaderDto", leaderDto);
 	    } else {
-		List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
+		List<GradeStatsDTO> sessionDtos = service.getSessionDtos(contentId, true);
 		sessionMap.put("sessionDtos", sessionDtos);
 
-		SessionDTO activityDto = service.getSessionDtoForActivity(contentId);
+		GradeStatsDTO activityDto = service.getStatsDtoForActivity(contentId);
 		sessionMap.put("activityDto", activityDto);
 	    }
 
