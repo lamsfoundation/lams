@@ -22,8 +22,6 @@
 
 package org.lamsfoundation.lams.gradebook.service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -47,8 +45,6 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.quartz.SchedulerException;
 
 public interface IGradebookFullService extends IGradebookService {
-
-    static final DateFormat RELEASE_MARKS_EMAIL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Gets all the activity rows for a lesson, with the mark for each activity being the average for all users in the

@@ -21,6 +21,10 @@
 
 package org.lamsfoundation.lams.gradebook.service;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -134,6 +138,25 @@ public class GradebookService implements IGradebookFullService {
 
     private static final Set<String> LESSON_EXPORT_TOOL_ACTIVITIES = new HashSet<>(
 	    Arrays.asList("laasse10", "lascrt11", "lamc11", "ladoku11"));
+
+    private static String RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = null;
+    private static final DateFormat RELEASE_MARKS_EMAIL_DATE_FORMAT = new SimpleDateFormat(DateUtil.PRETTY_FORMAT);
+
+    private static final String RELEASE_MARKS_EMAIL_PAGE_TITLE_PLACEHOLDER = "[PAGE_TITLE_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_TOP_HEADER_PLACEHOLDER = "[TOP_HEADER_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_CONTENT_START_PLACEHOLDER = "[CONTENT_START_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER = "[CONTENT_LESSON_NAME_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_LESSON_NAME_PLACEHOLDER = "[LESSON_NAME_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_RELEASE_DATE_PLACEHOLDER = "[RELEASE_DATE_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_OVERALL_GRADE_PLACEHOLDER = "[OVERALL_GRADE_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_CONTENT_END_PLACEHOLDER = "[CONTENT_END_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_CONTENT_THANKS_PLACEHOLDER = "[CONTENT_THANKS_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_FOOTER_PLACEHOLDER = "[FOOTER_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_ACTIVITY_ROW_START = "[ACTIVITY_ROW_START]";
+    private static final String RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END = "[ACTIVITY_ROW_END]";
+    private static final String RELEASE_MARKS_EMAIL_ACTIVITY_NAME_PLACEHOLDER = "[ACTIVITY_NAME_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_ACTIVITY_PROGRESS_ICON_PLACEHOLDER = "[ACTIVITY_PROGRESS_ICON_PLACEHOLDER]";
+    private static final String RELEASE_MARKS_EMAIL_ACTIVITY_GRADE_PLACEHOLDER = "[ACTIVITY_GRADE_PLACEHOLDER]";
 
     // Services
     private ILamsCoreToolService toolService;
@@ -1054,46 +1077,116 @@ public class GradebookService implements IGradebookFullService {
 
     @Override
     public String getReleaseMarksEmailContent(long lessonID, int userID) {
-	StringBuilder content = new StringBuilder();
+	// temporary comment so template gets loaded every time
+	// eventually it will be loaded just once
+//	if (RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT == null) {
+	    try {
+		RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
+			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
+				"gradebookReleaseLessonMarksEmailTemplate.html"));
+	    } catch (Exception e) {
+		throw new RuntimeException("Can not read release marks email template", e);
+	    }
+//	}
 
-	User user = gradebookDAO.find(User.class, userID);
+	User user = userService.getUserById(userID);
 	Lesson lesson = lessonService.getLesson(lessonID);
-	LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userID, lessonID);
-	content.append("Hi ").append(user.getFirstName()).append(",<br><br>here are your results of lesson \"")
-		.append(lesson.getLessonName()).append("\" in which you participated on ")
-		.append(RELEASE_MARKS_EMAIL_DATE_FORMAT.format(learnerProgress.getStartDate())).append(".<br><br>");
+	StringBuilder content = new StringBuilder(RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT);
 
-	content.append(
-		"<table style='width: 100%; max-width: 500px; margin: auto; border: thin darkgray solid; border-collapse: separate; border-radius: 10px;'>")
-		.append("<tr><th style='text-align: center; padding: 5px;'>Activity</th><th style='text-align: center; padding: 5px;'>Progress</th>")
-		.append("<th style='text-align: center; padding: 5px;'>Average score</th><th style='text-align: center; padding: 5px;'>Score</th></tr>");
+	int placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_PAGE_TITLE_PLACEHOLDER);
+	int placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_PAGE_TITLE_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd, messageService.getMessage(
+		"gradebook.monitor.releasemarks.email.content.subject", new Object[] { lesson.getLessonName() }));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_TOP_HEADER_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_TOP_HEADER_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.top.header"));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_START_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_START_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.start",
+			new Object[] { user.getFirstName() + " " + user.getLastName() }));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd, messageService.getMessage(
+		"gradebook.monitor.releasemarks.email.content.lesson.name", new Object[] { lesson.getLessonName() }));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_LESSON_NAME_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_LESSON_NAME_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd, lesson.getLessonName());
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_RELEASE_DATE_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_RELEASE_DATE_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd, RELEASE_MARKS_EMAIL_DATE_FORMAT.format(new Date()));
+
+	boolean isWeighted = isWeightedMarks(lessonID);
+	GradebookUserLesson gradebookUserLesson = getGradebookUserLesson(lessonID, userID);
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_OVERALL_GRADE_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_OVERALL_GRADE_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.overall.grade",
+			new Object[] { gradebookUserLesson == null || gradebookUserLesson.getMark() == null ? "-"
+				: GradebookUtil.niceFormatting(gradebookUserLesson.getMark(), isWeighted) }));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_END_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_END_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.end"));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_THANKS_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_THANKS_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.thanks"));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_FOOTER_PLACEHOLDER);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_FOOTER_PLACEHOLDER.length();
+	content.replace(placeholderStart, placeholderEnd,
+		messageService.getMessage("gradebook.monitor.releasemarks.email.content.footer"));
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_ROW_START);
+	placeholderEnd = content.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END)
+		+ RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END.length();
+
+	String activityRowTemplate = content.substring(placeholderStart, placeholderEnd)
+		.replace(RELEASE_MARKS_EMAIL_ACTIVITY_ROW_START, "");
+
+	content.replace(placeholderStart, placeholderEnd, RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END);
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = getGBLessonComplete(lessonID, userID);
 	for (GradebookGridRowDTO activityDTO : gradebookActivityDTOs) {
-	    content.append("<tr><td style='padding: 5px;'>").append(activityDTO.getRowName())
-		    .append("</td><td style='text-align: center; padding: 5px; font-weight: bold;'>");
+	    StringBuilder activityRowContent = new StringBuilder(activityRowTemplate);
 
+	    placeholderStart = activityRowContent.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_NAME_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_ACTIVITY_NAME_PLACEHOLDER.length();
+	    activityRowContent.replace(placeholderStart, placeholderEnd, activityDTO.getRowName());
+
+	    String icon = "";
 	    if (activityDTO.getStatus().contains("success")) {
-		content.append("&check;");
+		icon = "&#10004;";
 	    } else if (activityDTO.getStatus().contains("cog")) {
-		content.append("&#9881;");
-	    } else {
-		content.append("-");
+		icon = "&#9881;";
 	    }
 
-	    content.append("</td><td style='text-align: center; padding: 5px;'>");
-	    if (activityDTO.getAverageMark() != null) {
-		content.append(GradebookUtil.niceFormatting(activityDTO.getAverageMark()));
-	    }
+	    placeholderStart = activityRowContent.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_PROGRESS_ICON_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_ACTIVITY_PROGRESS_ICON_PLACEHOLDER.length();
+	    activityRowContent.replace(placeholderStart, placeholderEnd, icon);
 
-	    content.append("</td><td style='text-align: center; padding: 5px;'>");
-	    if (activityDTO.getMark() != null) {
-		content.append(GradebookUtil.niceFormatting(activityDTO.getMark()));
-	    }
+	    placeholderStart = activityRowContent.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_GRADE_PLACEHOLDER);
+	    placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_ACTIVITY_GRADE_PLACEHOLDER.length();
+	    activityRowContent.replace(placeholderStart, placeholderEnd,
+		    activityDTO.getMark() == null ? "-" : GradebookUtil.niceFormatting(activityDTO.getMark()));
 
-	    content.append("</td></tr>");
+	    placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END);
+	    placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END.length();
+	    content.replace(placeholderStart, placeholderEnd, activityRowContent.toString());
 	}
-	content.append("</table><br>Regards,<br>LAMS team");
+
+	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END);
+	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_ACTIVITY_ROW_END.length();
+	content.replace(placeholderStart, placeholderEnd, "");
 
 	return content.toString();
     }
@@ -1103,8 +1196,8 @@ public class GradebookService implements IGradebookFullService {
     public void sendReleaseMarksEmails(long lessonId, Collection<Integer> recipientIDs,
 	    IEventNotificationService eventNotificationService) {
 	Lesson lesson = lessonService.getLesson(lessonId);
-	String emailSubject = new StringBuilder("Results of LAMS lesson \"").append(lesson.getLessonName()).append("\"")
-		.toString();
+	String emailSubject = messageService.getMessage("gradebook.monitor.releasemarks.email.content.subject",
+		new Object[] { lesson.getLessonName() });
 
 	if (recipientIDs == null) {
 	    recipientIDs = ((List<User>) lessonService.getActiveLessonLearners(lessonId)).stream()

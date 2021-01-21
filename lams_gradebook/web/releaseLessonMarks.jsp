@@ -25,6 +25,12 @@
 		border-top: thin darkgray solid;
 	}
 	
+	#release-marks-email-preview-content > iframe {
+		width: 100%;
+		min-height: 500px;
+		border: none;
+	}
+	
 	.release-marks-buttons {
 		display: flex;
 		flex-direction: column;
@@ -183,15 +189,14 @@
 				   row.addClass('warning');
 
 				   let userID = row.attr('id');
-				   $('#release-marks-email-preview-content')
-				   		.load('<lams:LAMSURL/>gradebook/gradebookMonitoring/getReleaseMarksEmailContent.do',{
-							'lessonID' : releaseMarksLessonID,
-							'userID'   : userID
-					   }, function(){
-						   // set learner name in email preview
-						   $('#release-marks-email-preview-user').text(row.find('td:nth-child(2)').text());
-						   $(this).parent().slideDown();
-					   });
+				   $('<iframe />').appendTo($('#release-marks-email-preview-content').empty())
+   								  .attr('src', '<lams:LAMSURL/>gradebook/gradebookMonitoring/getReleaseMarksEmailContent.do?lessonID=' 
+		   								         + releaseMarksLessonID + '&userID=' + userID)
+		   						  .one('load',	function(){
+									   // set learner name in email preview
+									   $('#release-marks-email-preview-user').text(row.find('td:nth-child(2)').text());
+									   $(this).parent().parent().slideDown();
+								   });
 			   }
 			   return false;
 			},
