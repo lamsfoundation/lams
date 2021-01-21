@@ -39,6 +39,9 @@
  		
 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
 		<script>
+	        // avoid name clash between bootstrap and jQuery UI
+	        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
+        
 			var WEB_APP_URL = '<lams:WebAppURL />',
 				LABELS = {
 					<fmt:message key="label.monitoring.summary.completion" var="ACTIVITY_COMPLETION_CHART_TITLE_VAR"/>
