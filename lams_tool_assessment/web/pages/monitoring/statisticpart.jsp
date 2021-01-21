@@ -55,8 +55,8 @@
 			</c:forEach>	
 		</c:otherwise>
 		</c:choose>
- 
 
+ 
 	});		
 </script>
 
@@ -262,6 +262,7 @@
 			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
 		          		<fmt:message key="label.qb.stats" />
 		          	</a>
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.qb.stats.tooltip" />"></i>
 	      		</span>
 	        </div>
 	
@@ -278,13 +279,16 @@
 							<fmt:message key="label.qb.participant.count"/>
 						</th>
 						<th scope="col">
-							<fmt:message key="label.qb.difficulty.index"/>
+							<fmt:message key="label.qb.difficulty.index"/>&nbsp;
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
 						</th>
 						<th scope="col">
-							<fmt:message key="label.qb.discrimination.index"/>
+							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
 						</th>
 						<th scope="col">
-							<fmt:message key="label.qb.point.biserial"/>
+							<fmt:message key="label.qb.point.biserial"/>&nbsp;
+							 <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
 						</th>
 					</tr>
 						
