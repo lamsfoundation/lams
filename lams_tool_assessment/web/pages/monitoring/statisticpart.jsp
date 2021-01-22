@@ -77,55 +77,70 @@
 	<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput}">	
 		<div class="panel panel-default" >
        	<div class="panel-body">
- 		<table class="table table-condensed table-striped table-no-border">
-			<tr>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.number.groups.finished" />:
-				</td>
- 				<td>
-					<c:out value="${leaderDto.count}" />
-				</td>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.monitoring.question.summary.average.mark" />:
-				</td>
- 				<td>
-					<c:out value="${leaderDto.averageString}" />
-				</td>
- 			</tr>
- 			<tr>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.lowest.mark"/>
-				</td>
-				<td>
-					<c:out value="${leaderDto.minString}" />
-				</td>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.highest.mark"/>
-				</td>
-				<td>
-					<c:out value="${leaderDto.maxString}" />
-				</td>
-			
-			</tr>
-			 <tr>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.median.mark"/>
-				</td>
-				<td>
-					<c:out value="${leaderDto.medianString}" />
-				</td>
-				<td class="field-name" width="25%">
-					<fmt:message key="label.modes.mark"/>
-				</td>
-				<td>
-					<c:out value="${leaderDto.modesString}" />
-				</td>
-			</tr>
- 		</table>
  		<div class="row">
 			 <div class="col-xs-12"></div>
 				 <div id="chartDivLeader${sessionMap.toolContentID}" class="markChartDiv"></div>
 		</div>
+            
+        <div class="row"> 
+            <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+                <table class="table table-striped table-hover table-condensed">
+                    <tr>
+                        <td class="field-name">
+                            <fmt:message key="label.number.groups.finished" />:
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.count}" />
+                        </td>	 
+                    </tr>
+                    <tr>
+                        <td class="field-name">
+                            <fmt:message key="label.lowest.mark"/>
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.minString}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">
+                          <fmt:message key="label.median.mark"/> 
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.medianString}" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+                <table class="table table-striped table-hover table-condensed">
+                    <tr>
+                        <td class="field-name">
+                            <fmt:message key="label.monitoring.question.summary.average.mark" />:
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.averageString}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">
+                          <fmt:message key="label.highest.mark"/> 
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.maxString}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">
+                           <fmt:message key="label.modes.mark"/>
+                        </td>
+                        <td style="text-align:right;">
+                             <c:out value="${leaderDto.modesString}" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>	        
+
 		</div>
 		</div>
 	</c:when>
@@ -136,56 +151,71 @@
 		</c:if>
 		<div class="panel panel-default" >
        		<div class="panel-body">
-			<table class="table table-condensed table-striped table-no-border">
-				<tr>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.number.learners.per.activity" />:
-					</td>
-					<td>
-						<c:out value="${activityDto.count}" />
-					</td>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.monitoring.question.summary.average.mark" />:
-					</td>
-					
-					<td>
-						<c:out value="${activityDto.averageString}" />
-					</td>
-				</tr>
-				<tr>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.lowest.mark"/>
-					</td>
-					<td>
-						<c:out value="${activityDto.minString}" />
-					</td>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.highest.mark"/>
-					</td>
-					
-					<td>
-						<c:out value="${activityDto.maxString}" />
-					</td>
-				</tr>
-				<tr>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.median.mark"/>
-					</td>
-					<td>
-						<c:out value="${activityDto.medianString}" />
-					</td>
-					<td class="field-name" width="25%">
-						<fmt:message key="label.modes.mark"/>
-					</td>
-					<td>
-						<c:out value="${activityDto.modesString}" />
-					</td>
-				</tr>
-			</table>
-			<div class="row">
-				 <div class="col-xs-12"></div>
- 				 <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
+            <div class="row">
+                 <div class="col-xs-12" ></div>
+                 <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
+            </div>
+
+
+			<div class="row"> 
+				<div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+					<table class="table table-striped table-hover table-condensed">
+						<tr>
+							<td class="field-name">
+								<fmt:message key="label.number.learners.per.activity" />:
+							</td>
+							<td style="text-align:right;">
+								 <c:out value="${activityDto.count}" />
+							</td>	 
+						</tr>
+                        <tr>
+                            <td class="field-name">
+								<fmt:message key="label.lowest.mark"/>
+                            </td>
+                            <td style="text-align:right;">
+                                 <c:out value="${activityDto.minString}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">
+                              <fmt:message key="label.median.mark"/> 
+                            </td>
+                            <td style="text-align:right;">
+                                 <c:out value="${activityDto.medianString}" />
+                            </td>
+                        </tr>
+					</table>
 				</div>
+				<div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+					<table class="table table-striped table-hover table-condensed">
+                        <tr>
+                            <td class="field-name">
+								<fmt:message key="label.monitoring.question.summary.average.mark" />:
+                            </td>
+                            <td style="text-align:right;">
+                                 <c:out value="${activityDto.averageString}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">
+                              <fmt:message key="label.highest.mark"/> 
+                            </td>
+                            <td style="text-align:right;">
+                                 <c:out value="${activityDto.maxString}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">
+                               <fmt:message key="label.modes.mark"/>
+                            </td>
+                            <td style="text-align:right;">
+                                 <c:out value="${activityDto.modesString}" />
+                            </td>
+                        </tr>
+                    </table>
+				</div>
+			</div>	
+					
 			</div>
 		</div>
 		
@@ -199,56 +229,71 @@
 						</span>
 			        </div>
 		       		<div class="panel-body">
-					<table class="table table-condensed table-striped table-no-border">
-						<tr>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.number.learners.per.session" />:
-							</td>
-							<td>
-								<c:out value="${sessionDto.count}" />
-							</td>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.monitoring.question.summary.average.mark" />:
-							</td>
-							
-							<td>
-								<c:out value="${sessionDto.averageString}" />
-							</td>
-						</tr>
-						<tr>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.lowest.mark"/>
-							</td>
-							<td>
-								<c:out value="${sessionDto.minString}" />
-							</td>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.highest.mark"/>
-							</td>
-							
-							<td>
-								<c:out value="${sessionDto.maxString}" />
-							</td>
-						</tr>
-						<tr>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.median.mark"/>
-							</td>
-							<td>
-								<c:out value="${sessionDto.medianString}" />
-							</td>
-							<td class="field-name" width="25%">
-								<fmt:message key="label.modes.mark"/>
-							</td>
-							<td>
-								<c:out value="${sessionDto.modesString}" />
-							</td>
-						</tr>
-					</table>
+                        
 					<div class="row">
 						 <div class="col-xs-12"></div>
 		 				 <div id="chartDivSession${sessionDto.sessionId}" class="markChartDiv"></div>
-						</div>
+				    </div>
+                        
+                    <div class="row"> 
+                        <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+                            <table class="table table-striped table-hover table-condensed">
+                                <tr>
+                                    <td class="field-name">
+                                        <fmt:message key="label.number.learners.per.session" />:
+                                    </td>
+                                    <td style="text-align:right;">
+                                         <c:out value="${sessionDto.count}" />
+                                    </td>	 
+                                </tr>
+                                <tr>
+                                    <td class="field-name">
+                                        <fmt:message key="label.lowest.mark"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                         <c:out value="${sessionDto.minString}" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field-name">
+                                      <fmt:message key="label.median.mark"/> 
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <c:out value="${sessionDto.medianString}" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
+                            <table class="table table-striped table-hover table-condensed">
+                                <tr>
+                                    <td class="field-name">
+                                        <fmt:message key="label.monitoring.question.summary.average.mark" />:
+                                    </td>
+                                    <td style="text-align:right;">
+                                         <c:out value="${sessionDto.averageString}" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field-name">
+                                      <fmt:message key="label.highest.mark"/> 
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <c:out value="${sessionDto.maxString}" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field-name">
+                                       <fmt:message key="label.modes.mark"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                         <c:out value="${sessionDto.modesString}" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>	
+
 					</div>
 				</div>
 			</c:forEach>
@@ -268,7 +313,7 @@
 	        </div>
 	
 			<div aria-expanded="false" id="qb-stats" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="heading-qb-stats">
-				<table class="table table-condensed table-striped table-no-border">
+				<table class="table table-striped table-hover table-condensed">
 					<tr>		
 						<th scope="col">
 							#
@@ -301,19 +346,19 @@
 							<td>
 								<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			
 							</td>
-							<td>
+							<td style="text-align: right">
 								<c:out value="${activityDTO.participantCount}" />
 							</td>
 							<c:choose>
 								<c:when test="${activityDTO.participantCount < 2}">
-									<td>-</td>
-									<td>-</td>
-									<td>-</td>
+									<td style="text-align: center">-</td>
+									<td style="text-align: center">-</td>
+									<td style="text-align: center">-</td>
 								</c:when>
 								<c:otherwise>
-									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
-									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
-									<td><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
+									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.difficultyIndex}" /></td>
+									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.discriminationIndex}" /></td>
+									<td style="text-align: right"><fmt:formatNumber type="number" maxFractionDigits="2" value="${activityDTO.pointBiserial}" /></td>
 								</c:otherwise>
 							</c:choose>
 						</tr>
