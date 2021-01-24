@@ -38,6 +38,7 @@
 							<fmt:message key="label.justify.hedging.marks" />
 						</div>
 					</c:if>
+					<%-- ID and name are important to keep for sake of lams:textare, filterData(), ajaxSubmit, autosave etc. --%>
 					<lams:textarea id="justification-question${questionIndex}" name="question${questionIndex}" class="mark-hedging-select" disabled="${!hasEditRight}" 
 								    data-question-index="${questionIndex}" rows="4" cols="60">
 						<c:out value="${question.answer}" />
