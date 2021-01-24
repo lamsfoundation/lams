@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -118,6 +119,7 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -721,6 +723,8 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(session);
+
+	    groupSummary.setScratchingFinished(session.isScratchingFinished());
 
 	    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 	    groupSummary.setTotalAttempts(totalAttempts);
@@ -2216,6 +2220,38 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	}
     }
 
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	ScratchieSession session = getScratchieSessionBySessionId(toolSessionId);
+	if (session.isScratchingFinished()) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	ScratchieUser existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
+	    return;
+	}
+	Scratchie scratchie = session.getScratchie();
+	ScratchieUser newLeader = getUserByUserIDAndContentID(leaderUserId, scratchie.getContentId());
+	if (newLeader == null) {
+	    return;
+	}
+	if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
+	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
+		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
+	}
+
+	session.setGroupLeader(newLeader);
+	scratchieSessionDao.update(session);
+
+	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(scratchieUser -> scratchieUser.getUserId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "scratchie-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(scratchie.getContentId(), userIds, jsonCommand.toString());
+    }
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
