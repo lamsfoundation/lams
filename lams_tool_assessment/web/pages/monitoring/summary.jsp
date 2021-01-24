@@ -779,7 +779,7 @@
 					<c:if test="${assessment.useSelectLeaderToolOuput and sessionDto.numberLearners > 0 and not sessionDto.leaderFinished}">
 						<button type="button" class="btn btn-default btn-xs pull-right"
 								onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
-							<fmt:message key='label.monotoring.change.leader'/>
+							<fmt:message key='label.monitoring.change.leader'/>
 						</button>
 					</c:if>
 		        </div>

@@ -126,10 +126,10 @@
 			</div>
 		
 			<div id="usersInGroup">
-				<c:forEach var="user" items="${groupUsers}" varStatus="status">
-					<div id="user-${user.userId}" class="voffset5">
+				<c:forEach var="user" items="${groupUsers}">
+					<div id="user-${user.userId}" class="voffset10 loffset10">
 						<lams:Portrait userId="${user.userId}"/>
-						<span class="portrait-sm-lineheight">
+						<span>
 							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
 						</span>
 					</div>
@@ -184,11 +184,12 @@
 						</div>
 	
 						<div id="usersInGroup" class="voffset10">
-							<c:forEach var="user" items="${groupUsers}" varStatus="status">
-								<div id="user-${user.userId}" class="voffset2">
-									<div class="user loffset10" id="user-${user.userId}">
+							<c:forEach var="user" items="${groupUsers}">
+								<div id="user-${user.userId}" class="voffset10 loffset10">
+									<lams:Portrait userId="${user.userId}"/>
+									<span>
 										<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-									</div>
+									</span>
 								</div>
 							</c:forEach>
 						</div>

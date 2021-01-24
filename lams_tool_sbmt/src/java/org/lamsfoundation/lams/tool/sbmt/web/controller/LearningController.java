@@ -207,6 +207,7 @@ public class LearningController implements SbmtConstants {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null) {
+		request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
 		request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader");
 		return "learner/waitforleader";
 	    }

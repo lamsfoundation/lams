@@ -4017,7 +4017,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	AssessmentSession session = getSessionBySessionId(toolSessionId);
 
 	AssessmentUser existingLeader = session.getGroupLeader();
-	if (existingLeader != null && existingLeader.getUserId().equals(leaderUserId)) {
+	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
 	    return;
 	}
 	Assessment assessment = session.getAssessment();

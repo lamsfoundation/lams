@@ -2,10 +2,19 @@
 
 <script>
 	$(document).ready(function(){
+		<c:if test="${not empty groupLeader}">
+			$('input[name="change-leader-radio-${groupId}"][value="${groupLeader.userId}"]').prop('checked', true);
+		</c:if>
+			 
 		// Change leader button handler 
-		$('#change-leader-modal-${groupId}').modal()
-			.find('.change-leader-button').click(function () {
-				var leaderUserId = $('#change-leader-select-${groupId}').val();
+		var changeLeaderModalGroup${groupId} = $('#change-leader-modal-${groupId}').modal();
+		
+		$('.change-leader-button', changeLeaderModalGroup${groupId}).click(function () {
+				var leaderUserId = $('input[name="change-leader-radio-${groupId}"]:checked').val();
+				if (!leaderUserId || leaderUserId == '${not empty groupLeader ? groupLeader.userId : ""}') {
+					return;
+				}
+				
 		        $.ajax({
 		            url: '<lams:WebAppURL />monitoring/changeLeaderForGroup.do',
 		            data: {
@@ -26,43 +35,47 @@
 
 <div class="modal fade" id="change-leader-modal-${groupId}">
 	<div class="modal-dialog modal-lg">
-	<div class="modal-content">
-	
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-lg fa-close"></i></button>
-			<h4 class="modal-title">
-				<fmt:message key="label.change.leader"/>
-			</h4>
-			<c:if test="${empty toolSessionId}">
-				<small>
-					<fmt:message key="label.note.leader.change"/>
-				</small>
-			</c:if>
-		</div>
-	          
-		<!-- Begin -->
-		<div class="modal-body">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">${groupName}:</h4> 
+		<div class="modal-content">
+		
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-lg fa-close"></i></button>
+				<h4 class="modal-title">
+					<fmt:message key="label.change.leader"/>
+				</h4>
+				<c:if test="${empty toolSessionId}">
 					<small>
-						<fmt:message key="label.current.leader"/>
-						<c:if test="${not empty groupLeader}">
-							${groupLeader.lastName},&nbsp;${groupLeader.firstName} 
-						</c:if>
+						<fmt:message key="label.note.leader.change"/>
 					</small>
-				</div>
+				</c:if>
+			</div>
+			
+			<div class="modal-body">
+				<h4>${groupName}</h4> 
+				<fmt:message key="label.current.leader"/>&nbsp;
+				<c:choose>
+					<c:when test="${empty groupLeader}">
+						<fmt:message key="label.current.leader.none"/>
+					</c:when>
+					<c:otherwise>
+						<c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true" />
+					</c:otherwise>
+				</c:choose>
 				
-				<div class="panel-body">
-					<select class="select-picker" id="change-leader-select-${groupId}">
-						<c:forEach var="member" items="${members}">
-							<option value="${member.userId}">${member.lastName},&nbsp;${member.firstName}</option>
-						</c:forEach>
-					</select>
+				<div id="usersInGroup">
+					<c:forEach var="user" items="${members}">
+						<div class="voffset10 loffset10">
+							<label>
+								<input type="radio" name="change-leader-radio-${groupId}" value="${user.userId}">
+								<lams:Portrait userId="${user.userId}"/>
+								<span>
+									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+								</span>
+							</label>
+						</div>
+					</c:forEach>
 				</div>
 			</div>
-			<!-- end -->  
-	              
+			
 			<div class="modal-footer">	
 				<a href="#" data-dismiss="modal" class="btn btn-default">
 					<fmt:message key="button.cancel"/>
@@ -73,6 +86,5 @@
 			</div>
 		</div>
 	          
-	</div>
 	</div>
 </div>
