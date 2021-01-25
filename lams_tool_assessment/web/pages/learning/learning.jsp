@@ -271,10 +271,10 @@
 					this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;		
 				});
 
+				
+
 				// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before ajax submit
-				$("textarea[id^='essay-question'], textarea[id^='justification-question']").each(function()  {
-					filterData(this, document.getElementById(this.name.split('_')[0] + '__lamshidden'));
-				});
+				$("textarea[name$=__textarea]").change();
 				
 				//ajax form submit
 				$('#answers').ajaxSubmit({
@@ -322,9 +322,7 @@
 			disableButtons();
 
 			// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before submit
-			$("textarea[id^='essay-question'], textarea[id^='justification-question']").each(function()  {
-				filterData(this, document.getElementById(this.name.split('_')[0] + '__lamshidden'));
-			});
+			$("textarea[name$=__textarea]").change();
 			
 	        var myForm = $("#answers");
 	        myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
