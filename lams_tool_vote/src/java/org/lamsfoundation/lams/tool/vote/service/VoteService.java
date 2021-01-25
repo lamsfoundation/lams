@@ -22,6 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -37,6 +38,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -102,6 +105,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -120,6 +124,7 @@ public class VoteService
     private IVoteUserDAO voteUserDAO;
     private IVoteUsrAttemptDAO voteUsrAttemptDAO;
     private IUserManagementService userManagementService;
+    private ILearnerService learnerService;
     private ILogEventService logEventService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
@@ -221,6 +226,44 @@ public class VoteService
 	for (VoteUsrAttempt redundantUserAttempt : userAttempts) {
 	    voteUsrAttemptDAO.removeVoteUsrAttempt(redundantUserAttempt);
 	}
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	VoteSession session = getSessionBySessionId(toolSessionId);
+	if (VoteAppConstants.COMPLETED.equals(session.getSessionStatus())) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	VoteQueUsr existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getQueUsrId().equals(leaderUserId)) {
+	    return;
+	}
+
+	VoteQueUsr newLeader = getVoteUserBySession(leaderUserId, session.getUid());
+	if (newLeader == null) {
+	    return;
+	}
+
+	session.setGroupLeader(newLeader);
+	voteSessionDAO.updateVoteSession(session);
+
+	voteUsrAttemptDAO.removeAttemptsForUserandSession(existingLeader.getQueUsrId(), toolSessionId);
+
+	for (VoteUsrAttempt vote : existingLeader.getVoteUsrAttempts()) {
+	    vote.setVoteQueUsr(newLeader);
+	    voteUsrAttemptDAO.updateVoteUsrAttempt(vote);
+
+	}
+
+	Set<Integer> userIds = session.getVoteQueUsers().stream()
+		.collect(Collectors.mapping(voteUser -> voteUser.getQueUsrId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "vote-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(session.getVoteContent().getVoteContentId(), userIds,
+		jsonCommand.toString());
     }
 
     @Override
@@ -467,6 +510,8 @@ public class VoteService
 	    sessionDTO.setSessionUid(session.getUid());
 	    sessionDTO.setToolSessionId(session.getVoteSessionId());
 	    sessionDTO.setNominations(new TreeSet<SessionNominationDTO>());
+	    sessionDTO.setSessionUserCount(session.getVoteQueUsers().size());
+	    sessionDTO.setSessionFinished(VoteAppConstants.COMPLETED.equals(session.getSessionStatus()));
 
 	    int entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(session.getUid());
 
@@ -1738,6 +1783,10 @@ public class VoteService
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
     }
 
     public void setToolService(ILamsToolService toolService) {

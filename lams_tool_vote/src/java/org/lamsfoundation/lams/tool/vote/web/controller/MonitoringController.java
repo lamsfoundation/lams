@@ -55,11 +55,14 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -425,6 +428,14 @@ public class MonitoringController implements VoteAppConstants {
 	request.setAttribute("isAllowText", voteContent.isAllowText());
 
 	return "/monitoring/MonitoringMaincontent";
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	voteService.changeLeaderForGroup(toolSessionId, leaderUserId);
     }
 
     public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {

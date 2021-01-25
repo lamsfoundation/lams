@@ -663,6 +663,7 @@
 		});
 	}
 
+	// END OF TIME LIMIT
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#change-leader-modals').empty()
@@ -695,7 +696,6 @@
 		}
 	}
 	
-	// END OF TIME LIMIT
 	
 </script>
 

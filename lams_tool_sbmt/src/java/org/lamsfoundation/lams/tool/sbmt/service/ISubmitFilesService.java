@@ -348,9 +348,6 @@ public interface ISubmitFilesService extends ICommonToolService {
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     *
-     * @param userId
-     * @param toolSessionID
      */
     SubmitUser checkLeaderSelectToolForSessionLeader(SubmitUser user, Long toolSessionID);
 
@@ -359,13 +356,9 @@ public interface ISubmitFilesService extends ICommonToolService {
      */
     void createUser(SubmitUser submitUser);
 
-    /**
-     * @param userId
-     * @param toolSessionId
-     * @return
-     */
     boolean isUserGroupLeader(Long userId, Long toolSessionId);
 
     void copyLearnerContent(SubmitUser fromUser, SubmitUser toUser);
 
+    void changeLeaderForGroup(long toolSessionId, int leaderUserId);
 }

@@ -32,8 +32,12 @@ public class SessionDTO {
     private Long sessionID;
 
     private String sessionName;
-    
+
     private boolean marksReleased;
+
+    private int numberOfLearners;
+
+    private boolean sessionFinished;
 
     public Long getSessionID() {
 	return sessionID;
@@ -50,7 +54,7 @@ public class SessionDTO {
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
-    
+
     public boolean isMarksReleased() {
 	return marksReleased;
     }
@@ -59,4 +63,19 @@ public class SessionDTO {
 	this.marksReleased = marksReleased;
     }
 
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public boolean isSessionFinished() {
+	return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sessionFinished) {
+	this.sessionFinished = sessionFinished;
+    }
 }

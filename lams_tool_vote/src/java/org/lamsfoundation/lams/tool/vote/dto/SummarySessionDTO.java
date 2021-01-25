@@ -33,6 +33,8 @@ public class SummarySessionDTO implements Comparable<Object> {
     private Long sessionUid;
     private Long toolSessionId;
     private String sessionName;
+    private int sessionUserCount;
+    private boolean sessionFinished;
     private SortedSet<SessionNominationDTO> nominations;
     private Integer openTextNumberOfVotes;
     private Double openTextPercentageOfVotes;
@@ -83,6 +85,22 @@ public class SummarySessionDTO implements Comparable<Object> {
 
     public void setToolSessionId(Long toolSessionId) {
 	this.toolSessionId = toolSessionId;
+    }
+
+    public int getSessionUserCount() {
+	return sessionUserCount;
+    }
+
+    public void setSessionUserCount(int sessionUserCount) {
+	this.sessionUserCount = sessionUserCount;
+    }
+
+    public boolean isSessionFinished() {
+	return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sessionFinished) {
+	this.sessionFinished = sessionFinished;
     }
 
     public SortedSet<SessionNominationDTO> getNominations() {

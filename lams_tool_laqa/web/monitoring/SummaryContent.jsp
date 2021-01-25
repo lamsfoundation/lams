@@ -32,6 +32,12 @@
 					<fmt:message key="group.label" />:	<c:out value="${groupDto.sessionName}" />
 				</a>
 			</span>
+			<c:if test="${content.useSelectLeaderToolOuput and groupDto.numberOfLearners > 0 and not groupDto.sessionFinished}">
+				<button type="button" class="btn btn-default btn-xs pull-right"
+						onClick="javascript:showChangeLeaderModal(${groupDto.sessionId})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</c:if>
         </div>
         
         <div id="collapse${groupDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel"
@@ -89,3 +95,5 @@
 <%@include file="AdvanceOptions.jsp"%>
 
 <%@include file="dateRestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

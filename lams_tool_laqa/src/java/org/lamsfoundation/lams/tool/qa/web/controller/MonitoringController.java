@@ -60,11 +60,14 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -125,6 +128,8 @@ public class MonitoringController implements QaAppConstants {
 	    GroupDTO groupDTO = new GroupDTO();
 	    groupDTO.setSessionName(sessionName);
 	    groupDTO.setSessionId(sessionId);
+	    groupDTO.setNumberOfLearners(session.getQaQueUsers().size());
+	    groupDTO.setSessionFinished(QaAppConstants.COMPLETED.equals(session.getSession_status()));
 	    groupDTOs.add(groupDTO);
 	}
 	request.setAttribute(LIST_ALL_GROUPS_DTO, groupDTOs);
@@ -279,7 +284,8 @@ public class MonitoringController implements QaAppConstants {
      */
     @RequestMapping(path = "/getReflectionsJSON")
     @ResponseBody
-    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response ) throws IOException, ServletException, ToolException {
+    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, ToolException {
 
 	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
 
@@ -396,4 +402,11 @@ public class MonitoringController implements QaAppConstants {
 	return "monitoring/PrintAnswers";
     }
 
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	qaService.changeLeaderForGroup(toolSessionId, leaderUserId);
+    }
 }

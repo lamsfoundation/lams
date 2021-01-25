@@ -4015,6 +4015,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	AssessmentSession session = getSessionBySessionId(toolSessionId);
+	if (AssessmentConstants.COMPLETED == session.getStatus()) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
 
 	AssessmentUser existingLeader = session.getGroupLeader();
 	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
@@ -4029,26 +4033,27 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
 		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
 	}
-	AssessmentResult existingLeaderResult = getLastAssessmentResult(assessment.getUid(),
-		existingLeader.getUserId());
-	if (existingLeaderResult == null) {
-	    return;
-	}
-	if (existingLeaderResult.getFinishDate() != null) {
-	    throw new InvalidParameterException(
-		    "Attempting to assing a finished result of leader with user ID " + existingLeader.getUserId()
-			    + " to a new leader with user ID " + leaderUserId + " in session wtih ID " + toolSessionId);
-	}
+
 	AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
 	if (newLeaderResult != null) {
 	    assessmentDao.delete(newLeaderResult);
 	}
-	
+
+	AssessmentResult existingLeaderResult = getLastAssessmentResult(assessment.getUid(),
+		existingLeader.getUserId());
+	if (existingLeaderResult != null) {
+	    if (existingLeaderResult.getFinishDate() != null) {
+		throw new InvalidParameterException("Attempting to assing a finished result of leader with user ID "
+			+ existingLeader.getUserId() + " to a new leader with user ID " + leaderUserId
+			+ " in session wtih ID " + toolSessionId);
+	    }
+
+	    existingLeaderResult.setUser(newLeader);
+	    assessmentDao.update(existingLeaderResult);
+	}
+
 	session.setGroupLeader(newLeader);
 	assessmentDao.update(session);
-
-	existingLeaderResult.setUser(newLeader);
-	assessmentDao.update(existingLeaderResult);
 
 	Set<Integer> userIds = session.getAssessmentUsers().stream().collect(
 		Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(), Collectors.toSet()));

@@ -141,6 +141,38 @@
 			}
 		});
 	}
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do',{
+			toolSessionId : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 </script>
 
 <div class="panel">
@@ -172,6 +204,12 @@
 					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
 			<fmt:message key="label.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
 			</span>
+			<c:if test="${content.useSelectLeaderToolOuput and sessionDto.numberOfLearners > 0 and not sessionDto.sessionFinished}">
+				<button type="button" class="btn btn-default btn-xs pull-right"
+						onClick="javascript:showChangeLeaderModal(${sessionDto.sessionID})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</c:if>
         </div>
         
         <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
@@ -223,3 +261,5 @@
 <%@ include file="advanceoptions.jsp"%>	
 
 <%@include file="daterestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

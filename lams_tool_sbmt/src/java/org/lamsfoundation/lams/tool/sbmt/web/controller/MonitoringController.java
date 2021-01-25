@@ -64,13 +64,16 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -555,6 +558,14 @@ public class MonitoringController {
 	}
     }
 
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam int leaderUserId) {
+	submitFilesService.changeLeaderForGroup(toolSessionId, leaderUserId);
+    }
+
     // **********************************************************
     // Private methods
     // **********************************************************
@@ -575,6 +586,9 @@ public class MonitoringController {
 	    sessionDto.setSessionID(sessionID);
 	    sessionDto.setSessionName(sfs.getSessionName());
 	    sessionDto.setMarksReleased(sfs.isMarksReleased());
+	    sessionDto.setNumberOfLearners(submitFilesService.getCountUsersBySession(sessionID, null));
+	    sessionDto.setSessionFinished(
+		    sfs.getStatus() != null && sfs.getStatus().equals(SubmitFilesSession.COMPLETED));
 	    sessions.add(sessionDto);
 	}
 

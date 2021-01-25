@@ -43,6 +43,17 @@
 			if ($('#file-upload-area').length == 1) {
 				initFileUpload('${learnerForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
 			}
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
 		});
 		
 		/**
