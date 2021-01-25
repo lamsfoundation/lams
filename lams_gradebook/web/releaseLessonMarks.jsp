@@ -341,38 +341,41 @@
 	
 	<div id="release-marks-learners">
 		<div class="row">
-			<div id="release-marks-learners-panel" class="col-xs-6">
+			<div class="col-sm-4">
+                <div id="release-marks-learners-panel"> </div>
+                <button type="button" class="btn btn-sm btn-default" onClick="javascript:sendReleaseMarksEmails()">
+                    <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
+                </button>
+
+                <button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-default" onClick="javascript:displayReleaseMarksSchedule()">
+                    <fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
+                </button>
+
+                <button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
+                    title="<fmt:message key="gradebook.monitor.releasemarks.release" />" >
+                    <i class="fa fa-share-alt "></i>
+                    <span class="hidden-xs">
+                        <fmt:message key="gradebook.monitor.releasemarks.release" />
+                    </span>
+                </button>
+                <button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
+                    title="<fmt:message key="gradebook.monitor.releasemarks.hide" />" >
+                    <i class="fa fa-share-alt "></i>
+                    <span class="hidden-xs">
+                        <fmt:message key="gradebook.monitor.releasemarks.hide" />
+                    </span>
+                </button>                 
 			</div>
-			<div class="release-marks-buttons col-xs-6">
-					<button type="button" class="btn btn-default" onClick="javascript:sendReleaseMarksEmails()">
-						<fmt:message key="gradebook.monitor.releasemarks.send.emails" />
-					</button>
-					
-					<button type="button" id="release-marks-schedule-display" class="btn btn-default" onClick="javascript:displayReleaseMarksSchedule()">
-						<fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
-					</button>
-					
-					<button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-						title="<fmt:message key="gradebook.monitor.releasemarks.release" />" >
-						<i class="fa fa-share-alt "></i>
-						<span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.release" />
-						</span>
-					</button>
-					<button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-primary"
-						title="<fmt:message key="gradebook.monitor.releasemarks.hide" />" >
-						<i class="fa fa-share-alt "></i>
-						<span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.hide" />
-						</span>
-					</button> 
-			</div>
+			<div class="col-sm-8">
+                <div id="release-marks-email-preview">
+                    <h4><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></h4>
+                    <div id="release-marks-email-preview-content"></div>
+                </div>
+            </div>
+            
+            
 		</div>
-		
-		<div id="release-marks-email-preview">
-			<h4><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></h4>
-			<div id="release-marks-email-preview-content"></div>
-		</div>
+
 	</div>
 	
 	<div id="release-marks-schedule">
