@@ -412,6 +412,38 @@
 			}
 		});
 	}
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do',{
+			toolSessionId : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -510,6 +542,12 @@
 					<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
 				</a>
 			</span>
+			<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+				<button type="button" class="btn btn-default btn-xs pull-right"
+						onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</c:if>
         </div>
         
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
@@ -580,3 +618,5 @@
 </c:if>
 
 <%@ include file="advanceoptions.jsp"%>
+
+<div id="change-leader-modals"></div>

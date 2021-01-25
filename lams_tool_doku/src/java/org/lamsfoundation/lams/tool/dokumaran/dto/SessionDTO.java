@@ -32,6 +32,8 @@ public class SessionDTO {
     private String readOnlyPadId;
     private boolean sessionFaulty;
     private ItemRatingDTO itemRatingDto;
+    private int numberOfLearners;
+    private boolean sessionFinished;
 
     public Long getSessionId() {
 	return sessionId;
@@ -79,5 +81,21 @@ public class SessionDTO {
 
     public void setItemRatingDto(ItemRatingDTO ratingDto) {
 	this.itemRatingDto = ratingDto;
+    }
+
+    public int getNumberOfLearners() {
+        return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+        this.numberOfLearners = numberOfLearners;
+    }
+
+    public boolean isSessionFinished() {
+        return sessionFinished;
+    }
+
+    public void setSessionFinished(boolean sesssionFinished) {
+        this.sessionFinished = sesssionFinished;
     }
 }
