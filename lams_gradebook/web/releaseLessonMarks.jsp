@@ -27,7 +27,7 @@
 	
 	#release-marks-email-preview-content > iframe {
 		width: 100%;
-		min-height: 500px;
+		min-height: 480px;
 		border: none;
 	}
 	
@@ -166,8 +166,8 @@
 		   	colModel:[
 		   		{name:'name',index:'name', sortable: false, sorttype: 'text'}
 		   	],
-		    rowList:[5, 10, 20],
-		   	rowNum: 5,
+		    rowList:[20, 50],
+		   	rowNum: 20,
 		   	pager: true,
 		   	sortname: 'name',
 		   	multiselect: true,
