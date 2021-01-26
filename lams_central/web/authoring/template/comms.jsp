@@ -29,7 +29,7 @@
  	      		},
  	      		'tabClass': 'nav nav-pills',
  		  		'onNext': function(tab, navigation, index) {
- 		  			if ( index >= (startValidationOnTab + 1) ) {
+ 		  			if ( index > (startValidationOnTab + 1) ) {
 	 		  			var valid = $("#templateForm").valid();
 	 		  			if(!valid) {
 	 		  				validator.focusInvalid();
