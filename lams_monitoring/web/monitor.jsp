@@ -869,7 +869,8 @@
 			<div class="row">
 				<div class="col-xs-6">
 					<div class="form-group">
-						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label><input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value=""/>
+						<label for="emaildatePicker"><fmt:message key="progress.email.select.date"/></label>
+						<input type="text" class="form-control" name="emaildatePicker" id="emaildatePicker" value="" autocomplete="off" />
 					</div>
 				</div>
 			</div>
