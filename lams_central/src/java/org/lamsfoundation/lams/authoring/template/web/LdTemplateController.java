@@ -109,7 +109,7 @@ public abstract class LdTemplateController {
     NumberFormat groupNumberFormatter = new DecimalFormat("00");
 
     private static Logger log = Logger.getLogger(LdTemplateController.class);
-    public static final int MAX_OPTION_COUNT = 6;
+    public static final int MAX_OPTION_COUNT = 20;
     public static final int MAX_FLOATING_ACTIVITY_OPTIONS = 6; // Hardcoded in the Flash client
 
     public static final String PARENT_ACTIVITY_TYPE = "parentActivityType"; // used to work out transitions - not used by the authoring module
