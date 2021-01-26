@@ -324,11 +324,17 @@
 	<div id="release-marks-learners">
 		<div class="release-marks-buttons">
         	<button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-default" onClick="javascript:displayReleaseMarksSchedule()">
-        		<fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
+        	    <i class="fa fa-calendar"></i>
+                <span class="hidden-xs">
+                    <fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
+                </span>
         	</button>
               
 			<button type="button" class="btn btn-sm btn-default" onClick="javascript:sendReleaseMarksEmails()">
-                <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
+			    <i class="fa fa-bullhorn"></i>
+                <span class="hidden-xs">
+                    <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
+                </span>
             </button>
               
             <button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
@@ -366,13 +372,16 @@
 	<div id="release-marks-schedule">
 		<div class="release-marks-buttons">
 			<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-sm btn-default">
-					<fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
+				<i class="fa fa-ban"></i>
+                <span class="hidden-xs">
+                    <fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
+                </span>
 			</button>
 			
 			<c:if test="${empty releaseMarksScheduleDate}">
 				<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-sm btn-primary"
 					title="" >
-					<i class="fa fa-share-alt "></i>
+					<i class="fa fa-calendar"></i>
 					<span class="hidden-xs">
 						<fmt:message key="gradebook.monitor.releasemarks.schedule.confirm" />
 					</span>
