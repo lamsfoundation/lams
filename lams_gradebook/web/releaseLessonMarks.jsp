@@ -179,26 +179,12 @@
 			beforeSelectRow: function(rowid, e) {
 				let target = $(e.target),
 					isCheckboxClicked = target.is('input[type=checkbox]'),
-					row = target.closest('tr'),
-					isHighlighted = row.hasClass('warning');
+					row = target.closest('tr')
 			   if (isCheckboxClicked) {
 				   return true;
 			   }
-			   
-			   row.siblings('tr.warning').removeClass('warning');
-			   if (!isHighlighted) {
-				   row.addClass('warning');
 
-				   let userID = row.attr('id');
-				   $('<iframe />').appendTo($('#release-marks-email-preview-content').empty())
-   								  .attr('src', '<lams:LAMSURL/>gradebook/gradebookMonitoring/getReleaseMarksEmailContent.do?lessonID=' 
-		   								         + releaseMarksLessonID + '&userID=' + userID)
-		   						  .one('load',	function(){
-									   // set learner name in email preview
-									   $('#release-marks-email-preview-user').text(row.find('td:nth-child(2)').text());
-									   $(this).parent().parent().slideDown();
-								   });
-			   }
+			   highlightReleaseMarksLearnerRow(row.attr('id'));
 			   return false;
 			},
 		    onSelectRow : function(id, status, event) {
@@ -230,6 +216,7 @@
 			},
 			gridComplete : function(){
 				let grid = $(this),
+					rows = grid.jqGrid('getGridParam','data'),
 						   included = grid.data('included'),
 						   // cell containing "(de)select all" button
 						   selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
@@ -246,8 +233,8 @@
 												// on select all change mode and select all on current page
 												grid.data('included', null);
 												grid.data('excluded', []);
-												$('[role="row"]', grid).each(function(){
-													grid.jqGrid('setSelection', +$(this).attr('id'), false);
+												rows.each(function(){
+													grid.jqGrid('setSelection', this.id, false);
 												});
 											} else {
 												// on deselect all just change mode
@@ -282,12 +269,37 @@
 					});
 				}
 
-				// empty email preview on grid page change
-				$('#release-marks-email-preview').slideUp(function(){
-					 $('#release-marks-email-preview-content', this).empty();
-				});
+				if (rows.length === 0) {
+					// empty email preview on grid page change
+					$('#release-marks-email-preview').slideUp(function(){
+						 $('#release-marks-email-preview-content', this).empty();
+					});
+				} else {
+					// highlight first row
+					highlightReleaseMarksLearnerRow(rows[0].id);
+				}
 			}}).data({'included' : null, 
 				 	  'excluded' : []});
+	}
+
+	function highlightReleaseMarksLearnerRow(userID) {
+		let table = $('#release-marks-learners-table'),
+			row = $('#' + userID, table),
+			isHighlighted = row.hasClass('warning');
+		
+		   row.siblings('tr.warning').removeClass('warning');
+		   if (!isHighlighted) {
+			   row.addClass('warning');
+
+			   $('<iframe />').appendTo($('#release-marks-email-preview-content').empty())
+								  .attr('src', '<lams:LAMSURL/>gradebook/gradebookMonitoring/getReleaseMarksEmailContent.do?lessonID=' 
+	   								         + releaseMarksLessonID + '&userID=' + userID)
+	   						  .one('load',	function(){
+								   // set learner name in email preview
+								   $('#release-marks-email-preview-user').text(row.find('td:nth-child(2)').text());
+								   $(this).parent().parent().slideDown();
+							   });
+		   }
 	}
 
 	function displayReleaseMarksSchedule(){
