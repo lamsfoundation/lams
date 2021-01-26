@@ -32,15 +32,16 @@
 	}
 	
 	.release-marks-buttons {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		align-items: flex-end;
+		text-align: right;
+		margin-bottom: 10px;
 	}
 	
-	.release-marks-buttons > button {
-		width: 70%;
-		margin-bottom: 20px;
+	#release-marks-schedule-display {
+		margin-right: 20px;
+	}
+	
+	#release-marks-schedule-labels > label {
+		vertical-align: text-top;
 	}
 </style>
 	
@@ -340,95 +341,96 @@
 	<div id="release-marks-alert" class="alert alert-dismissable"></div>
 	
 	<div id="release-marks-learners">
+		<div class="release-marks-buttons">
+        	<button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-default" onClick="javascript:displayReleaseMarksSchedule()">
+        		<fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
+        	</button>
+              
+			<button type="button" class="btn btn-sm btn-default" onClick="javascript:sendReleaseMarksEmails()">
+                <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
+            </button>
+              
+            <button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
+                title="<fmt:message key="gradebook.monitor.releasemarks.release" />" >
+                <i class="fa fa-share-alt "></i>
+                <span class="hidden-xs">
+                    <fmt:message key="gradebook.monitor.releasemarks.release" />
+                </span>
+            </button>
+            <button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
+                title="<fmt:message key="gradebook.monitor.releasemarks.hide" />" >
+                <i class="fa fa-share-alt "></i>
+                <span class="hidden-xs">
+                    <fmt:message key="gradebook.monitor.releasemarks.hide" />
+                </span>
+            </button>  
+		</div>
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-4 col-xs-12">
+				<!-- A dummy element so learners table starts on the same height as email preview -->
+				<h4>&nbsp;</h4>
+				
                 <div id="release-marks-learners-panel"> </div>
-                <button type="button" class="btn btn-sm btn-default" onClick="javascript:sendReleaseMarksEmails()">
-                    <fmt:message key="gradebook.monitor.releasemarks.send.emails" />
-                </button>
-
-                <button type="button" id="release-marks-schedule-display" class="btn btn-sm btn-default" onClick="javascript:displayReleaseMarksSchedule()">
-                    <fmt:message key="gradebook.monitor.releasemarks.schedule.button" />
-                </button>
-
-                <button type="button" id="marksNotReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
-                    title="<fmt:message key="gradebook.monitor.releasemarks.release" />" >
-                    <i class="fa fa-share-alt "></i>
-                    <span class="hidden-xs">
-                        <fmt:message key="gradebook.monitor.releasemarks.release" />
-                    </span>
-                </button>
-                <button type="button" id="marksReleased" onClick="javascript:toggleMarksRelease()" class="btn btn-sm btn-primary"
-                    title="<fmt:message key="gradebook.monitor.releasemarks.hide" />" >
-                    <i class="fa fa-share-alt "></i>
-                    <span class="hidden-xs">
-                        <fmt:message key="gradebook.monitor.releasemarks.hide" />
-                    </span>
-                </button>                 
 			</div>
-			<div class="col-sm-8">
+			<div class="col-sm-8 col-xs-12">
                 <div id="release-marks-email-preview">
                     <h4><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></h4>
                     <div id="release-marks-email-preview-content"></div>
                 </div>
             </div>
-            
-            
 		</div>
 
 	</div>
 	
 	<div id="release-marks-schedule">
+		<div class="release-marks-buttons">
+			<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-sm btn-default">
+					<fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
+			</button>
+			
+			<c:if test="${empty releaseMarksScheduleDate}">
+				<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-sm btn-primary"
+					title="" >
+					<i class="fa fa-share-alt "></i>
+					<span class="hidden-xs">
+						<fmt:message key="gradebook.monitor.releasemarks.schedule.confirm" />
+					</span>
+				</button>
+			</c:if>
+		</div>
 		<div class="row">
 			<div class="col-xs-1"></div>
-			
-				<c:choose>
-					<c:when test="${empty releaseMarksScheduleDate}">
-						<div class="col-xs-3">
-							<label for="release-marks-schedule-date"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label><br><br>
-							<label for="release-marks-schedule-emails"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
-						</div>
-						<div class="col-xs-2">
-							<input type="text" id="release-marks-schedule-date" autocomplete="off" /><br><br>
-							<input type="checkbox" id="release-marks-schedule-emails" />
-						</div>
-					</c:when>
-					<c:otherwise>
-						<div class="col-xs-5">
-							<p>
-								<fmt:message key="gradebook.monitor.releasemarks.scheduled.date">
-									<fmt:param value="${releaseMarksScheduleDate}" />
-								</fmt:message>
-								<br>
-								<c:choose>
-									<c:when test="${releaseMarksSendEmails}">
-										<fmt:message key="gradebook.monitor.releasemarks.scheduled.send.emails" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="gradebook.monitor.releasemarks.scheduled.not.send.emails" />
-									</c:otherwise>
-								</c:choose>
-							</p>
-						</div>
-					</c:otherwise>
-				</c:choose>
-
-			
-			<div class="release-marks-buttons col-xs-6">
-				<button type="button" id="release-marks-schedule-cancel" onClick="javascript:cancelScheduleReleaseMarks()" class="btn btn-default">
-						<fmt:message key="gradebook.monitor.releasemarks.schedule.cancel" />
-				</button>
-				<c:if test="${empty releaseMarksScheduleDate}">
-					<button type="button" id="release-marks-schedule-confirm" onClick="javascript:scheduleReleaseMarks()" class="btn btn-primary"
-						title="" >
-						<i class="fa fa-share-alt "></i>
-						<span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.schedule.confirm" />
-						</span>
-					</button>
-				</c:if>
-			</div>
+			<c:choose>
+				<c:when test="${empty releaseMarksScheduleDate}">
+					<div id="release-marks-schedule-labels" class="col-xs-3">
+						<label for="release-marks-schedule-date"><fmt:message key="gradebook.monitor.releasemarks.schedule.date" /></label><br><br>
+						<label for="release-marks-schedule-emails"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
+					</div>
+					<div class="col-xs-3">
+						<input type="text" id="release-marks-schedule-date" autocomplete="off" /><br><br>
+						<input type="checkbox" id="release-marks-schedule-emails" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<div class="col-xs-6">
+						<p>
+							<fmt:message key="gradebook.monitor.releasemarks.scheduled.date">
+								<fmt:param value="${releaseMarksScheduleDate}" />
+							</fmt:message>
+							<br>
+							<c:choose>
+								<c:when test="${releaseMarksSendEmails}">
+									<fmt:message key="gradebook.monitor.releasemarks.scheduled.send.emails" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="gradebook.monitor.releasemarks.scheduled.not.send.emails" />
+								</c:otherwise>
+							</c:choose>
+						</p>
+					</div>
+				</c:otherwise>
+			</c:choose>
+			<div class="col-xs-5"></div>
 		</div>
-		
 	</div>
 </div>
