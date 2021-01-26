@@ -298,44 +298,21 @@ public class GradebookMonitoringController {
 	return gradebookService.getReleaseMarksEmailContent(lessonID, userID);
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping("/sendReleaseMarksEmails")
     @ResponseBody
     public String sendReleaseMarksEmails(@RequestParam long lessonID,
-	    @RequestParam(name = "includedLearners", required = false) String includedLearnersString,
-	    @RequestParam(name = "excludedLearners", required = false) String excludedLearnersString)
+	    @RequestParam(name = "includedLearners") String includedLearnersString)
 	    throws JsonProcessingException, IOException {
-	ArrayNode includedLearners = StringUtils.isBlank(includedLearnersString) ? null
-		: JsonUtil.readArray(includedLearnersString);
-	ArrayNode excludedLearners = StringUtils.isBlank(excludedLearnersString) ? null
-		: JsonUtil.readArray(excludedLearnersString);
-	if (includedLearners == null && excludedLearners == null) {
-	    throw new IllegalArgumentException(
-		    "neither included nor excluded learners found when sending an email with marks.");
-	}
 
+	if (StringUtils.isBlank(includedLearnersString)) {
+	    return "list of recipients is empty";
+	}
+	ArrayNode includedLearners = JsonUtil.readArray(includedLearnersString);
 	try {
 	    Set<Integer> recipientIDs = new HashSet<>();
-	    if (excludedLearners == null) {
-		// we send emails only to selected learners
-		for (int learnerIndex = 0; learnerIndex < includedLearners.size(); learnerIndex++) {
-		    recipientIDs.add(includedLearners.get(learnerIndex).asInt());
-		}
-	    } else {
-		List<User> learners = lessonService.getActiveLessonLearners(lessonID);
-		// we send emails to all lesson learners, excluding one who got deselected
-		for (User learner : learners) {
-		    boolean excludedLearnerFound = false;
-		    for (int learnerIndex = 0; learnerIndex < excludedLearners.size(); learnerIndex++) {
-			if (learner.getUserId().equals(excludedLearners.get(learnerIndex).asInt())) {
-			    excludedLearnerFound = true;
-			    break;
-			}
-		    }
-		    if (!excludedLearnerFound) {
-			recipientIDs.add(learner.getUserId());
-		    }
-		}
+	    // we send emails only to selected learners
+	    for (int learnerIndex = 0; learnerIndex < includedLearners.size(); learnerIndex++) {
+		recipientIDs.add(includedLearners.get(learnerIndex).asInt());
 	    }
 
 	    if (recipientIDs.isEmpty()) {
@@ -360,7 +337,7 @@ public class GradebookMonitoringController {
 	    Date scheduleDate = null;
 	    if (StringUtils.isNotBlank(scheduleDateString)) {
 		scheduleDate = RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
-		
+
 		// set seconds and miliseconds to 0
 		Calendar calendarDate = Calendar.getInstance();
 		calendarDate.setTime(scheduleDate);

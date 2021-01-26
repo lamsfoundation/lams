@@ -87,7 +87,7 @@
 
 	// release/hide marks
 	function toggleMarksRelease() {
-		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>")) {
+		if (confirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>")) {
 			releaseMarksAlertBox.hide();
 			
 			$.ajax({
@@ -111,21 +111,33 @@
 	}
 	
 	function sendReleaseMarksEmails(){
-		if (!confirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />')){
+		releaseMarksAlertBox.hide();
+		
+		let grid = $("#release-marks-learners-table"),
+			filteredData = grid.jqGrid('getGridParam', 'lastSelectedData'),
+			selectedLearners = grid.jqGrid('getGridParam','selarrrow'),
+			finalList = [];
+		filteredData.forEach(function(learner){
+			if (selectedLearners.indexOf(learner.id) >= 0) {
+				finalList.push(this.id);
+			}
+		});
+
+		if (finalList.length == 0) {
+			releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger')
+								.text('<fmt:message key="gradebook.monitor.releasemarks.send.emails.no.learners" />').show();
 			return;
 		}
-		let grid = $("#release-marks-learners-table"),
-			includedLearners = grid.data('included'),
-			excludedLearners = grid.data('excluded');
 		
-		releaseMarksAlertBox.hide();
+		if (!confirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length))){
+			return;
+		}
 	
 		$.ajax({
 			'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
 			'data'     : {
 				'lessonID' : releaseMarksLessonID,
-				 'includedLearners' : includedLearners === null ? null : JSON.stringify(includedLearners),
-				 'excludedLearners' : excludedLearners === null ? null : JSON.stringify(excludedLearners)
+				 'includedLearners' : JSON.stringify(finalList)
 			 },
 			'dataType' : 'text',
 			'cache'    : false,
@@ -187,88 +199,41 @@
 			   highlightReleaseMarksLearnerRow(row.attr('id'));
 			   return false;
 			},
-		    onSelectRow : function(id, status, event) {
-			    var grid = $(this),
-			   		included = grid.data('included'),
-					excluded = grid.data('excluded'),
-					selectAllChecked = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox .cbox').prop('checked');
-				if (selectAllChecked) {
-					var index = excluded.indexOf(+id);
-					// if row is deselected, add it to excluded array
-					if (index < 0) {
-						if (!status) {
-							excluded.push(+id);
-						}
-					} else if (status) {
-						excluded.splice(index, 1);
-					}
-				} else {
-					var index = included.indexOf(+id);
-					// if row is selected, add it to included array
-					if (index < 0) {
-						if (status) {
-							included.push(+id);
-						}
-					} else if (!status) {
-						included.splice(index, 1);
-					}
-				}
-			},
 			gridComplete : function(){
 				let grid = $(this),
-					rows = grid.jqGrid('getGridParam','data'),
-						   included = grid.data('included'),
-						   // cell containing "(de)select all" button
-						   selectAllCell = grid.closest('.ui-jqgrid-view').find('.jqgh_cbox > div');
+					rows = $('[role="row"]:not(.jqgfirstrow)', grid),
+				    mode = grid.data('mode'),
+				    // cell containing "(de)select all" button
+				    selectAllCell = grid.closest('.ui-jqgrid-view').find('.ui-jqgrid-labels .jqgh_cbox > div');
 				// remove the default button provided by jqGrid
 				$('.cbox', selectAllCell).remove();
 				// create own button which follows own rules
 				var selectAllCheckbox = $('<input type="checkbox" class="cbox" />')
-										.prop('checked', included === null)
+										.prop('checked', mode == 'all' || mode == 'start')
 										.prependTo(selectAllCell)
 										.change(function(){
-											// start with deselecting everyone on current page
+											// start with deselecting
 											grid.resetSelection();
+											var ids = [];
 											if ($(this).prop('checked')){
-												// on select all change mode and select all on current page
-												grid.data('included', null);
-												grid.data('excluded', []);
-												rows.each(function(){
-													grid.jqGrid('setSelection', this.id, false);
+												grid.data('mode', 'all');
+												// on select all change mode and select all
+												grid.jqGrid('getGridParam', 'data').forEach(function(row) {
+													ids.push(row.id);
+													// also select on current page as it is too late for selarrrow to be picked up
+													grid.jqGrid("setSelection", row.id, false);
 												});
 											} else {
-												// on deselect all just change mode
-												grid.data('excluded', null);
-												grid.data('included', []);
+												grid.data('mode', 'none');
 											}
+											grid.jqGrid("setGridParam", { selarrrow: ids }, true);
 										});
-	
-				grid.resetSelection();
-				if (selectAllCheckbox.prop('checked')) {
-					var excluded = grid.data('excluded');
-					// go through each loaded row
-					$('[role="row"]', grid).each(function(){
-						var id = +$(this).attr('id'),
-							selected = $(this).hasClass('success');
-						// if row is not selected and is not excluded, select it
-						if (!selected && (!excluded || !excluded.includes(id))) {
-							// select without triggering onSelectRow
-							grid.jqGrid('setSelection', id, false);
-						}
-					}); 
-				} else {
-					// go through each loaded row
-					$('[role="row"]', grid).each(function(){
-						var id = +$(this).attr('id'),
-							selected = $(this).hasClass('success');
-						// if row is not selected and is included, select it
-						if (!selected && included.includes(id)) {
-							// select without triggering onSelectRow
-							grid.jqGrid('setSelection', id, false);
-						}
-					});
+				
+				// initial select all
+				if (mode == 'start') {
+					selectAllCheckbox.change();
 				}
-
+				
 				if (rows.length === 0) {
 					// empty email preview on grid page change
 					$('#release-marks-email-preview').slideUp(function(){
@@ -278,8 +243,12 @@
 					// highlight first row
 					highlightReleaseMarksLearnerRow(rows[0].id);
 				}
-			}}).data({'included' : null, 
-				 	  'excluded' : []});
+			}}).data({'mode' : 'start'})
+			   .jqGrid('filterToolbar', {
+				       stringResult: true,
+				       searchOnEnter: true,
+				       defaultSearch: 'cn'
+					  });
 	}
 
 	function highlightReleaseMarksLearnerRow(userID) {
