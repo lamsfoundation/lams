@@ -322,6 +322,7 @@ public class GradebookMonitoringController {
 	    gradebookService.sendReleaseMarksEmails(lessonID, recipientIDs, eventNotificationService);
 
 	} catch (Exception e) {
+	    log.error("Error while sending emails with released marks for lesson with ID " + lessonID, e);
 	    return e.getMessage();
 	}
 
