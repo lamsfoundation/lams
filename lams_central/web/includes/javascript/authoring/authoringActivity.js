@@ -1543,16 +1543,15 @@ ActivityLib = {
 	 * Deletes the given activity.
 	 */
 	removeActivity : function(activity, forceRemove) {
-		var coreActivity =  activity.branchingActivity || this;
+		var coreActivity =  activity.branchingActivity || activity;
 		if (!forceRemove && activity instanceof ActivityDefs.BranchingEdgeActivity){
 			// user removes one of the branching edges, so remove the whole activity
-			if (confirm(LABELS.REMOVE_ACTIVITY_CONFIRM)){
-				var otherEdge = activity.isStart ? coreActivity.end
-						                         : coreActivity.start;
-				ActivityLib.removeActivity(otherEdge, true);
-			} else {
+			if (!confirm(LABELS.REMOVE_ACTIVITY_CONFIRM)){
 				return;
 			}
+			var otherEdge = activity.isStart ? coreActivity.end
+					                         : coreActivity.start;
+			ActivityLib.removeActivity(otherEdge, true);
 		}
 		
 		if (activity instanceof ActivityDefs.FloatingActivity) {
@@ -1578,11 +1577,14 @@ ActivityLib = {
 
 			// find references of this activity as grouping or input
 			$.each(layout.activities, function(){
-				if (activity == coreActivity.grouping) {
-					coreActivity.grouping = null;
+				var candidate = this.branchingActivity || this;
+				if (candidate.grouping == coreActivity) {
+					candidate.grouping = null;
+					this.propertiesContent = null;
 					this.draw();
-				} else if (activity == coreActivity.input) {
-					coreActivity.input = null;
+				} else if (candidate.input == coreActivity) {
+					candidate.input = null;
+					this.propertiesContent = null;
 				}
 			});
 		}
