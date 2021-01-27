@@ -355,13 +355,13 @@
 		<div class="row">
 			<div class="col-sm-4 col-xs-12">
 				<!-- A dummy element so learners table starts on the same height as email preview -->
-				<h4>&nbsp;</h4>
+				<span>&nbsp;</span>
 				
                 <div id="release-marks-learners-panel"> </div>
 			</div>
 			<div class="col-sm-8 col-xs-12">
                 <div id="release-marks-email-preview">
-                    <h4><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></h4>
+					<p style="margin: 0 0 0 0;" class="text-muted text-center"><small><em><fmt:message key="gradebook.monitor.releasemarks.email.preview" />&nbsp;<span id="release-marks-email-preview-user"></span></em></small></p>
                     <div id="release-marks-email-preview-content"></div>
                 </div>
             </div>
@@ -397,7 +397,7 @@
 						<label for="release-marks-schedule-emails"><fmt:message key="gradebook.monitor.releasemarks.schedule.send.emails" /></label>
 					</div>
 					<div class="col-xs-3">
-						<input type="text" id="release-marks-schedule-date" autocomplete="off" /><br><br>
+						<input type="text" id="release-marks-schedule-date" autocomplete="nope" /><br><br>
 						<input type="checkbox" id="release-marks-schedule-emails" />
 					</div>
 				</c:when>
