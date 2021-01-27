@@ -1023,6 +1023,8 @@ public class GradebookService implements IGradebookFullService {
 	    User user = gradebookDAO.find(User.class, currentUserId);
 	    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
 	    result.put("userTimeZoneScheduleDate", DateUtil.convertToTimeZoneFromDefault(userTimeZone, scheduleDate));
+	    result.put("sendEmails",
+		    scheduler.getJobDetail(releaseMarksTrigger.getJobKey()).getJobDataMap().get("sendEmails"));
 	    return result;
 
 	} catch (SchedulerException e) {
@@ -1080,13 +1082,13 @@ public class GradebookService implements IGradebookFullService {
 	// temporary comment so template gets loaded every time
 	// eventually it will be loaded just once
 //	if (RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT == null) {
-	    try {
-		RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
-			.readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
-				"gradebookReleaseLessonMarksEmailTemplate.html"));
-	    } catch (Exception e) {
-		throw new RuntimeException("Can not read release marks email template", e);
-	    }
+	try {
+	    RELEASE_MARKS_EMAIL_TEMPLATE_CONTENT = Files
+		    .readString(Paths.get(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR), FileUtil.LAMS_WWW_DIR,
+			    "gradebookReleaseLessonMarksEmailTemplate.html"));
+	} catch (Exception e) {
+	    throw new RuntimeException("Can not read release marks email template", e);
+	}
 //	}
 
 	User user = userService.getUserById(userID);
