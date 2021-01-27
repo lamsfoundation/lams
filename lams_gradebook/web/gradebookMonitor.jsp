@@ -704,140 +704,79 @@
 
 <body class="stripes">
 
-	<!--  The buttons are formatted and dispayed differently in the pop up vs monitoring version. Popup matches Course Gradebook, 
-	-- Monitoring matches monitoring. So various button settings and the button codes are setup in advance and included where needed later.  -->
-	
-	<c:choose>
-	<c:when test="${!isInTabs}">
-		<c:set var="btnclass" value="btn btn-xs btn-default"/>
-	</c:when>
-	<c:otherwise>
-		<c:set var="btnclass" value="btn btn-sm btn-default"/>
-	</c:otherwise>
-	</c:choose>
-		
-	<c:set var="lockLabelClass">${isInTabs?"lockLabel":""}</c:set>
-	<c:set var="padlockCode">
+	<div class="gbTopButtonsContainer pull-left">
 		<div class="visible-xs-inline">
-		<div id="padlockLocked" style="display:none">
-			<span class="${lockLabelClass}">
-			<i class="fa fa-lock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-		<div id="padlockUnlocked" style="display:none">
-			<span class="${lockLabelClass}">
-			<i class="fa fa-unlock"></i>
-			<fmt:message key="label.marks"/>
-			</span>
-		</div>
-		</div>
-	</c:set>
-			
-			
-	<c:set var="chartButtonCode">
-		<div id="tour-mark-chart-button">
-			<div id="markChartShown" style="display:none">
-			<a href="javascript:toggleMarkChart()" class="${btnclass}" title="<fmt:message key='label.hide.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
-				<fmt:message key="label.hide.marks.chart"/>
+			<div id="padlockLocked" style="display:none">
+				<span class="lockLabel">
+				<i class="fa fa-lock"></i>
+				<fmt:message key="label.marks"/>
 				</span>
-			</a> 
-		</div>
-		<div id="markChartHidden">
-			<a href="javascript:toggleMarkChart()" class="${btnclass}" title="<fmt:message key='label.show.marks.chart'/>" >
-				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
-				<fmt:message key="label.show.marks.chart"/>
+			</div>
+			<div id="padlockUnlocked" style="display:none">
+				<span class="lockLabel">
+				<i class="fa fa-unlock"></i>
+				<fmt:message key="label.marks"/>
 				</span>
-			</a> 
+			</div>
 		</div>
-		</div>
-	</c:set>
+	</div>
 	
-	<c:if test="${usesWeights}">
-		<c:set var="weightButtonCode">
+	<div class="gbTopButtonsContainer pull-right" id="export-link-area">
+
+		<div>
+			<a href="#nogo" id="export-grades-button" class="btn btn-sm btn-default" title="<fmt:message key='gradebook.export.excel'/>" >
+				<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
+				<fmt:message key="gradebook.export.excel" />
+				</span>
+			</a> 
+		</div>
+	
+		<div id="tour-release-marks">
+			<a href="javascript:toggleReleaseMarksPanel()" class="btn btn-sm btn-default" 
+				title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
+				<i class="fa fa-share-alt "></i> <span class="hidden-xs">
+					<fmt:message key="gradebook.monitor.releasemarks.release" />
+				</span>
+			</a>
+		</div>
+
+ 		<div id="tour-mark-chart-button">
+			<div id="markChartShown" style="display:none">
+				<a href="javascript:toggleMarkChart()" class="btn btn-sm btn-default" title="<fmt:message key='label.hide.marks.chart'/>" >
+					<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+					<fmt:message key="label.hide.marks.chart"/>
+					</span>
+				</a> 
+			</div>
+			<div id="markChartHidden">
+				<a href="javascript:toggleMarkChart()" class="btn btn-sm btn-default" title="<fmt:message key='label.show.marks.chart'/>" >
+					<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+					<fmt:message key="label.show.marks.chart"/>
+					</span>
+				</a> 
+			</div>
+		</div>
+		
+ 		<c:if test="${usesWeights}">
 			<div id="tour-weight-button">
 				<div id="weightShown" style="display:none">
-				<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.hide.weights'/>" >
+				<a href="javascript:toggleWeight()" class="btn btn-sm btn-default" title="<fmt:message key='label.button.hide.weights'/>" >
 					<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
 					<fmt:message key="label.button.hide.weights"/>
 					</span>
 				</a> 
 				</div>
 				<div id="weightHidden">
-					<a href="javascript:toggleWeight()" class="${btnclass}" title="<fmt:message key='label.button.show.weights'/>" >
+					<a href="javascript:toggleWeight()" class="btn btn-sm btn-default" title="<fmt:message key='label.button.show.weights'/>" >
 						<i class="fa fa-balance-scale"></i> <span class="hidden-xs">
 						<fmt:message key="label.button.show.weights"/>
 						</span>
 					</a> 
 				</div>
 			</div>
-		</c:set>
-	</c:if>
-	
-	<c:choose>
-		<c:when test="${!isInTabs}">
-			<%-- replacement for Page type admin --%>
-			<div class="row no-gutter no-margin">
-			<div class="col-xs-12">
-			<div class="container" id="content">
-	
-			<div class="panel panel-default panel-admin-page">
-			<div class="panel-body panel-admin-body">
-	
-			<h4><fmt:message key="gradebook.title.lessonGradebook">
-						<fmt:param>
-							<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
-						</fmt:param>
-					</fmt:message></h4>
-	
-			<div class="gbTopButtonsContainer pull-right">
-				${chartButtonCode}
-				${weightButtonCode}
-				<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
-					   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
-				<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
-			</div>
-	
-			<div class="gbTopButtonsContainer pull-left" id="export-link-area">
-				${padlockCode}
-			
-		</c:when>
-		
-		<c:otherwise>
-		 	
-			<div class="gbTopButtonsContainer pull-left">
-				${padlockCode}
-			</div>
-			
-			<div class="gbTopButtonsContainer pull-right" id="export-link-area">
-		 	
-		</c:otherwise>
-	</c:choose>
+		</c:if>
 
-				<div>
-					<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
-						<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
-						<fmt:message key="gradebook.export.excel" />
-						</span>
-					</a> 
-				</div>
-			
-					<div id="tour-release-marks">
-					<a href="javascript:toggleReleaseMarksPanel()" class="${btnclass}" 
-						title="<fmt:message key="gradebook.monitor.releasemarks.toggle.panel.tooltip" />">
-						<i class="fa fa-share-alt "></i> <span class="hidden-xs">
-							<fmt:message key="gradebook.monitor.releasemarks.release" />
-						</span>
-					</a>
-				</div>
-
-				<c:if test="${isInTabs}">
-			 		${chartButtonCode}
-			 		${weightButtonCode}
-				</c:if>
-		
-			</div> <!-- Closes buttons -->
+	</div> <!-- Closes buttons -->
 			
 	<div class="row">
 		<div class="col-xs-12">
@@ -869,7 +808,7 @@
 						</c:if>
 						<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
 					</c:forEach>
-							</div> <%-- close off row started in the loop --%>
+					</div> <%-- close off row started in the loop --%>
 				</div>
 			</div>	
 		</div>	
@@ -885,14 +824,6 @@
 		<table id="activityView" class="scroll" ></table>
 		<div id="activityViewPager" class="scroll" ></div>
 	</div>
-	 
-	<c:if test="${!isInTabs}">
- 		</div>
- 		</div>
- 		</div>
-		</div>
-		</div>	
-	</c:if>
 
 </body>
 </lams:html>

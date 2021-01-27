@@ -129,8 +129,6 @@ public class GradebookMonitoringController {
 	    request.setAttribute("weights", weights);
 	}
 
-	request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
-
 	return "gradebookMonitor";
     }
 
