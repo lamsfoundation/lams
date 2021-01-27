@@ -119,7 +119,7 @@
 			finalList = [];
 		filteredData.forEach(function(learner){
 			if (selectedLearners.indexOf(learner.id) >= 0) {
-				finalList.push(this.id);
+				finalList.push(learner.id);
 			}
 		});
 
