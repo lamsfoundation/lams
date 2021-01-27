@@ -2359,25 +2359,40 @@ GeneralLib = {
 				var candidate = this.branchingActivity ? coreActivity.start : this,
 					groupingFound = false,
 					inputFound = false;
-				do {
-					if (candidate.transitions && candidate.transitions.to.length > 0) {
-						candidate = candidate.transitions.to[0].fromActivity;
-					} else if (candidate.branchingActivity && !candidate.isStart) {
-						candidate = candidate.branchingActivity.start;
-					}  else if (!candidate.branchingActivity && candidate.parentActivity) {
-						candidate = candidate.parentActivity;
-					} else {
-						candidate = null;
-					}
-					
-					if (coreActivity.grouping == candidate) {
-						groupingFound = true;
-					}
-					if (coreActivity.input == candidate) {
-						inputFound = true;
-					}
-				} while (candidate != null);
 				
+				// if it is a support activity, grouping does not need to be connected with it
+				// it just needs to exist
+				if (coreActivity.parentActivity instanceof ActivityDefs.FloatingActivity) {
+					if (!coreActivity.grouping) {
+						return true;
+					}
+					$.each(layout.activities, function(){
+						candidate = this;
+						if (coreActivity.grouping == candidate) {
+							groupingFound = true;
+							return false;
+						}
+					});
+				} else {
+					do {
+						if (candidate.transitions && candidate.transitions.to.length > 0) {
+							candidate = candidate.transitions.to[0].fromActivity;
+						} else if (candidate.branchingActivity && !candidate.isStart) {
+							candidate = candidate.branchingActivity.start;
+						}  else if (!candidate.branchingActivity && candidate.parentActivity) {
+							candidate = candidate.parentActivity;
+						} else {
+							candidate = null;
+						}
+						
+						if (coreActivity.grouping == candidate) {
+							groupingFound = true;
+						}
+						if (coreActivity.input == candidate) {
+							inputFound = true;
+						}
+					} while (candidate != null);
+				}
 				if (coreActivity.grouping && !groupingFound) {
 					coreActivity.grouping = null;
 					this.draw();
