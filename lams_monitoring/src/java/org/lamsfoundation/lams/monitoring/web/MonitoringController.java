@@ -1101,7 +1101,7 @@ public class MonitoringController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	if (!securityService.isLessonMonitor(lessonId, user.getUserID(), "get lesson details", false)) {
+	if (true) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
