@@ -315,13 +315,6 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>GradebookServlet</servlet-name>
-		<servlet-class>
-			org.lamsfoundation.lams.web.GradebookServlet
-		</servlet-class>
-	</servlet>
-
-	<servlet>
 		<servlet-name>CourseGroupManager</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.web.OrganisationGroupServlet
@@ -441,11 +434,6 @@
 	<servlet-mapping>
 		<servlet-name>LessonManager</servlet-name>
 		<url-pattern>/services/xml/LessonManager/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>GradebookServlet</servlet-name>
-		<url-pattern>/services/Gradebook</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

@@ -23,8 +23,16 @@
 package org.lamsfoundation.lams.gradebook.web.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -32,7 +40,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookFullService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
@@ -54,12 +64,17 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -82,6 +97,10 @@ public class GradebookMonitoringController {
     private ILessonService lessonService;
     @Autowired
     private ISecurityService securityService;
+    @Autowired
+    private IEventNotificationService eventNotificationService;
+
+    private static final DateFormat RELEASE_MARKS_SCHEDULE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @RequestMapping("")
     public String unspecified(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -109,8 +128,6 @@ public class GradebookMonitoringController {
 	if (weights.size() > 0) {
 	    request.setAttribute("weights", weights);
 	}
-
-	request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
 
 	return "gradebookMonitor";
     }
@@ -241,15 +258,102 @@ public class GradebookMonitoringController {
      */
     @RequestMapping(path = "/toggleReleaseMarks", method = RequestMethod.POST)
     @ResponseBody
-    public String toggleReleaseMarks(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+    public String toggleReleaseMarks(@RequestParam long lessonID, HttpServletResponse response) throws IOException {
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "toggle release marks", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	}
 
 	gradebookService.toggleMarksReleased(lessonID);
-	response.setContentType("text/plain; charset=utf-8");
 	return "success";
+    }
+
+    @RequestMapping("/displayReleaseMarksPanel")
+    public String displayReleaseMarksPanel(@RequestParam long lessonID, Model model) {
+	Lesson lesson = lessonService.getLesson(lessonID);
+	if (lesson.getMarksReleased()) {
+	    model.addAttribute("marksReleased", true);
+	} else {
+	    model.addAttribute("marksReleased", false);
+
+	    Map<String, Object> scheduleData = gradebookService.getReleaseMarksSchedule(lessonID,
+		    getUser().getUserID());
+	    if (scheduleData != null) {
+		Date scheduleDate = (Date) scheduleData.get("userTimeZoneScheduleDate");
+		if (scheduleDate != null) {
+		    model.addAttribute("releaseMarksScheduleDate",
+			    RELEASE_MARKS_SCHEDULE_DATE_FORMAT.format(scheduleDate));
+		    model.addAttribute("releaseMarksSendEmails", scheduleData.get("sendEmails"));
+		}
+	    }
+	}
+
+	return "releaseLessonMarks";
+    }
+
+    @RequestMapping("/getReleaseMarksEmailContent")
+    @ResponseBody
+    public String getReleaseMarksEmailContent(@RequestParam long lessonID, @RequestParam int userID) {
+	return gradebookService.getReleaseMarksEmailContent(lessonID, userID);
+    }
+
+    @RequestMapping("/sendReleaseMarksEmails")
+    @ResponseBody
+    public String sendReleaseMarksEmails(@RequestParam long lessonID,
+	    @RequestParam(name = "includedLearners") String includedLearnersString)
+	    throws JsonProcessingException, IOException {
+
+	if (StringUtils.isBlank(includedLearnersString)) {
+	    return "list of recipients is empty";
+	}
+	ArrayNode includedLearners = JsonUtil.readArray(includedLearnersString);
+	try {
+	    Set<Integer> recipientIDs = new HashSet<>();
+	    // we send emails only to selected learners
+	    for (int learnerIndex = 0; learnerIndex < includedLearners.size(); learnerIndex++) {
+		recipientIDs.add(includedLearners.get(learnerIndex).asInt());
+	    }
+
+	    if (recipientIDs.isEmpty()) {
+		return "list of recipients it empty";
+	    }
+
+	    gradebookService.sendReleaseMarksEmails(lessonID, recipientIDs, eventNotificationService);
+
+	} catch (Exception e) {
+	    return e.getMessage();
+	}
+
+	return "success";
+    }
+
+    @RequestMapping(path = "/scheduleReleaseMarks", method = RequestMethod.POST)
+    @ResponseBody
+    public String scheduleReleaseMarks(@RequestParam long lessonID, @RequestParam boolean sendEmails,
+	    @RequestParam(name = "scheduleDate", required = false) String scheduleDateString)
+	    throws ParseException, SchedulerException {
+	try {
+	    Date scheduleDate = null;
+	    if (StringUtils.isNotBlank(scheduleDateString)) {
+		scheduleDate = RELEASE_MARKS_SCHEDULE_DATE_FORMAT.parse(scheduleDateString);
+
+		// set seconds and miliseconds to 0
+		Calendar calendarDate = Calendar.getInstance();
+		calendarDate.setTime(scheduleDate);
+		calendarDate.set(Calendar.SECOND, 0);
+		calendarDate.set(Calendar.MILLISECOND, 0);
+		scheduleDate = calendarDate.getTime();
+
+		// if schedule is less then in 5 seconds or in the past, refuse it
+		if (scheduleDate.getTime() - 5000 < new Date().getTime()) {
+		    return "schedule date must be in future";
+		}
+	    }
+	    gradebookService.scheduleReleaseMarks(lessonID, scheduleDate == null ? null : getUser().getUserID(),
+		    sendEmails, scheduleDate);
+	    return "success";
+	} catch (Exception e) {
+	    return e.getMessage();
+	}
     }
 
     /**
@@ -257,7 +361,8 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelLessonGradebook")
     @ResponseBody
-    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelLessonGradebook(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!securityService.isLessonMonitor(lessonID, getUser().getUserID(), "export lesson gradebook spreadsheet",
 		false)) {
@@ -292,7 +397,8 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelCourseGradebook")
     @ResponseBody
-    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelCourseGradebook(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.hasOrgRole(organisationID, user.getUserID(), new String[] { Role.GROUP_MANAGER },
@@ -328,7 +434,8 @@ public class GradebookMonitoringController {
      */
     @RequestMapping("/exportExcelSelectedLessons")
     @ResponseBody
-    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportExcelSelectedLessons(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	UserDTO user = getUser();
 	if (!securityService.isGroupMonitor(organisationID, user.getUserID(),

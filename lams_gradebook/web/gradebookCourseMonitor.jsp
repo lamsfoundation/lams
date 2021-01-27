@@ -8,12 +8,15 @@
 	<lams:css />
 	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
 	
-	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/portrait.js"></script>
 	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/blockexportbutton.js"></script>
+	
+	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 
 	<script type="text/javascript">
 	
@@ -437,22 +440,20 @@
 			</fmt:message>
 		</h4>
 		
-		<c:set var="btnclass" value="btn btn-xs btn-default"/>
-
-		<a target="_blank" class="${btnclass} pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
+		<a target="_blank" class="btn btn-xs btn-default pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
 		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Course+Monitor">
 			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
 		</a>
 
 		<div id="datesNotShown">
-			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates" />">
+			<a class="btn btn-xs btn-default pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates" />">
 				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
 				<fmt:message key="gradebook.monitor.show.dates" /></span>
 			</a>
 		</div>
 
 		<div id="datesShown" style="display:none">
-			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates" />">
+			<a class="btn btn-xs btn-default pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates" />">
 				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
 				<fmt:message key="gradebook.monitor.hide.dates" /></span>
 			</a>
@@ -461,7 +462,7 @@
 
 		<div id="export-link-area" class="gbTopButtonsContainer">
 		<div>
-			<a href="#nogo" id="export-course-button" class="${btnclass}" title="<fmt:message key="gradebook.export.excel" />">
+			<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default" title="<fmt:message key="gradebook.export.excel" />">
 				<i class="fa fa-download"></i><span class="hidden-xs">
 				<fmt:message key="gradebook.export.excel" />
 				</span>
@@ -469,14 +470,14 @@
 		</div>
 
 		<div id="selectLessonsNotShown">
-			<a class="${btnclass}" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.select.lessons.to.export" />" >
+			<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.select.lessons.to.export" />" >
 				<i class="fa fa-square-o"></i><span class="hidden-xs">
 				<fmt:message key="label.select.lessons.to.export" />
 				</span>
 			</a>
 		</div>
 		<div id="selectLessonsShown" style="display:none">
-			<a class="${btnclass}" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.hide.lessons.to.export " />" >
+			<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.hide.lessons.to.export " />" >
 				<i class="fa fa-square-o"></i><span class="hidden-xs">
 				<fmt:message key="label.hide.lessons.to.export" />
 				</span>
@@ -486,7 +487,7 @@
 		</div>
 
 		<div id="select-lessons-area" class="voffset5 form-inline">
-			<input class="${btnclass}" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />
+			<input class="btn btn-xs btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />
 			<div class="checkbox input-sm loffset5"><label><input type="checkbox" id="export-selected-simplified">&nbsp;<fmt:message key="label.simplified.export"/></label></div>
 			<div><fmt:message key="gradebook.export.desc"/></div>
 		</div>

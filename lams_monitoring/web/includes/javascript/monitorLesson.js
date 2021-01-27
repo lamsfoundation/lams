@@ -2302,7 +2302,7 @@ function initGradebookTab() {
  */
 function updateGradebookTab() {
 	$("#gradebookLoading").show();
-	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isInTabs=true&lessonID=' + lessonId, function() {
+	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonId, function() {
 		  $("#gradebookLoading").hide();
 	});
 }
