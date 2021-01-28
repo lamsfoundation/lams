@@ -560,6 +560,12 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
+	if (existingLeader.isResponseFinalized() || existingLeader.isLearnerFinished()) {
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a session wtih ID "
+			    + toolSessionId + " after response has been submitted by existing leader.");
+	}
+
 	QaQueUsr newLeader = getUserByIdAndSession(leaderUserId, toolSessionId);
 	if (newLeader == null) {
 	    return;

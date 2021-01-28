@@ -129,7 +129,9 @@ public class MonitoringController implements QaAppConstants {
 	    groupDTO.setSessionName(sessionName);
 	    groupDTO.setSessionId(sessionId);
 	    groupDTO.setNumberOfLearners(session.getQaQueUsers().size());
-	    groupDTO.setSessionFinished(QaAppConstants.COMPLETED.equals(session.getSession_status()));
+	    groupDTO.setSessionFinished(QaAppConstants.COMPLETED.equals(session.getSession_status())
+		    || (qaContent.isUseSelectLeaderToolOuput() && session.getGroupLeader() != null
+			    && session.getGroupLeader().isResponseFinalized()));
 	    groupDTOs.add(groupDTO);
 	}
 	request.setAttribute(LIST_ALL_GROUPS_DTO, groupDTOs);

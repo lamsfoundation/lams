@@ -434,6 +434,7 @@ public class LearningController implements QaAppConstants {
 
 	//finalize response so user won't need to edit his answers again, if coming back to the activity after leaving activity at this point
 	if (errorMap.isEmpty()) {
+
 	    qaQueUsr.setResponseFinalized(true);
 	    qaService.updateUser(qaQueUsr);
 
@@ -442,7 +443,6 @@ public class LearningController implements QaAppConstants {
 	    request.setAttribute("errorMap", errorMap);
 	    forwardName = QaAppConstants.LOAD_LEARNER;
 	}
-
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
 
