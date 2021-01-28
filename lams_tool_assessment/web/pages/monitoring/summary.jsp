@@ -767,26 +767,36 @@
 	
 	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 	
-		<c:if test="${sessionMap.isGroupedActivity}">	
-		    <div class="panel panel-default" >
-		        <div class="panel-heading" id="heading${sessionDto.sessionId}">
-		        	<span class="panel-title collapsable-icon-left">
-		        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
-								aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
-							<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
-						</a>
-					</span>
-					<c:if test="${assessment.useSelectLeaderToolOuput and sessionDto.numberLearners > 0 and not sessionDto.leaderFinished}">
-						<button type="button" class="btn btn-default btn-xs pull-right"
-								onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
-							<fmt:message key='label.monitoring.change.leader'/>
-						</button>
-					</c:if>
-		        </div>
-	        
-	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
-	        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
-		</c:if>
+		<c:choose>
+			<c:when test="${sessionMap.isGroupedActivity}">	
+			    <div class="panel panel-default" >
+			        <div class="panel-heading" id="heading${sessionDto.sessionId}">
+			        	<span class="panel-title collapsable-icon-left">
+			        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+									aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+								<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
+							</a>
+						</span>
+						<c:if test="${assessment.useSelectLeaderToolOuput and sessionDto.numberLearners > 0 and not sessionDto.leaderFinished}">
+							<button type="button" class="btn btn-default btn-xs pull-right"
+									onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
+								<fmt:message key='label.monitoring.change.leader'/>
+							</button>
+						</c:if>
+			        </div>
+		        
+		        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+		        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
+			</c:when>
+			<c:when test="${assessment.useSelectLeaderToolOuput and sessionDto.numberLearners > 0 and not sessionDto.leaderFinished}">
+				<div style="text-align: right">
+					<button type="button" class="btn btn-default btn-sm voffset10" style="margin-bottom: 10px;"
+							onClick="javascript:showChangeLeaderModal(${sessionDto.sessionId})">
+						<fmt:message key='label.monitoring.change.leader'/>
+					</button>
+				</div>
+			</c:when>
+		</c:choose>
 				
 		<table id="list${sessionDto.sessionId}"></table>
 		<div class="voffset10"></div>

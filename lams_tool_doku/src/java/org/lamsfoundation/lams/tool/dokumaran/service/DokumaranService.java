@@ -280,13 +280,9 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    return;
 	}
 	Dokumaran dokumaran = session.getDokumaran();
-	DokumaranUser newLeader = getUserByIDAndContent(leaderUserId, dokumaran.getContentId());
+	DokumaranUser newLeader = getUserByIDAndSession(leaderUserId, toolSessionId);
 	if (newLeader == null) {
 	    return;
-	}
-	if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
-	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
-		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
 	}
 
 	session.setGroupLeader(newLeader);

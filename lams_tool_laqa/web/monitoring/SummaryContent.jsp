@@ -22,27 +22,37 @@
 </div>
 
 <c:forEach var="groupDto" items="${listAllGroupsDTO}" varStatus="status">
-			  
-	<c:if test="${isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${sessionDto.sessionID}">
-        	<span class="panel-title collapsable-icon-left">
-	        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${groupDto.sessionId}" 
-						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupDto.sessionId}" >
-					<fmt:message key="group.label" />:	<c:out value="${groupDto.sessionName}" />
-				</a>
-			</span>
-			<c:if test="${content.useSelectLeaderToolOuput and groupDto.numberOfLearners > 0 and not groupDto.sessionFinished}">
-				<button type="button" class="btn btn-default btn-xs pull-right"
+
+	<c:choose>
+		<c:when test="${isGroupedActivity}">		  
+		    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${sessionDto.sessionID}">
+	        	<span class="panel-title collapsable-icon-left">
+		        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${groupDto.sessionId}" 
+							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupDto.sessionId}" >
+						<fmt:message key="group.label" />:	<c:out value="${groupDto.sessionName}" />
+					</a>
+				</span>
+				<c:if test="${content.useSelectLeaderToolOuput and groupDto.numberOfLearners > 0 and not groupDto.sessionFinished}">
+					<button type="button" class="btn btn-default btn-xs pull-right"
+							onClick="javascript:showChangeLeaderModal(${groupDto.sessionId})">
+						<fmt:message key='label.monitoring.change.leader'/>
+					</button>
+				</c:if>
+	        </div>
+	        
+	        <div id="collapse${groupDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel"
+				aria-labelledby="heading${groupDto.sessionId}">
+		</c:when>
+		<c:when test="${content.useSelectLeaderToolOuput and groupDto.numberOfLearners > 0 and not groupDto.sessionFinished}">
+			<div style="text-align: right">
+				<button type="button" class="btn btn-default" style="margin-bottom: 10px"
 						onClick="javascript:showChangeLeaderModal(${groupDto.sessionId})">
 					<fmt:message key='label.monitoring.change.leader'/>
 				</button>
-			</c:if>
-        </div>
-        
-        <div id="collapse${groupDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel"
-				aria-labelledby="heading${groupDto.sessionId}">
-	</c:if>	 
+			</div>
+		</c:when>
+	</c:choose>
 	
 	<c:if test="${content.reflect}"> 			
 		<div style="margin-bottom: 20px">
