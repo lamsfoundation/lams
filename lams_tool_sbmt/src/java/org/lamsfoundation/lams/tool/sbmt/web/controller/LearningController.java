@@ -222,12 +222,14 @@ public class LearningController implements SbmtConstants {
 		if (filesUploadedByLeader == null) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY,
 			    "label.waiting.for.leader.launch.time.limit");
+		    request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
 		    return "learner/waitforleader";
 		}
 
 		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
 		if (!groupLeader.isFinished()) {
 		    request.setAttribute(SbmtConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+		    request.setAttribute("groupUsers", submitFilesService.getUsersBySession(toolSessionID));
 		    return "learner/waitforleader";
 		}
 	    }
