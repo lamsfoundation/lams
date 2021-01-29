@@ -306,6 +306,7 @@
     			},
     			success : function(){
     				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				location.reload();
     			},
     			error : function(){
     				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
