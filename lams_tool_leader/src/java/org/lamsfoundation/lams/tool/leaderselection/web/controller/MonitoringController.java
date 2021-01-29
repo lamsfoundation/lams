@@ -29,6 +29,7 @@ import java.security.InvalidParameterException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionDTO;
@@ -148,7 +149,8 @@ public class MonitoringController {
     }
 
     @RequestMapping("/displayChangeLeaderForGroupDialogFromActivity")
-    public String displayChangeLeaderForGroupDialog(@RequestParam long toolSessionId, Model model) {
+    public String displayChangeLeaderForGroupDialog(@RequestParam long toolSessionId,
+	    @RequestParam(required = false) String availableLearners, Model model) {
 	Long leaderSelectionToolContentId = toolService.getNearestLeaderSelectionToolContentId(toolSessionId);
 	if (leaderSelectionToolContentId == null) {
 	    throw new InvalidParameterException(
@@ -161,12 +163,13 @@ public class MonitoringController {
 
 	model.addAttribute("toolSessionId", toolSessionId);
 
-	return displayChangeLeaderForGroupDialog(leaderSelectionToolContentId, group.getGroupId(), model);
+	return displayChangeLeaderForGroupDialog(leaderSelectionToolContentId, group.getGroupId(), availableLearners,
+		model);
     }
 
     @RequestMapping("/displayChangeLeaderForGroupDialog")
     public String displayChangeLeaderForGroupDialog(@RequestParam long leaderSelectionToolContentId,
-	    @RequestParam long groupId, Model model) {
+	    @RequestParam long groupId, String availableLearners, Model model) {
 	Leaderselection leaderSelection = leaderselectionService.getContentByContentId(leaderSelectionToolContentId);
 	if (leaderSelection == null) {
 	    throw new InvalidParameterException(
@@ -193,6 +196,10 @@ public class MonitoringController {
 	model.addAttribute("groupName", targetSession.getSessionName());
 	model.addAttribute("groupLeader", targetSession.getGroupLeader());
 	model.addAttribute("members", targetSession.getUsers());
+
+	if (StringUtils.isNotBlank(availableLearners)) {
+	    model.addAttribute("availableLearners", availableLearners.split(","));
+	}
 
 	return "/pages/monitoring/changeLeaderDialog";
     }

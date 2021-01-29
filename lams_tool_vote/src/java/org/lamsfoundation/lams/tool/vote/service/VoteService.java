@@ -243,7 +243,18 @@ public class VoteService
 
 	VoteQueUsr newLeader = getVoteUserBySession(leaderUserId, session.getUid());
 	if (newLeader == null) {
-	    return;
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+
+	    String userName = user.getLogin();
+	    String fullName = user.getFirstName() + " " + user.getLastName();
+
+	    newLeader = new VoteQueUsr(leaderUserId, userName, fullName, session, new TreeSet<VoteUsrAttempt>());
+	    createVoteQueUsr(newLeader);
+
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
 	}
 
 	session.setGroupLeader(newLeader);
@@ -254,7 +265,10 @@ public class VoteService
 	for (VoteUsrAttempt vote : existingLeader.getVoteUsrAttempts()) {
 	    vote.setVoteQueUsr(newLeader);
 	    voteUsrAttemptDAO.updateVoteUsrAttempt(vote);
+	}
 
+	if (logger.isDebugEnabled()) {
+	    logger.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
 	}
 
 	Set<Integer> userIds = session.getVoteQueUsers().stream()

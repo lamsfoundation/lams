@@ -1397,17 +1397,23 @@ public class SubmitFilesService
 
 	SubmitUser newLeader = getSessionUser(toolSessionId, leaderUserId);
 	if (newLeader == null) {
-	    return;
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = createSessionUser(user.getUserDTO(), toolSessionId);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else {
+	    List<SubmissionDetails> newLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
+		    leaderUserId);
+	    for (SubmissionDetails submission : newLeaderSubmissions) {
+		submissionDetailsDAO.delete(submission);
+	    }
 	}
 
 	session.setGroupLeader(newLeader);
 	submitFilesSessionDAO.update(session);
-
-	List<SubmissionDetails> newLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
-		leaderUserId);
-	for (SubmissionDetails submission : newLeaderSubmissions) {
-	    submissionDetailsDAO.delete(submission);
-	}
 
 	List<SubmissionDetails> existingLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
 		existingLeader.getUserID());
@@ -1415,6 +1421,10 @@ public class SubmitFilesService
 	for (SubmissionDetails submission : existingLeaderSubmissions) {
 	    submission.setLearner(newLeader);
 	    submissionDetailsDAO.update(submission);
+	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
 	}
 
 	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()

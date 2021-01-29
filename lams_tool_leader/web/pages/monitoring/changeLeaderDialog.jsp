@@ -69,6 +69,11 @@
 								<lams:Portrait userId="${user.userId}"/>
 								<span>
 									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+									<c:forEach var="availableLearnerId" items="${availableLearners}">
+										<c:if test="${user.userId eq availableLearnerId}">
+											&nbsp;<i class="fa fa-check text-success" title="<fmt:message key='label.learner.available.in.activity'/>"></i>
+										</c:if>
+									</c:forEach>
 								</span>
 							</label>
 						</div>

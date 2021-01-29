@@ -279,18 +279,30 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
 	    return;
 	}
-	Dokumaran dokumaran = session.getDokumaran();
+
 	DokumaranUser newLeader = getUserByIDAndSession(leaderUserId, toolSessionId);
 	if (newLeader == null) {
-	    return;
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = new DokumaranUser(user.getUserDTO(), session);
+	    saveOrUpdate(newLeader);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
 	}
 
 	session.setGroupLeader(newLeader);
 	dokumaranSessionDao.update(session);
 
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
 	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
 		.collect(Collectors.mapping(dokumaranUser -> dokumaranUser.getUserId().intValue(), Collectors.toSet()));
 
+	Dokumaran dokumaran = session.getDokumaran();
 	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
 	jsonCommand.put("hookTrigger", "doku-leader-change-refresh-" + toolSessionId);
 	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());

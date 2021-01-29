@@ -2235,15 +2235,25 @@ public class ScratchieServiceImpl implements IScratchieService, ICommonScratchie
 	Scratchie scratchie = session.getScratchie();
 	ScratchieUser newLeader = getUserByUserIDAndContentID(leaderUserId, scratchie.getContentId());
 	if (newLeader == null) {
-	    return;
-	}
-	if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = new ScratchieUser(user.getUserDTO(), session);
+	    createUser(newLeader);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
 	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
 		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
 	}
 
 	session.setGroupLeader(newLeader);
 	scratchieSessionDao.update(session);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
 
 	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
 		.collect(Collectors.mapping(scratchieUser -> scratchieUser.getUserId().intValue(), Collectors.toSet()));

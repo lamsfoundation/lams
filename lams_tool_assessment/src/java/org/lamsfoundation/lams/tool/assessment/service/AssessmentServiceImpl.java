@@ -4027,16 +4027,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Assessment assessment = session.getAssessment();
 	AssessmentUser newLeader = getUserByIdAndContent(leaderUserId, assessment.getContentId());
 	if (newLeader == null) {
-	    return;
-	}
-	if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = new AssessmentUser(user.getUserDTO(), session);
+	    createUser(newLeader);
+	    
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
 	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
 		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
-	}
-
-	AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
-	if (newLeaderResult != null) {
-	    assessmentDao.delete(newLeaderResult);
+	} else {
+	    AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
+	    if (newLeaderResult != null) {
+		assessmentDao.delete(newLeaderResult);
+	    }
 	}
 
 	AssessmentResult existingLeaderResult = getLastAssessmentResult(assessment.getUid(),
@@ -4054,6 +4060,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	session.setGroupLeader(newLeader);
 	assessmentDao.update(session);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
 
 	Set<Integer> userIds = session.getAssessmentUsers().stream().collect(
 		Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(), Collectors.toSet()));

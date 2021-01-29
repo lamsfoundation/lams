@@ -145,8 +145,8 @@
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#change-leader-modals').empty()
-		.load('<lams:LAMSURL/>tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do',{
-			toolSessionId : toolSessionId
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
 		});
 	}
 

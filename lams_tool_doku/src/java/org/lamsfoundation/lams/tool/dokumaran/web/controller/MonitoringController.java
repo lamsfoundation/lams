@@ -278,6 +278,18 @@ public class MonitoringController {
 
     }
 
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	// tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	String availableLearners = dokumaranService.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Long.toString(user.getUserId()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
     @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)

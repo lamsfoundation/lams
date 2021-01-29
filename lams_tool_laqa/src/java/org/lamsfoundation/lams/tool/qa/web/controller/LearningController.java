@@ -97,11 +97,6 @@ public class LearningController implements QaAppConstants {
     @Qualifier("qaMessageService")
     private MessageService messageService;
 
-    @RequestMapping("/")
-    public String unspecified() throws IOException, ServletException, ToolException {
-	return null;
-    }
-
     @RequestMapping("/learning")
     public String execute(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm, HttpServletRequest request)
 	    throws IOException, ServletException {

@@ -568,21 +568,30 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
 	QaQueUsr newLeader = getUserByIdAndSession(leaderUserId, toolSessionId);
 	if (newLeader == null) {
-	    return;
+	    newLeader = createUser(toolSessionId, Long.valueOf(leaderUserId).intValue());
+
+	    if (logger.isDebugEnabled()) {
+		logger.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else {
+	    List<QaUsrResp> newLeaderResponses = getResponsesByUserUid(newLeader.getUid());
+	    for (QaUsrResp response : newLeaderResponses) {
+		qaUsrRespDAO.removeUserResponse(response);
+	    }
 	}
 
 	session.setGroupLeader(newLeader);
 	qaSessionDAO.UpdateQaSession(session);
 
-	List<QaUsrResp> newLeaderResponses = getResponsesByUserUid(newLeader.getUid());
-	for (QaUsrResp response : newLeaderResponses) {
-	    qaUsrRespDAO.removeUserResponse(response);
-	}
-
 	List<QaUsrResp> existingLeaderResponses = getResponsesByUserUid(existingLeader.getUid());
 	for (QaUsrResp response : existingLeaderResponses) {
 	    response.setQaQueUser(newLeader);
 	    qaUsrRespDAO.updateUserResponse(response);
+	}
+
+	if (logger.isDebugEnabled()) {
+	    logger.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
 	}
 
 	Set<Integer> userIds = session.getQaQueUsers().stream()
