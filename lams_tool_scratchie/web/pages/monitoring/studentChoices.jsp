@@ -158,7 +158,7 @@
 						<c:if test="${not showStudentChoicesTableOnly or sessionMap.isGroupedActivity}">
 							<c:choose>
 								<c:when test="${empty sessionDto.leaderUid}">
-									{sessionDto.sessionName}
+									${sessionDto.sessionName}
 								</c:when>
 								<c:otherwise>
 									<c:url var="userSummaryUrl" value='/learning/start.do'>

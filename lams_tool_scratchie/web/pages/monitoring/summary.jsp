@@ -119,7 +119,7 @@
    	   				totalAttempts:"${summary.leaderUid eq user.uid ? summary.totalAttempts : ''}",
    	   				mark:"${summary.leaderUid eq user.uid ? (summary.totalAttempts == 0 ? '-' : summary.mark) : ''}",
    	   				portraitId:"${user.portraitId}",
-   	   				isLeader : "${summary.leaderUid eq user.uid}",
+   	   				isLeader : "${not empty summary.leaderUid and summary.leaderUid eq user.uid}",
    	   				reachedActivity : "${summary.getUsersWhoReachedActivity().contains(user.userId)}"
    	   	   	    });
 	        </c:forEach>
