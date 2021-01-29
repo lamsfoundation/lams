@@ -209,9 +209,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	Query<Float> q = getSession().createQuery(LAST_ASSESSMENT_RESULT_GRADE, Float.class);
 	q.setParameter("userId", userId);
 	q.setParameter("assessmentUid", assessmentUid);
-	Float lastTotalScore = q.uniqueResult();
-
-	return lastTotalScore == null ? 0 : lastTotalScore;
+	return q.uniqueResult();
     }
 
     @Override

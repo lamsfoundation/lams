@@ -150,15 +150,17 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 		String firstName = (String) element[1];
 		String lastName = (String) element[2];
 		String login = (String) element[3];
-		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
-		String portraitId = (String) element[5];
+		boolean resultSubmitted = element[4] != null;
+		float grade = resultSubmitted ? ((Number) element[4]).floatValue() : 0;
 
+		String portraitId = (String) element[5];
 		AssessmentUserDTO userDto = new AssessmentUserDTO();
 		userDto.setUserId(userId);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
 		userDto.setLogin(login);
 		userDto.setGrade(grade);
+		userDto.setResultSubmitted(resultSubmitted);
 		userDto.setPortraitId(portraitId);
 		userDtos.add(userDto);
 	    }
