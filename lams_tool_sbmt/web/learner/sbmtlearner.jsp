@@ -191,7 +191,7 @@
 				errDivId = 'file-error-msg';
 			}
 			var errDiv = $('#'+errDivId);
-			if ( errDiv.size() > 0 ) {
+			if ( errDiv.length > 0 ) {
 				errDiv.append(error);
 				errDiv.css( "display", "block" );
 			} else {
