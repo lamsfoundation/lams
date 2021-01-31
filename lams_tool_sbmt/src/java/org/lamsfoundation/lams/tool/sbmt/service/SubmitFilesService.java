@@ -244,6 +244,11 @@ public class SubmitFilesService
 
 		toolService.removeActivityMark(user.getUserID(), session.getSessionID());
 
+		if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
+		    session.setGroupLeader(null);
+		    submitFilesSessionDAO.update(session);
+		}
+
 		submitUserDAO.delete(user);
 	    }
 	}
