@@ -51,7 +51,8 @@
 				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
 				// if the trigger is recognised, the following action occurs
 				commandWebsocketHook = function() {
-					location.reload();
+					// in case in the address bar there is refresh.do, direct to the main learner URL
+					location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
 				};
 			</c:if>
 		});
