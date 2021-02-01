@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,7 +52,7 @@ public class LearningWebsocketServer {
 
 		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
 			    .iterator();
-		    // go through activities and update registered learners with reports and vote count
+		    // go through activities and update registered learners with selected leader
 		    while (entryIterator.hasNext()) {
 			Entry<Long, Set<Session>> entry = entryIterator.next();
 			Long toolSessionId = entry.getKey();
@@ -62,9 +63,14 @@ public class LearningWebsocketServer {
 			    continue;
 			}
 
-			boolean finished = LearningWebsocketServer.getLeaderService()
-				.getSessionBySessionId(toolSessionId).getGroupLeader() != null;
-			if (finished) {
+			LeaderselectionUser leader = LearningWebsocketServer.getLeaderService()
+				.getSessionBySessionId(toolSessionId).getGroupLeader();
+			Long existingLeaderUid = leaders.get(toolSessionId);
+			
+			// check if a leader has been selected or it has changed
+			if ((existingLeaderUid == null && leader != null) || (existingLeaderUid != null
+				&& (leader == null || !leader.getUid().equals(existingLeaderUid)))) {
+			    leaders.put(toolSessionId, leader == null ? null : leader.getUid());
 			    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
 			}
 		    }
@@ -90,6 +96,7 @@ public class LearningWebsocketServer {
 
     private static final SendWorker sendWorker = new SendWorker();
     private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<>();
+    private static final Map<Long, Long> leaders = new HashMap<>();
     private static ILeaderselectionService leaderService;
 
     static {

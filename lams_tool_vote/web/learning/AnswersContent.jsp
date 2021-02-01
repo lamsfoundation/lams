@@ -88,33 +88,42 @@
 			});
 		}
 
-		$(document)
-				.ready(
-						function() {
+		$(document).ready(function() {
 
-							var mode = "${voteGeneralLearnerFlowDTO.learningMode}";
-							var isUserLeader = ($('[name="userLeader"]').val() === "true");
-							var isLeadershipEnabled = ($(
-									'[name="useSelectLeaderToolOuput"]').val() === "true");
-							var hasEditRight = !isLeadershipEnabled
-									|| isLeadershipEnabled && isUserLeader;
+			var mode = "${voteGeneralLearnerFlowDTO.learningMode}";
+			var isUserLeader = ($('[name="userLeader"]').val() === "true");
+			var isLeadershipEnabled = ($(
+					'[name="useSelectLeaderToolOuput"]').val() === "true");
+			var hasEditRight = !isLeadershipEnabled
+					|| isLeadershipEnabled && isUserLeader;
 
-							if (!hasEditRight && (mode != "teacher")) {
-								setInterval("checkLeaderProgress();", 60000);// Auto-Refresh every 1 minute for non-leaders
-							}
+			if (!hasEditRight && (mode != "teacher")) {
+				setInterval("checkLeaderProgress();", 60000);// Auto-Refresh every 1 minute for non-leaders
+			}
 
-							if (!hasEditRight) {
-								$('[name="userEntry"]').prop('disabled', true);
-								$('[name="checkedVotes"]').prop('disabled',
-										true);
-								$('[name="continueOptionsCombined"]').hide();
-							}
-						});
+			if (!hasEditRight) {
+				$('[name="userEntry"]').prop('disabled', true);
+				$('[name="checkedVotes"]').prop('disabled',
+						true);
+				$('[name="continueOptionsCombined"]').hide();
+			}
+
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${voteLearningForm.useSelectLeaderToolOuput and voteGeneralLearnerFlowDTO.learningMode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'vote-leader-change-refresh-${voteLearningForm.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
+		});
 	</script>
 </lams:head>
 
 <body class="stripes">
-
 	<form:form modelAttribute="voteLearningForm" onsubmit="return validate();" action="continueOptionsCombined.do" method="POST">
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="userID" />

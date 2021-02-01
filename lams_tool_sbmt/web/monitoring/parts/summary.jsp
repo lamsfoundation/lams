@@ -141,6 +141,38 @@
 			}
 		});
 	}
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 </script>
 
 <div class="panel">
@@ -164,18 +196,34 @@
 
 <c:forEach var="sessionDto" items="${sessions}" varStatus="status">
 		
-	<c:if test="${isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${sessionDto.sessionID}">
-        	<span class="panel-title collapsable-icon-left">
-        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
-					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
-			<fmt:message key="label.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
-			</span>
-        </div>
-        
-        <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
-	</c:if>
+	<c:choose>
+		<c:when test="${isGroupedActivity}">		  
+		    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${sessionDto.sessionID}">
+	        	<span class="panel-title collapsable-icon-left">
+	        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
+				<fmt:message key="label.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
+				</span>
+				<c:if test="${content.useSelectLeaderToolOuput and sessionDto.numberOfLearners > 0 and not sessionDto.sessionFinished}">
+					<button type="button" class="btn btn-default btn-xs pull-right"
+							onClick="javascript:showChangeLeaderModal(${sessionDto.sessionID})">
+						<fmt:message key='label.monitoring.change.leader'/>
+					</button>
+				</c:if>
+	        </div>
+	        
+	        <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
+		</c:when>
+		<c:when test="${content.useSelectLeaderToolOuput and sessionDto.numberOfLearners > 0 and not sessionDto.sessionFinished}">
+			<div style="text-align: right">
+				<button type="button" class="btn btn-default" style="margin-bottom: 10px"
+						onClick="javascript:showChangeLeaderModal(${sessionDto.sessionID})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</div>
+		</c:when>
+	</c:choose>
 	
 	<lams:TSTable numColumns="${reflectOn ? 4 : 3}" dataId="data-session-id='${sessionDto.sessionID}'">
 			<th><fmt:message key="monitoring.user.fullname"/></th>
@@ -223,3 +271,5 @@
 <%@ include file="advanceoptions.jsp"%>	
 
 <%@include file="daterestriction.jsp"%>
+
+<div id="change-leader-modals"></div>

@@ -43,6 +43,18 @@
 			if ($('#file-upload-area').length == 1) {
 				initFileUpload('${learnerForm.tmpFileUploadId}', '<lams:user property="localeLanguage"/>');
 			}
+
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					// in case in the address bar there is refresh.do, direct to the main learner URL
+					location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
+				};
+			</c:if>
 		});
 		
 		/**
@@ -179,7 +191,7 @@
 				errDivId = 'file-error-msg';
 			}
 			var errDiv = $('#'+errDivId);
-			if ( errDiv.size() > 0 ) {
+			if ( errDiv.length > 0 ) {
 				errDiv.append(error);
 				errDiv.css( "display", "block" );
 			} else {

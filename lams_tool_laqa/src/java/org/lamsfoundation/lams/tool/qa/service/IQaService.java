@@ -91,7 +91,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     QaContent getQaContent(long toolContentId);
 
     void saveOrUpdateQaContent(QaContent qa);
-    
+
     void releaseFromCache(Object object);
 
     void updateUser(QaQueUsr qaQueUsr);
@@ -199,7 +199,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-    
+
     String finishToolSession(Long toolSessionID, Long userID);
 
     /**
@@ -256,10 +256,7 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString);
 
-    /**
-     * notifyTeachersOnResponseSubmit
-     *
-     * @param sessionId
-     */
     void notifyTeachersOnResponseSubmit(Long sessionId);
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

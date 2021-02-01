@@ -16,6 +16,19 @@
 		
 		//refresh page every 30 sec
 		setTimeout("refresh();",30000);
+
+		$(document).ready(function(){
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${sessionMap.mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
+		});
     </script>
 </lams:head>
 <body class="stripes">
@@ -29,6 +42,24 @@
 		<h4>
 			<fmt:message key="${waitingMessageKey}" />
 		</h4>
+		
+		<c:if test="${not empty groupUsers}">
+		
+			<div class="voffset5">
+				<fmt:message key="label.users.from.group" />
+			</div>
+		
+			<div id="usersInGroup">
+				<c:forEach var="user" items="${groupUsers}">
+					<div class="voffset10 loffset10">
+						<lams:Portrait userId="${user.userID}"/>
+						<span>
+							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+						</span>
+					</div>
+				</c:forEach>
+			</div>
+		</c:if>
 		
 		<button name="refreshButton" onclick="refresh();" class="btn btn-sm btn-primary pull-right">
 			<fmt:message key="label.refresh" />

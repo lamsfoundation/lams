@@ -412,6 +412,38 @@
 			}
 		});
 	}
+
+
+	function showChangeLeaderModal(toolSessionId) {
+		$('#change-leader-modals').empty()
+		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+			toolSessionID : toolSessionId
+		});
+	}
+
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+        if (response.isSuccessful) {
+            $.ajax({
+    			'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+    			'type': 'post',
+    			'cache' : 'false',
+    			'data': {
+    				'toolSessionID' : toolSessionId,
+    				'leaderUserId' : leaderUserId,
+    				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+    			},
+    			success : function(){
+    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    			},
+    			error : function(){
+    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+        		}
+            });
+        	
+		} else {
+			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+		}
+	}
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -500,21 +532,36 @@
 </c:if>
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	
-	<c:if test="${sessionMap.isGroupedActivity}">
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${groupSummary.sessionId}">
-        	<span class="panel-title collapsable-icon-left">
-        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-						aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-					<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
-				</a>
-			</span>
-        </div>
-        
-        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
-        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
-	</c:if>
+	<c:choose>
+		<c:when test="${sessionMap.isGroupedActivity}">		
+		    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+	        	<span class="panel-title collapsable-icon-left">
+	        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
+						<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+					</a>
+				</span>
+				<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+					<button type="button" class="btn btn-default btn-xs pull-right"
+							onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
+						<fmt:message key='label.monitoring.change.leader'/>
+					</button>
+				</c:if>
+	        </div>
+	        
+	        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+	        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+		</c:when>
+		<c:when test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+			<div style="text-align: right">
+				<button type="button" class="btn btn-default" style="margin-bottom: 10px"
+						onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</div>
+		</c:when>
+	</c:choose>
 	
 	<c:choose>
 		<c:when test="${groupSummary.sessionFaulty}">
@@ -580,3 +627,5 @@
 </c:if>
 
 <%@ include file="advanceoptions.jsp"%>
+
+<div id="change-leader-modals"></div>

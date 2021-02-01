@@ -150,6 +150,7 @@
             <props>
 				<prop key="allocateAnswerToOption">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
             	<prop key="audit*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            	<prop key="changeLeader*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>

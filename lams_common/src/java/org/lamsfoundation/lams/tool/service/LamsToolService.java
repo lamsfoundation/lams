@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.FloatingActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -171,6 +173,12 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
+    public Group getGroup(long toolSessionId) {
+	GroupedToolSession session = activityDAO.find(GroupedToolSession.class, toolSessionId);
+	return session == null ? null : session.getSessionGroup();
+    }
+
+    @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	logEventService.logStartEditingActivityInMonitor(toolContentID);
     }
@@ -232,8 +240,7 @@ public class LamsToolService implements ILamsToolService {
 
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
-		toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId);
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -260,8 +267,7 @@ public class LamsToolService implements ILamsToolService {
 
 	ToolSession toolSession = this.getToolSession(toolSessionId);
 	ToolActivity specifiedActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
-		toolSession.getLesson().getLessonId());
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId);
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {
@@ -290,14 +296,26 @@ public class LamsToolService implements ILamsToolService {
 	return result;
     }
 
+    @Override
+    public Long getNearestLeaderSelectionToolContentId(long toolSessionId) {
+	ToolSession session = activityDAO.find(ToolSession.class, toolSessionId);
+	ToolActivity leaderSelection = getNearestLeaderSelectionActivity(session.getToolActivity(), null);
+	return leaderSelection == null ? null : leaderSelection.getToolContentId();
+    }
+
     /**
      * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
      * activities set first, and then inside the parent set.
      */
     @SuppressWarnings("rawtypes")
-    private Activity getNearestLeaderSelectionActivity(Activity activity, Integer userId, Long lessonId) {
+    private ToolActivity getNearestLeaderSelectionActivity(Activity activity, Integer userId) {
 	// check if current activity is Leader Select one. if so - stop searching and return it.
 	Class activityClass = Hibernate.getClass(activity);
+
+	if (userId == null && activityClass.equals(FloatingActivity.class)) {
+	    return null;
+	}
+
 	if (activityClass.equals(ToolActivity.class)) {
 	    ToolActivity toolActivity;
 
@@ -312,17 +330,18 @@ public class LamsToolService implements ILamsToolService {
 	    }
 
 	    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
-		return activity;
+		return toolActivity;
 	    }
 
 	    //in case of a floating activity
 	} else if (activityClass.equals(FloatingActivity.class)) {
+	    Long lessonId = activity.getLearningDesign().getLessons().iterator().next().getLessonId();
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(userId, lessonId);
 	    Map<Activity, CompletedActivityProgress> completedActivities = learnerProgress.getCompletedActivities();
 
 	    //find the earliest finished Leader Select Activity
 	    Date leaderSelectActivityFinishDate = null;
-	    Activity leaderSelectionActivity = null;
+	    ToolActivity leaderSelectionActivity = null;
 	    for (Activity completedActivity : completedActivities.keySet()) {
 
 		if (completedActivity instanceof ToolActivity) {
@@ -349,13 +368,13 @@ public class LamsToolService implements ILamsToolService {
 	Transition transitionTo = activity.getTransitionTo();
 	if (transitionTo != null) {
 	    Activity fromActivity = transitionTo.getFromActivity();
-	    return getNearestLeaderSelectionActivity(fromActivity, userId, lessonId);
+	    return getNearestLeaderSelectionActivity(fromActivity, userId);
 	}
 
 	// check parent activity
 	Activity parent = activity.getParentActivity();
 	if (parent != null) {
-	    return getNearestLeaderSelectionActivity(parent, userId, lessonId);
+	    return getNearestLeaderSelectionActivity(parent, userId);
 	}
 
 	return null;

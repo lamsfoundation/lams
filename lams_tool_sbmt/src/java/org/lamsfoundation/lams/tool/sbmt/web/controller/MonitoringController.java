@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +57,8 @@ import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -64,13 +67,16 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -555,6 +561,26 @@ public class MonitoringController {
 	}
     }
 
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	// tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	String availableLearners = submitFilesService.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Integer.toString(user.getUserID()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam int leaderUserId) {
+	submitFilesService.changeLeaderForGroup(toolSessionId, leaderUserId);
+    }
+
     // **********************************************************
     // Private methods
     // **********************************************************
@@ -575,6 +601,9 @@ public class MonitoringController {
 	    sessionDto.setSessionID(sessionID);
 	    sessionDto.setSessionName(sfs.getSessionName());
 	    sessionDto.setMarksReleased(sfs.isMarksReleased());
+	    sessionDto.setNumberOfLearners(submitFilesService.getCountUsersBySession(sessionID, null));
+	    sessionDto.setSessionFinished(
+		    sfs.getStatus() != null && sfs.getStatus().equals(SubmitFilesSession.COMPLETED));
 	    sessions.add(sessionDto);
 	}
 

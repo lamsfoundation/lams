@@ -133,6 +133,7 @@ public class LearningController {
 	    List<User> groupUserDtos = new ArrayList<>();
 	    for (ScratchieUser groupUser : groupUsers) {
 		User groupUserDto = new User();
+		groupUserDto.setUserId(groupUser.getUserId().intValue());
 		groupUserDto.setFirstName(groupUser.getFirstName());
 		groupUserDto.setLastName(groupUser.getLastName());
 		groupUserDtos.add(groupUserDto);

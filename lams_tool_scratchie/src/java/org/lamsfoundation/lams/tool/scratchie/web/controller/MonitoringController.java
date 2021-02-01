@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -57,6 +58,8 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -73,6 +76,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -294,6 +298,26 @@ public class MonitoringController {
 	    request.setAttribute("qbStats", qbStats);
 	}
 	return "pages/monitoring/parts/statisticpart";
+    }
+
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	// tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	String availableLearners = scratchieService.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Long.toString(user.getUserId()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    private void changeLeaderForGroup(@RequestParam(name = AttributeNames.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	scratchieService.changeLeaderForGroup(toolSessionId, leaderUserId);
     }
 
     @SuppressWarnings("unchecked")

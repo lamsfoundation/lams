@@ -80,6 +80,7 @@
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 			   		<property name="ratingService"><ref bean="ratingService"/></property>   
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
+			   		<property name="learnerService"><ref bean="learnerService"/></property>
 			   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 			   		<property name="qbService"><ref bean="qbService"/></property> 
 			   		<property name="messageService"><ref bean="qaMessageService"/></property>
@@ -88,6 +89,7 @@
 			<property name="transactionAttributes">
 				<props>
             		<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            		<prop key="changeLeader*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="create*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>

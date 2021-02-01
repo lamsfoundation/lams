@@ -18,6 +18,9 @@ public class GradeStatsDTO {
     private Long sessionId;
     private String sessionName;
 
+    private int numberOfLearners;
+    private boolean leaderFinished;
+
     private int count;
     private Float min;
     private Float max;
@@ -78,6 +81,22 @@ public class GradeStatsDTO {
 
     public String getSessionName() {
 	return sessionName;
+    }
+
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
+
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
+
+    public boolean isLeaderFinished() {
+	return leaderFinished;
+    }
+
+    public void setLeaderFinished(boolean leaderFinished) {
+	this.leaderFinished = leaderFinished;
     }
 
     public List<AssessmentResult> getAssessmentResults() {

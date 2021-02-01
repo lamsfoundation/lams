@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -1214,7 +1215,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    } else {
 		sessionDto = new GradeStatsDTO(sessionId, session.getSessionName());
 
+		if (session.getAssessment().isUseSelectLeaderToolOuput()) {
+		    sessionDto.setNumberOfLearners(session.getAssessmentUsers().size());
+
+		    AssessmentUser leader = session.getGroupLeader();
+		    if (leader != null) {
+			if (leader.isSessionFinished()) {
+			    sessionDto.setLeaderFinished(true);
+			} else {
+			    AssessmentResult result = getLastAssessmentResult(session.getAssessment().getUid(),
+				    leader.getUserId());
+			    if (result != null && result.getFinishDate() != null) {
+				leader.setSessionFinished(true);
+			    }
+			}
+		    }
+		}
 	    }
+
 	    sessionDtos.add(sessionDto);
 	}
 
@@ -3980,5 +3998,66 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	result.putAll(answeredQuestions);
 	return result;
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	AssessmentSession session = getSessionBySessionId(toolSessionId);
+	if (AssessmentConstants.COMPLETED == session.getStatus()) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	AssessmentUser existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
+	    return;
+	}
+	Assessment assessment = session.getAssessment();
+	AssessmentUser newLeader = getUserByIdAndContent(leaderUserId, assessment.getContentId());
+	if (newLeader == null) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = new AssessmentUser(user.getUserDTO(), session);
+	    createUser(newLeader);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
+	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
+		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
+	} else {
+	    AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
+	    if (newLeaderResult != null) {
+		assessmentDao.delete(newLeaderResult);
+	    }
+	}
+
+	AssessmentResult existingLeaderResult = getLastAssessmentResult(assessment.getUid(),
+		existingLeader.getUserId());
+	if (existingLeaderResult != null) {
+	    if (existingLeaderResult.getFinishDate() != null) {
+		throw new InvalidParameterException("Attempting to assing a finished result of leader with user ID "
+			+ existingLeader.getUserId() + " to a new leader with user ID " + leaderUserId
+			+ " in session wtih ID " + toolSessionId);
+	    }
+
+	    existingLeaderResult.setUser(newLeader);
+	    assessmentDao.update(existingLeaderResult);
+	}
+
+	session.setGroupLeader(newLeader);
+	assessmentDao.update(session);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = session.getAssessmentUsers().stream().collect(
+		Collectors.mapping(assessmentUser -> assessmentUser.getUserId().intValue(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "assessment-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
     }
 }

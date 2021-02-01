@@ -189,6 +189,16 @@
 				
 			});
 
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and mode == 'learner'}">
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'qa-leader-change-refresh-${generalLearnerFlowDTO.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					location.reload();
+				};
+			</c:if>
 		});
 		
 	</script>

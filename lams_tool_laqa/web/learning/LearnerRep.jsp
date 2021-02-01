@@ -264,6 +264,7 @@
 					jQuery("time.timeago").timeago();
 				});
 			});
+
 		 });
 
 		function refreshPage(reload) {

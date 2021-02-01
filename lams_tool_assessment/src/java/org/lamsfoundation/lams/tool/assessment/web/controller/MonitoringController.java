@@ -1063,6 +1063,26 @@ public class MonitoringController {
 	service.saveOrUpdateAssessment(assessment);
     }
 
+    @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
+    public String displayChangeLeaderForGroupDialogFromActivity(
+	    // tell Change Leader dialog in Leader Selection tool which learner has already reached this activity
+	    @RequestParam(name = AssessmentConstants.PARAM_TOOL_SESSION_ID) long toolSessionId) {
+	String availableLearners = service.getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(user -> Long.toString(user.getUserId()), Collectors.joining(",")));
+
+	return new StringBuilder("redirect:").append(Configuration.get(ConfigurationKeys.SERVER_URL))
+		.append("tool/lalead11/monitoring/displayChangeLeaderForGroupDialogFromActivity.do?toolSessionId=")
+		.append(toolSessionId).append("&availableLearners=").append(availableLearners).toString();
+    }
+
+    @RequestMapping(path = "/changeLeaderForGroup", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void changeLeaderForGroup(@RequestParam(name = AssessmentConstants.PARAM_TOOL_SESSION_ID) long toolSessionId,
+	    @RequestParam long leaderUserId) {
+	service.changeLeaderForGroup(toolSessionId, leaderUserId);
+    }
+
     @SuppressWarnings("unchecked")
     private SessionMap<String, Object> getSessionMap(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);

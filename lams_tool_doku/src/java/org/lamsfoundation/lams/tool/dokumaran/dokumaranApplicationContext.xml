@@ -95,6 +95,7 @@
             <props>
                 <prop key="addOneMinute">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
             	<prop key="audit*">PROPAGATION_REQUIRED</prop>    
+            	<prop key="change*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
             	<prop key="check*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
                 <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

@@ -455,4 +455,6 @@ public interface IScratchieService extends ICommonToolService {
     Map<String, Object> prepareStudentChoicesData(Scratchie scratchie);
 
     boolean isLearnerEligibleForMark(long learnerId, long toolContentId);
+
+    void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

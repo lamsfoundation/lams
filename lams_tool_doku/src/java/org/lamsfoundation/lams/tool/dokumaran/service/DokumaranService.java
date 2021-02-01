@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -267,6 +268,47 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
+    public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
+	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
+	if (DokumaranConstants.COMPLETED == session.getStatus()) {
+	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
+		    + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	DokumaranUser existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getUserId().equals(leaderUserId)) {
+	    return;
+	}
+
+	DokumaranUser newLeader = getUserByIDAndSession(leaderUserId, toolSessionId);
+	if (newLeader == null) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = new DokumaranUser(user.getUserDTO(), session);
+	    saveOrUpdate(newLeader);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	}
+
+	session.setGroupLeader(newLeader);
+	dokumaranSessionDao.update(session);
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(dokumaranUser -> dokumaranUser.getUserId().intValue(), Collectors.toSet()));
+
+	Dokumaran dokumaran = session.getDokumaran();
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "doku-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
+    }
+
+    @Override
     public void launchTimeLimit(Long toolContentId) throws IOException {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	dokumaran.setTimeLimitLaunchedDate(new Date());
@@ -447,6 +489,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    SessionDTO group = new SessionDTO();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
+	    group.setNumberOfLearners(getUsersBySession(session.getSessionId()).size());
+	    group.setSessionFinished(DokumaranConstants.COMPLETED == session.getStatus());
 	    group.setPadId(session.getPadId());
 	    group.setReadOnlyPadId(session.getEtherpadReadOnlyId());
 

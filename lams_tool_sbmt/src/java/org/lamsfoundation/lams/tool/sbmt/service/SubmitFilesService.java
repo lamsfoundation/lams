@@ -40,6 +40,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,6 +50,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -92,6 +94,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -121,6 +124,8 @@ public class SubmitFilesService
     private ICoreNotebookService coreNotebookService;
 
     private IUserManagementService userManagementService;
+
+    private ILearnerService learnerService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -238,6 +243,11 @@ public class SubmitFilesService
 		}
 
 		toolService.removeActivityMark(user.getUserID(), session.getSessionID());
+
+		if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
+		    session.setGroupLeader(null);
+		    submitFilesSessionDAO.update(session);
+		}
 
 		submitUserDAO.delete(user);
 	    }
@@ -1238,6 +1248,10 @@ public class SubmitFilesService
 	this.userManagementService = userManagementService;
     }
 
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
     @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
@@ -1371,6 +1385,59 @@ public class SubmitFilesService
 	}
 
 	return leader;
+    }
+
+    @Override
+    public void changeLeaderForGroup(long toolSessionId, int leaderUserId) {
+	SubmitFilesSession session = getSessionById(toolSessionId);
+	if (session.getStatus() != null && session.getStatus().equals(SubmitFilesSession.COMPLETED)) {
+	    throw new java.security.InvalidParameterException("Attempting to assing a new leader with user ID "
+		    + leaderUserId + " to a finished session wtih ID " + toolSessionId);
+	}
+
+	SubmitUser existingLeader = session.getGroupLeader();
+	if (existingLeader == null || existingLeader.getUserID().equals(leaderUserId)) {
+	    return;
+	}
+
+	SubmitUser newLeader = getSessionUser(toolSessionId, leaderUserId);
+	if (newLeader == null) {
+	    User user = userManagementService.getUserById(Long.valueOf(leaderUserId).intValue());
+	    newLeader = createSessionUser(user.getUserDTO(), toolSessionId);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Created user with ID " + leaderUserId + " to become a new leader for session with ID "
+			+ toolSessionId);
+	    }
+	} else {
+	    List<SubmissionDetails> newLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
+		    leaderUserId);
+	    for (SubmissionDetails submission : newLeaderSubmissions) {
+		submissionDetailsDAO.delete(submission);
+	    }
+	}
+
+	session.setGroupLeader(newLeader);
+	submitFilesSessionDAO.update(session);
+
+	List<SubmissionDetails> existingLeaderSubmissions = submissionDetailsDAO.getBySessionAndLearner(toolSessionId,
+		existingLeader.getUserID());
+
+	for (SubmissionDetails submission : existingLeaderSubmissions) {
+	    submission.setLearner(newLeader);
+	    submissionDetailsDAO.update(submission);
+	}
+
+	if (log.isDebugEnabled()) {
+	    log.debug("User with ID " + leaderUserId + " became a new leader for session with ID " + toolSessionId);
+	}
+
+	Set<Integer> userIds = getUsersBySession(toolSessionId).stream()
+		.collect(Collectors.mapping(submitUser -> submitUser.getUserID(), Collectors.toSet()));
+
+	ObjectNode jsonCommand = JsonNodeFactory.instance.objectNode();
+	jsonCommand.put("hookTrigger", "submit-files-leader-change-refresh-" + toolSessionId);
+	learnerService.createCommandForLearners(session.getContent().getContentID(), userIds, jsonCommand.toString());
     }
 
     @Override

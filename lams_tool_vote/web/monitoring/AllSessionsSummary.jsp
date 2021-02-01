@@ -16,6 +16,12 @@
 
 	<c:set var="buttonbar">
 		<div class="pull-right">
+			<c:if test="${useSelectLeaderToolOuput and sessionDto.sessionUserCount > 0 and not sessionDto.sessionFinished}">
+				<button type="button" class="btn btn-default btn-xs"
+						onClick="javascript:showChangeLeaderModal(${sessionDto.toolSessionId})">
+					<fmt:message key='label.monitoring.change.leader'/>
+				</button>
+			</c:if>
 			<c:if test="${not empty viewReflectionsURL}">
 				<a href="javascript:launchPopup('${viewReflectionsURL}')" class="btn btn-default btn-sm">
 					<fmt:message key="label.notebook.entries" />
