@@ -706,7 +706,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	questionResult.setAnswerFloat(questionDto.getAnswerFloat());
 	questionResult.setAnswer(questionDto.getAnswer());
 
-	int j = 0;
 	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 	    // find according optionAnswer
@@ -721,7 +720,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    optionAnswer.setAnswerBoolean(optionDto.getAnswerBoolean());
 	    optionAnswer.setAnswerInt(optionDto.getAnswerInt());
 	    if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
-		optionAnswer.setAnswerInt(j++);
+		optionAnswer.setAnswerInt(optionDto.getDisplayOrder());
 	    }
 	}
 
