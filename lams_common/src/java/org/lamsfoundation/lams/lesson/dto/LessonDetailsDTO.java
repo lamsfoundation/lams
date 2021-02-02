@@ -34,7 +34,8 @@ public class LessonDetailsDTO {
 
     private Long lessonID;
     private String lessonName;
-    private String lessonDescription;
+    private String lessonIntro;;
+    private String learningDesignDescription;
     private Integer lessonStateID;
     private Date createDateTime;
     private String createDateTimeStr;
@@ -72,8 +73,8 @@ public class LessonDetailsDTO {
     public LessonDetailsDTO(Lesson lesson) {
 	this.lessonID = lesson.getLessonId();
 	this.lessonName = lesson.getLessonName();
-	this.lessonDescription = lesson.getLessonDescription();
-
+	this.lessonIntro = lesson.getLessonDescription();
+	this.learningDesignDescription = lesson.getLearningDesign().getDescription();
 	this.lessonStateID = lesson.getLessonStateId();
 	this.createDateTime = lesson.getCreateDateTime();
 	this.createDateTimeStr = null;
@@ -100,13 +101,16 @@ public class LessonDetailsDTO {
 		: null;
 
 	this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder() != null
-		? lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId() : null;
+		? lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId()
+		: null;
 
 	this.contentFolderID = lesson.getLearningDesign().getContentFolderID() != null
-		? lesson.getLearningDesign().getContentFolderID() : null;
+		? lesson.getLearningDesign().getContentFolderID()
+		: null;
 
 	this.licenseID = lesson.getLearningDesign().getLicense() != null
-		? lesson.getLearningDesign().getLicense().getLicenseID() : null;
+		? lesson.getLearningDesign().getLicense().getLicenseID()
+		: null;
 
 	this.licenseText = lesson.getLearningDesign().getLicenseText();
 
@@ -121,7 +125,7 @@ public class LessonDetailsDTO {
 	this.liveEditEnabled = lesson.getLiveEditEnabled();
 
 	this.lockedForEdit = lesson.getLockedForEdit();
-	if ( this.lockedForEdit && lesson.getLearningDesign().getEditOverrideUser() != null ) {
+	if (this.lockedForEdit && lesson.getLearningDesign().getEditOverrideUser() != null) {
 	    this.lockedForEditUserId = lesson.getLearningDesign().getEditOverrideUser().getUserId();
 	    this.lockedForEditUsername = lesson.getLearningDesign().getEditOverrideUser().getFullName();
 	}
@@ -264,8 +268,12 @@ public class LessonDetailsDTO {
 	this.numberStartedLearners = numberStartedLearners;
     }
 
-    public String getLessonDescription() {
-	return lessonDescription;
+    public String getLearningDesignDescription() {
+	return learningDesignDescription;
+    }
+
+    public String getLessonIntro() {
+	return lessonIntro;
     }
 
     public String getLessonName() {
@@ -317,8 +325,8 @@ public class LessonDetailsDTO {
 	this.lessonName = lessonName;
     }
 
-    public void setLessonDescription(String lessonDescription) {
-	this.lessonDescription = lessonDescription;
+    public void setLearningDesignDescription(String lessonDescription) {
+	this.learningDesignDescription = lessonDescription;
     }
 
     public void setLessonStateID(Integer lessonStateID) {
@@ -414,11 +422,11 @@ public class LessonDetailsDTO {
     }
 
     public Boolean getGradebookOnComplete() {
-        return gradebookOnComplete;
+	return gradebookOnComplete;
     }
 
     public void setGradebookOnComplete(Boolean gradebookOnComplete) {
-        this.gradebookOnComplete = gradebookOnComplete;
+	this.gradebookOnComplete = gradebookOnComplete;
     }
 
     public Integer getLockedForEditUserId() {
@@ -430,10 +438,10 @@ public class LessonDetailsDTO {
     }
 
     public String getLockedForEditUsername() {
-        return lockedForEditUsername;
+	return lockedForEditUsername;
     }
 
     public void setLockedForEditUsername(String lockedForEditUsername) {
-        this.lockedForEditUsername = lockedForEditUsername;
+	this.lockedForEditUsername = lockedForEditUsername;
     }
 }

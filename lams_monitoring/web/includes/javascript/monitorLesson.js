@@ -487,7 +487,8 @@ function updateLessonTab(){
 			
 			updateContributeActivities(response.contributeActivities);
 			$('#lesson-name-strong').html(response.lessonName);
-			$('#description').html(response.lessonDescription);
+			$('#description').html(response.learningDesignDescription);
+			$('#intro').html(response.lessonIntro);
 		}
 	});
 	
