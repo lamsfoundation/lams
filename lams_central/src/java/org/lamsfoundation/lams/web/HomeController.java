@@ -71,7 +71,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -97,8 +96,6 @@ public class HomeController {
     private IWorkspaceManagementService workspaceManagementService;
     @Autowired
     private ISecurityService securityService;
-    @Autowired
-    private WebApplicationContext applicationcontext;
     @Autowired
     private ILogEventService logEventService;
 
@@ -186,6 +183,11 @@ public class HomeController {
 		    req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
 		}
 		return "lessonIntro";
+	    }
+
+	    if (lesson.getForceLearnerRestart()) {
+		// start the lesson from the beginning each time
+		lessonService.removeLearnerProgress(lessonId, user.getUserID());
 	    }
 
 	    if (mode != null) {
