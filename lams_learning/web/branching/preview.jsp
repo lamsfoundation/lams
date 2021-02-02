@@ -130,7 +130,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:forEach>
 					</table>
 			
-					<button class="btn btn-primary pull-left">
+					<button class="btn btn-primary pull-right">
 						<fmt:message key="label.activity.options.choose" />
 					</button>
 		
@@ -141,7 +141,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<input type="hidden" name="activityID" value="${branchingForm.activityID}">
 					<input type="hidden" name="progressID" value="${branchingForm.progressID}">
 			
-					<button class="btn btn-primary pull-right na" onclick="finishActivity()">
+					<button class="btn btn-primary pull-left na" onclick="finishActivity()">
 						<fmt:message key="label.finish.button" />
 					</button>
 			
