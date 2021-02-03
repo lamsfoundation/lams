@@ -1181,6 +1181,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	dokumaran.setAllowMultipleLeaders(JsonUtil.optBoolean(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
+	dokumaran.setGalleryWalkEnabled(JsonUtil.optBoolean(toolContentJSON, "galleryWalkEnabled", false));
 
 	dokumaran.setContentInUse(false);
 	dokumaran.setDefineLater(false);

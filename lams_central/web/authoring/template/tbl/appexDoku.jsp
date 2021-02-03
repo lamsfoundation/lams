@@ -49,6 +49,16 @@
 
 		<div class="space-top space-sides space-bottom">
 			<div class="checkbox">
+				<label for="divappex${param.appexNumber}dokuGalleryWalkEnabled">
+					<input name="divappex${param.appexNumber}dokuGalleryWalkEnabled" id="divappex${param.appexNumber}dokuGalleryWalkEnabled" type="checkbox" value="true" />
+					<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.enabled" />&nbsp; 
+					<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right"
+					   title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.enabled.tooltip'/>">
+					</i>
+				</label>
+			</div>
+			
+			<div class="checkbox">
 				<label for="divappex${param.appexNumber}NB">
 					<input name="divappex${param.appexNumber}NB" id="divappex${param.appexNumber}NB" type="checkbox" value="true"/>
 					<fmt:message key="authoring.tbl.use.noticeboard" />&nbsp; 

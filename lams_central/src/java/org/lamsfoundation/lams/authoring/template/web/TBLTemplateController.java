@@ -229,8 +229,8 @@ public class TBLTemplateController extends LdTemplateController {
 		if (applicationExercise.assessments == null) {
 		    // it is doKumaran type AE
 		    Long aetoolContentId = createDokumaranToolContent(userDTO, applicationExerciseTitle,
-			    applicationExercise.dokuDescription, applicationExercise.dokuInstructions, true, false,
-			    null);
+			    applicationExercise.dokuDescription, applicationExercise.dokuInstructions, false,
+			    applicationExercise.dokuGalleryWalkEnabled, null);
 		    activities.add(createDokumaranActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		} else {
@@ -325,8 +325,11 @@ public class TBLTemplateController extends LdTemplateController {
     class AppExData {
 	String title = "Fix me";
 	SortedMap<Integer, Assessment> assessments;
+
 	String dokuDescription;
 	String dokuInstructions;
+	boolean dokuGalleryWalkEnabled;
+
 	boolean useNoticeboard = false;
 	String noticeboardInstructions;
     }
@@ -549,6 +552,9 @@ public class TBLTemplateController extends LdTemplateController {
 		// otherwise either it is Assessment type or the AE got deleted
 		if (StringUtils.isBlank(newAppex.dokuDescription) && StringUtils.isBlank(newAppex.dokuInstructions)) {
 		    newAppex.assessments = processAssessments(request, i, newAppex.title);
+		} else {
+		    newAppex.dokuGalleryWalkEnabled = WebUtil.readBooleanParam(request,
+			    appexDiv + "dokuGalleryWalkEnabled", false);
 		}
 
 		if (newAppex.assessments != null || StringUtils.isNotBlank(newAppex.dokuDescription)
