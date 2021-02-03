@@ -1166,7 +1166,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Dokumaran dokumaran = new Dokumaran();
 	dokumaran.setContentId(toolContentID);
 	dokumaran.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
-	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
+	dokumaran.setDescription(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
+	dokumaran.setInstructions(JsonUtil.optString(toolContentJSON, "etherpadInstructions"));
 	dokumaran.setCreated(updateDate);
 
 	dokumaran.setTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));

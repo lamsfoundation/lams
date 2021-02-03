@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
 import org.lamsfoundation.lams.authoring.template.Assessment;
@@ -224,16 +225,28 @@ public class TBLTemplateController extends LdTemplateController {
 		int assessmentNumber = 1;
 		String applicationExerciseTitle = applicationExercise.title;
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
-		ArrayNode questionsJSONArray = JsonNodeFactory.instance.arrayNode();
-		for (Assessment exerciseQuestion : applicationExercise.assessments.values()) {
-		    questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
-		    assessmentNumber++;
+
+		if (applicationExercise.assessments == null) {
+		    // it is doKumaran type AE
+		    Long aetoolContentId = createDokumaranToolContent(userDTO, applicationExerciseTitle,
+			    applicationExercise.dokuDescription, applicationExercise.dokuInstructions, true, false,
+			    null);
+		    activities.add(createDokumaranActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
+			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
+		} else {
+		    // it is Assessment type AE
+		    ArrayNode questionsJSONArray = JsonNodeFactory.instance.arrayNode();
+		    for (Assessment exerciseQuestion : applicationExercise.assessments.values()) {
+			questionsJSONArray.add(exerciseQuestion.getAsObjectNode(assessmentNumber));
+			assessmentNumber++;
+		    }
+
+		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
+			    applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, false,
+			    false, true, true, questionsJSONArray);
+		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
+			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		}
-		Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
-			applicationExerciseTitle, data.getText("boilerplate.ae.instructions"), null, true, false, false,
-			true, true, questionsJSONArray);
-		activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
-			data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 
 		// Optional Gate / Noticeboard. Don't add the extra gate in LAMS TBL or we will get too many scheduled gates to manage
 		if (applicationExercise.useNoticeboard) {
@@ -312,6 +325,8 @@ public class TBLTemplateController extends LdTemplateController {
     class AppExData {
 	String title = "Fix me";
 	SortedMap<Integer, Assessment> assessments;
+	String dokuDescription;
+	String dokuInstructions;
 	boolean useNoticeboard = false;
 	String noticeboardInstructions;
     }
@@ -527,9 +542,17 @@ public class TBLTemplateController extends LdTemplateController {
 		String appexDiv = "divappex" + i;
 		AppExData newAppex = new AppExData();
 		newAppex.title = WebUtil.readStrParam(request, appexDiv + "Title", true);
-		newAppex.assessments = processAssessments(request, i, newAppex.title);
-		// null indicates appex was deleted
-		if (newAppex.assessments != null) {
+		newAppex.dokuDescription = WebUtil.readStrParam(request, appexDiv + "dokuDescription", true);
+		newAppex.dokuInstructions = WebUtil.readStrParam(request, appexDiv + "dokuInstructions", true);
+
+		// if doKumaran data is present, it is doku type
+		// otherwise either it is Assessment type or the AE got deleted
+		if (StringUtils.isBlank(newAppex.dokuDescription) && StringUtils.isBlank(newAppex.dokuInstructions)) {
+		    newAppex.assessments = processAssessments(request, i, newAppex.title);
+		}
+
+		if (newAppex.assessments != null || StringUtils.isNotBlank(newAppex.dokuDescription)
+			|| StringUtils.isNotBlank(newAppex.dokuInstructions)) {
 		    newAppex.useNoticeboard = WebUtil.readBooleanParam(request, appexDiv + "NB", false);
 		    if (newAppex.useNoticeboard) {
 			newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv + "NBEntry", true);
@@ -770,10 +793,11 @@ public class TBLTemplateController extends LdTemplateController {
 	    } else {
 		for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
 		    AppExData appEx = appExEntry.getValue();
-		    if (appEx.assessments == null || appEx.assessments.size() == 0) {
+		    if (StringUtils.isBlank(appEx.dokuDescription) && StringUtils.isBlank(appEx.dokuInstructions)
+			    && (appEx.assessments == null)) {
 			addValidationErrorMessage("authoring.error.application.exercise.num",
 				new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
-		    } else {
+		    } else if (appEx.assessments != null) {
 			for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
 			    assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
 				    appExEntry.getKey(), "\"" + appEx.title + "\"", assessmentEntry.getKey());
