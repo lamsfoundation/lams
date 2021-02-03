@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -787,9 +788,8 @@ public class TBLTemplateController extends LdTemplateController {
     // Create the application exercise form on the screen. Not in LdTemplateController as this is specific to TBL
     // and hence the jsp is in the tbl template folder, not the tool template folder
     @RequestMapping("/createApplicationExercise")
-    public String createApplicationExercise(HttpServletRequest request) {
-	request.setAttribute("appexNumber", WebUtil.readIntParam(request, "appexNumber"));
-	return "/authoring/template/tbl/appex";
+    public String createApplicationExercise(@RequestParam String type) {
+	return "/authoring/template/tbl/appex" + (type.equals("doku") ? "Doku" : "Assessment");
     }
 
 }

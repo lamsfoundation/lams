@@ -5,20 +5,22 @@
 
 <%-- The title needs to look like an ordinary panel title, but be editable via the X-editable javascript.
      But that will not be returned to the server in the form data, so copy what appears in the displayed span to a hidden input field.  --%>
+<c:if test="${empty appexNumber}">
+	<c:set var="appexNumber" value="${param.appexNumber}" />
+</c:if>
 <c:set var="appexTitle"><fmt:message key="authoring.label.application.exercise.num"><fmt:param value="${appexNumber}"/></fmt:message></c:set>
 <c:set var="appexTitleDisplay">divappex${appexNumber}TitleDisplay</c:set>
 <c:set var="appexTitleField">divappex${appexNumber}Title</c:set>
 
+
 <!--  Start of panel Appex${appexNumber} -->
  <div class="panel panel-default" id="divappex${appexNumber}" >
      <div class="panel-heading" id="headingAppex${appexNumber}">
-		<c:if test="${appexNumber > 1}">
-			<a href="#" onclick="javascript:deleteAppexDiv('divappex${appexNumber}', '${appexTitleField}');"
-						class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${appexNumber}">
-				<i class="fa fa-lg fa-trash-o"></i>
-				<fmt:message key="authoring.fla.delete.button"/>
-			</a>
-		</c:if>
+		<a href="#" onclick="javascript:deleteAppexDiv('divappex${appexNumber}', '${appexTitleField}');"
+					class="btn btn-default btn-sm panel-title-button" id="deleteAssessmentButton${appexNumber}">
+			<i class="fa fa-lg fa-trash-o"></i>
+			<fmt:message key="authoring.fla.delete.button"/>
+		</a>
 		
      	<span class="panel-title collapsable-icon-left">
      		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapseAppex${appexNumber}" 
@@ -31,6 +33,7 @@
 		<span>&nbsp;</span>
 		<i class='fa fa-sm fa-pencil'></i>
 		<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
+		<span><fmt:message key="authoring.label.application.exercise.type.assessment"/></span>
      </div>
     
     <div id="collapseAppex${appexNumber}" class="panel-collapse collapse in" 

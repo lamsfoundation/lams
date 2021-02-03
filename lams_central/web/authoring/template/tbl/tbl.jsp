@@ -77,14 +77,15 @@
 			initializeWizard(validator);
 		});
 
-		function createApplicationExercise() {
-			var numAppex = $('#numAppEx');
-			var currNum = numAppex.val();
-			var nextNum = +currNum + 1;
-			var newDiv = document.createElement("div");
+		function createApplicationExercise(type) {
+			var numAppex = $('#numAppEx'),
+				currNum = numAppex.val(),
+				nextNum = +currNum + 1,
+				newDiv = document.createElement("div");
+
 			newDiv.id = 'divappex'+nextNum;
 			newDiv.className = 'panel panel-default';
-			var url=getSubmissionURL()+"/createApplicationExercise.do?appexNumber="+nextNum;
+			var url=getSubmissionURL()+"/createApplicationExercise.do?appexNumber=" + nextNum + "&type=" + type + "&contentFolderID=${contentFolderID}";
 			$('#accordianAppEx').append(newDiv);
 			$.ajaxSetup({ cache: true });
 			$(newDiv).load(url, function( response, status, xhr ) {
@@ -315,10 +316,15 @@
 	
 			<div class="panel-group" id="accordianAppEx" role="tablist" aria-multiselectable="true"> 
 			<c:set var="appexNumber" scope="page">1</c:set>
-			<%@ include file="appex.jsp" %>
+			<%@ include file="appexAssessment.jsp" %>
 			</div> <!--  end panel group -->
 
-			<a href="#" id="createApplicationExerciseButton" onclick="javascript:createApplicationExercise();" class="btn btn-default"><i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise"/></a>
+			<a href="#" id="createAssessmentApplicationExerciseButton" onclick="javascript:createApplicationExercise('assessment')" class="btn btn-default">
+				<i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise.assessment"/>
+			</a>
+			<a href="#" id="createDokuApplicationExerciseButton" onclick="javascript:createApplicationExercise('doku')" class="btn btn-default">
+				<i class="fa fa-plus"></i> <fmt:message key="authoring.create.application.exercise.doku"/>
+			</a>
 			
 	    </div>
 
