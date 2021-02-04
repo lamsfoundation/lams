@@ -63,6 +63,12 @@
                     	   	<i class="fa fa-list-ul text-primary"></i> <fmt:message key="authoring.create.mc.question"/>
                     	</a>
                     </li>
+                     <li>
+                    	<a href="javascript:void(0)"
+                    	   onclick="javascript:createApplicationExercise('doku', ${appexNumber})">
+                    	   	<i class="fa fa-list-ul text-primary"></i> <fmt:message key="authoring.create.doku.question"/>
+                    	</a>
+                    </li>
                     <li>
                     	<a href="javascript:void(0)" id="divass${appexNumber}CQB"
                     	   onClick="javascript:openQuestionBank(${appexNumber})">
