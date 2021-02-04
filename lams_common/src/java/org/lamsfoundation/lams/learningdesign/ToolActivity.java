@@ -75,17 +75,17 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Tool tool;
 
     @OneToMany(mappedBy = "toolActivity")
-    private Set<ToolSession> toolSessions = new HashSet<ToolSession>();
+    private Set<ToolSession> toolSessions = new HashSet<>();
 
     @OneToMany(mappedBy = "toolActivity")
-    private Set<CompetenceMapping> competenceMappings = new HashSet<CompetenceMapping>();
+    private Set<CompetenceMapping> competenceMappings = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     private ActivityEvaluation evaluation;
 
     @OneToMany(mappedBy = "activity")
-    private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<GradebookUserActivity>();
+    private Set<GradebookUserActivity> gradebookUserActivities = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "activity", cascade = CascadeType.ALL)
     private PedagogicalPlannerActivityMetadata plannerMetadata;
@@ -187,8 +187,9 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
 		//check if activity requires existing grouping but no group for user exists yet
 		if (group == null || group.isNull()) {
-		    String errorMessage = messageService.getMessage("error.requires.existing.grouping",
-			    new Object[] { getActivityId(), learner.getUserId() });
+		    log.warn("Activity " + getActivityId() + " requires existing grouping but no group for user "
+			    + learner.getUserId() + " exists yet.");
+		    String errorMessage = messageService.getMessage("error.requires.existing.grouping");
 		    throw new RequiredGroupMissingException(errorMessage);
 		}
 

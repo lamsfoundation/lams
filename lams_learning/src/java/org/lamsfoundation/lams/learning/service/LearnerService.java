@@ -333,7 +333,6 @@ public class LearnerService implements ILearnerFullService {
 		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity, lesson);
 	    }
 	} catch (RequiredGroupMissingException e) {
-	    log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
 	    throw e;
 	} catch (ToolException e) {
 	    log.error("error occurred in 'createToolSessionFor':" + e.getMessage());
