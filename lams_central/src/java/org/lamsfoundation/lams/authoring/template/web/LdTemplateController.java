@@ -1254,14 +1254,16 @@ public abstract class LdTemplateController {
      * Helper method to create a doKumaran tool content.
      */
     protected Long createDokumaranToolContent(UserDTO user, String title, String description, String instructions,
-	    boolean selectLeaderToolOutput, boolean galleryWalkEnabled, String reflectionInstructions)
-	    throws IOException {
+	    boolean selectLeaderToolOutput, boolean galleryWalkEnabled, boolean galleryWalkReadOnly,
+	    String galleryWalkInstructions, String reflectionInstructions) throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, description,
 		reflectionInstructions, null, null, user);
 	toolContentJSON.put(RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, selectLeaderToolOutput);
 	toolContentJSON.put("etherpadInstructions", instructions);
 	toolContentJSON.put("galleryWalkEnabled", galleryWalkEnabled);
+	toolContentJSON.put("galleryWalkReadOnly", galleryWalkReadOnly);
+	toolContentJSON.put("galleryWalkInstructions", galleryWalkInstructions);
 	return authoringService.createToolContent(user, LdTemplateController.DOKU_TOOL_SIGNATURE, toolContentJSON);
     }
 

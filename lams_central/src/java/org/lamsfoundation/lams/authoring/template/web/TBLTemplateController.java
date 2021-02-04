@@ -230,7 +230,8 @@ public class TBLTemplateController extends LdTemplateController {
 		    // it is doKumaran type AE
 		    Long aetoolContentId = createDokumaranToolContent(userDTO, applicationExerciseTitle,
 			    applicationExercise.dokuDescription, applicationExercise.dokuInstructions, false,
-			    applicationExercise.dokuGalleryWalkEnabled, null);
+			    applicationExercise.dokuGalleryWalkEnabled, applicationExercise.dokuGalleryWalkReadOnly,
+			    applicationExercise.dokuGalleryWalkInstructions, null);
 		    activities.add(createDokumaranActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		} else {
@@ -329,6 +330,8 @@ public class TBLTemplateController extends LdTemplateController {
 	String dokuDescription;
 	String dokuInstructions;
 	boolean dokuGalleryWalkEnabled;
+	boolean dokuGalleryWalkReadOnly;
+	String dokuGalleryWalkInstructions;
 
 	boolean useNoticeboard = false;
 	String noticeboardInstructions;
@@ -555,6 +558,10 @@ public class TBLTemplateController extends LdTemplateController {
 		} else {
 		    newAppex.dokuGalleryWalkEnabled = WebUtil.readBooleanParam(request,
 			    appexDiv + "dokuGalleryWalkEnabled", false);
+		    newAppex.dokuGalleryWalkReadOnly = WebUtil.readBooleanParam(request,
+			    appexDiv + "dokuGalleryWalkReadOnly", false);
+		    newAppex.dokuGalleryWalkInstructions = WebUtil.readStrParam(request,
+			    appexDiv + "dokuGalleryWalkInstructions", true);
 		}
 
 		if (newAppex.assessments != null || StringUtils.isNotBlank(newAppex.dokuDescription)

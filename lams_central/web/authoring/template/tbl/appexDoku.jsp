@@ -58,6 +58,23 @@
 				</label>
 			</div>
 			
+			<div id="divappex${param.appexNumber}dokuGalleryWalkOptions" class="loffset10">
+				<div class="checkbox">
+					<label for="divappex${param.appexNumber}dokuGalleryWalkReadOnly">
+						<input name="divappex${param.appexNumber}dokuGalleryWalkReadOnly" id="divappex${param.appexNumber}dokuGalleryWalkReadOnly" 
+							   type="checkbox" value="true" />
+						<fmt:message key="authoring.label.application.exercise.doku.gallery.walk.read.only" />
+					</label>
+					<i class="fa fa-question-circle" 
+					   data-toggle="tooltip" title="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.read.only.tooltip' />"></i>
+				</div>
+				
+				<div class="form-group">
+					<textarea name="divappex${param.appexNumber}dokuGalleryWalkInstructions" class="form-control" rows="3" 
+							  placeholder="<fmt:message key='authoring.label.application.exercise.doku.gallery.walk.instructions'/>"></textarea>
+				</div>
+			</div>
+			
 			<div class="checkbox">
 				<label for="divappex${param.appexNumber}NB">
 					<input name="divappex${param.appexNumber}NB" id="divappex${param.appexNumber}NB" type="checkbox" value="true"/>
@@ -98,7 +115,16 @@
 	       }
 	    }).on('shown', onShownForXEditable)
 		  .on('hidden', onHiddenForXEditable);
-    
+
+
+		$('#divappex${param.appexNumber}dokuGalleryWalkEnabled').change(function(){
+			if ($(this).is(':checked')) {
+				$('#divappex${param.appexNumber}dokuGalleryWalkOptions').slideDown();
+			} else {
+				$('#divappex${param.appexNumber}dokuGalleryWalkOptions').slideUp()
+					.find('#divappex${param.appexNumber}dokuGalleryWalkReadOnly').prop('checked', false);
+			}
+		}).change();
 	</script>
 	
 </div> 
