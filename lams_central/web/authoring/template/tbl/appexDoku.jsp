@@ -125,6 +125,8 @@
 					.find('#divappex${param.appexNumber}dokuGalleryWalkReadOnly').prop('checked', false);
 			}
 		}).change();
+
+		$('[data-toggle="tooltip"]').tooltip();
 	</script>
 	
 </div> 

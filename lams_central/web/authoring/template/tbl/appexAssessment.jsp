@@ -153,7 +153,8 @@
 	       }
 	    }).on('shown', onShownForXEditable)
 		  .on('hidden', onHiddenForXEditable);
-    
+
+		$('[data-toggle="tooltip"]').tooltip();
 	</script>
 	
 </div> 
