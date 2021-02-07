@@ -23,6 +23,10 @@ CKEDITOR.plugins.setLang( 'bootsnippets', 'en', {
 	textPanel: 'Panel (heading and body)',
 	textPanelFooter: 'Panel (heading, body and footer)',
 	textJumbotron: 'Jumbotron with text',
+	textWaveHeaderOrange: 'Header Wave Orange',
+	textWaveHeaderBlue: 'Header Wave Blue',
+	textWaveHeaderPurple: 'Header Wave Purple',
+	textWaveHeaderGreen: 'Header Wave Green',
 	
 	imageCenteredImage: 'Centered image',
 	imageImageFullWidth: 'Image full width',

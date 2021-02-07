@@ -202,8 +202,67 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'   	<h1>Header</h1>' +
 		'    	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique facere necessitatibus quo laboriosam consequuntur</p>' +
 		'	</div>'
-	}
-	
+	},
+	{
+		title: 'textWaveHeaderOrange',
+		image: 'background-orange3.svg',
+		html:
+		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
+		'<div style="text-align:center;color: white;background-image: url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2Q1NmExMSIgd2lkdGg9IjEyNDAiIGhlaWdodD0iMzA0IiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6IiBmaWxsPSIjZjkzIi8+PC9zdmc+\');background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px;">' +        
+		'<div class="container"><div class="row"><div class="col-xs-12">' +
+		'<h1 style="font-size: 59px;font-family: \'Montserrat\', sans-serif; font-weight: 700;">Lorem Ipsum</h1>' +
+		'<p style="font-size: 28px;font-family: \'Montserrat\', sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;&nbsp;</p></div></div></div></div>' +
+		'<div>&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;"><span style="font-size:36px;">Sed ut perspiciatis!&nbsp;</span></div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' 
+		},
+	{
+		title: 'textWaveHeaderBlue',
+		image: 'background-blue3.svg',
+		html:
+		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
+		'<div style="text-align:center;color: white;background-image: url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMwOTRiYWMiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+\');background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px;">' +
+		'<div class="container"><div class="row"><div class="col-xs-12">' +
+		'<h1 style="font-size: 59px;font-family: \'Montserrat\', sans-serif; font-weight: 700;">Lorem Ipsum</h1>' +
+		'<p style="font-size: 28px;font-family: \'Montserrat\', sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;&nbsp;</p></div></div></div></div>' +
+		'<div>&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;"><span style="font-size:36px;">Sed ut perspiciatis!&nbsp;</span></div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' 
+		},
+	{
+		title: 'textWaveHeaderPurple',
+		image: 'background-purple3.svg',
+		html:
+		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
+		'<div style="text-align:center;color: white;background-image: url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiM1ZDM3YTIiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+\');background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px;">' +        
+		'<div class="container"><div class="row"><div class="col-xs-12">' +
+		'<h1 style="font-size: 59px;font-family: \'Montserrat\', sans-serif; font-weight: 700;">Lorem Ipsum</h1>' +
+		'<p style="font-size: 28px;font-family: \'Montserrat\', sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;&nbsp;</p></div></div></div></div>' +
+		'<div>&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;"><span style="font-size:36px;">Sed ut perspiciatis!&nbsp;</span></div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' 
+		},
+	{
+		title: 'textWaveHeaderGreen',
+		image: 'background-green3.svg',
+		html:
+		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
+		'<div style="text-align:center;color: white;background-image: url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMyMjhjM2EiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+\');background-size: cover;background-repeat: no-repeat;background-position: top;padding: 5% 0 12% 0;margin: -16px;">' +
+		'<div class="container"><div class="row"><div class="col-xs-12">' +
+		'<h1 style="font-size: 59px;font-family: \'Montserrat\', sans-serif; font-weight: 700;">Lorem Ipsum</h1>' +
+		'<p style="font-size: 28px;font-family: \'Montserrat\', sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;&nbsp;</p></div></div></div></div>' +
+		'<div>&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;"><span style="font-size:36px;">Sed ut perspiciatis!&nbsp;</span></div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.</div>' +
+		'<div style="font-size: 19px;font-family: \'Montserrat\', sans-serif;">&nbsp;</div>' 
+		}   	
 	]
 } );
 
