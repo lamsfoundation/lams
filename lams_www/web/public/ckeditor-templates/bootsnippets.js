@@ -205,7 +205,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 	},
 	{
 		title: 'textWaveHeaders',
-        description: 'textWaveHeadersDesc',
+        description: 'New headers with waves. You can change the colour by double clicking on it.',
 		image: 'background-blue3.svg',
 		html:
 		'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
