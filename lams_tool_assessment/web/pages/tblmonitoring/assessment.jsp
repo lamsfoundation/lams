@@ -1,14 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="method">
-	<c:choose>
-		<c:when test="${isIraAssessment}">
-			iraAssessmentStudentChoices
-		</c:when>
-		<c:otherwise>
-			aesStudentChoices
-		</c:otherwise>
-	</c:choose>
-</c:set>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
 <script src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
@@ -158,14 +148,7 @@
 <div class="row no-gutter">
 	<div class="col-xs-12 col-md-12 col-lg-8">
 		<h3>
-			<c:choose>
-				<c:when test="${isIraAssessment}">
-					<fmt:message key="label.ira.questions.marks"/>
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.ae.questions.marks"/>
-				</c:otherwise>
-			</c:choose>
+			<fmt:message key="label.ira.questions.marks"/>
 		</h3>
 	</div>
 </div>
@@ -184,10 +167,10 @@
 		</div>
 	</div>
 
-	<c:if test="${method eq 'aesStudentChoices' or iraAttemptedByAnyLearners}">
+	<c:if test="${iraAttemptedByAnyLearners}">
 		<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
 			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-					onclick="javascript:loadTab('${method}', document.getElementById('selected-content-id').value); return false;">
+					onclick="javascript:loadTab('iraAssessmentStudentChoices', document.getElementById('selected-content-id').value); return false;">
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.show.students.choices"/>
 			</a>
@@ -197,21 +180,6 @@
 
 <div class="row no-gutter">
 	<input type="hidden" value="${assessmentDtos[0].assessment.contentId}" id="selected-content-id">
-	
-	<c:if test="${!isIraAssessment}">
-		<ul class="nav nav-tabs">
-			<c:forEach var="assessmentDto" items="${assessmentDtos}" varStatus="i">
-				<li <c:if test="${(i.index == 0 && toolContentID == null) || (toolContentID != null && assessmentDto.assessment.contentId == toolContentID)}">class="active"</c:if>>
-					<a data-toggle="tab" href="#assessment-${assessmentDto.assessment.uid}" 
-							data-attempted-learners-number="${assessmentDto.attemptedLearnersNumber}"
-							data-tool-content-id="${assessmentDto.assessment.contentId}">
-						<c:out value="${assessmentDto.activityTitle}" escapeXml="false"/>
-					</a>
-				</li>
-			</c:forEach>
-		</ul>
-	</c:if>
-		
 </div>
 <br>
 <!-- End notifications -->
