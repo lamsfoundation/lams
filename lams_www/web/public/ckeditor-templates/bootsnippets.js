@@ -159,7 +159,6 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		title: 'textPanel',
 		image: 'panel.png',
 		html: 
-		'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
 		'<div class="panel panel-primary lams-bootpanel">' +
 		'    <div class="panel-heading">' +
 		'        <h3 class="panel-title">' +
@@ -178,7 +177,6 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		title: 'textPanelFooter',
 		image: 'panel_footer.png',
 		html: 
-			'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
 			'<div class="panel panel-primary lams-bootpanel">' +
 			'    <div class="panel-heading">' +
 			'        <h3 class="panel-title">' +
@@ -208,7 +206,6 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
         description: 'New headers with waves. You can change the colour by double clicking on it.',
 		image: 'background-blue3.svg',
 		html:
-		'<script type="text/javascript" src="/lams/includes/javascript/clickable.js"></script>' +
 		'<style type="text/css">@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");</style>' +
         '<div class="lams-wavepanel wave-blue">' + 
 		'<div class="container"><div class="row"><div class="col-xs-12">' +
