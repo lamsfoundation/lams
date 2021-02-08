@@ -1,59 +1,20 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<script src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
-<script src="<lams:WebAppURL />includes/javascript/chart.js"></script>
-<script src="<lams:LAMSURL/>includes/javascript/common.js"></script> 
 <script>
-	var WEB_APP_URL = '<lams:WebAppURL />',
-		
-	LABELS = $.extend(LABELS, {
-		<fmt:message key="label.monitoring.summary.completion" var="ACTIVITY_COMPLETION_CHART_TITLE_VAR"/>
-		ACTIVITY_COMPLETION_CHART_TITLE : '<c:out value="${ACTIVITY_COMPLETION_CHART_TITLE_VAR}" />',
-		<fmt:message key="label.monitoring.summary.completion.possible" var="ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR"/>
-		ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS_VAR}" />',
-		<fmt:message key="label.monitoring.summary.completion.started" var="ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR"/>
-		ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS_VAR}" />',	
-		<fmt:message key="label.monitoring.summary.completion.completed" var="ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR"/>
-		ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS : '<c:out value="${ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS_VAR}" />',	
-		<fmt:message key="label.monitoring.summary.answered.questions" var="ANSWERED_QUESTIONS_CHART_TITLE_VAR"/>
-		ANSWERED_QUESTIONS_CHART_TITLE : '<c:out value="${ANSWERED_QUESTIONS_CHART_TITLE_VAR}" />',
-		<fmt:message key="label.monitoring.summary.answered.questions.groups" var="ANSWERED_QUESTIONS_CHART_TITLE_GROUPS_VAR"/>
-		ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : '<c:out value="${ANSWERED_QUESTIONS_CHART_TITLE_GROUPS_VAR}" />',
-		<fmt:message key="label.monitoring.summary.answered.questions.x.axis" var="ANSWERED_QUESTIONS_CHART_X_AXIS_VAR"/>
-		ANSWERED_QUESTIONS_CHART_X_AXIS : '<c:out value="${ANSWERED_QUESTIONS_CHART_X_AXIS_VAR}" />',
-		<fmt:message key="label.monitoring.summary.answered.questions.y.axis.students" var="ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS_VAR"/>
-		ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS_VAR}" />',
-		<fmt:message key="label.monitoring.summary.answered.questions.y.axis.groups" var="ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS_VAR"/>
-		ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS_VAR}" />'
-	});
-	
 	$(document).ready(function(){
-		// change attempted and all learners numbers
-		$('.nav-tabs').bind('click', function (event) {
-			
-			var link = $(event.target);
-			var attemptedLearnersNumber = link.data("attempted-learners-number");
-			$("#attempted-learners-number").html(attemptedLearnersNumber);
-
-			var toolContentId = link.data("tool-content-id");
-			$("#selected-content-id").val(toolContentId);
-		});
-
+		var assessmentPane = $('#assessment-pane-${toolContentID}');
 		//insert total learners number taken from the parent tblmonitor.jsp
-		$("#total-learners-number").html(TOTAL_LESSON_LEARNERS_NUMBER);
-
-		$('.results').each(function(){
-			// load results div for the first time
-			loadResultsPane($(this), false);
-		});
+		$(".total-learners-number", assessmentPane).html(TOTAL_LESSON_LEARNERS_NUMBER);
+		
+		loadResultsPane($('.results', assessmentPane), false);
 	});
 	
 	function loadResultsPane(resultsPane, isRefresh) {
+		var toolContentId = resultsPane.data('toolContentId');
 		// load an embedded results list
-		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&toolContentID=" 
-					 + resultsPane.data('toolContentId'), function(){
-			var assessmentPane = resultsPane.closest('.assessmentPane'),
+		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&toolContentID=" + toolContentId, function(){
+			var assessmentPane = $(this).closest('.tab-pane'),
 				// are any correct/groups buttons clickable?
 				discloseAllCorrectEnabled = false,
 				discloseAllGroupsEnabled = false; 
@@ -79,7 +40,7 @@
 					discloseAnswers(button, resultsPane);
 				});
 			});
-
+	
 			// if disclose all correct/groups answers buttons are clickable, add a click handler
 			// and disable if not
 			var allCorrectButton = $('.disclose-all-correct-button', assessmentPane);
@@ -99,7 +60,7 @@
 			} else {
 				disabledAndCheckButton(allCorrectButton);
 			}
-
+	
 			var allGroupsButton = $('.disclose-all-groups-button', assessmentPane);
 			if (discloseAllGroupsEnabled) {
 				// do not add a handler twice
@@ -121,7 +82,8 @@
 	}
 	
 	function discloseAnswers(button, resultsPane) {
-		let isCorrectButton = button.hasClass('disclose-correct-button');
+		let isCorrectButton = button.hasClass('disclose-correct-button'),
+			toolContentId = resultsPane.data('toolContentId');
 		
 		$.ajax({
 			'url'  : '<lams:WebAppURL />monitoring/' 
@@ -130,7 +92,7 @@
 			'type': 'POST',
 			'data' : {
 				'questionUid'   : button.closest('.disclose-button-group').attr('questionUid'),
-				'toolContentID' : $('#selected-content-id').val(),
+				'toolContentID' : toolContentId,
 				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 			}
 		}).done(function(){
@@ -144,72 +106,54 @@
 	}
 </script>
 
-<!-- Header -->
-<div class="row no-gutter">
-	<div class="col-xs-12 col-md-12 col-lg-8">
-		<h3>
-			<fmt:message key="label.ira.questions.marks"/>
-		</h3>
-	</div>
-</div>
-<!-- End header -->    
-
-<!-- Notifications -->  
-<div class="row no-gutter">
-	<div class="col-xs-6 col-md-4 col-lg-4 ">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<i class="fa fa-users" style="color:gray" ></i> 
-					<fmt:message key="label.attendance"/>: <span id="attempted-learners-number">${assessmentDtos[0].attemptedLearnersNumber}</span>/<span id="total-learners-number"></span> 
-				</h4> 
+<%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
+<div ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
+	<c:if test="${isIraAssessment}">
+		<div class="row">
+			<div class="col-xs-12">
+				<h3>
+					<fmt:message key="label.ira.questions.marks"/>
+				</h3>
 			</div>
 		</div>
-	</div>
-
-	<c:if test="${iraAttemptedByAnyLearners}">
-		<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
-			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
-					onclick="javascript:loadTab('iraAssessmentStudentChoices', document.getElementById('selected-content-id').value); return false;">
+	</c:if>
+	
+	<!-- Notifications -->  
+	<div class="row">
+		<div class="col-xs-6 col-sm-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<i class="fa fa-users" style="color:gray" ></i> 
+						<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
+					</h4> 
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-6 col-sm-8">
+			<div class="btn btn-sm btn-default pull-right"
+				 onclick="javascript:loadTab('${isIraAssessment ? 'iraAssessmentStudentChoices' : 'aesStudentChoices'}', ${toolContentID})">
 				<i class="fa fa-file"></i>
 				<fmt:message key="label.show.students.choices"/>
-			</a>
-		</div>      
-	</c:if>                           
-</div>
-
-<div class="row no-gutter">
-	<input type="hidden" value="${assessmentDtos[0].assessment.contentId}" id="selected-content-id">
-</div>
-<br>
-<!-- End notifications -->
-
-<!-- Tables -->
-<div class="tab-content">
-	<c:forEach var="assessmentDto" items="${assessmentDtos}" varStatus="k">
-		<div id="assessment-${assessmentDto.assessment.uid}" class="assessmentPane tab-pane 
-			<c:if test="${(k.index == 0 && toolContentID == null) || (toolContentID != null && assessmentDto.assessment.contentId == toolContentID)}">active</c:if>">
-			
-			<c:if test="${assessmentDto.assessment.allowDiscloseAnswers}">
-				<%-- Release correct/groups answers for all questions in this assessment --%>
-				<div class="row no-gutter">
-					<div class="col-xs-12 col-md-12 col-lg-12">
-						<div class="btn-group-sm pull-right disclose-all-button-group">
-							<div class="btn btn-default disclose-all-correct-button">
-								<fmt:message key="label.disclose.all.correct.answers"/>
-							</div>
-							<div class="btn btn-default disclose-all-groups-button">
-								<fmt:message key="label.disclose.all.groups.answers"/>
-							</div>
-						</div>
-						
-
+			</div>   
+		</div>                 
+	</div>
+		
+	<c:if test="${allowDiscloseAnswers}">
+		<%-- Release correct/groups answers for all questions in this assessment --%>
+		<div class="row">
+			<div class="col-xs-12 col-md-12 col-lg-12">
+				<div class="btn-group-sm pull-right disclose-all-button-group">
+					<div class="btn btn-default disclose-all-correct-button">
+						<fmt:message key="label.disclose.all.correct.answers"/>
+					</div>
+					<div class="btn btn-default disclose-all-groups-button">
+						<fmt:message key="label.disclose.all.groups.answers"/>
 					</div>
 				</div>
-			</c:if>
-			
-			<div class="results" data-tool-content-id="${assessmentDto.assessment.contentId}"></div>
+			</div>
 		</div>
-	</c:forEach>
+	</c:if>		
+
+	<div class="results" data-tool-content-id="${toolContentID}"></div>
 </div>
-<!-- End tables -->

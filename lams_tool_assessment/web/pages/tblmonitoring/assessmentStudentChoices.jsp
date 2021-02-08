@@ -39,9 +39,9 @@
 		ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : '<c:out value="${ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS_VAR}" />'
 	}),
 
-		activityCompletionChart = null,
-		answeredQuestionsChart = null,
-		COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
+	activityCompletionChart = null,
+	answeredQuestionsChart = null,
+	COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
 	
 	$(document).ready(function(){
 		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, true);

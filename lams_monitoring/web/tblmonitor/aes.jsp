@@ -16,7 +16,7 @@
 				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]').closest('li');
 
 			// load AE tab content for the given tool content ID
-			aePane.load("<lams:LAMSURL/>tool/laasse10/tblmonitoring/ae.do?toolContentID="  + toolContentId);
+			aePane.load("<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId);
 
 			// re-select the previous tab or stick to whatever is in the parameter
 			if (toolContentId == tblSelectedAeToolContentId) {
@@ -50,7 +50,7 @@
 	<ul class="nav nav-tabs">
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
 			<li>
-				<a data-toggle="tab" href="#ae-pane-${aeToolContentId}" 
+				<a data-toggle="tab" href="#assessment-pane-${aeToolContentId}" 
 				   data-tool-content-id="${aeToolContentId}">
 					<c:out value="${aeActivityTitles[status.index]}" escapeXml="false"/>
 				</a>
@@ -60,7 +60,7 @@
 			
 	<div class="tab-content">
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
-			<div id="ae-pane-${aeToolContentId}"
+			<div id="assessment-pane-${aeToolContentId}"
 				 class="tab-pane"
 				 data-tool-content-id="${aeToolContentId}">
 			</div>
