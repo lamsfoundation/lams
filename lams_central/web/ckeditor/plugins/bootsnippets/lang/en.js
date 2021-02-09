@@ -4,7 +4,7 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'bootsnippets', 'en', {
 	emptyListMsg: '(No snippets defined)',
-	insertOption: 'Replace actual contents',
+	insertOption: 'Replace existing content',
 	options: 'Snippet Options',
 	title: 'Content snippets',
 	tableButton: 'Table Snippets',
