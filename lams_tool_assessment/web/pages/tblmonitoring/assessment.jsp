@@ -5,7 +5,7 @@
 	$(document).ready(function(){
 		var assessmentPane = $('#assessment-pane-${toolContentID}');
 		//insert total learners number taken from the parent tblmonitor.jsp
-		$(".total-learners-number", assessmentPane).html(TOTAL_LESSON_LEARNERS_NUMBER);
+		$(".total-learners-number", assessmentPane).text(TOTAL_LESSON_LEARNERS_NUMBER);
 		
 		loadResultsPane($('.results', assessmentPane), false);
 	});

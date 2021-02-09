@@ -10,31 +10,41 @@
 	var tblSelectedAeToolContentId = tblSelectedAeToolContentId || '${empty param.toolContentID ? aeToolContentIds[0] : param.toolContentID}';
 
 	$(document).ready(function(){
-		$('#aes-tab .tab-pane').each(function(){
-			var aePane = $(this),
-				toolContentId = aePane.data('toolContentId'),
-				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]').closest('li');
-
-			// load AE tab content for the given tool content ID
-			aePane.load("<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId);
-
-			// re-select the previous tab or stick to whatever is in the parameter
-			if (toolContentId == tblSelectedAeToolContentId) {
-				aePane.addClass('active');
-				nav.addClass('active');
-			} else {
-				aePane.removeClass('active');
-				nav.removeClass('active');
-			}
-		});
-
+		loadAePane(tblSelectedAeToolContentId);
+		
 		// change attempted and all learners numbers
 		$('#aes-tab .nav-tabs').bind('click', function (event) {
 			var link = $(event.target);
 			// store which tab was cliked last
 			tblSelectedAeToolContentId = link.data("tool-content-id");
+			
+			loadAePane(tblSelectedAeToolContentId);
 		});
 	});
+	
+	function loadAePane(targetToolContentId){
+		$('#aes-tab .tab-pane').each(function(){
+			var aePane = $(this),
+				toolContentId = aePane.data('toolContentId'),
+				toolType = aePane.data('toolType'),
+				nav = $('#aes-tab .nav-tabs a[data-tool-content-id="' + toolContentId + '"]').closest('li');
+	
+			if (toolContentId == targetToolContentId) {
+				// load AE tab content for the given tool content ID
+				aePane.load(toolType == "d" ? 
+						 "<lams:LAMSURL/>tool/ladoku11/monitoring/ae.do?toolContentID="  + toolContentId
+						: "<lams:LAMSURL/>tool/laasse10/tblmonitoring/assessment.do?toolContentID="  + toolContentId);
+					
+				aePane.addClass('active');
+				nav.addClass('active');
+			} else {
+				aePane.empty().removeClass('active');
+				nav.removeClass('active');
+			}
+		});
+
+	}
+	
 </script>
 <div id="aes-tab">
 	<!-- Header -->
@@ -62,6 +72,7 @@
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">
 			<div id="assessment-pane-${aeToolContentId}"
 				 class="tab-pane"
+				 data-tool-type="${aeToolTypes[status.index]}"
 				 data-tool-content-id="${aeToolContentId}">
 			</div>
 		</c:forEach>

@@ -5,7 +5,6 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
-		<lams:css suffix="jquery.jRating"/>
 		
 		<style type="text/css">
 			.panel-collapse > .btn-group.btn-group-xs {

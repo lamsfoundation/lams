@@ -105,13 +105,15 @@ public class MonitoringController {
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
-		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	List<SessionDTO> groupList = dokumaranService.getSummary(contentId, null);
 	boolean hasFaultySession = false;
+	int attemptedLearnersNumber = 0;
 	for (SessionDTO group : groupList) {
 	    hasFaultySession |= group.isSessionFaulty();
+	    attemptedLearnersNumber += group.getNumberOfLearners();
 	}
 
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(contentId);
@@ -134,6 +136,7 @@ public class MonitoringController {
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(DokumaranConstants.ATTR_IS_GROUPED_ACTIVITY, dokumaranService.isGroupedActivity(contentId));
+	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	// get the API key from the config table and add it to the session
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
@@ -310,6 +313,14 @@ public class MonitoringController {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
 	dokumaranService.finishGalleryWalk(toolContentId);
+    }
+
+    @RequestMapping("/ae")
+    private String tblApplicationExcercise(HttpServletRequest request, HttpServletResponse response)
+	    throws EtherpadException {
+	summary(request, response);
+	request.setAttribute("isTbl", true);
+	return "pages/monitoring/summary";
     }
 
     private Integer getUserId() {

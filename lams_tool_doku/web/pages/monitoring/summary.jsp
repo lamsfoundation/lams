@@ -5,13 +5,14 @@
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
 
+<lams:css suffix="jquery.jRating"/>
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
 	
 <style media="screen,projection" type="text/css">
-	#countdown {
+	.doku-monitoring-summary #countdown {
 		min-width: 150px;
 		width: 100%;
 		font-size: 110%; 
@@ -21,63 +22,90 @@
 		text-align: center;
 		position: static;
 	}
-	#countdown-label {
+	
+	.doku-monitoring-summary #countdown-label {
 		font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
 	}
-	#timelimit-expired {
+	
+	.doku-monitoring-summary #timelimit-expired {
 		font-size: 145%; padding: 15px;
 	}
 		
-	.jGrowl {
+	.doku-monitoring-summary .jGrowl {
 	  	font-size: 22px;
 	  	font-family: arial, helvetica, sans-serif;
 	  	margin-left: 120px;
 	}
-	.jGrowl-notification {
+	.doku-monitoring-summary .jGrowl-notification {
 		opacity: .6;
 		border-radius: 10px;
 		width: 260px;
 		padding: 10px 20px;
 		margin: 10px 20px;
 	}
-	.jGrowl-message {
+	
+	.doku-monitoring-summary .jGrowl-message {
 		padding-left: 10px;
 		padding-top: 5px;
 	}
 	
-	.panel {
+	.doku-monitoring-summary .panel {
 		overflow: auto;
 	}
-	#control-buttons {
-		padding-bottom: 20px;
+	
+	.doku-monitoring-summary #control-buttons {
+		float: right;
+		margin-bottom: 20px;
 	}
 	
-	#gallery-walk-start {
+	.doku-monitoring-summary #gallery-walk-start {
 		margin-left: 20px;
 	}
 	
-	#gallery-walk-rating-table {
+	.doku-monitoring-summary #gallery-walk-rating-table {
 		width: 60%;
 		margin: 50px auto;
 		border-bottom: 1px solid #ddd;
 	}
 	
-	#gallery-walk-rating-table th {
+	.doku-monitoring-summary #gallery-walk-rating-table th {
 		font-weight: bold;
 		font-style: normal;
 		text-align: center;
 	}
 	
-	#gallery-walk-rating-table td {
+	.doku-monitoring-summary #gallery-walk-rating-table td {
 		text-align: center;
 	}
 	
-	#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
+	.doku-monitoring-summary #gallery-walk-rating-table th:first-child, .doku-monitoring-summary #gallery-walk-rating-table td:first-child {
 		text-align: right;
 	}
 	
-	.tablesorter tbody > tr > td > div[contenteditable=true]:focus {
+	.doku-monitoring-summary .tablesorter tbody > tr > td > div[contenteditable=true]:focus {
 	  outline: #337ab7 2px solid;
+	}
+	
+	.doku-monitoring-summary #no-session-summary, .doku-monitoring-summary .attendance-row {
+		margin-right: 0;
+	}
+	
+	/* We need to overwrite settings coming from main CSS as in Doku monitoring they look different */
+	
+	.doku-monitoring-summary .ts-pager {
+	    color: black;
+	}
+	
+	.doku-monitoring-summary .ts-pager .btn {
+	    background-color: #eee;
+	}
+	.doku-monitoring-summary .tablesorter tfoot th {
+		background-color: #eee !important;
+	}
+	
+	.doku-monitoring-summary .pagesize {
+	    border: black;
+	    background: white;
 	}
 </style>
 
@@ -108,7 +136,7 @@
 	
 	$(document).ready(function(){
 		// show etherpads only on Group expand
-		$('.etherpad-collapse').on('show.bs.collapse', function(){
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} .etherpad-collapse').on('show.bs.collapse', function(){
 			var etherpad = $('.etherpad-container', this);
 			if (!etherpad.hasClass('initialised')) {
 				var id = etherpad.attr('id'),
@@ -117,7 +145,7 @@
 			}
 		});
 		
-		$(".fix-faulty-pad").click(function() {
+		$("#doku-monitoring-summary-${sessionMap.toolContentID} .fix-faulty-pad").click(function() {
 			var toolSessionId = $(this).data("session-id");
 			var button = $(this);
 			
@@ -162,7 +190,7 @@
 			displayCountdown();
 		}
 		
-		$("#start-activity").click(function() {
+		$("#doku-monitoring-summary-${sessionMap.toolContentID} #start-activity").click(function() {
 			var button = $(this);
 			button.hide();
 			
@@ -181,7 +209,7 @@
                     );
                 	
                 	//unpause countdown
-                	$('#countdown').countdown('resume');
+                	$('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown').countdown('resume');
                 	isCountdownStarted = true;
 	            },
 	            error: function (request, status, error) {
@@ -193,7 +221,7 @@
 	        return false;
 		});
 		
-		$("#add-one-minute").click(function() {
+		$("#doku-monitoring-summary-${sessionMap.toolContentID} #add-one-minute").click(function() {
 			var button = $(this);
 			
 	        $.ajax({
@@ -202,16 +230,17 @@
 	            data : 'toolContentID=${sessionMap.toolContentID}',
 	            type: 'post',
 	            success: function (response) {
-	            	var times = $("#countdown").countdown('getTimes');
+		            var countdown = $('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown');
+	            	var times = countdown.countdown('getTimes');
 	            	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
 	            	if (isCountdownStarted) {
-		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
+	            		countdown.countdown('option', { until: '+' + secondsLeft + 'S' });
 		            
 		            //fixing countdown bug of not updating it in case if being paused 
 	            	} else {
-	            		$('#countdown').countdown('resume');
-		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
-		            	$('#countdown').countdown('pause');
+	            		countdown.countdown('resume');
+	            		countdown.countdown('option', { until: '+' + secondsLeft + 'S' });
+	            		countdown.countdown('pause');
 	            	}
 	            	
 	            },
@@ -225,7 +254,7 @@
 		
 		
 		// marks table for each group
-		var tablesorters = $(".tablesorter");
+		var tablesorters = $("#doku-monitoring-summary-${sessionMap.toolContentID} .tablesorter");
 		// intialise tablesorter tables
 		tablesorters.tablesorter({
 			theme: 'bootstrap',
@@ -347,10 +376,15 @@
 			  }
 			});
 		});
+
+		<c:if test="${isTbl}">
+			//insert total learners number taken from the parent tblmonitor.jsp
+			$("#doku-monitoring-summary-${sessionMap.toolContentID} .total-learners-number").text(TOTAL_LESSON_LEARNERS_NUMBER);
+		</c:if>
 	});
 	
 	function displayCountdown() {		
-		$('#countdown').countdown({
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown').countdown({
 			until: '+${sessionMap.secondsLeft}S',
 			format: 'hMS',
 			compact: true,
@@ -358,9 +392,9 @@
 			onTick: function(periods) {
 				//check for 30 seconds
 				if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
-					$('#countdown').css('color', '#FF3333');
+					$('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown').css('color', '#FF3333');
 				} else {
-					$('#countdown').css('color', '#47bc23');
+					$('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown').css('color', '#47bc23');
 				}					
 			},
 			onExpiry: function(periods) {
@@ -369,7 +403,7 @@
 		
 		//pause countdown in case it hasn't been yet started
 		if (${empty dokumaran.timeLimitLaunchedDate}) {
-			$('#countdown').countdown('pause');
+			$('#doku-monitoring-summary-${sessionMap.toolContentID} #countdown').countdown('pause');
 		}
 	}
 	
@@ -384,8 +418,10 @@
 				toolContentID : ${dokumaran.contentId}
 			},
 			'success' : function(){
-				$('#gallery-walk-start, #countdown, #add-one-minute, #start-activity').hide();
-				$('#gallery-walk-finish').removeClass('hidden');
+				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-start, ' +
+				  '#doku-monitoring-summary-${sessionMap.toolContentID} #countdown, ' + 
+				  '#doku-monitoring-summary-${sessionMap.toolContentID} #add-one-minute, #start-activity').hide();
+				$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').removeClass('hidden');
 			}
 		});
 	}
@@ -403,7 +439,7 @@
 			'success' : function(){
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkReadOnly}">
-						$('#gallery-walk-finish').hide();
+						$('#doku-monitoring-summary-${sessionMap.toolContentID} #gallery-walk-finish').hide();
 					</c:when>
 					<c:otherwise>
 						location.reload();
@@ -415,7 +451,7 @@
 
 
 	function showChangeLeaderModal(toolSessionId) {
-		$('#change-leader-modals').empty()
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
 		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
 			toolSessionID : toolSessionId
 		});
@@ -448,184 +484,207 @@
 <script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
-<div class="panel">
-	<h4>
-	    <c:out value="${dokumaran.title}" escapeXml="true"/>
-	</h4>
+<!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
+<div id="doku-monitoring-summary-${sessionMap.toolContentID}" class="doku-monitoring-summary">
+	<div class="panel">
+		<c:choose>
+			<c:when test="${isTbl}">
+				<div class="row attendance-row">
+					<div class="col-xs-6 col-sm-4">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<i class="fa fa-users" style="color:gray" ></i> 
+									<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
+								</h4> 
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<h4>
+				    <c:out value="${dokumaran.title}" escapeXml="true"/>
+				</h4>
+				
+				<c:out value="${dokumaran.description}" escapeXml="false"/>
+			</c:otherwise>
+		</c:choose>
 	
-	<c:out value="${dokumaran.description}" escapeXml="false"/>
 	
+		<c:if test="${empty summaryList}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				 <fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:if>
+		
+		<!--For release marks feature-->
+		<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
+		<div id="message-area"></div>
 	
-	<c:if test="${empty summaryList}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			 <fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
-	
-	<!--For release marks feature-->
-	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
-	<div id="message-area"></div>
-
-	<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
-		<div class="pull-right" id="control-buttons">
-	
-			<c:if test="${dokumaran.timeLimit > 0 and not dokumaran.galleryWalkStarted}">
-				<div id="countdown"></div>
-			
-				<c:if test="${empty dokumaran.timeLimitLaunchedDate and dokumaran.timeLimitManualStart}">
-					<a href="#nogo" class="btn btn-default" id="start-activity">
-						<fmt:message key="label.start.activity" />
-					</a>		
+		<c:if test="${dokumaran.timeLimit > 0 or dokumaran.galleryWalkEnabled}">
+			<div id="control-buttons">
+		
+				<c:if test="${dokumaran.timeLimit > 0 and not dokumaran.galleryWalkStarted}">
+					<div id="countdown"></div>
+				
+					<c:if test="${empty dokumaran.timeLimitLaunchedDate and dokumaran.timeLimitManualStart}">
+						<a href="#nogo" class="btn btn-default" id="start-activity">
+							<fmt:message key="label.start.activity" />
+						</a>		
+					</c:if>
+					
+					<a href="#nogo" class="btn btn-default" id="add-one-minute">
+						<fmt:message key="label.plus.one.minute" />
+					</a>	
 				</c:if>
 				
-				<a href="#nogo" class="btn btn-default" id="add-one-minute">
-					<fmt:message key="label.plus.one.minute" />
-				</a>	
-			</c:if>
+				<c:if test="${not empty summaryList and dokumaran.galleryWalkEnabled}">
+					<button id="gallery-walk-start" type="button"
+					        class="btn btn-default 
+					        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+					        onClick="javascript:startGalleryWalk()">
+						<fmt:message key="monitoring.summary.gallery.walk.start" /> 
+					</button>
+					
+					<button id="gallery-walk-finish" type="button"
+					        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+					        onClick="javascript:finishGalleryWalk()">
+						<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
+					</button>
+				</c:if>
+			</div>
 			
-			<c:if test="${dokumaran.galleryWalkEnabled}">
-				<button id="gallery-walk-start" type="button"
-				        class="btn btn-default 
-				        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
-				        onClick="javascript:startGalleryWalk()">
-					<fmt:message key="monitoring.summary.gallery.walk.start" /> 
-				</button>
-				
-				<button id="gallery-walk-finish" type="button"
-				        class="btn btn-default ${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
-				        onClick="javascript:finishGalleryWalk()">
-					<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
-				</button>
-			</c:if>
-		</div>
-		
-		<br>
+			<br>
+		</c:if>
+	</div>
+
+	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
+		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
+		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
+		  <thead class="thead-light">
+		    <tr>
+		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
+		      <th scope="col"><fmt:message key="label.rating" /></th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			<c:forEach var="groupSummary" items="${summaryList}">
+				<tr>
+					<td>${groupSummary.sessionName}</td>
+					<td>
+						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+									 isItemAuthoredByUser="true"
+									 hideCriteriaTitle="true" />
+					</td>
+				</tr>
+			</c:forEach>
+		  </tbody>
+		</table>
 	</c:if>
-</div>
-
-<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-	<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-	  <thead class="thead-light">
-	    <tr>
-	      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-	      <th scope="col"><fmt:message key="label.rating" /></th>
-	    </tr>
-	  </thead>
-	  <tbody>
-		<c:forEach var="groupSummary" items="${summaryList}">
-			<tr>
-				<td>${groupSummary.sessionName}</td>
-				<td>
-					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
-								 isItemAuthoredByUser="true"
-								 hideCriteriaTitle="true" />
-				</td>
-			</tr>
-		</c:forEach>
-	  </tbody>
-	</table>
-</c:if>
-
-<c:if test="${sessionMap.isGroupedActivity}">
-	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
-</c:if>
-
-<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	<c:choose>
-		<c:when test="${sessionMap.isGroupedActivity}">		
-		    <div class="panel panel-default" >
-	        <div class="panel-heading" id="heading${groupSummary.sessionId}">
-	        	<span class="panel-title collapsable-icon-left">
-	        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-						<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
-					</a>
-				</span>
-				<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
-					<button type="button" class="btn btn-default btn-xs pull-right"
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	</c:if>
+	
+	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+		<c:choose>
+			<c:when test="${sessionMap.isGroupedActivity}">		
+			    <div class="panel panel-default" >
+		        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+		        	<span class="panel-title collapsable-icon-left">
+		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+								aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
+							<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+						</a>
+					</span>
+					<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+						<button type="button" class="btn btn-default btn-xs pull-right"
+								onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
+							<fmt:message key='label.monitoring.change.leader'/>
+						</button>
+					</c:if>
+		        </div>
+		        
+		        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+		        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+			</c:when>
+			<c:when test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
+				<div style="text-align: right">
+					<button type="button" class="btn btn-default" style="margin-bottom: 10px"
 							onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
 						<fmt:message key='label.monitoring.change.leader'/>
 					</button>
-				</c:if>
-	        </div>
-	        
-	        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
-	        	 role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
-		</c:when>
-		<c:when test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
-			<div style="text-align: right">
-				<button type="button" class="btn btn-default" style="margin-bottom: 10px"
-						onClick="javascript:showChangeLeaderModal(${groupSummary.sessionId})">
-					<fmt:message key='label.monitoring.change.leader'/>
-				</button>
-			</div>
-		</c:when>
-	</c:choose>
-	
-	<c:choose>
-		<c:when test="${groupSummary.sessionFaulty}">
+				</div>
+			</c:when>
+		</c:choose>
 		
-			<div class="faulty-pad-container">
-				<fmt:message key="label.cant.display.faulty.pad" />
+		<c:choose>
+			<c:when test="${groupSummary.sessionFaulty}">
+			
+				<div class="faulty-pad-container">
+					<fmt:message key="label.cant.display.faulty.pad" />
+					
+					<a href="#nogo" class="btn btn-default btn-xs fix-faulty-pad" data-session-id="${groupSummary.sessionId}">
+						<fmt:message key="label.recreate.faulty.pad" />
+					</a>
+				</div>
+										
+			</c:when>
+			<c:otherwise>
+				<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
+					<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
+				</c:if>
 				
-				<a href="#nogo" class="btn btn-default btn-xs fix-faulty-pad" data-session-id="${groupSummary.sessionId}">
-					<fmt:message key="label.recreate.faulty.pad" />
-				</a>
-			</div>
-									
-		</c:when>
-		<c:otherwise>
-			<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
-				<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
-			</c:if>
-			
-			<div class="btn-group btn-group-xs pull-right">
-				<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
-				<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
-						title="<fmt:message key="label.export.pad.html" />">
-					<i class="fa fa-lg fa-file-text-o"></i>
-					<fmt:message key="label.export.pad.html" />
-				</a>
-			</div>	
-			
-			<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
-						   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
-						   heightAutoGrow="true" height="600" />	
-		</c:otherwise>
-	</c:choose>
+				<div class="btn-group btn-group-xs pull-right">
+					<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
+					<a href="#nogo" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
+							title="<fmt:message key="label.export.pad.html" />">
+						<i class="fa fa-lg fa-file-text-o"></i>
+						<fmt:message key="label.export.pad.html" />
+					</a>
+				</div>	
+				
+				<lams:Etherpad groupId="${groupSummary.sessionId}" padId="${groupSummary.padId}"
+							   showControls="true" showChat="${dokumaran.showChat}" showOnDemand="${sessionMap.isGroupedActivity}"
+							   heightAutoGrow="true" height="600" />	
+			</c:otherwise>
+		</c:choose>
+		
 	
-
-	<!-- Editable marks section -->
-	<div class="voffset10">	
-		<h4>
-		   <fmt:message key="label.monitoring.learner.marks.header"/>
-		</h4>
-		<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
-			<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
-			<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
-			<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
-				<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
-			</th>
-		</lams:TSTable>
-	</div>
+		<!-- Editable marks section -->
+		<div class="voffset10">	
+			<h4>
+			   <fmt:message key="label.monitoring.learner.marks.header"/>
+			</h4>
+			<lams:TSTable numColumns="3" dataId='toolSessionId="${groupSummary.sessionId}"'>
+				<th><fmt:message key="label.monitoring.learner.marks.first.name"/></th>
+				<th><fmt:message key="label.monitoring.learner.marks.last.name"/></th>
+				<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
+					<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
+				</th>
+			</lams:TSTable>
+		</div>
+		
+		<c:if test="${sessionMap.isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
+	</c:forEach>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
-		</div> <!-- end collapse area  -->
-		</div> <!-- end collapse panel  -->
+		</div> <!--  end accordianSessions --> 
 	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
+	<c:if test="${sessionMap.dokumaran.reflectOnActivity}">
+		<%@ include file="reflections.jsp"%>
+	</c:if>
 	
-</c:forEach>
-
-<c:if test="${sessionMap.isGroupedActivity}">
-	</div> <!--  end accordianSessions --> 
-</c:if>
+	<c:if test="${not isTbl}">
+		<%@ include file="advanceoptions.jsp"%>
+	</c:if>
 	
-<c:if test="${sessionMap.dokumaran.reflectOnActivity}">
-	<%@ include file="reflections.jsp"%>
-</c:if>
-
-<%@ include file="advanceoptions.jsp"%>
-
-<div id="change-leader-modals"></div>
+	<div id="change-leader-modals"></div>
+</div>

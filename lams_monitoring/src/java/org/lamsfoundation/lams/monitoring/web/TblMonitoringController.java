@@ -265,9 +265,11 @@ public class TblMonitoringController {
     @RequestMapping("/aes")
     public String aes(HttpServletRequest request, Model model) {
 	String[] toolContentIds = request.getParameter("aeToolContentIds").split(",");
+	String[] toolTypes = request.getParameter("aeToolTypes").split(",");
 	String[] activityTitles = request.getParameter("aeActivityTitles").split("\\,");
 
 	model.addAttribute("aeToolContentIds", toolContentIds);
+	model.addAttribute("aeToolTypes", toolTypes);
 	model.addAttribute("aeActivityTitles", activityTitles);
 
 	return "tblmonitor/aes";
@@ -385,6 +387,7 @@ public class TblMonitoringController {
 	boolean scratchiePassed = false;
 	boolean iraPassed = false;
 	String aeToolContentIds = "";
+	String aeToolTypes = "";
 	String aeActivityTitles = "";
 	for (Activity activity : activities) {
 	    if (activity instanceof ToolActivity) {
@@ -417,6 +420,7 @@ public class TblMonitoringController {
 		    request.setAttribute("isAeAvailable", true);
 		    //prepare assessment details to be passed to Assessment tool
 		    aeToolContentIds += toolContentId + ",";
+		    aeToolTypes += CommonConstants.TOOL_SIGNATURE_DOKU.equals(toolSignature) ? "d," : "a,";
 		    aeActivityTitles += toolTitle + "\\,";
 
 		} else if (CommonConstants.TOOL_SIGNATURE_FORUM.equals(toolSignature)) {
@@ -447,6 +451,7 @@ public class TblMonitoringController {
 	}
 
 	request.setAttribute("aeToolContentIds", aeToolContentIds);
+	request.setAttribute("aeToolTypes", aeToolTypes);
 	request.setAttribute("aeActivityTitles", aeActivityTitles);
     }
 }

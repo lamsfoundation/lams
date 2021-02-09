@@ -94,6 +94,7 @@
 			} else if (method == "aes") {
 				options = {
 					aeToolContentIds: "${aeToolContentIds}",
+					aeToolTypes: "${aeToolTypes}",
 					aeActivityTitles: "${aeActivityTitles}"
 				};
 
