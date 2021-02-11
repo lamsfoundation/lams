@@ -479,9 +479,9 @@
 						<span id="ldDescriptionHideTip">▼</span>
 					</div>
 					<div id="ldDescriptionDetails">
-						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.description" /></div>
+						<div class="ldDescriptionLabel"><label for="ldDescriptionFieldDescription"><fmt:message key="authoring.fla.page.ld.description" /></label><p class="text-muted"><i class="text-primary fa fa-info-circle" aria-hidden="true"></i> <fmt:message key="authoring.fla.page.ld.description.placeholder" /></p></div>
 						<div id="ldDescriptionEditorContainer">
-							 <lams:CKEditor id="ldDescriptionFieldDescription" value="" contentFolderID="${contentFolderID}"></lams:CKEditor>
+							<lams:CKEditor id="ldDescriptionFieldDescription" contentFolderID="${contentFolderID}" value=""></lams:CKEditor>
 						</div>
 
 						<div id="ldLicenseDetails">						

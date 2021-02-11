@@ -245,12 +245,6 @@
 			initLearnersTab();
 			initGradebookTab();
 			refreshMonitor();
-			<c:if test="${not empty lesson.lessonIntro}">
-				$('#intro').readmore({
-					speed: 500,
-					collapsedHeight: 85
-				});
-			</c:if>
 			<c:if test="${not empty lesson.learningDesignDescription}">
 				$('#description').readmore({
 					speed: 500,
@@ -353,14 +347,6 @@
 									<dd id="tabLessonLessonDescription">
 										<div id="description">
 											<c:out value="${lesson.learningDesignDescription}" escapeXml="false"/>
-										</div>
-									</dd>
-								</c:if>
-								<c:if test="${not empty lesson.lessonIntro}">
-									<dt><fmt:message key="lesson.intro"/></dt>
-									<dd id="tabLessonLessonIntro">
-										<div id="intro">
-											<c:out value="${lesson.lessonIntro}" escapeXml="false"/>
 										</div>
 									</dd>
 								</c:if>

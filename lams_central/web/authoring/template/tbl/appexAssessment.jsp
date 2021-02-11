@@ -33,7 +33,6 @@
 		<span>&nbsp;</span>
 		<i class='fa fa-sm fa-pencil'></i>
 		<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
-		<span><fmt:message key="authoring.label.application.exercise.type.assessment"/></span>
      </div>
     
     <div id="collapseAppex${appexNumber}" class="panel-collapse collapse in" 
@@ -54,25 +53,27 @@
                     <li>
                     	<a href="javascript:void(0)" id="divass${appexNumber}CEssay"
                     	   onclick="javascript:createAssessment('essay', 'numAssessments${appexNumber}', 'divass${appexNumber}');">
-                    		<i class="fa fa-align-justify text-primary"></i> <fmt:message key="authoring.create.essay.question"/>
+                    		<i class="fa fa-align-justify fa-fw text-primary"></i> <fmt:message key="authoring.create.essay.question"/>
                     	</a>
                     </li>
                     <li>
                     	<a href="javascript:void(0)" id="divass${appexNumber}CMCQ"
                     	   onclick="javascript:createAssessment('mcq', 'numAssessments${appexNumber}', 'divass${appexNumber}');">
-                    	   	<i class="fa fa-list-ul text-primary"></i> <fmt:message key="authoring.create.mc.question"/>
+                    	   	<i class="fa fa-list-ul fa-fw text-primary"></i> <fmt:message key="authoring.create.mc.question"/>
                     	</a>
                     </li>
                      <li>
                     	<a href="javascript:void(0)"
                     	   onclick="javascript:createApplicationExercise('doku', ${appexNumber})">
-                    	   	<i class="fa fa-list-ul text-primary"></i> <fmt:message key="authoring.create.doku.question"/>
+                    	   	<i class="fa fa-file-text fa-fw text-primary"></i> <fmt:message key="authoring.create.doku.question"/>&nbsp;&nbsp; 
+							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.create.doku.question.tooltip"/>"></i>
+
                     	</a>
                     </li>
                     <li>
                     	<a href="javascript:void(0)" id="divass${appexNumber}CQB"
                     	   onClick="javascript:openQuestionBank(${appexNumber})">
-                    	   	<i class="fa fa-bank text-primary"></i> <fmt:message key="authoring.create.question.qb" />
+                    	   	<i class="fa fa-bank fa-fw text-primary"></i> <fmt:message key="authoring.create.question.qb" />
                     	</a>
                    	</li>
                     <li role="separator" class="divider"></li>
@@ -80,12 +81,12 @@
                     <li>
                     	<a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CQTI"
                     	   onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,es', 'word')">
-                    		<i class="fa fa-file-word-o text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
+                    		<i class="fa fa-file-word-o fa-fw text-primary"></i> <fmt:message key="label.qb.collection.word"/>...
                     	</a>
                     </li>
                   	<li><a style="margin-left: 1em;" href="javascript:void(0)" id="divass${appexNumber}CWord"
                   		   onClick="javascript:importQTI('appex${appexNumber}', 'mc,mr,es', 'qti')">
-                  		   	<i class="fa fa-file-code-o text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
+                  		   	<i class="fa fa-file-code-o fa-fw text-primary"></i> <fmt:message key="label.qb.collection.qti"/>...
                   		</a>
                   	</li>
                 </ul>

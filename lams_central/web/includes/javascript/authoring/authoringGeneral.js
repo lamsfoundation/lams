@@ -2362,7 +2362,10 @@ GeneralLib = {
 				
 				// if it is a support activity, grouping does not need to be connected with it
 				// it just needs to exist
-				if (coreActivity.parentActivity instanceof ActivityDefs.FloatingActivity) {
+				if (coreActivity.parentActivity && 
+					 (coreActivity.parentActivity instanceof ActivityDefs.FloatingActivity 
+				     || coreActivity.parentActivity.parentActivity instanceof ActivityDefs.FloatingActivity)) {
+					// above: parent of parent check is because a parallel activity can be a support activity
 					if (!coreActivity.grouping) {
 						return true;
 					}

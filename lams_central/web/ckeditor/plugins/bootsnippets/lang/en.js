@@ -4,7 +4,7 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'bootsnippets', 'en', {
 	emptyListMsg: '(No snippets defined)',
-	insertOption: 'Replace actual contents',
+	insertOption: 'Replace existing content',
 	options: 'Snippet Options',
 	title: 'Content snippets',
 	tableButton: 'Table Snippets',
@@ -23,6 +23,8 @@ CKEDITOR.plugins.setLang( 'bootsnippets', 'en', {
 	textPanel: 'Panel (heading and body)',
 	textPanelFooter: 'Panel (heading, body and footer)',
 	textJumbotron: 'Jumbotron with text',
+	textWaveHeaders: 'Header Waves',
+    textWaveHeadersDesc:  'New headers with waves. You can change the colour by double clicking on it.',
 	
 	imageCenteredImage: 'Centered image',
 	imageImageFullWidth: 'Image full width',

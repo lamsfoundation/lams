@@ -30,21 +30,24 @@
 		<span>&nbsp;</span>
 		<i class='fa fa-sm fa-pencil'></i>
 		<input type="hidden" name="${appexTitleField}" id="${appexTitleField}" value="${appexTitle}"/>
-		<span><fmt:message key="authoring.label.application.exercise.type.doku"/></span>
      </div>
     
     <div id="collapseAppex${param.appexNumber}" class="panel-body panel-collapse collapse in" 
     	 role="tabpanel" aria-labelledby="headingAppex${param.appexNumber}">	
 		<div class="form-group">
-		    <label for="divappex${param.appexNumber}dokuDescription"><fmt:message key="authoring.label.application.exercise.doku.description" /></label>
-		    <lams:CKEditor id="divappex${param.appexNumber}dokuDescription" value="" contentFolderID="${param.contentFolderID}"/>
+		    <label for="divappex${param.appexNumber}dokuDescription">
+				<fmt:message key="authoring.label.application.exercise.doku.description" />&nbsp;
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.description.tooltop"/>"></i>
+			</label>
+		    <lams:CKEditor id="divappex${param.appexNumber}dokuDescription" value="" contentFolderID="${param.contentFolderID}" height="100"/>
 		</div>
 		
 		<div class="form-group">
 		    <label for="divappex${param.appexNumber}dokuInstructions">
-		    	<fmt:message key="authoring.label.application.exercise.doku.instructions" />
+		    	<fmt:message key="authoring.label.application.exercise.doku.instructions" /> &nbsp;
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="<fmt:message key="authoring.label.application.exercise.doku.instructions.tooltop"/>"></i>
 		    </label>
-		    <lams:CKEditor id="divappex${param.appexNumber}dokuInstructions" value="" contentFolderID="${param.contentFolderID}" height="200" toolbarSet="DefaultDoku" method="inline"/>
+		    <lams:CKEditor id="divappex${param.appexNumber}dokuInstructions" value="" contentFolderID="${param.contentFolderID}" height="100" toolbarSet="DefaultDoku" method="inline"/>
 		</div>
 
 		<div class="space-top space-sides space-bottom">
