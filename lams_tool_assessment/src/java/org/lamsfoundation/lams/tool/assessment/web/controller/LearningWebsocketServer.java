@@ -40,7 +40,10 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
     protected Logger getLog() {
 	return log;
     }
-
+    
+    /**
+     * Gets settings from DB.
+     */
     @Override
     protected TimeCache getExistingTimeSettings(long toolContentId, Collection<Integer> userIds) {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
@@ -76,9 +79,11 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	return result;
     }
 
+    /**
+     * Fetches or creates a singleton of this websocket server.
+     */
     public static Long getSecondsLeft(long toolContentId, int userId) {
 	LearningWebsocketServer instance = LearningWebsocketServer.getInstance();
-	TimeCache timeCache = instance.timeCaches.get(toolContentId);
-	return timeCache == null ? null : instance.getSecondsLeft(timeCache, userId);
+	return AbstractTimeLimitWebsocketServer.getSecondsLeft(instance, toolContentId, userId, true);
     }
 }

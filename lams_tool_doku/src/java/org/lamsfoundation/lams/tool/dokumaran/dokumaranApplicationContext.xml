@@ -64,6 +64,9 @@
    		<property name="learnerService">
    			<ref bean="learnerService"/>
    		</property>
+   		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
    		<property name="ratingService">
    			<ref bean="ratingService"/>
    		</property>

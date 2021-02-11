@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -299,6 +300,24 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	}
     }
 
+    protected static Long getSecondsLeft(AbstractTimeLimitWebsocketServer instance, long toolContentId, int userId,
+	    boolean getCurrentLaunchedDateByDefault) {
+	// get time from cache
+	TimeCache timeCache = instance.timeCaches.get(toolContentId);
+	if (timeCache == null) {
+	    // if the requested learner is first to enter the activity, there is no cache yet,
+	    // so fetch data straight from DB
+	    timeCache = instance.getExistingTimeSettings(toolContentId, Arrays.asList(userId));
+	    LocalDateTime timeLimitLaunchedDate = timeCache.timeLimitLaunchedDate.get(userId);
+	    if (timeLimitLaunchedDate == null && getCurrentLaunchedDateByDefault) {
+		// temporarily set launch date to now
+		// it will properly set by next sendWorker run
+		timeCache.timeLimitLaunchedDate.put(userId, LocalDateTime.now());
+	    }
+	}
+	return instance.getSecondsLeft(timeCache, userId);
+    }
+
     protected Long getSecondsLeft(TimeCache timeCache, int userId) {
 	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
 	    // no time limit is set at all
@@ -312,6 +331,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	if (timeCache.absoluteTimeLimit != null) {
 	    // the limit is same for everyone
 	    finish = timeCache.absoluteTimeLimit;
+	} else if (launchedDate == null) {
+	    return null;
 	} else {
 	    // the limit is his entry plus relative time limit
 	    finish = launchedDate.plusSeconds(timeCache.relativeTimeLimit);

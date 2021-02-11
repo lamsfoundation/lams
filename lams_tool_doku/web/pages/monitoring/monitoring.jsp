@@ -20,8 +20,6 @@
 			.faulty-pad-container a{
 				margin-left: 10px;
 			}
-			
-			    margin-top: -33px;
 		</style>
 		
 		<script>

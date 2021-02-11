@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.dokumaran;
 public class DokumaranConstants {
     public static final String TOOL_SIGNATURE = "ladoku11";
 
-    public static final String RESOURCE_SERVICE = "dokumaranService";
+    public static final String DOKUMARAN_SERVICE = "dokumaranService";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "dokumaranToolContentHandler";
 

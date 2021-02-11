@@ -328,7 +328,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public boolean checkTimeLimitExceeded(long toolContentId, int userId) {
 	Long secondsLeft = LearningWebsocketServer.getSecondsLeft(toolContentId, userId);
-	return secondsLeft != null && secondsLeft.equals(0);
+	return secondsLeft != null && secondsLeft.equals(0L);
     }
 
     @Override

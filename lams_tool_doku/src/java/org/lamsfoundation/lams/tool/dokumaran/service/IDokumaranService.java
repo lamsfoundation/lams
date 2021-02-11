@@ -24,11 +24,13 @@
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 
 import org.lamsfoundation.lams.etherpad.EtherpadException;
+import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -36,6 +38,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -106,28 +109,15 @@ public interface IDokumaranService extends ICommonToolService {
 
     /**
      * Stores date when user has started activity with time limit.
-     *
-     * @param toolContentId
-     * @throws IOException
-     * @throws JSONException
      */
-    void launchTimeLimit(Long toolContentId) throws IOException;
-
-    void addOneMinute(Long toolContentId) throws IOException;
+    LocalDateTime launchTimeLimit(long toolContentId, int userId);
 
     /**
-     * Calculates how many seconds left till the time limit will expire.
-     *
-     * @param assessment
-     * @return
-     */
-    long getSecondsLeft(Dokumaran dokumaran);
-
-    /**
-     * @param assessment
      * @return whether the time limit is exceeded already
      */
-    boolean checkTimeLimitExceeded(Dokumaran dokumaran);
+    boolean checkTimeLimitExceeded(Dokumaran dokumaran, int userId);
+
+    List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
 
     Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
 	    throws DokumaranApplicationException, EtherpadException;
@@ -241,4 +231,6 @@ public interface IDokumaranService extends ICommonToolService {
     void finishGalleryWalk(long toolContentId) throws IOException;
 
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
+    
+    Grouping getGrouping(long toolContentId);
 }
